@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.2'
+    id 'io.spring.dependency-management' version '1.1.0'
+}
+
+group = 'cn.shmedo.monitor'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+repositories {
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    mavenCentral()
+    maven {
+        url 'http://nexus.shmedo.cn/repository/maven-releases/'
+        allowInsecureProtocol true
+        credentials {
+            username = 'medo_ldd'
+            password = 'medo420529'
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.16'
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
+    implementation 'com.alibaba:druid-spring-boot-starter:1.2.15'
+    implementation 'com.baomidou:mybatis-plus-boot-starter:3.5.3.1'
+    implementation('org.mybatis:mybatis:3.5.6')
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.4")
+    implementation group: 'com.alibaba.boot', name: 'nacos-config-spring-boot-starter', version: '0.2.12'
+    implementation("cn.shmedo.iot:entity:1.0.56")
+
+
+    implementation group: 'io.github.openfeign', name: 'feign-core', version: '10.0.1'
+    implementation group: 'io.github.openfeign', name: 'feign-jackson', version: '10.0.1'
+    implementation group: 'io.github.openfeign', name: 'feign-okhttp', version: '10.0.1'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    implementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.11'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'junit:junit:4.13.1'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
