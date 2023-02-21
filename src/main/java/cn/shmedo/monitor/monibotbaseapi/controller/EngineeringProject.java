@@ -87,7 +87,6 @@ public class EngineeringProject {
      * @apiSuccess (返回结果) {String} projectAddress.province 行政区划-省
      * @apiSuccess (返回结果) {String} projectAddress.city 行政区划-市
      * @apiSuccess (返回结果) {String} projectAddress.county 行政区划-区/县
-     * @apiSuccess (返回结果) {String} projectAddress.village 行政区划-村
      * @apiSuccess (返回结果) {String} projectAddress.fullAddress 详细地址
      * @apiSuccess (返回结果) {Basicdevelopment[]}  basicData 基础拓展信息
      * @apiSuccess (返回结果) {String} basicData.river 所在河流
@@ -106,6 +105,65 @@ public class EngineeringProject {
     @RequestMapping(value = "/QueryProjectData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
     public Object quickProjectData(int projcetId){
+        return null;
+    }
+
+    /**
+     * @api {post} /UpdateProjectData 工程项目编辑
+     * @apiDescription 工程项目编辑
+     * @apiVersion 1.0
+     * @apiGroup 工程项目管理
+     * @apiName UpdateProjectData
+     * @apiParam {projectDto} projectDto 基本信息请求参数
+     * @apiParam {int} projectDto.projectID 项目id
+     * @apiParam {String} projectDto.projectName 项目名称
+     * @apiParam {String} {String} projectDto.abbreviation 项目简称
+     * @apiParam {String} projectDto.managementUnit 项目直接管理单位（直管单位）
+     * @apiParam {DateTime} projectDto.validityPeriod 有效期
+     * @apiParam {int} projectDto.projectStatus 项目状态
+     * @apiParam {int} projectDto.label 项目标签
+     * @apiParam {clientEnterprise[]} clientEnterprise 客户企业
+     * @apiParam {Int} clientEnterprise.client 客户企业id
+     * @apiParam {String} clientEnterprise.clientEnterprise 客户企业名称
+     * @apiParam {String} clientEnterprise.contactPerson 联系人
+     * @apiParam {int} clientEnterprise.phone 联系人电话
+     * @apiParam {String} clientEnterprise.address 联系人地址
+     * @apiParam {String} clientEnterprise.introduction 简介
+     * @apiParam {String} {projectAddress[]} projectAddress 项目地址信息列表
+     * @apiParam {String} {String} projectAddress.province 行政区划-省
+     * @apiParam {String}) {String} projectAddress.city 行政区划-市
+     * @apiParam {String} {String} projectAddress.county 行政区划-区/县
+     * @apiParam {String} {String} projectAddress.fullAddress 详细地址
+     * @apiSuccess (返回结果) {String} message 信息
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    @RequestMapping(value = "/UpdateProjectData", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    @Permission
+    public Object updateProjectData(Object a){
+        return null;
+    }
+
+    /**
+     * @api {POST} /QuickClientEnterprise 查询客户企业信息
+     * @apiDescription 查询客户企业信息
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理
+     * @apiName QuickClientEnterprise
+     * @apiParam (请求体) {String} clientEnterprise 客户企业名称
+     * @apiSuccess (返回结果) {clientEnterprise[]} clientEnterprise 客户企业信息列表
+     * @apiSuccess (返回结果) {Int} clientEnterprise.client 客户企业id
+     * @apiSuccess (返回结果) {String} clientEnterprise.clientEnterprise 客户企业名称
+     * @apiSuccess (返回结果) {String} clientEnterprise.contactPerson 联系人
+     * @apiSuccess (返回结果) {int} clientEnterprise.phone 联系人电话
+     * @apiSuccess (返回结果) {String} clientEnterprise.address 联系人地址
+     * @apiSuccess (返回结果) {String} clientEnterprise.introduction 简介
+     * @apiSampleRequest off
+     * @apiPermission xx权限:
+     */
+    @RequestMapping(value = "/QuickClientEnterprise", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    @Permission
+    public Object quickClientEnterprise(String name){
         return null;
     }
 }
