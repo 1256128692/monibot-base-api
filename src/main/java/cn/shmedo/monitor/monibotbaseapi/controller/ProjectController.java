@@ -95,7 +95,7 @@ public class ProjectController {
     }
 
     /**
-     * @api {POST} /  QueryModelList 查询模板
+     * @api {POST} /QueryModelList 查询模板
      * @apiVersion 1.0.0
      * @apiGroup 项目模块
      * @apiName QueryModelList
