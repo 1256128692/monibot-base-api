@@ -1,4 +1,4 @@
-package cn.shmedo.document;
+package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
@@ -21,7 +21,7 @@ public class EngineeringProject {
     /**
      * @api {post} /QueryProjectBriefList 查询项目简略信息列表
      * @apiDescription 查询项目列表
-     * @apiVersion 1.0
+     * @apiVersion 1.0.0
      * @apiGroup 工程项目管理
      * @apiName QueryProjectBriefList
      * @apiParam {Int} pageSize 页大小
@@ -111,13 +111,13 @@ public class EngineeringProject {
     /**
      * @api {post} /UpdateProjectData 工程项目编辑
      * @apiDescription 工程项目编辑
-     * @apiVersion 1.0
+     * @apiVersion 1.0.0
      * @apiGroup 工程项目管理
      * @apiName UpdateProjectData
      * @apiParam {projectDto} projectDto 基本信息请求参数
      * @apiParam {int} projectDto.projectID 项目id
      * @apiParam {String} projectDto.projectName 项目名称
-     * @apiParam {String} {String} projectDto.abbreviation 项目简称
+     * @apiParam {String}  projectDto.abbreviation 项目简称
      * @apiParam {String} projectDto.managementUnit 项目直接管理单位（直管单位）
      * @apiParam {DateTime} projectDto.validityPeriod 有效期
      * @apiParam {int} projectDto.projectStatus 项目状态
