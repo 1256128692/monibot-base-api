@@ -65,7 +65,7 @@ public class ProjectController {
      * @api {post} /QueryProjectPageList 分页查询工程项目列表
      * @apiDescription 分页查询工程项目列表
      * @apiVersion 1.0.0
-     * @apiGroup 工程项目管理
+     * @apiGroup 工程项目管理模块
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
@@ -119,7 +119,7 @@ public class ProjectController {
      * @api {post} /QueryProjectInfo 查询工程项目详情
      * @apiDescription 查询工程项目详情
      * @apiVersion 1.0.0
-     * @apiGroup 工程项目管理
+     * @apiGroup 工程项目管理模块
      * @apiName QueryProjectInfo
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {Int} projectID 项目id
@@ -170,7 +170,7 @@ public class ProjectController {
      * @api {post} /UpdateProject 修改工程项目
      * @apiDescription 修改工程项目
      * @apiVersion 1.0.0
-     * @apiGroup 工程项目管理
+     * @apiGroup 工程项目管理模块
      * @apiName UpdateProject
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} projectName 项目名称
