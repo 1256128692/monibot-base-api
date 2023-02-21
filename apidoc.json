@@ -1,0 +1,15 @@
+{
+  "name": "monibot-base-api",
+  "version": "1.0.0",
+  "description": "monibot-base-api rest api 接口文档",
+  "title": "monibot-base-api",
+  "template": {
+    "forceLanguage": "zh_cn",
+    "withCompare": true,
+    "withGenerator": true,
+    "jQueryAjaxSetup": {
+      "dataType": "json",
+      "contentType": "application/json;charset=UTF-8"
+    }
+  }
+}
