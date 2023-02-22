@@ -1,19 +1,16 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
-import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
-import cn.shmedo.monitor.monibotbaseapi.service.TbProjcetInfoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import cn.shmedo.monitor.monibotbaseapi.service.ProjcetInfoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,15 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 public class ProjectController {
-
-    @Autowired
-    private TbProjcetInfoService tbProjcetInfoService;
-
-
+    private ProjcetInfoService projcetInfoService;
     private ProjectService projectService;
     @Autowired
-    public ProjectController(ProjectService projectService) {
+    public ProjectController(ProjectService projectService,ProjcetInfoService projcetInfoService) {
         this.projectService = projectService;
+        this.projcetInfoService = projcetInfoService;
     }
 
     /**
@@ -155,8 +149,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
      * @apiSuccess (返回结果) {Int} projectTypeName 项目类型名称
-     * @apiSuccess (返回结果) {Int} platformType 平台类型
-     * @apiSuccess (返回结果) {Int} platformTypeName 平台名称
+     * @apiSuccess (返回结果) {Byte} platformType 平台类型
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} enable 是否有效
@@ -199,8 +192,7 @@ public class ProjectController {
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
     public Object queryProjectInfo(int Id){
-
-        return tbProjcetInfoService;
+        return projcetInfoService.getProjectInfoData(Id);
     }
 
     /**

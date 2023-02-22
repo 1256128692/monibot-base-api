@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.util.Date;
 
 public class TbProjectInfo {
@@ -87,21 +90,25 @@ public class TbProjectInfo {
     /**
     * 创建时间
     */
+    @TableField(fill = FieldFill.INSERT)
     private Date createTime;
 
     /**
     * 创建用户ID
     */
+    @TableField(fill = FieldFill.INSERT)
     private Integer createUserID;
 
     /**
     * 修改时间
     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Date updateTime;
 
     /**
     * 修改用户ID
     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private Integer updateUserID;
 
     public Integer getID() {

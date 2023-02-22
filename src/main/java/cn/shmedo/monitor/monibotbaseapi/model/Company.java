@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.data;
+package cn.shmedo.monitor.monibotbaseapi.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
