@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
+    <!--@mbg.generated-->
+    <!--@Table tb_project_info-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="ProjectName" jdbcType="VARCHAR" property="projectName" />
+    <result column="ShortName" jdbcType="VARCHAR" property="shortName" />
+    <result column="ProjectType" jdbcType="TINYINT" property="projectType" />
+    <result column="ExpiryDate" jdbcType="DATE" property="expiryDate" />
+    <result column="DirectManageUnit" jdbcType="VARCHAR" property="directManageUnit" />
+    <result column="PlatformType" jdbcType="TINYINT" property="platformType" />
+    <result column="Enable" jdbcType="BIT" property="enable" />
+    <result column="Location" jdbcType="VARCHAR" property="location" />
+    <result column="ProjectAddress" jdbcType="VARCHAR" property="projectAddress" />
+    <result column="Latitude" jdbcType="DOUBLE" property="latitude" />
+    <result column="Longitude" jdbcType="DOUBLE" property="longitude" />
+    <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
+    <result column="ProjectDesc" jdbcType="VARCHAR" property="projectDesc" />
+    <result column="ModelID" jdbcType="INTEGER" property="modelID" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, ProjectName, ShortName, ProjectType, ExpiryDate, DirectManageUnit, 
+    PlatformType, `Enable`, `Location`, ProjectAddress, Latitude, Longitude, ImagePath, 
+    ProjectDesc, ModelID, CreateTime, CreateUserID, UpdateTime, UpdateUserID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_project_info
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_project_info
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_info (CompanyID, ProjectName, ShortName, 
+      ProjectType, ExpiryDate, DirectManageUnit, 
+      PlatformType, `Enable`, `Location`, 
+      ProjectAddress, Latitude, Longitude, 
+      ImagePath, ProjectDesc, ModelID, 
+      CreateTime, CreateUserID, UpdateTime, 
+      UpdateUserID)
+    values (#{companyID,jdbcType=INTEGER}, #{projectName,jdbcType=VARCHAR}, #{shortName,jdbcType=VARCHAR}, 
+      #{projectType,jdbcType=TINYINT}, #{expiryDate,jdbcType=DATE}, #{directManageUnit,jdbcType=VARCHAR}, 
+      #{platformType,jdbcType=TINYINT}, #{enable,jdbcType=BIT}, #{location,jdbcType=VARCHAR}, 
+      #{projectAddress,jdbcType=VARCHAR}, #{latitude,jdbcType=DOUBLE}, #{longitude,jdbcType=DOUBLE}, 
+      #{imagePath,jdbcType=VARCHAR}, #{projectDesc,jdbcType=VARCHAR}, #{modelID,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{updateUserID,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
+        CompanyID,
+      </if>
+      <if test="projectName != null">
+        ProjectName,
+      </if>
+      <if test="shortName != null">
+        ShortName,
+      </if>
+      <if test="projectType != null">
+        ProjectType,
+      </if>
+      <if test="expiryDate != null">
+        ExpiryDate,
+      </if>
+      <if test="directManageUnit != null">
+        DirectManageUnit,
+      </if>
+      <if test="platformType != null">
+        PlatformType,
+      </if>
+      <if test="enable != null">
+        `Enable`,
+      </if>
+      <if test="location != null">
+        `Location`,
+      </if>
+      <if test="projectAddress != null">
+        ProjectAddress,
+      </if>
+      <if test="latitude != null">
+        Latitude,
+      </if>
+      <if test="longitude != null">
+        Longitude,
+      </if>
+      <if test="imagePath != null">
+        ImagePath,
+      </if>
+      <if test="projectDesc != null">
+        ProjectDesc,
+      </if>
+      <if test="modelID != null">
+        ModelID,
+      </if>
+      <if test="createTime != null">
+        CreateTime,
+      </if>
+      <if test="createUserID != null">
+        CreateUserID,
+      </if>
+      <if test="updateTime != null">
+        UpdateTime,
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
+        #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null">
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="shortName != null">
+        #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null">
+        #{projectType,jdbcType=TINYINT},
+      </if>
+      <if test="expiryDate != null">
+        #{expiryDate,jdbcType=DATE},
+      </if>
+      <if test="directManageUnit != null">
+        #{directManageUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        #{platformType,jdbcType=TINYINT},
+      </if>
+      <if test="enable != null">
+        #{enable,jdbcType=BIT},
+      </if>
+      <if test="location != null">
+        #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="projectAddress != null">
+        #{projectAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        #{latitude,jdbcType=DOUBLE},
+      </if>
+      <if test="longitude != null">
+        #{longitude,jdbcType=DOUBLE},
+      </if>
+      <if test="imagePath != null">
+        #{imagePath,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDesc != null">
+        #{projectDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="modelID != null">
+        #{modelID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
+    <!--@mbg.generated-->
+    update tb_project_info
+    <set>
+      <if test="companyID != null">
+        CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="projectName != null">
+        ProjectName = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="shortName != null">
+        ShortName = #{shortName,jdbcType=VARCHAR},
+      </if>
+      <if test="projectType != null">
+        ProjectType = #{projectType,jdbcType=TINYINT},
+      </if>
+      <if test="expiryDate != null">
+        ExpiryDate = #{expiryDate,jdbcType=DATE},
+      </if>
+      <if test="directManageUnit != null">
+        DirectManageUnit = #{directManageUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="platformType != null">
+        PlatformType = #{platformType,jdbcType=TINYINT},
+      </if>
+      <if test="enable != null">
+        `Enable` = #{enable,jdbcType=BIT},
+      </if>
+      <if test="location != null">
+        `Location` = #{location,jdbcType=VARCHAR},
+      </if>
+      <if test="projectAddress != null">
+        ProjectAddress = #{projectAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="latitude != null">
+        Latitude = #{latitude,jdbcType=DOUBLE},
+      </if>
+      <if test="longitude != null">
+        Longitude = #{longitude,jdbcType=DOUBLE},
+      </if>
+      <if test="imagePath != null">
+        ImagePath = #{imagePath,jdbcType=VARCHAR},
+      </if>
+      <if test="projectDesc != null">
+        ProjectDesc = #{projectDesc,jdbcType=VARCHAR},
+      </if>
+      <if test="modelID != null">
+        ModelID = #{modelID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
+    <!--@mbg.generated-->
+    update tb_project_info
+    set CompanyID = #{companyID,jdbcType=INTEGER},
+      ProjectName = #{projectName,jdbcType=VARCHAR},
+      ShortName = #{shortName,jdbcType=VARCHAR},
+      ProjectType = #{projectType,jdbcType=TINYINT},
+      ExpiryDate = #{expiryDate,jdbcType=DATE},
+      DirectManageUnit = #{directManageUnit,jdbcType=VARCHAR},
+      PlatformType = #{platformType,jdbcType=TINYINT},
+      `Enable` = #{enable,jdbcType=BIT},
+      `Location` = #{location,jdbcType=VARCHAR},
+      ProjectAddress = #{projectAddress,jdbcType=VARCHAR},
+      Latitude = #{latitude,jdbcType=DOUBLE},
+      Longitude = #{longitude,jdbcType=DOUBLE},
+      ImagePath = #{imagePath,jdbcType=VARCHAR},
+      ProjectDesc = #{projectDesc,jdbcType=VARCHAR},
+      ModelID = #{modelID,jdbcType=INTEGER},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      CreateUserID = #{createUserID,jdbcType=INTEGER},
+      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectTypeMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType">
+    <!--@mbg.generated-->
+    <!--@Table tb_project_type-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="TypeName" jdbcType="VARCHAR" property="typeName" />
+    <result column="MainType" jdbcType="VARCHAR" property="mainType" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, TypeName, MainType
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_project_type
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_project_type
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_type (TypeName, MainType)
+    values (#{typeName,jdbcType=VARCHAR}, #{mainType,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_type
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="typeName != null">
+        TypeName,
+      </if>
+      <if test="mainType != null">
+        MainType,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="typeName != null">
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainType != null">
+        #{mainType,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType">
+    <!--@mbg.generated-->
+    update tb_project_type
+    <set>
+      <if test="typeName != null">
+        TypeName = #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="mainType != null">
+        MainType = #{mainType,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType">
+    <!--@mbg.generated-->
+    update tb_project_type
+    set TypeName = #{typeName,jdbcType=VARCHAR},
+      MainType = #{mainType,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>
