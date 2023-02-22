@@ -10,7 +10,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
-import cn.shmedo.monitor.monibotbaseapi.service.ProjcetInfoService;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,12 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 public class ProjectController {
-    private ProjcetInfoService projcetInfoService;
     private ProjectService projectService;
     @Autowired
-    public ProjectController(ProjectService projectService,ProjcetInfoService projcetInfoService) {
+    public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
-        this.projcetInfoService = projcetInfoService;
     }
 
     /**
@@ -191,8 +188,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
-    public Object queryProjectInfo(int Id){
-        return projcetInfoService.getProjectInfoData(Id);
+    public Object queryProjectInfo(int id){
+        return projectService.getProjectInfoData(id);
     }
 
     /**
@@ -258,5 +255,21 @@ public class ProjectController {
         return null;
     }
 
-
+    /**
+     * @api {POST} /QueryProjectType 查询项目类型
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryProjectType
+     * @apiDescription 查询项目类型
+     * @apiSuccess (返回结果) {Object[]} projectType 项目类型
+     * @apiSuccess (返回结果) {int} projectType.ID ID
+     * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
+     * @apiSuccess (返回结果) {String} projectType.mainType 主类型名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:
+     */
+    @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryProjectType(){
+        return null;
+    }
 }

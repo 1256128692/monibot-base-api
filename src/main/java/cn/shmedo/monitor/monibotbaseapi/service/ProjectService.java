@@ -9,6 +9,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.response.ProjectInfoResult;
  * @create: 2023-02-22 13:24
  **/
 public interface ProjectService {
-    ProjectInfoResult getProjectInfoData(int Id);
+
+    /**
+     * 查询项目详情
+     * @param id
+     * @return
+     */
+    ProjectInfoResult getProjectInfoData(int id);
     void addProject(AddProjectParam pa, Integer userID);
 }

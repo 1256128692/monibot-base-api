@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
-public interface TbTagMapper {
+@Mapper
+public interface TbTagMapper extends BaseMapper<TbTag> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbTag record);
