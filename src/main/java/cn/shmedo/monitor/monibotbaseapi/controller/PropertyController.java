@@ -7,6 +7,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PropertyController {
+    /**
+     * @api {POST} /AddModel 新增模板
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName AddModel
+     * @apiDescription 新增模板
+     * @apiParam (请求体) {String} modelName 模型名称
+     * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {String} [desc] 模板描述
+     * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表
+     * @apiParam (请求体) {String} modelPropertyList.name 属性名称
+     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
+     * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
+     * @apiParam (请求体) {Boolean} modelPropertyList.required 自定义属性是否必填
+     * @apiParam (请求体) {String} [modelPropertyList.enumField] 枚举字段，json数组
+     * @apiParam (请求体) {Boolean} [modelPropertyList.multiSelect] 可否多选,限定枚举
+     * @apiParam (请求体) {Int} [modelPropertyList.createType] 创建类型
+     * @apiParam (请求体) {Int} [modelPropertyList.className] 类名称
+     * @apiParam (请求体) {Int} [modelPropertyList.displayOrder] 展示顺序
+     * @apiSuccess (返回结果) {Int} modelID  模板ID
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:
+     */
+    @RequestMapping(value = "AddModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addModel() {
+        return null;
+    }
 
     /**
      * @api {POST} /QueryModelList 查询模板信息

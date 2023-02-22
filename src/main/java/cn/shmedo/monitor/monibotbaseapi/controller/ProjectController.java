@@ -35,24 +35,15 @@ public class ProjectController {
      * @apiParam (请求体) {Double} latitude 项目位置经度
      * @apiParam (请求体) {Double} longitude 项目位置纬度
      * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
-     * @apiParam (请求体) {Int[]} [tagIDList] 项目标签
+     * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
+     * @apiParam (请求体) {Json[]} [tagList] 标签列表
+     * @apiParam (请求体) {String} tagIDList.key 项目键
+     * @apiParam (请求体) {String} tagIDList.value 项目值
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表
-     * @apiParam (请求体) {Int} [modelID] 模型ID
-     * @apiParam (请求体) {Jons[]} [modelValueList] 模型值列表
+     * @apiParam (请求体) {Int} modelID 模型ID
+     * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
      * @apiParam (请求体) {Int} modelValueList.pID 属性ID
      * @apiParam (请求体) {String} modelValueList.value 属性值
-     * @apiParam (请求体) {String} [modelName模型名称]
-     * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表
-     * @apiParam (请求体) {String} modelPropertyList.name 属性名称
-     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
-     * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
-     * @apiParam (请求体) {Boolean} modelPropertyList.required 自定义属性是否必填
-     * @apiParam (请求体) {String} [modelPropertyList.enumField] 枚举字段，json数组
-     * @apiParam (请求体) {Boolean} [modelPropertyList.multiSelect] 可否多选,限定枚举
-     * @apiParam (请求体) {Int} [modelPropertyList.createType] 创建类型
-     * @apiParam (请求体) {Int} [modelPropertyList.className] 类名称
-     * @apiParam (请求体) {Int} [modelPropertyList.displayOrder] 展示顺序
-     * @apiParam (请求体) {String} [modelPropertyList.value] 属性类型值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
      * @apiPermission xx权限:
