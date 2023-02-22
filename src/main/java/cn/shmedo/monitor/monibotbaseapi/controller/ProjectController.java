@@ -1,8 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
+import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import cn.shmedo.monitor.monibotbaseapi.service.TbProjcetInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +28,13 @@ public class ProjectController {
 
     @Autowired
     private TbProjcetInfoService tbProjcetInfoService;
+
+
+    private ProjectService projectService;
+    @Autowired
+    public ProjectController(ProjectService projectService) {
+        this.projectService = projectService;
+    }
 
     /**
      * @api {POST} /AddProject 新增工程项目
@@ -54,9 +70,12 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission xx权限:
      */
+    //@LogParam(moduleName = "设备模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
+    @Permission(permissionName = "iot:xxx")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addProject() {
-        return null;
+    public Object addProject(@Validated @RequestBody AddProjectParam pa) {
+        projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
     /**
      * @api {post} /QueryProjectPageList 分页查询工程项目列表
@@ -82,6 +101,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} dataList 项目信息列表
      * @apiSuccess (返回结果) {Int} dataList.projectID 项目id
+     * @apiSuccess (返回结果) {Int} dataList.companyID 公司id
+     * @apiSuccess (返回结果) {String} dataList.companyName 所属公司名称
      * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
      * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
      * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
@@ -128,6 +149,8 @@ public class ProjectController {
      * @apiName QueryProjectInfo
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {Int} projectID 项目id
+     * @apiSuccess (返回结果) {Int} companyID 公司id
+     * @apiSuccess (返回结果) {String} companyName 所属公司名称
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型

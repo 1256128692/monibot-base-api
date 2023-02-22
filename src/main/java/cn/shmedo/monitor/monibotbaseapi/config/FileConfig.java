@@ -16,6 +16,17 @@ public class FileConfig {
     @Value("${service.authAppSecret}")
     private String authAppSecret;
 
+    @Value("${service.authServiceAddress}")
+    private String authServiceAddress;
+
+    public String getAuthServiceAddress() {
+        return authServiceAddress;
+    }
+
+    public void setAuthServiceAddress(String authServiceAddress) {
+        this.authServiceAddress = authServiceAddress;
+    }
+
     public String getApiVersion() {
         return apiVersion;
     }
