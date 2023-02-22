@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.service.TbProjcetInfoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
  **/
 @RestController
 public class ProjectController {
+
+    @Autowired
+    private TbProjcetInfoService tbProjcetInfoService;
+
     /**
      * @api {POST} /AddProject 新增工程项目
      * @apiVersion 1.0.0
@@ -76,8 +82,6 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} dataList 项目信息列表
      * @apiSuccess (返回结果) {Int} dataList.projectID 项目id
-     * @apiSuccess (返回结果) {Int} dataList.companyID 公司id
-     * @apiSuccess (返回结果) {String} dataList.companyName 所属公司名称
      * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
      * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
      * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
@@ -97,6 +101,16 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} dataList.createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} dataList.updateUserID 修改用户ID
+     * @apiSuccess (返回结果) {Object} companyInfo 公司信息
+     * @apiSuccess (返回结果) {Int} companyInfo.companyID 公司id
+     * @apiSuccess (返回结果) {String} companyInfo.companyName 所属公司名称
+     * @apiSuccess (返回结果) {String} companyInfo.companyContacts 公司联系人
+     * @apiSuccess (返回结果) {String} companyInfo.contactsPhone 公司联系人电话
+     * @apiSuccess (返回结果) {String} companyInfo.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
+     * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
+     * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
+     * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
@@ -114,8 +128,6 @@ public class ProjectController {
      * @apiName QueryProjectInfo
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {Int} projectID 项目id
-     * @apiSuccess (返回结果) {Int} companyID 公司id
-     * @apiSuccess (返回结果) {String} companyName 所属公司名称
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
@@ -135,6 +147,16 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
      * @apiSuccess (返回结果) {Int} updateUserID 修改用户ID
+     * @apiSuccess (返回结果) {Object} companyInfo 公司信息
+     * @apiSuccess (返回结果) {Int} companyInfo.companyID 公司id
+     * @apiSuccess (返回结果) {String} companyInfo.companyName 所属公司名称
+     * @apiSuccess (返回结果) {String} companyInfo.companyContacts 公司联系人
+     * @apiSuccess (返回结果) {String} companyInfo.contactsPhone 公司联系人电话
+     * @apiSuccess (返回结果) {String} companyInfo.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
+     * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
+     * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
+     * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
      * @apiSuccess (返回结果) {Object[]} propertyList 项目基础信息列表
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyType 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
@@ -153,8 +175,9 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
-    public Object queryProjectInfo(){
-        return null;
+    public Object queryProjectInfo(int Id){
+
+        return tbProjcetInfoService;
     }
 
     /**
