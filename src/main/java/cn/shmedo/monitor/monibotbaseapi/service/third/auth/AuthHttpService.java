@@ -17,7 +17,7 @@ public class AuthHttpService {
     public static <T> T getInstance(Class<T> tClass) {
         FileConfig fileConfig = ContextHolder.getBean(FileConfig.class);
         String url = fileConfig.getAuthServiceAddress();
-        ObjectMapper objectMapper = CommonVariable.getLowerCaseAndIgnoreUnknownPropertyObjectMapper();
+        ObjectMapper objectMapper = ContextHolder.getBean(ObjectMapper.class);
         T instance = Feign.builder()
                 .requestInterceptor(new AuthRequestInterceptor())
                 .encoder(new JacksonEncoder(objectMapper))
