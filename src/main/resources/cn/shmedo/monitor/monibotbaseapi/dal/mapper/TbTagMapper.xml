@@ -144,4 +144,14 @@
             (#{item.companyID},#{item.tagkey},#{item.tagvalue},#{item.createtime},#{item.createuserid},#{item.updatetime},#{item.updateuserid})
         </foreach>
     </insert>
+
+    <select id="queryListBy" resultMap="BaseResultMap">
+        select * from tb_tag where CompanyID = #{companyID}
+        <if test="fuzzyKey != null and fuzzyKey != ''">
+            and tagKey like concat( '%',#{fuzzyKey},'%')
+        </if>
+        <if test="fuzzyValue != null and fuzzyValue != ''">
+            and TagValue like concat( '%',#{fuzzyValue},'%')
+        </if>
+    </select>
 </mapper>

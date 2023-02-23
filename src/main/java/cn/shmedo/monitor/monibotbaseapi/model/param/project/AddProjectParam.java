@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
@@ -66,12 +67,12 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private Integer modelID;
     @NotEmpty
     @Valid
-    private List< @NotNull IDAndValue> modelValueList;
+    private List< @NotNull NameAndValue> modelValueList;
 
     @Override
     public ResultWrapper validate() {
-        TbProjectTypeMapper tbProjectTypeMapper = ContextHolder.getBean(TbProjectTypeMapper.class);
-        if (tbProjectTypeMapper.selectByPrimaryKey(Integer.valueOf(platformType)) == null){
+
+        if (ProjectTypeCache.projectTypeMap.get(Integer.valueOf(projectType)) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (DateUtil.betweenDay(expiryDate, DateUtil.date(),true)<=90){
@@ -253,11 +254,11 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         this.modelID = modelID;
     }
 
-    public List<IDAndValue> getModelValueList() {
+    public List<NameAndValue> getModelValueList() {
         return modelValueList;
     }
 
-    public void setModelValueList(List<IDAndValue> modelValueList) {
+    public void setModelValueList(List<NameAndValue> modelValueList) {
         this.modelValueList = modelValueList;
     }
 }

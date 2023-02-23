@@ -4,6 +4,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface TbProjectTypeMapper extends BaseMapper<TbProjectType> {
     int deleteByPrimaryKey(Integer ID);
@@ -17,4 +19,6 @@ public interface TbProjectTypeMapper extends BaseMapper<TbProjectType> {
     int updateByPrimaryKeySelective(TbProjectType record);
 
     int updateByPrimaryKey(TbProjectType record);
+
+    List<TbProjectType> selectAll();
 }

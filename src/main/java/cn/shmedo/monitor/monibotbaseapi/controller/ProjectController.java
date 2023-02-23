@@ -52,13 +52,13 @@ public class ProjectController {
      * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
      * @apiParam (请求体) {Json[]} [tagList] 标签列表
-     * @apiParam (请求体) {String} tagIDList.key 标签键
-     * @apiParam (请求体) {String} tagIDList.value 标签值
+     * @apiParam (请求体) {String} tagList.key 标签键
+     * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表
      * @apiParam (请求体) {Int} modelID 模型ID
      * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
-     * @apiParam (请求体) {Int} modelValueList.ID 属性ID
-     * @apiParam (请求体) {String} modelValueList.value 属性值
+     * @apiParam (请求体) {String} modelValueList.name 属性名称
+     * @apiParam (请求体) {String} [modelValueList.value] 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
      * @apiPermission xx权限:
@@ -78,16 +78,18 @@ public class ProjectController {
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
-     * @apiParam (请求体) {Int} [companyId] 企业名称-先调用接口查询具体企业，发送id
-     * @apiParam (请求体) {Int} [projectType] 项目类型列表
-     * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，0:启用，1:停用
+     * @apiParam (请求体) {String} [companyName] 企业名称,支持模糊查询
+     * @apiParam (请求体) {String} [location] 行政区域
+     * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
+     * @apiParam (请求体) {Int} [status] 项目状态，null:全选，1:启用，0:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
-     * @apiParam (请求体) {DateTime} [expiryDate] 有效期
+     * @apiParam (请求体) {DateTime} [verifyDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
      * @apiParam (请求体) {DateTime} [endCreatTime] 创建时间-结束
      * @apiParam (请求体) {Object[]} [propertyQueryEntity] 属性查询实体
-     * @apiParam (请求体) {Int} propertyQueryEntity.propertyID 属性ID
+     * @apiParam (请求体) {String} propertyQueryEntity.propertyName 属性名称
      * @apiParam (请求体) {String} [propertyQueryEntity.value] 属性值，仅字符串类型支持模糊查询
+     * @apiParam (请求体) {Bool} [property] 是否带出属性信息，默认false
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -125,12 +127,26 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
      * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
+     * @apiSuccess (返回结果) {Object[]} propertyList 项目基础信息列表
+     * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
+     * @apiSuccess (返回结果) {Int} propertyList.propertyType 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     * @apiSuccess (返回结果) {String} propertyList.className 结构名称
+     * @apiSuccess (返回结果) {String} propertyList.name 属性名称
+     * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
+     * @apiSuccess (返回结果) {Bool} propertyList.multiSelect 是否多选
+     * @apiSuccess (返回结果) {Int} propertyList.createType 创建类型 0-预定义 1-自定义
+     * @apiSuccess (返回结果) {String} [propertyList.enumField] 枚举字段
+     * @apiSuccess (返回结果) {String} [propertyList.unit] 属性单位
+     * @apiSuccess (返回结果) {String} [propertyList.value] 属性值
+     * @apiSuccess (返回结果) {String} [propertyList.exValue] 属性拓展信息
+     * @apiSuccess (返回结果) {Int} [propertyList.displayOrder] 排序字段
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
     public Object queryProjectList(@Validated @RequestBody QueryProjectListParam pa){
+        // TODO 文档有更新待实现
         return projectService.getProjectInfoList(pa);
     }
 

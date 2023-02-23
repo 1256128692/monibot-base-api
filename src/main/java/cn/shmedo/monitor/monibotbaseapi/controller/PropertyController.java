@@ -1,22 +1,37 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
+import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class PropertyController {
+    private PropertyService propertyService;
+    @Autowired
+    public PropertyController(PropertyService propertyService) {
+        this.propertyService = propertyService;
+    }
+
     /**
      * @api {POST} /AddModel 新增模板
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName AddModel
      * @apiDescription 新增模板
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} modelName 模型名称
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [desc] 模板描述
-     * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表
+     * @apiParam (请求体) {Json[]} [modelPropertyList] 自定义属性列表
      * @apiParam (请求体) {String} modelPropertyList.name 属性名称
      * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
      * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
@@ -31,8 +46,9 @@ public class PropertyController {
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "AddModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addModel() {
-        return null;
+    public Object addModel(@RequestBody @Validated AddModelParam param) {
+        propertyService.addModel(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -68,21 +84,23 @@ public class PropertyController {
     }
 
     /**
-     * @api {POST} /UpdateProperty 设置项目属性
+     * @api {POST} /UpdateProperty 更新项目属性
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName UpdateProperty
-     * @apiDescription 设置项目属性
+     * @apiDescription 更新项目属性
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Object[]} propertyList 属性列表
-     * @apiParam (请求体) {Int} propertyList.propertyID 属性ID
-     * @apiParam (请求体) {String} propertyList.value 属性值
+     * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
+     * @apiParam (请求体) {String} modelValueList.name 属性名称
+     * @apiParam (请求体) {String} [modelValueList.value] 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "UpdateProperty", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateProperty() {
-        return null;
+    public Object updateProperty(@RequestBody @Validated UpdatePropertyParam pa) {
+        propertyService.updateProperty(pa);
+        return ResultWrapper.successWithNothing();
     }
 }

@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.ApplicationHasPer
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.BatchResourceParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.ResourceItemV2;
+import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.AuthHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
@@ -95,7 +96,7 @@ public class PermissionInterceptor {
         if (!permission.allowApplication()) {
             return ResultWrapper.noPermission(permission.permissionName());
         }
-        PermissionService permissionService = AuthHttpService.getInstance(PermissionService.class);
+        PermissionService permissionService = ThirdHttpService.getInstance(PermissionService.class,ThirdHttpService.Auth);
         ApplicationHasPermissionParameter pa = new ApplicationHasPermissionParameter();
         pa.setServiceName(servicePermission.getItem1());
         pa.setPermissionToken(servicePermission.getItem2());
@@ -132,7 +133,7 @@ public class PermissionInterceptor {
         }
         String token = CurrentSubjectHolder.getCurrentSubjectExtractData();
         ResourcePermissionType resourcePermissionType = provider.resourcePermissionType();
-        PermissionService permissionService = AuthHttpService.getInstance(PermissionService.class);
+        PermissionService permissionService = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         ResultWrapper validateResultWrapper = null;
         switch (resourcePermissionType) {
             case SINGLE_RESOURCE_SINGLE_PERMISSION:

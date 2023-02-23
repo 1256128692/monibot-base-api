@@ -5,17 +5,17 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
  * @author: gaoxu
  * @create: 2023-02-23 13:36
  **/
-public class IDAndValue {
-    private Integer ID;
+public class NameAndValue {
+    private String name;
     private String value;
 
 
-    public Integer getID() {
-        return ID;
+    public String getName() {
+        return name;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getValue() {

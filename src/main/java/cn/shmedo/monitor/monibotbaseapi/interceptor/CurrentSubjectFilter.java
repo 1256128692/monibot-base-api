@@ -10,6 +10,7 @@ import cn.shmedo.iot.entity.base.SubjectType;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.iot.entity.exception.BaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.AuthHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,7 +40,7 @@ public class CurrentSubjectFilter implements Filter {
             String token = httpRequest.getHeader(TOKEN_HEADER);
             String appKey = httpRequest.getHeader(APP_KEY_HEADER);
             String appSecret = httpRequest.getHeader(APP_SECRET_HEADER);
-            UserService userService = AuthHttpService.getInstance(UserService.class);
+            UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
             ResultWrapper<CurrentSubject> currentSubjectResultWrapper = null;
             if (!ObjectUtil.isEmpty(token)) {
                 token = token.replace("Bearer ", "");
