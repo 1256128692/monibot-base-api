@@ -69,4 +69,11 @@
       ProjectID = #{projectID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <insert id="insertBatch">
+    insert into tb_tag_relation(tagid, projectid) value
+    <foreach collection="tagIDList" item="id" separator=",">
+      (#{id},#{projectID})
+    </foreach>
+    </insert>
 </mapper>

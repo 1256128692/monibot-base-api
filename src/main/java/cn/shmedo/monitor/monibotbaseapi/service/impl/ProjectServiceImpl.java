@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
@@ -11,15 +13,17 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoPara
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import com.mysql.cj.util.StringUtils;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -27,21 +31,40 @@ import java.util.List;
  * @create: 2023-02-22 13:24
  **/
 @Service
-public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService {
+public class ProjectServiceImpl implements ProjectService {
     private TbProjectInfoMapper tbProjectInfoMapper;
     private TbTagMapper tbTagMapper;
     private TbProjectTypeMapper tbProjectTypeMapper;
 
+    private TbTagRelationMapper tbTagRelationMapper;
     @Autowired
-    public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper, TbTagMapper tbTagMapper,TbProjectTypeMapper tbProjectTypeMapper) {
+    public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper, TbTagMapper tbTagMapper, TbTagRelationMapper tbTagRelationMapper) {
         this.tbProjectInfoMapper = tbProjectInfoMapper;
         this.tbTagMapper = tbTagMapper;
         this.tbProjectTypeMapper = tbProjectTypeMapper;
+        this.tbTagRelationMapper = tbTagRelationMapper;
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addProject(AddProjectParam pa, Integer userID) {
-
+        // TODO 处理图片
+        String imgPath = "xxxx";
+        TbProjectInfo tbProjectInfo = Param2DBEntityUtil.fromAddProjectParam2TbProjectInfo(pa, userID, imgPath);
+        tbProjectInfoMapper.insert(tbProjectInfo);
+        // TODO 处理模板数据
+        List<Integer> tagID4DBList = new ArrayList<>();
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+            List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
+            tbTagMapper.insertBatch(tagList);
+            tagID4DBList.addAll(tagList.stream().map(TbTag::getID).collect(Collectors.toList()));
+        }
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+            tagID4DBList.addAll(pa.getTagIDList());
+        }
+        if (ObjectUtil.isNotEmpty(tagID4DBList)){
+            tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
+        }
     }
 
     @Override

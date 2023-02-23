@@ -4,6 +4,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface TbTagMapper extends BaseMapper<TbTag> {
     int deleteByPrimaryKey(Integer ID);
@@ -17,4 +19,8 @@ public interface TbTagMapper extends BaseMapper<TbTag> {
     int updateByPrimaryKeySelective(TbTag record);
 
     int updateByPrimaryKey(TbTag record);
+
+    int countByCIDAndIDs(Integer companyID, List<Integer> tagIDList);
+
+    void insertBatch(List<TbTag> tagList);
 }

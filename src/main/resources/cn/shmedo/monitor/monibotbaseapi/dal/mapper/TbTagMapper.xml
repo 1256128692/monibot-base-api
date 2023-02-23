@@ -1,131 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
-    <!--@mbg.generated-->
-    <!--@Table tb_tag-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
-    <result column="TagKey" jdbcType="VARCHAR" property="tagKey" />
-    <result column="TagValue" jdbcType="VARCHAR" property="tagValue" />
-    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, CompanyID, TagKey, TagValue, CreateTime, CreateUserID, UpdateTime, UpdateUserID
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from tb_tag
-    where ID = #{ID,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    <!--@mbg.generated-->
-    delete from tb_tag
-    where ID = #{ID,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_tag (CompanyID, TagKey, TagValue, 
-      CreateTime, CreateUserID, UpdateTime, 
-      UpdateUserID)
-    values (#{companyID,jdbcType=INTEGER}, #{tagKey,jdbcType=VARCHAR}, #{tagValue,jdbcType=VARCHAR}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, 
-      #{updateUserID,jdbcType=INTEGER})
-  </insert>
-  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_tag
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="companyID != null">
-        CompanyID,
-      </if>
-      <if test="tagKey != null">
-        TagKey,
-      </if>
-      <if test="tagValue != null">
-        TagValue,
-      </if>
-      <if test="createTime != null">
-        CreateTime,
-      </if>
-      <if test="createUserID != null">
-        CreateUserID,
-      </if>
-      <if test="updateTime != null">
-        UpdateTime,
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="companyID != null">
-        #{companyID,jdbcType=INTEGER},
-      </if>
-      <if test="tagKey != null">
-        #{tagKey,jdbcType=VARCHAR},
-      </if>
-      <if test="tagValue != null">
-        #{tagValue,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null">
-        #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        #{updateUserID,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
-    <!--@mbg.generated-->
-    update tb_tag
-    <set>
-      <if test="companyID != null">
-        CompanyID = #{companyID,jdbcType=INTEGER},
-      </if>
-      <if test="tagKey != null">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
+        <!--@mbg.generated-->
+        <!--@Table tb_tag-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
+        <result column="TagKey" jdbcType="VARCHAR" property="tagKey"/>
+        <result column="TagValue" jdbcType="VARCHAR" property="tagValue"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
+        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID, CompanyID, TagKey, TagValue, CreateTime, CreateUserID, UpdateTime, UpdateUserID
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_tag
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete from tb_tag
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag"
+            useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_tag (CompanyID, TagKey, TagValue,
+        CreateTime, CreateUserID, UpdateTime,
+        UpdateUserID)
+        values (#{companyID,jdbcType=INTEGER}, #{tagKey,jdbcType=VARCHAR}, #{tagValue,jdbcType=VARCHAR},
+        #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP},
+        #{updateUserID,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_tag
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyID != null">
+                CompanyID,
+            </if>
+            <if test="tagKey != null">
+                TagKey,
+            </if>
+            <if test="tagValue != null">
+                TagValue,
+            </if>
+            <if test="createTime != null">
+                CreateTime,
+            </if>
+            <if test="createUserID != null">
+                CreateUserID,
+            </if>
+            <if test="updateTime != null">
+                UpdateTime,
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyID != null">
+                #{companyID,jdbcType=INTEGER},
+            </if>
+            <if test="tagKey != null">
+                #{tagKey,jdbcType=VARCHAR},
+            </if>
+            <if test="tagValue != null">
+                #{tagValue,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserID != null">
+                #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                #{updateUserID,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
+        <!--@mbg.generated-->
+        update tb_tag
+        <set>
+            <if test="companyID != null">
+                CompanyID = #{companyID,jdbcType=INTEGER},
+            </if>
+            <if test="tagKey != null">
+                TagKey = #{tagKey,jdbcType=VARCHAR},
+            </if>
+            <if test="tagValue != null">
+                TagValue = #{tagValue,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                CreateTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserID != null">
+                CreateUserID = #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
+        <!--@mbg.generated-->
+        update tb_tag
+        set CompanyID = #{companyID,jdbcType=INTEGER},
         TagKey = #{tagKey,jdbcType=VARCHAR},
-      </if>
-      <if test="tagValue != null">
         TagValue = #{tagValue,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
         CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null">
         CreateUserID = #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
         UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      </if>
-    </set>
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTag">
-    <!--@mbg.generated-->
-    update tb_tag
-    set CompanyID = #{companyID,jdbcType=INTEGER},
-      TagKey = #{tagKey,jdbcType=VARCHAR},
-      TagValue = #{tagValue,jdbcType=VARCHAR},
-      CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      CreateUserID = #{createUserID,jdbcType=INTEGER},
-      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      UpdateUserID = #{updateUserID,jdbcType=INTEGER}
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+
+    <select id="countByCIDAndIDs" resultType="int">
+        select count(1) from tb_tag where CompanyID = #{companyID} and ID in
+        <foreach collection="tagIDList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <insert id="insertBatch" keyColumn="ID" keyProperty="id" useGeneratedKeys="true">
+        insert into tb_tag(companyid, tagkey, tagvalue, createtime, createuserid, updatetime, updateuserid) value
+        <foreach collection="tagList" item="item" separator=",">
+            (#{item.companyID},#{item.tagkey},#{item.tagvalue},#{item.createtime},#{item.createuserid},#{item.updatetime},#{item.updateuserid})
+        </foreach>
+    </insert>
 </mapper>

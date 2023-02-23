@@ -37,27 +37,27 @@ public class ProjectController {
      * @apiDescription 新增工程项目
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} projectName 项目名称(<=50)
-     * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
+     * @apiParam (请求体) {String} [shortName] 项目简称(<=20)
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
-     * @apiParam (请求体) {DateTime} expiryDate 有效日期，经度到天
+     * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天
      * @apiParam (请求体) {String} [directManageUnit] 直管单位(<=50)
      * @apiParam (请求体) {Int} platformType 所属平台类型
      * @apiParam (请求体) {Boolean} enable 开启状态
-     * @apiParam (请求体) {String} locationInfo 四级行政区域信息(<=500)
+     * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
      * @apiParam (请求体) {Double} latitude 项目位置经度
      * @apiParam (请求体) {Double} longitude 项目位置纬度
      * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
      * @apiParam (请求体) {Json[]} [tagList] 标签列表
-     * @apiParam (请求体) {String} tagIDList.key 项目键
-     * @apiParam (请求体) {String} tagIDList.value 项目值
+     * @apiParam (请求体) {String} tagIDList.key 标签键
+     * @apiParam (请求体) {String} tagIDList.value 标签值
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表
      * @apiParam (请求体) {Int} modelID 模型ID
      * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
-     * @apiParam (请求体) {Int} modelValueList.pID 属性ID
+     * @apiParam (请求体) {Int} modelValueList.ID 属性ID
      * @apiParam (请求体) {String} modelValueList.value 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
