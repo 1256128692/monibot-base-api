@@ -19,6 +19,7 @@ public class FileConfig {
     @Value("${service.authServiceAddress}")
     private String authServiceAddress;
 
+
     public String getAuthServiceAddress() {
         return authServiceAddress;
     }
