@@ -11,7 +11,6 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.iot.entity.exception.BaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.auth.AuthHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.*;

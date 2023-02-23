@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
  * @author: gaoxu
  * @create: 2023-02-23 17:14
  **/
-@Component
+// @Component
 public class ProjectTypeCache {
     private static List<TbProjectType> projectTypeList;
     public static Map<Integer, TbProjectType> projectTypeMap;
     public ProjectTypeCache() {
-        init();
+       // init();
     }
 
     void init(){

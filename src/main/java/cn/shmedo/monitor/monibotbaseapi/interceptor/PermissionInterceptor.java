@@ -12,14 +12,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.BatchResourcePara
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.ResourceItemV2;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.auth.AuthHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
