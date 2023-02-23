@@ -6,6 +6,8 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -76,11 +78,11 @@ public class ProjectController {
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
-     * @apiParam (请求体) {String} [companyName] 企业名称,支持模糊查询
-     * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
-     * @apiParam (请求体) {Int} [status] 项目状态，null:全选，1:启用，0:停用
+     * @apiParam (请求体) {Int} [companyId] 企业名称-先调用接口查询具体企业，发送id
+     * @apiParam (请求体) {Int} [projectType] 项目类型列表
+     * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，0:启用，1:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
-     * @apiParam (请求体) {DateTime} [verifyDate] 有效期
+     * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
      * @apiParam (请求体) {DateTime} [endCreatTime] 创建时间-结束
      * @apiParam (请求体) {Object[]} [propertyQueryEntity] 属性查询实体
@@ -127,8 +129,9 @@ public class ProjectController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectList(String name){
-        return null;
+    @Permission
+    public Object queryProjectList(@Validated @RequestBody QueryProjectListParam pa){
+        return projectService.getProjectInfoList(pa);
     }
 
 
@@ -188,8 +191,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
-    public Object queryProjectInfo(int id){
-        return projectService.getProjectInfoData(id);
+    public Object queryProjectInfo(@Validated @RequestBody QueryProjectInfoParam pa){
+        return projectService.getProjectInfoData(pa);
     }
 
     /**
@@ -269,7 +272,8 @@ public class ProjectController {
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryProjectType(){
-        return null;
+    @Permission
+    public Object queryProjectType(@Validated @RequestBody AddProjectParam param){
+        return projectService.getProjectType();
     }
 }
