@@ -28,6 +28,12 @@ public interface ProjectService {
      * @return
      */
     ProjectInfoResult getProjectInfoData(QueryProjectInfoParam pa);
+
+    /**
+     * 新增项目
+     * @param pa
+     * @param userID
+     */
     void addProject(AddProjectParam pa, Integer userID);
 
     /**
