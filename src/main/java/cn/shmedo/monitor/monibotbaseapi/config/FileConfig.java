@@ -7,10 +7,8 @@ import org.springframework.stereotype.Component;
 public class FileConfig {
     @Value("${common.apiVersion}")
     private String apiVersion;
-    @Value("${service.authAddress}")
-    private String authAddress;
-    @Value("${service.iotAddress}")
-    private String iotAddress;
+    @Value("${service.iotServiceAddress}")
+    private String iotServiceAddress;
     @Value("${service.authAppKey}")
     private String authAppKey;
     @Value("${service.authAppSecret}")
@@ -50,20 +48,12 @@ public class FileConfig {
         return ContextHolder.getBean(FileConfig.class);
     }
 
-    public String getAuthAddress() {
-        return authAddress;
+    public String getIotServiceAddress() {
+        return iotServiceAddress;
     }
 
-    public void setAuthAddress(String authAddress) {
-        this.authAddress = authAddress;
-    }
-
-    public String getIotAddress() {
-        return iotAddress;
-    }
-
-    public void setIotAddress(String iotAddress) {
-        this.iotAddress = iotAddress;
+    public void setIotServiceAddress(String iotServiceAddress) {
+        this.iotServiceAddress = iotServiceAddress;
     }
 
     public String getAuthAppKey() {
