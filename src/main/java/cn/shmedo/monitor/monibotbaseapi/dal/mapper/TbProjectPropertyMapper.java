@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 
+import java.util.List;
+
 public interface TbProjectPropertyMapper {
     int deleteByPrimaryKey(Integer ID);
 
@@ -14,4 +16,6 @@ public interface TbProjectPropertyMapper {
     int updateByPrimaryKeySelective(TbProjectProperty record);
 
     int updateByPrimaryKey(TbProjectProperty record);
+
+    void updateBatch(List<TbProjectProperty> projectPropertyList);
 }

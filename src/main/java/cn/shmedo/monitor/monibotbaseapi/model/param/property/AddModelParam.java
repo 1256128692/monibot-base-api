@@ -9,6 +9,8 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 /**
  * @program: monibot-base-api
  * @author: gaoxu
@@ -22,6 +24,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     @NotNull
     private Byte projectType;
     private String desc;
+    private List<ModelItem> modelPropertyList;
 
     @Override
     public ResultWrapper validate() {
@@ -39,5 +42,46 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     @Override
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionProvider.super.resourcePermissionType();
+    }
+
+
+    public Integer getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(Integer companyID) {
+        this.companyID = companyID;
+    }
+
+    public String getModelName() {
+        return modelName;
+    }
+
+    public void setModelName(String modelName) {
+        this.modelName = modelName;
+    }
+
+    public Byte getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(Byte projectType) {
+        this.projectType = projectType;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public List<ModelItem> getModelPropertyList() {
+        return modelPropertyList;
+    }
+
+    public void setModelPropertyList(List<ModelItem> modelPropertyList) {
+        this.modelPropertyList = modelPropertyList;
     }
 }

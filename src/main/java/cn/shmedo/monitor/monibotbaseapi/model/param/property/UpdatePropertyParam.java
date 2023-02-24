@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.NameAndValue;
 import jakarta.validation.Valid;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -42,6 +44,11 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
             ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不属于该公司");
 
         }
+        TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+        int count = tbPropertyMapper.countByPIDAndNames(projectID, modelValueList.stream().map(NameAndValue::getName).collect(Collectors.toList()));
+        if (count!=modelValueList.size()){
+            ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有属性不存在或不属于该公司");
+        }
         return null;
     }
 
@@ -55,6 +62,13 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         return ResourcePermissionProvider.super.resourcePermissionType();
     }
 
+    public Integer getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(Integer companyID) {
+        this.companyID = companyID;
+    }
 
     public Integer getProjectID() {
         return projectID;

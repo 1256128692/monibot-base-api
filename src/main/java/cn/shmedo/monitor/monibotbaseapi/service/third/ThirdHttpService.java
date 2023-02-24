@@ -15,7 +15,6 @@ import feign.jackson.JacksonEncoder;
  **/
 public class ThirdHttpService {
     public static final int Auth = 1;
-    public static final int Info = 2;
     public static <T> T getInstance(Class<T> tClass , int direct) {
         ObjectMapper objectMapper = ContextHolder.getBean(ObjectMapper.class);
         T instance = Feign.builder()
@@ -32,9 +31,6 @@ public class ThirdHttpService {
         switch (direct){
             case Auth -> {
                 return fileConfig.getAuthServiceAddress();
-            }
-            case Info -> {
-                return fileConfig.getInfoServiceAddress();
             }
             default -> {
                 throw new CustomBaseException("获取第三方服务地址出错", new Exception());

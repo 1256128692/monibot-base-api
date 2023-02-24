@@ -30,14 +30,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.16'
     implementation 'com.mysql:mysql-connector-j:8.0.32'
-    //implementation("com.alibaba:druid:1.2.16")
+    implementation("com.alibaba:druid:1.2.16")
 
-    //implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
+    implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
     implementation ('com.baomidou:mybatis-plus-boot-starter:3.5.3.1')
     //implementation('org.mybatis:mybatis:3.5.6')
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0")
     implementation group: 'com.alibaba.boot', name: 'nacos-config-spring-boot-starter', version: '0.2.12'
-    implementation("cn.shmedo.iot:entity:1.0.56")
+    implementation("cn.shmedo.iot:entity:1.0.57")
 
 
     implementation group: 'io.github.openfeign', name: 'feign-core', version: '10.0.1'

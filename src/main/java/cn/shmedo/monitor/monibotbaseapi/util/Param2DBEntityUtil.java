@@ -1,9 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 
 import java.util.Date;
 import java.util.List;
@@ -55,5 +59,18 @@ public class Param2DBEntityUtil {
                     return temp;
                 }
         ).collect(Collectors.toList());
+    }
+
+    public static TbPropertyModel fromAddModelParam2TbPropertyModel(AddModelParam param, Integer userID) {
+        TbPropertyModel obj = new TbPropertyModel();
+        obj.setName(param.getModelName());
+//        obj.setProjectType(param.getProjectType());
+//        obj.setCreateType(CreateType.Predefined.getType());
+//        obj.setDesc(param.getDesc());
+        return obj;
+    }
+
+    public static List<TbProperty> fromAddModelParam2TbPropertyList(AddModelParam param, Integer userID) {
+        return null;
     }
 }
