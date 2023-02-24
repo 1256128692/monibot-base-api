@@ -78,10 +78,10 @@ public class ProjectController {
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
-     * @apiParam (请求体) {String} [companyName] 企业名称,支持模糊查询
      * @apiParam (请求体) {String} [location] 行政区域
-     * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
-     * @apiParam (请求体) {Int} [status] 项目状态，null:全选，1:启用，0:停用
+     * @apiParam (请求体) {Int} [companyId] 企业名称-先调用接口查询具体企业，发送id
+     * @apiParam (请求体) {Int} [projectType] 项目类型
+     * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，1:启用，0:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
