@@ -18,7 +18,7 @@ import lombok.Data;
 @Data
 public class QueryProjectInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    private int id;
+    private Integer id;
     @Override
     public ResultWrapper validate() {
         return null;

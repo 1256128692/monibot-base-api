@@ -83,7 +83,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
      * @apiParam (请求体) {Int} [status] 项目状态，null:全选，1:启用，0:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
-     * @apiParam (请求体) {DateTime} [verifyDate] 有效期
+     * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
      * @apiParam (请求体) {DateTime} [endCreatTime] 创建时间-结束
      * @apiParam (请求体) {Object[]} [propertyQueryEntity] 属性查询实体
