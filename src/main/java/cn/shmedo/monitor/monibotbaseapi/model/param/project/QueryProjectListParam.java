@@ -22,12 +22,12 @@ import java.util.List;
 @Data
 public class QueryProjectListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    private int pageSize;
-    private int currentPage;
+    private Integer pageSize;
+    private Integer currentPage;
     private String projectName;
     private String directManageUnit;
-    private int companyId;
-    private int projectType;
+    private Integer companyId;
+    private Integer projectType;
     private Boolean enable;
     private List<Integer> platformTypeList;
     private Timestamp expiryDate;

@@ -1,12 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.response.ProjectInfoResult;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
+
 
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface ProjectService {
      * @param pa
      * @return
      */
-    Page<TbProjectInfo> getProjectInfoList(QueryProjectListParam pa);
+    List<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa);
     /**
      * 查询项目详情
      * @param pa

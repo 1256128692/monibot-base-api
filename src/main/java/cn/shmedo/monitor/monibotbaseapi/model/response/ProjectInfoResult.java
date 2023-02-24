@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.param.response;
+package cn.shmedo.monitor.monibotbaseapi.model.response;
 
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;

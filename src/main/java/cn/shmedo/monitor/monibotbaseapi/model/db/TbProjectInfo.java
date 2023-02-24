@@ -47,8 +47,7 @@ public class TbProjectInfo {
     private Byte platformType;
 
     /**
-    * 是否可用，需要配合有效期使用
-0:可用，1不可用
+    * 是否可用，需要配合有效期使用0:可用，1不可用
     */
     private Boolean enable;
 
