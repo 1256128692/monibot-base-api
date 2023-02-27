@@ -8,6 +8,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoPara
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -100,6 +102,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
 
+        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
+
         //类型转换，实体表转为要返回的类型
         List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
             ProjectInfoResult projectInfoResult = new ProjectInfoResult();
@@ -107,7 +111,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             //根据项目id获取标签信息列表-todo
 
             //根据项目id获取客户企业信息-todo
-
+            /*ResultWrapper<Company> companyInfo = userService.getCompanyInfo(207);
+            projectInfoResult.setCompany(companyInfo.getData());*/
             //根据项目id获取拓展属性信息列表
             projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(s.getID()));
             return projectInfoResult;
@@ -121,6 +126,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         int id = pa.getId();
         //根据项目id获取数据库表数据-未判空-todo
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
+        //调用第三方服务
+        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
 
         //判断项目是否停用
         if (projectInfo.getEnable() || projectInfo.getExpiryDate().before(new Date())) {
@@ -141,7 +148,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setTagInfo(tbTags);
 
         //给公司信息赋值-todo
-        projectInfoResult.setCompany(null);
+        /*ResultWrapper<Company> companyInfo = userService.getCompanyInfo(projectInfo.getCompanyID());
+        projectInfoResult.setCompany(companyInfo.getData());*/
 
         //给拓展信息赋值-todo
         projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));

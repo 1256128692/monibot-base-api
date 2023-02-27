@@ -62,45 +62,46 @@
         FROM tb_project_info a1
         LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
         LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
-        WHERE
-        <if test="projectName != null and projectName != ''">
-            projectName like "%"#{projectName,jdbcType=VARCHAR}"%"
-        </if>
-        <if test="directManageUnit != null and directManageUnit != ''">
-            and directManageUnit like "%"#{directManageUnit,jdbcType=VARCHAR}"%"
-        </if>
-        <if test="location != null and location != ''">
-            and location like "%"#{location,jdbcType=VARCHAR}"%"
-        </if>
-        <if test="companyId != null and companyId != ''">
-            and companyId = #{companyId,jdbcType=INTEGER}
-        </if>
-        <if test="projectType != null and projectType != ''">
-            and projectType = #{projectType,jdbcType=INTEGER}
-        </if>
-        <if test="enable != null and enable != ''">
-            and enable = #{enable,jdbcType=BOOLEAN}
-        </if>
-        <if test="platformTypeList != null and platformTypeList != ''">
-            and platformTypeList in #{platformTypeList}
-        </if>
-        <if test="expiryDate != null and expiryDate != ''">
-            and expiryDate <![CDATA[ <= ]]> #{expiryDate,jdbcType=TIMESTAMP}
-        </if>
-        <if test="beginCreateTime != null and beginCreateTime != ''">
-            and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="endCreateTime != null and endCreateTime != ''">
-            and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
-        </if>
-        <if test="propertyEntity != null and propertyEntity.size > 0">
-            <foreach collection="propertyEntity" item="item" separator="and">
-                and (
-                a3.`Name` = #{item.name,jdbcType=VARCHAR}
-                and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
-                )
-            </foreach>
-        </if>
+        <where>
+            <if test="projectName != null and projectName != ''">
+                and projectName like "%"#{projectName,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="directManageUnit != null and directManageUnit != ''">
+                and directManageUnit like "%"#{directManageUnit,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="location != null and location != ''">
+                and location like "%"#{location,jdbcType=VARCHAR}"%"
+            </if>
+            <if test="companyId != null and companyId != ''">
+                and companyId = #{companyId,jdbcType=INTEGER}
+            </if>
+            <if test="projectType != null and projectType != ''">
+                and projectType = #{projectType,jdbcType=INTEGER}
+            </if>
+            <if test="enable != null and enable != ''">
+                and enable = #{enable,jdbcType=BOOLEAN}
+            </if>
+            <if test="platformTypeList != null and platformTypeList != ''">
+                and platformTypeList in #{platformTypeList}
+            </if>
+            <if test="expiryDate != null and expiryDate != ''">
+                and expiryDate <![CDATA[ <= ]]> #{expiryDate,jdbcType=TIMESTAMP}
+            </if>
+            <if test="beginCreateTime != null and beginCreateTime != ''">
+                and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="endCreateTime != null and endCreateTime != ''">
+                and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
+            </if>
+            <if test="propertyEntity != null and propertyEntity.size > 0">
+                <foreach collection="propertyEntity" item="item" separator="and">
+                    and (
+                    a3.`Name` = #{item.name,jdbcType=VARCHAR}
+                    and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
+                    )
+                </foreach>
+            </if>
+        </where>
         order by createTime;
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
