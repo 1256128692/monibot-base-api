@@ -9,6 +9,23 @@
         <result column="PropertyID" jdbcType="INTEGER" property="propertyID"/>
         <result column="Value" jdbcType="VARCHAR" property="value"/>
     </resultMap>
+    <resultMap id="PorpertyResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.PropertyList">
+        <!--@mbg.generated-->
+        <!--@Table tb_project_property-->
+        <id column="ID" jdbcType="INTEGER" property="ID" />
+        <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+        <result column="PropertyID" jdbcType="INTEGER" property="propertyID" />
+        <result column="ProjectType" jdbcType="INTEGER" property="projectType" />
+        <result column="ClassName" jdbcType="VARCHAR" property="className" />
+        <result column="Name" jdbcType="VARCHAR" property="name" />
+        <result column="Required" jdbcType="BOOLEAN" property="required" />
+        <result column="MultiSelect" jdbcType="BOOLEAN" property="multiSelect" />
+        <result column="CreateType" jdbcType="INTEGER" property="createType" />
+        <result column="EnumField" jdbcType="VARCHAR" property="enumField" />
+        <result column="Unit" jdbcType="VARCHAR" property="unit" />
+        <result column="Value" jdbcType="VARCHAR" property="value" />
+        <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -16,12 +33,35 @@
         PropertyID,
         `Value`
     </sql>
+    <sql id="Property_LIst">
+        <!--@mbg.generated-->
+        ProjectID,
+        PropertyID,
+        ProjectType,
+        ClassName,
+        Name,
+        Required,
+        MultiSelect,
+        CreateType,
+        EnumField,
+        Unit,
+        Value,
+        ExValue
+    </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         <!--@mbg.generated-->
         select
         <include refid="Base_Column_List"/>
         from tb_project_property
         where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <select id="getPropertyList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" resultMap="PorpertyResultMap">
+        SELECT
+        a2.ID,
+        <include refid="Property_LIst"/>
+        FROM tb_property a1
+        LEFT JOIN tb_project_property a2 ON a1.ID = a2.PropertyID
+        WHERE a2.ID = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->
