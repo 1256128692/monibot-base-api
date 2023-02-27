@@ -74,6 +74,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public List<TbProjectType> getProjectType() {
+        //查询全部项目类型并返回
         List<TbProjectType> list = tbProjectTypeMapper.selectList(null);
         return list;
     }
@@ -85,9 +86,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
         //构建查询条件
         //基础拓展信息查询未写-todo
+        //标签查询未写-todo
         List<TbProjectInfo> tbProjectInfoPage = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
                 .like(!StringUtils.isNullOrEmpty(pa.getProjectName()), TbProjectInfo::getProjectName, pa.getProjectName())
                 .like(!StringUtils.isNullOrEmpty(pa.getDirectManageUnit()), TbProjectInfo::getDirectManageUnit, pa.getDirectManageUnit())
+                .like(!StringUtils.isNullOrEmpty(pa.getLocation()), TbProjectInfo::getLocation,pa.getLocation())
                 .eq(pa.getCompanyId() != null, TbProjectInfo::getCompanyID, pa.getCompanyId())
                 .eq(pa.getProjectType() != null, TbProjectInfo::getProjectType, pa.getProjectType())
                 .eq(pa.getEnable() != null, TbProjectInfo::getEnable, pa.getEnable())
@@ -96,6 +99,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 .le(pa.getBeginCreateTime() != null, TbProjectInfo::getCreateTime, pa.getBeginCreateTime())
                 .ge(pa.getEndCreatTime() != null, TbProjectInfo::getCreateTime, pa.getEndCreatTime()));
 
+        //类型转换，实体表转为要返回的类型
         List<ProjectInfoResult> projectInfoResults = tbProjectInfoPage.stream().map(s -> {
             ProjectInfoResult projectInfoResult = new ProjectInfoResult();
             BeanUtils.copyProperties(s, projectInfoResult);
