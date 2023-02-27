@@ -5,9 +5,7 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -220,7 +218,6 @@ public class ProjectController {
      * @apiParam (请求体) {String} projectName 项目名称
      * @apiParam (请求体) {String} shortName 项目简称
      * @apiParam (请求体) {String} [directManageUnit] 直管单位
-     * @apiParam (请求体) {DateTime} expiryDate 有效期
      * @apiParam (请求体) {Int} status 项目状态,1启用，0停用
      * @apiParam (请求体) {String} projectAddress 项目地址
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
@@ -252,8 +249,9 @@ public class ProjectController {
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "TransferProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object transferProject() {
-        return null;
+    public Object transferProject(@Validated @RequestBody TransferProjectParam param) {
+        projectService.transferProject(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -269,8 +267,9 @@ public class ProjectController {
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "RaiseExpiryDate", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object raiseExpiryDate() {
-        return null;
+    public Object raiseExpiryDate(@Validated @RequestBody RaiseExpiryDateParam param) {
+        projectService.raiseExpiryDate(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**

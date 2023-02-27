@@ -5,9 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.CompanyThird;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
@@ -99,6 +97,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //查询全部项目类型并返回
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
         return list;
+    }
+
+    @Override
+    public void transferProject(TransferProjectParam param, Integer userID) {
+        tbProjectInfoMapper.updateCompanyID(param.getProjectID(), param.getCompanyID(), userID, new Date());
+    }
+
+    @Override
+    public void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID) {
+        tbProjectInfoMapper.updateExpiryDate(param.getProjectID(), param.getNewRetireDate(), userID, new Date());
     }
 
     @Override

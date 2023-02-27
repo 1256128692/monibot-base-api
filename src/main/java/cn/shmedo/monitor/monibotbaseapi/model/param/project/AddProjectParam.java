@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
@@ -89,7 +90,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (ProjectTypeCache.projectTypeMap.get(projectType) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        if (DateUtil.betweenDay(expiryDate, DateUtil.date(), true) <= 90) {
+        if (DateUtil.between(expiryDate, DateUtil.date(), DateUnit.DAY, false) <= 90) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于90日");
         }
         if (!PlatformType.validate(platformType)) {

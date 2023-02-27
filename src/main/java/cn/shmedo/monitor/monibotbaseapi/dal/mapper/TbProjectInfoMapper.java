@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListPara
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -26,4 +27,8 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
      * @return
      */
     List<TbProjectInfo> getProjectInfoList(QueryProjectListParam param);
+
+    void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
+
+    void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
 }
