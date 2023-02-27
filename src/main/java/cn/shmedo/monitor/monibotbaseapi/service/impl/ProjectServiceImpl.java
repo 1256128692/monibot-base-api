@@ -18,7 +18,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -39,6 +41,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private TbPropertyMapper tbPropertyMapper;
     private TbProjectPropertyMapper tbProjectPropertyMapper;
+
     @Autowired
     public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper, TbTagMapper tbTagMapper, TbTagRelationMapper tbTagRelationMapper, TbPropertyMapper tbPropertyMapper, TbProjectPropertyMapper tbProjectPropertyMapper) {
         this.tbProjectInfoMapper = tbProjectInfoMapper;
@@ -73,15 +76,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectPropertyMapper.insertBatch(projectPropertyList);
 
         List<Integer> tagID4DBList = new ArrayList<>();
-        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())) {
             List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
             tbTagMapper.insertBatch(tagList);
             tagID4DBList.addAll(tagList.stream().map(TbTag::getID).collect(Collectors.toList()));
         }
-        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())) {
             tagID4DBList.addAll(pa.getTagIDList());
         }
-        if (ObjectUtil.isNotEmpty(tagID4DBList)){
+        if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
         }
     }
@@ -97,8 +100,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public List<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa) {
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
-
-
 
         //类型转换，实体表转为要返回的类型
         List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
@@ -144,7 +145,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setCompany(null);
 
         //给拓展信息赋值-todo
-        projectInfoResult.setPropertyList(null);
+        projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));
 
         return projectInfoResult;
     }

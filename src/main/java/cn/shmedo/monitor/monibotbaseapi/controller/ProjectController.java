@@ -85,51 +85,51 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
-     * @apiParam (请求体) {DateTime} [endCreatTime] 创建时间-结束
-     * @apiParam (请求体) {Object[]} [propertyQueryEntity] 属性查询实体
-     * @apiParam (请求体) {String} propertyQueryEntity.propertyName 属性名称
-     * @apiParam (请求体) {String} [propertyQueryEntity.value] 属性值，仅字符串类型支持模糊查询
+     * @apiParam (请求体) {DateTime} [endCreateTime] 创建时间-结束
+     * @apiParam (请求体) {Object[]} [propertyEntity] 属性查询实体
+     * @apiParam (请求体) {String} propertyEntity.name 属性名称
+     * @apiParam (请求体) {String} [propertyEntity.value] 属性值，仅字符串类型支持模糊查询
      * @apiParam (请求体) {Bool} [property] 是否带出属性信息，默认false
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} dataList 项目信息列表
-     * @apiSuccess (返回结果) {Int} dataList.projectID 项目id
-     * @apiSuccess (返回结果) {Int} dataList.companyID 公司id
-     * @apiSuccess (返回结果) {String} dataList.companyName 所属公司名称
+     * @apiSuccess (返回结果) {Int} dataList.ID 项目id
      * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
      * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
      * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
      * @apiSuccess (返回结果) {Int} dataList.projectTypeName 项目类型名称
-     * @apiSuccess (返回结果) {Int} dataList.PlatformType 平台类型
-     * @apiSuccess (返回结果) {Int} dataList.PlatformTypeName 平台名称
+     * @apiSuccess (返回结果) {Int} dataList.platformType 平台类型
+     * @apiSuccess (返回结果) {Int} dataList.platformTypeName 平台名称
      * @apiSuccess (返回结果) {String} dataList.directManageUnit 直管单位
-     * @apiSuccess (返回结果) {DateTime} dataList.ExpiryDate 项目有效期
-     * @apiSuccess (返回结果) {Bool} dataList.isValid 是否有效
-     * @apiSuccess (返回结果) {String} dataList.locationInfo 四级行政区域信息
+     * @apiSuccess (返回结果) {DateTime} dataList.expiryDate 项目有效期
+     * @apiSuccess (返回结果) {Bool} dataList.enable 是否有效
+     * @apiSuccess (返回结果) {String} dataList.location 四级行政区域信息
      * @apiSuccess (返回结果) {String} dataList.projectAddress 项目地址
      * @apiSuccess (返回结果) {Double} dataList.latitude 项目经度
      * @apiSuccess (返回结果) {Double} dataList.longitude 项目纬度
      * @apiSuccess (返回结果) {String} [dataList.imagePath] 项目图片地址
-     * @apiSuccess (返回结果) {String} [dataList.desc] 项目简介
+     * @apiSuccess (返回结果) {String} [dataList.projectDesc] 项目简介
      * @apiSuccess (返回结果) {DateTime} dataList.createTime 创建时间
      * @apiSuccess (返回结果) {Int} dataList.createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} dataList.updateUserID 修改用户ID
-     * @apiSuccess (返回结果) {Object} companyInfo 公司信息
-     * @apiSuccess (返回结果) {Int} companyInfo.companyID 公司id
-     * @apiSuccess (返回结果) {String} companyInfo.companyName 所属公司名称
-     * @apiSuccess (返回结果) {String} companyInfo.companyContacts 公司联系人
-     * @apiSuccess (返回结果) {String} companyInfo.contactsPhone 公司联系人电话
-     * @apiSuccess (返回结果) {String} companyInfo.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Object} company 公司信息
+     * @apiSuccess (返回结果) {Int} company.companyID 公司id
+     * @apiSuccess (返回结果) {String} company.companyName 所属公司名称
+     * @apiSuccess (返回结果) {String} company.companyContacts 公司联系人
+     * @apiSuccess (返回结果) {String} company.contactsPhone 公司联系人电话
+     * @apiSuccess (返回结果) {String} company.contactsAddress 公司联系地址
      * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
-     * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
+     * @apiSuccess (返回结果) {Int} tagInfo.ID 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
      * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
      * @apiSuccess (返回结果) {Object[]} propertyList 项目基础信息列表
+     * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
-     * @apiSuccess (返回结果) {Int} propertyList.propertyType 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
@@ -146,7 +146,6 @@ public class ProjectController {
     @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
     public Object queryProjectList(@Validated @RequestBody QueryProjectListParam pa){
-        // TODO 文档有更新待实现
         return projectService.getProjectInfoList(pa);
     }
 
@@ -158,9 +157,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectInfo
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiSuccess (返回结果) {Int} projectID 项目id
-     * @apiSuccess (返回结果) {Int} companyID 公司id
-     * @apiSuccess (返回结果) {String} companyName 所属公司名称
+     * @apiSuccess (返回结果) {Int} ID 项目id
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
@@ -174,24 +171,26 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Double} latitude 项目经度
      * @apiSuccess (返回结果) {Double} longitude 项目纬度
      * @apiSuccess (返回结果) {String} [imagePath] 项目图片地址
-     * @apiSuccess (返回结果) {String} [desc] 项目简介
+     * @apiSuccess (返回结果) {String} [projectDesc] 项目简介
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
      * @apiSuccess (返回结果) {Int} createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
      * @apiSuccess (返回结果) {Int} updateUserID 修改用户ID
-     * @apiSuccess (返回结果) {Object} companyInfo 公司信息
-     * @apiSuccess (返回结果) {Int} companyInfo.companyID 公司id
-     * @apiSuccess (返回结果) {String} companyInfo.companyName 所属公司名称
-     * @apiSuccess (返回结果) {String} companyInfo.companyContacts 公司联系人
-     * @apiSuccess (返回结果) {String} companyInfo.contactsPhone 公司联系人电话
-     * @apiSuccess (返回结果) {String} companyInfo.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Object} company 公司信息
+     * @apiSuccess (返回结果) {Int} company.companyID 公司id
+     * @apiSuccess (返回结果) {String} company.companyName 所属公司名称
+     * @apiSuccess (返回结果) {String} company.companyContacts 公司联系人
+     * @apiSuccess (返回结果) {String} company.contactsPhone 公司联系人电话
+     * @apiSuccess (返回结果) {String} company.contactsAddress 公司联系地址
      * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
      * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
      * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
      * @apiSuccess (返回结果) {Object[]} propertyList 项目基础信息列表
+     * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
-     * @apiSuccess (返回结果) {Int} propertyList.propertyType 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填

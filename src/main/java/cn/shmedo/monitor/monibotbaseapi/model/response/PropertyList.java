@@ -15,6 +15,7 @@ public class PropertyList {
     private Integer ID;
     private Integer projectID;
     private Integer propertyID;
+    private Integer type;
     private Integer projectType;
     private String className;
     private String name;
@@ -25,4 +26,5 @@ public class PropertyList {
     private String unit;
     private String value;
     private String exValue;
+    private Integer displayOrder;
 }
