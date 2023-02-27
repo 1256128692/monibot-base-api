@@ -1,17 +1,20 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.CompanyThird;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
@@ -19,7 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Date;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         this.tbProjectTypeMapper = tbProjectTypeMapper;
         this.tbTagRelationMapper = tbTagRelationMapper;
     }
+
+    //String accessToken = server.accessToken
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -98,11 +102,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public List<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa) {
+    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa) {
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
-
-        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
 
         //类型转换，实体表转为要返回的类型
         List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
@@ -110,29 +112,31 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             BeanUtils.copyProperties(s, projectInfoResult);
             //根据项目id获取标签信息列表-todo
 
-            //根据项目id获取客户企业信息-todo
-            /*ResultWrapper<Company> companyInfo = userService.getCompanyInfo(207);
-            projectInfoResult.setCompany(companyInfo.getData());*/
+            //根据项目id获取客户企业信息
+            Company data = new Company();
+            Object data1 = getCompany(s.getCompanyID()).getData();
+            /*if (!getCompany(s.getCompanyID()).getData().equals(null)){
+                data = (Company) getCompany(s.getCompanyID()).getData();
+            }else {
+                data = null;
+            }*/
+            projectInfoResult.setCompany(data);
+
             //根据项目id获取拓展属性信息列表
             projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(s.getID()));
             return projectInfoResult;
         }).collect(Collectors.toList());
-        return projectInfoResults;
+
+        return PageUtil.page(projectInfoResults,pa.getPageSize(),pa.getCurrentPage());
     }
 
     @Override
-    public ProjectInfoResult getProjectInfoData(QueryProjectInfoParam pa) {
+    public ResultWrapper getProjectInfoData(QueryProjectInfoParam pa) {
 
         int id = pa.getId();
         //根据项目id获取数据库表数据-未判空-todo
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
-        //调用第三方服务
-        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
 
-        //判断项目是否停用
-        if (projectInfo.getEnable() || projectInfo.getExpiryDate().before(new Date())) {
-
-        }
         //类型转换-将projectInfo转为ProjectInfoResult
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
 
@@ -140,20 +144,27 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
         tagLambdaQueryWrapper.eq(TbTag::getCompanyID, projectInfo.getCompanyID());
         List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
-        if (CollectionUtil.isNullOrEmpty(tbTags)) {
-
-        }
 
         //给标签列表赋值
         projectInfoResult.setTagInfo(tbTags);
 
         //给公司信息赋值-todo
-        /*ResultWrapper<Company> companyInfo = userService.getCompanyInfo(projectInfo.getCompanyID());
-        projectInfoResult.setCompany(companyInfo.getData());*/
+        Company data = (Company) getCompany(projectInfo.getCompanyID()).getData();
+        projectInfoResult.setCompany(data);
 
         //给拓展信息赋值-todo
         projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));
 
-        return projectInfoResult;
+        return ResultWrapper.success(projectInfoResult);
+    }
+
+    @Override
+    public ResultWrapper getCompany(Integer id){
+        CompanyThird companyThird = new CompanyThird();
+        companyThird.setCompanyID(id);
+        //待验证-todo
+        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
+        ResultWrapper<Company> companyInfo = userService.getCompanyInfo("1",companyThird);
+        return ResultWrapper.success(companyInfo);
     }
 }

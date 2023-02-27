@@ -1,10 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 
 import java.util.List;
@@ -21,13 +23,13 @@ public interface ProjectService {
      * @param pa
      * @return
      */
-    List<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa);
+    PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa);
     /**
      * 查询项目详情
      * @param pa
      * @return
      */
-    ProjectInfoResult getProjectInfoData(QueryProjectInfoParam pa);
+    ResultWrapper getProjectInfoData(QueryProjectInfoParam pa);
 
     /**
      * 新增项目
@@ -41,4 +43,6 @@ public interface ProjectService {
      * @return
      */
     List<TbProjectType> getProjectType();
+
+    ResultWrapper getCompany(Integer id);
 }
