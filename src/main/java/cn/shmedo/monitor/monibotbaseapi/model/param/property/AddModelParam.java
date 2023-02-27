@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -30,6 +31,9 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     public ResultWrapper validate() {
         if (ProjectTypeCache.projectTypeMap.get(Integer.valueOf(projectType)) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
+        }
+        if (!PropertyUtil.validate(modelPropertyList)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性不合法");
         }
         return null;
     }

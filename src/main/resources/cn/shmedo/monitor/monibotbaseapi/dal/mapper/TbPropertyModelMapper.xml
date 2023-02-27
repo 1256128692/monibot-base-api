@@ -5,8 +5,8 @@
     <!--@mbg.generated-->
     <!--@Table tb_property_model-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="ProjectType" jdbcType="INTEGER" property="projectType" />
-    <result column="CreateType" jdbcType="INTEGER" property="createType" />
+    <result column="ProjectType" jdbcType="TINYINT" property="projectType" />
+    <result column="CreateType" jdbcType="TINYINT" property="createType" />
     <result column="Name" jdbcType="VARCHAR" property="name" />
     <result column="Desc" jdbcType="VARCHAR" property="desc" />
   </resultMap>
@@ -30,7 +30,7 @@
     <!--@mbg.generated-->
     insert into tb_property_model (ProjectType, CreateType, `Name`, 
       `Desc`)
-    values (#{projectType,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+    values (#{projectType,jdbcType=TINYINT}, #{createType,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, 
       #{desc,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel" useGeneratedKeys="true">
@@ -52,10 +52,10 @@
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="projectType != null">
-        #{projectType,jdbcType=INTEGER},
+        #{projectType,jdbcType=TINYINT},
       </if>
       <if test="createType != null">
-        #{createType,jdbcType=INTEGER},
+        #{createType,jdbcType=TINYINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
@@ -70,10 +70,10 @@
     update tb_property_model
     <set>
       <if test="projectType != null">
-        ProjectType = #{projectType,jdbcType=INTEGER},
+        ProjectType = #{projectType,jdbcType=TINYINT},
       </if>
       <if test="createType != null">
-        CreateType = #{createType,jdbcType=INTEGER},
+        CreateType = #{createType,jdbcType=TINYINT},
       </if>
       <if test="name != null">
         `Name` = #{name,jdbcType=VARCHAR},
@@ -87,8 +87,8 @@
   <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel">
     <!--@mbg.generated-->
     update tb_property_model
-    set ProjectType = #{projectType,jdbcType=INTEGER},
-      CreateType = #{createType,jdbcType=INTEGER},
+    set ProjectType = #{projectType,jdbcType=TINYINT},
+      CreateType = #{createType,jdbcType=TINYINT},
       `Name` = #{name,jdbcType=VARCHAR},
       `Desc` = #{desc,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}

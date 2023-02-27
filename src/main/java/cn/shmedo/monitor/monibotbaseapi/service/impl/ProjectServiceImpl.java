@@ -1,13 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectTypeMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagRelationMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
@@ -28,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -42,10 +39,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private TbProjectTypeMapper tbProjectTypeMapper;
 
     private TbTagRelationMapper tbTagRelationMapper;
+
+    private TbPropertyMapper tbPropertyMapper;
+    private TbProjectPropertyMapper tbProjectPropertyMapper;
     @Autowired
-    public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper, TbTagMapper tbTagMapper, TbTagRelationMapper tbTagRelationMapper) {
+    public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper, TbTagMapper tbTagMapper, TbTagRelationMapper tbTagRelationMapper, TbPropertyMapper tbPropertyMapper, TbProjectPropertyMapper tbProjectPropertyMapper) {
         this.tbProjectInfoMapper = tbProjectInfoMapper;
         this.tbTagMapper = tbTagMapper;
+        this.tbPropertyMapper = tbPropertyMapper;
+        this.tbProjectPropertyMapper = tbProjectPropertyMapper;
         this.tbProjectTypeMapper = tbProjectTypeMapper;
         this.tbTagRelationMapper = tbTagRelationMapper;
     }
@@ -57,7 +59,22 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         String imgPath = "xxxx";
         TbProjectInfo tbProjectInfo = Param2DBEntityUtil.fromAddProjectParam2TbProjectInfo(pa, userID, imgPath);
         tbProjectInfoMapper.insert(tbProjectInfo);
-        // TODO 处理模板数据
+
+        // 处理属性
+
+        Map<String, TbProperty> propertyMap = pa.getProperties().stream().collect(Collectors.toMap(TbProperty::getName, Function.identity()));
+        List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
+                item -> {
+                    TbProjectProperty tbProjectProperty = new TbProjectProperty();
+                    tbProjectProperty.setPropertyID(tbProjectInfo.getID());
+                    tbProjectProperty.setPropertyID(propertyMap.get(item.getName()).getID());
+                    tbProjectProperty.setValue(item.getValue());
+                    return tbProjectProperty;
+                }
+        ).collect(Collectors.toList());
+
+        tbProjectPropertyMapper.insertBatch(projectPropertyList);
+
         List<Integer> tagID4DBList = new ArrayList<>();
         if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
             List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
@@ -75,7 +92,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public List<TbProjectType> getProjectType() {
         //查询全部项目类型并返回
-        List<TbProjectType> list = tbProjectTypeMapper.selectList(null);
+        List<TbProjectType> list = tbProjectTypeMapper.selectAll();
         return list;
     }
 

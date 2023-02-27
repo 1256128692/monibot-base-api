@@ -2,68 +2,68 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 public class TbProperty {
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 项目类型
-    */
-    private Integer projectType;
+     * 项目类型
+     */
+    private Byte projectType;
 
     /**
-    * 属性名称
-    */
+     * 属性名称
+     */
     private String name;
 
     /**
-    * 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
-    */
+     * 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     */
     private Byte type;
 
     /**
-    * 属性单位
-    */
+     * 属性单位
+     */
     private String unit;
 
     /**
-    * 是否必填
-    */
+     * 是否必填
+     */
     private Boolean required;
 
     /**
-    * 是否多选,限定枚举
-    */
+     * 是否多选,限定枚举
+     */
     private Boolean multiSelect;
 
     /**
-    * 枚举字段
-    */
+     * 枚举字段
+     */
     private String enumField;
 
     /**
-    * 创建类型 0-预定义 1-自定义
-    */
+     * 创建类型 0-预定义 1-自定义
+     */
     private Byte createType;
 
     /**
-    * 结构名称
-    */
+     * 结构名称
+     */
     private String className;
 
     /**
-    * 排序字段
-    */
+     * 排序字段
+     */
     private Integer displayOrder;
 
     /**
-    * 模板ID
-    */
+     * 模板ID
+     */
     private Integer modelID;
 
     /**
-    * 拓展信息
-    */
+     * 拓展信息
+     */
     private String exValue;
 
     public Integer getID() {
@@ -74,11 +74,11 @@ public class TbProperty {
         this.ID = ID;
     }
 
-    public Integer getProjectType() {
+    public Byte getProjectType() {
         return projectType;
     }
 
-    public void setProjectType(Integer projectType) {
+    public void setProjectType(Byte projectType) {
         this.projectType = projectType;
     }
 

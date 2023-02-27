@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public class ProjectTypeCache {
 
     private static List<TbProjectType> projectTypeList;
-    public static Map<Integer, TbProjectType> projectTypeMap;
+    public static Map<Byte, TbProjectType> projectTypeMap;
 
 
     private TbProjectTypeMapper tbProjectTypeMapper;

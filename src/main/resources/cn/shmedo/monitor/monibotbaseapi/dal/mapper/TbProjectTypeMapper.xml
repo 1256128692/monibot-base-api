@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType">
     <!--@mbg.generated-->
     <!--@Table tb_project_type-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <id column="ID" jdbcType="TINYINT" property="ID" />
     <result column="TypeName" jdbcType="VARCHAR" property="typeName" />
     <result column="MainType" jdbcType="VARCHAR" property="mainType" />
   </resultMap>
@@ -12,17 +12,17 @@
     <!--@mbg.generated-->
     ID, TypeName, MainType
   </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+  <select id="selectByPrimaryKey" parameterType="java.lang.Byte" resultMap="BaseResultMap">
     <!--@mbg.generated-->
     select 
     <include refid="Base_Column_List" />
     from tb_project_type
-    where ID = #{ID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=TINYINT}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Byte">
     <!--@mbg.generated-->
     delete from tb_project_type
-    where ID = #{ID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=TINYINT}
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -60,14 +60,14 @@
         MainType = #{mainType,jdbcType=VARCHAR},
       </if>
     </set>
-    where ID = #{ID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=TINYINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType">
     <!--@mbg.generated-->
     update tb_project_type
     set TypeName = #{typeName,jdbcType=VARCHAR},
       MainType = #{mainType,jdbcType=VARCHAR}
-    where ID = #{ID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=TINYINT}
   </update>
 
   <select id="selectAll" resultMap="BaseResultMap">

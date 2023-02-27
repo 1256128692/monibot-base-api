@@ -2,25 +2,25 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 public class TbProjectType {
     /**
-    * 主键
-    */
-    private Integer ID;
+     * 主键
+     */
+    private Byte ID;
 
     /**
-    * 类型名称
-    */
+     * 类型名称
+     */
     private String typeName;
 
     /**
-    * 主类型名称
-    */
+     * 主类型名称
+     */
     private String mainType;
 
-    public Integer getID() {
+    public Byte getID() {
         return ID;
     }
 
-    public void setID(Integer ID) {
+    public void setID(Byte ID) {
         this.ID = ID;
     }
 

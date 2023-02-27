@@ -11,7 +11,10 @@
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID, ProjectID, PropertyID, `Value`
+        ID,
+        ProjectID,
+        PropertyID,
+        `Value`
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         <!--@mbg.generated-->
@@ -22,16 +25,15 @@
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->
-        delete from tb_project_property
+        delete
+        from tb_project_property
         where ID = #{ID,jdbcType=INTEGER}
     </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into tb_project_property (ProjectID, PropertyID, `Value`
-        )
-        values (#{projectID,jdbcType=INTEGER}, #{propertyID,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR}
-        )
+        insert into tb_project_property (ProjectID, PropertyID, `Value`)
+        values (#{projectID,jdbcType=INTEGER}, #{propertyID,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR})
     </insert>
     <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
@@ -80,9 +82,9 @@
     <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
         <!--@mbg.generated-->
         update tb_project_property
-        set ProjectID = #{projectID,jdbcType=INTEGER},
-        PropertyID = #{propertyID,jdbcType=INTEGER},
-        `Value` = #{value,jdbcType=VARCHAR}
+        set ProjectID  = #{projectID,jdbcType=INTEGER},
+            PropertyID = #{propertyID,jdbcType=INTEGER},
+            `Value`    = #{value,jdbcType=VARCHAR}
         where ID = #{ID,jdbcType=INTEGER}
     </update>
 
@@ -98,4 +100,11 @@
             #{item.propertyID}
         </foreach>
     </update>
+
+    <insert id="insertBatch">
+        insert into tb_project_property(ProjectID, PropertyID, Value) value
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectID}, #{item.projectID}, #{item.value})
+        </foreach>
+    </insert>
 </mapper>

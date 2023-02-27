@@ -22,4 +22,8 @@ public interface TbPropertyMapper {
     int countByPIDAndNames(Integer projectID, List<String> nameList);
 
     void insertBatch(List<TbProperty> properties);
+
+    int countByMIDAndNames(Integer modelID, List<String> nameList);
+
+    List<TbProperty> queryByMID(Integer modelID);
 }

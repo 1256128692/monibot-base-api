@@ -64,13 +64,29 @@ public class Param2DBEntityUtil {
     public static TbPropertyModel fromAddModelParam2TbPropertyModel(AddModelParam param, Integer userID) {
         TbPropertyModel obj = new TbPropertyModel();
         obj.setName(param.getModelName());
-//        obj.setProjectType(param.getProjectType());
-//        obj.setCreateType(CreateType.Predefined.getType());
-//        obj.setDesc(param.getDesc());
+        obj.setProjectType(param.getProjectType());
+        obj.setCreateType(CreateType.Predefined.getType());
+        obj.setDesc(param.getDesc());
         return obj;
     }
 
-    public static List<TbProperty> fromAddModelParam2TbPropertyList(AddModelParam param, Integer userID) {
-        return null;
+    public static List<TbProperty> fromAddModelParam2TbPropertyList(AddModelParam param, Integer userID, Integer modelID) {
+        return param.getModelPropertyList().stream().map(item ->{
+            TbProperty obj = new TbProperty();
+            obj.setProjectType(param.getProjectType());
+            obj.setName(item.getName());
+            obj.setType(item.getType());
+            obj.setUnit(item.getUnit());
+            obj.setRequired(item.getRequired());
+            obj.setMultiSelect(item.getMultiSelect());
+            obj.setEnumField(item.getEnumField());
+            obj.setCreateType(CreateType.Predefined.getType());
+            obj.setClassName(item.getClassName());
+            obj.setDisplayOrder(item.getDisplayOrder());
+            obj.setExValue(item.getExValue());
+            obj.setModelID(modelID);
+            return obj;
+        }).collect(Collectors.toList());
+
     }
 }

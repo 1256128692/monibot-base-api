@@ -5,7 +5,7 @@
         <!--@mbg.generated-->
         <!--@Table tb_property-->
         <id column="ID" jdbcType="INTEGER" property="ID"/>
-        <result column="ProjectType" jdbcType="INTEGER" property="projectType"/>
+        <result column="ProjectType" jdbcType="TINYINT" property="projectType"/>
         <result column="Name" jdbcType="VARCHAR" property="name"/>
         <result column="Type" jdbcType="TINYINT" property="type"/>
         <result column="Unit" jdbcType="VARCHAR" property="unit"/>
@@ -43,7 +43,7 @@
         EnumField, CreateType, ClassName,
         DisplayOrder, ModelID, ExValue
         )
-        values (#{projectType,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT},
+        values (#{projectType,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT},
         #{unit,jdbcType=VARCHAR}, #{required,jdbcType=BIT}, #{multiSelect,jdbcType=BIT},
         #{enumField,jdbcType=VARCHAR}, #{createType,jdbcType=TINYINT}, #{className,jdbcType=VARCHAR},
         #{displayOrder,jdbcType=INTEGER}, #{modelID,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}
@@ -93,7 +93,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="projectType != null">
-                #{projectType,jdbcType=INTEGER},
+                #{projectType,jdbcType=TINYINT},
             </if>
             <if test="name != null">
                 #{name,jdbcType=VARCHAR},
@@ -135,7 +135,7 @@
         update tb_property
         <set>
             <if test="projectType != null">
-                ProjectType = #{projectType,jdbcType=INTEGER},
+                ProjectType = #{projectType,jdbcType=TINYINT},
             </if>
             <if test="name != null">
                 `Name` = #{name,jdbcType=VARCHAR},
@@ -176,7 +176,7 @@
     <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty">
         <!--@mbg.generated-->
         update tb_property
-        set ProjectType = #{projectType,jdbcType=INTEGER},
+        set ProjectType = #{projectType,jdbcType=TINYINT},
         `Name` = #{name,jdbcType=VARCHAR},
         `Type` = #{type,jdbcType=TINYINT},
         Unit = #{unit,jdbcType=VARCHAR},
@@ -199,21 +199,35 @@
 
     <select id="countByPIDAndNames" resultType="int">
         select count(1) from tb_property as p
-                                 left join tb_project_info as pinfo on pinfo.ModelID = p.ModelID
+        left join tb_project_info as pinfo on pinfo.ModelID = p.ModelID
         where p.ID = #{projectID} and p.Name in
-        <foreach collection="nameList" item="name" separator="," open="(" close=")">
+        <foreach close=")" collection="nameList" item="name" open="(" separator=",">
             #{name}
         </foreach>
-
     </select>
 
     <insert id="insertBatch">
         insert into tb_property
-        (projecttype, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid, exvalue)
+        (projecttype, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid,
+        exvalue)
         value
         <foreach collection="list" item="item" separator=",">
-            (#{item.projectType}, #{item.name}, #{item.type}, #{item.unit}, #{item.required}, #{item.multiSelect}, #{item.enumField}
+            (#{item.projectType}, #{item.name}, #{item.type}, #{item.unit}, #{item.required}, #{item.multiSelect},
+            #{item.enumField}
             , #{item.createType}, #{item.className}, #{item.displayOrder}, #{item.modelID}, #{item.exValue})
         </foreach>
     </insert>
+
+    <select id="countByMIDAndNames" resultType="int">
+        select count(1) from tb_property as p
+        left join tb_property_model as m on m.ID = p.ModelID
+        where m.ID = #{modelID} and p.Name in
+        <foreach close=")" collection="nameList" item="name" open="(" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
+    <select id="queryByMID" resultMap="BaseResultMap">
+        select * from tb_property where ModelID = #{modelID}
+    </select>
 </mapper>

@@ -18,4 +18,6 @@ public interface TbProjectPropertyMapper {
     int updateByPrimaryKey(TbProjectProperty record);
 
     void updateBatch(List<TbProjectProperty> projectPropertyList);
+
+    void insertBatch(List<TbProjectProperty> projectPropertyList);
 }

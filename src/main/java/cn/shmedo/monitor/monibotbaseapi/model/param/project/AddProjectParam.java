@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -10,9 +12,14 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectTypeMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
+import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -21,6 +28,9 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -48,10 +58,10 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @NotNull
     private Boolean enable;
     @NotBlank
-    @Size(max =500)
+    @Size(max = 500)
     private String location;
     @NotBlank
-    @Size(max =100)
+    @Size(max = 100)
     private String projectAddress;
     @NotNull
     private Double latitude;
@@ -62,30 +72,57 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<Integer> tagIDList;
     private List<TagKeyAndValue> tagList;
     @Valid
-    private List< @NotNull Integer > monitorTypeList;
+    private List<@NotNull Integer> monitorTypeList;
     @NotNull
     private Integer modelID;
     @NotEmpty
     @Valid
-    private List< @NotNull NameAndValue> modelValueList;
+    private List<@NotNull NameAndValue> modelValueList;
+    @JsonIgnore
+    List<TbProperty> properties;
 
     @Override
     public ResultWrapper validate() {
 
-        if (ProjectTypeCache.projectTypeMap.get(Integer.valueOf(projectType)) == null){
+        if (ProjectTypeCache.projectTypeMap.get(Integer.valueOf(projectType)) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        if (DateUtil.betweenDay(expiryDate, DateUtil.date(),true)<=90){
+        if (DateUtil.betweenDay(expiryDate, DateUtil.date(), true) <= 90) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于90日");
         }
-        if (!PlatformType.validate(platformType)){
+        if (!PlatformType.validate(platformType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
         }
-        if (ObjectUtil.isNotEmpty(tagIDList)){
+        if (ObjectUtil.isNotEmpty(tagIDList)) {
             TbTagMapper tbTagMapper = ContextHolder.getBean(TbTagMapper.class);
-            if (tbTagMapper.countByCIDAndIDs(companyID, tagIDList)!=tagIDList.size()){
+            if (tbTagMapper.countByCIDAndIDs(companyID, tagIDList) != tagIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "标签不存在或不属于本公司");
             }
+        }
+        TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
+        if (!tbPropertyModelMapper.selectByPrimaryKey(modelID).getProjectType().equals(projectType)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
+        }
+        TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+        properties = tbPropertyMapper.queryByMID(modelID);
+        ;
+        if (properties.size() != modelValueList.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "提供的属性与模板属性数量不符");
+        }
+
+
+        Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
+        boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.Type_Enum.getType()))
+                .anyMatch(item -> {
+                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
+                    NameAndValue temp = nameAndValueMap.get(item.getName());
+                    if (!enums.contains(temp.getValue())) {
+                        return true;
+                    }
+                    return false;
+                });
+        if (b) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法");
         }
         return null;
     }
@@ -260,5 +297,9 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
 
     public void setModelValueList(List<NameAndValue> modelValueList) {
         this.modelValueList = modelValueList;
+    }
+
+    public List<TbProperty> getProperties() {
+        return properties;
     }
 }

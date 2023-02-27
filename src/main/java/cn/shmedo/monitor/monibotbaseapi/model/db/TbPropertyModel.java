@@ -2,28 +2,28 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 public class TbPropertyModel {
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 项目类型
-    */
-    private Integer projectType;
+     * 项目类型
+     */
+    private Byte projectType;
 
     /**
-    * 创建类型 0预定义 1自定义
-    */
-    private Integer createType;
+     * 创建类型 0预定义 1自定义
+     */
+    private Byte createType;
 
     /**
-    * 模板名称
-    */
+     * 模板名称
+     */
     private String name;
 
     /**
-    * 模板描述
-    */
+     * 模板描述
+     */
     private String desc;
 
     public Integer getID() {
@@ -34,19 +34,19 @@ public class TbPropertyModel {
         this.ID = ID;
     }
 
-    public Integer getProjectType() {
+    public Byte getProjectType() {
         return projectType;
     }
 
-    public void setProjectType(Integer projectType) {
+    public void setProjectType(Byte projectType) {
         this.projectType = projectType;
     }
 
-    public Integer getCreateType() {
+    public Byte getCreateType() {
         return createType;
     }
 
-    public void setCreateType(Integer createType) {
+    public void setCreateType(Byte createType) {
         this.createType = createType;
     }
 

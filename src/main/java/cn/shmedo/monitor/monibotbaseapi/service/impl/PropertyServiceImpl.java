@@ -59,7 +59,7 @@ public class PropertyServiceImpl implements PropertyService {
         TbPropertyModel record = Param2DBEntityUtil.fromAddModelParam2TbPropertyModel(param, userID);
         tbPropertyModelMapper.insert(record);
 
-        List<TbProperty> properties = Param2DBEntityUtil.fromAddModelParam2TbPropertyList(param, userID);
+        List<TbProperty> properties = Param2DBEntityUtil.fromAddModelParam2TbPropertyList(param, userID, record.getID());
         tbPropertyMapper.insertBatch(properties);
     }
 }
