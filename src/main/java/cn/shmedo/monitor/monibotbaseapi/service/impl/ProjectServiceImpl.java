@@ -66,7 +66,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
-                    tbProjectProperty.setPropertyID(tbProjectInfo.getID());
+                    tbProjectProperty.setProjectID(tbProjectInfo.getID());
                     tbProjectProperty.setPropertyID(propertyMap.get(item.getName()).getID());
                     tbProjectProperty.setValue(item.getValue());
                     return tbProjectProperty;
@@ -76,10 +76,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectPropertyMapper.insertBatch(projectPropertyList);
 
         List<Integer> tagID4DBList = new ArrayList<>();
-        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagList())){
             List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
             tbTagMapper.insertBatch(tagList);
-            tagID4DBList.addAll(tagList.stream().map(TbTag::getID).collect(Collectors.toList()));
+            tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
         }
         if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
             tagID4DBList.addAll(pa.getTagIDList());

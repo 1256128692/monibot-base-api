@@ -42,7 +42,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天
-     * @apiParam (请求体) {String} [directManageUnit] 直管单位(<=50)
+     * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
      * @apiParam (请求体) {Int} platformType 所属平台类型
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)

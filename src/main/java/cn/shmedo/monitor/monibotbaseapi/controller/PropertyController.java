@@ -31,7 +31,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} modelName 模型名称
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [desc] 模板描述
-     * @apiParam (请求体) {Json[]} [modelPropertyList] 自定义属性列表
+     * @apiParam (请求体) {Json[]} modelPropertyList 自定义属性列表
      * @apiParam (请求体) {String} modelPropertyList.name 属性名称
      * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
      * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位

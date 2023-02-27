@@ -192,9 +192,9 @@
     </update>
 
     <select id="queryByPID" resultMap="BaseResultMap">
-        select * from tb_property as p
-        left join tb_project_info as pinfo on pinfo.ModelID = p.ModelID
-        where p.ID = #{projectID}
+        select * from tb_property where
+            ModelID = (
+                select  ModelID from tb_project_info where ID = #{projectID})
     </select>
 
     <select id="countByPIDAndNames" resultType="int">

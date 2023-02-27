@@ -16,6 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
@@ -52,6 +53,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @NotNull
     private Date expiryDate;
     @Size(max = 50)
+    @NotBlank
     private String directManageUnit;
     @NotNull
     private Byte platformType;
@@ -84,7 +86,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @Override
     public ResultWrapper validate() {
 
-        if (ProjectTypeCache.projectTypeMap.get(Integer.valueOf(projectType)) == null) {
+        if (ProjectTypeCache.projectTypeMap.get(projectType) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (DateUtil.betweenDay(expiryDate, DateUtil.date(), true) <= 90) {
@@ -100,16 +102,19 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             }
         }
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
-        if (!tbPropertyModelMapper.selectByPrimaryKey(modelID).getProjectType().equals(projectType)) {
+        TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
+        if (tbPropertyModel == null){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不存在");
+        }
+        if (!tbPropertyModel.getProjectType().equals(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
         }
         TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
         properties = tbPropertyMapper.queryByMID(modelID);
-        ;
         if (properties.size() != modelValueList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "提供的属性与模板属性数量不符");
         }
-
+        // TODO 校验标签
 
         Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
         boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.Type_Enum.getType()))
@@ -125,6 +130,8 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法");
         }
         return null;
+
+
     }
 
     @Override

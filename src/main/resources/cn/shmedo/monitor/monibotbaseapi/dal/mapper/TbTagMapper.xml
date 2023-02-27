@@ -138,10 +138,10 @@
         </foreach>
     </select>
 
-    <insert id="insertBatch" keyColumn="ID" keyProperty="id" useGeneratedKeys="true">
+    <insert id="insertBatch" keyColumn="ID" keyProperty="ID" useGeneratedKeys="true">
         insert into tb_tag(companyid, tagkey, tagvalue, createtime, createuserid, updatetime, updateuserid) value
         <foreach collection="tagList" item="item" separator=",">
-            (#{item.companyID},#{item.tagkey},#{item.tagvalue},#{item.createtime},#{item.createuserid},#{item.updatetime},#{item.updateuserid})
+            (#{item.companyID},#{item.tagKey},#{item.tagValue},#{item.createTime},#{item.createUserID},#{item.updateTime},#{item.updateUserID})
         </foreach>
     </insert>
 

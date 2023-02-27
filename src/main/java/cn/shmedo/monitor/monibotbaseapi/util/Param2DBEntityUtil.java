@@ -37,6 +37,7 @@ public class Param2DBEntityUtil {
         obj.setLatitude(pa.getLatitude());
         obj.setImagePath(imgPath);
         obj.setProjectDesc(pa.getProjectDesc());
+        obj.setModelID(pa.getModelID());
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);
         obj.setCreateTime(now);
@@ -65,7 +66,7 @@ public class Param2DBEntityUtil {
         TbPropertyModel obj = new TbPropertyModel();
         obj.setName(param.getModelName());
         obj.setProjectType(param.getProjectType());
-        obj.setCreateType(CreateType.Predefined.getType());
+        obj.setCreateType(CreateType.Customized.getType());
         obj.setDesc(param.getDesc());
         return obj;
     }
@@ -80,7 +81,7 @@ public class Param2DBEntityUtil {
             obj.setRequired(item.getRequired());
             obj.setMultiSelect(item.getMultiSelect());
             obj.setEnumField(item.getEnumField());
-            obj.setCreateType(CreateType.Predefined.getType());
+            obj.setCreateType(CreateType.Customized.getType());
             obj.setClassName(item.getClassName());
             obj.setDisplayOrder(item.getDisplayOrder());
             obj.setExValue(item.getExValue());
