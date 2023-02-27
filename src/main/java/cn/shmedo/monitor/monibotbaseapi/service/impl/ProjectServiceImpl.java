@@ -11,17 +11,16 @@ import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
-import com.mysql.cj.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -81,10 +80,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             tbTagMapper.insertBatch(tagList);
             tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
         }
-        if (ObjectUtil.isNotEmpty(pa.getTagIDList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())) {
             tagID4DBList.addAll(pa.getTagIDList());
         }
-        if (ObjectUtil.isNotEmpty(tagID4DBList)){
+        if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
         }
     }
@@ -98,28 +97,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public List<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa) {
-        //添加分页参数
-        IPage page = Page.of(pa.getPageSize(), pa.getCurrentPage());
-
-        //构建查询条件
-        //基础拓展信息查询未写-todo
-        //标签查询未写-todo
-        List<TbProjectInfo> tbProjectInfoPage = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
-                .like(!StringUtils.isNullOrEmpty(pa.getProjectName()), TbProjectInfo::getProjectName, pa.getProjectName())
-                .like(!StringUtils.isNullOrEmpty(pa.getDirectManageUnit()), TbProjectInfo::getDirectManageUnit, pa.getDirectManageUnit())
-                .like(!StringUtils.isNullOrEmpty(pa.getLocation()), TbProjectInfo::getLocation,pa.getLocation())
-                .eq(pa.getCompanyId() != null, TbProjectInfo::getCompanyID, pa.getCompanyId())
-                .eq(pa.getProjectType() != null, TbProjectInfo::getProjectType, pa.getProjectType())
-                .eq(pa.getEnable() != null, TbProjectInfo::getEnable, pa.getEnable())
-                .in(pa.getPlatformTypeList() != null, TbProjectInfo::getPlatformType, pa.getPlatformTypeList())
-                .ge(pa.getExpiryDate() != null, TbProjectInfo::getExpiryDate, pa.getExpiryDate())
-                .le(pa.getBeginCreateTime() != null, TbProjectInfo::getCreateTime, pa.getBeginCreateTime())
-                .ge(pa.getEndCreatTime() != null, TbProjectInfo::getCreateTime, pa.getEndCreatTime()));
+        //查询列表信息
+        List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
 
         //类型转换，实体表转为要返回的类型
-        List<ProjectInfoResult> projectInfoResults = tbProjectInfoPage.stream().map(s -> {
+        List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
             ProjectInfoResult projectInfoResult = new ProjectInfoResult();
             BeanUtils.copyProperties(s, projectInfoResult);
+            //根据项目id获取标签信息列表-todo
+
+            //根据项目id获取客户企业信息-todo
+
+            //根据项目id获取拓展属性信息列表
+            projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(s.getID()));
             return projectInfoResult;
         }).collect(Collectors.toList());
         return projectInfoResults;
@@ -154,7 +144,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setCompany(null);
 
         //给拓展信息赋值-todo
-        projectInfoResult.setPropertyList(null);
+        projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));
 
         return projectInfoResult;
     }

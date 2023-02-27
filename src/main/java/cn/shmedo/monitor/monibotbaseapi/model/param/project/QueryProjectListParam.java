@@ -5,7 +5,6 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import lombok.Data;
 
 import java.sql.Timestamp;
@@ -33,11 +32,8 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     private List<Integer> platformTypeList;
     private Timestamp expiryDate;
     private Timestamp beginCreateTime;
-    private Timestamp endCreatTime;
-    private List<TbProjectProperty> tbProjectProperty;
-
-
-
+    private Timestamp endCreateTime;
+    private List<PropertyQueryEntity> propertyEntity;
 
 
     @Override
