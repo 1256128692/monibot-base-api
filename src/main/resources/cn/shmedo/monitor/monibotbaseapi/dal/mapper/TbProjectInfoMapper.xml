@@ -89,8 +89,8 @@
                     #{item}
                 </foreach>
             </if>
-            <if test="expiryDate != null">
-                and expiryDate <![CDATA[ <= ]]> #{expiryDate,jdbcType=TIMESTAMP}
+            <if test="expiryDateStr != null">
+                and expiryDate <![CDATA[ <= ]]> #{expiryDateStr,jdbcType=VARCHAR}
             </if>
             <if test="beginCreateTime != null">
                 and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}

@@ -35,6 +35,7 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     private Timestamp endCreateTime;
     private List<PropertyQueryEntity> propertyEntity;
 
+    private String expiryDateStr;
 
     @Override
     public ResultWrapper validate() {

@@ -114,6 +114,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request,QueryProjectListParam pa) {
+        //将有效期转化为字符串
+        if (pa.getExpiryDate() != null) {
+            String s1 = pa.getExpiryDate().toString();
+            pa.setExpiryDateStr(s1);
+        }
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
 
