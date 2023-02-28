@@ -90,7 +90,7 @@
                 </foreach>
             </if>
             <if test="expiryDateStr != null">
-                and expiryDate <![CDATA[ <= ]]> #{expiryDateStr,jdbcType=VARCHAR}
+                and expiryDate <![CDATA[ = ]]> #{expiryDateStr,jdbcType=VARCHAR}
             </if>
             <if test="beginCreateTime != null">
                 and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
@@ -106,6 +106,7 @@
                 </foreach>
             </if>
         </where>
+        group by a1.ID
         order by createTime;
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
@@ -123,7 +124,7 @@
 	    LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
 	    LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
         WHERE
-            a1.ID = #{ID,jdbcType=INTEGER}
+            a1.ID = #{id,jdbcType=INTEGER}
     </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">
