@@ -1,12 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
-public interface TbProjectTypeMapper {
+public interface TbProjectTypeMapper extends BaseMapper<TbProjectType> {
     int deleteByPrimaryKey(Byte ID);
 
     int insert(TbProjectType record);
