@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -61,5 +62,10 @@ public class PropertyServiceImpl implements PropertyService {
 
         List<TbProperty> properties = Param2DBEntityUtil.fromAddModelParam2TbPropertyList(param, userID, record.getID());
         tbPropertyMapper.insertBatch(properties);
+    }
+
+    @Override
+    public List<String> queryPropertyValue(QueryPropertyValueParam param) {
+        return tbProjectPropertyMapper.getPropertyValue(param);
     }
 }

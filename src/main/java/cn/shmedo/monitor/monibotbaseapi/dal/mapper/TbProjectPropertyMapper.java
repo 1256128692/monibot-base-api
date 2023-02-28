@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.PropertyList;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface TbProjectPropertyMapper {
     void insertBatch(List<TbProjectProperty> projectPropertyList);
 
     List<PropertyList> getPropertyList(Integer id);
+
+    List<String> getPropertyValue(QueryPropertyValueParam param);
 }
