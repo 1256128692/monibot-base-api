@@ -135,6 +135,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             tagLambdaQueryWrapper.eq(TbTag::getCompanyID, s.getCompanyID());
             List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
 
+            //给项目类型名称赋值
+            TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
+            projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+
             //给标签列表赋值
             projectInfoResult.setTagInfo(tbTags);
             //根据项目id获取客户企业信息
@@ -153,7 +157,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public ResultWrapper getProjectInfoData(ServletRequest request,QueryProjectInfoParam pa) {
 
         int id = pa.getID();
-        //根据项目id获取数据库表数据-未判空
+        //根据项目id获取数据库表数据
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
         if (projectInfo == null){
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
@@ -161,6 +165,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
         //类型转换-将projectInfo转为ProjectInfoResult
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
+
+        //给项目类型赋值
+        TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(projectInfo.getProjectType());
+        if (tbProjectType == null){
+            return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
+        }
+        projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
 
         //构建查询条件查询标签列表
         LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -170,11 +181,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //给标签列表赋值
         projectInfoResult.setTagInfo(tbTags);
 
-        //给公司信息赋值-todo
+        //给公司信息赋值
         Company data = getCompany(request,projectInfo.getCompanyID());
         projectInfoResult.setCompany(data);
 
-        //给拓展信息赋值-todo
+        //给拓展信息赋值
         projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getID()));
 
         return ResultWrapper.success(projectInfoResult);
