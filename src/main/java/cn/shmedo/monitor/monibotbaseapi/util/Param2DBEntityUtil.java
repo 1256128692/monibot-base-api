@@ -66,7 +66,7 @@ public class Param2DBEntityUtil {
         TbPropertyModel obj = new TbPropertyModel();
         obj.setName(param.getModelName());
         obj.setProjectType(param.getProjectType());
-        obj.setCreateType(CreateType.Customized.getType());
+        obj.setCreateType(CreateType.CUSTOMIZED.getType());
         obj.setDesc(param.getDesc());
         return obj;
     }
@@ -81,7 +81,7 @@ public class Param2DBEntityUtil {
             obj.setRequired(item.getRequired());
             obj.setMultiSelect(item.getMultiSelect());
             obj.setEnumField(item.getEnumField());
-            obj.setCreateType(CreateType.Customized.getType());
+            obj.setCreateType(CreateType.CUSTOMIZED.getType());
             obj.setClassName(item.getClassName());
             obj.setDisplayOrder(item.getDisplayOrder());
             obj.setExValue(item.getExValue());

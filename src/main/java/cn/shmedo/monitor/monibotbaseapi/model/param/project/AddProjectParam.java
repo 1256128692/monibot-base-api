@@ -20,7 +20,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
-import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -114,7 +113,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
 
 
         Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
-        boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.Type_Enum.getType()))
+        boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
                     JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                     NameAndValue temp = nameAndValueMap.get(item.getName());

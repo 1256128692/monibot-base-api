@@ -3,16 +3,17 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 import java.util.Arrays;
 
 /**
+ * 模板的属性的类型的枚举
  * @program: monibot-base-api
  * @author: gaoxu
  * @create: 2023-02-24 14:52
  **/
 
 public enum PropertyType {
-    Type_Number((byte)1,"数值"),
-    Type_String((byte)2,"字符串"),
-    Type_Enum((byte)3,"枚举"),
-    Type_Date((byte)4,"数值");
+    TYPE_NUMBER((byte) 1, "数值"),
+    TYPE_STRING((byte)2,"字符串"),
+    TYPE_ENUM((byte)3,"枚举"),
+    TYPE_DATE((byte)4,"数值");
     private Byte type;
     private String typeStr;
 

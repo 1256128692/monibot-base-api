@@ -17,10 +17,10 @@ public class PropertyUtil {
         return modelPropertyList.stream().noneMatch(
                 item -> {
                     // 非数值却又单位
-                    if (!item.getType().equals(PropertyType.Type_Number.getType()) && ObjectUtil.isNotEmpty(item.getUnit())){
+                    if (!item.getType().equals(PropertyType.TYPE_NUMBER.getType()) && ObjectUtil.isNotEmpty(item.getUnit())){
                         return true;
                     }
-                    if (item.getType().equals(PropertyType.Type_Enum.getType())){
+                    if (item.getType().equals(PropertyType.TYPE_ENUM.getType())){
                        if (ObjectUtil.hasEmpty(item.getMultiSelect(),item.getEnumField())){
                            return true;
                        }
