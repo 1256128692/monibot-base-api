@@ -7,7 +7,7 @@ import lombok.Data;
  * @Date 2023/2/27 11:44
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.response
  * @ClassName: PropertyList
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Data

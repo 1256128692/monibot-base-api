@@ -63,7 +63,7 @@ public class ProjectController {
      * @apiPermission xx权限:
      */
     //@LogParam(moduleName = "设备模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
-    @Permission(permissionName = "iot:xxx")
+//    @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
         projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -151,7 +151,7 @@ public class ProjectController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    @Permission
+ //    @Permission(permissionName = "mdmbase:ListBaseProject")
     public Object queryProjectList( ServletRequest request,@Validated @RequestBody QueryProjectListParam pa){
         return projectService.getProjectInfoList(request,pa);
     }
@@ -220,7 +220,7 @@ public class ProjectController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    @Permission
+    //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     public Object queryProjectInfo( ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa){
         return projectService.getProjectInfoData(request,pa);
     }
@@ -248,7 +248,7 @@ public class ProjectController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    @Permission
+    //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     public Object updateProjectData(Object a){
         return null;
     }
@@ -263,8 +263,9 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限:
      */
+    //    @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
     @RequestMapping(value = "TransferProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object transferProject(@Validated @RequestBody TransferProjectParam param) {
         projectService.transferProject(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -283,6 +284,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
+//    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "RaiseExpiryDate", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object raiseExpiryDate(@Validated @RequestBody RaiseExpiryDateParam param) {
         projectService.raiseExpiryDate(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -302,8 +304,8 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
+//    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    @Permission
     public Object queryProjectType(@Validated @RequestBody AddProjectParam param){
         return projectService.getProjectType();
     }
@@ -312,14 +314,15 @@ public class ProjectController {
      * @api {POST} /DeleteProjectList 批量删除项目
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} dataIDList 项目ID列表
      * @apiDescription 批量删除项目
      * @apiSuccess (返回结果) {boolean} result 结果
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限
      */
+//    @Permission(permissionName = "mdmbase:DeleteBaseProject")
     @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    @Permission
     public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam dataIDList){
         return projectService.deleteProjectList(dataIDList);
     }

@@ -14,7 +14,7 @@ import java.util.List;
  * @Date 2023/2/22 11:21
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.data.response
  * @ClassName: TbProjectInfoResult
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 
@@ -22,6 +22,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper=false)
 public class ProjectInfoResult extends TbProjectInfo {
 
+    private String projectTypeName;
     private Company company;
     private List<TbTag> tagInfo;
     private List<PropertyList> propertyList;

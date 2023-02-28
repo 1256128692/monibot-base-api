@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * @Date 2023/2/22 11:54
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.data
  * @ClassName: Company
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Data
