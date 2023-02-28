@@ -18,7 +18,7 @@ public class CommonController {
     }
 
     /**
-     * @api {get} /ApiVersion 获取服务版本
+     * @api {GET} /ApiVersion 获取服务版本
      * @apiDescription 获取服务版本信息
      * @apiVersion 1.0.0
      * @apiGroup 通用模块
@@ -30,5 +30,23 @@ public class CommonController {
     @RequestMapping(value = "/ApiVersion", method = RequestMethod.GET, produces = CommonVariable.JSON)
     public Object apiVersion() {
         return fileConfig.getApiVersion();
+    }
+
+    /**
+     * @api {POST} /GetLocation 根据地区编号获取经纬度
+     * @apiDescription 根据地区编号获取经纬度
+     * @apiVersion 1.0.0
+     * @apiGroup 通用模块
+     * @apiName GetLocation
+     * @apiParam (请求体) {String} code 地区编号
+     * @apiSuccess (返回结果) {String} name 地区名称
+     * @apiSuccess (返回结果) {Double} lat 经度
+     * @apiSuccess (返回结果) {Double} lon 纬度
+     * @apiSampleRequest off
+     * @apiPermission 公共权限
+     */
+    @RequestMapping(value = "/GetLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object GetLocation() {
+        return null;
     }
 }
