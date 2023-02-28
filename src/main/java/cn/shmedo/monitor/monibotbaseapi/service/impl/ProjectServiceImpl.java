@@ -151,7 +151,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public ResultWrapper getProjectInfoData(ServletRequest request,QueryProjectInfoParam pa) {
 
-        int id = pa.getId();
+        int id = pa.getID();
         //根据项目id获取数据库表数据-未判空-todo
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
 
@@ -171,7 +171,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setCompany(data);
 
         //给拓展信息赋值-todo
-        projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));
+        projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getID()));
 
         return ResultWrapper.success(projectInfoResult);
     }
