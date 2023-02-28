@@ -120,11 +120,14 @@
         a2,
         a3
         FROM
-	        tb_project_info a1
-	    LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
-	    LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
+        tb_project_info a1
+        LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
+        LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
         WHERE
-            a1.ID = #{id,jdbcType=INTEGER}
+        a1.ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">

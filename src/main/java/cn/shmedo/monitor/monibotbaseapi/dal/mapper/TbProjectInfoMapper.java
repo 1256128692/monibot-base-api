@@ -32,5 +32,5 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
 
-    void deleteProjectList(Integer id);
+    void deleteProjectList(List ids);
 }

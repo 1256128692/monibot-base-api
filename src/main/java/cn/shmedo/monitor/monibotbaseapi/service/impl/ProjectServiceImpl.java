@@ -188,17 +188,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
         List<Integer> ids = idListParam.getDataIDList();
-        //判断id是否存在-todo
-        for (int i = 0; i < ids.size(); i++) {
-            TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(ids.get(i));
-            if (tbProjectInfo == null){
-                return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
-            }
-        }
 
-        for (int i = 0; i < ids.size(); i++) {
-            tbProjectInfoMapper.deleteProjectList(ids.get(i));
-        }
+        tbProjectInfoMapper.deleteProjectList(ids);
         return ResultWrapper.success("删除成功");
     }
 
