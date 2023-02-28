@@ -59,10 +59,24 @@
     <select id="getPropertyList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" resultMap="PorpertyResultMap">
         SELECT
         a2.ID,
-        <include refid="Property_LIst"/>
-        FROM tb_property a1
-        LEFT JOIN tb_project_property a2 ON a1.ID = a2.PropertyID
-        WHERE a2.ID = #{id,jdbcType=INTEGER}
+        ProjectID,
+        PropertyID,
+        a1.ProjectType,
+        ClassName,
+        Name,
+        Type,
+        Required,
+        MultiSelect,
+        CreateType,
+        EnumField,
+        Unit,
+        Value,
+        ExValue
+        FROM
+        tb_property a1
+        LEFT JOIN tb_project_property a2 on a1.ID = a2.PropertyID
+        LEFT JOIN tb_project_info a3 ON a2.ProjectID = a3.ID
+        WHERE a2.ProjectID = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->

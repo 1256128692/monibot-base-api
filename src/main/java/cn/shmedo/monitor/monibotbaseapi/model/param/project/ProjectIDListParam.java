@@ -14,5 +14,5 @@ import java.util.List;
  */
 @Data
 public class ProjectIDListParam {
-    List<Integer> IDS;
+    List<Integer> dataIDList;
 }

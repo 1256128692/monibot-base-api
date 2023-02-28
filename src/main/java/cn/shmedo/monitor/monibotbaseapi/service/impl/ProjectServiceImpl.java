@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
@@ -152,8 +153,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public ResultWrapper getProjectInfoData(ServletRequest request,QueryProjectInfoParam pa) {
 
         int id = pa.getID();
-        //根据项目id获取数据库表数据-未判空-todo
+        //根据项目id获取数据库表数据-未判空
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
+        if (projectInfo == null){
+            return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
+        }
 
         //类型转换-将projectInfo转为ProjectInfoResult
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
@@ -178,12 +182,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
-     * @param IDS
+     * @param idListParam
      * @return
      */
     @Override
-    public ResultWrapper deleteProjectList(ProjectIDListParam IDS) {
-        List<Integer> ids = IDS.getIDS();
+    public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
+        List<Integer> ids = idListParam.getDataIDList();
+        //判断id是否存在-todo
+        for (int i = 0; i < ids.size(); i++) {
+            TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(ids.get(i));
+            if (tbProjectInfo == null){
+                return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
+            }
+        }
+
         for (int i = 0; i < ids.size(); i++) {
             tbProjectInfoMapper.deleteProjectList(ids.get(i));
         }
