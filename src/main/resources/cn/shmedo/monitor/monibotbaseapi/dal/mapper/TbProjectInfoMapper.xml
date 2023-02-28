@@ -78,21 +78,24 @@
                 and companyId = #{companyId,jdbcType=INTEGER}
             </if>
             <if test="projectType != null and projectType != ''">
-                and projectType = #{projectType,jdbcType=INTEGER}
+                and a1.projectType = #{projectType,jdbcType=INTEGER}
             </if>
             <if test="enable != null and enable != ''">
                 and enable = #{enable,jdbcType=BOOLEAN}
             </if>
-            <if test="platformTypeList != null and platformTypeList != ''">
-                and platformTypeList in #{platformTypeList}
+            <if test="platformTypeList != null and platformTypeList.size > 0">
+                and platformType in
+                <foreach collection="platformTypeList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
             </if>
-            <if test="expiryDate != null and expiryDate != ''">
+            <if test="expiryDate != null">
                 and expiryDate <![CDATA[ <= ]]> #{expiryDate,jdbcType=TIMESTAMP}
             </if>
-            <if test="beginCreateTime != null and beginCreateTime != ''">
+            <if test="beginCreateTime != null">
                 and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
             </if>
-            <if test="endCreateTime != null and endCreateTime != ''">
+            <if test="endCreateTime != null">
                 and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
             </if>
             <if test="propertyEntity != null and propertyEntity.size > 0">

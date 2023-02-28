@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import jakarta.servlet.ServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -114,11 +115,19 @@ public class ProjectController {
      * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} dataList.updateUserID 修改用户ID
      * @apiSuccess (返回结果) {Object} company 公司信息
-     * @apiSuccess (返回结果) {Int} company.companyID 公司id
-     * @apiSuccess (返回结果) {String} company.companyName 所属公司名称
-     * @apiSuccess (返回结果) {String} company.companyContacts 公司联系人
-     * @apiSuccess (返回结果) {String} company.contactsPhone 公司联系人电话
-     * @apiSuccess (返回结果) {String} company.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Int} company.ID ID
+     * @apiSuccess (返回结果) {String} company.ShortName 公司简称
+     * @apiSuccess (返回结果) {String} company.FullName 所属公司全称
+     * @apiSuccess (返回结果) {Int} company.ParentID 所属公司id
+     * @apiSuccess (返回结果) {String} company.Desc 简介
+     * @apiSuccess (返回结果) {String} company.Address 公司联系地址
+     * @apiSuccess (返回结果) {String} company.Phone 公司联系人电话
+     * @apiSuccess (返回结果) {String} company.LegalPerson 公司法人
+     * @apiSuccess (返回结果) {String} company.Scale 公司规模
+     * @apiSuccess (返回结果) {String} company.Industry 行业
+     * @apiSuccess (返回结果) {String} company.Nature 性质
+     * @apiSuccess (返回结果) {String} company.WebSite 网站
+     * @apiSuccess (返回结果) {String} company.displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
      * @apiSuccess (返回结果) {Int} tagInfo.ID 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
@@ -143,8 +152,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
-    public Object queryProjectList(@Validated @RequestBody QueryProjectListParam pa){
-        return projectService.getProjectInfoList(pa);
+    public Object queryProjectList( ServletRequest request,@Validated @RequestBody QueryProjectListParam pa){
+        return projectService.getProjectInfoList(request,pa);
     }
 
 
@@ -154,8 +163,8 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectInfo
-     * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiSuccess (返回结果) {Int} ID 项目id
+     * @apiParam (请求体) {Int} ID 项目ID
+     * @apiSuccess (返回结果) {Int} ID 项目ID
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
@@ -175,11 +184,19 @@ public class ProjectController {
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
      * @apiSuccess (返回结果) {Int} updateUserID 修改用户ID
      * @apiSuccess (返回结果) {Object} company 公司信息
-     * @apiSuccess (返回结果) {Int} company.companyID 公司id
-     * @apiSuccess (返回结果) {String} company.companyName 所属公司名称
-     * @apiSuccess (返回结果) {String} company.companyContacts 公司联系人
-     * @apiSuccess (返回结果) {String} company.contactsPhone 公司联系人电话
-     * @apiSuccess (返回结果) {String} company.contactsAddress 公司联系地址
+     * @apiSuccess (返回结果) {Int} company.ID ID
+     * @apiSuccess (返回结果) {String} company.ShortName 公司简称
+     * @apiSuccess (返回结果) {String} company.FullName 所属公司全称
+     * @apiSuccess (返回结果) {Int} company.ParentID 所属公司id
+     * @apiSuccess (返回结果) {String} company.Desc 简介
+     * @apiSuccess (返回结果) {String} company.Address 公司联系地址
+     * @apiSuccess (返回结果) {String} company.Phone 公司联系人电话
+     * @apiSuccess (返回结果) {String} company.LegalPerson 公司法人
+     * @apiSuccess (返回结果) {String} company.Scale 公司规模
+     * @apiSuccess (返回结果) {String} company.Industry 行业
+     * @apiSuccess (返回结果) {String} company.Nature 性质
+     * @apiSuccess (返回结果) {String} company.WebSite 网站
+     * @apiSuccess (返回结果) {String} company.displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
      * @apiSuccess (返回结果) {Int} tagInfo.tagID 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
@@ -204,8 +221,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission
-    public Object queryProjectInfo(@Validated @RequestBody QueryProjectInfoParam pa){
-        return projectService.getProjectInfoData(pa);
+    public Object queryProjectInfo( ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa){
+        return projectService.getProjectInfoData(request,pa);
     }
 
     /**

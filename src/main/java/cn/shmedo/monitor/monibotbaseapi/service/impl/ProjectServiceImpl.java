@@ -15,6 +15,8 @@ import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,7 +56,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         this.tbTagRelationMapper = tbTagRelationMapper;
     }
 
-    //String accessToken = server.accessToken
+    private static final String TOKEN_HEADER = "Authorization";
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -111,7 +113,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(QueryProjectListParam pa) {
+    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request,QueryProjectListParam pa) {
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
 
@@ -122,14 +124,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             //根据项目id获取标签信息列表-todo
 
             //根据项目id获取客户企业信息
-            Company data = new Company();
-            Object data1 = getCompany(s.getCompanyID()).getData();
-            /*if (!getCompany(s.getCompanyID()).getData().equals(null)){
-                data = (Company) getCompany(s.getCompanyID()).getData();
-            }else {
-                data = null;
-            }*/
-            projectInfoResult.setCompany(data);
+            Company company = getCompany(request, s.getCompanyID());
+            projectInfoResult.setCompany(company);
 
             //根据项目id获取拓展属性信息列表
             projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(s.getID()));
@@ -140,7 +136,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public ResultWrapper getProjectInfoData(QueryProjectInfoParam pa) {
+    public ResultWrapper getProjectInfoData(ServletRequest request,QueryProjectInfoParam pa) {
 
         int id = pa.getId();
         //根据项目id获取数据库表数据-未判空-todo
@@ -158,7 +154,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setTagInfo(tbTags);
 
         //给公司信息赋值-todo
-        Company data = (Company) getCompany(projectInfo.getCompanyID()).getData();
+        Company data = getCompany(request,projectInfo.getCompanyID());
         projectInfoResult.setCompany(data);
 
         //给拓展信息赋值-todo
@@ -168,12 +164,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public ResultWrapper getCompany(Integer id){
+    public Company getCompany(ServletRequest request,Integer id){
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String token = httpRequest.getHeader(TOKEN_HEADER);
         CompanyThird companyThird = new CompanyThird();
         companyThird.setCompanyID(id);
-        //待验证-todo
         UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
-        ResultWrapper<Company> companyInfo = userService.getCompanyInfo("1",companyThird);
-        return ResultWrapper.success(companyInfo);
+        ResultWrapper<Company> companyInfo = userService.getCompanyInfo(token,companyThird);
+        Company data = companyInfo.getData();
+        return data;
     }
 }
