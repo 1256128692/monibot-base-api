@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -18,6 +19,7 @@ import lombok.Data;
 @Data
 public class QueryProjectInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
+    @JsonProperty(value = "ID")
     private Integer ID;
     @Override
     public ResultWrapper validate() {
