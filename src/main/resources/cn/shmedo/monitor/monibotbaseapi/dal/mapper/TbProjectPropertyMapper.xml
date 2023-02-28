@@ -59,10 +59,24 @@
     <select id="getPropertyList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" resultMap="PorpertyResultMap">
         SELECT
         a2.ID,
-        <include refid="Property_LIst"/>
-        FROM tb_property a1
-        LEFT JOIN tb_project_property a2 ON a1.ID = a2.PropertyID
-        WHERE a2.ID = #{id,jdbcType=INTEGER}
+        ProjectID,
+        PropertyID,
+        a1.ProjectType,
+        ClassName,
+        Name,
+        Type,
+        Required,
+        MultiSelect,
+        CreateType,
+        EnumField,
+        Unit,
+        Value,
+        ExValue
+        FROM
+        tb_property a1
+        LEFT JOIN tb_project_property a2 on a1.ID = a2.PropertyID
+        LEFT JOIN tb_project_info a3 ON a2.ProjectID = a3.ID
+        WHERE a2.ProjectID = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->
@@ -148,4 +162,32 @@
             (#{item.projectID}, #{item.propertyID}, #{item.value})
         </foreach>
     </insert>
+
+    <select id="getPropertyValue" resultType="java.lang.String">
+        SELECT
+        DISTINCT tpp.`Value`
+        FROM
+        `tb_project_property` tpp
+        LEFT JOIN `tb_project_info` tpi ON tpi.ID = tpp.ProjectID
+        LEFT JOIN `tb_property` tp ON tp.ID = tpp.PropertyID
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="companyID != null">
+                    tpi.CompanyID = #{companyID} AND
+                </if>
+                <if test="projectID != null">
+                    tpi.ID = #{projectID} AND
+                </if>
+                <if test="projectType != null">
+                    tpi.ProjectType = #{projectType} AND
+                </if>
+                <if test="propertyName != null">
+                    tp.`Name` = #{propertyName} AND
+                </if>
+                <if test="createType != null">
+                    tp.CreateType = #{createType} AND
+                </if>
+            </trim>
+        </where>
+    </select>
 </mapper>

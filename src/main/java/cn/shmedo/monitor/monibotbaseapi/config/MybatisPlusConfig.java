@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @Date 2023/2/23 11:51
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.config
  * @ClassName: MybatisPlusConfig
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Configuration

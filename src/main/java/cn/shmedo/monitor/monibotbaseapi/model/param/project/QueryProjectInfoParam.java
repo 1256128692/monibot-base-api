@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -12,13 +13,14 @@ import lombok.Data;
  * @Date 2023/2/22 17:14
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.param.project
  * @ClassName: QueryProjectInfoParam
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Data
 public class QueryProjectInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    private Integer id;
+    @JsonProperty(value = "ID")
+    private Integer ID;
     @Override
     public ResultWrapper validate() {
         return null;

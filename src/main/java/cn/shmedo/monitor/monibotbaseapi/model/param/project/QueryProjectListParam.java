@@ -15,7 +15,7 @@ import java.util.List;
  * @Date 2023/2/23 10:17
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.param.project
  * @ClassName: QueryProjectListParam
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Data
@@ -35,6 +35,7 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     private Timestamp endCreateTime;
     private List<PropertyQueryEntity> propertyEntity;
 
+    private String expiryDateStr;
 
     @Override
     public ResultWrapper validate() {

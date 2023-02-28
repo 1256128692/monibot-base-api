@@ -78,38 +78,56 @@
                 and companyId = #{companyId,jdbcType=INTEGER}
             </if>
             <if test="projectType != null and projectType != ''">
-                and projectType = #{projectType,jdbcType=INTEGER}
+                and a1.projectType = #{projectType,jdbcType=INTEGER}
             </if>
             <if test="enable != null and enable != ''">
                 and enable = #{enable,jdbcType=BOOLEAN}
             </if>
-            <if test="platformTypeList != null and platformTypeList != ''">
-                and platformTypeList in #{platformTypeList}
+            <if test="platformTypeList != null and platformTypeList.size > 0">
+                and platformType in
+                <foreach collection="platformTypeList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
             </if>
-            <if test="expiryDate != null and expiryDate != ''">
-                and expiryDate <![CDATA[ <= ]]> #{expiryDate,jdbcType=TIMESTAMP}
+            <if test="expiryDateStr != null">
+                and expiryDate <![CDATA[ = ]]> #{expiryDateStr,jdbcType=VARCHAR}
             </if>
-            <if test="beginCreateTime != null and beginCreateTime != ''">
+            <if test="beginCreateTime != null">
                 and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
             </if>
-            <if test="endCreateTime != null and endCreateTime != ''">
+            <if test="endCreateTime != null">
                 and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
             </if>
             <if test="propertyEntity != null and propertyEntity.size > 0">
-                <foreach collection="propertyEntity" item="item" separator="and">
-                    and (
-                    a3.`Name` = #{item.name,jdbcType=VARCHAR}
+                <foreach collection="propertyEntity" item="item">
+                    and a3.`Name` = #{item.name,jdbcType=VARCHAR}
                     and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
-                    )
+
                 </foreach>
             </if>
         </where>
+        group by a1.ID
         order by createTime;
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->
         delete from tb_project_info
         where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteProjectList" parameterType="java.lang.Integer">
+        DELETE
+        a1,
+        a2,
+        a3
+        FROM
+        tb_project_info a1
+        LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
+        LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
+        WHERE
+        a1.ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">

@@ -18,7 +18,7 @@ public interface UserService {
     ResultWrapper<CurrentSubject> getCurrentSubjectByApp(@Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
     @RequestLine("POST /GetCompanyInfo")
-    @Headers({"user:DescribeCompany {accessToken}"})
+    @Headers("Authorization: Bearer {accessToken}")
     ResultWrapper<Company> getCompanyInfo(@Param("accessToken")String accessToken, CompanyThird company);
 
 }

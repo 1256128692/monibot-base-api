@@ -4,14 +4,12 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class PropertyController {
@@ -102,5 +100,25 @@ public class PropertyController {
     public Object updateProperty(@RequestBody @Validated UpdatePropertyParam pa) {
         propertyService.updateProperty(pa);
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /QueryPropertyValue 查询指定属性所有值
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName QueryPropertyValue
+     * @apiDescription 查询指定属性所有值（去重）
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {Int} createType 创建类型 0-预定义 1-自定义
+     * @apiParam (请求体) {String} propertyName 属性名称
+     * @apiSuccess (返回结果) {Object[]} data 属性值列表
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:
+     */
+    @PostMapping(value = "QueryPropertyValue", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryPropertyValue(@RequestBody @Validated QueryPropertyValueParam param) {
+        return propertyService.queryPropertyValue(param);
     }
 }

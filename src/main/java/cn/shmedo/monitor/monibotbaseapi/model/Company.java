@@ -18,10 +18,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Company {
 
-    private int companyID;
-    private String companyName;
-    private String companyContacts;
-    private String contactsPhone;
-    private String contactsAddress;
+    private Integer ID;
+    private String ShortName;
+    private String FullName;
+    private Integer ParentID;
+    private String Desc;
+    private String Address;
+    private String Phone;
+    private String LegalPerson;
+    private String Scale;
+    private String Industry;
+    private String Nature;
+    private String WebSite;
+    private String displayOrder;
 
 }
