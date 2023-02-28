@@ -49,4 +49,11 @@ public interface ProjectService {
     void transferProject(TransferProjectParam param, Integer userID);
 
     void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID);
+
+    /**
+     * 批量删除
+     * @param IDS
+     * @return
+     */
+    ResultWrapper deleteProjectList(ProjectIDListParam IDS);
 }

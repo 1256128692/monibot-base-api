@@ -307,4 +307,20 @@ public class ProjectController {
     public Object queryProjectType(@Validated @RequestBody AddProjectParam param){
         return projectService.getProjectType();
     }
+
+    /**
+     * @api {POST} /DeleteProjectList 批量删除项目
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiParam (请求体) {Int[]} IDS 项目ID列表
+     * @apiDescription 批量删除项目
+     * @apiSuccess (返回结果) {boolean} result 结果
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:
+     */
+    @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @Permission
+    public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam IDS){
+        return null;
+    }
 }

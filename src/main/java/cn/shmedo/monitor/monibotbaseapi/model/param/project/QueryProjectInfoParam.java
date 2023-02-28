@@ -12,7 +12,7 @@ import lombok.Data;
  * @Date 2023/2/22 17:14
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.param.project
  * @ClassName: QueryProjectInfoParam
- * @Description: TODO
+ * @Description:
  * @Version 1.0
  */
 @Data

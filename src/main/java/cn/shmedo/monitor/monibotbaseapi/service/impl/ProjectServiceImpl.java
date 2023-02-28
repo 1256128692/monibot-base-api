@@ -112,6 +112,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectInfoMapper.updateExpiryDate(param.getProjectID(), param.getNewRetireDate(), userID, new Date());
     }
 
+
+
     @Override
     public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request,QueryProjectListParam pa) {
         //将有效期转化为字符串
@@ -126,8 +128,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
             ProjectInfoResult projectInfoResult = new ProjectInfoResult();
             BeanUtils.copyProperties(s, projectInfoResult);
-            //根据项目id获取标签信息列表-todo
+            //根据项目id获取标签信息列表
+            //构建查询条件查询标签列表
+            LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            tagLambdaQueryWrapper.eq(TbTag::getCompanyID, s.getCompanyID());
+            List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
 
+            //给标签列表赋值
+            projectInfoResult.setTagInfo(tbTags);
             //根据项目id获取客户企业信息
             Company company = getCompany(request, s.getCompanyID());
             projectInfoResult.setCompany(company);
@@ -166,6 +174,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getId()));
 
         return ResultWrapper.success(projectInfoResult);
+    }
+
+    /**
+     * 批量删除
+     * @param IDS
+     * @return
+     */
+    @Override
+    public ResultWrapper deleteProjectList(ProjectIDListParam IDS) {
+        List<Integer> ids = IDS.getIDS();
+        for (int i = 0; i < ids.size(); i++) {
+            tbProjectInfoMapper.deleteProjectList(ids.get(i));
+        }
+        return ResultWrapper.success("删除成功");
     }
 
     @Override

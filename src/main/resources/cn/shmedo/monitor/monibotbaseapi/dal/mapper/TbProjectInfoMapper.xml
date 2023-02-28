@@ -99,11 +99,10 @@
                 and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
             </if>
             <if test="propertyEntity != null and propertyEntity.size > 0">
-                <foreach collection="propertyEntity" item="item" separator="and">
-                    and (
-                    a3.`Name` = #{item.name,jdbcType=VARCHAR}
+                <foreach collection="propertyEntity" item="item">
+                    and a3.`Name` = #{item.name,jdbcType=VARCHAR}
                     and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
-                    )
+
                 </foreach>
             </if>
         </where>
@@ -113,6 +112,18 @@
         <!--@mbg.generated-->
         delete from tb_project_info
         where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteProjectList" parameterType="java.lang.Integer">
+        DELETE
+        a1,
+        a2,
+        a3
+        FROM
+	        tb_project_info a1
+	    LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
+	    LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
+        WHERE
+            a1.ID = #{ID,jdbcType=INTEGER}
     </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">
