@@ -1,15 +1,18 @@
-package cn.shmedo.monitor.monibotbaseapi.interceptor;
+package cn.shmedo.wtapi.interceptor;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.exception.BaseException;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintDeclarationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.converter.HttpMessageConversionException;
@@ -32,10 +35,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    /**
+     * 自定义异常 处理器
+     *
+     * @param request {@link HttpServletRequest}
+     * @param e       {@link BaseException}
+     * @return {@link ResultWrapper}
+     */
     @ResponseBody
-    @ExceptionHandler(Exception.class)
-    public ResultWrapper<?> handleException(HttpServletRequest request, Exception e) {
-
+    @ExceptionHandler(BaseException.class)
+    public ResultWrapper<?> handleBaseException(HttpServletRequest request, BaseException e) {
         //自定义异常
         if (e instanceof CustomBaseException ex) {
             return ResultWrapper.withCode(ResultCode.valueOfCode(ex.errCode()), e.getMessage());
@@ -45,7 +54,19 @@ public class GlobalExceptionHandler {
         if (e instanceof InvalidParameterException ex) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, ex.getMessage());
         }
+        return generalExceptionHandle(request, e);
+    }
 
+    /**
+     * 参数验证异常 处理器
+     *
+     * @param request {@link HttpServletRequest}
+     * @param e       {@link ValidationException}
+     * @return {@link ResultWrapper}
+     */
+    @ResponseBody
+    @ExceptionHandler(ValidationException.class)
+    public ResultWrapper<?> handleValidationException(HttpServletRequest request, ValidationException e) {
         //参数校验异常
         if (e instanceof ConstraintViolationException ex) {
             String msg = ex.getConstraintViolations().stream()
@@ -53,11 +74,27 @@ public class GlobalExceptionHandler {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, msg);
         }
 
-        log.error("{}请求发生异常, 路径: {}，参数: {}", request.getMethod(), request.getRequestURI(),
-                JSONUtil.toJsonStr(request.getParameterMap()));
-        log.error(ExceptionUtil.stacktraceToString(e));
+        //约束声明异常 通常由 validation 注解和参数类型不匹配引起
+        if (e instanceof ConstraintDeclarationException ex) {
+            outputLog(request, e);
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "约束声明异常");
+        }
+        return generalExceptionHandle(request, e);
+    }
 
-        //参数绑定异常，通常由错误使用 {@code validation} 注解引起
+    /**
+     * 其他异常处理器
+     *
+     * @param request {@link HttpServletRequest}
+     * @param e       {@link Exception}
+     * @return {@link ResultWrapper}
+     */
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
+    public ResultWrapper<?> handleException(HttpServletRequest request, Exception e) {
+        outputLog(request, e);
+
+        //参数绑定异常
         if (e instanceof BindException ex) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "参数绑定异常");
         }
@@ -78,7 +115,7 @@ public class GlobalExceptionHandler {
                     StrUtil.isBlank(e.getMessage()) ? "非法参数异常" : e.getMessage());
         }
 
-        //越界异常
+        //越界异常，通常由集合越界操作引起
         if (e instanceof IndexOutOfBoundsException) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "索引越界异常");
         }
@@ -100,6 +137,31 @@ public class GlobalExceptionHandler {
 
         //其他异常
         return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "服务端异常");
+    }
+
+    /**
+     * 通用异常处理 输出错误日志并返回 {@link ResultCode#SERVER_EXCEPTION}
+     *
+     * @param request {@link HttpServletRequest}
+     * @param e       {@link Exception}
+     * @return {@link ResultWrapper}
+     */
+    private static ResultWrapper<?> generalExceptionHandle(HttpServletRequest request, Exception e) {
+        outputLog(request, e);
+        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "服务端发生错误");
+    }
+
+    /**
+     * 输出详细的异常日志<br/>
+     * 如请求参数已经被读取，此处将无法获得
+     *
+     * @param request {@link HttpServletRequest}
+     * @param e       {@link Exception}
+     */
+    private static void outputLog(HttpServletRequest request, Exception e) {
+        log.error("{}请求发生异常, 路径: {}，参数: {}", request.getMethod(), request.getRequestURI(),
+                JSONUtil.toJsonStr(request.getParameterMap()));
+        log.error(ExceptionUtil.stacktraceToString(e));
     }
 }
 
