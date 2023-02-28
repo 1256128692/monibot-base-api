@@ -351,7 +351,7 @@
     <update id="updateExpiryDate">
         update tb_project_info
         set ExpiryDate = #{newExpiryDate},
-        UpdateTime = #{date},
+        UpdateTime = #{date },
         UpdateUserID = #{userID}
         where ID = #{projectID}
     </update>

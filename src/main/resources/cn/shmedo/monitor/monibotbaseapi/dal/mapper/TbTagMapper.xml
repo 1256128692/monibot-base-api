@@ -154,4 +154,23 @@
             and TagValue like concat( '%',#{fuzzyValue},'%')
         </if>
     </select>
+
+    <select id="countByCIDAndTags" resultType="int">
+        select count(1) from tb_tag where CompanyID = #{companyID}
+        and
+        <foreach collection="tagList" item="item" separator="or">
+            ( TagKey = #{item.key}
+            and TagValue
+            <choose>
+                <when test="item.value == null">
+                    is null
+                </when>
+                <otherwise>
+                    = #{item.value}
+                </otherwise>
+            </choose>
+
+            )
+        </foreach>
+    </select>
 </mapper>

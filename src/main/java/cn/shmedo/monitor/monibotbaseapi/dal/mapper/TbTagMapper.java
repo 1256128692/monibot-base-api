@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -25,4 +26,6 @@ public interface TbTagMapper extends BaseMapper<TbTag> {
     void insertBatch(List<TbTag> tagList);
 
     List<TbTag> queryListBy(Integer companyID, String fuzzyKey, String fuzzyValue);
+
+    int countByCIDAndTags(Integer companyID, List<TagKeyAndValue> tagList);
 }

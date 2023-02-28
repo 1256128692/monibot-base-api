@@ -55,8 +55,8 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表
      * @apiParam (请求体) {Int} modelID 模型ID
      * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
-     * @apiParam (请求体) {String} modelValueList.name 属性名称
-     * @apiParam (请求体) {String} [modelValueList.value] 属性值
+     * @apiParam (请求体) {String} modelValueList.name 属性名称（<=50）
+     * @apiParam (请求体) {String} [modelValueList.value] 属性值（<=50） 可为null， 不能为空字符串
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
      * @apiPermission xx权限:
@@ -242,7 +242,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName TransferProject
      * @apiDescription 项目转移到其他企业
-     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} companyID 目标公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
@@ -261,7 +261,7 @@ public class ProjectController {
      * @apiName RaiseExpiryDate
      * @apiDescription 推迟有效期
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Date} newRetireDate 项目ID
+     * @apiParam (请求体) {Date} newRetireDate 新有效期
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
      * @apiPermission 项目权限:

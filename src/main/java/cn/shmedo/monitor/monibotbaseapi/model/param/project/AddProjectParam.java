@@ -73,7 +73,8 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @Size(max = 2000)
     private String projectDesc;
     private List<Integer> tagIDList;
-    private List<TagKeyAndValue> tagList;
+    @Valid
+    private List< @NotNull TagKeyAndValue> tagList;
     @Valid
     private List<@NotNull Integer> monitorTypeList;
     @NotNull
@@ -96,12 +97,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (!PlatformType.validate(platformType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
         }
-        if (ObjectUtil.isNotEmpty(tagIDList)) {
-            TbTagMapper tbTagMapper = ContextHolder.getBean(TbTagMapper.class);
-            if (tbTagMapper.countByCIDAndIDs(companyID, tagIDList) != tagIDList.size()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "标签不存在或不属于本公司");
-            }
-        }
+
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
         TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
         if (tbPropertyModel == null){
@@ -115,7 +111,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (properties.size() != modelValueList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "提供的属性与模板属性数量不符");
         }
-        // TODO 校验标签
+
 
         Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
         boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.Type_Enum.getType()))
@@ -129,6 +125,28 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 });
         if (b) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法");
+        }
+        //校验标签
+        TbTagMapper tbTagMapper = ContextHolder.getBean(TbTagMapper.class);
+        if (ObjectUtil.isNotEmpty(tagIDList)) {
+            if (tbTagMapper.countByCIDAndIDs(companyID, tagIDList) != tagIDList.size()) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "标签不存在或不属于本公司");
+            }
+        }
+        // 总数不能大于5
+        if ((ObjectUtil.isEmpty(tagIDList)?0:tagIDList.size()) + (ObjectUtil.isEmpty(tagList)?0:tagList.size()) >5){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "标签数量不能大于5");
+        }
+        // 是否有重复的
+        if (ObjectUtil.isNotEmpty(tagList)){
+           if ( tagList.stream().map(
+                   item -> item.getKey() + (ObjectUtil.isEmpty(item.getValue())?"_":item.getKey())
+           ).distinct().count() >1){
+               return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的标签中存在重复");
+           }
+           if (tbTagMapper.countByCIDAndTags(companyID, tagList) > 0){
+               return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有新增的标签已经存在");
+           }
         }
         return null;
 
