@@ -136,8 +136,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
 
             //给项目类型名称赋值
-            TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
-            projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+            /*if (s.getProjectType() != null) {
+                TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
+                projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+            }*/
 
             //给标签列表赋值
             projectInfoResult.setTagInfo(tbTags);
@@ -166,12 +168,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //类型转换-将projectInfo转为ProjectInfoResult
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
 
-        //给项目类型赋值
+        /*//给项目类型赋值
         TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(projectInfo.getProjectType());
         if (tbProjectType == null){
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
         }
-        projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+        projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());*/
 
         //构建查询条件查询标签列表
         LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
