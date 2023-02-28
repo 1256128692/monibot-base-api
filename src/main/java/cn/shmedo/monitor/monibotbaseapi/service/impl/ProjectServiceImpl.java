@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -139,10 +142,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
 
             //给项目类型名称赋值
-            if (s.getProjectType() != null) {
-                TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
-                projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
-            }
+            TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
+            projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+            projectInfoResult.setProjectTypeMainName(tbProjectType.getMainType());
 
             //给标签列表赋值
             projectInfoResult.setTagInfo(tbTags);
@@ -172,11 +174,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
 
         //给项目类型赋值
-        TbProjectType tbProjectType = tbProjectTypeMapper.selectById(projectInfo.getProjectType());
+        TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(projectInfo.getProjectType());
         if (tbProjectType == null){
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
         }
         projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
+        projectInfoResult.setProjectTypeMainName(tbProjectType.getMainType());
 
         //构建查询条件查询标签列表
         LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -198,15 +201,38 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
-     * @param idListParam
+     * @param pa
      * @return
      */
     @Override
-    public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
-        List<Integer> ids = idListParam.getDataIDList();
-
-        tbProjectInfoMapper.deleteProjectList(ids);
+    public ResultWrapper deleteProjectList(ProjectIDListParam pa) {
+        tbProjectInfoMapper.deleteProjectList(pa.getDataIDList());
         return ResultWrapper.success("删除成功");
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateProject(UpdateProjectParameter pa) {
+        CurrentSubject currentSubject = CurrentSubjectHolder.getCurrentSubject();
+        TbProjectInfo projectInfo = pa.buildProject(currentSubject.getSubjectID());
+        tbProjectInfoMapper.updateByPrimaryKey(projectInfo);
+        if (!CollectionUtil.isEmpty(pa.getPropertyDataList())) {
+            List<TbProjectProperty> projectProperties = pa.buildPropertyDataList();
+            tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties);
+        }
+        //处理标签
+        List<Integer> tagID4DBList = new ArrayList<>();
+        if (ObjectUtil.isNotEmpty(pa.getTagList())){
+            List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), currentSubject.getSubjectID());
+            tbTagMapper.insertBatch(tagList);
+            tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
+        }
+        if (ObjectUtil.isNotEmpty(pa.getTagIDList())) {
+            tagID4DBList.addAll(pa.getTagIDList());
+        }
+        if (ObjectUtil.isNotEmpty(tagID4DBList)) {
+            tbTagRelationMapper.insertBatch(tagID4DBList, pa.getProjectID());
+        }
     }
 
     @Override

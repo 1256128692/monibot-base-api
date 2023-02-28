@@ -3,10 +3,11 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.PropertyList;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 
-public interface TbProjectPropertyMapper {
+public interface TbProjectPropertyMapper extends BaseMapper<TbProjectProperty> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbProjectProperty record);
@@ -19,7 +20,7 @@ public interface TbProjectPropertyMapper {
 
     int updateByPrimaryKey(TbProjectProperty record);
 
-    void updateBatch(List<TbProjectProperty> projectPropertyList);
+    void updateBatch(Integer projectID, List<TbProjectProperty> projectPropertyList);
 
     void insertBatch(List<TbProjectProperty> projectPropertyList);
 

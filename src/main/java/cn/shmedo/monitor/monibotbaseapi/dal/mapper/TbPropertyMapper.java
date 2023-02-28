@@ -1,12 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
 @Mapper
-public interface TbPropertyMapper {
+public interface TbPropertyMapper extends BaseMapper<TbProperty> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbProperty record);

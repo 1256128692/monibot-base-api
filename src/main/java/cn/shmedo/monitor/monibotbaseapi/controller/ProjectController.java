@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ProjectController {
     private ProjectService projectService;
+
     @Autowired
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
@@ -69,6 +70,7 @@ public class ProjectController {
         projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {post} /QueryProjectPageList 分页查询工程项目列表
      * @apiDescription 分页查询工程项目列表
@@ -80,7 +82,8 @@ public class ProjectController {
      * @apiParam (请求体) {String} [location] 行政区域
      * @apiParam (请求体) {Int} [companyId] 企业名称-先调用接口查询具体企业，发送id
      * @apiParam (请求体) {Int} [projectType] 项目类型
-     * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，1:启用，0:停用
+     * @apiParam (请求体) {Int} [projectType] 项目类型
+     * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
@@ -98,7 +101,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
      * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
      * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} dataList.projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} dataList.projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} dataList.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Int} dataList.platformType 平台类型
      * @apiSuccess (返回结果) {Int} dataList.platformTypeName 平台名称
      * @apiSuccess (返回结果) {String} dataList.directManageUnit 直管单位
@@ -150,10 +154,10 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @RequestMapping(value = "/QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
- //    @Permission(permissionName = "mdmbase:ListBaseProject")
-    public Object queryProjectList( ServletRequest request,@Validated @RequestBody QueryProjectListParam pa){
-        return projectService.getProjectInfoList(request,pa);
+    @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    //    @Permission(permissionName = "mdmbase:ListBaseProject")
+    public Object queryProjectList(ServletRequest request, @Validated @RequestBody QueryProjectListParam pa) {
+        return projectService.getProjectInfoList(request, pa);
     }
 
 
@@ -168,7 +172,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
-     * @apiSuccess (返回结果) {Int} projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Byte} platformType 平台类型
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
@@ -221,8 +226,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
-    public Object queryProjectInfo( ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa){
-        return projectService.getProjectInfoData(request,pa);
+    public Object queryProjectInfo(ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa) {
+        return projectService.getProjectInfoData(request, pa);
     }
 
     /**
@@ -234,23 +239,29 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} projectName 项目名称
      * @apiParam (请求体) {String} shortName 项目简称
-     * @apiParam (请求体) {String} [directManageUnit] 直管单位
-     * @apiParam (请求体) {Int} status 项目状态,1启用，0停用
-     * @apiParam (请求体) {String} projectAddress 项目地址
-     * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
-     * @apiParam (请求体) {String} [imageSuffix] 图片格式
+     * @apiParam (请求体) {String} directManageUnit 直管单位
+     * @apiParam (请求体) {Bool} enable 项目状态,true:启用，false:停用
+     * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
+     * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
+     * @apiParam (请求体) {Double} latitude 项目位置经度
+     * @apiParam (请求体) {Double} longitude 项目位置纬度
+     * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
      * @apiParam (请求体) {Object[]} [tagDataList] 标签信息列表
      * @apiParam (请求体) {String} tagKey 标签键
      * @apiParam (请求体) {String} tagValue 标签值
+     * @apiParam (请求体) {Object[]} [propertyList] 属性值列表
+     * @apiParam (请求体) {String} propertyList.propertyID 属性ID
+     * @apiParam (请求体) {String} [propertyList.value] 属性值
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @RequestMapping(value = "/UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
     //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
-    public Object updateProjectData(Object a){
-        return null;
+    public Object updateProject(@Validated @RequestBody UpdateProjectParameter pa) {
+         projectService.updateProject(pa);
+         return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -306,7 +317,7 @@ public class ProjectController {
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryProjectType(@Validated @RequestBody AddProjectParam param){
+    public Object queryProjectType(@Validated @RequestBody AddProjectParam param) {
         return projectService.getProjectType();
     }
 
@@ -323,7 +334,26 @@ public class ProjectController {
      */
 //    @Permission(permissionName = "mdmbase:DeleteBaseProject")
     @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam dataIDList){
+    public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam dataIDList) {
         return projectService.deleteProjectList(dataIDList);
+    }
+
+    /**
+     * @api {post} /UpdateProjectImage 修改工程项目图片
+     * @apiDescription 修改工程项目图片
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName UpdateProjectImage
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} imageContent 图片内容,该项存在则imageSuffix不能为空
+     * @apiParam (请求体) {String} imageSuffix 图片格式
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
+    @RequestMapping(value = "UpdateProjectImage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object updateProjectImage(@Validated @RequestBody UpdateProjectImageParam pa) {
+        return ResultWrapper.successWithNothing();
     }
 }
