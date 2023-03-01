@@ -126,11 +126,15 @@
         DELETE
         a1,
         a2,
-        a3
+        a3,
+        a4,
+        a5
         FROM
         tb_project_info a1
         LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
         LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
+        LEFT JOIN tb_tag_relation a4 ON a1.ID = a4.ProjectID
+        LEFT JOIN tb_tag a5 ON a4.TagID = a5.ID
         WHERE
         a1.ID in
         <foreach collection="ids" item="item" open="(" close=")" separator=",">

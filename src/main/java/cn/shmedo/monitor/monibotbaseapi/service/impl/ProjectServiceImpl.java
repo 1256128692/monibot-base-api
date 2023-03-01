@@ -214,7 +214,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
         tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, pa.getID());
         List<Integer> collect= tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
-        List<TbTag> tbTags = tbTagMapper.queryTagList(collect);
+        List<TbTag> tbTags = null;
+        if (collect.size() > 0){
+            tbTags = tbTagMapper.queryTagList(collect);
+        }
 
         //给标签列表赋值
         projectInfoResult.setTagInfo(tbTags);
