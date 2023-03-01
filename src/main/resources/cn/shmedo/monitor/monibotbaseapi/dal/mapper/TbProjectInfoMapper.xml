@@ -98,11 +98,16 @@
             <if test="endCreateTime != null">
                 and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
             </if>
-            <if test="propertyEntity != null and propertyEntity.size > 0">
-                <foreach collection="propertyEntity" item="item">
+            <if test="propertyStr != null and propertyStr.size > 0">
+                <foreach collection="propertyStr" item="item">
                     and a3.`Name` = #{item.name,jdbcType=VARCHAR}
                     and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
-
+                </foreach>
+            </if>
+            <if test="propertyJson != null and propertyJson.size > 0">
+                <foreach collection="propertyJson" item="json">
+                    or ( a3.`Name` = #{json.name,jdbcType=VARCHAR}
+                    and a2.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
                 </foreach>
             </if>
         </where>

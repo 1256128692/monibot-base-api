@@ -17,10 +17,12 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,6 +50,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private TbTagRelationMapper tbTagRelationMapper;
     private TbPropertyMapper tbPropertyMapper;
     private TbProjectPropertyMapper tbProjectPropertyMapper;
+
     @Autowired
     public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper,
                               TbTagMapper tbTagMapper,
@@ -89,7 +92,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectPropertyMapper.insertBatch(projectPropertyList);
 
         List<Integer> tagID4DBList = new ArrayList<>();
-        if (ObjectUtil.isNotEmpty(pa.getTagList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagList())) {
             List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
             tbTagMapper.insertBatch(tagList);
             tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
@@ -122,12 +125,36 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
 
     @Override
-    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request,QueryProjectListParam pa) {
+    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa) {
         //将有效期转化为字符串
         if (pa.getExpiryDate() != null) {
             String s1 = pa.getExpiryDate().toString();
             pa.setExpiryDateStr(s1);
         }
+        //对基础属性进行分类，json和普通字符串
+        List<PropertyQueryEntity> propertyEntity = pa.getPropertyEntity();
+        if (propertyEntity != null) {
+            List<PropertyQueryEntity> propertystr = new ArrayList<>();
+            List<PropertyQueryEntity> propertyJson = new ArrayList<>();
+            propertyEntity.forEach(p->{
+                if (isJson(p)) {
+                    String jsonString = JSON.toJSONString(p.getValue());
+                    jsonString = deleteChar(jsonString);
+                    String[] split = jsonString.split(",");
+                    for (String s : split) {
+                        PropertyQueryEntity entity = new PropertyQueryEntity();
+                        entity.setName(p.getName());
+                        entity.setValue(s);
+                        propertyJson.add(entity);
+                    }
+                }else {
+                    propertystr.add(p);
+                }
+            });
+            pa.setPropertyJson(propertyJson);
+            pa.setPropertyStr(propertystr);
+        }
+
         //查询列表信息
         List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
 
@@ -157,16 +184,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             return projectInfoResult;
         }).collect(Collectors.toList());
 
-        return PageUtil.page(projectInfoResults,pa.getPageSize(),pa.getCurrentPage());
+        return PageUtil.page(projectInfoResults, pa.getPageSize(), pa.getCurrentPage());
     }
 
     @Override
-    public ResultWrapper getProjectInfoData(ServletRequest request,QueryProjectInfoParam pa) {
+    public ResultWrapper getProjectInfoData(ServletRequest request, QueryProjectInfoParam pa) {
 
         int id = pa.getID();
         //根据项目id获取数据库表数据
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
-        if (projectInfo == null){
+        if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
         }
 
@@ -174,8 +201,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
 
         //给项目类型赋值
-        TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(projectInfo.getProjectType());
-        if (tbProjectType == null){
+        TbProjectType tbProjectType = tbProjectTypeMapper.selectById(projectInfo.getProjectType());
+        if (tbProjectType == null) {
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
         }
         projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
@@ -190,7 +217,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setTagInfo(tbTags);
 
         //给公司信息赋值
-        Company data = getCompany(request,projectInfo.getCompanyID());
+        Company data = getCompany(request, projectInfo.getCompanyID());
         projectInfoResult.setCompany(data);
 
         //给拓展信息赋值
@@ -201,12 +228,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
-     * @param pa
+     * @param idListParam
      * @return
      */
     @Override
-    public ResultWrapper deleteProjectList(ProjectIDListParam pa) {
-        tbProjectInfoMapper.deleteProjectList(pa.getDataIDList());
+    public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
+        List<Integer> ids = idListParam.getDataIDList();
+
+        tbProjectInfoMapper.deleteProjectList(ids);
         return ResultWrapper.success("删除成功");
     }
 
@@ -236,14 +265,61 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public Company getCompany(ServletRequest request,Integer id){
+    public Company getCompany(ServletRequest request, Integer id) {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = httpRequest.getHeader(TOKEN_HEADER);
         CompanyThird companyThird = new CompanyThird();
         companyThird.setCompanyID(id);
         UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
-        ResultWrapper<Company> companyInfo = userService.getCompanyInfo(token,companyThird);
+        ResultWrapper<Company> companyInfo = userService.getCompanyInfo(token, companyThird);
         Company data = companyInfo.getData();
         return data;
+    }
+
+    /**
+     * 判断是否为json格式
+     *
+     * @param entity
+     * @return
+     */
+    public boolean isJson(PropertyQueryEntity entity) {
+        String value = entity.getValue();
+        boolean result = false;
+        if (StringUtils.isNotBlank(value)) {
+            value = value.trim();
+            if (value.startsWith("{") && value.endsWith("}")) {
+                result = true;
+            } else if (value.startsWith("[") && value.endsWith("]")) {
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 去掉字符串头尾字符
+     * @param source 需要处理的字符串
+     * @return
+     */
+    public String deleteChar(String source) {
+        source = trimFirstAndLastChar(source, '"');
+        source = trimFirstAndLastChar(source,'[');
+        source = trimFirstAndLastChar(source,']');
+        return source;
+    }
+    /**
+     * 去掉字符串头尾指定字符
+     * @param source 	需要处理的字符串
+     * @param element	指定字符
+     * @return
+     */
+    public String trimFirstAndLastChar(String source, char element) {
+        //判断指定字符是否出现在该字符串的第一位  是--返回下标1   否--返回下标0
+        int beginIndex = source.indexOf(element) == 0 ? 1 : 0;
+        //判断指定字符是否出现在该字符串的最后一位  是--返回出现的位置   否--返回字符长度
+        int endIndex = source.lastIndexOf(element) + 1 == source.length() ? source.lastIndexOf(element) : source.length();
+        //开始截取字符串
+        source = source.substring(beginIndex, endIndex);
+        return source;
     }
 }
