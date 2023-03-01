@@ -12,10 +12,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.CompanyThird;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -27,13 +30,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -72,8 +72,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addProject(AddProjectParam pa, Integer userID) {
-        // TODO 处理图片
-        String imgPath = "xxxx";
+        String imgPath = "";
+        if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())){
+            imgPath = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID);
+        }
         TbProjectInfo tbProjectInfo = Param2DBEntityUtil.fromAddProjectParam2TbProjectInfo(pa, userID, imgPath);
         tbProjectInfoMapper.insert(tbProjectInfo);
 
@@ -104,6 +106,27 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
         }
+    }
+
+    private String handlerimagePath(String imageContent, String imageSuffix, Integer userID) {
+        MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
+        AddFileUploadRequest pojo = new AddFileUploadRequest();
+        pojo.setFileName(UUID.randomUUID().toString());
+        pojo.setBucketName("mdnet-normal");
+        pojo.setFileContent(imageContent);
+        pojo.setFileType(imageSuffix);
+        pojo.setUserID(userID);
+        FilePathResponse info = instance.AddFileUpload(pojo);
+        if (info != null) {
+            return info.getPath();
+        }else{
+            return "图片存储失败";
+        }
+//        if (!info.apiSuccess()){
+//            return "图片存储失败";
+//        }else{
+//            return info.getData().toString();
+//        }
     }
 
     @Override

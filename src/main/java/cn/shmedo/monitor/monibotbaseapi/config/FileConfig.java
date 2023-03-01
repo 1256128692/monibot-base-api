@@ -19,6 +19,9 @@ public class FileConfig {
     @Value("${service.infoServiceAddress}")
     private String infoServiceAddress;
 
+    @Value("${service.mdInfoServiceAddress}")
+    private String mdInfoServiceAddress;
+
 
     public String getInfoServiceAddress() {
         return infoServiceAddress;
@@ -70,5 +73,13 @@ public class FileConfig {
 
     public void setAuthAppSecret(String authAppSecret) {
         this.authAppSecret = authAppSecret;
+    }
+
+    public String getMdInfoServiceAddress() {
+        return mdInfoServiceAddress;
+    }
+
+    public void setMdInfoServiceAddress(String mdInfoServiceAddress) {
+        this.mdInfoServiceAddress = mdInfoServiceAddress;
     }
 }
