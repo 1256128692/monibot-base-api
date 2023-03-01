@@ -137,7 +137,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<PropertyQueryEntity> propertystr = new ArrayList<>();
             List<PropertyQueryEntity> propertyJson = new ArrayList<>();
             propertyEntity.forEach(p->{
-                if (p.getValue() != null && !"[]".equals(p.getValue()) && "".equals(p.getValue())) {
+                if (p.getValue() != null && !"[]".equals(p.getValue()) && !"".equals(p.getValue())) {
                     if (isJson(p)) {
                         List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
                         for (String s : strings) {
@@ -166,8 +166,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
             tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, s.getID());
             List<Integer> collect= tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
-            List<TbTag> tbTags = tbTagMapper.queryTagList(collect);
-
+            List<TbTag> tbTags = null;
+            if (collect.size() > 0){
+                tbTags = tbTagMapper.queryTagList(collect);
+            }
             //给项目类型名称赋值
             TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
             projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
