@@ -30,4 +30,5 @@ public interface TbPropertyMapper extends BaseMapper<TbProperty> {
     int countByMIDAndNames(Integer modelID, List<String> nameList);
 
     List<TbProperty> queryByMID(Integer modelID);
+
 }

@@ -354,6 +354,7 @@ public class ProjectController {
     //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProjectImage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateProjectImage(@Validated @RequestBody UpdateProjectImageParam pa) {
+        projectService.updateProjectImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 }

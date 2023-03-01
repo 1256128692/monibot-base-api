@@ -58,4 +58,6 @@ public interface ProjectService {
     ResultWrapper deleteProjectList(ProjectIDListParam IDS);
 
     void updateProject(UpdateProjectParameter pa);
+
+    void updateProjectImage(UpdateProjectImageParam pa, Integer userID);
 }

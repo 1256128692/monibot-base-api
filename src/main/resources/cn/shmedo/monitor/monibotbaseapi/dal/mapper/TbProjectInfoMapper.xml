@@ -347,40 +347,47 @@
     <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
         <!--@mbg.generated-->
         update tb_project_info
-        set CompanyID        = #{companyID,jdbcType=INTEGER},
-            ProjectName      = #{projectName,jdbcType=VARCHAR},
-            ShortName        = #{shortName,jdbcType=VARCHAR},
-            ProjectType      = #{projectType,jdbcType=TINYINT},
-            ExpiryDate       = #{expiryDate,jdbcType=DATE},
-            DirectManageUnit = #{directManageUnit,jdbcType=VARCHAR},
-            PlatformType     = #{platformType,jdbcType=TINYINT},
-            `Enable`         = #{enable,jdbcType=BIT},
-            `Location`       = #{location,jdbcType=VARCHAR},
-            ProjectAddress   = #{projectAddress,jdbcType=VARCHAR},
-            Latitude         = #{latitude,jdbcType=DOUBLE},
-            Longitude        = #{longitude,jdbcType=DOUBLE},
-            ImagePath        = #{imagePath,jdbcType=VARCHAR},
-            ProjectDesc      = #{projectDesc,jdbcType=VARCHAR},
-            ModelID          = #{modelID,jdbcType=INTEGER},
-            CreateTime       = #{createTime,jdbcType=TIMESTAMP},
-            CreateUserID     = #{createUserID,jdbcType=INTEGER},
-            UpdateTime       = #{updateTime,jdbcType=TIMESTAMP},
-            UpdateUserID     = #{updateUserID,jdbcType=INTEGER}
+        set CompanyID = #{companyID,jdbcType=INTEGER},
+        ProjectName = #{projectName,jdbcType=VARCHAR},
+        ShortName = #{shortName,jdbcType=VARCHAR},
+        ProjectType = #{projectType,jdbcType=TINYINT},
+        ExpiryDate = #{expiryDate,jdbcType=DATE},
+        DirectManageUnit = #{directManageUnit,jdbcType=VARCHAR},
+        PlatformType = #{platformType,jdbcType=TINYINT},
+        `Enable` = #{enable,jdbcType=BIT},
+        `Location` = #{location,jdbcType=VARCHAR},
+        ProjectAddress = #{projectAddress,jdbcType=VARCHAR},
+        Latitude = #{latitude,jdbcType=DOUBLE},
+        Longitude = #{longitude,jdbcType=DOUBLE},
+        ImagePath = #{imagePath,jdbcType=VARCHAR},
+        ProjectDesc = #{projectDesc,jdbcType=VARCHAR},
+        ModelID = #{modelID,jdbcType=INTEGER},
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER}
         where ID = #{ID,jdbcType=INTEGER}
     </update>
 
     <update id="updateCompanyID">
         update tb_project_info
-        set CompanyID = #{companyID},
-        UpdateTime = #{date},
-        UpdateUserID = #{userID}
+        set CompanyID    = #{companyID},
+            UpdateTime   = #{date},
+            UpdateUserID = #{userID}
         where ID = #{projectID}
     </update>
     <update id="updateExpiryDate">
         update tb_project_info
-        set ExpiryDate = #{newExpiryDate},
-        UpdateTime = #{date },
-        UpdateUserID = #{userID}
+        set ExpiryDate   = #{newExpiryDate},
+            UpdateTime   = #{date },
+            UpdateUserID = #{userID}
+        where ID = #{projectID}
+    </update>
+
+
+    <update id="updatePathByID">
+        update tb_project_info
+        set ImagePath = #{path}
         where ID = #{projectID}
     </update>
 </mapper>

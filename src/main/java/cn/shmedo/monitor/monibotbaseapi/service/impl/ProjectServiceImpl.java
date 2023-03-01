@@ -296,6 +296,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
+    public void updateProjectImage(UpdateProjectImageParam pa, Integer userID) {
+        String path = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID);
+        if (StringUtils.isNotBlank(path)){
+            tbProjectInfoMapper.updatePathByID(path,pa.getProjectID());
+        }
+    }
+
+    @Override
     public Company getCompany(ServletRequest request, Integer id) {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         String token = httpRequest.getHeader(TOKEN_HEADER);
