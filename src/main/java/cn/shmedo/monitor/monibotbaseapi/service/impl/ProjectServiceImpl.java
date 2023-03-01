@@ -137,7 +137,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<PropertyQueryEntity> propertystr = new ArrayList<>();
             List<PropertyQueryEntity> propertyJson = new ArrayList<>();
             propertyEntity.forEach(p->{
-                if (p.getValue() != null || !"[]".equals(p.getValue())) {
+                if (p.getValue() != null && !"[]".equals(p.getValue()) && "".equals(p.getValue())) {
                     if (isJson(p)) {
                         List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
                         for (String s : strings) {
