@@ -50,7 +50,6 @@ dependencies {
     implementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.11'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'junit:junit:4.13.1'
-    implementation("com.alibaba:fastjson:1.2.54")
 }
 
 tasks.named('test') {

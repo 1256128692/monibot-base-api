@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -17,7 +18,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
@@ -123,7 +123,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
 
-
     @Override
     public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa) {
         //将有效期转化为字符串
@@ -138,16 +137,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<PropertyQueryEntity> propertyJson = new ArrayList<>();
             propertyEntity.forEach(p->{
                 if (isJson(p)) {
-                    String jsonString = JSON.toJSONString(p.getValue());
-                    jsonString = deleteChar(jsonString);
-                    String[] split = jsonString.split(",");
-                    for (String s : split) {
+                    List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
+                    for (String s : strings) {
                         PropertyQueryEntity entity = new PropertyQueryEntity();
                         entity.setName(p.getName());
                         entity.setValue(s);
                         propertyJson.add(entity);
                     }
-                }else {
+                } else {
                     propertystr.add(p);
                 }
             });
@@ -228,6 +225,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
+     *
      * @param idListParam
      * @return
      */
@@ -251,7 +249,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         //处理标签
         List<Integer> tagID4DBList = new ArrayList<>();
-        if (ObjectUtil.isNotEmpty(pa.getTagList())){
+        if (ObjectUtil.isNotEmpty(pa.getTagList())) {
             List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), currentSubject.getSubjectID());
             tbTagMapper.insertBatch(tagList);
             tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
@@ -286,40 +284,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         String value = entity.getValue();
         boolean result = false;
         if (StringUtils.isNotBlank(value)) {
-            value = value.trim();
-            if (value.startsWith("{") && value.endsWith("}")) {
-                result = true;
-            } else if (value.startsWith("[") && value.endsWith("]")) {
+            if (JSONUtil.isTypeJSONArray(value)) {
                 result = true;
             }
         }
         return result;
     }
 
-    /**
-     * 去掉字符串头尾字符
-     * @param source 需要处理的字符串
-     * @return
-     */
-    public String deleteChar(String source) {
-        source = trimFirstAndLastChar(source, '"');
-        source = trimFirstAndLastChar(source,'[');
-        source = trimFirstAndLastChar(source,']');
-        return source;
-    }
-    /**
-     * 去掉字符串头尾指定字符
-     * @param source 	需要处理的字符串
-     * @param element	指定字符
-     * @return
-     */
-    public String trimFirstAndLastChar(String source, char element) {
-        //判断指定字符是否出现在该字符串的第一位  是--返回下标1   否--返回下标0
-        int beginIndex = source.indexOf(element) == 0 ? 1 : 0;
-        //判断指定字符是否出现在该字符串的最后一位  是--返回出现的位置   否--返回字符长度
-        int endIndex = source.lastIndexOf(element) + 1 == source.length() ? source.lastIndexOf(element) : source.length();
-        //开始截取字符串
-        source = source.substring(beginIndex, endIndex);
-        return source;
-    }
 }
