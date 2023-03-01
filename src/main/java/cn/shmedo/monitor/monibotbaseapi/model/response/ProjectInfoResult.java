@@ -23,6 +23,7 @@ import java.util.List;
 public class ProjectInfoResult extends TbProjectInfo {
 
     private String projectTypeName;
+    private String projectTypeMainName;
     private Company company;
     private List<TbTag> tagInfo;
     private List<PropertyList> propertyList;

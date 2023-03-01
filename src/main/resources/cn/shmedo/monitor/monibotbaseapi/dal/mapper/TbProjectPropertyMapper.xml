@@ -146,14 +146,15 @@
     <update id="updateBatch">
         update tb_project_property set
         <trim prefix="Value = case" suffix="end">
-            <foreach collection="list" index="index" item="item">
+            <foreach collection="projectPropertyList" index="index" item="item">
                 when PropertyID = #{item.propertyID} then #{item.value}
             </foreach>
         </trim>
         where PropertyID in
-        <foreach collection="list" separator="," open="(" item="item" close=")">
+        <foreach collection="projectPropertyList" separator="," open="(" item="item" close=")">
             #{item.propertyID}
         </foreach>
+        and ProjectID = #{projectID,jdbcType=INTEGER}
     </update>
 
     <insert id="insertBatch">

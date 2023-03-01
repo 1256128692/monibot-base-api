@@ -56,4 +56,6 @@ public interface ProjectService {
      * @return
      */
     ResultWrapper deleteProjectList(ProjectIDListParam IDS);
+
+    void updateProject(UpdateProjectParameter pa);
 }

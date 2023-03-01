@@ -109,9 +109,9 @@ public class PropertyController {
      * @apiName QueryPropertyValue
      * @apiDescription 查询指定属性所有值（去重）
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {Int} projectType 项目类型
-     * @apiParam (请求体) {Int} createType 创建类型 0-预定义 1-自定义
+     * @apiParam (请求体) {Int} [createType] 创建类型 0-预定义 1-自定义, 默认0
      * @apiParam (请求体) {String} propertyName 属性名称
      * @apiSuccess (返回结果) {Object[]} data 属性值列表
      * @apiSampleRequest off

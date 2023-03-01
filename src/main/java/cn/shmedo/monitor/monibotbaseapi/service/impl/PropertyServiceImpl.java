@@ -45,14 +45,14 @@ public class PropertyServiceImpl implements PropertyService {
         List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
-                    tbProjectProperty.setPropertyID(pa.getProjectID());
+//                    tbProjectProperty.setPropertyID(pa.getProjectID());
                     tbProjectProperty.setPropertyID(propertyMap.get(item.getName()).getID());
                     tbProjectProperty.setValue(item.getValue());
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
 
-        tbProjectPropertyMapper.updateBatch(projectPropertyList);
+        tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectPropertyList);
     }
     @Transactional(rollbackFor = Exception.class)
     @Override

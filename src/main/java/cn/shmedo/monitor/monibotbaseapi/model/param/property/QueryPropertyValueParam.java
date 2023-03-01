@@ -30,6 +30,7 @@ public class QueryPropertyValueParam implements ParameterValidator, ResourcePerm
     /**
      * 项目ID
      */
+    @Range(min = 1, message = "项目ID必须大于0")
     private Integer projectID;
 
     /**
