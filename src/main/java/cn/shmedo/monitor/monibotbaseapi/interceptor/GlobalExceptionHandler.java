@@ -1,4 +1,4 @@
-package cn.shmedo.wtapi.interceptor;
+package cn.shmedo.monitor.monibotbaseapi.interceptor;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
