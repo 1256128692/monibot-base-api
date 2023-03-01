@@ -267,6 +267,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             tagID4DBList.addAll(pa.getTagIDList());
         }
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
+            tbTagRelationMapper.deleteByProjectID(pa.getProjectID());
             tbTagRelationMapper.insertBatch(tagID4DBList, pa.getProjectID());
         }
     }

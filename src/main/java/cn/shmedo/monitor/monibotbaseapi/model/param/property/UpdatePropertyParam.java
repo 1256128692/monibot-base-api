@@ -55,12 +55,15 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
         boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
-                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                     NameAndValue temp = nameAndValueMap.get(item.getName());
-                    if (!enums.contains(temp.getValue())) {
-                        return true;
+                    if (temp != null){
+                        JSONArray enums = JSONUtil.parseArray(item.getEnumField());
+
+                        if (!enums.contains(temp.getValue())) {
+                            return true;
+                        }
                     }
-                    return false;
+                     return false;
                 });
         if (b) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法");
