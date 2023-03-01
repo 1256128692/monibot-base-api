@@ -1,21 +1,23 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.PermissionScope;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import cn.shmedo.monitor.monibotbaseapi.model.param.region.GetLocationParam;
+import cn.shmedo.monitor.monibotbaseapi.service.RegionAreaService;
+import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+@AllArgsConstructor
 @RestController
 public class CommonController {
 
-    private FileConfig fileConfig;
+    private final FileConfig fileConfig;
 
-    @Autowired
-    public CommonController(FileConfig fileConfig) {
-        this.fileConfig = fileConfig;
-    }
+    private final RegionAreaService regionAreaService;
 
     /**
      * @api {GET} /ApiVersion 获取服务版本
@@ -38,15 +40,16 @@ public class CommonController {
      * @apiVersion 1.0.0
      * @apiGroup 通用模块
      * @apiName GetLocation
-     * @apiParam (请求体) {String} code 地区编号
+     * @apiParam (请求体) {Int} code 地区编号
      * @apiSuccess (返回结果) {String} name 地区名称
      * @apiSuccess (返回结果) {Double} lat 经度
      * @apiSuccess (返回结果) {Double} lon 纬度
      * @apiSampleRequest off
      * @apiPermission 公共权限
      */
+    @Permission(permissionScope = PermissionScope.LOGGED)
     @RequestMapping(value = "/GetLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object GetLocation() {
-        return null;
+    public Object GetLocation(@RequestBody @Validated GetLocationParam params) {
+        return ResultWrapper.success(regionAreaService.getLocationById(params));
     }
 }
