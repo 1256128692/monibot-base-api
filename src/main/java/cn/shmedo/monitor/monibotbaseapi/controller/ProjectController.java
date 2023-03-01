@@ -306,7 +306,7 @@ public class ProjectController {
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryProjectType(@Validated @RequestBody AddProjectParam param){
+    public Object queryProjectType(){
         return projectService.getProjectType();
     }
 
