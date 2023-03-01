@@ -90,8 +90,8 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (ProjectTypeCache.projectTypeMap.get(projectType) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        if (DateUtil.between(expiryDate, DateUtil.date(), DateUnit.DAY, false) <= 90) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于90日");
+        if (DateUtil.between(DateUtil.date(), expiryDate, DateUnit.DAY, false) <= 1) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于1日");
         }
         if (!PlatformType.validate(platformType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
