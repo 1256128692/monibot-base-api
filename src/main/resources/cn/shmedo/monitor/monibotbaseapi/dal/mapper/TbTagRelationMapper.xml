@@ -76,4 +76,8 @@
       (#{id},#{projectID})
     </foreach>
     </insert>
+
+  <delete id="deleteByProjectID">
+    delete from tb_tag_relation where ProjectID = #{projectID}
+  </delete>
 </mapper>

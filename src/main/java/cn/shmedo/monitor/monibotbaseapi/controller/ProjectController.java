@@ -247,9 +247,9 @@ public class ProjectController {
      * @apiParam (请求体) {Double} longitude 项目位置纬度
      * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
-     * @apiParam (请求体) {Object[]} [tagDataList] 标签信息列表
-     * @apiParam (请求体) {String} tagKey 标签键
-     * @apiParam (请求体) {String} tagValue 标签值
+     * @apiParam (请求体) {Object[]} [tagList] 标签信息列表
+     * @apiParam (请求体) {String} tagList.key 标签键
+     * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Object[]} [propertyList] 属性值列表
      * @apiParam (请求体) {String} propertyList.propertyID 属性ID
      * @apiParam (请求体) {String} [propertyList.value] 属性值
