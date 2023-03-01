@@ -105,10 +105,12 @@
                 </foreach>
             </if>
             <if test="propertyJson != null and propertyJson.size > 0">
-                <foreach collection="propertyJson" item="json">
-                    or ( a3.`Name` = #{json.name,jdbcType=VARCHAR}
+                and(
+                <foreach collection="propertyJson" item="json" separator="or">
+                    ( a3.`Name` = #{json.name,jdbcType=VARCHAR}
                     and a2.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
                 </foreach>
+                )
             </if>
         </where>
         group by a1.ID

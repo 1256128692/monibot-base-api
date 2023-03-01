@@ -28,4 +28,5 @@ public interface TbTagMapper extends BaseMapper<TbTag> {
     List<TbTag> queryListBy(Integer companyID, String fuzzyKey, String fuzzyValue);
 
     int countByCIDAndTags(Integer companyID, List<TagKeyAndValue> tagList);
+    List<TbTag> queryTagList(List<Integer> ids);
 }

@@ -64,6 +64,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         this.tbProjectPropertyMapper = tbProjectPropertyMapper;
         this.tbProjectTypeMapper = tbProjectTypMapper;
         this.tbTagRelationMapper = tbTagRelationMapper;
+        this.tbTagRelationMapper = tbTagRelationMapper;
     }
 
     private static final String TOKEN_HEADER = "Authorization";
@@ -136,16 +137,18 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<PropertyQueryEntity> propertystr = new ArrayList<>();
             List<PropertyQueryEntity> propertyJson = new ArrayList<>();
             propertyEntity.forEach(p->{
-                if (isJson(p)) {
-                    List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
-                    for (String s : strings) {
-                        PropertyQueryEntity entity = new PropertyQueryEntity();
-                        entity.setName(p.getName());
-                        entity.setValue(s);
-                        propertyJson.add(entity);
+                if (p.getValue() != null || !"[]".equals(p.getValue())) {
+                    if (isJson(p)) {
+                        List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
+                        for (String s : strings) {
+                            PropertyQueryEntity entity = new PropertyQueryEntity();
+                            entity.setName(p.getName());
+                            entity.setValue(s);
+                            propertyJson.add(entity);
+                        }
+                    } else {
+                        propertystr.add(p);
                     }
-                } else {
-                    propertystr.add(p);
                 }
             });
             pa.setPropertyJson(propertyJson);
@@ -159,11 +162,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
             ProjectInfoResult projectInfoResult = new ProjectInfoResult();
             BeanUtils.copyProperties(s, projectInfoResult);
-            //根据项目id获取标签信息列表
-            //构建查询条件查询标签列表
-            LambdaQueryWrapper<TbTag> tagLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            tagLambdaQueryWrapper.eq(TbTag::getCompanyID, s.getCompanyID());
-            List<TbTag> tbTags = tbTagMapper.selectList(tagLambdaQueryWrapper);
+            //根据项目id获取标签信息列表,构建查询条件查询标签列表
+            LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, s.getID());
+            List<Integer> collect= tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
+            List<TbTag> tbTags = tbTagMapper.queryTagList(collect);
 
             //给项目类型名称赋值
             TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());

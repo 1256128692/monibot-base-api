@@ -173,4 +173,10 @@
             )
         </foreach>
     </select>
+    <select id="queryTagList" resultMap="BaseResultMap">
+        select * from tb_tag where ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
