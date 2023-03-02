@@ -171,7 +171,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         resourceItemV2s.add(new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, param.getProjectID().toString()));
         if (!CollectionUtil.isEmpty(resourceItemV2s)) {
             ResultWrapper<Object> info = instance.transferMdmbaseResource(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(currentSubject.getCompanyID(),
+                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(param.getRowCompanyID(),
                             param.getCompanyID(), resourceItemV2s));
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());

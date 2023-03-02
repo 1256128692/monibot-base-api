@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 
 /**
@@ -20,6 +21,9 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
     @NotNull Integer projectID;
 
 
+    @JsonProperty()
+    private Integer rowCompanyID;
+
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
@@ -30,6 +34,7 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
         if (tbProjectInfo.getCompanyID().equals(companyID)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目标公司与当前公司一样");
         }
+        this.rowCompanyID = tbProjectInfo.getCompanyID();
         // TODO 校验用户在目标公司的权限
         return null;
     }
@@ -50,6 +55,14 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
 
     public void setCompanyID(Integer companyID) {
         this.companyID = companyID;
+    }
+
+    public Integer getRowCompanyID() {
+        return rowCompanyID;
+    }
+
+    public void setRowCompanyID(Integer rowCompanyID) {
+        this.rowCompanyID = rowCompanyID;
     }
 
     public Integer getProjectID() {
