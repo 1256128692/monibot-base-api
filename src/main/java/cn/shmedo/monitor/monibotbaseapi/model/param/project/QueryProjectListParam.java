@@ -39,14 +39,11 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
      * 有效期字符串
      */
     private String expiryDateStr;
+
     /**
-     * 基础属性为字符串
+     * id列表
      */
-    private List<PropertyQueryEntity> propertyStr;
-    /**
-     * 基础属性为json
-     */
-    private List<PropertyQueryEntity> propertyJson;
+    List<Integer> idList;
 
     @Override
     public ResultWrapper validate() {

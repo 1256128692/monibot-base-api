@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
@@ -33,6 +34,9 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
 
     void deleteProjectList(List ids);
+
+    List<Integer> getStrIDList(PropertyQueryEntity entity);
+    List<Integer> getJsonIDList(List<PropertyQueryEntity> entity);
 
     void updatePathByID(String path, Integer projectID);
 }

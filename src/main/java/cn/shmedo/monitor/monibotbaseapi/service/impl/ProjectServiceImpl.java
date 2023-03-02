@@ -158,26 +158,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         //对基础属性进行分类，json和普通字符串
         List<PropertyQueryEntity> propertyEntity = pa.getPropertyEntity();
-        if (propertyEntity != null) {
-            List<PropertyQueryEntity> propertystr = new ArrayList<>();
-            List<PropertyQueryEntity> propertyJson = new ArrayList<>();
-            propertyEntity.forEach(p -> {
-                if (p.getValue() != null && !"[]".equals(p.getValue()) && !"".equals(p.getValue())) {
-                    if (isJson(p)) {
-                        List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
-                        for (String s : strings) {
-                            PropertyQueryEntity entity = new PropertyQueryEntity();
-                            entity.setName(p.getName());
-                            entity.setValue(s);
-                            propertyJson.add(entity);
-                        }
-                    } else {
-                        propertystr.add(p);
-                    }
-                }
-            });
-            pa.setPropertyJson(propertyJson);
-            pa.setPropertyStr(propertystr);
+        if (propertyEntity != null){
+            List<Integer> idList = getIDList(propertyEntity);
+            if (idList != null && idList.size() > 0) {
+                pa.setIdList(idList);
+            }
         }
 
         //查询列表信息
@@ -332,6 +317,70 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
         return result;
+    }
+
+    /**
+     * 获取项目ID列表
+     *
+     * @param propertyEntity
+     * @return
+     */
+    public List<Integer> getIDList(List<PropertyQueryEntity> propertyEntity) {
+        List<PropertyQueryEntity> propertystr = new ArrayList<>();
+        List<List<PropertyQueryEntity>> propertyJson = new ArrayList<>();
+        if (propertyEntity != null && propertyEntity.size() > 0) {
+            propertyEntity.forEach(p -> {
+                if (p.getValue() != null && !"[]".equals(p.getValue()) && !"".equals(p.getValue())) {
+                    if (isJson(p)) {
+                        List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
+                        List<PropertyQueryEntity> json = new ArrayList<>();
+                        for (String s : strings) {
+                            PropertyQueryEntity entity = new PropertyQueryEntity();
+                            entity.setName(p.getName());
+                            entity.setValue(s);
+                            json.add(entity);
+                        }
+                        propertyJson.add(json);
+                    } else {
+                        propertystr.add(p);
+                    }
+                }
+            });
+        }
+        List<List<Integer>> strIDLists = new ArrayList<>();
+        List<Integer> str = null;
+        List<Integer> json = null;
+        if (propertystr != null && propertystr.size() > 0) {
+            PropertyQueryEntity entity = propertystr.get(0);
+            List<Integer> strIDList = tbProjectInfoMapper.getStrIDList(propertystr.get(0));
+            propertystr.forEach(p -> strIDLists.add(tbProjectInfoMapper.getStrIDList(p)));
+            int i = 0;
+            if (strIDLists != null && strIDLists.size() > 1) {
+                str = strIDLists.get(i);
+                for (i = 0; i < strIDLists.size(); i++) {
+                    str.retainAll(strIDLists.get(i));
+                }
+            }
+        }
+        if (propertyJson != null && propertyJson.size() > 0) {
+            propertyJson.forEach(p -> strIDLists.add(tbProjectInfoMapper.getJsonIDList(p)));
+            int i = 0;
+            if (strIDLists != null && strIDLists.size() > 1) {
+                json = strIDLists.get(i);
+                for (i = 0; i < strIDLists.size(); i++) {
+                    json.retainAll(strIDLists.get(i));
+                }
+            }
+        }
+        if (str != null && json != null) {
+            str.retainAll(json);
+            return str;
+        } else if (str != null && json == null) {
+            return str;
+        } else if (str == null && json != null) {
+            return json;
+        }
+        return null;
     }
 
 }

@@ -25,6 +25,10 @@
         <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
     </resultMap>
+    <resultMap id="PropertyMap" type="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Value" jdbcType="VARCHAR" property="value"/>
+    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID, CompanyID, ProjectName, ShortName, ProjectType, ExpiryDate, DirectManageUnit,
@@ -98,7 +102,13 @@
             <if test="endCreateTime != null">
                 and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
             </if>
-            <if test="propertyStr != null and propertyStr.size > 0">
+            <if test="idList != null">
+                and a1.ID in
+                <foreach collection="idList" item="item" separator="," open="(" close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <!--<if test="propertyStr != null and propertyStr.size > 0">
                 <foreach collection="propertyStr" item="item">
                     and a3.`Name` = #{item.name,jdbcType=VARCHAR}
                     and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
@@ -112,10 +122,32 @@
                     and a2.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
                 </foreach>
                 )
-            </if>
+            </if>-->
         </where>
         group by a1.ID
         order by createTime;
+    </select>
+    <select id="getStrIDList" resultType="java.lang.Integer" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
+        SELECT
+        a1.ProjectID
+        FROM tb_project_property a1
+        LEFT JOIN tb_property a2 on a1.PropertyID = a2.ID
+        <where>
+            a2.`Name` = #{name,jdbcType=VARCHAR}
+            and a1.`Value` like "%"#{value,jdbcType=VARCHAR}"%"
+        </where>
+    </select>
+    <select id="getJsonIDList" resultType="java.lang.Integer" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
+        SELECT
+        a1.ProjectID
+        FROM tb_project_property a1
+        LEFT JOIN tb_property a2 on a1.PropertyID = a2.ID
+        <where>
+            <foreach collection="entity" item="json" separator="or">
+                ( a2.`Name` = #{json.name,jdbcType=VARCHAR}
+                and a1.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
+            </foreach>
+        </where>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->
@@ -126,13 +158,11 @@
         DELETE
         a1,
         a2,
-        a3,
-        a4
+        a3
         FROM
         tb_project_info a1
         LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
-        LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
-        LEFT JOIN tb_tag_relation a4 ON a1.ID = a4.ProjectID
+        LEFT JOIN tb_tag_relation a3 ON a1.ID = a3.ProjectID
         WHERE
         a1.ID in
         <foreach collection="ids" item="item" open="(" close=")" separator=",">
