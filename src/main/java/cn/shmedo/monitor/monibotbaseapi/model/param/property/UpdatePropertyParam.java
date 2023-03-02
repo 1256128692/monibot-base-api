@@ -56,9 +56,9 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
             properties.addAll(tbPropertyMapper.queryByMID(tbProjectInfo.getModelID()));
         }
-        Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getID, Function.identity()));
+        Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getpID, Function.identity()));
         // 校验必填
-        boolean b2 = properties.stream().filter(TbProperty::getRequired)
+        boolean b2 = properties.stream().filter(item ->!item.getRequired())
                 .anyMatch(item -> {
                     IDAndValue temp = idAndValueMap.get(item.getID());
                     if (temp != null && ObjectUtil.isEmpty(temp.getValue())) {

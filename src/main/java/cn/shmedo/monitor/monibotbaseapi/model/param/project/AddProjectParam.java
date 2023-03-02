@@ -24,6 +24,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -78,6 +79,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<@NotNull Integer> monitorTypeList;
     private Integer modelID;
     @Valid
+    @NotEmpty
     private List<@NotNull IDAndValue> modelValueList;
     @JsonIgnore
     List<TbProperty> properties;
@@ -111,12 +113,13 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(modelID));
             }
-            Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getID, Function.identity()));
+            Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getpID, Function.identity()));
             // 校验必填
-            boolean b2 = properties.stream().filter(TbProperty::getRequired)
+            boolean b2 = properties.stream().filter(item ->!item.getRequired())
                     .anyMatch(item -> {
                         IDAndValue temp = idAndValueMap.get(item.getID());
                         if (temp == null ||  ObjectUtil.isEmpty(temp.getValue())){
+                            System.err.println(temp.getpID() + temp.getValue());
                             return true;
                         }
                         return false;
@@ -127,6 +130,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                         IDAndValue temp = idAndValueMap.get(item.getID());
                         if (temp!=null &&!enums.contains(temp.getValue())) {
+                            System.err.println(temp.getpID() + temp.getValue());
                             return true;
                         }
                         return false;

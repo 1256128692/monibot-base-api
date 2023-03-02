@@ -250,7 +250,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} tagList.key 标签键
      * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Object[]} [propertyList] 属性值列表
-     * @apiParam (请求体) {String} propertyList.propertyID 属性ID
+     * @apiParam (请求体) {String} propertyList.ID 属性ID
      * @apiParam (请求体) {String} [propertyList.value] 属性值
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off

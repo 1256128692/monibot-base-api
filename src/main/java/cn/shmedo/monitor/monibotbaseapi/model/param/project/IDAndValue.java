@@ -6,16 +6,16 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
  * @create: 2023-02-23 13:36
  **/
 public class IDAndValue {
-    private Integer ID;
+    private Integer pID;
     private String value;
 
 
-    public Integer getID() {
-        return ID;
+    public Integer getpID() {
+        return pID;
     }
 
-    public void setID(Integer ID) {
-        this.ID = ID;
+    public void setpID(Integer pID) {
+        this.pID = pID;
     }
 
     public String getValue() {
