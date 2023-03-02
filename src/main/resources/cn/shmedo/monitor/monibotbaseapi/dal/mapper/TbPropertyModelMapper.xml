@@ -93,4 +93,12 @@
       `Desc` = #{desc,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <select id="queryModel4WebBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web">
+      select *
+      from tb_property_model where ProjectType = #{projectType}
+      <if test="createType != null">
+          and createType = #{createType}
+      </if>
+  </select>
 </mapper>

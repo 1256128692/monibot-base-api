@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
 
 import java.util.List;
 
@@ -17,4 +19,6 @@ public interface PropertyService {
     void addModel(AddModelParam param, Integer userID);
 
     List<String> queryPropertyValue(QueryPropertyValueParam param);
+
+    List<Model4Web> queryModelList(QueryModelListParam param);
 }

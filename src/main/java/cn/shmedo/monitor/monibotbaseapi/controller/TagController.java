@@ -34,7 +34,7 @@ public class TagController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String}  [fuzzyKey] 模糊Key
      * @apiParam (请求体) {String} [fuzzyValue] 模糊Value
-     * @apiSuccess (返回结果) {Json[]} tagList  标签列表
+     * @apiSuccess (返回结果) {Object[]} tagList  标签列表
      * @apiSuccess (返回结果) {Int} tagList.id  标签ID
      * @apiSuccess (返回结果) {String} tagList.key  标签键
      * @apiSuccess (返回结果) {String} [tagList.value]  标签值

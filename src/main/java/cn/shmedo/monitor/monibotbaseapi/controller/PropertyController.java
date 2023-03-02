@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -29,7 +30,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} modelName 模型名称
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [desc] 模板描述
-     * @apiParam (请求体) {Json[]} modelPropertyList 自定义属性列表
+     * @apiParam (请求体) {Object[]} modelPropertyList 自定义属性列表
      * @apiParam (请求体) {String} modelPropertyList.name 属性名称
      * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
      * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
@@ -55,6 +56,7 @@ public class PropertyController {
      * @apiGroup 项目属性管理模块
      * @apiName QueryModelList
      * @apiDescription 查询模板信息
+     * @apiParam (请求体) {Int} [modelID] 模板ID, 优先级最高的参数
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {Int} [createType] 创建类型
      * @apiSuccess (返回结果) {Object[]} modelList  模板列表
@@ -77,8 +79,8 @@ public class PropertyController {
      * @apiPermission 项目权限:
      */
     @RequestMapping(value = "QueryModelList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryModelList() {
-        return null;
+    public Object queryModelList(@RequestBody @Validated QueryModelListParam param) {
+        return propertyService.queryModelList(param);
     }
 
     /**

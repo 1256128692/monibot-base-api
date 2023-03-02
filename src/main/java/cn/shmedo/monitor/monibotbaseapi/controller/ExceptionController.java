@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  **/
 
 @Slf4j
-@RestControllerAdvice
+//@RestControllerAdvice
 public class ExceptionController {
 
     /**

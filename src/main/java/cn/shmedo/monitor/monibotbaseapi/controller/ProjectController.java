@@ -41,9 +41,9 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
-     * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天
+     * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
-     * @apiParam (请求体) {Int} platformType 所属平台类型
+     * @apiParam (请求体) {Int} platformType 所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
@@ -51,7 +51,7 @@ public class ProjectController {
      * @apiParam (请求体) {Double} longitude 项目位置纬度
      * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
-     * @apiParam (请求体) {Json[]} [tagList] 标签列表
+     * @apiParam (请求体) {Object[]} [tagList] 标签列表
      * @apiParam (请求体) {String} tagList.key 标签键
      * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表

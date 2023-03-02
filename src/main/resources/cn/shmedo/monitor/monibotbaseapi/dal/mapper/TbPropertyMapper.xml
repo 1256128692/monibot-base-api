@@ -193,8 +193,8 @@
 
     <select id="queryByPID" resultMap="BaseResultMap">
         select * from tb_property where
-            ModelID = (
-                select  ModelID from tb_project_info where ID = #{projectID})
+        ModelID = (
+        select ModelID from tb_project_info where ID = #{projectID})
     </select>
 
     <select id="countByPIDAndNames" resultType="int">
@@ -229,5 +229,12 @@
 
     <select id="queryByMID" resultMap="BaseResultMap">
         select * from tb_property where ModelID = #{modelID}
+    </select>
+
+    <select id="selectByModelIDs" resultMap="BaseResultMap">
+        select * from tb_property where ModelID in
+        <foreach collection="list" item="modelID" separator="," open="(" close=")">
+            #{modelID}
+        </foreach>
     </select>
 </mapper>

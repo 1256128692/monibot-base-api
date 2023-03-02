@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
@@ -84,7 +85,11 @@ public class Param2DBEntityUtil {
             obj.setCreateType(CreateType.CUSTOMIZED.getType());
             obj.setClassName(item.getClassName());
             obj.setDisplayOrder(item.getDisplayOrder());
-            obj.setExValue(item.getExValue());
+            if (ObjectUtil.isEmpty(item.getExValue())){
+                obj.setExValue(null);
+            }else {
+                obj.setExValue(item.getExValue());
+            }
             obj.setModelID(modelID);
             return obj;
         }).collect(Collectors.toList());

@@ -25,4 +25,11 @@ public enum CreateType {
     public String getTypeStr() {
         return typeStr;
     }
+
+    public static boolean validate( Byte type){
+        if (PREDEFINED.type.equals(type) || CUSTOMIZED.type.equals(type)){
+            return true;
+        }
+        return false;
+    }
 }
