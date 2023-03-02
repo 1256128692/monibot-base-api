@@ -199,12 +199,18 @@
             tp.`ModelID`, tp.`ExValue`
         FROM `tb_property` tp
                  LEFT JOIN `tb_project_property` tpp ON tp.ID = tpp.PropertyID
-        WHERE tp.CreateType = 0
-        <if test="list != null and list.size() > 0">
-            AND tpp.ProjectID IN
-            <foreach collection="list" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
-        </if>
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="createType != null">
+                    tp.CreateType = #{createType}
+                </if>
+                <if test="list != null and list.size() > 0">
+                    AND tpp.ProjectID IN
+                    <foreach collection="list" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
     </select>
 </mapper>
