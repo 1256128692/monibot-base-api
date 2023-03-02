@@ -226,7 +226,8 @@ public class ProjectController {
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     public Object queryProjectInfo(ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa) {
-        return projectService.getProjectInfoData(request, pa);
+        return projectService.queryProjectInfo(request, pa);
+//        return projectService.getProjectInfoData(request, pa);
     }
 
     /**

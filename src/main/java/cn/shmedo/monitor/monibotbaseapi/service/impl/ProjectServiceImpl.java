@@ -24,8 +24,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRe
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
@@ -46,7 +46,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -524,7 +523,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 .selectBatchIds(page.getRecords().stream().map(TbProjectInfo::getProjectType).toList())
                 .stream().collect(Collectors.toMap(TbProjectType::getID, e -> e));
 
-        Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper.queryPropertyByProjectID(ids).stream()
+        Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper.queryPropertyByProjectID(ids, 0).stream()
                 .collect(Collectors.groupingBy(PropertyDto::getProjectID));
 
         List<ProjectInfo> dataList = page.getRecords().stream().map(item -> {
@@ -549,5 +548,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }).toList();
 
         return new PageUtil.PageResult<>((int)page.getPages(), dataList, (int)page.getTotal());
+    }
+
+    @Override
+    public ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa) {
+        TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(pa.getID());
+        ProjectInfo result = ProjectInfo.create(projectInfo);
+        result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
+        result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
+
+        List<TbProjectType> typeList = tbProjectTypeMapper.selectBatchIds(List.of(projectInfo.getProjectType()));
+        if (!typeList.isEmpty()) {
+            TbProjectType type = typeList.get(0);
+            result.setProjectTypeName(type.getTypeName());
+            result.setProjectMainTypeName(type.getMainType());
+        }
+        return result;
     }
 }
