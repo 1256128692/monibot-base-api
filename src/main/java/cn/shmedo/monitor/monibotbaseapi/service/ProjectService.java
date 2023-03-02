@@ -5,11 +5,10 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.C;
 import jakarta.servlet.ServletRequest;
-
 
 import java.util.List;
 
@@ -62,4 +61,12 @@ public interface ProjectService {
     void updateProject(UpdateProjectParameter pa);
 
     void updateProjectImage(UpdateProjectImageParam pa, Integer userID);
+
+    /**
+     * 查询项目列表
+     * @param request   请求 {@link ServletRequest}
+     * @param pa    参数 {@link QueryProjectListRequest}
+     * @return  {@link PageUtil.PageResult<ProjectInfo>}
+     */
+    PageUtil.PageResult<?> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
 }

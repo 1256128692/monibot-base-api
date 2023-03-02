@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.PropertyList;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,4 +29,6 @@ public interface TbProjectPropertyMapper extends BaseMapper<TbProjectProperty> {
     List<PropertyList> getPropertyList(Integer id);
 
     List<String> getPropertyValue(QueryPropertyValueParam param);
+
+    List<PropertyDto> queryPropertyByProjectID(@Param("list") List<Integer> list);
 }

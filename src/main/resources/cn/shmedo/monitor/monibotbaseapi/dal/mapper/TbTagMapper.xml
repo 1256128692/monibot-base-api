@@ -179,4 +179,18 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="queryTagByProjectID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto">
+        SELECT ttr.ProjectID, tt.*
+        FROM `tb_tag_relation` ttr
+                 LEFT JOIN `tb_tag` tt ON ttr.TagID = tt.ID
+        <where>
+            <if test="list != null and list.size() > 0">
+                ttr.ProjectID in
+                <foreach collection="list" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

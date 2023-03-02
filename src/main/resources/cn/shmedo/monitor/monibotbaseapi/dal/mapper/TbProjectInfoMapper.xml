@@ -420,4 +420,28 @@
         set ImagePath = #{path}
         where ID = #{projectID}
     </update>
+
+    <select id="getProjectIDByProperty" resultType="java.lang.Integer">
+        SELECT ProjectID
+        FROM
+        (
+        SELECT COUNT(1) size,
+               ProjectID
+        FROM tb_project_property tpp
+                 LEFT JOIN tb_property tp ON tp.ID = tpp.PropertyID
+        WHERE tp.CreateType = 0
+          AND
+        <foreach collection="list" item="item" separator="OR" open="(" close=")">
+                tp.`Name` = #{item.name}
+            <if test="item.values != null and item.values.size() != 0">
+                AND
+                <foreach collection="item.values" item="value" separator="OR" open="(" close=")">
+                    tpp.`Value` LIKE CONCAT('%', #{value}, '%')
+                </foreach>
+            </if>
+        </foreach>
+        GROUP BY ProjectID
+        ) t
+        WHERE size = #{size}
+    </select>
 </mapper>

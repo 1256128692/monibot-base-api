@@ -3,8 +3,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -39,4 +41,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<Integer> getJsonIDList(List<PropertyQueryEntity> entity);
 
     void updatePathByID(String path, Integer projectID);
+
+    List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
+                                         @Param("size") Integer size);
 }

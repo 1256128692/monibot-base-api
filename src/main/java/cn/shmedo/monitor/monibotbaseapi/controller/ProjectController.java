@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
@@ -97,7 +96,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} dataList 项目信息列表
-     * @apiSuccess (返回结果) {Int} dataList.ID 项目id
+     * @apiSuccess (返回结果) {Int} dataList.id 项目id
      * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
      * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
      * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
@@ -156,8 +155,8 @@ public class ProjectController {
      */
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     //    @Permission(permissionName = "mdmbase:ListBaseProject")
-    public Object queryProjectList(ServletRequest request, @Validated @RequestBody QueryProjectListParam pa) {
-        return projectService.getProjectInfoList(request, pa);
+    public Object queryProjectList(ServletRequest request, @Validated @RequestBody QueryProjectListRequest pa) {
+        return projectService.queryProjectList(request, pa);
     }
 
 

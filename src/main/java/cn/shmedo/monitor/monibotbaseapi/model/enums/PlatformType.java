@@ -36,4 +36,14 @@ public enum PlatformType {
     public static boolean validate(Byte type){
          return Arrays.stream(PlatformType.values()).anyMatch(item -> item.getType().equals(type));
     }
+
+    /**
+     * 根据类型获取枚举
+     * @param type  类型
+     * @return  枚举
+     */
+    public static PlatformType getPlatformType(Byte type) {
+        return Arrays.stream(PlatformType.values())
+                .filter(item -> item.getType().equals(type)).findFirst().orElse(null);
+    }
 }

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,6 +16,8 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
@@ -22,6 +25,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
@@ -30,6 +34,8 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -37,11 +43,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -464,4 +468,83 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         return null;
     }
 
+    @Override
+    public PageUtil.PageResult<?> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
+        List<Integer> projectIDList = tbProjectInfoMapper
+                .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
+        if (CollUtil.isEmpty(projectIDList)) {
+            return PageUtil.PageResult.empty();
+        }
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .in(TbProjectInfo::getID, projectIDList);
+        if(StrUtil.isNotBlank(pa.getProjectName())) {
+            wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
+        }
+        if (StrUtil.isNotBlank(pa.getDirectManageUnit())) {
+            wrapper.like(TbProjectInfo::getDirectManageUnit, pa.getDirectManageUnit());
+        }
+        if (StrUtil.isNotBlank(pa.getLocation())) {
+            wrapper.like(TbProjectInfo::getLocation, pa.getLocation());
+        }
+        if (ObjectUtil.isNotNull(pa.getCompanyId())) {
+            wrapper.eq(TbProjectInfo::getCompanyID, pa.getCompanyId());
+        }
+        if (ObjectUtil.isNotNull(pa.getProjectType())) {
+            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
+        }
+        if (pa.getEnable() != null) {
+            wrapper.eq(TbProjectInfo::getEnable, pa.getEnable());
+        }
+        if (CollUtil.isNotEmpty(pa.getPlatformTypeList())) {
+            wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformTypeList());
+        }
+        if (ObjectUtil.isNotEmpty(pa.getExpiryDate())) {
+            wrapper.le(TbProjectInfo::getExpiryDate, pa.getExpiryDate());
+        }
+        if (ObjectUtil.isNotEmpty(pa.getEndCreateTime())) {
+            wrapper.le(TbProjectInfo::getCreateTime, pa.getEndCreateTime());
+        }
+        if (ObjectUtil.isNotEmpty(pa.getBeginCreateTime())) {
+            wrapper.ge(TbProjectInfo::getCreateTime, pa.getBeginCreateTime());
+        }
+        IPage<TbProjectInfo> page = tbProjectInfoMapper.selectPage(new Page<>(pa.getCurrentPage(),
+                pa.getPageSize()), wrapper);
+        if (CollUtil.isEmpty(page.getRecords())) {
+            return PageUtil.PageResult.empty();
+        }
+        List<Integer> ids = page.getRecords().stream().map(TbProjectInfo::getID).toList();
+        Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids)
+                .stream().collect(Collectors.groupingBy(TagDto::getProjectID));
+
+        //TODO TbProjectType可加载至内存或redis
+        Map<Byte, TbProjectType> projectTypeMap = tbProjectTypeMapper
+                .selectBatchIds(page.getRecords().stream().map(TbProjectInfo::getProjectType).toList())
+                .stream().collect(Collectors.toMap(TbProjectType::getID, e -> e));
+
+        Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper.queryPropertyByProjectID(ids).stream()
+                .collect(Collectors.groupingBy(PropertyDto::getProjectID));
+
+        List<ProjectInfo> dataList = page.getRecords().stream().map(item -> {
+            ProjectInfo result = ProjectInfo.create(item);
+
+            if (tagGroup.containsKey(item.getID())) {
+                result.setTagInfo(tagGroup.get(item.getID()));
+            }
+            if (projectTypeMap.containsKey(item.getProjectType())) {
+                TbProjectType type = projectTypeMap.get(item.getProjectType());
+                result.setProjectTypeName(type.getTypeName());
+                result.setProjectMainTypeName(type.getMainType());
+            }
+
+            if (propMap.containsKey(item.getID())) {
+                result.setPropertyList(propMap.get(item.getID()));
+            }
+            //根据项目id获取客户企业信息
+            Company company = getCompany(request, item.getCompanyID());
+            result.setCompany(company);
+            return result;
+        }).toList();
+
+        return new PageUtil.PageResult<>((int)page.getPages(), dataList, (int)page.getTotal());
+    }
 }
