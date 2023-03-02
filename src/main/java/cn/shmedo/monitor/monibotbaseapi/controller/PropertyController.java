@@ -92,7 +92,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
-     * @apiParam (请求体) {String} modelValueList.name 属性名称
+     * @apiParam (请求体) {String} modelValueList.ID 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off

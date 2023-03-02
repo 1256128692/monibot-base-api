@@ -30,14 +30,15 @@ public class TagController {
      * @apiVersion 1.0.0
      * @apiGroup 标签模块
      * @apiName QueryTagList
-     * @apiDescription 查询标签
+     * @apiDescription 查询标签, 结果为2维数组，根据tagKey区分
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String}  [fuzzyKey] 模糊Key
      * @apiParam (请求体) {String} [fuzzyValue] 模糊Value
-     * @apiSuccess (返回结果) {Object[]} tagList  标签列表
-     * @apiSuccess (返回结果) {Int} tagList.id  标签ID
-     * @apiSuccess (返回结果) {String} tagList.key  标签键
-     * @apiSuccess (返回结果) {String} [tagList.value]  标签值
+     * @apiSuccess (响应结果) {[][]} list 全部数据
+     * @apiSuccess (响应结果) {Object[]} list.list 一列数据
+     * @apiSuccess (响应结果) {Int} list.list.ID 标签ID
+     * @apiSuccess (响应结果) {String} list.list.tagKey 标签键
+     * @apiSuccess (响应结果) {String} [list.list.tagValue] 标签值
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */

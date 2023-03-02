@@ -73,7 +73,7 @@ public class Param2DBEntityUtil {
     }
 
     public static List<TbProperty> fromAddModelParam2TbPropertyList(AddModelParam param, Integer userID, Integer modelID) {
-        return param.getModelPropertyList().stream().map(item ->{
+        return param.getModelPropertyList().stream().map(item -> {
             TbProperty obj = new TbProperty();
             obj.setProjectType(param.getProjectType());
             obj.setName(item.getName());
@@ -85,9 +85,9 @@ public class Param2DBEntityUtil {
             obj.setCreateType(CreateType.CUSTOMIZED.getType());
             obj.setClassName(item.getClassName());
             obj.setDisplayOrder(item.getDisplayOrder());
-            if (ObjectUtil.isEmpty(item.getExValue())){
+            if (ObjectUtil.isEmpty(item.getExValue())) {
                 obj.setExValue(null);
-            }else {
+            } else {
                 obj.setExValue(item.getExValue());
             }
             obj.setModelID(modelID);

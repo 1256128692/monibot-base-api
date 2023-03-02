@@ -237,4 +237,8 @@
             #{modelID}
         </foreach>
     </select>
+
+    <select id="queryByCreateType" resultMap="BaseResultMap">
+        select * from tb_property where CreateType = #{createType}
+    </select>
 </mapper>

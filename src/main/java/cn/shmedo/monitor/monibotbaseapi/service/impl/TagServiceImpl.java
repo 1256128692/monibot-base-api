@@ -7,7 +7,9 @@ import cn.shmedo.monitor.monibotbaseapi.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -23,7 +25,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public List<TbTag> queryTagList(QueryTagListParam param) {
-        return tbTagMapper.queryListBy(param.getCompanyID(), param.getFuzzyKey(), param.getFuzzyValue());
+    public List<List<TbTag>> queryTagList(QueryTagListParam param) {
+        List<TbTag> temp = tbTagMapper.queryListBy(param.getCompanyID(), param.getFuzzyKey(), param.getFuzzyValue());
+        return new ArrayList<>(temp.stream().collect(Collectors.groupingBy(TbTag::getTagKey)).values());
     }
 }

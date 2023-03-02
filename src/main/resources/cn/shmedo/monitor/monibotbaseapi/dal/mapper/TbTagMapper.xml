@@ -132,10 +132,13 @@
     </update>
 
     <select id="countByCIDAndIDs" resultType="int">
-        select count(1) from tb_tag where CompanyID = #{companyID} and ID in
-        <foreach collection="tagIDList" item="id" separator="," open="(" close=")">
-            #{id}
-        </foreach>
+        select count(1) from tb_tag where CompanyID = #{companyID}
+        <if test="tagIDList != null and tagIDList.size > 0">
+            and ID in
+            <foreach collection="tagIDList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
     <insert id="insertBatch" keyColumn="ID" keyProperty="ID" useGeneratedKeys="true">

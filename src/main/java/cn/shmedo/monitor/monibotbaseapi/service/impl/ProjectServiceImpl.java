@@ -95,19 +95,22 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectInfoMapper.insert(tbProjectInfo);
 
         // 处理属性
-
-        Map<String, TbProperty> propertyMap = pa.getProperties().stream().collect(Collectors.toMap(TbProperty::getName, Function.identity()));
-        List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
+        Map<Integer, String> PropertyIDAndValueMap =
+                ObjectUtil.isEmpty( pa.getModelValueList())?
+                        new HashMap<>():
+                        pa.getModelValueList().stream().collect(Collectors.toMap(IDAndValue::getID, IDAndValue::getValue));
+        List<TbProjectProperty> projectPropertyList = pa.getProperties().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
                     tbProjectProperty.setProjectID(tbProjectInfo.getID());
-                    tbProjectProperty.setPropertyID(propertyMap.get(item.getName()).getID());
-                    tbProjectProperty.setValue(item.getValue());
+                    tbProjectProperty.setPropertyID(item.getID());
+                    tbProjectProperty.setValue(PropertyIDAndValueMap.get(item.getID()));
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
-
         tbProjectPropertyMapper.insertBatch(projectPropertyList);
+
+
 
         List<Integer> tagID4DBList = new ArrayList<>();
         if (ObjectUtil.isNotEmpty(pa.getTagList())) {

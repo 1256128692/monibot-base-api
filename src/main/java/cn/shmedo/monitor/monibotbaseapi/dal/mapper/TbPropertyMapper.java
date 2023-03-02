@@ -32,4 +32,6 @@ public interface TbPropertyMapper extends BaseMapper<TbProperty> {
     List<TbProperty> queryByMID(Integer modelID);
 
     List<TbProperty> selectByModelIDs(List<Integer> modelIDList);
+
+    List<TbProperty> queryByCreateType(Byte createType);
 }

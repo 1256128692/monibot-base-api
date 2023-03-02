@@ -117,6 +117,11 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             if (tbTagMapper.countByCIDAndTags(companyID, tagList) > 0) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有新增的标签已经存在");
             }
+
+            int count = tbTagMapper.countByCIDAndIDs(companyID, null);
+            if (count + tagList.size() > 100){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前公司下标签数量为：" + count + " ,新增会导致超过100");
+            }
         }
         return null;
     }

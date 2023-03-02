@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
@@ -8,13 +9,14 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.NameAndValue;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.IDAndValue;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -37,36 +39,47 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
 
     @NotEmpty
     @Valid
-    private List< @NotNull NameAndValue> modelValueList;
+    private List<@NotNull IDAndValue> modelValueList;
 
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
-        if (tbProjectInfo == null){
-           return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+        if (tbProjectInfo == null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
-        if (!tbProjectInfo.getCompanyID().equals(companyID)){
-          return   ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不属于该公司");
-
+        if (!tbProjectInfo.getCompanyID().equals(companyID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不属于该公司");
         }
-        TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
-        List<TbProperty> properties = tbPropertyMapper.queryByMID(tbProjectInfo.getModelID());
-        Map<String, NameAndValue> nameAndValueMap = modelValueList.stream().collect(Collectors.toMap(NameAndValue::getName, Function.identity()));
-        boolean b = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
+        List<TbProperty> properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(tbProjectInfo.getProjectType());
+        if (tbProjectInfo.getModelID() != null) {
+            TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+            properties.addAll(tbPropertyMapper.queryByMID(tbProjectInfo.getModelID()));
+        }
+        Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getID, Function.identity()));
+        // 校验必填
+        boolean b2 = properties.stream().filter(TbProperty::getRequired)
                 .anyMatch(item -> {
-                    NameAndValue temp = nameAndValueMap.get(item.getName());
-                    if (temp != null){
+                    IDAndValue temp = idAndValueMap.get(item.getID());
+                    if (temp != null && ObjectUtil.isEmpty(temp.getValue())) {
+                        return true;
+                    }
+                    return false;
+                });
+        // 校验枚举
+        boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
+                .anyMatch(item -> {
+                    IDAndValue temp = idAndValueMap.get(item.getID());
+                    if (temp != null) {
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
-
                         if (!enums.contains(temp.getValue())) {
                             return true;
                         }
                     }
-                     return false;
+                    return false;
                 });
-        if (b) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法");
+        if (b2 || b1) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法或必填项未填入");
         }
         return null;
     }
@@ -97,11 +110,11 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         this.projectID = projectID;
     }
 
-    public List<NameAndValue> getModelValueList() {
+    public List<IDAndValue> getModelValueList() {
         return modelValueList;
     }
 
-    public void setModelValueList(List<NameAndValue> modelValueList) {
+    public void setModelValueList(List<IDAndValue> modelValueList) {
         this.modelValueList = modelValueList;
     }
 }

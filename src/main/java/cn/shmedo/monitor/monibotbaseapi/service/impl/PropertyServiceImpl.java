@@ -44,12 +44,11 @@ public class PropertyServiceImpl implements PropertyService {
     public void updateProperty(UpdatePropertyParam pa) {
         Integer projectID = pa.getProjectID();
         List<TbProperty> properties =  tbPropertyMapper.queryByPID(projectID);
-        Map<String, TbProperty> propertyMap = properties.stream().collect(Collectors.toMap(TbProperty::getName, Function.identity()));
+        Map<Integer, TbProperty> propertyMap = properties.stream().collect(Collectors.toMap(TbProperty::getID, Function.identity()));
         List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
-//                    tbProjectProperty.setPropertyID(pa.getProjectID());
-                    tbProjectProperty.setPropertyID(propertyMap.get(item.getName()).getID());
+                    tbProjectProperty.setPropertyID(propertyMap.get(item.getID()).getID());
                     tbProjectProperty.setValue(item.getValue());
                     return tbProjectProperty;
                 }

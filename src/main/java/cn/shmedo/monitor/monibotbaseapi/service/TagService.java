@@ -11,5 +11,5 @@ import java.util.List;
  * @create: 2023-02-23 16:04
  **/
 public interface TagService {
-    List<TbTag> queryTagList(QueryTagListParam param);
+    List<List<TbTag>> queryTagList(QueryTagListParam param);
 }
