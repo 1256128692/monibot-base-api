@@ -279,7 +279,7 @@ public class ProjectController {
     //    @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
     @RequestMapping(value = "TransferProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object transferProject(@Validated @RequestBody TransferProjectParam param) {
-        projectService.transferProject(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        projectService.transferProject(param, CurrentSubjectHolder.getCurrentSubject());
         return ResultWrapper.successWithNothing();
     }
 

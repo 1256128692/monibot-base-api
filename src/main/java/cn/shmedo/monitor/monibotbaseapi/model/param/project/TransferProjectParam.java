@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -21,6 +18,8 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
     private Integer companyID;
     @NotNull
     @NotNull Integer projectID;
+
+
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);

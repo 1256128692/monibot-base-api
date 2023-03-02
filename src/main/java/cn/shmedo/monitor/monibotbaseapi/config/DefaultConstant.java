@@ -6,4 +6,7 @@ public class DefaultConstant {
     public static final String COLON = ":";
 
     public static final String MD_INFO_BUCKETNAME = "mdnet-normal";
+
+    // 监测业务工程类型
+    public static final Integer AUTH_RESOURSE = 9;
 }

@@ -8,18 +8,21 @@ import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.CompanyThird;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -54,20 +57,23 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private TbPropertyMapper tbPropertyMapper;
     private TbProjectPropertyMapper tbProjectPropertyMapper;
 
+    private final FileConfig fileConfig;
+
     @Autowired
     public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper,
                               TbTagMapper tbTagMapper,
                               TbTagRelationMapper tbTagRelationMapper,
                               TbPropertyMapper tbPropertyMapper,
                               TbProjectTypeMapper tbProjectTypMapper,
-                              TbProjectPropertyMapper tbProjectPropertyMapper) {
+                              TbProjectPropertyMapper tbProjectPropertyMapper,
+                              FileConfig fileConfig) {
         this.tbProjectInfoMapper = tbProjectInfoMapper;
         this.tbTagMapper = tbTagMapper;
         this.tbPropertyMapper = tbPropertyMapper;
         this.tbProjectPropertyMapper = tbProjectPropertyMapper;
         this.tbProjectTypeMapper = tbProjectTypMapper;
         this.tbTagRelationMapper = tbTagRelationMapper;
-        this.tbTagRelationMapper = tbTagRelationMapper;
+        this.fileConfig = fileConfig;
     }
 
     private static final String TOKEN_HEADER = "Authorization";
@@ -109,6 +115,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
         }
+
+        // 新增项目权限
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
+        // 插入成功,并且添加权限
+        if (tbProjectInfo.getID() != null) {
+            resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, tbProjectInfo.getID().toString(), tbProjectInfo.getProjectName()));
+        }
+        if (!CollectionUtil.isEmpty(resourceItemV3s)) {
+            ResultWrapper<Object> info = instance.addMdmbaseResource(fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret(), new AddResourcesParameter(pa.getCompanyID(), resourceItemV3s));
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }
+        }
     }
 
     private String handlerimagePath(String imageContent, String imageSuffix, Integer userID, String fileName) {
@@ -139,8 +160,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public void transferProject(TransferProjectParam param, Integer userID) {
-        tbProjectInfoMapper.updateCompanyID(param.getProjectID(), param.getCompanyID(), userID, new Date());
+    public void transferProject(TransferProjectParam param, CurrentSubject currentSubject) {
+        tbProjectInfoMapper.updateCompanyID(param.getProjectID(), param.getCompanyID(), currentSubject.getSubjectID(), new Date());
+
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        List<ResourceItemV2> resourceItemV2s = new LinkedList<ResourceItemV2>();
+        // 转移成功后,并且修改项目资源的公司ID
+        resourceItemV2s.add(new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, param.getProjectID().toString()));
+        if (!CollectionUtil.isEmpty(resourceItemV2s)) {
+            ResultWrapper<Object> info = instance.transferMdmbaseResource(fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(currentSubject.getCompanyID(),
+                            param.getCompanyID(), resourceItemV2s));
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }
+        }
     }
 
     @Override
@@ -254,9 +288,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
      */
     @Override
     public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
-        List<Integer> ids = idListParam.getDataIDList();
-
-        tbProjectInfoMapper.deleteProjectList(ids);
+        tbProjectInfoMapper.deleteProjectList(idListParam.getDataIDList());
+        // 删除项目权限
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        List<ResourceItemV2> resourceItemV2s = null;
+        if (!CollectionUtil.isEmpty(idListParam.getDataIDList())) {
+            resourceItemV2s = idListParam.getDataIDList().stream().map(item -> new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, item.toString())).toList();
+        }
+        if (!CollectionUtil.isEmpty(resourceItemV2s)) {
+            ResultWrapper<Object> info = instance.deleteMdmbaseResource(fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret(), new DeleteResourcesParameter(idListParam.getCompanyID(), resourceItemV2s));
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }
+        }
         return ResultWrapper.success("删除成功");
     }
 
@@ -283,6 +328,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.deleteByProjectID(pa.getProjectID());
             tbTagRelationMapper.insertBatch(tagID4DBList, pa.getProjectID());
+        }
+
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
+        // 更新成功后,并且修改项目资源的描述
+        if (projectInfo != null) {
+            resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, projectInfo.getID().toString(), projectInfo.getProjectName()));
+        }
+        if (!CollectionUtil.isEmpty(resourceItemV3s)) {
+            ResultWrapper<Object> info = instance.updateMdmbaseResourceDesc(fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret(), new UpdateResourceDescParameter(resourceItemV3s));
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }
         }
     }
 
