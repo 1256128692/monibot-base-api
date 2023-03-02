@@ -2,11 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -73,8 +76,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Transactional(rollbackFor = Exception.class)
     public void addProject(AddProjectParam pa, Integer userID) {
         String imgPath = "";
-        if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())){
-            imgPath = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID);
+        if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())) {
+            imgPath = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID, null);
         }
         TbProjectInfo tbProjectInfo = Param2DBEntityUtil.fromAddProjectParam2TbProjectInfo(pa, userID, imgPath);
         tbProjectInfoMapper.insert(tbProjectInfo);
@@ -108,25 +111,24 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
     }
 
-    private String handlerimagePath(String imageContent, String imageSuffix, Integer userID) {
+    private String handlerimagePath(String imageContent, String imageSuffix, Integer userID, String fileName) {
         MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         AddFileUploadRequest pojo = new AddFileUploadRequest();
-        pojo.setFileName(UUID.randomUUID().toString());
-        pojo.setBucketName("mdnet-normal");
+        if (StrUtil.isBlank(fileName)) {
+            pojo.setFileName(UUID.randomUUID().toString());
+        } else {
+            pojo.setFileName(fileName);
+        }
+        pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
         pojo.setFileContent(imageContent);
         pojo.setFileType(imageSuffix);
         pojo.setUserID(userID);
-        FilePathResponse info = instance.AddFileUpload(pojo);
-        if (info != null) {
-            return info.getPath();
-        }else{
-            return "图片存储失败";
+        ResultWrapper<FilePathResponse> info = instance.AddFileUpload(pojo);
+        if (!info.apiSuccess()) {
+            return ErrorConstant.IMAGE_INSERT_FAIL;
+        } else {
+            return info.getData().getPath();
         }
-//        if (!info.apiSuccess()){
-//            return "图片存储失败";
-//        }else{
-//            return info.getData().toString();
-//        }
     }
 
     @Override
@@ -159,7 +161,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (propertyEntity != null) {
             List<PropertyQueryEntity> propertystr = new ArrayList<>();
             List<PropertyQueryEntity> propertyJson = new ArrayList<>();
-            propertyEntity.forEach(p->{
+            propertyEntity.forEach(p -> {
                 if (p.getValue() != null && !"[]".equals(p.getValue()) && !"".equals(p.getValue())) {
                     if (isJson(p)) {
                         List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
@@ -188,9 +190,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             //根据项目id获取标签信息列表,构建查询条件查询标签列表
             LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
             tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, s.getID());
-            List<Integer> collect= tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
+            List<Integer> collect = tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
             List<TbTag> tbTags = null;
-            if (collect.size() > 0){
+            if (collect.size() > 0) {
                 tbTags = tbTagMapper.queryTagList(collect);
             }
             //给项目类型名称赋值
@@ -236,9 +238,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //构建查询条件查询标签列表
         LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
         tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, pa.getID());
-        List<Integer> collect= tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
+        List<Integer> collect = tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
         List<TbTag> tbTags = null;
-        if (collect.size() > 0){
+        if (collect.size() > 0) {
             tbTags = tbTagMapper.queryTagList(collect);
         }
 
@@ -297,9 +299,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public void updateProjectImage(UpdateProjectImageParam pa, Integer userID) {
-        String path = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID);
-        if (StringUtils.isNotBlank(path)){
-            tbProjectInfoMapper.updatePathByID(path,pa.getProjectID());
+        String path = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName());
+        if (StringUtils.isNotBlank(path)) {
+            tbProjectInfoMapper.updatePathByID(path, pa.getProjectID());
         }
     }
 

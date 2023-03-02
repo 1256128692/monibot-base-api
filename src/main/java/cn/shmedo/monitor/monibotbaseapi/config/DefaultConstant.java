@@ -4,4 +4,6 @@ public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
 
     public static final String COLON = ":";
+
+    public static final String MD_INFO_BUCKETNAME = "mdnet-normal";
 }
