@@ -158,11 +158,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         //对基础属性进行分类，json和普通字符串，分别进行查询后取交集
         List<PropertyQueryEntity> propertyEntity = pa.getPropertyEntity();
-        if (propertyEntity != null){
+        if (propertyEntity != null) {
             List<Integer> idList = getIDList(propertyEntity);
             if (idList != null && idList.size() > 0) {
                 pa.setIdList(idList);
-            }else if(idList == null || idList.size() == 0){
+            } else if (idList == null || idList.size() == 0) {
                 List<Integer> list = new ArrayList<>();
                 list.add(0);
                 pa.setIdList(list);
@@ -352,13 +352,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             });
         }
         List<List<Integer>> strIDLists = new ArrayList<>();
-        List<Integer> str = null;
-        List<Integer> json = null;
+        List<Integer> str = new ArrayList<>();
+        List<Integer> json = new ArrayList<>();
         if (propertystr != null && propertystr.size() > 0) {
             propertystr.forEach(p -> strIDLists.add(tbProjectInfoMapper.getStrIDList(p)));
             int i = 0;
+            List<Integer> list = strIDLists.get(0);
+            str.add(list.get(0));
             if (strIDLists != null && strIDLists.size() > 1) {
-                str = strIDLists.get(i);
                 for (i = 0; i < strIDLists.size(); i++) {
                     str.retainAll(strIDLists.get(i));
                 }
@@ -367,19 +368,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (propertyJson != null && propertyJson.size() > 0) {
             propertyJson.forEach(p -> strIDLists.add(tbProjectInfoMapper.getJsonIDList(p)));
             int i = 0;
+            List<Integer> list = strIDLists.get(0);
+            json = strIDLists.get(list.get(0));
             if (strIDLists != null && strIDLists.size() > 1) {
-                json = strIDLists.get(i);
                 for (i = 0; i < strIDLists.size(); i++) {
                     json.retainAll(strIDLists.get(i));
                 }
             }
         }
-        if (str != null && json != null) {
+        if (str.size() > 0 && json.size() > 0) {
             str.retainAll(json);
             return str;
-        } else if (str != null && json == null) {
+        } else if (str.size() > 0 && json.size() == 0) {
             return str;
-        } else if (str == null && json != null) {
+        } else if (str.size() == 0 && json.size() > 0) {
             return json;
         }
         return null;
