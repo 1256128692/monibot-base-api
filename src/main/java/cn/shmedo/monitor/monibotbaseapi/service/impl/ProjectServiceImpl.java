@@ -18,7 +18,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
@@ -246,6 +248,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
         }
+        handlerimagePathToRealPath(projectInfo);
 
         //类型转换-将projectInfo转为ProjectInfoResult
         ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
@@ -278,6 +281,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getID()));
 
         return ResultWrapper.success(projectInfoResult);
+    }
+
+    private void handlerimagePathToRealPath(TbProjectInfo projectInfo) {
+        if (!StrUtil.isBlank(projectInfo.getImagePath())){
+            MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
+            QueryFileInfoRequest pojo = new QueryFileInfoRequest();
+            pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
+            pojo.setFilePath(projectInfo.getImagePath());
+            ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo);
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }else{
+                projectInfo.setImagePath(info.getData().getAbsolutePath());
+            }
+        }
     }
 
     /**
