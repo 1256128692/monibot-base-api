@@ -156,12 +156,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             String s1 = pa.getExpiryDate().toString();
             pa.setExpiryDateStr(s1);
         }
-        //对基础属性进行分类，json和普通字符串
+        //对基础属性进行分类，json和普通字符串，分别进行查询后取交集
         List<PropertyQueryEntity> propertyEntity = pa.getPropertyEntity();
         if (propertyEntity != null){
             List<Integer> idList = getIDList(propertyEntity);
             if (idList != null && idList.size() > 0) {
                 pa.setIdList(idList);
+            }else if(idList == null || idList.size() == 0){
+                List<Integer> list = new ArrayList<>();
+                list.add(0);
+                pa.setIdList(list);
             }
         }
 
@@ -351,8 +355,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<Integer> str = null;
         List<Integer> json = null;
         if (propertystr != null && propertystr.size() > 0) {
-            PropertyQueryEntity entity = propertystr.get(0);
-            List<Integer> strIDList = tbProjectInfoMapper.getStrIDList(propertystr.get(0));
             propertystr.forEach(p -> strIDLists.add(tbProjectInfoMapper.getStrIDList(p)));
             int i = 0;
             if (strIDLists != null && strIDLists.size() > 1) {
