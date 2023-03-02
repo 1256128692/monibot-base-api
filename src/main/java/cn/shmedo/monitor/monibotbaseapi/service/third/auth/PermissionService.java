@@ -75,4 +75,30 @@ public interface PermissionService {
     @Headers("Authorization: Bearer {accessToken}")
     ResultWrapper<List<String>> queryResourceListByPermission(QueryResourceListByPermissionParameter pa,
                                                               @Param("accessToken") String accessToken);
+
+
+    @RequestLine("POST /DeleteMdmbaseResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> deleteMdmbaseResource(@Param("appKey") String authAppKey,
+                                                @Param("appSecret") String authAppSecret,
+                                                DeleteResourcesParameter deleteResourcesParameter);
+
+
+    @RequestLine("POST /AddMdmbaseResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> addMdmbaseResource(@Param("appKey") String authAppKey,
+                                             @Param("appSecret") String authAppSecret,
+                                             AddResourcesParameter addResourcesParameter);
+
+    @RequestLine("POST /UpdateMdmbaseResourceDesc")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> updateMdmbaseResourceDesc(@Param("appKey") String authAppKey,
+                                                    @Param("appSecret") String authAppSecret,
+                                                    UpdateResourceDescParameter updateResourceDescParameter);
+
+    @RequestLine("POST /TransferMdmbaseResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> transferMdmbaseResource(@Param("appKey")String authAppKey,
+                                                  @Param("appSecret")String authAppSecret,
+                                                  TransferResourceParameter transferResourceParameter);
 }

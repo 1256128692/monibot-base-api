@@ -1,11 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.C;
 import jakarta.servlet.ServletRequest;
 
 
@@ -46,7 +48,7 @@ public interface ProjectService {
 
     Company getCompany(ServletRequest request, Integer id);
 
-    void transferProject(TransferProjectParam param, Integer userID);
+    void transferProject(TransferProjectParam param, CurrentSubject currentSubject);
 
     void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID);
 
