@@ -44,4 +44,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
                                          @Param("size") Integer size);
+
+    List<Integer> queryAllID();
 }

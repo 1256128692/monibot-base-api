@@ -472,10 +472,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public PageUtil.PageResult<?> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
-        List<Integer> projectIDList = tbProjectInfoMapper
-                .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
-        if (CollUtil.isEmpty(projectIDList)) {
-            return PageUtil.PageResult.empty();
+        // TODO 临时处理
+        List<Integer> projectIDList = tbProjectInfoMapper.queryAllID();
+        if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())){
+            projectIDList = tbProjectInfoMapper
+                    .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
+            if (CollUtil.isEmpty(projectIDList)) {
+                return PageUtil.PageResult.empty();
+            }
         }
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
                 .in(TbProjectInfo::getID, projectIDList);

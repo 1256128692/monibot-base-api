@@ -444,4 +444,8 @@
         ) t
         WHERE size = #{size}
     </select>
+
+    <select id="queryAllID" resultType="java.lang.Integer">
+        select id from tb_project_info
+    </select>
 </mapper>
