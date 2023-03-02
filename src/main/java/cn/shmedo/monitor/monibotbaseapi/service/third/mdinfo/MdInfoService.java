@@ -14,6 +14,6 @@ public interface MdInfoService {
 
     @RequestLine("POST /AddFileUpload")
 //    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    FilePathResponse AddFileUpload(AddFileUploadRequest addFileUploadRequest);
+    ResultWrapper<FilePathResponse> AddFileUpload(AddFileUploadRequest addFileUploadRequest);
 
 }

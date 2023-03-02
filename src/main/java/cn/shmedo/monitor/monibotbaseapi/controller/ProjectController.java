@@ -345,6 +345,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName UpdateProjectImage
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} fileName 文件名称,不要带后缀
      * @apiParam (请求体) {String} imageContent 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} imageSuffix 图片格式
      * @apiSuccess (返回结果) {String} none 空
