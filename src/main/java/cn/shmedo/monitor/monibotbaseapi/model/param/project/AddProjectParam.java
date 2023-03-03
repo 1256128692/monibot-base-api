@@ -14,6 +14,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
@@ -95,6 +96,11 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         }
         if (!PlatformType.validate(platformType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
+        }
+
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        if (tbProjectInfoMapper.countByCIDAndName(companyID, projectName) >0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在公司下已存在");
         }
         if (modelID != null) {
 

@@ -448,4 +448,8 @@
     <select id="queryAllID" resultType="java.lang.Integer">
         select id from tb_project_info
     </select>
+
+    <select id="countByCIDAndName" resultType="int">
+        select count(1) from tb_project_info where CompanyID = #{companyID} and ProjectName = #{projectName}
+    </select>
 </mapper>
