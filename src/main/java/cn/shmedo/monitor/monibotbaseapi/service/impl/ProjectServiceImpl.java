@@ -557,6 +557,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa) {
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(pa.getID());
+        if (projectInfo == null){
+            return null;
+        }
         ProjectInfo result = ProjectInfo.create(projectInfo);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
