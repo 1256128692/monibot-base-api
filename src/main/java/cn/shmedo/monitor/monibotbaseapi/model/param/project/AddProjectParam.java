@@ -80,7 +80,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private Integer modelID;
     @Valid
     @NotEmpty
-    private List<@NotNull IDAndValue> modelValueList;
+    private List<@NotNull PropertyIdAndValue> modelValueList;
     @JsonIgnore
     List<TbProperty> properties;
 
@@ -113,13 +113,13 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(modelID));
             }
-            Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getpID, Function.identity()));
+            Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
             // 校验必填
             boolean b2 = properties.stream().filter(item ->!item.getRequired())
                     .anyMatch(item -> {
-                        IDAndValue temp = idAndValueMap.get(item.getID());
+                        PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                         if (temp == null ||  ObjectUtil.isEmpty(temp.getValue())){
-                            System.err.println(temp.getpID() + temp.getValue());
+                            System.err.println(temp.getID() + temp.getValue());
                             return true;
                         }
                         return false;
@@ -128,9 +128,9 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                     .anyMatch(item -> {
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
-                        IDAndValue temp = idAndValueMap.get(item.getID());
+                        PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                         if (temp!=null &&!enums.contains(temp.getValue())) {
-                            System.err.println(temp.getpID() + temp.getValue());
+                            System.err.println(temp.getID() + temp.getValue());
                             return true;
                         }
                         return false;
@@ -334,12 +334,16 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         this.modelID = modelID;
     }
 
-    public List<IDAndValue> getModelValueList() {
+    public List<PropertyIdAndValue> getModelValueList() {
         return modelValueList;
     }
 
-    public void setModelValueList(List<IDAndValue> modelValueList) {
+    public void setModelValueList(List<PropertyIdAndValue> modelValueList) {
         this.modelValueList = modelValueList;
+    }
+
+    public void setProperties(List<TbProperty> properties) {
+        this.properties = properties;
     }
 
     public List<TbProperty> getProperties() {

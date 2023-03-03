@@ -16,7 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.IDAndValue;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -39,7 +39,7 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
 
     @NotEmpty
     @Valid
-    private List<@NotNull IDAndValue> modelValueList;
+    private List<@NotNull PropertyIdAndValue> modelValueList;
 
     @Override
     public ResultWrapper validate() {
@@ -56,11 +56,11 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
             properties.addAll(tbPropertyMapper.queryByMID(tbProjectInfo.getModelID()));
         }
-        Map<Integer, IDAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(IDAndValue::getpID, Function.identity()));
+        Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
         // 校验必填
         boolean b2 = properties.stream().filter(item ->!item.getRequired())
                 .anyMatch(item -> {
-                    IDAndValue temp = idAndValueMap.get(item.getID());
+                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp != null && ObjectUtil.isEmpty(temp.getValue())) {
                         return true;
                     }
@@ -69,7 +69,7 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         // 校验枚举
         boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
-                    IDAndValue temp = idAndValueMap.get(item.getID());
+                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp != null) {
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                         if (!enums.contains(temp.getValue())) {
@@ -110,11 +110,11 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         this.projectID = projectID;
     }
 
-    public List<IDAndValue> getModelValueList() {
+    public List<PropertyIdAndValue> getModelValueList() {
         return modelValueList;
     }
 
-    public void setModelValueList(List<IDAndValue> modelValueList) {
+    public void setModelValueList(List<PropertyIdAndValue> modelValueList) {
         this.modelValueList = modelValueList;
     }
 }

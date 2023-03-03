@@ -97,7 +97,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         Map<Integer, String> PropertyIDAndValueMap =
                 ObjectUtil.isEmpty( pa.getModelValueList())?
                         new HashMap<>():
-                        pa.getModelValueList().stream().collect(Collectors.toMap(IDAndValue::getpID, IDAndValue::getValue));
+                        pa.getModelValueList().stream().collect(Collectors.toMap(PropertyIdAndValue::getID, PropertyIdAndValue::getValue));
         List<TbProjectProperty> projectPropertyList = pa.getProperties().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
