@@ -1,15 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response;
 
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 
@@ -18,6 +22,12 @@ import java.util.List;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ProjectInfo extends TbProjectInfo {
+
+    /**
+     * 项目有效期
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date expiryDate;
 
     /**
      * 平台类型名称
@@ -49,33 +59,23 @@ public class ProjectInfo extends TbProjectInfo {
      */
     private List<PropertyDto> propertyList;
 
-    public static ProjectInfo create(TbProjectInfo info) {
-        ProjectInfo result = new ProjectInfo();
-        result.setID(info.getID());
-        result.setCompanyID(info.getCompanyID());
-        result.setProjectName(info.getProjectName());
-        result.setShortName(info.getShortName());
-        result.setProjectType(info.getProjectType());
-        result.setExpiryDate(info.getExpiryDate());
-        result.setDirectManageUnit(info.getDirectManageUnit());
-        result.setPlatformType(info.getPlatformType());
-        result.setEnable(info.getEnable());
-        result.setLocation(info.getLocation());
-        result.setLatitude(info.getLatitude());
-        result.setLongitude(info.getLongitude());
-        result.setImagePath(info.getImagePath());
-        result.setProjectDesc(info.getProjectDesc());
-        result.setModelID(info.getModelID());
-        result.setProjectAddress(info.getProjectAddress());
-        result.setCreateTime(info.getCreateTime());
-        result.setCreateUserID(info.getCreateUserID());
-        result.setUpdateTime(info.getUpdateTime());
-        result.setUpdateUserID(info.getUpdateUserID());
 
-        PlatformType platformType = PlatformType.getPlatformType(info.getPlatformType());
-        if (platformType != null) {
-            result.setPlatformTypeName(platformType.getTypeStr());
+    @Override
+    public void setProjectType(Byte projectType) {
+        TbProjectType type = ProjectTypeCache.projectTypeMap.getOrDefault(projectType, null);
+        if(type != null) {
+            this.projectTypeName = type.getTypeName();
+            this.projectMainTypeName = type.getMainType();
         }
-        return result;
+        super.setProjectType(projectType);
+    }
+
+    @Override
+    public void setPlatformType(Byte platformType) {
+        PlatformType type = PlatformType.getPlatformType(platformType);
+        if (platformType != null) {
+            this.platformTypeName = type.getTypeStr();
+        }
+        super.setPlatformType(platformType);
     }
 }

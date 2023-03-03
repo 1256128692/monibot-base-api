@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
@@ -13,6 +15,7 @@ import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -27,6 +30,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRe
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -64,6 +68,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private final FileConfig fileConfig;
 
+    private final RedisService redisService;
+
     @Autowired
     public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper,
                               TbTagMapper tbTagMapper,
@@ -71,7 +77,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                               TbPropertyMapper tbPropertyMapper,
                               TbProjectTypeMapper tbProjectTypMapper,
                               TbProjectPropertyMapper tbProjectPropertyMapper,
-                              FileConfig fileConfig) {
+                              FileConfig fileConfig,
+                              RedisService redisService) {
         this.tbProjectInfoMapper = tbProjectInfoMapper;
         this.tbTagMapper = tbTagMapper;
         this.tbPropertyMapper = tbPropertyMapper;
@@ -79,6 +86,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         this.tbProjectTypeMapper = tbProjectTypMapper;
         this.tbTagRelationMapper = tbTagRelationMapper;
         this.fileConfig = fileConfig;
+        this.redisService = redisService;
     }
 
     private static final String TOKEN_HEADER = "Authorization";
@@ -289,7 +297,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         return ResultWrapper.success(projectInfoResult);
     }
 
-    private void handlerimagePathToRealPath(TbProjectInfo projectInfo) {
+    private <T extends TbProjectInfo> void handlerimagePathToRealPath(T projectInfo) {
         if (!StrUtil.isBlank(projectInfo.getImagePath())){
             MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
@@ -471,87 +479,50 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public PageUtil.PageResult<?> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
-        // TODO 临时处理
-        List<Integer> projectIDList = tbProjectInfoMapper.queryAllID();
+    public PageUtil.PageResult<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
+        List<Integer> projectIDList = null;
         if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())){
             projectIDList = tbProjectInfoMapper
                     .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
-            if (CollUtil.isEmpty(projectIDList)) {
-                return PageUtil.PageResult.empty();
-            }
         }
-        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
-                .in(TbProjectInfo::getID, projectIDList);
-        if(StrUtil.isNotBlank(pa.getProjectName())) {
-            wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
-        }
-        if (StrUtil.isNotBlank(pa.getDirectManageUnit())) {
-            wrapper.like(TbProjectInfo::getDirectManageUnit, pa.getDirectManageUnit());
-        }
-        if (StrUtil.isNotBlank(pa.getLocation())) {
-            wrapper.like(TbProjectInfo::getLocation, pa.getLocation());
-        }
-        if (ObjectUtil.isNotNull(pa.getCompanyId())) {
-            wrapper.eq(TbProjectInfo::getCompanyID, pa.getCompanyId());
-        }
-        if (ObjectUtil.isNotNull(pa.getProjectType())) {
-            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
-        }
-        if (pa.getEnable() != null) {
-            wrapper.eq(TbProjectInfo::getEnable, pa.getEnable());
-        }
-        if (CollUtil.isNotEmpty(pa.getPlatformTypeList())) {
-            wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformTypeList());
-        }
-        if (ObjectUtil.isNotEmpty(pa.getExpiryDate())) {
-            wrapper.le(TbProjectInfo::getExpiryDate, pa.getExpiryDate());
-        }
-        if (ObjectUtil.isNotEmpty(pa.getEndCreateTime())) {
-            wrapper.le(TbProjectInfo::getCreateTime, pa.getEndCreateTime());
-        }
-        if (ObjectUtil.isNotEmpty(pa.getBeginCreateTime())) {
-            wrapper.ge(TbProjectInfo::getCreateTime, pa.getBeginCreateTime());
-        }
-        IPage<TbProjectInfo> page = tbProjectInfoMapper.selectPage(new Page<>(pa.getCurrentPage(),
-                pa.getPageSize()), wrapper);
-        if (CollUtil.isEmpty(page.getRecords())) {
-            return PageUtil.PageResult.empty();
-        }
-        List<Integer> ids = page.getRecords().stream().map(TbProjectInfo::getID).toList();
-        Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids)
-                .stream().collect(Collectors.groupingBy(TagDto::getProjectID));
 
-        //TODO TbProjectType可加载至内存或redis
-        Map<Byte, TbProjectType> projectTypeMap = tbProjectTypeMapper
-                .selectBatchIds(page.getRecords().stream().map(TbProjectInfo::getProjectType).toList())
-                .stream().collect(Collectors.toMap(TbProjectType::getID, e -> e));
+        pa.setProjectIDList(projectIDList);
+        Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+        IPage<ProjectInfo> dataList = tbProjectInfoMapper.getProjectList(page, pa);
 
-        Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper.queryPropertyByProjectID(ids, 0).stream()
-                .collect(Collectors.groupingBy(PropertyDto::getProjectID));
+        List<Integer> ids = dataList.getRecords().stream().map(TbProjectInfo::getID).toList();
+        if (!ids.isEmpty()) {
+            Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids)
+                    .stream().collect(Collectors.groupingBy(TagDto::getProjectID));
 
-        List<ProjectInfo> dataList = page.getRecords().stream().map(item -> {
-            ProjectInfo result = ProjectInfo.create(item);
+            Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
+                    .queryPropertyByProjectID(ids, 0).stream()
+                    .collect(Collectors.groupingBy(PropertyDto::getProjectID));
 
-            if (tagGroup.containsKey(item.getID())) {
-                result.setTagInfo(tagGroup.get(item.getID()));
-            }
-            if (projectTypeMap.containsKey(item.getProjectType())) {
-                TbProjectType type = projectTypeMap.get(item.getProjectType());
-                result.setProjectTypeName(type.getTypeName());
-                result.setProjectMainTypeName(type.getMainType());
-            }
+            Collection<Object> areas = dataList.getRecords()
+                    .stream().map(e -> {
+                        JSONObject json = JSONUtil.parseObj(e.getLocation());
+                        return json.isEmpty() ? null : CollUtil.getLast(json.values());
+                    }).filter(Objects::nonNull).collect(Collectors.toSet());;
+            Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                    .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
+            areas.clear();
 
-            if (propMap.containsKey(item.getID())) {
-                result.setPropertyList(propMap.get(item.getID()));
-            }
-            //根据项目id获取客户企业信息
-            Company company = getCompany(request, item.getCompanyID());
-            result.setCompany(company);
-            return result;
-        }).toList();
+            dataList.getRecords().forEach(item -> {
+                item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
+                item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
+                item.setCompany(getCompany(request, item.getCompanyID()));
 
-        return new PageUtil.PageResult<>((int)page.getPages(), dataList, (int)page.getTotal());
+                JSONObject json = JSONUtil.parseObj(item.getLocation());
+                if(!json.isEmpty()) {
+                    String areaCode = (String) CollUtil.getLast(json.values());
+                    item.setLocation(areaMap.getOrDefault(areaCode, null));
+                }
+
+                handlerimagePathToRealPath(item);
+            });
+        }
+        return new PageUtil.PageResult<>((int)page.getPages(), dataList.getRecords(), (int)page.getTotal());
     }
 
     @Override
@@ -560,16 +531,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (projectInfo == null){
             return null;
         }
-        ProjectInfo result = ProjectInfo.create(projectInfo);
+        ProjectInfo result = new ProjectInfo();
+        BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
 
-        List<TbProjectType> typeList = tbProjectTypeMapper.selectBatchIds(List.of(projectInfo.getProjectType()));
-        if (!typeList.isEmpty()) {
-            TbProjectType type = typeList.get(0);
-            result.setProjectTypeName(type.getTypeName());
-            result.setProjectMainTypeName(type.getMainType());
+        JSONObject json = JSONUtil.parseObj(result.getLocation());
+        if (!json.isEmpty()) {
+            String areaCode = (String) CollUtil.getLast(json.values());
+            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, areaCode, RegionArea.class);
+            result.setLocation(area != null ? area.getName() : StrUtil.EMPTY);
         }
+
+        handlerimagePathToRealPath(result);
         return result;
     }
 }

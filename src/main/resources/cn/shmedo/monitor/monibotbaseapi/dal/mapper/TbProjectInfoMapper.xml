@@ -445,8 +445,61 @@
         WHERE size = #{size}
     </select>
 
-    <select id="queryAllID" resultType="java.lang.Integer">
-        select id from tb_project_info
+    <select id="getProjectList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">
+        SELECT <include refid="Base_Column_List"/> FROM tb_project_info
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="pa.projectIDList != null and pa.projectIDList.size() != 0">
+                    ID IN
+                    <foreach collection="pa.projectIDList" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                    AND
+                </if>
+                <if test="pa.projectName != null and pa.projectName != ''">
+                    ProjectName LIKE CONCAT('%',#{pa.projectName},'%') AND
+                </if>
+                <if test="pa.directManageUnit != null and pa.directManageUnit != ''">
+                    DirectManageUnit LIKE CONCAT('%', #{pa.directManageUnit},'%') AND
+                </if>
+                <if test="pa.location != null and pa.location != ''">
+                    Location LIKE CONCAT('%', #{pa.location}, '%') AND
+                </if>
+                <if test="pa.companyId != null">
+                    CompanyID = #{pa.companyId} AND
+                </if>
+                <if test="pa.projectType != null">
+                    ProjectType = #{pa.projectType} AND
+                </if>
+                <if test="pa.enable != null ">
+                    <choose>
+                        <when test="pa.enable">
+                            Enable = 1 AND
+                        </when>
+                        <otherwise>
+                            Enable = 0 AND
+                        </otherwise>
+                    </choose>
+                </if>
+                <if test="pa.platformTypeList != null and pa.platformTypeList.size() != 0">
+                    PlatformType IN
+                    <foreach collection="pa.platformTypeList" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                    AND
+                </if>
+                <if test="pa.expiryDate != null">
+                    ExpiryDate &lt;= #{pa.expiryDate} AND
+                </if>
+                <if test="pa.endCreateTime != null">
+                    CreateTime &lt;= #{pa.endCreateTime} AND
+                </if>
+                <if test="pa.beginCreateTime != null">
+                    CreateTime &gt;= #{pa.beginCreateTime} AND
+                </if>
+            </trim>
+        </where>
+        ORDER BY CreateTime DESC
     </select>
 
     <select id="countByCIDAndName" resultType="int">

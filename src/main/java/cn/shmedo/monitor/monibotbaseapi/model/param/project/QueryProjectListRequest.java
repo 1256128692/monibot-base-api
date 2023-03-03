@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -49,6 +50,9 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private DateTime endCreateTime;
+
+    @JsonIgnore
+    private List<Integer> projectIDList;
 
 
     private List<Property> propertyEntity;

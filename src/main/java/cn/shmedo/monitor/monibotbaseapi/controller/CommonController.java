@@ -9,7 +9,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.region.GetLocationParam;
 import cn.shmedo.monitor.monibotbaseapi.service.RegionAreaService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
@@ -42,10 +45,10 @@ public class CommonController {
      * @apiName GetLocation
      * @apiParam (请求体) {Int} code 地区编号
      * @apiSuccess (返回结果) {String} name 地区名称
-     * @apiSuccess (返回结果) {Double} lat 经度
-     * @apiSuccess (返回结果) {Double} lon 纬度
+     * @apiSuccess (返回结果) {Double} lat 纬度
+     * @apiSuccess (返回结果) {Double} lon 经度
      * @apiSampleRequest off
-     * @apiPermission 公共权限
+     * @apiPermission 登录权限
      */
     @Permission(permissionScope = PermissionScope.LOGGED)
     @RequestMapping(value = "/GetLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
