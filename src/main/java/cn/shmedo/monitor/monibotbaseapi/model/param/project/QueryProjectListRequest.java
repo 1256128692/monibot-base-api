@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateTime;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
@@ -19,6 +21,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -50,15 +53,15 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     private List<Byte> platformTypeList;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
-    private DateTime expiryDate;
+    private Date expiryDate;
 
     @Past(message = "开始时间不能大于当前时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime beginCreateTime;
+    private Date beginCreateTime;
 
     @Past(message = "结束时间不能大于当前时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime endCreateTime;
+    private Date endCreateTime;
 
     @JsonIgnore
     private List<Integer> projectIDList;
