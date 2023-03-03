@@ -13,7 +13,7 @@ public enum PropertyType {
     TYPE_NUMBER((byte) 1, "数值"),
     TYPE_STRING((byte)2,"字符串"),
     TYPE_ENUM((byte)3,"枚举"),
-    TYPE_DATE((byte)4,"数值");
+    TYPE_DATE((byte)4,"日期");
     private Byte type;
     private String typeStr;
 

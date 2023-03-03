@@ -5,12 +5,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -83,15 +87,15 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         if (projectNameInfo != null && !projectNameInfo.getID().equals(projectID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "重复的项目名称");
         }
-        if (!CollectionUtil.isEmpty(propertyList)) {
-            List<Integer> propertyIdList = propertyList.stream().map(PropertyIdAndValue::getID).collect(Collectors.toList());
-            TbProjectPropertyMapper projectPropertyMapper = ContextHolder.getBean(TbProjectPropertyMapper.class);
-            LambdaQueryWrapper<TbProjectProperty> propertyLambdaQueryWrapper = new LambdaQueryWrapper<TbProjectProperty>()
-                    .in(TbProjectProperty::getPropertyID, propertyIdList)
-                    .eq(TbProjectProperty::getProjectID, projectID);
-            propertyDataList = projectPropertyMapper.selectList(propertyLambdaQueryWrapper);
-            if (CollectionUtil.isEmpty(propertyDataList) || propertyDataList.size() != propertyIdList.size()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性值列表含非法的属性");
+        if (ObjectUtil.isNotEmpty(propertyList)){
+            List<TbProperty> properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType());
+            if (projectInfo.getModelID() != null) {
+                TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+                properties.addAll(tbPropertyMapper.queryByMID(projectInfo.getModelID()));
+            }
+            ResultWrapper temp = PropertyUtil.validPropertyValue(propertyList, properties, false);
+            if (temp!=null){
+                return temp;
             }
         }
         //校验标签

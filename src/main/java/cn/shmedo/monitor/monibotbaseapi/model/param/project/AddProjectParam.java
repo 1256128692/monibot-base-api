@@ -11,6 +11,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
@@ -19,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
+import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -118,28 +120,9 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
             properties.addAll(tbPropertyMapper.queryByMID(modelID));
         }
-        Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
-        // 校验必填
-        boolean b2 = properties.stream().filter(item -> !item.getRequired())
-                .anyMatch(item -> {
-                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp == null || ObjectUtil.isEmpty(temp.getValue())) {
-                        return true;
-                    }
-                    return false;
-                });
-        // 校验枚举
-        boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
-                .anyMatch(item -> {
-                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
-                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp != null && !enums.contains(temp.getValue())) {
-                        return true;
-                    }
-                    return false;
-                });
-        if (b1 || b2) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法或必填项未填入");
+        ResultWrapper temp = PropertyUtil.validPropertyValue(modelValueList, properties, true);
+        if (temp!=null){
+            return temp;
         }
         //校验标签
         TbTagMapper tbTagMapper = ContextHolder.getBean(TbTagMapper.class);

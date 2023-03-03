@@ -35,7 +35,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期
      * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
      * @apiParam (请求体) {Boolean} modelPropertyList.required 自定义属性是否必填
-     * @apiParam (请求体) {String} [modelPropertyList.enumField] 枚举字段，json数组
+     * @apiParam (请求体) {String} [modelPropertyList.enumField] 枚举字段，json数组, 限制长度为10
      * @apiParam (请求体) {Boolean} [modelPropertyList.multiSelect] 可否多选,限定枚举
      * @apiParam (请求体) {String} [modelPropertyList.className] 类名称
      * @apiParam (请求体) {Int} [modelPropertyList.displayOrder] 展示顺序

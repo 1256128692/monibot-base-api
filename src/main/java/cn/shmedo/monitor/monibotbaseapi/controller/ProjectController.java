@@ -37,7 +37,7 @@ public class ProjectController {
      * @apiDescription 新增工程项目
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} projectName 项目名称(<=50)
-     * @apiParam (请求体) {String} [shortName] 项目简称(<=20)
+     * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
@@ -327,7 +327,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} dataIDList 项目ID列表
-     * @apiDescription 批量删除项目
+     * @apiDescription 批量删除项目,需要级联删除模板值，标签关系
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限
