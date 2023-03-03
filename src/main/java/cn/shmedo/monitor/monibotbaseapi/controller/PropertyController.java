@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PropertyController {
     private PropertyService propertyService;
+
     @Autowired
     public PropertyController(PropertyService propertyService) {
         this.propertyService = propertyService;
@@ -42,8 +44,9 @@ public class PropertyController {
      * @apiParam (请求体) {String} [modelPropertyList.exValue] 额外属性
      * @apiSuccess (返回结果) {Int} modelID  模板ID
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限:mdmbase:AddModel
      */
+    @Permission(permissionName = "mdmbase:AddModel")
     @RequestMapping(value = "AddModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addModel(@RequestBody @Validated AddModelParam param) {
         propertyService.addModel(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -76,8 +79,9 @@ public class PropertyController {
      * @apiSuccess (返回结果) {Int} [modelList.propertyList.displayOrder] 展示顺序
      * @apiSuccess (返回结果) {String} [modelList.propertyList.exValue] 拓展信息
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限:mdmbase:DescribeModel
      */
+    @Permission(permissionName = "mdmbase:DescribeModel")
     @RequestMapping(value = "QueryModelList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryModelList(@RequestBody @Validated QueryModelListParam param) {
         return propertyService.queryModelList(param);
@@ -91,13 +95,14 @@ public class PropertyController {
      * @apiDescription 更新项目属性
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Jons[]} modelValueList 模型值列表
+     * @apiParam (请求体) {Object[]} modelValueList 模型值列表
      * @apiParam (请求体) {String} modelValueList.ID 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 项目权限:mdmbase:UpdateBaseProject
      */
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProperty", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateProperty(@RequestBody @Validated UpdatePropertyParam pa) {
         propertyService.updateProperty(pa);
@@ -117,8 +122,9 @@ public class PropertyController {
      * @apiParam (请求体) {String} propertyName 属性名称
      * @apiSuccess (返回结果) {Object[]} data 属性值列表
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限:mdmbase:DescribeModel
      */
+    @Permission(permissionName = "mdmbase:DescribeModel")
     @PostMapping(value = "QueryPropertyValue", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryPropertyValue(@RequestBody @Validated QueryPropertyValueParam param) {
         return propertyService.queryPropertyValue(param);

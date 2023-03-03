@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.tag.QueryTagListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.TagService;
@@ -40,8 +41,9 @@ public class TagController {
      * @apiSuccess (响应结果) {String} list.list.tagKey 标签键
      * @apiSuccess (响应结果) {String} [list.list.tagValue] 标签值
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 系统权限:mdmbase:ListMdmbaseTag
      */
+    @Permission(permissionName = "mdmbase:ListMdmbaseTag")
     @RequestMapping(value = "QueryTagList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryTagList(@Validated @RequestBody QueryTagListParam param) {
         return tagService.queryTagList(param);
