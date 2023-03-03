@@ -29,7 +29,6 @@ public class ProjectInfo extends TbProjectInfo {
     /**
      * 项目有效期
      */
-    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expiryDate;
 
     /**
