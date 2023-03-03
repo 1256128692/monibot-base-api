@@ -104,8 +104,12 @@ public class PropertyUtil {
         boolean b2  = required?
                  properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
-                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
+                    if (item.getRequired() && temp == null){
+                        return false;
+                    }
+                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
+
                     if (item.getMultiSelect()){
                         if (temp == null || !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.contains(JSONUtil.parseArray(temp.getValue()))) {
                             return true;
