@@ -502,7 +502,7 @@
         ORDER BY CreateTime DESC
     </select>
 
-    <select id="countByCIDAndName" resultType="int">
-        select count(1) from tb_project_info where CompanyID = #{companyID} and ProjectName = #{projectName}
+    <select id="countByName" resultType="int">
+        select count(1) from tb_project_info where  ProjectName = #{projectName}
     </select>
 </mapper>

@@ -3,15 +3,12 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
@@ -19,7 +16,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -30,9 +26,6 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -98,8 +91,8 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         }
 
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.countByCIDAndName(companyID, projectName) > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在公司下已存在");
+        if (tbProjectInfoMapper.countByName(projectName) > 0) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在系统中已存在");
         }
         if (modelID != null) {
 
