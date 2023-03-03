@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -41,9 +42,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,36 +57,17 @@ import java.util.stream.Collectors;
  * @create: 2023-02-22 13:24
  **/
 @Service
+@AllArgsConstructor
 public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService {
-    private TbProjectInfoMapper tbProjectInfoMapper;
-    private TbTagMapper tbTagMapper;
-    private TbProjectTypeMapper tbProjectTypeMapper;
-    private TbTagRelationMapper tbTagRelationMapper;
-    private TbPropertyMapper tbPropertyMapper;
-    private TbProjectPropertyMapper tbProjectPropertyMapper;
-
+    private final TbProjectInfoMapper tbProjectInfoMapper;
+    private final TbTagMapper tbTagMapper;
+    private final TbProjectTypeMapper tbProjectTypeMapper;
+    private final TbTagRelationMapper tbTagRelationMapper;
+    private final TbPropertyMapper tbPropertyMapper;
+    private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final FileConfig fileConfig;
-
     private final RedisService redisService;
 
-    @Autowired
-    public ProjectServiceImpl(TbProjectInfoMapper tbProjectInfoMapper,
-                              TbTagMapper tbTagMapper,
-                              TbTagRelationMapper tbTagRelationMapper,
-                              TbPropertyMapper tbPropertyMapper,
-                              TbProjectTypeMapper tbProjectTypMapper,
-                              TbProjectPropertyMapper tbProjectPropertyMapper,
-                              FileConfig fileConfig,
-                              RedisService redisService) {
-        this.tbProjectInfoMapper = tbProjectInfoMapper;
-        this.tbTagMapper = tbTagMapper;
-        this.tbPropertyMapper = tbPropertyMapper;
-        this.tbProjectPropertyMapper = tbProjectPropertyMapper;
-        this.tbProjectTypeMapper = tbProjectTypMapper;
-        this.tbTagRelationMapper = tbTagRelationMapper;
-        this.fileConfig = fileConfig;
-        this.redisService = redisService;
-    }
 
     private static final String TOKEN_HEADER = "Authorization";
 
@@ -198,7 +180,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
 
     @Override
-    public PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa) {
+    public PageUtil.Page<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa) {
         //将有效期转化为字符串
         if (pa.getExpiryDate() != null) {
             String s1 = pa.getExpiryDate().toString();
@@ -477,18 +459,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public PageUtil.PageResult<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
+    public PageUtil.Page<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
         List<Integer> projectIDList = null;
-        if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())){
+        if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())) {
             projectIDList = tbProjectInfoMapper
                     .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
+            if (CollUtil.isEmpty(projectIDList)) {
+                return PageUtil.Page.empty();
+            }
         }
 
         pa.setProjectIDList(projectIDList);
         Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        IPage<ProjectInfo> dataList = tbProjectInfoMapper.getProjectList(page, pa);
+        IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(page, pa);
 
-        List<Integer> ids = dataList.getRecords().stream().map(TbProjectInfo::getID).toList();
+        List<Integer> ids = pageData.getRecords().stream().map(TbProjectInfo::getID).toList();
         if (!ids.isEmpty()) {
             Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids)
                     .stream().collect(Collectors.groupingBy(TagDto::getProjectID));
@@ -497,13 +482,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .queryPropertyByProjectID(ids, 0).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
 
-            Collection<Object> areas = dataList.getRecords()
+            Collection<Object> areas = pageData.getRecords()
                     .stream().map(e -> (Object) e.getLocation()).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
             areas.clear();
 
-            dataList.getRecords().forEach(item -> {
+            pageData.getRecords().forEach(item -> {
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
@@ -511,13 +496,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 handlerimagePathToRealPath(item);
             });
         }
-        return new PageUtil.PageResult<>((int)page.getPages(), dataList.getRecords(), (int)page.getTotal());
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
     @Override
     public ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa) {
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(pa.getID());
-        if (projectInfo == null){
+        if (projectInfo == null) {
             return null;
         }
         ProjectInfo result = new ProjectInfo();

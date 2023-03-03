@@ -24,7 +24,7 @@ public interface ProjectService {
      * @param pa
      * @return
      */
-    PageUtil.PageResult<ProjectInfoResult> getProjectInfoList(ServletRequest request,QueryProjectListParam pa);
+    PageUtil.Page<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa);
     /**
      * 查询项目详情
      * @param pa
@@ -66,9 +66,9 @@ public interface ProjectService {
      * 查询项目列表
      * @param request   请求 {@link ServletRequest}
      * @param pa    参数 {@link QueryProjectListRequest}
-     * @return  {@link PageUtil.PageResult<ProjectInfo>}
+     * @return  {@link PageUtil.Page <ProjectInfo>}
      */
-    PageUtil.PageResult<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
+    PageUtil.Page<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
 
     ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa);
 }

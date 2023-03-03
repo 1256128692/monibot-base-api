@@ -6,7 +6,9 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * @Author cyf
@@ -19,10 +21,16 @@ import lombok.Data;
 @Data
 public class QueryProjectInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
+    /**
+     * 项目ID
+     */
     @JsonProperty(value = "ID")
+    @NotNull(message = "项目ID不能为空")
+    @Range(min = 1, message = "项目ID必须大于0")
     private Integer ID;
+
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         return null;
     }
 
