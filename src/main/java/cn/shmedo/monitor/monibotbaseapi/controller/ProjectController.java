@@ -81,7 +81,6 @@ public class ProjectController {
      * @apiParam (请求体) {String} [location] 行政区域
      * @apiParam (请求体) {Int} [companyId] 企业名称-先调用接口查询具体企业，发送id
      * @apiParam (请求体) {Int} [projectType] 项目类型
-     * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期

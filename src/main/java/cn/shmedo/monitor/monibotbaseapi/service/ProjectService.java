@@ -68,7 +68,7 @@ public interface ProjectService {
      * @param pa    参数 {@link QueryProjectListRequest}
      * @return  {@link PageUtil.PageResult<ProjectInfo>}
      */
-    PageUtil.PageResult<?> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
+    PageUtil.PageResult<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
 
     ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa);
 }

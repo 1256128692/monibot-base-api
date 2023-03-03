@@ -4,7 +4,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -45,7 +47,8 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
                                          @Param("size") Integer size);
 
-    List<Integer> queryAllID();
+    IPage<ProjectInfo> getProjectList(IPage<ProjectInfo> page,
+                                      @Param("pa") QueryProjectListRequest pa);
 
     int countByCIDAndName(Integer companyID, String projectName);
 }
