@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -77,5 +80,15 @@ public class ProjectInfo extends TbProjectInfo {
             this.platformTypeName = type.getTypeStr();
         }
         super.setPlatformType(platformType);
+    }
+
+    @Override
+    public void setLocation(String location) {
+        if (JSONUtil.isTypeJSON(location)) {
+            JSONObject json = JSONUtil.parseObj(location);
+            super.setLocation(json.isEmpty() ? null : (String) CollUtil.getLast(json.values()));
+        }else {
+            super.setLocation(location);
+        }
     }
 }
