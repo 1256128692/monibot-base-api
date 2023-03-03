@@ -56,7 +56,7 @@ public interface ProjectService {
      * @param IDS
      * @return
      */
-    ResultWrapper deleteProjectList(ProjectIDListParam IDS);
+    void deleteProjectList(ProjectIDListParam IDS);
 
     void updateProject(UpdateProjectParameter pa);
 

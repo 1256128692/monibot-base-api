@@ -294,12 +294,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
-     *
+     * TODO:删除关联信息以及水利平台相关关联信息
      * @param idListParam
      * @return
      */
     @Override
-    public ResultWrapper deleteProjectList(ProjectIDListParam idListParam) {
+    public void deleteProjectList(ProjectIDListParam idListParam) {
         tbProjectInfoMapper.deleteProjectList(idListParam.getDataIDList());
         // 删除项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
@@ -314,7 +314,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
-        return ResultWrapper.success("删除成功");
     }
 
     @Override

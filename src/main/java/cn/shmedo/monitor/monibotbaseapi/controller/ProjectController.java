@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
@@ -63,7 +64,7 @@ public class ProjectController {
      * @apiPermission xx权限:
      */
     //@LogParam(moduleName = "设备模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
-//    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
         projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -152,8 +153,8 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
+//    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    //    @Permission(permissionName = "mdmbase:ListBaseProject")
     public Object queryProjectList(ServletRequest request, @Validated @RequestBody QueryProjectListRequest pa) {
         return projectService.queryProjectList(request, pa);
     }
@@ -222,8 +223,8 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     public Object queryProjectInfo(ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa) {
         return projectService.queryProjectInfo(request, pa);
 //        return projectService.getProjectInfoData(request, pa);
@@ -236,15 +237,15 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName UpdateProject
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} projectName 项目名称
-     * @apiParam (请求体) {String} shortName 项目简称
-     * @apiParam (请求体) {String} directManageUnit 直管单位
+     * @apiParam (请求体) {String} projectName 项目名称(<=50)
+     * @apiParam (请求体) {String} shortName 项目简称(<=10)
+     * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
      * @apiParam (请求体) {Bool} enable 项目状态,true:启用，false:停用
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
-     * @apiParam (请求体) {Double} latitude 项目位置经度
-     * @apiParam (请求体) {Double} longitude 项目位置纬度
-     * @apiParam (请求体) {String} [desc] 项目描述(<=2000)
+     * @apiParam (请求体) {Double} longitude 项目位置经度
+     * @apiParam (请求体) {Double} latitude 项目位置纬度
+     * @apiParam (请求体) {String} [desc] 项目描述(<=1000)
      * @apiParam (请求体) {Int[]} [tagIDList] 标签ID列表
      * @apiParam (请求体) {Object[]} [tagList] 标签信息列表
      * @apiParam (请求体) {String} tagList.key 标签键
@@ -257,10 +258,10 @@ public class ProjectController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     public Object updateProject(@Validated @RequestBody UpdateProjectParameter pa) {
-         projectService.updateProject(pa);
-         return ResultWrapper.successWithNothing();
+        projectService.updateProject(pa);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -275,7 +276,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限:
      */
-    //    @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
+    @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
     @RequestMapping(value = "TransferProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object transferProject(@Validated @RequestBody TransferProjectParam param) {
         projectService.transferProject(param, CurrentSubjectHolder.getCurrentSubject());
@@ -294,7 +295,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
-//    @Permission(permissionName = "mdmbase:UpdateBaseProject")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "RaiseExpiryDate", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object raiseExpiryDate(@Validated @RequestBody RaiseExpiryDateParam param) {
         projectService.raiseExpiryDate(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -314,9 +315,9 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryProjectType(){
+    public Object queryProjectType() {
         return projectService.getProjectType();
     }
 
@@ -327,14 +328,15 @@ public class ProjectController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} dataIDList 项目ID列表
      * @apiDescription 批量删除项目
-     * @apiSuccess (返回结果) {boolean} result 结果
+     * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */
-//    @Permission(permissionName = "mdmbase:DeleteBaseProject")
+    @Permission(permissionName = "mdmbase:DeleteBaseProject")
     @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam dataIDList) {
-        return projectService.deleteProjectList(dataIDList);
+        projectService.deleteProjectList(dataIDList);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -351,7 +353,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    //    @Permission(permissionName = "mdmbase:UpdateBaseProject")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProjectImage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateProjectImage(@Validated @RequestBody UpdateProjectImageParam pa) {
         projectService.updateProjectImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());

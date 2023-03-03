@@ -9,4 +9,8 @@ public class DefaultConstant {
 
     // 监测业务工程类型
     public static final Integer AUTH_RESOURSE = 9;
+
+    public final static String APP_KEY = "appKey";
+
+    public final static String APP_SECRET = "appSecret";
 }
