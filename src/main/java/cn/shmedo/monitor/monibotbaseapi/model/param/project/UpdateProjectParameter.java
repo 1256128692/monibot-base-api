@@ -141,7 +141,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
 
     public List<TbProjectProperty> buildPropertyDataList() {
         propertyDataList.forEach(pd -> {
-            propertyList.stream().filter(p -> p.getID().equals(pd.getID())).findFirst().ifPresent(p -> pd.setValue(p.getValue()));
+            propertyList.stream().filter(p -> p.getID().equals(pd.getPropertyID())).findFirst().ifPresent(p -> pd.setValue(p.getValue()));
         });
         return propertyDataList;
     }
