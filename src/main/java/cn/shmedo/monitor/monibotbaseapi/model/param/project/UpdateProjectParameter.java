@@ -13,12 +13,10 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -86,7 +84,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "重复的项目名称");
         }
         if (!CollectionUtil.isEmpty(propertyList)) {
-            List<Integer> propertyIdList = propertyList.stream().map(PropertyIdAndValue::getPropertyID).collect(Collectors.toList());
+            List<Integer> propertyIdList = propertyList.stream().map(PropertyIdAndValue::getID).collect(Collectors.toList());
             TbProjectPropertyMapper projectPropertyMapper = ContextHolder.getBean(TbProjectPropertyMapper.class);
             LambdaQueryWrapper<TbProjectProperty> propertyLambdaQueryWrapper = new LambdaQueryWrapper<TbProjectProperty>()
                     .in(TbProjectProperty::getPropertyID, propertyIdList)
@@ -143,7 +141,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
 
     public List<TbProjectProperty> buildPropertyDataList() {
         propertyDataList.forEach(pd -> {
-            propertyList.stream().filter(p -> p.getPropertyID().equals(pd.getID())).findFirst().ifPresent(p -> pd.setValue(p.getValue()));
+            propertyList.stream().filter(p -> p.getID().equals(pd.getID())).findFirst().ifPresent(p -> pd.setValue(p.getValue()));
         });
         return propertyDataList;
     }
