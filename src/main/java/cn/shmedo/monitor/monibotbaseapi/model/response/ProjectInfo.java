@@ -86,7 +86,8 @@ public class ProjectInfo extends TbProjectInfo {
     public void setLocation(String location) {
         if (JSONUtil.isTypeJSON(location)) {
             JSONObject json = JSONUtil.parseObj(location);
-            super.setLocation(json.isEmpty() ? null : (String) CollUtil.getLast(json.values()));
+            super.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+            System.out.println(1);
         }else {
             super.setLocation(location);
         }
