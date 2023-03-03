@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.PermissionScope;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -313,9 +314,9 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
      * @apiSuccess (返回结果) {String} projectType.mainType 主类型名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限:mdmbase:DescribeBaseProject
+     * @apiPermission  登录权限
      */
-    @Permission(permissionName = "mdmbase:DescribeBaseProject")
+    @Permission(permissionScope = PermissionScope.LOGGED)
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryProjectType() {
         return projectService.getProjectType();
