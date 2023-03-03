@@ -46,7 +46,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @NotBlank
     @Size(max = 50)
     private String projectName;
-    @Size(max = 20)
+    @Size(max = 10)
     private String shortName;
     @NotNull
     private Byte projectType;
@@ -127,7 +127,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp == null || ObjectUtil.isEmpty(temp.getValue())) {
-                        System.err.println(temp.getID() + temp.getValue());
                         return true;
                     }
                     return false;
@@ -138,7 +137,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                     JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp != null && !enums.contains(temp.getValue())) {
-                        System.err.println(temp.getID() + temp.getValue());
                         return true;
                     }
                     return false;

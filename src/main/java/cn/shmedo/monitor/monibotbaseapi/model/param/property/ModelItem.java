@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 /**
  * @program: monibot-base-api
@@ -10,6 +11,7 @@ import jakarta.validation.constraints.NotNull;
  **/
 public class ModelItem {
     @NotBlank
+    @Size(max = 20)
     private String name;
     @NotNull
     private Byte type;

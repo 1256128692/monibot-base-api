@@ -42,7 +42,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
         if (!PropertyUtil.validate(modelPropertyList)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性不合法");
         }
-        if (modelPropertyList.stream().map(ModelItem::getName).distinct().count() >1){
+        if (modelPropertyList.stream().map(ModelItem::getName).distinct().count() !=modelPropertyList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
         }
         if (modelPropertyList.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))){
