@@ -1,11 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
@@ -500,10 +498,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
 
             Collection<Object> areas = dataList.getRecords()
-                    .stream().map(e -> {
-                        JSONObject json = JSONUtil.parseObj(e.getLocation());
-                        return json.isEmpty() ? null : CollUtil.getLast(json.values());
-                    }).filter(Objects::nonNull).collect(Collectors.toSet());;
+                    .stream().map(e -> (Object) e.getLocation()).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
             areas.clear();
@@ -512,13 +507,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
-
-                JSONObject json = JSONUtil.parseObj(item.getLocation());
-                if(!json.isEmpty()) {
-                    String areaCode = (String) CollUtil.getLast(json.values());
-                    item.setLocation(areaMap.getOrDefault(areaCode, null));
-                }
-
+                item.setLocation(areaMap.getOrDefault(item.getLocation(), null));
                 handlerimagePathToRealPath(item);
             });
         }
@@ -536,10 +525,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
 
-        JSONObject json = JSONUtil.parseObj(result.getLocation());
-        if (!json.isEmpty()) {
-            String areaCode = (String) CollUtil.getLast(json.values());
-            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, areaCode, RegionArea.class);
+        if (StrUtil.isNotEmpty(result.getLocation())) {
+            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocation(), RegionArea.class);
             result.setLocation(area != null ? area.getName() : StrUtil.EMPTY);
         }
 
