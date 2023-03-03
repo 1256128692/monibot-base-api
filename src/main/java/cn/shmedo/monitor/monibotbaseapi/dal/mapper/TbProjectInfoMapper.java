@@ -51,4 +51,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
                                       @Param("pa") QueryProjectListRequest pa);
 
     int countByName(String projectName);
+
+    int countByProjectIDList(List<Integer> idList,Integer companyID);
 }

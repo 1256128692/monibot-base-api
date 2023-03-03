@@ -505,4 +505,11 @@
     <select id="countByName" resultType="int">
         select count(1) from tb_project_info where  ProjectName = #{projectName}
     </select>
+
+    <select id="countByProjectIDList" resultType="int">
+        select count(1) from tb_project_info where CompanyID = #{companyID} and ID in
+        <foreach collection="idList" item="item" separator="," open="(" close=")">
+        #{item}
+        </foreach>
+    </select>
 </mapper>

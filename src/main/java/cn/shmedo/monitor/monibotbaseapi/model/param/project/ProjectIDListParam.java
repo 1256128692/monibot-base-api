@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -28,12 +31,17 @@ public class ProjectIDListParam implements ParameterValidator, ResourcePermissio
 
     @Override
     public ResultWrapper validate() {
-        return null;
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        int count = tbProjectInfoMapper.countByProjectIDList(this.dataIDList,companyID);
+        if (count == this.dataIDList.size()) {
+            return null;
+        }
+        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "删除项目ID列表有非法数据");
     }
 
     @Override
     public Resource parameter() {
-        return new Resource(companyID.toString(), ResourceType.BASE_PROJECT);
+        return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override

@@ -20,19 +20,6 @@ import java.util.List;
 public interface ProjectService {
 
     /**
-     * 查询项目列表信息
-     * @param pa
-     * @return
-     */
-    PageUtil.Page<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa);
-    /**
-     * 查询项目详情
-     * @param pa
-     * @return
-     */
-    ResultWrapper getProjectInfoData(ServletRequest request, QueryProjectInfoParam pa);
-
-    /**
      * 新增项目
      * @param pa
      * @param userID

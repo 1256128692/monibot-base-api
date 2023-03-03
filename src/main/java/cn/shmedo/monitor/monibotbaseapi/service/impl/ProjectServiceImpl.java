@@ -5,10 +5,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
-import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -27,7 +25,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
@@ -36,7 +33,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -44,7 +40,6 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -83,8 +78,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
         // 处理属性
         Map<Integer, String> PropertyIDAndValueMap =
-                ObjectUtil.isEmpty( pa.getModelValueList())?
-                        new HashMap<>():
+                ObjectUtil.isEmpty(pa.getModelValueList()) ?
+                        new HashMap<>() :
                         pa.getModelValueList().stream().collect(Collectors.toMap(PropertyIdAndValue::getID, PropertyIdAndValue::getValue));
         List<TbProjectProperty> projectPropertyList = pa.getProperties().stream().map(
                 item -> {
@@ -96,7 +91,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 }
         ).collect(Collectors.toList());
         tbProjectPropertyMapper.insertBatch(projectPropertyList);
-
 
 
         List<Integer> tagID4DBList = new ArrayList<>();
@@ -178,107 +172,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectInfoMapper.updateExpiryDate(param.getProjectID(), param.getNewRetireDate(), userID, new Date());
     }
 
-
-    @Override
-    public PageUtil.Page<ProjectInfoResult> getProjectInfoList(ServletRequest request, QueryProjectListParam pa) {
-        //将有效期转化为字符串
-        if (pa.getExpiryDate() != null) {
-            String s1 = pa.getExpiryDate().toString();
-            pa.setExpiryDateStr(s1);
-        }
-        //对基础属性进行分类，json和普通字符串，分别进行查询后取交集
-        List<PropertyQueryEntity> propertyEntity = pa.getPropertyEntity();
-        if (propertyEntity != null) {
-            List<Integer> idList = getIDList(propertyEntity);
-            if (idList != null && idList.size() > 0) {
-                pa.setIdList(idList);
-            } else if (idList == null || idList.size() == 0) {
-                List<Integer> list = new ArrayList<>();
-                list.add(0);
-                pa.setIdList(list);
-            }
-        }
-
-        //查询列表信息
-        List<TbProjectInfo> projectInfoList = tbProjectInfoMapper.getProjectInfoList(pa);
-
-        //类型转换，实体表转为要返回的类型
-        List<ProjectInfoResult> projectInfoResults = projectInfoList.stream().map(s -> {
-            ProjectInfoResult projectInfoResult = new ProjectInfoResult();
-            BeanUtils.copyProperties(s, projectInfoResult);
-            //根据项目id获取标签信息列表,构建查询条件查询标签列表
-            LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, s.getID());
-            List<Integer> collect = tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
-            List<TbTag> tbTags = null;
-            if (collect.size() > 0) {
-                tbTags = tbTagMapper.queryTagList(collect);
-            }
-            //给项目类型名称赋值
-            TbProjectType tbProjectType = tbProjectTypeMapper.selectByPrimaryKey(s.getProjectType());
-            projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
-            projectInfoResult.setProjectTypeMainName(tbProjectType.getMainType());
-
-            //给标签列表赋值
-            projectInfoResult.setTagInfo(tbTags);
-            //根据项目id获取客户企业信息
-            Company company = getCompany(request, s.getCompanyID());
-            projectInfoResult.setCompany(company);
-
-            //根据项目id获取拓展属性信息列表
-            projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(s.getID()));
-            return projectInfoResult;
-        }).collect(Collectors.toList());
-
-        return PageUtil.page(projectInfoResults, pa.getPageSize(), pa.getCurrentPage());
-    }
-
-    @Override
-    public ResultWrapper getProjectInfoData(ServletRequest request, QueryProjectInfoParam pa) {
-
-        int id = pa.getID();
-        //根据项目id获取数据库表数据
-        TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(id);
-        if (projectInfo == null) {
-            return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
-        }
-        handlerimagePathToRealPath(projectInfo);
-
-        //类型转换-将projectInfo转为ProjectInfoResult
-        ProjectInfoResult projectInfoResult = ProjectInfoResult.valueOf(projectInfo);
-
-        //给项目类型赋值
-        TbProjectType tbProjectType = tbProjectTypeMapper.selectById(projectInfo.getProjectType());
-        if (tbProjectType == null) {
-            return ResultWrapper.withCode(ResultCode.RESOURCE_NOT_FOUND);
-        }
-        projectInfoResult.setProjectTypeName(tbProjectType.getTypeName());
-        projectInfoResult.setProjectTypeMainName(tbProjectType.getMainType());
-
-        //构建查询条件查询标签列表
-        LambdaQueryWrapper<TbTagRelation> tbTagRelationLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        tbTagRelationLambdaQueryWrapper.eq(TbTagRelation::getProjectID, pa.getID());
-        List<Integer> collect = tbTagRelationMapper.selectList(tbTagRelationLambdaQueryWrapper).stream().map(t -> t.getTagID()).collect(Collectors.toList());
-        List<TbTag> tbTags = null;
-        if (collect.size() > 0) {
-            tbTags = tbTagMapper.queryTagList(collect);
-        }
-
-        //给标签列表赋值
-        projectInfoResult.setTagInfo(tbTags);
-
-        //给公司信息赋值
-        Company data = getCompany(request, projectInfo.getCompanyID());
-        projectInfoResult.setCompany(data);
-
-        //给拓展信息赋值
-        projectInfoResult.setPropertyList(tbProjectPropertyMapper.getPropertyList(pa.getID()));
-
-        return ResultWrapper.success(projectInfoResult);
-    }
-
     private <T extends TbProjectInfo> void handlerimagePathToRealPath(T projectInfo) {
-        if (!StrUtil.isBlank(projectInfo.getImagePath())){
+        if (!StrUtil.isBlank(projectInfo.getImagePath())) {
             MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
@@ -286,7 +181,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo);
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
-            }else{
+            } else {
                 projectInfo.setImagePath(info.getData().getAbsolutePath());
             }
         }
@@ -295,6 +190,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     /**
      * 批量删除
      * TODO:删除关联信息以及水利平台相关关联信息
+     *
      * @param idListParam
      * @return
      */
@@ -314,6 +210,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+        ResultWrapper.successWithNothing();
     }
 
     @Override
@@ -374,87 +271,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ResultWrapper<Company> companyInfo = userService.getCompanyInfo(token, companyThird);
         Company data = companyInfo.getData();
         return data;
-    }
-
-    /**
-     * 判断是否为json格式
-     *
-     * @param entity
-     * @return
-     */
-    public boolean isJson(PropertyQueryEntity entity) {
-        String value = entity.getValue();
-        boolean result = false;
-        if (StringUtils.isNotBlank(value)) {
-            if (JSONUtil.isTypeJSONArray(value)) {
-                result = true;
-            }
-        }
-        return result;
-    }
-
-    /**
-     * 获取项目ID列表
-     *
-     * @param propertyEntity
-     * @return
-     */
-    public List<Integer> getIDList(List<PropertyQueryEntity> propertyEntity) {
-        List<PropertyQueryEntity> propertystr = new ArrayList<>();
-        List<List<PropertyQueryEntity>> propertyJson = new ArrayList<>();
-        if (propertyEntity != null && propertyEntity.size() > 0) {
-            propertyEntity.forEach(p -> {
-                if (p.getValue() != null && !"[]".equals(p.getValue()) && !"".equals(p.getValue())) {
-                    if (isJson(p)) {
-                        List<String> strings = JSONUtil.parseArray(p.getValue()).toList(String.class);
-                        List<PropertyQueryEntity> json = new ArrayList<>();
-                        for (String s : strings) {
-                            PropertyQueryEntity entity = new PropertyQueryEntity();
-                            entity.setName(p.getName());
-                            entity.setValue(s);
-                            json.add(entity);
-                        }
-                        propertyJson.add(json);
-                    } else {
-                        propertystr.add(p);
-                    }
-                }
-            });
-        }
-        List<List<Integer>> strIDLists = new ArrayList<>();
-        List<Integer> str = new ArrayList<>();
-        List<Integer> json = new ArrayList<>();
-        if (propertystr != null && propertystr.size() > 0) {
-            propertystr.forEach(p -> strIDLists.add(tbProjectInfoMapper.getStrIDList(p)));
-            int i = 0;
-            List<Integer> list = strIDLists.get(0);
-            str.add(list.get(0));
-            if (strIDLists != null && strIDLists.size() > 1) {
-                for (i = 0; i < strIDLists.size(); i++) {
-                    str.retainAll(strIDLists.get(i));
-                }
-            }
-        }
-        if (propertyJson != null && propertyJson.size() > 0) {
-            propertyJson.forEach(p -> strIDLists.add(tbProjectInfoMapper.getJsonIDList(p)));
-            int i = 0;
-            List<Integer> list = strIDLists.get(0);
-            json = strIDLists.get(list.get(0));
-            if (strIDLists != null && strIDLists.size() > 1) {
-                for (i = 0; i < strIDLists.size(); i++) {
-                    json.retainAll(strIDLists.get(i));
-                }
-            }
-        }
-        if (str.size() > 0 && json.size() > 0) {
-            str.retainAll(json);
-            return str;
-        } else if (str.size() > 0 && json.size() == 0) {
-            return str;
-        } else if (str.size() == 0 && json.size() > 0) {
-            return json;
-        }
-        return null;
     }
 
     @Override

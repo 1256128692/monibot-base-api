@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.beans.BeanUtils;
@@ -26,7 +27,7 @@ public class ProjectInfoResult extends TbProjectInfo {
     private String projectTypeMainName;
     private Company company;
     private List<TbTag> tagInfo;
-    private List<PropertyList> propertyList;
+    private List<PropertyDto> propertyList;
     public static ProjectInfoResult valueOf(TbProjectInfo tbProjectInfo){
         ProjectInfoResult projectInfoResult = new ProjectInfoResult();
         BeanUtils.copyProperties(tbProjectInfo,projectInfoResult);
