@@ -99,7 +99,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         }
 
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.countByCIDAndName(companyID, projectName) >0){
+        if (tbProjectInfoMapper.countByCIDAndName(companyID, projectName) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在公司下已存在");
         }
         if (modelID != null) {
@@ -113,37 +113,38 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
         }
-        if (ObjectUtil.isNotEmpty(modelValueList)) {
-            properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType);
-            if (modelID != null) {
-                TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
-                properties.addAll(tbPropertyMapper.queryByMID(modelID));
-            }
-            Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
-            // 校验必填
-            boolean b2 = properties.stream().filter(item ->!item.getRequired())
-                    .anyMatch(item -> {
-                        PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                        if (temp == null ||  ObjectUtil.isEmpty(temp.getValue())){
-                            System.err.println(temp.getID() + temp.getValue());
-                            return true;
-                        }
-                        return false;
-                    });
-            // 校验枚举
-            boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
-                    .anyMatch(item -> {
-                        JSONArray enums = JSONUtil.parseArray(item.getEnumField());
-                        PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                        if (temp!=null &&!enums.contains(temp.getValue())) {
-                            System.err.println(temp.getID() + temp.getValue());
-                            return true;
-                        }
-                        return false;
-                    });
-            if (b1 || b2) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法或必填项未填入");
-            }
+        properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType);
+        if (ObjectUtil.isEmpty(properties)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
+        }
+        if (modelID != null) {
+            TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+            properties.addAll(tbPropertyMapper.queryByMID(modelID));
+        }
+        Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
+        // 校验必填
+        boolean b2 = properties.stream().filter(item -> !item.getRequired())
+                .anyMatch(item -> {
+                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
+                    if (temp == null || ObjectUtil.isEmpty(temp.getValue())) {
+                        System.err.println(temp.getID() + temp.getValue());
+                        return true;
+                    }
+                    return false;
+                });
+        // 校验枚举
+        boolean b1 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
+                .anyMatch(item -> {
+                    JSONArray enums = JSONUtil.parseArray(item.getEnumField());
+                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
+                    if (temp != null && !enums.contains(temp.getValue())) {
+                        System.err.println(temp.getID() + temp.getValue());
+                        return true;
+                    }
+                    return false;
+                });
+        if (b1 || b2) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的属性值非法或必填项未填入");
         }
         //校验标签
         TbTagMapper tbTagMapper = ContextHolder.getBean(TbTagMapper.class);
@@ -167,7 +168,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有新增的标签已经存在");
             }
             int count = tbTagMapper.countByCIDAndIDs(companyID, null);
-            if (count + tagList.size() > 100){
+            if (count + tagList.size() > 100) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前公司下标签数量为：" + count + " ,新增会导致超过100");
             }
         }
