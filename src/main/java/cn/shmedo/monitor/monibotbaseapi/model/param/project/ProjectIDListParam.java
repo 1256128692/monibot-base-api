@@ -9,7 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author cyf
@@ -20,7 +19,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  */
 @Data
-public class ProjectIDListParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class ProjectIDListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
     @NotEmpty
@@ -33,14 +32,13 @@ public class ProjectIDListParam implements ParameterValidator, ResourcePermissio
     }
 
     @Override
-    public List<Resource> parameter() {
-        return dataIDList.stream().map(d ->
-                new Resource(d.toString(), ResourceType.BASE_PROJECT)).collect(Collectors.toList());
+    public Resource parameter() {
+        return new Resource(companyID.toString(), ResourceType.BASE_PROJECT);
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 
 

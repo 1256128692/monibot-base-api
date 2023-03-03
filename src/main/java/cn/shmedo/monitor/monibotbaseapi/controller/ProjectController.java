@@ -313,7 +313,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
      * @apiSuccess (返回结果) {String} projectType.mainType 主类型名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 项目权限:mdmbase:DescribeBaseProject
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -330,7 +330,7 @@ public class ProjectController {
      * @apiDescription 批量删除项目
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限:mdmbase:DeleteBaseProject
      */
     @Permission(permissionName = "mdmbase:DeleteBaseProject")
     @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -351,7 +351,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} imageSuffix 图片格式
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限:mdmbase:UpdateBaseProject
      */
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProjectImage", method = RequestMethod.POST, produces = CommonVariable.JSON)
