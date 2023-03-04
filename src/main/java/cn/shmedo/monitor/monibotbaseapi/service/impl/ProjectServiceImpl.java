@@ -336,7 +336,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
-                item.setLocation(areaMap.getOrDefault(item.getLocation(), null));
+               // item.setLocation(areaMap.getOrDefault(item.getLocation(), null));
                 handlerimagePathToRealPath(item);
             });
         }
