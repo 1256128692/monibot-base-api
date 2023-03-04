@@ -89,14 +89,22 @@ public class PropertyUtil {
     public static  ResultWrapper  validPropertyValue(List<PropertyIdAndValue> modelValueList, List<TbProperty> properties , boolean required){
         Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
         // 校验必填
-        boolean b1 = properties.stream().filter(item -> !item.getRequired())
+        boolean b1 =required? properties.stream().filter(item -> !item.getRequired())
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp == null || ObjectUtil.isEmpty(temp.getValue())) {
                         return true;
                     }
                     return false;
-                });
+                }):
+                properties.stream().filter(item -> !item.getRequired())
+                        .anyMatch(item -> {
+                            PropertyIdAndValue temp = idAndValueMap.get(item.getID());
+                            if (temp!=null && ObjectUtil.isEmpty(temp.getValue())) {
+                                return true;
+                            }
+                            return false;
+                        });
         if (b1){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性值必填项未填入");
         }

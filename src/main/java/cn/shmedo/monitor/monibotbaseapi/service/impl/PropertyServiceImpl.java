@@ -48,7 +48,6 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void updateProperty(Integer projectID, List<PropertyIdAndValue> propertyIdAndValueList, List<TbProperty> propertyList) {
-        System.err.println(propertyList.size());
         Map<Integer, TbProperty> propertyMap = propertyList.stream().collect(Collectors.toMap(TbProperty::getID, Function.identity()));
         List<TbProjectProperty> projectPropertyList = propertyIdAndValueList.stream().map(
                 item -> {
