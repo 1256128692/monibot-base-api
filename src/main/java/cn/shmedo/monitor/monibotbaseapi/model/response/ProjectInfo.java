@@ -81,14 +81,14 @@ public class ProjectInfo extends TbProjectInfo {
         super.setPlatformType(platformType);
     }
 
-    @Override
-    public void setLocation(String location) {
-        if (JSONUtil.isTypeJSON(location)) {
-            JSONObject json = JSONUtil.parseObj(location);
-            super.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
-            System.out.println(1);
-        }else {
-            super.setLocation(location);
-        }
-    }
+//    @Override
+//    public void setLocation(String location) {
+//        if (JSONUtil.isTypeJSON(location)) {
+//            JSONObject json = JSONUtil.parseObj(location);
+//            super.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+//            System.out.println(1);
+//        }else {
+//            super.setLocation(location);
+//        }
+//    }
 }
