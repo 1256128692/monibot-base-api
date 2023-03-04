@@ -61,7 +61,7 @@ public class ProjectInfo extends TbProjectInfo {
      */
     private List<PropertyDto> propertyList;
 
-
+    private String locationInfo;
     @Override
     public void setProjectType(Byte projectType) {
         TbProjectType type = ProjectTypeCache.projectTypeMap.getOrDefault(projectType, null);
@@ -80,7 +80,6 @@ public class ProjectInfo extends TbProjectInfo {
         }
         super.setPlatformType(platformType);
     }
-
 //    @Override
 //    public void setLocation(String location) {
 //        if (JSONUtil.isTypeJSON(location)) {
@@ -91,4 +90,14 @@ public class ProjectInfo extends TbProjectInfo {
 //            super.setLocation(location);
 //        }
 //    }
+
+    public void dealLocationInfo() {
+        if (JSONUtil.isTypeJSON(super.getLocation())) {
+            JSONObject json = JSONUtil.parseObj(super.getLocation());
+            this.locationInfo = (json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+            System.out.println(1);
+        }else {
+            this.locationInfo = locationInfo;
+        }
+    }
 }

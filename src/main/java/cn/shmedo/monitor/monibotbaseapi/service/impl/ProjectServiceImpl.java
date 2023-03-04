@@ -341,7 +341,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
-               // item.setLocation(areaMap.getOrDefault(item.getLocation(), null));
+                item.dealLocationInfo();
+                item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
                 handlerimagePathToRealPath(item);
             });
         }
@@ -358,11 +359,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
-// location 不进行处理
-//        if (StrUtil.isNotEmpty(result.getLocation())) {
-//            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocation(), RegionArea.class);
-//            result.setLocation(area != null ? area.getName() : StrUtil.EMPTY);
-//        }
+        result.dealLocationInfo();
+        if (StrUtil.isNotEmpty(result.getLocationInfo())) {
+            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
+            result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
+        }
 
         handlerimagePathToRealPath(result);
         return result;

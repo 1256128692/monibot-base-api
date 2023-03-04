@@ -109,6 +109,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {DateTime} dataList.expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} dataList.enable 是否有效
      * @apiSuccess (返回结果) {String} dataList.location 四级行政区域信息
+     * @apiSuccess (返回结果) {String} dataList.locationInfo  第四级区域名称
      * @apiSuccess (返回结果) {String} dataList.projectAddress 项目地址
      * @apiSuccess (返回结果) {Double} dataList.latitude 项目经度
      * @apiSuccess (返回结果) {Double} dataList.longitude 项目纬度
@@ -178,7 +179,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} enable 是否有效
-     * @apiSuccess (返回结果) {String} location 四级行政区域信息
+     * @apiSuccess (返回结果) {String} dataList.location 四级行政区域信息
+     * @apiSuccess (返回结果) {String} dataList.locationInfo  第四级区域名称
      * @apiSuccess (返回结果) {String} projectAddress 项目地址
      * @apiSuccess (返回结果) {Double} latitude 项目经度
      * @apiSuccess (返回结果) {Double} longitude 项目纬度
@@ -314,7 +316,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
      * @apiSuccess (返回结果) {String} projectType.mainType 主类型名称
      * @apiSampleRequest off
-     * @apiPermission  登录权限
+     * @apiPermission 登录权限
      */
     @Permission(permissionScope = PermissionScope.LOGGED)
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -328,7 +330,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} dataIDList 项目ID列表
-     * @apiDescription 批量删除项目,需要级联删除模板值，标签关系
+     * @apiDescription 批量删除项目, 需要级联删除模板值，标签关系
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:DeleteBaseProject
