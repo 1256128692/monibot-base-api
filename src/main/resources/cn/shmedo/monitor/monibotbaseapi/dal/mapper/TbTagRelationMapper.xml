@@ -82,13 +82,13 @@
   </delete>
   <select id="countTag" resultType="int">
     select count(1) from tb_tag_relation where ProjectID in
-    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+    <foreach collection="idList" item="item" open="(" close=")" separator=",">
       #{item}
     </foreach>
   </select>
   <delete id="deleteProjectTagList" parameterType="java.lang.Integer">
     DELETE tb_tag_relation from tb_tag_relation where ProjectID in
-    <foreach collection="ids" item="item" open="(" close=")" separator=",">
+    <foreach collection="idList" item="item" open="(" close=")" separator=",">
       #{item}
     </foreach>
   </delete>

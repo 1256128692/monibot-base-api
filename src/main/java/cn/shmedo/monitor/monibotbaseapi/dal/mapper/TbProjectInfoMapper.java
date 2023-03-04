@@ -52,7 +52,5 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int countByProjectIDList(List<Integer> idList,Integer companyID);
     List<Integer> countComany(List idList);
-
-    void deleteProjectList(List idList);
     int deleteProjectInfoList(List idList);
 }

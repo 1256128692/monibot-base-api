@@ -154,21 +154,6 @@
         delete from tb_project_info
         where ID = #{ID,jdbcType=INTEGER}
     </delete>
-    <delete id="deleteProjectList" parameterType="java.lang.Integer">
-        DELETE
-        a1,
-        a2,
-        a3
-        FROM
-        tb_project_info a1
-        LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
-        LEFT JOIN tb_tag_relation a3 ON a1.ID = a3.ProjectID
-        WHERE
-        a1.ID in
-        <foreach collection="idList" item="item" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-    </delete>
     <delete id="deleteProjectInfoList" parameterType="java.lang.Integer">
         DELETE tb_project_info from tb_project_info where ID in
         <foreach collection="idList" item="item" open="(" close=")" separator=",">
