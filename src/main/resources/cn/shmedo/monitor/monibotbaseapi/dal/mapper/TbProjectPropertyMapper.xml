@@ -213,4 +213,16 @@
             </trim>
         </where>
     </select>
+    <select id="countProperty" resultType="int">
+        select count(1) from tb_project_property where ProjectID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <delete id="deleteProjectPropertyList" parameterType="java.lang.Integer">
+        DELETE tb_project_property from tb_project_property where ProjectID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
 </mapper>

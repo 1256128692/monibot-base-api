@@ -24,4 +24,7 @@ public interface TbTagRelationMapper  extends BaseMapper<TbTagRelation> {
     void insertBatch(List<Integer> tagIDList, Integer projectID);
 
     void deleteByProjectID(Integer projectID);
+
+    int deleteProjectTagList(List ids);
+    int countTag(List ids);
 }

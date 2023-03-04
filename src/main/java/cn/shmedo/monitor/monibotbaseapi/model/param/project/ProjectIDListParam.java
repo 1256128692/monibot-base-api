@@ -32,6 +32,10 @@ public class ProjectIDListParam implements ParameterValidator, ResourcePermissio
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        List<Integer> list = tbProjectInfoMapper.countComany(this.dataIDList);
+        if (list.size() != 1){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "删除项目ID列表有不属于该公司的数据");
+        }
         int count = tbProjectInfoMapper.countByProjectIDList(this.dataIDList,companyID);
         if (count == this.dataIDList.size()) {
             return null;
