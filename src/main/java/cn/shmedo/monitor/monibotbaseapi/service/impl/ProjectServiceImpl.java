@@ -353,11 +353,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
-
-        if (StrUtil.isNotEmpty(result.getLocation())) {
-            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocation(), RegionArea.class);
-            result.setLocation(area != null ? area.getName() : StrUtil.EMPTY);
-        }
+// location 不进行处理
+//        if (StrUtil.isNotEmpty(result.getLocation())) {
+//            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocation(), RegionArea.class);
+//            result.setLocation(area != null ? area.getName() : StrUtil.EMPTY);
+//        }
 
         handlerimagePathToRealPath(result);
         return result;

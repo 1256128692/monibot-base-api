@@ -178,7 +178,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} enable 是否有效
-     * @apiSuccess (返回结果) {String} locationInfo 四级行政区域信息
+     * @apiSuccess (返回结果) {String} location 四级行政区域信息
      * @apiSuccess (返回结果) {String} projectAddress 项目地址
      * @apiSuccess (返回结果) {Double} latitude 项目经度
      * @apiSuccess (返回结果) {Double} longitude 项目纬度
