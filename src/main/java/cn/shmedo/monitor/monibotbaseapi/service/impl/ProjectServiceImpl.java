@@ -203,20 +203,20 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public void deleteProjectList(ProjectIDListParam idListParam) {
         try {
             Integer infoList = tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
-            if (infoList != idListParam.getDataIDList().size()){
+            if (infoList != idListParam.getDataIDList().size()) {
                 throw new Exception("删除项目列表失败");
             }
             Integer countTag = tbTagRelationMapper.countTag(idListParam.getDataIDList());
-            if (!countTag.equals(0)){
+            if (!countTag.equals(0)) {
                 Integer tagList = tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
-                if (!tagList.equals(countTag)){
+                if (!tagList.equals(countTag)) {
                     throw new Exception("删除项目标签关系失败");
                 }
             }
             Integer countProperty = tbProjectPropertyMapper.countProperty(idListParam.getDataIDList());
-            if (!countProperty.equals(0)){
+            if (!countProperty.equals(0)) {
                 Integer propertyList = tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
-                if (!propertyList.equals(countProperty)){
+                if (!propertyList.equals(countProperty)) {
                     throw new Exception("删除项目属性关系列表失败");
                 }
             }
