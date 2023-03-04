@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
@@ -42,10 +43,13 @@ public class PropertyServiceImpl implements PropertyService {
 
     @Override
     public void updateProperty(UpdatePropertyParam pa) {
-        Integer projectID = pa.getProjectID();
-        List<TbProperty> properties =  tbPropertyMapper.queryByPID(projectID);
-        Map<Integer, TbProperty> propertyMap = properties.stream().collect(Collectors.toMap(TbProperty::getID, Function.identity()));
-        List<TbProjectProperty> projectPropertyList = pa.getModelValueList().stream().map(
+        updateProperty(pa.getProjectID(), pa.getModelValueList(), pa.getProperties());
+    }
+
+    @Override
+    public void updateProperty(Integer projectID, List<PropertyIdAndValue> propertyIdAndValueList, List<TbProperty> propertyList) {
+        Map<Integer, TbProperty> propertyMap = propertyList.stream().collect(Collectors.toMap(TbProperty::getID, Function.identity()));
+        List<TbProjectProperty> projectPropertyList = propertyIdAndValueList.stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
                     tbProjectProperty.setPropertyID(propertyMap.get(item.getID()).getID());
@@ -54,8 +58,9 @@ public class PropertyServiceImpl implements PropertyService {
                 }
         ).collect(Collectors.toList());
 
-        tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectPropertyList);
+        tbProjectPropertyMapper.updateBatch(projectID, projectPropertyList);
     }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void addModel(AddModelParam param, Integer userID) {

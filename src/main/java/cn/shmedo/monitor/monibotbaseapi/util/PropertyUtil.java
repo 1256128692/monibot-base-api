@@ -125,7 +125,7 @@ public class PropertyUtil {
                  properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp != null) {
+                    if (temp != null&& temp.getValue()!=null) {
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                         if (item.getMultiSelect()){
                             if ( !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.contains(JSONUtil.parseArray(temp.getValue()))) {
@@ -146,7 +146,7 @@ public class PropertyUtil {
         boolean b3 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_DATE.getType()))
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp != null ) {
+                    if (temp != null && temp.getValue()!=null) {
                         try {
                             DateUtil.parse(temp.getValue(), DefaultConstant.SYSTEM_DATE_FORMAT);
                         }catch (Exception e){
@@ -163,7 +163,7 @@ public class PropertyUtil {
         boolean b4 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_NUMBER.getType()))
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp != null ) {
+                    if (temp != null && temp.getValue()!=null) {
                         try {
                             Double.valueOf(temp.getValue());
                         }catch (Exception e){

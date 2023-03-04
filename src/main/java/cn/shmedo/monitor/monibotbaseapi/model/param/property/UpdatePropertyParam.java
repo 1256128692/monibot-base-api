@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -39,6 +40,8 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
     @Valid
     private List<@NotNull PropertyIdAndValue> modelValueList;
 
+    @JsonIgnore
+    private List<TbProperty> properties;
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
@@ -93,5 +96,9 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
 
     public void setModelValueList(List<PropertyIdAndValue> modelValueList) {
         this.modelValueList = modelValueList;
+    }
+
+    public List<TbProperty> getProperties() {
+        return properties;
     }
 }

@@ -71,7 +71,8 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     private TbProjectInfo projectInfo;
     @JsonIgnore
     private List<TbProjectProperty> propertyDataList;
-
+    @JsonIgnore
+    private List<TbProperty> properties;
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper projectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
@@ -88,7 +89,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "重复的项目名称");
         }
         if (ObjectUtil.isNotEmpty(propertyList)){
-            List<TbProperty> properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType());
+             properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType());
             if (projectInfo.getModelID() != null) {
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(projectInfo.getModelID()));
@@ -159,4 +160,6 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
+
+
 }

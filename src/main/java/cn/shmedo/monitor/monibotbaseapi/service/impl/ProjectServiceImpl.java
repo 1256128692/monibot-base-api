@@ -26,6 +26,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
+import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
@@ -66,7 +67,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final FileConfig fileConfig;
     private final RedisService redisService;
-
+    private final PropertyService propertyService;
 
     private static final String TOKEN_HEADER = "Authorization";
 
@@ -265,6 +266,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.deleteByProjectID(pa.getProjectID());
             tbTagRelationMapper.insertBatch(tagID4DBList, pa.getProjectID());
+        }
+        // 处理属性
+        if(ObjectUtil.isNotEmpty(pa.getPropertyList())){
+            propertyService.updateProperty(pa.getProjectID(), pa.getPropertyList(), pa.getProperties());
         }
 
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
