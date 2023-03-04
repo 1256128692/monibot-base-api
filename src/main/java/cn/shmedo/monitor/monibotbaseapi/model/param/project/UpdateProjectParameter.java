@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,7 +90,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "重复的项目名称");
         }
         if (ObjectUtil.isNotEmpty(propertyList)){
-             properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType());
+             properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType()));
             if (projectInfo.getModelID() != null) {
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(projectInfo.getModelID()));

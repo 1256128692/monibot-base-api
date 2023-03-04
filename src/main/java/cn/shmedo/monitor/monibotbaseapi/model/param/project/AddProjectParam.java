@@ -24,6 +24,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -80,7 +81,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @Override
     public ResultWrapper validate() {
 
-        if (ProjectTypeCache.projectTypeMap.get(projectType) == null) {
+        if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (DateUtil.between(DateUtil.date(), expiryDate, DateUnit.DAY, false) <= 1) {
@@ -105,7 +106,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
         }
-        properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType);
+        properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType));
         if (ObjectUtil.isEmpty(properties)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
         }

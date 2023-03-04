@@ -20,6 +20,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -52,7 +53,7 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
         if (!tbProjectInfo.getCompanyID().equals(companyID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不属于该公司");
         }
-        List<TbProperty> properties = PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(tbProjectInfo.getProjectType());
+        List<TbProperty> properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(tbProjectInfo.getProjectType()));
         if (tbProjectInfo.getModelID() != null) {
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
             properties.addAll(tbPropertyMapper.queryByMID(tbProjectInfo.getModelID()));

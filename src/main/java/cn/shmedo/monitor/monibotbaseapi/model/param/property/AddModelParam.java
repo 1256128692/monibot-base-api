@@ -32,7 +32,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
 
     @Override
     public ResultWrapper validate() {
-        if (ProjectTypeCache.projectTypeMap.get(projectType) == null){
+        if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         ResultWrapper temp = PropertyUtil.validate(modelPropertyList);
