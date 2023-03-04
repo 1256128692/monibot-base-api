@@ -37,8 +37,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
 
-    void deleteProjectList(List ids);
-
     List<Integer> getStrIDList(PropertyQueryEntity entity);
     List<Integer> getJsonIDList(List<PropertyQueryEntity> entity);
 
@@ -53,4 +51,9 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     int countByName(String projectName);
 
     int countByProjectIDList(List<Integer> idList,Integer companyID);
+
+    void deleteProjectList(List ids);
+    int deleteProjectInfoList(List ids);
+    int deleteProjectTagList(List ids);
+    int deleteProjectPropertyList(List ids);
 }

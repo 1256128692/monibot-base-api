@@ -41,7 +41,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,6 +54,7 @@ import java.util.stream.Collectors;
  * @author: gaoxu
  * @create: 2023-02-22 13:24
  **/
+@EnableTransactionManagement
 @Service
 @AllArgsConstructor
 public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService {
@@ -195,8 +199,27 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteProjectList(ProjectIDListParam idListParam) {
-        tbProjectInfoMapper.deleteProjectList(idListParam.getDataIDList());
+        int size = idListParam.getDataIDList().size();
+        try {
+            Integer infoList = tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
+            if (infoList != size){
+                throw new Exception("删除项目列表失败");
+            }
+            Integer tagList = tbProjectInfoMapper.deleteProjectTagList(idListParam.getDataIDList());
+            if (tagList != size){
+                throw new Exception("删除项目标签关系失败");
+            }
+            Integer propertyList = tbProjectInfoMapper.deleteProjectPropertyList(idListParam.getDataIDList());
+            if (propertyList != size){
+                throw new Exception("删除项目属性关系列表失败");
+            }
+            ResultWrapper.successWithNothing();
+        } catch (Exception e) {
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            ResultWrapper.fail(e);
+        }
         // 删除项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV2> resourceItemV2s = null;

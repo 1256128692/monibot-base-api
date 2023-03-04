@@ -169,6 +169,24 @@
             #{item}
         </foreach>
     </delete>
+    <delete id="deleteProjectInfoList" parameterType="java.lang.Integer">
+        DELETE tb_project_info from tb_project_info where ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteProjectTagList" parameterType="java.lang.Integer">
+        DELETE tb_tag_relation from tb_tag_relation where ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+    <delete id="deleteProjectPropertyList" parameterType="java.lang.Integer">
+        DELETE tb_project_property from tb_project_property where ID in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo" useGeneratedKeys="true">
         <!--@mbg.generated-->
