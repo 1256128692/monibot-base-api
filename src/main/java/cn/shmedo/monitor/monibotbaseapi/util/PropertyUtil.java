@@ -119,7 +119,7 @@ public class PropertyUtil {
                     JSONArray enums = JSONUtil.parseArray(item.getEnumField());
 
                     if (item.getMultiSelect()){
-                        if (temp == null || !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.contains(JSONUtil.parseArray(temp.getValue()))) {
+                        if (temp == null || !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.containsAll(JSONUtil.parseArray(temp.getValue()))) {
                             return true;
                         }
                     }else {
