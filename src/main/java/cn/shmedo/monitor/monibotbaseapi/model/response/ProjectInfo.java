@@ -10,7 +10,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -62,6 +61,7 @@ public class ProjectInfo extends TbProjectInfo {
     private List<PropertyDto> propertyList;
 
     private String locationInfo;
+
     @Override
     public void setProjectType(Byte projectType) {
         TbProjectType type = ProjectTypeCache.projectTypeMap.getOrDefault(projectType, null);
@@ -80,24 +80,12 @@ public class ProjectInfo extends TbProjectInfo {
         }
         super.setPlatformType(platformType);
     }
-//    @Override
-//    public void setLocation(String location) {
-//        if (JSONUtil.isTypeJSON(location)) {
-//            JSONObject json = JSONUtil.parseObj(location);
-//            super.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
-//            System.out.println(1);
-//        }else {
-//            super.setLocation(location);
-//        }
-//    }
-
-    public void dealLocationInfo() {
-        if (JSONUtil.isTypeJSON(super.getLocation())) {
-            JSONObject json = JSONUtil.parseObj(super.getLocation());
-            this.locationInfo = (json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
-            System.out.println(1);
-        }else {
-            this.locationInfo = locationInfo;
+    @Override
+    public void setLocation(String location) {
+        super.setLocation(location);
+        if (JSONUtil.isTypeJSON(location)) {
+            JSONObject json = JSONUtil.parseObj(location);
+            this.setLocationInfo(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
         }
     }
 }

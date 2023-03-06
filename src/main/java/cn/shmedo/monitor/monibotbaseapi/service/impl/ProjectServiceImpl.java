@@ -43,7 +43,6 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
 
@@ -332,7 +331,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
 
             Collection<Object> areas = pageData.getRecords()
-                    .stream().map(e -> (Object) e.getLocation()).filter(Objects::nonNull).collect(Collectors.toSet());
+                    .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
             areas.clear();
@@ -341,7 +340,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
-                item.dealLocationInfo();
                 item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
                 handlerimagePathToRealPath(item);
             });
@@ -359,7 +357,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
-        result.dealLocationInfo();
         if (StrUtil.isNotEmpty(result.getLocationInfo())) {
             RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
             result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
