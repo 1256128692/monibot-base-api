@@ -89,7 +89,7 @@ public class PropertyUtil {
     public static  ResultWrapper  validPropertyValue(List<PropertyIdAndValue> modelValueList, List<TbProperty> properties , boolean required){
         Map<Integer, PropertyIdAndValue> idAndValueMap = modelValueList.stream().collect(Collectors.toMap(PropertyIdAndValue::getID, Function.identity()));
         // 校验必填
-        boolean b1 =required? properties.stream().filter(item -> !item.getRequired())
+        boolean b1 =required? properties.stream().filter(TbProperty::getRequired)
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                     if (temp == null || ObjectUtil.isEmpty(temp.getValue())) {
@@ -97,7 +97,7 @@ public class PropertyUtil {
                     }
                     return false;
                 }):
-                properties.stream().filter(item -> !item.getRequired())
+                properties.stream().filter(TbProperty::getRequired)
                         .anyMatch(item -> {
                             PropertyIdAndValue temp = idAndValueMap.get(item.getID());
                             if (temp!=null && ObjectUtil.isEmpty(temp.getValue())) {
@@ -113,7 +113,7 @@ public class PropertyUtil {
                  properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_ENUM.getType()))
                 .anyMatch(item -> {
                     PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (item.getRequired() && temp == null){
+                    if (!item.getRequired() && temp == null){
                         return false;
                     }
                     JSONArray enums = JSONUtil.parseArray(item.getEnumField());
@@ -136,7 +136,7 @@ public class PropertyUtil {
                     if (temp != null&& temp.getValue()!=null) {
                         JSONArray enums = JSONUtil.parseArray(item.getEnumField());
                         if (item.getMultiSelect()){
-                            if ( !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.contains(JSONUtil.parseArray(temp.getValue()))) {
+                            if ( !JSONUtil.isTypeJSONArray(temp.getValue()) ||!enums.containsAll(JSONUtil.parseArray(temp.getValue()))) {
                                 return true;
                             }
                         }else {
