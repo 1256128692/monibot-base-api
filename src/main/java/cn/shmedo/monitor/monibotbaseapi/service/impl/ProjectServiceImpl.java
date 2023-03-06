@@ -302,8 +302,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
 
         //FIXME 米度查询所有项目，暂时以固定ID判断
-        if (DefaultConstant.MD_ID.equals(pa.getCompanyId())) {
-            pa.setCompanyId(null);
+        if (DefaultConstant.MD_ID.equals(pa.getCompanyID())) {
+            pa.setCompanyID(null);
         }
         pa.setProjectIDList(projectIDList);
         Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());

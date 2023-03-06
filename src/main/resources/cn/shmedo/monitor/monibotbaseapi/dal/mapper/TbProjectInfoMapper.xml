@@ -456,8 +456,8 @@
                 <if test="pa.location != null and pa.location != ''">
                     Location LIKE CONCAT('%', #{pa.location}, '%') AND
                 </if>
-                <if test="pa.companyId != null">
-                    CompanyID = #{pa.companyId} AND
+                <if test="pa.companyID != null">
+                    CompanyID = #{pa.companyID} AND
                 </if>
                 <if test="pa.projectType != null">
                     ProjectType = #{pa.projectType} AND

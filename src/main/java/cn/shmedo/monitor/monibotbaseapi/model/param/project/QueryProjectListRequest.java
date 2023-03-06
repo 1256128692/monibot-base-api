@@ -41,7 +41,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     private String location;
 
     @NotNull(message = "公司ID不能为空")
-    private Integer companyId;
+    private Integer companyID;
 
     private Byte projectType;
 
@@ -114,7 +114,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     @Override
     public Resource parameter() {
-        return new Resource(this.companyId.toString(), ResourceType.COMPANY);
+        return new Resource(this.companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override
