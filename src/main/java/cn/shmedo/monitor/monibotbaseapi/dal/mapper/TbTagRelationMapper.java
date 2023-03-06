@@ -26,5 +26,4 @@ public interface TbTagRelationMapper  extends BaseMapper<TbTagRelation> {
     void deleteByProjectID(Integer projectID);
 
     int deleteProjectTagList(List idList);
-    int countTag(List idList);
 }

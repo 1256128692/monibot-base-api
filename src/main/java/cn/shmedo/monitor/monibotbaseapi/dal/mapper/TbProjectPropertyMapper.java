@@ -32,6 +32,5 @@ public interface TbProjectPropertyMapper extends BaseMapper<TbProjectProperty> {
 
     List<PropertyDto> queryPropertyByProjectID(@Param("list") List<Integer> list,
                                                @Param("createType") Integer createType);
-    int countProperty(List idList);
     int deleteProjectPropertyList(List idList);
 }

@@ -202,26 +202,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjectList(ProjectIDListParam idListParam) {
         try {
-            Integer infoData = tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
-            if (infoData != idListParam.getDataIDList().size()) {
-                throw new CustomBaseException(8,"删除项目列表失败");
-            }
-            Integer countTag = tbTagRelationMapper.countTag(idListParam.getDataIDList());
-            if (!countTag.equals(0)) {
-                Integer tagData = tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
-                if (!tagData.equals(countTag)) {
-                    throw new CustomBaseException(8,"删除项目列表失败");
-                }
-            }
-            Integer countProperty = tbProjectPropertyMapper.countProperty(idListParam.getDataIDList());
-            if (!countProperty.equals(0)) {
-                Integer propertyData = tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
-                if (!propertyData.equals(countProperty)) {
-                    throw new CustomBaseException(8,"删除项目列表失败");
-                }
-            }
-            ResultWrapper.successWithNothing();
-        } catch (CustomBaseException e) {
+            tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
+            tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
+            tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
+        } catch (Exception e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             ResultWrapper.fail(e);
             return;
