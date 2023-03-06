@@ -18,5 +18,6 @@ public class DefaultConstant {
 
     public final static SimpleDateFormat SYSTEM_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-
+    //上海米度测控有限公司ID
+    public static final Integer MD_ID = 138;
 }

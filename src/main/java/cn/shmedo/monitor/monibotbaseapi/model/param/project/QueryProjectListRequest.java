@@ -2,10 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
@@ -43,7 +40,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     private String location;
 
-    //    @NotNull(message = "公司ID不能为空")
+    @NotNull(message = "公司ID不能为空")
     private Integer companyId;
 
     private Byte projectType;
@@ -117,7 +114,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     @Override
     public Resource parameter() {
-        return null;
+        return new Resource(this.companyId.toString(), ResourceType.COMPANY);
     }
 
     @Override
