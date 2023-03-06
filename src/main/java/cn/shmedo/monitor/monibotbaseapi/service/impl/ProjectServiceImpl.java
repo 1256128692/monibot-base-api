@@ -205,24 +205,24 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         try {
             Integer infoData = tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
             if (infoData != idListParam.getDataIDList().size()) {
-                throw new Exception("删除项目列表失败");
+                throw new CustomBaseException(8,"删除项目列表失败");
             }
             Integer countTag = tbTagRelationMapper.countTag(idListParam.getDataIDList());
             if (!countTag.equals(0)) {
                 Integer tagData = tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
                 if (!tagData.equals(countTag)) {
-                    throw new Exception("删除项目标签关系失败");
+                    throw new CustomBaseException(8,"删除项目列表失败");
                 }
             }
             Integer countProperty = tbProjectPropertyMapper.countProperty(idListParam.getDataIDList());
             if (!countProperty.equals(0)) {
                 Integer propertyData = tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
                 if (!propertyData.equals(countProperty)) {
-                    throw new Exception("删除项目属性关系列表失败");
+                    throw new CustomBaseException(8,"删除项目列表失败");
                 }
             }
             ResultWrapper.successWithNothing();
-        } catch (Exception e) {
+        } catch (CustomBaseException e) {
             TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
             ResultWrapper.fail(e);
             return;
