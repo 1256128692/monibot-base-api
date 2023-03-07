@@ -8,6 +8,7 @@ import java.util.Date;
 
 public class AddFileUploadRequest {
 
+    private Integer companyID;
     @NotBlank
     private String bucketName;
     private String fileName;
@@ -137,5 +138,13 @@ public class AddFileUploadRequest {
 
     public void setExValue(String exValue) {
         this.exValue = exValue;
+    }
+
+    public Integer getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(Integer companyID) {
+        this.companyID = companyID;
     }
 }

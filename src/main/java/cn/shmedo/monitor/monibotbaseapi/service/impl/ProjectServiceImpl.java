@@ -75,7 +75,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public void addProject(AddProjectParam pa, Integer userID) {
         String imgPath = "";
         if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())) {
-            imgPath = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID, null);
+            imgPath = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, null, pa.getCompanyID());
         }
         TbProjectInfo tbProjectInfo = Param2DBEntityUtil.fromAddProjectParam2TbProjectInfo(pa, userID, imgPath);
         tbProjectInfoMapper.insert(tbProjectInfo);
@@ -126,7 +126,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
     }
 
-    private String handlerimagePath(String imageContent, String imageSuffix, Integer userID, String fileName) {
+    private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,
+                                    Integer companyID) {
         MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         AddFileUploadRequest pojo = new AddFileUploadRequest();
         if (StrUtil.isBlank(fileName)) {
@@ -138,7 +139,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         pojo.setFileContent(imageContent);
         pojo.setFileType(imageSuffix);
         pojo.setUserID(userID);
-        ResultWrapper<FilePathResponse> info = instance.AddFileUpload(pojo);
+        pojo.setCompanyID(companyID);
+        ResultWrapper<FilePathResponse> info = instance.AddFileUpload(pojo,fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
         } else {
@@ -176,13 +178,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectInfoMapper.updateExpiryDate(param.getProjectID(), param.getNewRetireDate(), userID, new Date());
     }
 
-    private <T extends TbProjectInfo> void handlerimagePathToRealPath(T projectInfo) {
+    private <T extends TbProjectInfo> void handlerImagePathToRealPath(T projectInfo) {
         if (!StrUtil.isBlank(projectInfo.getImagePath())) {
             MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
             pojo.setFilePath(projectInfo.getImagePath());
-            ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo);
+            ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             } else {
@@ -272,7 +274,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public void updateProjectImage(UpdateProjectImageParam pa, Integer userID) {
-        String path = handlerimagePath(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName());
+        String path = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName(), pa.getCompanyID());
         if (StringUtils.isNotBlank(path)) {
             tbProjectInfoMapper.updatePathByID(path, pa.getProjectID());
         }
@@ -329,7 +331,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setCompany(getCompany(request, item.getCompanyID()));
                 item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
-                handlerimagePathToRealPath(item);
+                handlerImagePathToRealPath(item);
             });
         }
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
@@ -350,7 +352,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
         }
 
-        handlerimagePathToRealPath(result);
+        handlerImagePathToRealPath(result);
         return result;
     }
 }
