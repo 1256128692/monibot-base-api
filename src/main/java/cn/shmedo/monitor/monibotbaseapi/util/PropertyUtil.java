@@ -58,10 +58,17 @@ public class PropertyUtil {
                 if (!JSONUtil.isTypeJSONArray(item.getEnumField())){
                     return true;
                 }
+                List<String> temp = JSONUtil.toList(item.getEnumField(), String.class);
+                if ( temp.stream().anyMatch(ObjectUtil::isEmpty)){
+                    return true;
+                }
+                if (temp.stream().distinct().count() !=temp.size()){
+                    return true;
+                }
             }
             return false;
         })){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的枚举内容需要是json数组");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "枚举类型的枚举内容需要是json数组,内容不能为空,不能重复");
         }
         if (modelPropertyList.stream().anyMatch(item -> {
             // 枚举类型

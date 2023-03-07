@@ -6,6 +6,8 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -35,15 +37,19 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
         if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        ResultWrapper temp = PropertyUtil.validate(modelPropertyList);
-        if (temp != null){
-            return temp;
+       TbPropertyModelMapper tbPropertyModelMapper =  ContextHolder.getBean(TbPropertyModelMapper.class);
+        if (tbPropertyModelMapper.countByName(modelName) > 0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的名称已存在");
         }
         if (modelPropertyList.stream().map(ModelItem::getName).distinct().count() !=modelPropertyList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
         }
         if (modelPropertyList.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性的额外属性应为json字符串");
+        }
+        ResultWrapper temp = PropertyUtil.validate(modelPropertyList);
+        if (temp != null){
+            return temp;
         }
         return null;
     }

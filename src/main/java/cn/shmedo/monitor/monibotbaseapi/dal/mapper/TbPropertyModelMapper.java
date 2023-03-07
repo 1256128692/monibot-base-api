@@ -19,4 +19,6 @@ public interface TbPropertyModelMapper {
     int updateByPrimaryKey(TbPropertyModel record);
 
     List<Model4Web> queryModel4WebBy(Byte projectType, Byte createType);
+
+    int countByName(String modelName);
 }

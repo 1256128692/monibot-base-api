@@ -101,4 +101,8 @@
           and createType = #{createType}
       </if>
   </select>
+
+  <select id="countByName" resultType="int">
+    select count(1) from tb_property_model where Name = #{modelName}
+    </select>
 </mapper>
