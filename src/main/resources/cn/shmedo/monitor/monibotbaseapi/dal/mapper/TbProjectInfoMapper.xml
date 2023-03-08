@@ -25,10 +25,6 @@
         <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
     </resultMap>
-    <resultMap id="PropertyMap" type="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
-        <result column="Name" jdbcType="VARCHAR" property="name"/>
-        <result column="Value" jdbcType="VARCHAR" property="value"/>
-    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID, CompanyID, ProjectName, ShortName, ProjectType, ExpiryDate, DirectManageUnit,
@@ -41,113 +37,6 @@
         <include refid="Base_Column_List"/>
         from tb_project_info
         where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <select id="getProjectInfoList"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam"
-            resultMap="BaseResultMap">
-        SELECT a1.ID,
-        companyID,
-        projectName,
-        shortName,
-        a1.projectType,
-        expiryDate,
-        directManageUnit,
-        platformType,
-        ENABLE,
-        location,
-        projectAddress,
-        latitude,
-        longitude,
-        imagePath,
-        projectDesc,
-        a1.modelID,
-        createTime,
-        createUserID,
-        updateTime,
-        updateUserID
-        FROM tb_project_info a1
-        LEFT JOIN tb_project_property a2 ON a1.ID = a2.ProjectID
-        LEFT JOIN tb_property a3 ON a2.PropertyID = a3.ID
-        <where>
-            <if test="projectName != null and projectName != ''">
-                and projectName like "%"#{projectName,jdbcType=VARCHAR}"%"
-            </if>
-            <if test="directManageUnit != null and directManageUnit != ''">
-                and directManageUnit like "%"#{directManageUnit,jdbcType=VARCHAR}"%"
-            </if>
-            <if test="location != null and location != ''">
-                and location like "%"#{location,jdbcType=VARCHAR}"%"
-            </if>
-            <if test="companyId != null and companyId != ''">
-                and companyId = #{companyId,jdbcType=INTEGER}
-            </if>
-            <if test="projectType != null and projectType != ''">
-                and a1.projectType = #{projectType,jdbcType=INTEGER}
-            </if>
-            <if test="enable != null and enable != ''">
-                and enable = #{enable,jdbcType=BOOLEAN}
-            </if>
-            <if test="platformTypeList != null and platformTypeList.size > 0">
-                and platformType in
-                <foreach collection="platformTypeList" item="item" separator="," open="(" close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="expiryDateStr != null">
-                and expiryDate <![CDATA[ = ]]> #{expiryDateStr,jdbcType=VARCHAR}
-            </if>
-            <if test="beginCreateTime != null">
-                and createTime <![CDATA[ >= ]]> #{beginCreateTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="endCreateTime != null">
-                and createTime <![CDATA[ <= ]]> #{endCreateTime,jdbcType=TIMESTAMP}
-            </if>
-            <if test="idList != null">
-                and a1.ID in
-                <foreach collection="idList" item="item" separator="," open="(" close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <!--<if test="propertyStr != null and propertyStr.size > 0">
-                <foreach collection="propertyStr" item="item">
-                    and a3.`Name` = #{item.name,jdbcType=VARCHAR}
-                    and a2.`Value` like "%"#{item.value,jdbcType=VARCHAR}"%"
-                </foreach>
-            </if>
-            <if test="propertyJson != null and propertyJson.size > 0">
-                and
-                (
-                <foreach collection="propertyJson" item="json" separator="or">
-                    ( a3.`Name` = #{json.name,jdbcType=VARCHAR}
-                    and a2.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
-                </foreach>
-                )
-            </if>-->
-        </where>
-        group by a1.ID
-        order by createTime;
-    </select>
-    <select id="getStrIDList" resultType="java.lang.Integer" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
-        SELECT
-        a1.ProjectID
-        FROM tb_project_property a1
-        LEFT JOIN tb_property a2 on a1.PropertyID = a2.ID
-        <where>
-            a2.`Name` = #{name,jdbcType=VARCHAR}
-            and a1.`Value` like "%"#{value,jdbcType=VARCHAR}"%"
-        </where>
-    </select>
-    <select id="getJsonIDList" resultType="java.lang.Integer" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity">
-        SELECT
-        a1.ProjectID
-        FROM tb_project_property a1
-        LEFT JOIN tb_property a2 on a1.PropertyID = a2.ID
-        <where>
-            <foreach collection="entity" item="json" separator="or">
-                ( a2.`Name` = #{json.name,jdbcType=VARCHAR}
-                and a1.`Value` like "%"#{json.value,jdbcType=VARCHAR}"%" )
-            </foreach>
-        </where>
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->

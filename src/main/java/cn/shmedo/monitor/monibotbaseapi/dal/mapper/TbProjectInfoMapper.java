@@ -1,8 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyQueryEntity;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -27,18 +25,9 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int updateByPrimaryKey(TbProjectInfo record);
 
-    /**
-     * 连表查询项目工程列表信息
-     * @return
-     */
-    List<TbProjectInfo> getProjectInfoList(QueryProjectListParam param);
-
     void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
-
-    List<Integer> getStrIDList(PropertyQueryEntity entity);
-    List<Integer> getJsonIDList(List<PropertyQueryEntity> entity);
 
     void updatePathByID(String path, Integer projectID);
 

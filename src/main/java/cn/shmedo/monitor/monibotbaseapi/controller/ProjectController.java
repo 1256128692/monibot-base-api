@@ -8,7 +8,6 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
-import jakarta.servlet.ServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,7 +80,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
      * @apiParam (请求体) {String} [location] 行政区域
-     * @apiParam (请求体) {Int} companyId 企业名称-先调用接口查询具体企业，发送id
+     * @apiParam (请求体) {Int} companyID 企业名称-先调用接口查询具体企业，发送id
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
@@ -230,7 +229,6 @@ public class ProjectController {
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectInfo(@Validated @RequestBody QueryProjectInfoParam pa) {
         return projectService.queryProjectInfo(pa);
-//        return projectService.getProjectInfoData(request, pa);
     }
 
     /**
