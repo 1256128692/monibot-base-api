@@ -203,15 +203,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteProjectList(ProjectIDListParam idListParam) {
-        try {
-            tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
-            tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
-            tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
-        } catch (Exception e) {
-            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-            ResultWrapper.fail(e);
-            return;
-        }
+        tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
+        tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
+        tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
         // 删除项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV2> resourceItemV2s = null;
@@ -225,7 +219,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
-        ResultWrapper.successWithNothing();
     }
 
     @Override
@@ -280,20 +273,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
     }
 
-    @Override
-    public Company getCompany(ServletRequest request, Integer id) {
-        HttpServletRequest httpRequest = (HttpServletRequest) request;
-        String token = httpRequest.getHeader(TOKEN_HEADER);
-        CompanyThird companyThird = new CompanyThird();
-        companyThird.setCompanyID(id);
-        UserService userService = ThirdHttpService.getInstance(UserService.class, ThirdHttpService.Auth);
-        ResultWrapper<Company> companyInfo = userService.getCompanyInfo(token, companyThird);
-        Company data = companyInfo.getData();
-        return data;
-    }
 
     @Override
-    public PageUtil.Page<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa) {
+    public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
         List<Integer> projectIDList = null;
         if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())) {
             projectIDList = tbProjectInfoMapper
@@ -325,11 +307,18 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
             areas.clear();
+            Collection<Object> companyData = pageData.getRecords()
+                    .stream().map(s -> s.getCompanyID().toString()).filter(Objects::nonNull).collect(Collectors.toSet());
+            List<Company> companies = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class);
+            System.out.println(companies);
+            Map<Integer, Company> companyMap = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class)
+                    .stream().collect(Collectors.toMap(e->e.getId(), e -> e));
+            companyData.clear();
 
             pageData.getRecords().forEach(item -> {
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
-                item.setCompany(getCompany(request, item.getCompanyID()));
+                item.setCompany(companyMap.getOrDefault(item.getCompanyID(), null));
                 item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
                 handlerImagePathToRealPath(item);
             });
@@ -338,7 +327,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa) {
+    public ProjectInfo queryProjectInfo(QueryProjectInfoParam pa) {
         TbProjectInfo projectInfo = tbProjectInfoMapper.selectById(pa.getID());
         if (projectInfo == null) {
             return null;

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model;
 
+import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,18 +19,18 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Company {
 
-    private Integer ID;
-    private String ShortName;
-    private String FullName;
-    private Integer ParentID;
-    private String Desc;
-    private String Address;
-    private String Phone;
-    private String LegalPerson;
-    private String Scale;
-    private String Industry;
-    private String Nature;
-    private String WebSite;
+    private Integer id;
+    private String shortName;
+    private String fullName;
+    private Integer parentID;
+    private String desc;
+    private String address;
+    private String phone;
+    private String legalPerson;
+    private String scale;
+    private String industry;
+    private String nature;
+    private String webSite;
     private String displayOrder;
 
 }

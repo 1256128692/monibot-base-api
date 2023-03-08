@@ -157,8 +157,8 @@ public class ProjectController {
      */
 //    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectList(ServletRequest request, @Validated @RequestBody QueryProjectListRequest pa) {
-        return projectService.queryProjectList(request, pa);
+    public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa) {
+        return projectService.queryProjectList(pa);
     }
 
 
@@ -228,8 +228,8 @@ public class ProjectController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectInfo(ServletRequest request, @Validated @RequestBody QueryProjectInfoParam pa) {
-        return projectService.queryProjectInfo(request, pa);
+    public Object queryProjectInfo(@Validated @RequestBody QueryProjectInfoParam pa) {
+        return projectService.queryProjectInfo(pa);
 //        return projectService.getProjectInfoData(request, pa);
     }
 
