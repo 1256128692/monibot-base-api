@@ -37,7 +37,7 @@ public class ProjectController {
      * @apiName AddProject
      * @apiDescription 新增工程项目
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} projectName 项目名称(<=50)
+     * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
      * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
