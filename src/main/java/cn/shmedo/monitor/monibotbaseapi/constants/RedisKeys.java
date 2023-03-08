@@ -8,6 +8,8 @@ package cn.shmedo.monitor.monibotbaseapi.constants;
 public class RedisKeys {
 
     public static final String REGION_AREA_KEY = "cn.shmedo.monitor.regionArea";
+
+    public static final String COMPANY_INFO_KEY = "cn.shmedo.mdauth.companyInfo";
 }
 
     

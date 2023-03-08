@@ -9,23 +9,6 @@
         <result column="PropertyID" jdbcType="INTEGER" property="propertyID"/>
         <result column="Value" jdbcType="VARCHAR" property="value"/>
     </resultMap>
-    <resultMap id="PorpertyResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.PropertyList">
-        <!--@mbg.generated-->
-        <!--@Table tb_project_property-->
-        <id column="ID" jdbcType="INTEGER" property="ID" />
-        <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
-        <result column="PropertyID" jdbcType="INTEGER" property="propertyID" />
-        <result column="ProjectType" jdbcType="INTEGER" property="projectType" />
-        <result column="ClassName" jdbcType="VARCHAR" property="className" />
-        <result column="Name" jdbcType="VARCHAR" property="name" />
-        <result column="Required" jdbcType="BOOLEAN" property="required" />
-        <result column="MultiSelect" jdbcType="BOOLEAN" property="multiSelect" />
-        <result column="CreateType" jdbcType="INTEGER" property="createType" />
-        <result column="EnumField" jdbcType="VARCHAR" property="enumField" />
-        <result column="Unit" jdbcType="VARCHAR" property="unit" />
-        <result column="Value" jdbcType="VARCHAR" property="value" />
-        <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
-    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -55,28 +38,6 @@
         <include refid="Base_Column_List"/>
         from tb_project_property
         where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <select id="getPropertyList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" resultMap="PorpertyResultMap">
-        SELECT
-        a2.ID,
-        ProjectID,
-        PropertyID,
-        a1.ProjectType,
-        ClassName,
-        Name,
-        Type,
-        Required,
-        MultiSelect,
-        CreateType,
-        EnumField,
-        Unit,
-        Value,
-        ExValue
-        FROM
-        tb_property a1
-        LEFT JOIN tb_project_property a2 on a1.ID = a2.PropertyID
-        LEFT JOIN tb_project_info a3 ON a2.ProjectID = a3.ID
-        WHERE a2.ProjectID = #{id,jdbcType=INTEGER}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
         <!--@mbg.generated-->

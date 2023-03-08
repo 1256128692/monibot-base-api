@@ -1,17 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
-import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import jakarta.servlet.ServletRequest;
 
 import java.util.List;
-
 /**
  * @program: monibot-base-api
  * @author: gaoxu
@@ -32,8 +27,6 @@ public interface ProjectService {
      */
     List<TbProjectType> getProjectType();
 
-    Company getCompany(ServletRequest request, Integer id);
-
     void transferProject(TransferProjectParam param, CurrentSubject currentSubject);
 
     void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID);
@@ -51,11 +44,10 @@ public interface ProjectService {
 
     /**
      * 查询项目列表
-     * @param request   请求 {@link ServletRequest}
      * @param pa    参数 {@link QueryProjectListRequest}
      * @return  {@link PageUtil.Page <ProjectInfo>}
      */
-    PageUtil.Page<ProjectInfo> queryProjectList(ServletRequest request, QueryProjectListRequest pa);
+    PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa);
 
-    ProjectInfo queryProjectInfo(ServletRequest request, QueryProjectInfoParam pa);
+    ProjectInfo queryProjectInfo(QueryProjectInfoParam pa);
 }

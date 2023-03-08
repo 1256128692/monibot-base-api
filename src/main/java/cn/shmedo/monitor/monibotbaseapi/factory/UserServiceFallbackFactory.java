@@ -7,8 +7,6 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.Company;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.CompanyThird;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -32,11 +30,6 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<CurrentSubject> getCurrentSubject(String accessToken) {
-                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
-            }
-
-            @Override
-            public ResultWrapper<Company> getCompanyInfo(String accessToken, CompanyThird company) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
