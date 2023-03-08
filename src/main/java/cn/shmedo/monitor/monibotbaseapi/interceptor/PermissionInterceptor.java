@@ -82,18 +82,19 @@ public class PermissionInterceptor {
             case REQUIRE -> {
                 Tuple<String, String> tuple = PermissionUtil.splitServiceAndPermission(permission.permissionName());
                 CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-                if (subject.getSubjectType().equals(SubjectType.APPLICATION)) {
+                if (subject == null) {
+                    return ResultWrapper.success(Boolean.FALSE);
+                }
+                if (SubjectType.APPLICATION.equals(subject.getSubjectType())) {
                     Tuple<String, String> appKeySecret = CurrentSubjectHolder.getCurrentSubjectExtractData();
                     return validateApplicationPermission(permission, appKeySecret, tuple);
-                } else {
+                } else if (SubjectType.USER.equals(subject.getSubjectType())) {
                     String token = CurrentSubjectHolder.getCurrentSubjectExtractData();
                     return validateUserPermission(args, permission, token, tuple);
                 }
             }
-            default -> {
-                return ResultWrapper.success(Boolean.FALSE);
-            }
         }
+        return ResultWrapper.success(Boolean.FALSE);
     }
 
     /**
