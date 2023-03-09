@@ -48,7 +48,7 @@ public class PropertyController {
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:AddModel
      */
-    @LogParam(moduleName = "属性模块", operationName = "新增模板", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "属性管理模块", operationName = "新增模板", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddModel")
     @RequestMapping(value = "AddModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addModel(@RequestBody @Validated AddModelParam param) {
@@ -105,7 +105,7 @@ public class PropertyController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:mdmbase:UpdateBaseProject
      */
-    @LogParam(moduleName = "属性模块", operationName = "更新项目属性", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "属性管理模块", operationName = "更新项目属性", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProperty", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateProperty(@RequestBody @Validated UpdatePropertyParam pa) {
