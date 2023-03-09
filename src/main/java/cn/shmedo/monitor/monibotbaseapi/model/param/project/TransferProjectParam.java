@@ -77,4 +77,13 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
     public void setProjectID(Integer projectID) {
         this.projectID = projectID;
     }
+
+    @Override
+    public String toString() {
+        return "TransferProjectParam{" +
+                "companyID=" + companyID +
+                ", projectID=" + projectID +
+                ", rowCompanyID=" + rowCompanyID +
+                '}';
+    }
 }

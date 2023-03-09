@@ -96,4 +96,19 @@ public class ModelItem {
     public void setExValue(String exValue) {
         this.exValue = exValue;
     }
+
+    @Override
+    public String toString() {
+        return "ModelItem{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", unit='" + unit + '\'' +
+                ", required=" + required +
+                ", enumField='" + enumField + '\'' +
+                ", multiSelect=" + multiSelect +
+                ", className='" + className + '\'' +
+                ", displayOrder=" + displayOrder +
+                ", exValue='" + exValue + '\'' +
+                '}';
+    }
 }

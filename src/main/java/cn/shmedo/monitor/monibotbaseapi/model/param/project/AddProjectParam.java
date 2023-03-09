@@ -325,4 +325,30 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     public List<TbProperty> getProperties() {
         return properties;
     }
+
+    @Override
+    public String toString() {
+        return "AddProjectParam{" +
+                "companyID=" + companyID +
+                ", projectName='" + projectName + '\'' +
+                ", shortName='" + shortName + '\'' +
+                ", projectType=" + projectType +
+                ", imageContent='" + imageContent + '\'' +
+                ", imageSuffix='" + imageSuffix + '\'' +
+                ", expiryDate=" + expiryDate +
+                ", directManageUnit='" + directManageUnit + '\'' +
+                ", platformType=" + platformType +
+                ", enable=" + enable +
+                ", location='" + location + '\'' +
+                ", projectAddress='" + projectAddress + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", projectDesc='" + projectDesc + '\'' +
+                ", tagIDList=" + tagIDList +
+                ", tagList=" + tagList +
+                ", monitorTypeList=" + monitorTypeList +
+                ", modelID=" + modelID +
+                ", modelValueList=" + modelValueList +
+                '}';
+    }
 }

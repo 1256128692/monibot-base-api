@@ -32,4 +32,12 @@ public class TagKeyAndValue {
     public void setValue(String value) {
         this.value = value;
     }
+
+    @Override
+    public String toString() {
+        return "TagKeyAndValue{" +
+                "key='" + key + '\'' +
+                ", value='" + value + '\'' +
+                '}';
+    }
 }

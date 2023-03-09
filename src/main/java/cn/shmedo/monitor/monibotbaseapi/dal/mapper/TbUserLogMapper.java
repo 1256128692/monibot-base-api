@@ -14,4 +14,6 @@ public interface TbUserLogMapper {
     int updateByPrimaryKeySelective(TbUserLog record);
 
     int updateByPrimaryKey(TbUserLog record);
+
+    void cleanUserLog();
 }

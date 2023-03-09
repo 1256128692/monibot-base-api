@@ -1,8 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -12,7 +9,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,9 +18,6 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -101,5 +94,15 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
 
     public List<TbProperty> getProperties() {
         return properties;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdatePropertyParam{" +
+                "companyID=" + companyID +
+                ", projectID=" + projectID +
+                ", modelValueList=" + modelValueList +
+                ", properties=" + properties +
+                '}';
     }
 }

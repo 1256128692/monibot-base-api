@@ -169,4 +169,23 @@ public class TbProperty {
     public void setExValue(String exValue) {
         this.exValue = exValue;
     }
+
+    @Override
+    public String toString() {
+        return "TbProperty{" +
+                "ID=" + ID +
+                ", projectType=" + projectType +
+                ", name='" + name + '\'' +
+                ", type=" + type +
+                ", unit='" + unit + '\'' +
+                ", required=" + required +
+                ", multiSelect=" + multiSelect +
+                ", enumField='" + enumField + '\'' +
+                ", createType=" + createType +
+                ", className='" + className + '\'' +
+                ", displayOrder=" + displayOrder +
+                ", modelID=" + modelID +
+                ", exValue='" + exValue + '\'' +
+                '}';
+    }
 }

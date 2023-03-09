@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
@@ -46,6 +48,7 @@ public class PropertyController {
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:AddModel
      */
+    @LogParam(moduleName = "属性模块", operationName = "新增模板", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddModel")
     @RequestMapping(value = "AddModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addModel(@RequestBody @Validated AddModelParam param) {
@@ -102,6 +105,7 @@ public class PropertyController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:mdmbase:UpdateBaseProject
      */
+    @LogParam(moduleName = "属性模块", operationName = "更新项目属性", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProperty", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateProperty(@RequestBody @Validated UpdatePropertyParam pa) {

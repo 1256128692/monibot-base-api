@@ -1,10 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.PermissionScope;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
@@ -63,7 +65,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission xx权限:
      */
-    //@LogParam(moduleName = "设备模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "设备模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
@@ -258,6 +260,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
+    @LogParam(moduleName = "设备模块", operationName = "修改项目信息", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     public Object updateProject(@Validated @RequestBody UpdateProjectParameter pa) {
@@ -277,6 +280,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限:
      */
+    @LogParam(moduleName = "设备模块", operationName = "转移项目", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
     @RequestMapping(value = "TransferProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object transferProject(@Validated @RequestBody TransferProjectParam param) {
@@ -296,6 +300,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:
      */
+    @LogParam(moduleName = "设备模块", operationName = "推迟有效期", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "RaiseExpiryDate", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object raiseExpiryDate(@Validated @RequestBody RaiseExpiryDateParam param) {
@@ -333,6 +338,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:DeleteBaseProject
      */
+    @LogParam(moduleName = "设备模块", operationName = "删除项目", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeleteBaseProject")
     @RequestMapping(value = "DeleteProjectList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteProjectList(@Validated @RequestBody ProjectIDListParam dataIDList) {
@@ -354,6 +360,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限:mdmbase:UpdateBaseProject
      */
+    @LogParam(moduleName = "设备模块", operationName = "修改工程项目图片", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "UpdateProjectImage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateProjectImage(@Validated @RequestBody UpdateProjectImageParam pa) {

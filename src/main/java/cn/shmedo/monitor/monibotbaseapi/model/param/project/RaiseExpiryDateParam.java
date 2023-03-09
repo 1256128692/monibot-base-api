@@ -61,4 +61,12 @@ public class RaiseExpiryDateParam implements ParameterValidator, ResourcePermiss
     public void setNewRetireDate(Date newRetireDate) {
         this.newRetireDate = newRetireDate;
     }
+
+    @Override
+    public String toString() {
+        return "RaiseExpiryDateParam{" +
+                "projectID=" + projectID +
+                ", newRetireDate=" + newRetireDate +
+                '}';
+    }
 }

@@ -104,4 +104,15 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     public void setModelPropertyList(List<ModelItem> modelPropertyList) {
         this.modelPropertyList = modelPropertyList;
     }
+
+    @Override
+    public String toString() {
+        return "AddModelParam{" +
+                "companyID=" + companyID +
+                ", modelName='" + modelName + '\'' +
+                ", projectType=" + projectType +
+                ", desc='" + desc + '\'' +
+                ", modelPropertyList=" + modelPropertyList +
+                '}';
+    }
 }
