@@ -158,22 +158,22 @@ public class PropertyUtil {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性值的枚举格式不合法或者非范围内");
         }
         // 校验日期
-        boolean b3 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_DATE.getType()))
-                .anyMatch(item -> {
-                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
-                    if (temp != null && temp.getValue()!=null) {
-                        try {
-                            DateUtil.parse(temp.getValue(), DefaultConstant.SYSTEM_DATE_FORMAT);
-                        }catch (Exception e){
-                            return true;
-                        }
-                        return false;
-                    }
-                    return false;
-                });
-        if (b3) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性值的日期格式不正确");
-        }
+//        boolean b3 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_DATE.getType()))
+//                .anyMatch(item -> {
+//                    PropertyIdAndValue temp = idAndValueMap.get(item.getID());
+//                    if (temp != null && temp.getValue()!=null) {
+//                        try {
+//                            DateUtil.parse(temp.getValue(), DefaultConstant.SYSTEM_DATE_FORMAT);
+//                        }catch (Exception e){
+//                            return true;
+//                        }
+//                        return false;
+//                    }
+//                    return false;
+//                });
+//        if (b3) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性值的日期格式不正确");
+//        }
         // 校验数值
         boolean b4 = properties.stream().filter(item -> item.getType().equals(PropertyType.TYPE_NUMBER.getType()))
                 .anyMatch(item -> {
