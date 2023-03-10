@@ -273,7 +273,7 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName TransferProject
-     * @apiDescription 项目转移到其他企业
+     * @apiDescription 项目转移到其他企业,同事会删除设备的标签
      * @apiParam (请求体) {Int} companyID 目标公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无

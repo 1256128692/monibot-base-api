@@ -26,7 +26,6 @@ public class PredefinedModelProperTyCache {
 
 
     private TbPropertyMapper tbPropertyMapper;
-    @Autowired
     public PredefinedModelProperTyCache(TbPropertyMapper tbPropertyMapper) {
         this.tbPropertyMapper = tbPropertyMapper;
     }

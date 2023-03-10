@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
+import cn.hutool.core.date.DateTime;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog;
+
+import java.util.Date;
 
 public interface TbUserLogMapper {
     int deleteByPrimaryKey(Integer ID);
@@ -16,4 +19,5 @@ public interface TbUserLogMapper {
     int updateByPrimaryKey(TbUserLog record);
 
     void cleanUserLog();
+
 }

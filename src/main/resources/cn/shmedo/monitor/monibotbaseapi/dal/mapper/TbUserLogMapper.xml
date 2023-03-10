@@ -167,4 +167,5 @@
   <delete id="cleanUserLog">
     DELETE FROM tb_user_log WHERE OperationDate <![CDATA[ <= ]]> DATE_SUB(NOW(),INTERVAL 30 day);
   </delete>
+
 </mapper>

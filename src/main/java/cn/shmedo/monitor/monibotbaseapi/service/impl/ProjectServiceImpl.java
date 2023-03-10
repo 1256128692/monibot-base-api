@@ -150,11 +150,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
         return list;
     }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void transferProject(TransferProjectParam param, CurrentSubject currentSubject) {
         tbProjectInfoMapper.updateCompanyID(param.getProjectID(), param.getCompanyID(), currentSubject.getSubjectID(), new Date());
-
+        tbTagRelationMapper.deleteByProjectID(param.getProjectID());
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV2> resourceItemV2s = new LinkedList<ResourceItemV2>();
         // 转移成功后,并且修改项目资源的公司ID
