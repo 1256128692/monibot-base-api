@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
@@ -66,6 +68,13 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     @Valid
     private List<PropertyIdAndValue> propertyList;
 
+    private Integer newCompanyID;
+    private Date newRetireDate;
+
+    @Size(max = 100)
+    private String fileName;
+    private String imageContent;
+    private String imageSuffix;
     @JsonIgnore
     private Integer companyID;
     @JsonIgnore
@@ -80,6 +89,21 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         projectInfo = projectInfoMapper.selectByPrimaryKey(projectID);
         if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "找不到对应的工程项目");
+        }
+        if (companyID!=null){
+            if (projectInfo.getCompanyID().equals(companyID)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目标公司与当前公司一样");
+            }
+        }
+        if(newRetireDate != null){
+            if (DateUtil.between(projectInfo.getExpiryDate(), newRetireDate, DateUnit.DAY, false)<=0){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新有效期应当大于当前的有效期");
+            }
+        }
+        if (ObjectUtil.isNotEmpty(fileName)){
+            if (fileName.contains(".")){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "文件名称不能出现特殊字符,例如.");
+            }
         }
         companyID = projectInfo.getCompanyID();
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
@@ -142,6 +166,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         projectInfo.setProjectDesc(projectDesc);
         projectInfo.setUpdateTime(new Date());
         projectInfo.setUpdateUserID(userID);
+        if (newRetireDate !=null){
+            projectInfo.setExpiryDate(newRetireDate);
+        }
         return projectInfo;
     }
 

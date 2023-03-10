@@ -256,6 +256,11 @@ public class ProjectController {
      * @apiParam (请求体) {Object[]} [propertyList] 属性值列表
      * @apiParam (请求体) {String} propertyList.ID 属性ID
      * @apiParam (请求体) {String} [propertyList.value] 属性值
+     * @apiParam (请求体) {String} [fileName] 文件名称,不要带后缀 ,需要与imageContent，imageSuffix均存在才可更新图片
+     * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
+     * @apiParam (请求体) {String} [imageSuffix] 图片格式
+     * @apiParam (请求体) {Int} [newCompanyID] 新公司, 转移公司用
+     * @apiParam (请求体) {Date}  [newRetireDate] 新有效期
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -264,7 +269,7 @@ public class ProjectController {
     @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     public Object updateProject(@Validated @RequestBody UpdateProjectParameter pa) {
-        projectService.updateProject(pa);
+        projectService.updateProject(pa , CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 

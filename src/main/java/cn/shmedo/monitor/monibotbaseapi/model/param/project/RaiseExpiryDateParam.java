@@ -29,7 +29,6 @@ public class RaiseExpiryDateParam implements ParameterValidator, ResourcePermiss
         if (tbProjectInfo == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
-        System.out.println(DateUtil.betweenDay(tbProjectInfo.getExpiryDate(), newRetireDate, true));
         if (DateUtil.between(tbProjectInfo.getExpiryDate(), newRetireDate, DateUnit.DAY, false)<=0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新有效期应当大于当前的有效期");
         }

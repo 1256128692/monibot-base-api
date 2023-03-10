@@ -38,7 +38,7 @@ public interface ProjectService {
      */
     void deleteProjectList(ProjectIDListParam IDS);
 
-    void updateProject(UpdateProjectParameter pa);
+    void updateProject(UpdateProjectParameter pa, Integer userID);
 
     void updateProjectImage(UpdateProjectImageParam pa, Integer userID);
 

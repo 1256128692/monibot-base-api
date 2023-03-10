@@ -153,21 +153,27 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void transferProject(TransferProjectParam param, CurrentSubject currentSubject) {
-        tbProjectInfoMapper.updateCompanyID(param.getProjectID(), param.getCompanyID(), currentSubject.getSubjectID(), new Date());
-        tbTagRelationMapper.deleteByProjectID(param.getProjectID());
+        transferProject(currentSubject.getSubjectID(), param.getProjectID(), param.getCompanyID(), param.getRowCompanyID());
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void transferProject(Integer userID, Integer projectID, Integer newCompanyID, Integer oldCompanyID) {
+        tbProjectInfoMapper.updateCompanyID(projectID, newCompanyID, userID, new Date());
+        tbTagRelationMapper.deleteByProjectID(projectID);
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV2> resourceItemV2s = new LinkedList<ResourceItemV2>();
         // 转移成功后,并且修改项目资源的公司ID
-        resourceItemV2s.add(new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, param.getProjectID().toString()));
+        resourceItemV2s.add(new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, projectID.toString()));
         if (!CollectionUtil.isEmpty(resourceItemV2s)) {
             ResultWrapper<Object> info = instance.transferMdmbaseResource(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(param.getRowCompanyID(),
-                            param.getCompanyID(), resourceItemV2s));
+                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(oldCompanyID,
+                            newCompanyID, resourceItemV2s));
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
     }
+
 
     @Override
     public void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID) {
@@ -219,9 +225,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateProject(UpdateProjectParameter pa) {
-        CurrentSubject currentSubject = CurrentSubjectHolder.getCurrentSubject();
-        TbProjectInfo projectInfo = pa.buildProject(currentSubject.getSubjectID());
+    public void updateProject(UpdateProjectParameter pa, Integer userID) {
+        TbProjectInfo projectInfo = pa.buildProject(userID);
         tbProjectInfoMapper.updateByPrimaryKey(projectInfo);
         if (!CollectionUtil.isEmpty(pa.getPropertyDataList())) {
             List<TbProjectProperty> projectProperties = pa.buildPropertyDataList();
@@ -230,7 +235,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //处理标签
         List<Integer> tagID4DBList = new ArrayList<>();
         if (ObjectUtil.isNotEmpty(pa.getTagList())) {
-            List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), currentSubject.getSubjectID());
+            List<TbTag> tagList = Param2DBEntityUtil.from2TbTagList(pa.getTagList(), pa.getCompanyID(), userID);
             tbTagMapper.insertBatch(tagList);
             tagID4DBList.addAll(tagList.stream().map(TbTag::getID).toList());
         }
@@ -245,9 +250,17 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if(ObjectUtil.isNotEmpty(pa.getPropertyList())){
             propertyService.updateProperty(pa.getProjectID(), pa.getPropertyList(), pa.getProperties());
         }
-
+        if (pa.getNewCompanyID()!=null){
+            transferProject(userID, pa.getProjectID(), pa.getNewCompanyID(), projectInfo.getCompanyID());
+        }
+        if (ObjectUtil.isAllNotEmpty(pa.getFileName(), pa.getImageContent(), pa.getImageSuffix())){
+            updateProjectImage(pa.getImageContent(), pa.getImageSuffix(), pa.getFileName(),userID,
+                    pa.getNewCompanyID() == null?projectInfo.getCompanyID():pa.getNewCompanyID()
+                    ,  pa.getProjectID());
+        }
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
+
         // 更新成功后,并且修改项目资源的描述
         if (projectInfo != null) {
             resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, projectInfo.getID().toString(), projectInfo.getProjectName()));
@@ -263,12 +276,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public void updateProjectImage(UpdateProjectImageParam pa, Integer userID) {
-        String path = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName(), pa.getCompanyID());
-        if (StringUtils.isNotBlank(path)) {
-            tbProjectInfoMapper.updatePathByID(path, pa.getProjectID());
-        }
+        updateProjectImage(pa.getImageContent(), pa.getImageSuffix(),pa.getFileName(),  userID,pa.getCompanyID(),pa.getProjectID());
     }
 
+    public void updateProjectImage(String imageContent, String imageSuffix, String fileName, Integer userID, Integer compnayID, Integer projectID) {
+        String path = handlerImagePath(imageContent,imageSuffix, userID, fileName, compnayID);
+        if (StringUtils.isNotBlank(path)) {
+            tbProjectInfoMapper.updatePathByID(path, projectID);
+        }
+    }
 
     @Override
     public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
