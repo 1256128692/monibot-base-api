@@ -132,7 +132,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (ObjectUtil.isNotEmpty(tagList)) {
             if (tagList.stream().map(
                     item -> item.getKey() + (ObjectUtil.isEmpty(item.getValue()) ? "_" : item.getKey())
-            ).distinct().count() > 1) {
+            ).distinct().count() !=tagList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的标签中存在重复");
             }
             if (tbTagMapper.countByCIDAndTags(companyID, tagList) > 0) {
