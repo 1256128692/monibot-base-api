@@ -5,17 +5,25 @@
     <!--@mbg.generated-->
     <!--@Table tb_region_area-->
     <id column="id" jdbcType="INTEGER" property="id" />
-    <result column="parent_id" jdbcType="INTEGER" property="parentId" />
+    <result column="level" jdbcType="TINYINT" property="level" />
+    <result column="parent_code" jdbcType="BIGINT" property="parentCode" />
+    <result column="area_code" jdbcType="BIGINT" property="areaCode" />
+    <result column="zip_code" jdbcType="INTEGER" property="zipCode" />
+    <result column="city_code" jdbcType="CHAR" property="cityCode" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="short_name" jdbcType="VARCHAR" property="shortName" />
-    <result column="longitude" jdbcType="VARCHAR" property="longitude" />
-    <result column="latitude" jdbcType="VARCHAR" property="latitude" />
-    <result column="level" jdbcType="SMALLINT" property="level" />
-    <result column="sort" jdbcType="INTEGER" property="sort" />
-    <result column="status" jdbcType="BOOLEAN" property="status" />
+    <result column="merger_name" jdbcType="VARCHAR" property="mergerName" />
+    <result column="pinyin" jdbcType="VARCHAR" property="pinyin" />
+    <result column="lng" jdbcType="DECIMAL" property="lng" />
+    <result column="lat" jdbcType="DECIMAL" property="lat" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, parent_id, `name`, short_name, longitude, latitude, `level`, sort, `status`
+    id, `level`, parent_code, area_code, zip_code, city_code, `name`, short_name, merger_name, 
+    pinyin, lng, lat
   </sql>
+
+  <select id="streamQuery" resultMap="BaseResultMap" fetchSize="2000" resultSetType="FORWARD_ONLY">
+    SELECT <include refid="Base_Column_List" /> FROM `tb_region_area` ${ew.customSqlSegment}
+  </select>
 </mapper>

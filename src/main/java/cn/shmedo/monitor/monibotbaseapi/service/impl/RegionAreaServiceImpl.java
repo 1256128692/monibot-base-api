@@ -27,15 +27,15 @@ public class RegionAreaServiceImpl extends ServiceImpl<RegionAreaMapper, RegionA
     ApplicationRunner runner() {
         return args -> {
             if (!redisService.hasKey(RedisKeys.REGION_AREA_KEY)) {
-                Map<Integer, RegionArea> dataMap = new HashMap<>();
+                Map<Long, RegionArea> dataMap = new HashMap<>();
                 baseMapper.streamQuery(resultContext -> {
                     RegionArea regionArea = resultContext.getResultObject();
-                    dataMap.put(regionArea.getId(), regionArea);
+                    dataMap.put(regionArea.getAreaCode(), regionArea);
                     if (dataMap.size() == 1000) {
                         redisService.putAll(RedisKeys.REGION_AREA_KEY, dataMap);
                         dataMap.clear();
                     }
-                }, new LambdaQueryWrapper<RegionArea>().eq(RegionArea::getStatus, 1));
+                }, new LambdaQueryWrapper<>());
 
                 if (!dataMap.isEmpty()) {
                     redisService.putAll(RedisKeys.REGION_AREA_KEY, dataMap);
@@ -49,6 +49,6 @@ public class RegionAreaServiceImpl extends ServiceImpl<RegionAreaMapper, RegionA
         RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, param.getCode().toString(), RegionArea.class);
         Assert.notNull(area, "地区编号不存在");
         record result(String name, String lat, String lon){}
-        return new result(area.getName(), area.getLatitude(), area.getLongitude());
+        return new result(area.getName(), area.getLat().toString(), area.getLng().toString());
     }
 }
