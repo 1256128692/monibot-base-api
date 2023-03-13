@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -10,7 +9,6 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -31,7 +29,6 @@ import org.hibernate.validator.constraints.Range;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -89,6 +86,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         projectInfo = projectInfoMapper.selectByPrimaryKey(projectID);
         if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "找不到对应的工程项目");
+        }
+        if (projectInfoMapper.countByNameExcludeID(projectName,projectID) >0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称已存在");
         }
         if (companyID!=null){
             if (projectInfo.getCompanyID().equals(companyID)) {

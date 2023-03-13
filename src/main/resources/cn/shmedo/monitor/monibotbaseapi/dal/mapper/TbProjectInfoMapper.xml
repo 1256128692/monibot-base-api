@@ -382,8 +382,11 @@
         ORDER BY CreateTime DESC
     </select>
 
-    <select id="countByName" resultType="int">
+    <select id="countByNameExcludeID" resultType="int">
         select count(1) from tb_project_info where  ProjectName = #{projectName}
+        <if test="projectID != null">
+        and id != #{projectID}
+        </if>
     </select>
 
     <select id="countByProjectIDList" resultType="int">

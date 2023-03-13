@@ -90,7 +90,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         }
 
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.countByName(projectName) > 0) {
+        if (tbProjectInfoMapper.countByNameExcludeID(projectName, null) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在系统中已存在");
         }
         if (modelID != null) {
