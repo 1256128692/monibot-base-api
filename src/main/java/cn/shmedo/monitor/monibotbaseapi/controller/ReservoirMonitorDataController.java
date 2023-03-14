@@ -23,6 +23,7 @@ public class ReservoirMonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
      * @apiName QueryMonitorPointNewDataList
+     * @apiDescription 查询公司下所有监测点最新数据列表
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
      * @apiParam (请求体) {Int} [monitorType] 监测类型
@@ -62,12 +63,12 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} data.fieldList            监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken   字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName    字段名称
-     * @apiSuccessExample 响应结果示例
-     * {}
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+    public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
         return reservoirMonitorService.queryMonitorPointList(pa);
     }
 
@@ -76,11 +77,10 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QuerySingleMonitorPointNewData 查询单个监测点最新数据详情
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询单个监测点最新数据详情
      * @apiName QuerySingleMonitorPointNewData
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
-     * @apiParamExample 请求体示例
-     * {"projectID":64,"monitorPointID":2}
      * @apiSuccess (响应结果) {Int} monitorPointID      监测点ID
      * @apiSuccess (响应结果) {String} monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} monitorType         监测类型
@@ -111,11 +111,11 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} fieldList 监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
-     * @apiSuccessExample 响应结果示例
-     * {}
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QuerySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
+    public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return null;
     }
 
@@ -124,11 +124,10 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryMonitorPointTypeStatistics 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
-     * @apiParamExample 请求体示例
-     * {"companyID":7986,"queryType":0}
      * @apiSuccess (响应结果) {Object[]} typeInfo          监测类型统计信息
      * @apiSuccess (响应结果) {Int} typeInfo.monitorType   监测类型
      * @apiSuccess (响应结果) {String} typeInfo.monitorTypeName   监测类型名称
@@ -141,11 +140,11 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} warnInfo.levelTwoCount   二级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelThreeCount 三级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
-     * @apiSuccessExample 响应结果示例
-     * {}
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryMonitorPointTypeStatistics", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
+    public Object queryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
         return null;
     }
 
@@ -153,6 +152,7 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryMonitorPointHistoryDataList 查询监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询监测点历史数据列表
      * @apiName QueryMonitorPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
@@ -186,9 +186,11 @@ public class ReservoirMonitorDataController {
      * {"fieldToken":"speed","fieldName":"速度"}
      * ]
      * }]
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryMonitorPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    public Object queryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -196,6 +198,7 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QuerySmcPointHistoryDataList 查询墒情监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询墒情监测点历史数据列表
      * @apiName QuerySmcPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
@@ -227,9 +230,11 @@ public class ReservoirMonitorDataController {
      *  },
      * ]
      * }
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QuerySmcPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QuerySmcPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    public Object querySmcPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -238,6 +243,7 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryWtPointHistoryDataList 查询水位监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询水位监测点历史数据列表
      * @apiName QueryWtPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
@@ -272,9 +278,11 @@ public class ReservoirMonitorDataController {
      * "capacity":200.8}
      * ]
      * }
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryWtPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryWtPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    public Object queryWtPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -282,6 +290,7 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryRainPointHistoryDataList 查询雨量监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
+     * @apiDescription 查询雨量监测点历史数据列表
      * @apiName QueryRainPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
@@ -313,9 +322,11 @@ public class ReservoirMonitorDataController {
      * "capacity":200.8}
      * ]
      * }
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryRainPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryRainPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
