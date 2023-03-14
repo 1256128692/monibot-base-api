@@ -1,13 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
-import cn.shmedo.monitor.monibotbaseapi.service.TagService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +19,10 @@ public class ReservoirMonitorDataController {
     private ReservoirMonitorService reservoirMonitorService;
 
     /**
-     * @api {POST} /QueryReservoirMonitorPointList 查询水库项目监测点最新数据列表
+     * @api {POST} /QueryMonitorPointList 查询水库项目监测点最新数据列表
      * @apiVersion 1.0.0
      * @apiGroup 水库模块
-     * @apiName QueryReservoirMonitorPointList
+     * @apiName QueryMonitorPointList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
      * @apiParam (请求体) {Int} [monitorType] 环境监测类型(项目) (例如: 水位:XX 流速:XX 水质:XX 雨量:XX ...)
@@ -40,25 +37,26 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} data.monitorTypeName  监测项目类型名称(例如:水位)
      * @apiSuccess (响应结果) {Int} data.monitorItemID       监测项目子类型ID
      * @apiSuccess (响应结果) {String} data.monitorItemName  监测项目子类型名称(例如:坝前水位)
-     * @apiSuccess (响应结果) {Int} data.projectTypeID       工程类型ID
-     * @apiSuccess (响应结果) {Int} data.projectTypeName     工程类型名称(例如:水库)
-     * @apiSuccess (响应结果) {Int} data.projectID           工程ID
-     * @apiSuccess (响应结果) {String} data.projectName      工程名称(例如:xxx城市项目水库)
-     * @apiSuccess (响应结果) {Int} data.sensorID            传感器ID
-     * @apiSuccess (响应结果) {Date} data.time               采集时间
+     * @apiSuccess (响应结果) {Int} data.projectTypeID       工程项目类型ID
+     * @apiSuccess (响应结果) {Int} data.projectTypeName     工程项目类型名称(例如:水库)
+     * @apiSuccess (响应结果) {Int} data.projectID           项目ID
+     * @apiSuccess (响应结果) {String} data.projectName      项目名称(例如:xxx城市项目水库)
      * @apiSuccess (响应结果) {Object[]} regionArea          行政区划
      * @apiSuccess (响应结果) {String} regionArea.name       行政区划名称
      * @apiSuccess (响应结果) {String} regionArea.shortName  行政区划别称
-     * @apiSuccess (响应结果) {Object[]} sensorData          传感器数据
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken1] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken2] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
+     * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
+     * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
+     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
+     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
      * @apiSuccessExample 响应结果示例
      * {}
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
-    @RequestMapping(value = "/QueryReservoirMonitorPointList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryReservoirMonitorPointList(@Validated @RequestBody QueryReservoirMonitorPointListParam pa) {
-        return reservoirMonitorService.queryReservoirMonitorPointList(pa);
+    @RequestMapping(value = "/QueryMonitorPointList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+        return reservoirMonitorService.queryMonitorPointList(pa);
     }
 
 
@@ -77,15 +75,16 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} monitorItemName  监测项目子类型名称(例如:坝前水位)
      * @apiSuccess (响应结果) {Int} sensorStatus        传感器状态
      * @apiSuccess (响应结果) {String} sensorStatusName 传感器状态名称
-     * @apiSuccess (响应结果) {Int} projectTypeID       工程类型ID
-     * @apiSuccess (响应结果) {Int} projectTypeName     工程类型名称(例如:水库)
-     * @apiSuccess (响应结果) {Int} projectID           工程ID
-     * @apiSuccess (响应结果) {String} projectName      工程名称(例如:xxx城市项目水库)
-     * @apiSuccess (响应结果) {Int} sensorID                    传感器ID
-     * @apiSuccess (响应结果) {Date} time                       采集时间
-     * @apiSuccess (响应结果) {Object[]} sensorData             传感器数据
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken1] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken2] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
+     * @apiSuccess (响应结果) {Int} projectTypeID       工程项目类型ID
+     * @apiSuccess (响应结果) {Int} projectTypeName     工程项目类型名称(例如:水库)
+     * @apiSuccess (响应结果) {Int} projectID           项目ID
+     * @apiSuccess (响应结果) {String} projectName      项目名称(例如:xxx城市项目水库)
+     * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
+     * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
+     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
+     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
      * @apiSuccessExample 响应结果示例
      * {}
      */
@@ -96,22 +95,15 @@ public class ReservoirMonitorDataController {
 
 
     /**
-     * @api {POST} /StatisticsReservoirMonitorPointType 统计当前公司下的水库监测点类型数量以及项目状态数量
+     * @api {POST} /StatisticsMonitorPointType 统计当前公司下的监测点类型数量以及项目状态数量
      * @apiVersion 1.0.0
      * @apiGroup 水库模块
-     * @apiName StatisticsReservoirMonitorPointType
-     * @apiParam (请求体) {Int} companyID
+     * @apiName StatisticsMonitorPointType
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
      * @apiParamExample 请求体示例
-     * {"companyID":7986}
-     * @apiSuccess (响应结果) {Int} waterLevelCount     水位类型的项目数量
-     * @apiSuccess (响应结果) {Int} flowRateCount       流速类型的项目数量
-     * @apiSuccess (响应结果) {Int} waterQualityCount   水质类型的项目数量
-     * @apiSuccess (响应结果) {Int} rainfallCount       雨量类型的项目数量
-     * @apiSuccess (响应结果) {Int} temperatureCount    温度类型的项目数量
-     * @apiSuccess (响应结果) {Int} humidityCount       湿度类型的项目数量
-     * @apiSuccess (响应结果) {Int} windSpeedCount      风速类型的项目数量
-     * @apiSuccess (响应结果) {Int} shangQingCount      墒情类型的项目数量
-     * @apiSuccess (响应结果) {Int} sandContentCount    含沙量类型的项目数量
+     * {"companyID":7986,"queryType":0}
+     * @apiSuccess (响应结果) {Object[]} data           具体查询类型的对应内容
      * @apiSuccess (响应结果) {Int} normalCount         正常的项目数量
      * @apiSuccess (响应结果) {Int} warnLevelOneCount   一级警报的项目数量
      * @apiSuccess (响应结果) {Int} warnLevelTwoCount   二级警报的项目数量
@@ -120,34 +112,39 @@ public class ReservoirMonitorDataController {
      * @apiSuccessExample 响应结果示例
      * {}
      */
-    @RequestMapping(value = "/StatisticsReservoirMonitorPointType", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object statisticsReservoirMonitorPointType(@Validated @RequestBody StatisticsReservoirMonitorPointTypeParam pa) {
+    @RequestMapping(value = "/StatisticsMonitorPointType", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object statisticsMonitorPointType(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
         return null;
     }
 
 
     /**
-     * @api {POST} /QueryReservoirMonitorPointSensorDataList 查询水库监测点下传感器的数据
+     * @api {POST} /QueryMonitorPointSensorDataList 查询监测点下传感器的数据
      * @apiVersion 1.0.0
      * @apiGroup 水库模块
-     * @apiName QueryReservoirMonitorPointSensorDataList
+     * @apiName QueryMonitorPointSensorDataList
      * @apiParam (请求体) {Int} projectID  项目ID
-     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {Int} monitorType  监测类型
+     * @apiParam (请求体) {Int} monitorPointIDList 监测点ID列表,监测点的监测类型必须保持一致
      * @apiParam (请求体) {Date} begin 开始时间
      * @apiParam (请求体) {Date} end   结束时间
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":5861}
-     * @apiSuccess (响应结果) {Int} sensorID                    传感器ID
-     * @apiSuccess (响应结果) {Date} time                       采集时间
-     * @apiSuccess (响应结果) {Object[]} sensorData             传感器数据
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken1] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
-     * @apiSuccess (响应结果) {Object} [sensorData.fieldToken2] 传感器物模型字段，值类型为物模型的值类型，比如Long,Double,String,Bool。Object,Array被转换为字符串.Binary被转换为Base64字符串
+     * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
+     * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
+     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
+     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
      * @apiSuccessExample 响应结果示例
-     * {}
+     * {"sensorDataList":[
+     * {"sensorID":1,"time":"2021-09-27 00:00:00","data":["value":1.5]},
+     * {"sensorID":2,"time":"2021-09-27 00:00:00","data":["flow":1.5,"speed":2.8]}]
+     * }
      */
-    @RequestMapping(value = "/QueryReservoirMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryReservoirMonitorPointSensorDataList(@Validated @RequestBody QueryReservoirMonitorPointSensorDataListParam pa) {
+    @RequestMapping(value = "/QueryMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointSensorDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 

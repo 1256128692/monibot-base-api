@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-public class QueryReservoirMonitorPointSensorDataListParam implements ParameterValidator {
+public class QueryMonitorPointSensorDataListParam implements ParameterValidator {
 
 
     private Integer projectID;

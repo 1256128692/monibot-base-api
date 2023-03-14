@@ -6,22 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class QueryReservoirMonitorPointListParam implements ParameterValidator {
+public class StatisticsMonitorPointTypeParam implements ParameterValidator {
 
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
-
-    private Integer projectTypeID;
-
-    private Integer monitorType;
-
-    private Integer monitorItemID;
-
-    private String town;
 
     @Override
     public ResultWrapper<?> validate() {
         return null;
     }
-
 }
