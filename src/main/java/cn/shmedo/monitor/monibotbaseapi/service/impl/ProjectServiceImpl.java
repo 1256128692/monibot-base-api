@@ -317,7 +317,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             Collection<Object> areas = pageData.getRecords()
                     .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
             Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
-                    .stream().collect(Collectors.toMap(e -> e.getId().toString(), RegionArea::getName));
+                    .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
             areas.clear();
             Collection<Object> companyData = pageData.getRecords()
                     .stream().map(s -> s.getCompanyID().toString()).filter(Objects::nonNull).collect(Collectors.toSet());
