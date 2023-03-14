@@ -21,7 +21,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointList 查询水库项目监测点最新数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 水库模块
+     * @apiGroup 环境监测模块
      * @apiName QueryMonitorPointList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
@@ -45,6 +45,8 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} regionArea.name       行政区划名称
      * @apiSuccess (响应结果) {String} regionArea.shortName  行政区划别称
      * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
      * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
      * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
@@ -66,7 +68,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointDescribe 查询监测点最新数据详情
      * @apiVersion 1.0.0
-     * @apiGroup 水库模块
+     * @apiGroup 环境监测模块
      * @apiName QueryMonitorPointDescribe
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
@@ -83,6 +85,8 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} projectID           项目ID
      * @apiSuccess (响应结果) {String} projectName      项目名称(例如:xxx城市项目水库)
      * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
      * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
      * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
@@ -103,7 +107,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /StatisticsMonitorPointType 统计当前公司下的监测点类型数量以及项目状态数量
      * @apiVersion 1.0.0
-     * @apiGroup 水库模块
+     * @apiGroup 环境监测模块
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
@@ -127,7 +131,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointSensorDataList 查询监测点下传感器的数据
      * @apiVersion 1.0.0
-     * @apiGroup 水库模块
+     * @apiGroup 环境监测模块
      * @apiName QueryMonitorPointSensorDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorType  监测类型
@@ -137,9 +141,11 @@ public class ReservoirMonitorDataController {
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":5861}
-     * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
-     * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
-     * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
+     * @apiSuccess (响应结果) {Object[]} sensorDataList             传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} sensorDataList.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} sensorDataList.sensorID         传感器ID
+     * @apiSuccess (响应结果) {Date} sensorDataList.time            采集时间
      * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
      * @apiSuccess (响应结果) {Object} [sensorDataList.value] 传感器最新数据值
      * @apiSuccess (响应结果) {Object[]} fieldList 物模型字段列表
@@ -147,8 +153,14 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
      * @apiSuccessExample 响应结果示例
-     * {"sensorDataList":[
-     * {"sensorID":2,"time":"2021-09-27 00:00:00","flow":1.5,"speed":2.8}
+     * {
+     * "sensorDataList":[
+     * {"monitorPointID":1,
+     * "monitorPointName":"xxx监测点",
+     * "sensorID":2,
+     * "time":"2021-09-27 00:00:00",
+     * "flow":1.5,
+     * "speed":2.8}
      * ],
      * "fieldList": [
      * {"fieldToken":"flow","fieldName":"流量","fieldCalOrder":1},
