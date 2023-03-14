@@ -11,6 +11,9 @@ public class StatisticsMonitorPointTypeParam implements ParameterValidator {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
+    @NotNull(message = "查询类型不能为空")
+    private Integer queryType;
+
     @Override
     public ResultWrapper<?> validate() {
         return null;

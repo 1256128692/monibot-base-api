@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class QueryReservoirMonitorPointDescribeParam implements ParameterValidator {
+public class QueryMonitorPointDescribeParam implements ParameterValidator {
 
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;

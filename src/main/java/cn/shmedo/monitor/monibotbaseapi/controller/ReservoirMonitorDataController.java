@@ -47,9 +47,12 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
      * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
      * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
-     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
-     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
-     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [sensorDataList.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object[]} fieldList 物模型字段列表
+     * @apiSuccess (响应结果) {Int} fieldList.fieldCalOrder 字段排序
+     * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
+     * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
      * @apiSuccessExample 响应结果示例
      * {}
      */
@@ -61,10 +64,10 @@ public class ReservoirMonitorDataController {
 
 
     /**
-     * @api {POST} /QueryReservoirMonitorPointDescribe 查询监测点最新数据详情
+     * @api {POST} /QueryMonitorPointDescribe 查询监测点最新数据详情
      * @apiVersion 1.0.0
      * @apiGroup 水库模块
-     * @apiName QueryReservoirMonitorPointDescribe
+     * @apiName QueryMonitorPointDescribe
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
      * @apiParamExample 请求体示例
@@ -82,14 +85,17 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
      * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
      * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
-     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
-     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
-     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [sensorDataList.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object[]} fieldList 物模型字段列表
+     * @apiSuccess (响应结果) {Int} fieldList.fieldCalOrder 字段排序
+     * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
+     * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
      * @apiSuccessExample 响应结果示例
      * {}
      */
-    @RequestMapping(value = "/QueryReservoirMonitorPointDescribe", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryReservoirMonitorPointDescribe(@Validated @RequestBody QueryReservoirMonitorPointDescribeParam pa) {
+    @RequestMapping(value = "/QueryMonitorPointDescribe", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointDescribe(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return null;
     }
 
@@ -134,13 +140,20 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} sensorDataList         传感器数据列表
      * @apiSuccess (响应结果) {Int} sensorDataList.sensorID     传感器ID
      * @apiSuccess (响应结果) {Date} sensorDataList.time        采集时间
-     * @apiSuccess (响应结果) {Map} sensorDataList.data         传感器数据键值对
-     * @apiSuccess (响应结果) {Object} [data.key] 传感器类型名称
-     * @apiSuccess (响应结果) {Object} [data.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object} [sensorDataList.key] 传感器类型名称
+     * @apiSuccess (响应结果) {Object} [sensorDataList.value] 传感器最新数据值
+     * @apiSuccess (响应结果) {Object[]} fieldList 物模型字段列表
+     * @apiSuccess (响应结果) {Int} fieldList.fieldCalOrder 字段排序
+     * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
+     * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
      * @apiSuccessExample 响应结果示例
      * {"sensorDataList":[
-     * {"sensorID":1,"time":"2021-09-27 00:00:00","data":["value":1.5]},
-     * {"sensorID":2,"time":"2021-09-27 00:00:00","data":["flow":1.5,"speed":2.8]}]
+     * {"sensorID":2,"time":"2021-09-27 00:00:00","flow":1.5,"speed":2.8}
+     * ],
+     * "fieldList": [
+     * {"fieldToken":"flow","fieldName":"流量","fieldCalOrder":1},
+     * {"fieldToken":"speed","fieldName":"速度","fieldCalOrder":2}
+     * ]
      * }
      */
     @RequestMapping(value = "/QueryMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
