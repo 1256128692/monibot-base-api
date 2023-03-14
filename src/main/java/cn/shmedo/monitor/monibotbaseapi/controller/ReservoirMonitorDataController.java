@@ -49,17 +49,18 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} data.locationInfo      第四级区域名称
      * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
      * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
+     * @apiSuccess (响应结果) {String} data.sensorStatus     传感器状态 -1:无数据 0:正常 1-4:警报等级
      * @apiSuccess (响应结果) {Bool} data.multiSensor       是否为关联多传感器
      * @apiSuccess (响应结果) {Object} data.sensorData             传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
      * @apiSuccess (响应结果) {Int} data.sensorData.sid        传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorData.time      数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorData.data         传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object} multiSensorData   多传感器最新数据
-     * @apiSuccess (响应结果) {DateTime} multiSensorData.time     数据采集时间
-     * @apiSuccess (响应结果) {Object[]} multiSensorData.timeDataList     时刻数据列表
-     * @apiSuccess (响应结果) {Int} multiSensorData.timeDataList.sid      传感器ID
-     * @apiSuccess (响应结果) {Double} multiSensorData.timeDataList.distinguishingValue    区分值，如:深度
-     * @apiSuccess (响应结果) {T} multiSensorData.timeDataList.value  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)
+     * @apiSuccess (响应结果) {Object} data.multiSensorData   多传感器最新数据
+     * @apiSuccess (响应结果) {DateTime} data.multiSensorData.time     数据采集时间
+     * @apiSuccess (响应结果) {Object[]} data.multiSensorData.timeDataList     时刻数据列表
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.timeDataList.sid      传感器ID
+     * @apiSuccess (响应结果) {Double} data.multiSensorData.timeDataList.distinguishingValue    区分值，如:深度
+     * @apiSuccess (响应结果) {T} data.multiSensorData.timeDataList.value  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)
      * @apiSuccess (响应结果) {Object[]} data.fieldList            监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken   字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName    字段名称
@@ -240,11 +241,11 @@ public class ReservoirMonitorDataController {
 
 
     /**
-     * @api {POST} /QueryWtPointHistoryDataList 查询水位监测点历史数据列表
+     * @api {POST} /QueryReservoirPointHistoryDataList 查询水库水位监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
-     * @apiDescription 查询水位监测点历史数据列表
-     * @apiName QueryWtPointHistoryDataList
+     * @apiDescription 查询水库水位监测点历史数据列表
+     * @apiName QueryReservoirPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
      * @apiParam (请求体) {DateTime} begin 开始时间
@@ -281,8 +282,49 @@ public class ReservoirMonitorDataController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @RequestMapping(value = "/QueryWtPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryWtPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    @RequestMapping(value = "/QueryReservoirPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryReservoirPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryRiverWtPointHistoryDataList 查询河道水位监测点历史数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点数据模块
+     * @apiDescription 查询河道水位监测点历史数据列表
+     * @apiName QueryRiverWtPointHistoryDataList
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParamExample 请求体示例
+     * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861}
+     * @apiSuccess (响应结果) {Int} monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Double} warnWater 警戒水位
+     * @apiSuccess (响应结果) {Double} guaranteedWater 保证水位
+     * @apiSuccess (响应结果) {Object[]} sensorDataList 传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorDataList.sid      传感器ID
+     * @apiSuccess (响应结果) {DateTime} sensorDataList.time   采集时间
+     * @apiSuccess (响应结果) {Double} sensorDataList.sectionWater 断面水位
+     * @apiSuccessExample 响应结果示例
+     * {
+     * "monitorPointID":1,
+     * "monitorPointName":"测点1",
+     * "warnWater":58,
+     * "guaranteedWater":59,
+     * "sensorDataList":[
+     * {"sensorID":1,
+     * "time":"2023-03-01 00:00:00",
+     * "sectionWater":55,
+     * ]
+     * }
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    @RequestMapping(value = "/QueryRiverWtPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryRiverWtPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -327,6 +369,61 @@ public class ReservoirMonitorDataController {
      */
     @RequestMapping(value = "/QueryRainPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryMonitorPointListHistoryDataList 查询多监测点历史数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点数据模块
+     * @apiDescription 查询多监测点历史数据列表
+     * @apiName QueryMonitorPointListHistoryDataList
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int} pointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParamExample 请求体示例
+     * {"pointIDList":[1,2,3],"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":66}
+     * @apiSuccess (响应结果) {Object[]} data   结果数据
+     * @apiSuccess (响应结果) {DateTime} data.time     数据采集时间
+     * @apiSuccess (响应结果) {Object[]} data.timeDataList     时刻数据列表
+     * @apiSuccess (响应结果) {Int} data.timeDataList.pointID      监测点ID
+     * @apiSuccess (响应结果) {Int} data.timeDataList.pointName      监测点名称
+     * @apiSuccess (响应结果) {Double} data.timeDataList.sid   传感器ID
+     * @apiSuccess (响应结果) {T} data.timeDataList.value  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccessExample 响应结果示例
+     * [{
+     * "time":"2023-02-27 00:00:00",
+     * "timeDataList":[
+     * {
+     * "pointID":1,
+     * "pointName":"测点1",
+     * "value":1.5},
+     * {
+     * "pointID":2,
+     * "pointName":"测点2",
+     * "value":2.5}
+     * ]
+     * },
+     * {
+     * "time":"2023-02-27 02:00:00",
+     * "timeDataList":[
+     * {
+     * "pointID":1,
+     * "pointName":"测点1",
+     * "value":1.6},
+     * {
+     * "pointID":2,
+     * "pointName":"测点2",
+     * "value":2.4}
+     * ]
+     * }]
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    @RequestMapping(value = "/QueryMonitorPointListHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
