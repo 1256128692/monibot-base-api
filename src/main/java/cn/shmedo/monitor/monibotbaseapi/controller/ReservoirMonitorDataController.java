@@ -46,6 +46,8 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectShortName  工程项目简称
      * @apiSuccess (响应结果) {String} data.location          四级行政区域信息
      * @apiSuccess (响应结果) {String} data.locationInfo      第四级区域名称
+     * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
+     * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
      * @apiSuccess (响应结果) {Bool} data.multiSensor       是否为关联多传感器
      * @apiSuccess (响应结果) {Object} data.sensorData             传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
      * @apiSuccess (响应结果) {Int} data.sensorData.sid        传感器ID
@@ -64,8 +66,8 @@ public class ReservoirMonitorDataController {
      * {}
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseProject")
-    @RequestMapping(value = "/QueryMonitorPointList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+    @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QueryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
         return reservoirMonitorService.queryMonitorPointList(pa);
     }
 
@@ -112,8 +114,8 @@ public class ReservoirMonitorDataController {
      * @apiSuccessExample 响应结果示例
      * {}
      */
-    @RequestMapping(value = "/QueryMonitorPointDescribe", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointDescribe(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
+    @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QuerySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return null;
     }
 
@@ -142,8 +144,8 @@ public class ReservoirMonitorDataController {
      * @apiSuccessExample 响应结果示例
      * {}
      */
-    @RequestMapping(value = "/StatisticsMonitorPointType", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object statisticsMonitorPointType(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
+    @RequestMapping(value = "/QueryMonitorPointTypeStatistics", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QueryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
         return null;
     }
 
@@ -185,8 +187,8 @@ public class ReservoirMonitorDataController {
      * ]
      * }]
      */
-    @RequestMapping(value = "/QueryMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointSensorDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    @RequestMapping(value = "/QueryMonitorPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QueryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -226,8 +228,8 @@ public class ReservoirMonitorDataController {
      * ]
      * }
      */
-    @RequestMapping(value = "/QueryMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object querySmcPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    @RequestMapping(value = "/QuerySmcPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QuerySmcPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
@@ -271,8 +273,8 @@ public class ReservoirMonitorDataController {
      * ]
      * }
      */
-    @RequestMapping(value = "/QueryMonitorPointSensorDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object QueryMonitorPointHistoryDataListEx(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    @RequestMapping(value = "/QueryWtPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object QueryWtPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
     }
 
