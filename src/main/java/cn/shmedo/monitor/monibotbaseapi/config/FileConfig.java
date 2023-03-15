@@ -22,6 +22,26 @@ public class FileConfig {
     @Value("${service.mdInfoServiceAddress}")
     private String mdInfoServiceAddress;
 
+    @Value("${service.influxAddr}")
+    private String influxAddr;
+
+    @Value("${service.influxDatabase}")
+    private String influxDatabase;
+
+    @Value("${service.influxUsername}")
+    private String influxUsername;
+
+    @Value("${service.influxPassword}")
+    private String influxPassword;
+    @Value("${service.iotInfluxAddr}")
+    private String iotInfluxAddr;
+    @Value("${service.iotInfluxDatabase}")
+    private String iotInfluxDatabase;
+    @Value("${service.iotInfluxUsername}")
+    private String iotInfluxUsername;
+    @Value("${service.iotInfluxPassword}")
+    private String iotInfluxPassword;
+
 
     public String getInfoServiceAddress() {
         return infoServiceAddress;
@@ -81,5 +101,69 @@ public class FileConfig {
 
     public void setMdInfoServiceAddress(String mdInfoServiceAddress) {
         this.mdInfoServiceAddress = mdInfoServiceAddress;
+    }
+
+    public String getInfluxAddr() {
+        return influxAddr;
+    }
+
+    public void setInfluxAddr(String influxAddr) {
+        this.influxAddr = influxAddr;
+    }
+
+    public String getInfluxDatabase() {
+        return influxDatabase;
+    }
+
+    public void setInfluxDatabase(String influxDatabase) {
+        this.influxDatabase = influxDatabase;
+    }
+
+    public String getInfluxUsername() {
+        return influxUsername;
+    }
+
+    public void setInfluxUsername(String influxUsername) {
+        this.influxUsername = influxUsername;
+    }
+
+    public String getInfluxPassword() {
+        return influxPassword;
+    }
+
+    public void setInfluxPassword(String influxPassword) {
+        this.influxPassword = influxPassword;
+    }
+
+    public String getIotInfluxAddr() {
+        return iotInfluxAddr;
+    }
+
+    public void setIotInfluxAddr(String iotInfluxAddr) {
+        this.iotInfluxAddr = iotInfluxAddr;
+    }
+
+    public String getIotInfluxDatabase() {
+        return iotInfluxDatabase;
+    }
+
+    public void setIotInfluxDatabase(String iotInfluxDatabase) {
+        this.iotInfluxDatabase = iotInfluxDatabase;
+    }
+
+    public String getIotInfluxUsername() {
+        return iotInfluxUsername;
+    }
+
+    public void setIotInfluxUsername(String iotInfluxUsername) {
+        this.iotInfluxUsername = iotInfluxUsername;
+    }
+
+    public String getIotInfluxPassword() {
+        return iotInfluxPassword;
+    }
+
+    public void setIotInfluxPassword(String iotInfluxPassword) {
+        this.iotInfluxPassword = iotInfluxPassword;
     }
 }
