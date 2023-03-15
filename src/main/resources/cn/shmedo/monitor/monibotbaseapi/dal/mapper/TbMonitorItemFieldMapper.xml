@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemFieldMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_item_field-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID" />
+    <result column="MonitorTypeFieldID" jdbcType="INTEGER" property="monitorTypeFieldID" />
+    <result column="Enable" jdbcType="BIT" property="enable" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, MonitorItemID, MonitorTypeFieldID, `Enable`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_item_field
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_item_field
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_item_field (MonitorItemID, MonitorTypeFieldID, 
+      `Enable`)
+    values (#{monitorItemID,jdbcType=INTEGER}, #{monitorTypeFieldID,jdbcType=INTEGER}, 
+      #{enable,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_item_field
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="monitorItemID != null">
+        MonitorItemID,
+      </if>
+      <if test="monitorTypeFieldID != null">
+        MonitorTypeFieldID,
+      </if>
+      <if test="enable != null">
+        `Enable`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="monitorItemID != null">
+        #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorTypeFieldID != null">
+        #{monitorTypeFieldID,jdbcType=INTEGER},
+      </if>
+      <if test="enable != null">
+        #{enable,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField">
+    <!--@mbg.generated-->
+    update tb_monitor_item_field
+    <set>
+      <if test="monitorItemID != null">
+        MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorTypeFieldID != null">
+        MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
+      </if>
+      <if test="enable != null">
+        `Enable` = #{enable,jdbcType=BIT},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField">
+    <!--@mbg.generated-->
+    update tb_monitor_item_field
+    set MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
+      `Enable` = #{enable,jdbcType=BIT}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

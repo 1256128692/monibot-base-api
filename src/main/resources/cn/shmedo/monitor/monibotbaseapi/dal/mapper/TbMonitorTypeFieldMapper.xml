@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_type_field-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="FieldName" jdbcType="VARCHAR" property="fieldName" />
+    <result column="FieldToken" jdbcType="VARCHAR" property="fieldToken" />
+    <result column="FieldDataType" jdbcType="VARCHAR" property="fieldDataType" />
+    <result column="FieldClass" jdbcType="INTEGER" property="fieldClass" />
+    <result column="FieldUnitID" jdbcType="INTEGER" property="fieldUnitID" />
+    <result column="ParentID" jdbcType="INTEGER" property="parentID" />
+    <result column="FieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder" />
+    <result column="CreateType" jdbcType="INTEGER" property="createType" />
+    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, MonitorType, FieldName, FieldToken, FieldDataType, FieldClass, FieldUnitID, ParentID, 
+    FieldCalOrder, CreateType, ExValues
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_type_field
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_type_field
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken, 
+      FieldDataType, FieldClass, FieldUnitID, 
+      ParentID, FieldCalOrder, CreateType, 
+      ExValues)
+    values (#{monitorType,jdbcType=INTEGER}, #{fieldName,jdbcType=VARCHAR}, #{fieldToken,jdbcType=VARCHAR}, 
+      #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldUnitID,jdbcType=INTEGER}, 
+      #{parentID,jdbcType=INTEGER}, #{fieldCalOrder,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER}, 
+      #{exValues,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type_field
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="fieldName != null">
+        FieldName,
+      </if>
+      <if test="fieldToken != null">
+        FieldToken,
+      </if>
+      <if test="fieldDataType != null">
+        FieldDataType,
+      </if>
+      <if test="fieldClass != null">
+        FieldClass,
+      </if>
+      <if test="fieldUnitID != null">
+        FieldUnitID,
+      </if>
+      <if test="parentID != null">
+        ParentID,
+      </if>
+      <if test="fieldCalOrder != null">
+        FieldCalOrder,
+      </if>
+      <if test="createType != null">
+        CreateType,
+      </if>
+      <if test="exValues != null">
+        ExValues,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="fieldName != null">
+        #{fieldName,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldToken != null">
+        #{fieldToken,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldDataType != null">
+        #{fieldDataType,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldClass != null">
+        #{fieldClass,jdbcType=INTEGER},
+      </if>
+      <if test="fieldUnitID != null">
+        #{fieldUnitID,jdbcType=INTEGER},
+      </if>
+      <if test="parentID != null">
+        #{parentID,jdbcType=INTEGER},
+      </if>
+      <if test="fieldCalOrder != null">
+        #{fieldCalOrder,jdbcType=INTEGER},
+      </if>
+      <if test="createType != null">
+        #{createType,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        #{exValues,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+    <!--@mbg.generated-->
+    update tb_monitor_type_field
+    <set>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="fieldName != null">
+        FieldName = #{fieldName,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldToken != null">
+        FieldToken = #{fieldToken,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldDataType != null">
+        FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldClass != null">
+        FieldClass = #{fieldClass,jdbcType=INTEGER},
+      </if>
+      <if test="fieldUnitID != null">
+        FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
+      </if>
+      <if test="parentID != null">
+        ParentID = #{parentID,jdbcType=INTEGER},
+      </if>
+      <if test="fieldCalOrder != null">
+        FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
+      </if>
+      <if test="createType != null">
+        CreateType = #{createType,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        ExValues = #{exValues,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+    <!--@mbg.generated-->
+    update tb_monitor_type_field
+    set MonitorType = #{monitorType,jdbcType=INTEGER},
+      FieldName = #{fieldName,jdbcType=VARCHAR},
+      FieldToken = #{fieldToken,jdbcType=VARCHAR},
+      FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
+      FieldClass = #{fieldClass,jdbcType=INTEGER},
+      FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
+      ParentID = #{parentID,jdbcType=INTEGER},
+      FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
+      CreateType = #{createType,jdbcType=INTEGER},
+      ExValues = #{exValues,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>
