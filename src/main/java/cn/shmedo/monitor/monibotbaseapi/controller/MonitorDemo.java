@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import org.springframework.web.bind.annotation.RestController;
+
 /**
  * 监测平台接口文档
  * @Author cyf
@@ -9,6 +11,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
  * @Description: TODO
  * @Version 1.0
  */
+@RestController
 public class MonitorDemo {
 
     /**
@@ -22,7 +25,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} dropDownList 下拉列表-todo
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiSuccess (响应结果) {Object}[] list 监测点列表
+     * @apiSuccess (响应结果) {Object[]} list 监测点列表
      * @apiSuccess (响应结果) {Int} list.ID 监测点ID
      * @apiSuccess (响应结果) {Int} list.projectID 工程项目ID
      * @apiSuccess (响应结果) {Int} list.monitorType 监测类型
@@ -36,7 +39,7 @@ public class MonitorDemo {
      * @apiSuccess (响应结果) {Int} list.enable 是否启用，1：启用，0：停用
      * @apiSuccess (响应结果) {String} list.exValues 拓展字段
      * @apiSuccess (响应结果) {String} list.displayOrder 排序字段
-     * @apiSuccess (响应结果) {Object}[] list.sensorList 监测传感器列表
+     * @apiSuccess (响应结果) {Object[]} list.sensorList 监测传感器列表
      * @apiSuccess (响应结果) {int} list.sensorList.ID 传感器ID
      * @apiSuccess (响应结果) {int} list.sensorList.projectID 工程项目ID
      * @apiSuccess (响应结果) {int} list.sensorList.templateID 监测类型模板ID
@@ -143,7 +146,7 @@ public class MonitorDemo {
      * @apiSuccess (响应结果) {Int} enable 是否启用，1：启用，0：停用
      * @apiSuccess (响应结果) {String} exValues 拓展字段
      * @apiSuccess (响应结果) {String} displayOrder 排序字段
-     * @apiSuccess (响应结果) {Object}[] sensorList 监测传感器列表
+     * @apiSuccess (响应结果) {Object[]} sensorList 监测传感器列表
      * @apiSuccess (响应结果) {int} sensorList.ID 传感器ID
      * @apiSuccess (响应结果) {int} sensorList.projectID 工程项目ID
      * @apiSuccess (响应结果) {int} sensorList.templateID 监测类型模板ID
@@ -174,7 +177,7 @@ public class MonitorDemo {
      * @apiName MonitorPointConfig
      * @apiDescription 监测点操作-配置
      * @apiParam (请求体) {Int} ID 监测点ID
-     * @apiParam (请求体) {Object}[] sensorList 监测传感器列表
+     * @apiParam (请求体) {Object[]} sensorList 监测传感器列表
      * @apiParam (请求体) {Object} sensorList.oneID 传感器1
      * @apiParam (请求体) {Object} sensorList.twoID 传感器2
      * @apiSuccess (返回结果) {Int} code 响应码
@@ -194,7 +197,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} monitorID 监测点ID
      * @apiParam (请求体) {String} monitorName 监测点ID
      * @apiParam (请求体) {String} monitorProject 监测项目
-     * @apiParam (请求体) {Object}[] sensorList 监测传感器列表
+     * @apiParam (请求体) {Object[]} sensorList 监测传感器列表
      * @apiParam (请求体) {Object} sensorList.one 传感器1
      * @apiParam (请求体) {Object} sensorList.two 传感器2
      * @apiSuccess (返回结果) {Int} code 响应码
@@ -214,7 +217,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {String} name 监测组别名称
      * @apiParam (请求体) {Int} enable 监测组别状态
-     * @apiParam (请求体) {Object}[] list 监测项目列表
+     * @apiParam (请求体) {Object[]} list 监测项目列表
      * @apiParam (请求体) {Int} list.monitorItemID 监测项目列表
      * @apiSuccess (返回结果) {Int} code 响应码
      * @apiSampleRequest off
@@ -234,9 +237,9 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {String} name 监测组别名称
      * @apiParam (请求体) {Int} enable 监测组别状态
-     * @apiParam (请求体) {Object}[] list 监测项目列表
+     * @apiParam (请求体) {Object[]} list 监测项目列表
      * @apiParam (请求体) {Int} list.monitorItemID 监测项目列表
-     * @apiParam (请求体) {Object}[] monitorItemList 监测项目列表
+     * @apiParam (请求体) {Object[]} monitorItemList 监测项目列表
      * @apiParam (请求体) {Int} monitorItemList.ID 监测组ID
      * @apiParam (请求体) {Int} monitorItemList.enable 监测组状态
      * @apiSuccess (返回结果) {Int} code 响应码
@@ -272,16 +275,16 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiDescription 监测组别分页查询
-     * @apiSuccess (响应结果) {Object}[] list 监测组别列表
+     * @apiSuccess (响应结果) {Object[]} list 监测组别列表
      * @apiSuccess (响应结果) {Int} list.ID 监测组别ID
      * @apiSuccess (响应结果) {String} list.name 监测组别名称
      * @apiSuccess (响应结果) {Boolean} list.enable 是否启用
      * @apiSuccess (响应结果) {String} list.exValue 拓展字段
      * @apiSuccess (响应结果) {Int} list.displayOrder 排序字段
-     * @apiSuccess (响应结果) {Object}[] list.monitorItem 监测项目列表
+     * @apiSuccess (响应结果) {Object[]} list.monitorItem 监测项目列表
      * @apiSuccess (响应结果) {Int} list.monitorItem.monitorItemID 监测项目ID
      * @apiSuccess (响应结果) {String} list.monitorItem.name 监测项目名称
-     * @apiSuccess (响应结果) {Object}[] list.monitorGroup 监测组列表
+     * @apiSuccess (响应结果) {Object[]} list.monitorGroup 监测组列表
      * @apiSuccess (响应结果) {Int} list.monitorGroup.ID 监测组ID
      * @apiSuccess (响应结果) {Int} list.monitorGroup.name 监测组名称
      * @apiSuccess (响应结果) {Int} list.monitorGroup.enable 是否启用
@@ -307,7 +310,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {String} name 监测组名称
      * @apiParam (请求体) {Int} enable 监测组状态
-     * @apiParam (请求体) {Object}[] list 监测点列表
+     * @apiParam (请求体) {Object[]} list 监测点列表
      * @apiParam (请求体) {Int} list.ID 监测点ID
      * @apiSuccess (返回结果) {Int} code 响应码
      * @apiSampleRequest off
@@ -327,7 +330,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {String} name 监测组名称
      * @apiParam (请求体) {Int} enable 监测组状态
-     * @apiParam (请求体) {Object}[] list 监测点列表
+     * @apiParam (请求体) {Object[]} list 监测点列表
      * @apiParam (请求体) {Int} list.ID 监测点ID
      * @apiParam (请求体) {String} list.ImageLocation 监测点底图位置
      * @apiParam (请求体) {String} imagePath 底图地址
@@ -348,7 +351,7 @@ public class MonitorDemo {
      * @apiParam (请求体) {String} CompanyID 公司ID
      * @apiParam (请求体) {String} monitorProject 监测项目
      * @apiParam (请求体) {Int} CreateType 创建类型
-     * @apiSuccess (响应结果) {Object}[] list 监测项目列表
+     * @apiSuccess (响应结果) {Object[]} list 监测项目列表
      * @apiSuccess (响应结果) {Int} list.ID ID
      * @apiSuccess (响应结果) {Int} list.companyID 公司ID
      * @apiSuccess (响应结果) {Int} list.monitorType 监测类型
@@ -372,9 +375,9 @@ public class MonitorDemo {
      * @apiDescription 查询监测点列表
      * @apiParam (请求体) {String} companyID 公司ID
      * @apiParam (请求体) {String} name 监测点名称
-     * @apiParam (请求体) {Object}[] list 监测项目列表
-     * @apiParam (请求体) {Int} list.MonitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Object}[] list 监测点列表
+     * @apiParam (请求体) {Object[]} list 监测项目列表
+     * @apiParam (请求体) {Int} list.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Object[]} list 监测点列表
      * @apiSuccess (响应结果) {String} list.ID 监测点ID
      * @apiSuccess (响应结果) {String} list.projectID 工程项目ID
      * @apiSuccess (响应结果) {Int} list.monitorType 监测点类型
