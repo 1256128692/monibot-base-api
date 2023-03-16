@@ -90,8 +90,8 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         if (projectInfoMapper.countByNameExcludeID(projectName,projectID) >0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称已存在");
         }
-        if (companyID!=null){
-            if (projectInfo.getCompanyID().equals(companyID)) {
+        if (newCompanyID!=null){
+            if (projectInfo.getCompanyID().equals(newCompanyID)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目标公司与当前公司一样");
             }
         }
