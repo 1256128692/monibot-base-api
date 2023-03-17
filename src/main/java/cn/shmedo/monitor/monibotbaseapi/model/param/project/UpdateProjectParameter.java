@@ -96,7 +96,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             }
         }
         if(newRetireDate != null){
-            if (DateUtil.date().isBefore(newRetireDate)){
+            if (DateUtil.date().isAfter(newRetireDate)){
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新有效期应当不小于今日");
             }
         }
