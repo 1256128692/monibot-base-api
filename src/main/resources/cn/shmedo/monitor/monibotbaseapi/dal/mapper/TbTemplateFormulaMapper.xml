@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTemplateFormulaMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula">
+    <!--@mbg.generated-->
+    <!--@Table tb_template_formula-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="FieldID" jdbcType="INTEGER" property="fieldID" />
+    <result column="DisplayFormula" jdbcType="VARCHAR" property="displayFormula" />
+    <result column="Formula" jdbcType="VARCHAR" property="formula" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, TemplateID, MonitorType, FieldID, DisplayFormula, Formula
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_template_formula
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_template_formula
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_template_formula (TemplateID, MonitorType, FieldID, 
+      DisplayFormula, Formula)
+    values (#{templateID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, #{fieldID,jdbcType=INTEGER}, 
+      #{displayFormula,jdbcType=VARCHAR}, #{formula,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_template_formula
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="templateID != null">
+        TemplateID,
+      </if>
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="fieldID != null">
+        FieldID,
+      </if>
+      <if test="displayFormula != null">
+        DisplayFormula,
+      </if>
+      <if test="formula != null">
+        Formula,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="templateID != null">
+        #{templateID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="fieldID != null">
+        #{fieldID,jdbcType=INTEGER},
+      </if>
+      <if test="displayFormula != null">
+        #{displayFormula,jdbcType=VARCHAR},
+      </if>
+      <if test="formula != null">
+        #{formula,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula">
+    <!--@mbg.generated-->
+    update tb_template_formula
+    <set>
+      <if test="templateID != null">
+        TemplateID = #{templateID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="fieldID != null">
+        FieldID = #{fieldID,jdbcType=INTEGER},
+      </if>
+      <if test="displayFormula != null">
+        DisplayFormula = #{displayFormula,jdbcType=VARCHAR},
+      </if>
+      <if test="formula != null">
+        Formula = #{formula,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula">
+    <!--@mbg.generated-->
+    update tb_template_formula
+    set TemplateID = #{templateID,jdbcType=INTEGER},
+      MonitorType = #{monitorType,jdbcType=INTEGER},
+      FieldID = #{fieldID,jdbcType=INTEGER},
+      DisplayFormula = #{displayFormula,jdbcType=VARCHAR},
+      Formula = #{formula,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

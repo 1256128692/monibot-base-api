@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_type_template-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="DataSourceComposeType" jdbcType="INTEGER" property="dataSourceComposeType" />
+    <result column="TemplateDataSourceID" jdbcType="VARCHAR" property="templateDataSourceID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="CalType" jdbcType="INTEGER" property="calType" />
+    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
+    <result column="CreateType" jdbcType="TINYINT" property="createType" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="DefaultTemplate" jdbcType="BIT" property="defaultTemplate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, `Name`, DataSourceComposeType, TemplateDataSourceID, MonitorType, CalType, DisplayOrder, 
+    ExValues, CreateType, CompanyID, DefaultTemplate
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_type_template
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_type_template
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type_template (`Name`, DataSourceComposeType, TemplateDataSourceID, 
+      MonitorType, CalType, DisplayOrder, 
+      ExValues, CreateType, CompanyID, 
+      DefaultTemplate)
+    values (#{name,jdbcType=VARCHAR}, #{dataSourceComposeType,jdbcType=INTEGER}, #{templateDataSourceID,jdbcType=VARCHAR}, 
+      #{monitorType,jdbcType=INTEGER}, #{calType,jdbcType=INTEGER}, #{displayOrder,jdbcType=INTEGER}, 
+      #{exValues,jdbcType=VARCHAR}, #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, 
+      #{defaultTemplate,jdbcType=BIT})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type_template
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        `Name`,
+      </if>
+      <if test="dataSourceComposeType != null">
+        DataSourceComposeType,
+      </if>
+      <if test="templateDataSourceID != null">
+        TemplateDataSourceID,
+      </if>
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="calType != null">
+        CalType,
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder,
+      </if>
+      <if test="exValues != null">
+        ExValues,
+      </if>
+      <if test="createType != null">
+        CreateType,
+      </if>
+      <if test="companyID != null">
+        CompanyID,
+      </if>
+      <if test="defaultTemplate != null">
+        DefaultTemplate,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceComposeType != null">
+        #{dataSourceComposeType,jdbcType=INTEGER},
+      </if>
+      <if test="templateDataSourceID != null">
+        #{templateDataSourceID,jdbcType=VARCHAR},
+      </if>
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="calType != null">
+        #{calType,jdbcType=INTEGER},
+      </if>
+      <if test="displayOrder != null">
+        #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        #{exValues,jdbcType=VARCHAR},
+      </if>
+      <if test="createType != null">
+        #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="companyID != null">
+        #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="defaultTemplate != null">
+        #{defaultTemplate,jdbcType=BIT},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate">
+    <!--@mbg.generated-->
+    update tb_monitor_type_template
+    <set>
+      <if test="name != null">
+        `Name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceComposeType != null">
+        DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+      </if>
+      <if test="templateDataSourceID != null">
+        TemplateDataSourceID = #{templateDataSourceID,jdbcType=VARCHAR},
+      </if>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="calType != null">
+        CalType = #{calType,jdbcType=INTEGER},
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        ExValues = #{exValues,jdbcType=VARCHAR},
+      </if>
+      <if test="createType != null">
+        CreateType = #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="companyID != null">
+        CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="defaultTemplate != null">
+        DefaultTemplate = #{defaultTemplate,jdbcType=BIT},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate">
+    <!--@mbg.generated-->
+    update tb_monitor_type_template
+    set `Name` = #{name,jdbcType=VARCHAR},
+      DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+      TemplateDataSourceID = #{templateDataSourceID,jdbcType=VARCHAR},
+      MonitorType = #{monitorType,jdbcType=INTEGER},
+      CalType = #{calType,jdbcType=INTEGER},
+      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      ExValues = #{exValues,jdbcType=VARCHAR},
+      CreateType = #{createType,jdbcType=TINYINT},
+      CompanyID = #{companyID,jdbcType=INTEGER},
+      DefaultTemplate = #{defaultTemplate,jdbcType=BIT}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>
