@@ -51,6 +51,8 @@ public class MonitorTypeUtil {
             vo.setFieldToken("currentRainfall");
             vo.setFieldName("当前降雨量");
             vo.setFieldOrder(0);
+            // 雨量单位ID:1
+            vo.setFieldExValue("1");
             fieldList.add(vo);
         }
         return fieldList;

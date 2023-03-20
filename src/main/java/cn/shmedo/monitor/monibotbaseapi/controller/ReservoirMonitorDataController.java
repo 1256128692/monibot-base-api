@@ -68,7 +68,12 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} fieldList.fieldOrder    属性字段排序
+     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * "data": [
      *         {
@@ -198,12 +203,18 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} fieldList 监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
+     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
-        return null;
+        return reservoirMonitorService.querySingleMonitorPointNewData(pa);
     }
 
 

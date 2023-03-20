@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataUnitMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit">
+    <!--@mbg.generated-->
+    <!--@Table tb_data_unit-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="EngUnit" jdbcType="VARCHAR" property="engUnit" />
+    <result column="ChnUnit" jdbcType="VARCHAR" property="chnUnit" />
+    <result column="UnitClass" jdbcType="VARCHAR" property="unitClass" />
+    <result column="UnitDesc" jdbcType="VARCHAR" property="unitDesc" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, EngUnit, ChnUnit, UnitClass, UnitDesc
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_data_unit
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_data_unit
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_data_unit (EngUnit, ChnUnit, UnitClass, 
+      UnitDesc)
+    values (#{engUnit,jdbcType=VARCHAR}, #{chnUnit,jdbcType=VARCHAR}, #{unitClass,jdbcType=VARCHAR}, 
+      #{unitDesc,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_data_unit
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="engUnit != null">
+        EngUnit,
+      </if>
+      <if test="chnUnit != null">
+        ChnUnit,
+      </if>
+      <if test="unitClass != null">
+        UnitClass,
+      </if>
+      <if test="unitDesc != null">
+        UnitDesc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="engUnit != null">
+        #{engUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="chnUnit != null">
+        #{chnUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="unitClass != null">
+        #{unitClass,jdbcType=VARCHAR},
+      </if>
+      <if test="unitDesc != null">
+        #{unitDesc,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit">
+    <!--@mbg.generated-->
+    update tb_data_unit
+    <set>
+      <if test="engUnit != null">
+        EngUnit = #{engUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="chnUnit != null">
+        ChnUnit = #{chnUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="unitClass != null">
+        UnitClass = #{unitClass,jdbcType=VARCHAR},
+      </if>
+      <if test="unitDesc != null">
+        UnitDesc = #{unitDesc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit">
+    <!--@mbg.generated-->
+    update tb_data_unit
+    set EngUnit = #{engUnit,jdbcType=VARCHAR},
+      ChnUnit = #{chnUnit,jdbcType=VARCHAR},
+      UnitClass = #{unitClass,jdbcType=VARCHAR},
+      UnitDesc = #{unitDesc,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from tb_data_unit
+  </select>
+</mapper>

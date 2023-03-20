@@ -123,6 +123,13 @@ public class InfluxSensorDataUtil {
         if (queryResult.hasError()) {
             throw new RuntimeException(queryResult.getError());
         }
+        if (CollectionUtil.isNullOrEmpty(queryResult.getResults())) {
+            return Collections.emptyList();
+        }
+        if (CollectionUtil.isNullOrEmpty(queryResult.getResults().get(0).getSeries())){
+            return Collections.emptyList();
+        }
+
         List<Map<String, Object>> resultInfolList = new LinkedList<>();
         for (int i = 0; i < queryResult.getResults().size(); i++) {
             // 单挑查询记录内容

@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

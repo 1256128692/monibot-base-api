@@ -141,6 +141,11 @@ public class SensorNewDataInfo {
      */
     private List<FieldSelectInfo> fieldList;
 
+    /**
+     * 监测类型属性字段单位列表
+     */
+    private List<TbDataUnit> dataUnitList;
+
 
     public static SensorNewDataInfo reBuildProAndMonitor(TbMonitorPoint tbMonitorPoint, TbProjectInfo tbProjectInfo,
                                                          Map<Byte, TbProjectType> projectTypeMap, List<TbSensor> sensorList,
