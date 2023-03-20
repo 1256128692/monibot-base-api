@@ -6,30 +6,30 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
-    * 监测项目子字段关联表
-    */
+ * 监测项目监测属性关联表
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TbMonitorItemField implements Serializable {
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 监测项目ID
-    */
+     * 监测项目ID
+     */
     private Integer monitorItemID;
 
     /**
-    * 监测属性ID
-    */
+     * 监测属性ID
+     */
     private Integer monitorTypeFieldID;
 
     /**
-    * 是否开启
-    */
+     * 是否开启
+     */
     private Boolean enable;
 
     private static final long serialVersionUID = 1L;

@@ -17,4 +17,9 @@ public class DbConstant {
 
 
     public static final String SENSOR_ID_FIELD_TOKEN = "sensorID";
+
+    public static final String SHANGQING_DEEP = "deep";
+
+
+    public static final String CURRENT_RAIN_FALL = "currentRainfall";
 }

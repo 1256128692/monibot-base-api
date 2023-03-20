@@ -13,11 +13,12 @@ public class QueryMonitorPointListParam implements ParameterValidator {
 
     private Integer projectTypeID;
 
+    @NotNull(message = "监测类型不能为空")
     private Integer monitorType;
 
     private Integer monitorItemID;
 
-    private String town;
+    private String areaCode;
 
     @Override
     public ResultWrapper<?> validate() {

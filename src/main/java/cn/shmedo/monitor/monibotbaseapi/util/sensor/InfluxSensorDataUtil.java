@@ -14,18 +14,18 @@ import java.util.*;
 
 public class InfluxSensorDataUtil {
 
+
     public static List<Map<String, Object>> parseResult(QueryResult queryResult,
-                                                        List<FieldSelectInfo> fieldSelectInfoList) {
+                                                        List<String> selectField) {
         if (queryResult.hasError()) {
             throw new RuntimeException(queryResult.getError());
         }
-        if (CollectionUtil.isNullOrEmpty(queryResult.getResults()) || CollectionUtil.isNullOrEmpty(fieldSelectInfoList)) {
+        if (CollectionUtil.isNullOrEmpty(queryResult.getResults()) || CollectionUtil.isNullOrEmpty(selectField)) {
             return Collections.emptyList();
         }
         List<Map<String, Object>> result = new LinkedList<>();
-        Map<String, Tuple<String, FieldType>> columnNameFieldTokenType = calculateColumnNameFieldTokenAndType(fieldSelectInfoList);
         queryResult.getResults().forEach(r -> {
-            List<Map<String, Object>> itemResult = parseSingleResult(r, columnNameFieldTokenType);
+            List<Map<String, Object>> itemResult = parseSingleResult(r, selectField);
             if (!CollectionUtil.isNullOrEmpty(itemResult)) {
                 result.addAll(itemResult);
             }
@@ -34,7 +34,7 @@ public class InfluxSensorDataUtil {
     }
 
     private static List<Map<String, Object>> parseSingleResult(QueryResult.Result result,
-                                                               Map<String, Tuple<String, FieldType>> columnNameFieldTokenType) {
+                                                               List<String> selectField) {
         if (result.hasError()) {
             throw new RuntimeException(result.getError());
         }
@@ -44,7 +44,7 @@ public class InfluxSensorDataUtil {
         }
         List<Map<String, Object>> returnResult = new LinkedList<>();
         seriesList.forEach(s -> {
-            List<Map<String, Object>> itemResult = parseSingleSeries(s, columnNameFieldTokenType);
+            List<Map<String, Object>> itemResult = parseSingleSeries(s, selectField);
             if (!CollectionUtil.isNullOrEmpty(itemResult)) {
                 returnResult.addAll(itemResult);
             }
@@ -53,7 +53,7 @@ public class InfluxSensorDataUtil {
     }
 
     private static List<Map<String, Object>> parseSingleSeries(QueryResult.Series series,
-                                                               Map<String, Tuple<String, FieldType>> columnNameFieldTokenType) {
+                                                               List<String> selectField) {
         Map<String, String> tagMap = series.getTags();
         List<String> columns = series.getColumns();
         List<List<Object>> rowList = series.getValues();
@@ -77,16 +77,11 @@ public class InfluxSensorDataUtil {
                     data.put(DbConstant.TIME_FIELD, timeString);
                 } else if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
                     data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
-                } else if (DbConstant.GENE_ID_FIELD.equals(columnName)) {
-                    data.put(DbConstant.GENE_ID_FIELD, value);
                 } else {
-                    Tuple<String, FieldType> fieldInfoItem = columnNameFieldTokenType.get(columnName);
-                    String fieldToken = fieldInfoItem.getItem1();
-                    FieldType fieldType = fieldInfoItem.getItem2();
-                    if (FieldType.LONG.equals(fieldType)) {
-                        value = ((Double) Double.parseDouble(value.toString())).longValue();
+                    boolean contains = selectField.contains(columnName);
+                    if (contains) {
+                        data.put(columnName, value);
                     }
-                    data.put(fieldToken, value);
                 }
             }
         });
@@ -123,4 +118,49 @@ public class InfluxSensorDataUtil {
         }
     }
 
+    public static List<Map<String, Object>> parseCurrentRainResult(QueryResult queryResult) {
+
+        if (queryResult.hasError()) {
+            throw new RuntimeException(queryResult.getError());
+        }
+        List<Map<String, Object>> resultInfolList = new LinkedList<>();
+        for (int i = 0; i < queryResult.getResults().size(); i++) {
+            // 单挑查询记录内容
+            QueryResult.Result result = queryResult.getResults().get(i);
+            List<QueryResult.Series> series = result.getSeries();
+            for (int j = 0; j < series.size(); j++) {
+                QueryResult.Series resultContent = series.get(j);
+
+                // 分组信息
+                Map<String, String> tagMap = resultContent.getTags();
+                // 字段列
+                List<String> columns = resultContent.getColumns();
+                // 数值
+                List<List<Object>> rowList = resultContent.getValues();
+                if (CollectionUtil.isNullOrEmpty(rowList)) {
+                    return Collections.emptyList();
+                }
+
+                rowList.forEach(row -> {
+                    Map<String, Object> data = new HashMap<>();
+                    resultInfolList.add(data);
+
+                    if (tagMap != null && tagMap.containsKey(DbConstant.SENSOR_ID_TAG)) {
+                        data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(tagMap.get(DbConstant.SENSOR_ID_TAG)));
+                    }
+                    for (int k = 0; k < row.size(); k++) {
+                        String columnName = columns.get(k);
+                        Object value = row.get(k);
+
+                        if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
+                            data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
+                        } else if ("currentRainfall".equals(columnName)) {
+                            data.put(columnName, value);
+                        }
+                    }
+                });
+            }
+        }
+        return resultInfolList;
+    }
 }

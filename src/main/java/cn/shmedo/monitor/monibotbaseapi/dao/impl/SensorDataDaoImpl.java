@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.dao.impl;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.shmedo.iot.entity.api.base.QueryDensity;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -65,7 +64,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         });
         String sql = sqlBuilder.toString();
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, fieldSelectInfoList);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         String sql = sqlBuilder.toString();
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, fieldSelectInfoList);
+        return InfluxSensorDataUtil.parseResult(queryResult, null);
     }
 
     @Override
@@ -129,7 +128,35 @@ public class SensorDataDaoImpl implements SensorDataDao {
                 break;
         }
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, fieldSelectInfoList);
+        return InfluxSensorDataUtil.parseResult(queryResult, null);
+    }
+
+    @Override
+    public List<Map<String, Object>> querySensorRainStatisticsData(List<Integer> sensorIDList, Timestamp begin, Timestamp end, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
+
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, false);
+        List<String> selectField = new LinkedList<>();
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
+        // 当前雨量
+        selectField.add(DbConstant.CURRENT_RAIN_FALL);
+        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String endString = TimeUtil.formatInfluxTimeString(end);
+
+        StringBuilder sensorIDListSql = new StringBuilder();
+        sensorIDList.forEach(sid -> {
+            sensorIDListSql.append("sid = '" );
+            sensorIDListSql.append(sid).append("'").append(" or ");
+        });
+        String tempSidListSql = sensorIDListSql.toString();
+        String sidListSql = tempSidListSql.substring(0, tempSidListSql.length() - 3);
+
+        String sql = " select sum(v1) as currentRainfall from  " + measurement
+                + " where (" + sidListSql + ") and time>='" + beginString + "' and time<='" + endString
+                + "' group by sid;";
+//        " tz('Asia/Shanghai') "
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseCurrentRainResult(queryResult);
     }
 
     private String getAllSensorDataSql(String sensorIDOrString, String beginString,
@@ -312,15 +339,17 @@ public class SensorDataDaoImpl implements SensorDataDao {
     @Override
     public List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
                                                                    boolean raw, Date maxTime, Integer limitCount, Integer monitorType) {
-//        List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-//        String measurement = FieldUtil.getMeasurement(fieldTypeCount, raw, false);
 
-        // TODO:根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
+        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
 
-        List<String> selectField = FieldUtil.getSelectField(fieldSelectInfoList, false);
+//        FieldUtil.getSelectField(fieldSelectInfoList, false);
+        List<String> selectField = new LinkedList<>();
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
+        fieldSelectInfoList.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
         String fieldString = String.join(",", selectField);
         StringBuilder sqlBuilder = new StringBuilder();
         sensorIDList.forEach(sid -> {
@@ -334,7 +363,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         });
         String sql = sqlBuilder.toString();
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, fieldSelectInfoList);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
 

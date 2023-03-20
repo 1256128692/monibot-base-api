@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface TbMonitorItemFieldMapper {
+public interface TbMonitorItemFieldMapper extends BaseMapper<TbMonitorItemField> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorItemField record);
