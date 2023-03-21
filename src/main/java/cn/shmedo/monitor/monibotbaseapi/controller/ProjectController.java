@@ -97,29 +97,29 @@ public class ProjectController {
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
-     * @apiSuccess (返回结果) {Object[]} dataList 项目信息列表
-     * @apiSuccess (返回结果) {Int} dataList.id 项目id
-     * @apiSuccess (返回结果) {String} dataList.projectName 项目名称
-     * @apiSuccess (返回结果) {String} dataList.shortName 项目简称
-     * @apiSuccess (返回结果) {Int} dataList.projectType 项目类型
-     * @apiSuccess (返回结果) {String} dataList.projectTypeName 项目类型名称
-     * @apiSuccess (返回结果) {String} dataList.projectMainTypeName 项目主类型名称
-     * @apiSuccess (返回结果) {Int} dataList.platformType 平台类型
-     * @apiSuccess (返回结果) {Int} dataList.platformTypeName 平台名称
-     * @apiSuccess (返回结果) {String} dataList.directManageUnit 直管单位
-     * @apiSuccess (返回结果) {DateTime} dataList.expiryDate 项目有效期
-     * @apiSuccess (返回结果) {Bool} dataList.enable 是否有效
-     * @apiSuccess (返回结果) {String} dataList.location 四级行政区域信息
-     * @apiSuccess (返回结果) {String} dataList.locationInfo  第四级区域名称
-     * @apiSuccess (返回结果) {String} dataList.projectAddress 项目地址
-     * @apiSuccess (返回结果) {Double} dataList.latitude 项目经度
-     * @apiSuccess (返回结果) {Double} dataList.longitude 项目纬度
-     * @apiSuccess (返回结果) {String} [dataList.imagePath] 项目图片地址
-     * @apiSuccess (返回结果) {String} [dataList.projectDesc] 项目简介
-     * @apiSuccess (返回结果) {DateTime} dataList.createTime 创建时间
-     * @apiSuccess (返回结果) {Int} dataList.createUserID 创建用户ID
-     * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间
-     * @apiSuccess (返回结果) {Int} dataList.updateUserID 修改用户ID
+     * @apiSuccess (返回结果) {Object[]} currentPageData 项目信息列表
+     * @apiSuccess (返回结果) {Int} currentPageData.id 项目id
+     * @apiSuccess (返回结果) {String} currentPageData.projectName 项目名称
+     * @apiSuccess (返回结果) {String} currentPageData.shortName 项目简称
+     * @apiSuccess (返回结果) {Int} currentPageData.projectType 项目类型
+     * @apiSuccess (返回结果) {String} currentPageData.projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} currentPageData.projectMainTypeName 项目主类型名称
+     * @apiSuccess (返回结果) {Int} currentPageData.platformType 平台类型
+     * @apiSuccess (返回结果) {Int} currentPageData.platformTypeName 平台名称
+     * @apiSuccess (返回结果) {String} currentPageData.directManageUnit 直管单位
+     * @apiSuccess (返回结果) {DateTime} currentPageData.expiryDate 项目有效期
+     * @apiSuccess (返回结果) {Bool} currentPageData.enable 是否有效
+     * @apiSuccess (返回结果) {String} currentPageData.location 四级行政区域信息
+     * @apiSuccess (返回结果) {String} currentPageData.locationInfo  第四级区域名称
+     * @apiSuccess (返回结果) {String} currentPageData.projectAddress 项目地址
+     * @apiSuccess (返回结果) {Double} currentPageData.latitude 项目经度
+     * @apiSuccess (返回结果) {Double} currentPageData.longitude 项目纬度
+     * @apiSuccess (返回结果) {String} [currentPageData.imagePath] 项目图片地址
+     * @apiSuccess (返回结果) {String} [currentPageData.projectDesc] 项目简介
+     * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
+     * @apiSuccess (返回结果) {Int} currentPageData.createUserID 创建用户ID
+     * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间
+     * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 修改用户ID
      * @apiSuccess (返回结果) {Object} company 公司信息
      * @apiSuccess (返回结果) {Int} company.ID ID
      * @apiSuccess (返回结果) {String} company.ShortName 公司简称
