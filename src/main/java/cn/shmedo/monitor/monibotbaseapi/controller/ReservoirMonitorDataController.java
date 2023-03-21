@@ -239,11 +239,11 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} warnInfo.levelThreeCount 三级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 系统权限
      */
     @RequestMapping(value = "/QueryMonitorPointTypeStatistics", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
-        return null;
+        return reservoirMonitorService.queryMonitorPointTypeStatistics(pa);
     }
 
     /**

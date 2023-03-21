@@ -17,7 +17,11 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointDescribeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.StatisticsMonitorPointTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointTypeStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.SensorNewDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
@@ -29,7 +33,6 @@ import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,6 +55,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
+
+    private final TbMonitorTypeMapper tbMonitorTypeMapper;
 
     @Override
     public List<SensorNewDataInfo> queryMonitorPointList(QueryMonitorPointListParam pa) {
@@ -363,6 +368,29 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         }else {
             return sensorNewDataInfoList.get(0);
         }
+    }
+
+    @Override
+    public MonitorPointTypeStatisticsInfo queryMonitorPointTypeStatistics(StatisticsMonitorPointTypeParam pa) {
+
+        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+
+        MonitorPointTypeStatisticsInfo vo = new MonitorPointTypeStatisticsInfo();
+        if (pa.getQueryType().equals(0)) {
+            List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(pa.getCompanyID());
+            monitorTypeBaseInfos.forEach(item -> {
+                if (!monitorTypeMap.isEmpty()) {
+                    TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
+                    item.setMonitorTypeName(tbMonitorType.getTypeName());
+                    item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
+                }
+            });
+            vo.setTypeInfoList(monitorTypeBaseInfos);
+        }
+        List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID());
+        vo.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList));
+
+        return vo;
     }
 
 }

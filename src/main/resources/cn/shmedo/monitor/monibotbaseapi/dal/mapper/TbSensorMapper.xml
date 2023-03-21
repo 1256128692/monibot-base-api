@@ -281,4 +281,16 @@
       UpdateUserID = #{updateUserID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <select id="selectStatisticsCountByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select ID, Status
+      from tb_sensor
+      where MonitorPointID in (select ID
+                               from tb_monitor_point
+                               where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID}))
+  </select>
+
+
+
+
 </mapper>
