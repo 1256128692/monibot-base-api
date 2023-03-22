@@ -77,7 +77,23 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [projectType] 项目类型
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiParam (请求参数) {Int} pageSize
+     * @apiParam (请求参数) {Int} currentPage
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 监测项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.name 监测项目名称
+     * @apiSuccess (返回结果) {String} currentPageData.alias 监测项目别名
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} currentPageData.typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} currentPageData.typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Int} currentPageData.creatType 创建类型
+     * @apiSuccess (返回结果) {Int} [currentPageData.projectID] 项目ID
+     * @apiSuccess (返回结果) {Int} [currentPageData.enable] 项目中是否可见
+     * @apiSuccess (返回结果) {Object[]} currentPageData.fieldList 字段列表
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.ID 字段ID
+     * @apiSuccess (返回结果) {String} currentPageData.fieldList.name 字段名称
+     * @apiSuccess (返回结果) {String} currentPageData.fieldList.token 字段标识
+     * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 字段描述
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
