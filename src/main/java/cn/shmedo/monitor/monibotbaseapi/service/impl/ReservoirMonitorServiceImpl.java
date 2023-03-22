@@ -3,7 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.db.Entity;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
@@ -34,9 +34,8 @@ import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -168,38 +167,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             // 处理需要计算的监测子类型返回token
             fieldList = MonitorTypeUtil.handlefieldList(monitorType, fieldList);
 
-            // 雨量单独处理
-            if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
-                // 当前时间
-                DateTime nowDate = DateUtil.date();
-                // 当天早上8点
-                DateTime nowDateEightclock = DateUtil.offsetHour(DateUtil.beginOfDay(nowDate), 8);
-
-                // 如果当前时间小于当天的早上8点,那么就统计昨天的早上8点到凌晨现在的时间
-                if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
-                    DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
-                    nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
-                }
-                List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(sensorIDList, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
-                if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-                    for (Map<String, Object> mapEntry : maps) {
-                        for (Map<String, Object> currentRainMap : currentRainMaps) {
-                            String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-                            String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-                            if (currentSid.equals(sid)) {
-                                mapEntry.put(DbConstant.CURRENT_RAIN_FALL, currentRainMap.get(DbConstant.CURRENT_RAIN_FALL));
-                                filteredMaps.add(mapEntry);
-                            }
-                        }
-                    }
-                }
-                if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-                    for (Map<String, Object> mapEntry : maps) {
-                        mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0);
-                        filteredMaps.add(mapEntry);
-                    }
-                }
-            }
+            handleSpecialSensorDataList(monitorType, filteredMaps, tbSensors, fieldList, maps);
         } else {
             fieldList = null;
             maps = null;
@@ -220,6 +188,69 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         } else {
             return handleFinalResultInfo(sensorNewDataInfoList, areaMap, maps, tbSensors, finalFieldList, dataUnitsMap);
         }
+
+    }
+
+    private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> filteredMaps,
+                                             List<TbSensor> sensorList, List<FieldSelectInfo> fieldList,
+                                             List<Map<String, Object>> maps) {
+        List<Integer> sensorIDList = sensorList.stream().map(TbSensor::getID).collect(Collectors.toList());
+
+        // 雨量单独处理
+        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
+            // 当前时间
+            DateTime nowDate = DateUtil.date();
+            // 当天早上8点
+            DateTime nowDateEightclock = DateUtil.offsetHour(DateUtil.beginOfDay(nowDate), 8);
+
+            // 如果当前时间小于当天的早上8点,那么就统计昨天的早上8点到凌晨现在的时间
+            if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
+                DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
+                nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
+            }
+            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(sensorIDList, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
+            if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
+                for (Map<String, Object> mapEntry : maps) {
+                    for (Map<String, Object> currentRainMap : currentRainMaps) {
+                        String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
+                        String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
+                        if (currentSid.equals(sid)) {
+                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, currentRainMap.get(DbConstant.CURRENT_RAIN_FALL));
+                            filteredMaps.add(mapEntry);
+                        }
+                    }
+                }
+            }
+            if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
+                for (Map<String, Object> mapEntry : maps) {
+                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0);
+                    filteredMaps.add(mapEntry);
+                }
+            }
+        } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
+
+            // 流量计算
+            maps.forEach(da -> {
+                TbSensor tbSensor = sensorList.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
+                // 将JSON字符串转换为JSON对象
+                if (tbSensor != null) {
+                    da.put(DbConstant.RESERVOIR_AREA, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.area"));
+                    if (!StringUtil.isNullOrEmpty(da.get(DbConstant.RESERVOIR_AREA).toString()) ) {
+                        double area = Double.parseDouble(da.get(DbConstant.RESERVOIR_AREA).toString());
+                        double speed = Double.parseDouble(da.get("speed").toString());
+                        Double result = area * speed;
+                        BigDecimal bd = new BigDecimal(result);
+                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+                        da.put(DbConstant.RESERVOIR_FLOW, rounded);
+                    }
+                }
+//                result.add(da);
+            });
+//            String configFieldValue = sensorList.get(0).getConfigFieldValue();
+
+
+        }
+
 
     }
 
@@ -265,8 +296,10 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     TbSensor tbSensor = snd.getSensorList().get(0);
                     if (!CollectionUtil.isNullOrEmpty(maps)) {
                         Map<String, Object> currentSensorData = maps.stream().filter(m -> m.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(tbSensor.getID())).findFirst().orElse(null);
-                        snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), snd.getMonitorItemID(), currentSensorData));
-                        snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
+                        if (MapUtil.isNotEmpty(currentSensorData)) {
+                            snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), snd.getMonitorItemID(), currentSensorData));
+                            snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
+                        }
                     }
                 }
             }
@@ -467,8 +500,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         vo.setDataUnitList(tbDataUnitList);
         return vo;
     }
-
-
 
 
 }
