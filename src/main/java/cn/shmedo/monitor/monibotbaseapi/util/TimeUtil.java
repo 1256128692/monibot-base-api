@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -11,9 +13,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created 2015/12/15
@@ -388,6 +388,40 @@ public class TimeUtil {
                     "begin=" + begin +
                     ", end=" + end +
                     '}';
+        }
+    }
+
+
+    /**
+     * 对于时间分组的数据进行倒序排序
+     *
+     * @param flag (false:倒序, true:正序)
+     * @return
+     */
+    public static Map<Date, List<Map<String, Object>>> handleTimeSort(List<Map<String, Object>> resultMaps, Boolean flag) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 再将数据以时间进行分组最后返回
+        Map<Date, List<Map<String, Object>>> groupedMaps = new HashMap<>();
+        for (Map<String, Object> map : resultMaps) {
+            String time = (String) map.get(DbConstant.TIME_FIELD);
+            if (groupedMaps.containsKey(time)) {
+                groupedMaps.get(time).add(map);
+            } else {
+                List<Map<String, Object>> list = new ArrayList<>();
+                list.add(map);
+                try {
+                    groupedMaps.put(dateFormat.parse(time), list);
+                } catch (ParseException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        if (flag) {
+            // 正序
+            return MapUtil.sort(groupedMaps, Comparator.naturalOrder());
+        } else {
+            // 倒序
+            return MapUtil.sort(groupedMaps, Comparator.reverseOrder());
         }
     }
 }

@@ -108,13 +108,17 @@ public class SensorDataDaoImpl implements SensorDataDao {
         // 截取最后一个字母,以此来判断查询密度,h:代表小时,d:代表天
         String endStr = density.substring(density.length() - 1, density.length());
 
-        List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-        String measurement = FieldUtil.getMeasurement(fieldTypeCount, raw, flag);
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, flag);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
         String endString = TimeUtil.formatInfluxTimeString(end);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
-        List<String> selectField = FieldUtil.getSelectField(fieldSelectInfoList,flag);
+
+        List<String> selectField = new LinkedList<>();
+        fieldSelectInfoList.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
+
         String sql = null;
         switch (endStr) {
             case "":
@@ -128,7 +132,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
                 break;
         }
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, null);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
     @Override
@@ -165,7 +169,12 @@ public class SensorDataDaoImpl implements SensorDataDao {
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
         StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
+        StringBuilder querySql = new StringBuilder();
+        selectField.forEach(item -> {
+            querySql.append("first(").append(item).append(") as ").append(item).append(",");
+        });
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+//        String selectFieldString = String.join(",", selectField);
         sqlBuilder.append(" select ");
         sqlBuilder.append(selectFieldString);
         sqlBuilder.append(" from  ").append(measurement);
@@ -181,7 +190,12 @@ public class SensorDataDaoImpl implements SensorDataDao {
                                         String endString, String measurement,
                                         List<String> selectField,String density) {
         StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
+        StringBuilder querySql = new StringBuilder();
+        selectField.forEach(item -> {
+            querySql.append("first(").append(item).append(") as ").append(item).append(",");
+        });
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+//        String selectFieldString = String.join(",", selectField);
         sqlBuilder.append(" select ");
         sqlBuilder.append(selectFieldString);
         sqlBuilder.append(" from  ").append(measurement);
@@ -200,7 +214,12 @@ public class SensorDataDaoImpl implements SensorDataDao {
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
         StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
+        StringBuilder querySql = new StringBuilder();
+        selectField.forEach(item -> {
+            querySql.append("first(").append(item).append(") as ").append(item).append(",");
+        });
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+//        String selectFieldString = String.join(",", selectField);
         sqlBuilder.append(" select ");
         sqlBuilder.append(selectFieldString);
         sqlBuilder.append(" from  ").append(measurement);

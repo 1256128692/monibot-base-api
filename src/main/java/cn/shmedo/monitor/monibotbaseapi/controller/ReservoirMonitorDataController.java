@@ -76,87 +76,87 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * "data": [
-     *         {
-     *             "projectID": 220,
-     *             "projectTypeID": 1,
-     *             "monitorPointID": 5,
-     *             "monitorType": 9,
-     *             "projectName": "水库测试项目3（勿删）",
-     *             "projectShortName": "墒情监测项目1",
-     *             "projectTypeName": "水库",
-     *             "monitorPointName": "墒情监测点1",
-     *             "monitorTypeName": "",
-     *             "monitorItemID": 2,
-     *             "monitorItemName": "",
-     *             "monitorItemAlias": "",
-     *             "location": "{\"province\":\"420000\",\"city\":\"420100\",\"area\":\"420115\",\"town\":\"420115404\"}",
-     *             "locationInfo": "江夏梁子湖风景区",
-     *             "gpsLocation": "1",
-     *             "imageLocation": "1",
-     *             "sensorList": [
-     *                 {
-     *                     "projectID": 220,
-     *                     "templateID": 1,
-     *                     "dataSourceID": "111",
-     *                     "dataSourceComposeType": 1,
-     *                     "monitorType": 9,
-     *                     "name": "9_1",
-     *                     "alias": "9_1",
-     *                     "kind": 1,
-     *                     "displayOrder": 6,
-     *                     "monitorPointID": 5,
-     *                     "configFieldValue": "{\"deep\":10}",
-     *                     "exValues": "测试数据",
-     *                     "status": 0,
-     *                     "warnNoData": false,
-     *                     "monitorBeginTime": "2023-03-16 16:24:31",
-     *                     "imagePath": null,
-     *                     "id": 6
-     *                 },
-     *                 {
-     *                     "projectID": 220,
-     *                     "templateID": 1,
-     *                     "dataSourceID": "111",
-     *                     "dataSourceComposeType": 1,
-     *                     "monitorType": 9,
-     *                     "name": "9_2",
-     *                     "alias": "9_2",
-     *                     "kind": 1,
-     *                     "displayOrder": 7,
-     *                     "monitorPointID": 5,
-     *                     "configFieldValue": "{\"deep\":20}",
-     *                     "exValues": "测试数据",
-     *                     "status": 0,
-     *                     "warnNoData": false,
-     *                     "monitorBeginTime": "2023-03-16 16:27:58",
-     *                     "imagePath": null,
-     *                     "id": 7
-     *                 }
-     *             ],
-     *             "multiSensor": true,
-     *             "sensorData": null,
-     *             "multiSensorData": [
-     *                 {
-     *                     "time": "2023-03-16 14:26:03.326",
-     *                     "v1": 21.2,
-     *                     "sensorID": 6
-     *                 },
-     *                 {
-     *                     "time": "2023-03-16 14:26:03.326",
-     *                     "v1": 22.2,
-     *                     "sensorID": 7
-     *                 }
-     *             ],
-     *             "time": "2023-03-16 14:26:03.326",
-     *             "fieldList": [
-     *                 {
-     *                     "fieldToken": "v1",
-     *                     "fieldName": "土壤含水量",
-     *                     "fieldOrder": 1,
-     *                     "fieldType": "DOUBLE",
-     *                 }
-     *             ]
-     *         }]
+     * {
+     * "projectID": 220,
+     * "projectTypeID": 1,
+     * "monitorPointID": 5,
+     * "monitorType": 9,
+     * "projectName": "水库测试项目3（勿删）",
+     * "projectShortName": "墒情监测项目1",
+     * "projectTypeName": "水库",
+     * "monitorPointName": "墒情监测点1",
+     * "monitorTypeName": "",
+     * "monitorItemID": 2,
+     * "monitorItemName": "",
+     * "monitorItemAlias": "",
+     * "location": "{\"province\":\"420000\",\"city\":\"420100\",\"area\":\"420115\",\"town\":\"420115404\"}",
+     * "locationInfo": "江夏梁子湖风景区",
+     * "gpsLocation": "1",
+     * "imageLocation": "1",
+     * "sensorList": [
+     * {
+     * "projectID": 220,
+     * "templateID": 1,
+     * "dataSourceID": "111",
+     * "dataSourceComposeType": 1,
+     * "monitorType": 9,
+     * "name": "9_1",
+     * "alias": "9_1",
+     * "kind": 1,
+     * "displayOrder": 6,
+     * "monitorPointID": 5,
+     * "configFieldValue": "{\"deep\":10}",
+     * "exValues": "测试数据",
+     * "status": 0,
+     * "warnNoData": false,
+     * "monitorBeginTime": "2023-03-16 16:24:31",
+     * "imagePath": null,
+     * "id": 6
+     * },
+     * {
+     * "projectID": 220,
+     * "templateID": 1,
+     * "dataSourceID": "111",
+     * "dataSourceComposeType": 1,
+     * "monitorType": 9,
+     * "name": "9_2",
+     * "alias": "9_2",
+     * "kind": 1,
+     * "displayOrder": 7,
+     * "monitorPointID": 5,
+     * "configFieldValue": "{\"deep\":20}",
+     * "exValues": "测试数据",
+     * "status": 0,
+     * "warnNoData": false,
+     * "monitorBeginTime": "2023-03-16 16:27:58",
+     * "imagePath": null,
+     * "id": 7
+     * }
+     * ],
+     * "multiSensor": true,
+     * "sensorData": null,
+     * "multiSensorData": [
+     * {
+     * "time": "2023-03-16 14:26:03.326",
+     * "v1": 21.2,
+     * "sensorID": 6
+     * },
+     * {
+     * "time": "2023-03-16 14:26:03.326",
+     * "v1": 22.2,
+     * "sensorID": 7
+     * }
+     * ],
+     * "time": "2023-03-16 14:26:03.326",
+     * "fieldList": [
+     * {
+     * "fieldToken": "v1",
+     * "fieldName": "土壤含水量",
+     * "fieldOrder": 1,
+     * "fieldType": "DOUBLE",
+     * }
+     * ]
+     * }]
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */
@@ -268,7 +268,12 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
-     * @apiSuccess (响应结果) {String} fieldList.fieldCalOrder  属性字段排序
+     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * [{
      * "monitorPointID":1,
@@ -283,14 +288,29 @@ public class ReservoirMonitorDataController {
      * "fieldList": [
      * {"fieldToken":"flow","fieldName":"流量"},
      * {"fieldToken":"speed","fieldName":"速度"}
-     * ]
+     * ],
+     * "dataUnitList": [
+     * {
+     * "engUnit": "℃",
+     * "chnUnit": "摄氏度",
+     * "unitClass": "温度",
+     * "unitDesc": "摄氏度",
+     * "id": 3
+     * },
+     * {
+     * "engUnit": "FTU",
+     * "chnUnit": "浊度",
+     * "unitClass": "浊度",
+     * "unitDesc": "浊度",
+     * "id": 16
+     * }]
      * }]
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryMonitorPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
-        return null;
+        return reservoirMonitorService.queryMonitorPointHistoryDataList(pa);
     }
 
     /**
@@ -312,7 +332,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {DateTime} dataList.time     数据采集时间
      * @apiSuccess (响应结果) {Object[]} dataList.timeDataList     时刻数据列表
      * @apiSuccess (响应结果) {Int} dataList.timeDataList.sid      传感器ID
-     * @apiSuccess (响应结果) {Double} dataList.timeDataList.depth    深度
+     * @apiSuccess (响应结果) {Double} dataList.timeDataList.deep    深度
      * @apiSuccess (响应结果) {Double} dataList.timeDataList.value  土壤含水量(%)
      * @apiSuccessExample 响应结果示例
      * {
@@ -321,11 +341,11 @@ public class ReservoirMonitorDataController {
      * "dataList":[
      * {
      * "time":"2023-03-01 02:00:00",
-     * "timeDataList":[{"sid":1,"depth":10,"value":10},{"sid":2,"depth":20,"value":20},{"sid":3,"depth":30,"value":30}]
+     * "timeDataList":[{"sid":1,"deep":10,"value":10},{"sid":2,"deep":20,"value":20},{"sid":3,"deep":30,"value":30}]
      * },
      * {
      * "time":"2023-03-01 04:00:00",
-     * "timeDataList":[{"sid":1,"depth":10,"value":10},{"sid":2,"depth":20,"value":20},{"sid":3,"depth":30,"value":30}]
+     * "timeDataList":[{"sid":1,"deep":10,"value":10},{"sid":2,"deep":20,"value":20},{"sid":3,"deep":30,"value":30}]
      * },
      * ]
      * }
