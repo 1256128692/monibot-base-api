@@ -201,7 +201,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} createType  创建类型
      * @apiParam (请求参数) {Int} calType  计算方式 123 公式，脚本，外部http
      * @apiParam (请求参数) {Int} displayOrder  排序
-     * @apiParam (请求参数) {String} [扩展信息]  存储模板的拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
+     * @apiParam (请求参数) {String} [exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiParam (请求参数) {Object[]} tokenList  标识列表
      * @apiParam (请求参数) {Int} tokenList.datasourceType  12 物联网，监测传感器
      * @apiParam (请求参数) {String} tokenList.token  标识
