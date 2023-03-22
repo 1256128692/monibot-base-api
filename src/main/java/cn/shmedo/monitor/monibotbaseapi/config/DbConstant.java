@@ -20,6 +20,9 @@ public class DbConstant {
 
     public static final String SHANGQING_DEEP = "deep";
 
+    public static final String RESERVOIR_AREA = "area";
+    public static final String RESERVOIR_FLOW = "flow";
+
 
     public static final String CURRENT_RAIN_FALL = "currentRainfall";
 }

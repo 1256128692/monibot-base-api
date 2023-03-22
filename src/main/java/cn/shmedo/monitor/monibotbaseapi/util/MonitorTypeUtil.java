@@ -55,6 +55,17 @@ public class MonitorTypeUtil {
             vo.setFieldExValue("1");
             fieldList.add(vo);
         }
+
+        // 流速
+        if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("flow");
+            vo.setFieldName("流量");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("15");
+            fieldList.add(vo);
+        }
+
         return fieldList;
     }
 }
