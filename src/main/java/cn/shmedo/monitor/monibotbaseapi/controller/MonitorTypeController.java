@@ -85,7 +85,6 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {String} typeName 监测类型名称
-     * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
@@ -380,35 +379,32 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} /QueryFormulaPage 查询公式分页
+     * @api {POST} /QueryMonitorTypeFieldWithFormula 查询监测类型属性与公式
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName QueryFormulaPage
-     * @apiDescription 查询公式分页
+     * @apiName QueryMonitorTypeFieldWithFormula
+     * @apiDescription 查询监测类型属性与公式, 只包含12类型的属性
+     * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {Int} templateID  模板ID
-     * @apiParam (请求参数) {Int} pageSize
-     * @apiParam (请求参数) {Int} currentPage
-     * @apiSuccess (返回结果) {Int} totalCount 数据总量
-     * @apiSuccess (返回结果) {Int} totalPage 总页数
-     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.ID 属性ID
-     * @apiSuccess (返回结果) {String} currentPageData.fieldName 属性名称
-     * @apiSuccess (返回结果) {String} currentPageData.fieldToken 属性标识
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
-     * @apiSuccess (返回结果) {String} currentPageData.fieldDataType 属性数据类型，String，Double，Long
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldUnitID 属性单位ID
-     * @apiSuccess (返回结果) {Int} [currentPageData.parentID] 父属性ID
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldCalOrder 属性计算排序
-     * @apiSuccess (返回结果) {Int} currentPageData.createType 创建类型
-     * @apiSuccess (返回结果) {String} [currentPageData.exValue] 额外属性
-     * @apiSuccess (返回结果) {String} currentPageData.formula  公式字符串
-     * @apiSuccess (返回结果) {String} currentPageData.displayFormula  公式字符串展示用
+     * @apiSuccess (返回结果) {Object[]} list 当前页数据
+     * @apiSuccess (返回结果) {Int} list.ID 属性ID
+     * @apiSuccess (返回结果) {String} list.fieldName 属性名称
+     * @apiSuccess (返回结果) {String} list.fieldToken 属性标识
+     * @apiSuccess (返回结果) {Int} list.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiSuccess (返回结果) {String} list.fieldDataType 属性数据类型，String，Double，Long
+     * @apiSuccess (返回结果) {Int} list.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [list.parentID] 父属性ID
+     * @apiSuccess (返回结果) {Int} list.fieldCalOrder 属性计算排序
+     * @apiSuccess (返回结果) {Int} list.createType 创建类型
+     * @apiSuccess (返回结果) {String} [list.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} list.formula  公式字符串
+     * @apiSuccess (返回结果) {String} list.displayFormula  公式字符串展示用
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
-    @PostMapping(value = "/QueryFormulaPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryFormulaPage(@RequestBody @Validated Object request) {
+    @PostMapping(value = "/QueryMonitorTypeFieldWithFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeFieldWithFormula(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
 
