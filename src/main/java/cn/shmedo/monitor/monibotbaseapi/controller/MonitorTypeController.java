@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import lombok.AllArgsConstructor;
@@ -27,7 +26,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
-     * @apiParam (请求参数) {Boolean} thirdDataSource 开启第三方数据源
+     * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
      * @apiParam (请求参数) {Object[]} fieldList 属性列表
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
@@ -47,6 +46,7 @@ public class MonitorTypeController {
     public Object addPredefinedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /AddCustomizedMonitorType 新增自定义监测类型
      * @apiVersion 1.0.0
@@ -57,7 +57,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
-     * @apiParam (请求参数) {Boolean} thirdDataSource 开启第三方数据源
+     * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
      * @apiParam (请求参数) {Object[]} fieldList 属性列表
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
@@ -77,6 +77,7 @@ public class MonitorTypeController {
     public Object addCustomizedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /AddMonitorTypeField 新增监测类型字段
      * @apiVersion 1.0.0
@@ -89,12 +90,12 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
-     * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
+     * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
-     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性, 可包含默认值，是否多选，可选范围
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
@@ -241,10 +242,14 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
      * @apiSuccess (返回结果) {Int} templateList.tokenList.datasourceType  12 物联网，监测传感器
      * @apiSuccess (返回结果) {String} templateList.tokenList.token  标识
+     * @apiSuccess (返回结果) {String} templateList.tokenList.name  名称
+     * @apiSuccess (返回结果) {String} templateList.tokenList.unit  单位
+     * @apiSuccess (返回结果) {String} templateList.tokenList.desc  描述
      * @apiSuccess (返回结果) {String} [templateList.script]  计算脚本，与公式二选一
      * @apiSuccess (返回结果) {Object[]} [templateList.formulaList]  公式列表
      * @apiSuccess (返回结果) {Int} templateList.formulaList.fieldID  监测类型ID
      * @apiSuccess (返回结果) {String} templateList.formulaList.formula  公式字符串
+     * @apiSuccess (返回结果) {String} templateList.formulaList.displayFormula  展示用公式字符串
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
@@ -258,8 +263,8 @@ public class MonitorTypeController {
      * @api {POST} /AddTemplate  添加模板
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName AddTemplate添加模板
-     * @apiDescription 为监测类型添加模板(模板 + 数据源 + 公式/脚本)
+     * @apiName AddTemplate
+     * @apiDescription 为监测类型添加模板(模板 + 数据源 + 公式 / 脚本)
      * @apiParam (请求参数) {Int} [companyID]  公司ID 预定义该项会设置为-1
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
@@ -275,6 +280,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Object[]} [formulaList]  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
      * @apiParam (请求参数) {String} formulaList.formula  公式字符串
+     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
@@ -315,6 +321,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Object[]} formulaList  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
      * @apiParam (请求参数) {String} formulaList.formula  公式字符串
+     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
@@ -322,6 +329,85 @@ public class MonitorTypeController {
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/SetFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object setFormula(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /QueryFormulaPage 查询公式分页
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryFormulaPage
+     * @apiDescription 查询公式分页
+     * @apiParam (请求参数) {Int} templateID  模板ID
+     * @apiParam (请求参数) {Int} pageSize
+     * @apiParam (请求参数) {Int} currentPage
+     * @apiSuccess (返回结果) {Int} totalCount 数据总量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Object[]} currentPageData  公式列表
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldID  监测类型ID
+     * @apiSuccess (返回结果) {String} currentPageData.formula  公式字符串
+     * @apiSuccess (返回结果) {String} currentPageData.displayFormula  公式字符串展示用
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/QueryFormulaPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryFormulaPage(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /SetParam  设置参数
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName SetParam
+     * @apiDescription 为公式，脚本，传感器设置参数, 覆盖处理
+     * @apiParam (请求参数) {Int} companyID  公司ID
+     * @apiParam (请求参数) {Int} subjectType  类型123 公式脚本传感器
+     * @apiParam (请求参数) {Object[]} paramList  标识列表
+     * @apiParam (请求参数) {Int} paramList.subjectID  主体ID
+     * @apiParam (请求参数) {String} paramList.dataType  数据类型 String,Double,Long
+     * @apiParam (请求参数) {Int} paramList.token  参数标识
+     * @apiParam (请求参数) {String} paramList.name  参数名称
+     * @apiParam (请求参数) {String} paramList.paValue  参数值
+     * @apiParam (请求参数) {String} paramList.paUnitID  参数单位
+     * @apiParam (请求参数) {String} [paramList.paDesc] 参数描述
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/SetParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object setParam(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /QueryParam  查询参数
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryParam
+     * @apiDescription 查询参数
+     * @apiParam (请求参数) {Int} companyID  公司ID
+     * @apiParam (请求参数) {Int} subjectType  类型123 公式脚本传感器
+     * @apiParam (请求参数) {String[]} subjectTokenList  主体IDList
+     * @apiSuccess (返回结果) {String[]} paramList  参数列表
+     * @apiSuccess (返回结果) {Int} paramList.subjectID  主体ID
+     * @apiSuccess (返回结果) {String} paramList.dataType  数据类型 String,Double,Long
+     * @apiSuccess (返回结果) {Int} paramList.token  参数标识
+     * @apiSuccess (返回结果) {String} paramList.name  参数名称
+     * @apiSuccess (返回结果) {String} paramList.paValue  参数值
+     * @apiSuccess (返回结果) {String} paramList.paUnitID  参数单位
+     * @apiSuccess (返回结果) {String} [paramList.paDesc] 参数描述
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/QueryParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryParam(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
 }

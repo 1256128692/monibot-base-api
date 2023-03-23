@@ -10,14 +10,15 @@
     <result column="TypeAlias" jdbcType="VARCHAR" property="typeAlias" />
     <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
     <result column="MultiSensor" jdbcType="BIT" property="multiSensor" />
+    <result column="ApiDatasource" jdbcType="BIT" property="apiDatasource" />
     <result column="CreateType" jdbcType="TINYINT" property="createType" />
     <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
     <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, CreateType, CompanyID, 
-    ExValues
+    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, ApiDatasource, CreateType, 
+    CompanyID, ExValues
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -34,11 +35,13 @@
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_monitor_type (MonitorType, TypeName, TypeAlias, 
-      DisplayOrder, MultiSensor, CreateType, 
-      CompanyID, ExValues)
+      DisplayOrder, MultiSensor, ApiDatasource, 
+      CreateType, CompanyID, ExValues
+      )
     values (#{monitorType,jdbcType=INTEGER}, #{typeName,jdbcType=VARCHAR}, #{typeAlias,jdbcType=VARCHAR}, 
-      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{createType,jdbcType=TINYINT}, 
-      #{companyID,jdbcType=INTEGER}, #{exValues,jdbcType=VARCHAR})
+      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{apiDatasource,jdbcType=BIT}, 
+      #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, #{exValues,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -58,6 +61,9 @@
       </if>
       <if test="multiSensor != null">
         MultiSensor,
+      </if>
+      <if test="apiDatasource != null">
+        ApiDatasource,
       </if>
       <if test="createType != null">
         CreateType,
@@ -84,6 +90,9 @@
       </if>
       <if test="multiSensor != null">
         #{multiSensor,jdbcType=BIT},
+      </if>
+      <if test="apiDatasource != null">
+        #{apiDatasource,jdbcType=BIT},
       </if>
       <if test="createType != null">
         #{createType,jdbcType=TINYINT},
@@ -115,6 +124,9 @@
       <if test="multiSensor != null">
         MultiSensor = #{multiSensor,jdbcType=BIT},
       </if>
+      <if test="apiDatasource != null">
+        ApiDatasource = #{apiDatasource,jdbcType=BIT},
+      </if>
       <if test="createType != null">
         CreateType = #{createType,jdbcType=TINYINT},
       </if>
@@ -135,6 +147,7 @@
       TypeAlias = #{typeAlias,jdbcType=VARCHAR},
       DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       MultiSensor = #{multiSensor,jdbcType=BIT},
+      ApiDatasource = #{apiDatasource,jdbcType=BIT},
       CreateType = #{createType,jdbcType=TINYINT},
       CompanyID = #{companyID,jdbcType=INTEGER},
       ExValues = #{exValues,jdbcType=VARCHAR}

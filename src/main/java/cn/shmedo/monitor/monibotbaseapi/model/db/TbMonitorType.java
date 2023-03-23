@@ -1,63 +1,139 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
-import java.io.Serializable;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
-    * 监测类型
-    */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class TbMonitorType implements Serializable {
+ * 监测类型
+ */
+public class TbMonitorType {
+    private static final long serialVersionUID = 1L;
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 小于10000是预定义预留
-
-整个系统内不重复
-    */
+     * 小于10000是预定义预留
+     * <p>
+     * 整个系统内不重复
+     */
     private Integer monitorType;
 
     /**
-    * 监测类型名称
-    */
+     * 监测类型名称
+     */
     private String typeName;
 
     /**
-    * 监测类型别名
-    */
+     * 监测类型别名
+     */
     private String typeAlias;
 
     /**
-    * 排序字段
-    */
+     * 排序字段
+     */
     private Integer displayOrder;
 
     /**
-    * 监测点允许关联多传感器标识
-    */
+     * 监测点允许关联多传感器标识
+     */
     private Boolean multiSensor;
 
     /**
-    * 创建类型
-    */
+     * 允许api数据源
+     */
+    private Boolean apiDatasource;
+
+    /**
+     * 创建类型
+     */
     private Byte createType;
 
     /**
-    * 公司ID，预定义监测类型为-1
-    */
+     * 公司ID，预定义监测类型为-1
+     */
     private Integer companyID;
 
     /**
-    * 拓展字段
-    */
+     * 拓展字段
+     */
     private String exValues;
 
-    private static final long serialVersionUID = 1L;
+    public Integer getID() {
+        return ID;
+    }
+
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
+
+    public Integer getMonitorType() {
+        return monitorType;
+    }
+
+    public void setMonitorType(Integer monitorType) {
+        this.monitorType = monitorType;
+    }
+
+    public String getTypeName() {
+        return typeName;
+    }
+
+    public void setTypeName(String typeName) {
+        this.typeName = typeName;
+    }
+
+    public String getTypeAlias() {
+        return typeAlias;
+    }
+
+    public void setTypeAlias(String typeAlias) {
+        this.typeAlias = typeAlias;
+    }
+
+    public Integer getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public void setDisplayOrder(Integer displayOrder) {
+        this.displayOrder = displayOrder;
+    }
+
+    public Boolean getMultiSensor() {
+        return multiSensor;
+    }
+
+    public void setMultiSensor(Boolean multiSensor) {
+        this.multiSensor = multiSensor;
+    }
+
+    public Boolean getApiDatasource() {
+        return apiDatasource;
+    }
+
+    public void setApiDatasource(Boolean apiDatasource) {
+        this.apiDatasource = apiDatasource;
+    }
+
+    public Byte getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Byte createType) {
+        this.createType = createType;
+    }
+
+    public Integer getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(Integer companyID) {
+        this.companyID = companyID;
+    }
+
+    public String getExValues() {
+        return exValues;
+    }
+
+    public void setExValues(String exValues) {
+        this.exValues = exValues;
+    }
 }

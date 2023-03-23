@@ -1,54 +1,54 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 /**
-    * 参数表
-    */
+ * 参数表
+ */
 public class TbParameter {
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 主体ID
-    */
-    private String subjectToken;
+     * 主体ID
+     */
+    private Integer subjectID;
 
     /**
-    * 主体类型 1 - 公式
-2 - 脚本
-3 - 传感器
-    */
+     * 主体类型 1 - 公式
+     * 2 - 脚本
+     * 3 - 传感器
+     */
     private Integer subjectType;
 
     /**
-    * 数据类型，String,Double,Long
-    */
+     * 数据类型，String,Double,Long
+     */
     private String dataType;
 
     /**
-    * 参数标识
-    */
+     * 参数标识
+     */
     private String token;
 
     /**
-    * 参数名称
-    */
+     * 参数名称
+     */
     private String name;
 
     /**
-    * 参数默认值
-    */
+     * 参数默认值
+     */
     private String paValue;
 
     /**
-    * 计量单位ID
-    */
+     * 计量单位ID
+     */
     private Integer paUnitID;
 
     /**
-    * 参数描述
-    */
+     * 参数描述
+     */
     private String paDesc;
 
     public Integer getID() {
@@ -59,12 +59,12 @@ public class TbParameter {
         this.ID = ID;
     }
 
-    public String getSubjectToken() {
-        return subjectToken;
+    public Integer getSubjectID() {
+        return subjectID;
     }
 
-    public void setSubjectToken(String subjectToken) {
-        this.subjectToken = subjectToken;
+    public void setSubjectID(Integer subjectID) {
+        this.subjectID = subjectID;
     }
 
     public Integer getSubjectType() {

@@ -5,7 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table tb_parameter-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="SubjectToken" jdbcType="VARCHAR" property="subjectToken" />
+    <result column="SubjectID" jdbcType="INTEGER" property="subjectID" />
     <result column="SubjectType" jdbcType="INTEGER" property="subjectType" />
     <result column="DataType" jdbcType="VARCHAR" property="dataType" />
     <result column="Token" jdbcType="VARCHAR" property="token" />
@@ -16,7 +16,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, SubjectToken, SubjectType, DataType, Token, `Name`, PaValue, PaUnitID, PaDesc
+    ID, SubjectID, SubjectType, DataType, Token, `Name`, PaValue, PaUnitID, PaDesc
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -32,10 +32,10 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_parameter (SubjectToken, SubjectType, DataType, 
+    insert into tb_parameter (SubjectID, SubjectType, DataType, 
       Token, `Name`, PaValue, 
       PaUnitID, PaDesc)
-    values (#{subjectToken,jdbcType=VARCHAR}, #{subjectType,jdbcType=INTEGER}, #{dataType,jdbcType=VARCHAR}, 
+    values (#{subjectID,jdbcType=INTEGER}, #{subjectType,jdbcType=INTEGER}, #{dataType,jdbcType=VARCHAR}, 
       #{token,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{paValue,jdbcType=VARCHAR}, 
       #{paUnitID,jdbcType=INTEGER}, #{paDesc,jdbcType=VARCHAR})
   </insert>
@@ -43,8 +43,8 @@
     <!--@mbg.generated-->
     insert into tb_parameter
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="subjectToken != null">
-        SubjectToken,
+      <if test="subjectID != null">
+        SubjectID,
       </if>
       <if test="subjectType != null">
         SubjectType,
@@ -69,8 +69,8 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="subjectToken != null">
-        #{subjectToken,jdbcType=VARCHAR},
+      <if test="subjectID != null">
+        #{subjectID,jdbcType=INTEGER},
       </if>
       <if test="subjectType != null">
         #{subjectType,jdbcType=INTEGER},
@@ -99,8 +99,8 @@
     <!--@mbg.generated-->
     update tb_parameter
     <set>
-      <if test="subjectToken != null">
-        SubjectToken = #{subjectToken,jdbcType=VARCHAR},
+      <if test="subjectID != null">
+        SubjectID = #{subjectID,jdbcType=INTEGER},
       </if>
       <if test="subjectType != null">
         SubjectType = #{subjectType,jdbcType=INTEGER},
@@ -129,7 +129,7 @@
   <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
     <!--@mbg.generated-->
     update tb_parameter
-    set SubjectToken = #{subjectToken,jdbcType=VARCHAR},
+    set SubjectID = #{subjectID,jdbcType=INTEGER},
       SubjectType = #{subjectType,jdbcType=INTEGER},
       DataType = #{dataType,jdbcType=VARCHAR},
       Token = #{token,jdbcType=VARCHAR},
