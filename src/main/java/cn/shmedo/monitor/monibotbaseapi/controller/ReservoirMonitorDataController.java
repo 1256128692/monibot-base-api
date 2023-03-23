@@ -354,7 +354,7 @@ public class ReservoirMonitorDataController {
      */
     @RequestMapping(value = "/QuerySmcPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySmcPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
-        return null;
+        return reservoirMonitorService.querySmcPointHistoryDataList(pa);
     }
 
 
@@ -463,6 +463,38 @@ public class ReservoirMonitorDataController {
     @RequestMapping(value = "/QueryMonitorPointListHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return null;
+    }
+
+
+
+    /**
+     * @api {POST} /QueryMonitorPointBaseInfoList 查询监测点基本信息
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点数据模块
+     * @apiDescription 查询监测点基本信息
+     * @apiName QueryMonitorPointBaseInfoList
+     * @apiParam (请求体) {Int} projectID  工程ID
+     * @apiParamExample 请求体示例
+     * {"projectID":"1"}
+     * @apiSuccess (响应结果) {Object} data   结果数据
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitorTypes   监测类型列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitorItems.monitorType   监测类型
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.typeName   监测类型名称
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.typeAlias   监测类型别名
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitorItems   监测项目列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitorItems.ID   监测项目id
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.name   监测项目名称
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.alias   监测项目别名
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitors   监测点列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitors.ID   监测点id
+     * @apiSuccess (响应结果) {String} data.tbMonitors.name   监测点名称
+     * @apiSuccessExample 响应结果示例
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    @RequestMapping(value = "/QueryMonitorPointBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointBaseInfoList(@Validated @RequestBody QueryMonitorPointBaseInfoListParam pa) {
+        return reservoirMonitorService.queryMonitorPointBaseInfoList(pa.getProjectID());
     }
 
 }

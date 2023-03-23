@@ -14,6 +14,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created 2015/12/15
@@ -404,16 +405,16 @@ public class TimeUtil {
         Map<Date, List<Map<String, Object>>> groupedMaps = new HashMap<>();
         for (Map<String, Object> map : resultMaps) {
             String time = (String) map.get(DbConstant.TIME_FIELD);
-            if (groupedMaps.containsKey(time)) {
-                groupedMaps.get(time).add(map);
-            } else {
-                List<Map<String, Object>> list = new ArrayList<>();
-                list.add(map);
-                try {
+            try {
+                if (groupedMaps.containsKey(dateFormat.parse(time))) {
+                    groupedMaps.get(dateFormat.parse(time)).add(map);
+                } else {
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    list.add(map);
                     groupedMaps.put(dateFormat.parse(time), list);
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
                 }
+            } catch (ParseException e) {
+                throw new RuntimeException(e);
             }
         }
         if (flag) {

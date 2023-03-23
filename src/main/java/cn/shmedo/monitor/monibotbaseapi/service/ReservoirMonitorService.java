@@ -2,10 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointDescribeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointSensorDataListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.StatisticsMonitorPointTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointHistoryData;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointTypeStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.SensorNewDataInfo;
 
@@ -22,5 +21,9 @@ public interface ReservoirMonitorService {
 
     MonitorPointTypeStatisticsInfo queryMonitorPointTypeStatistics(StatisticsMonitorPointTypeParam pa);
 
-    Object queryMonitorPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
+    MonitorPointHistoryData queryMonitorPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
+
+    Object querySmcPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
+
+    MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID);
 }
