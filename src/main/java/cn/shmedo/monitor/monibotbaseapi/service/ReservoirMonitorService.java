@@ -23,7 +23,9 @@ public interface ReservoirMonitorService {
 
     MonitorPointHistoryData queryMonitorPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
 
-    Object querySmcPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
+    MonitorPointHistoryData querySmcPointHistoryDataList(QuerySmcPointHistoryDataListParam pa);
 
     MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID);
+
+    MonitorPointHistoryData queryRainPointHistoryDataList(QueryMonitorPointSensorDataListParam pa);
 }

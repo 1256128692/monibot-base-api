@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.response;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataUnit;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +17,9 @@ import java.util.Map;
 @NoArgsConstructor
 public class MonitorPointHistoryData {
 
+    private TbMonitorPoint monitorPoint;
+
+    private List<TbSensor> sensorList;
 
     /**
      * 以time为分组的传感器历史数据

@@ -4,6 +4,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 public interface TbMonitorPointMapper  extends BaseMapper<TbMonitorPoint> {
     int deleteByPrimaryKey(Integer ID);
 
@@ -16,4 +18,6 @@ public interface TbMonitorPointMapper  extends BaseMapper<TbMonitorPoint> {
     int updateByPrimaryKeySelective(TbMonitorPoint record);
 
     int updateByPrimaryKey(TbMonitorPoint record);
+
+    List<TbMonitorPoint> selectMonitorTypeAndProIDByCompanyID(Integer companyID);
 }
