@@ -49,8 +49,9 @@ public class MonitorTypeController {
     public Object addMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
-     * @api {POST} / AddMonitorTypeField 新增监测类型字段
+     * @api {POST} /AddMonitorTypeField 新增监测类型字段
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName AddMonitorTypeField
@@ -68,6 +69,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
      * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
@@ -75,8 +77,9 @@ public class MonitorTypeController {
     public Object addMonitorTypeField(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
-     * @api {POST} / DeleteMonitorTypeFieldBatch 批量删除监测类型字段
+     * @api {POST} /DeleteMonitorTypeFieldBatch 批量删除监测类型字段
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName DeleteMonitorTypeFieldBatch
@@ -85,6 +88,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Int[]} templateFieldIDList  模板字段ID列表
      * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
@@ -92,6 +96,7 @@ public class MonitorTypeController {
     public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /QueryMonitorTypePage 查询监测类型分页
      * @apiVersion 1.0.0
@@ -155,7 +160,7 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} / 推荐监测类型
+     * @api {POST} /QueryRecommendedMonitorType 推荐监测类型
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName QueryRecommendedMonitorType
@@ -172,14 +177,48 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} / QueryMonitorTypeDetail 查看监测类型详情
+     * @api {POST} /QueryMonitorTypeDetail 查看监测类型详情
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypeDetail
      * @apiDescription 查看监测类型详情
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
-     * @apiSuccess (返回结果) {Int} monitorType xx
+     * @apiSuccess (返回结果) {Int} ID 监测类型ID
+     * @apiSuccess (返回结果) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {String} typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Int} createType 定义类型
+     * @apiSuccess (返回结果) {Boolean} multiSensor 多传感器么
+     * @apiSuccess (返回结果) {Int} datasourceCount 数据源个数
+     * @apiSuccess (返回结果) {Object[]} fieldList 属性列表
+     * @apiSuccess (返回结果) {Int} fieldList.ID 属性ID
+     * @apiSuccess (返回结果) {String} fieldList.fieldName 属性名称
+     * @apiSuccess (返回结果) {String} fieldList.fieldToken 属性标识
+     * @apiSuccess (返回结果) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiSuccess (返回结果) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
+     * @apiSuccess (返回结果) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [fieldList.parentID] 父属性ID
+     * @apiSuccess (返回结果) {Int} fieldList.fieldCalOrder 属性计算排序
+     * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型
+     * @apiSuccess (返回结果) {String} [fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} [fieldList.desc] 描述
+     * @apiSuccess (返回结果) {Object[]} templateList 模板列表
+     * @apiSuccess (返回结果) {Boolean} templateList.defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
+     * @apiSuccess (返回结果) {Int} templateList.monitorType  监测类型
+     * @apiSuccess (返回结果) {String} templateList.name  模板名称
+     * @apiSuccess (返回结果) {Int} templateList.createType  创建类型
+     * @apiSuccess (返回结果) {Int} templateList.calType  计算方式 123 公式，脚本，外部http
+     * @apiSuccess (返回结果) {Int} templateList.displayOrder  排序
+     * @apiSuccess (返回结果) {String} [exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
+     * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
+     * @apiSuccess (返回结果) {Int} templateList.tokenList.datasourceType  12 物联网，监测传感器
+     * @apiSuccess (返回结果) {String} templateList.tokenList.token  标识
+     * @apiSuccess (返回结果) {String} [templateList.script]  计算脚本，与公式二选一
+     * @apiSuccess (返回结果) {Object[]} [templateList.formulaList]  公式列表
+     * @apiSuccess (返回结果) {Int} templateList.formulaList.fieldID  监测类型ID
+     * @apiSuccess (返回结果) {String} templateList.formulaList.formula  公式字符串
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
@@ -189,11 +228,11 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} / AddTemplate  添加模板
+     * @api {POST} /AddTemplate  添加模板
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName AddTemplate添加模板
-     * @apiDescription 为监测类型添加模板(模板 + 数据源)
+     * @apiDescription 为监测类型添加模板(模板 + 数据源 + 公式/脚本)
      * @apiParam (请求参数) {Int} [companyID]  公司ID 预定义该项会设置为-1
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
@@ -205,10 +244,12 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Object[]} tokenList  标识列表
      * @apiParam (请求参数) {Int} tokenList.datasourceType  12 物联网，监测传感器
      * @apiParam (请求参数) {String} tokenList.token  标识
+     * @apiParam (请求参数) {String} [script]  计算脚本，与公式二选一
      * @apiParam (请求参数) {Object[]} [formulaList]  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
      * @apiParam (请求参数) {String} formulaList.formula  公式字符串
      * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
@@ -216,8 +257,9 @@ public class MonitorTypeController {
     public Object addTemplate(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
-     * @api {POST} / DeleteTemplateBatch 批量删除模板
+     * @api {POST} /DeleteTemplateBatch 批量删除模板
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName DeleteTemplateBatch
@@ -225,6 +267,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int[]} templateIDList  模板ID列表
      * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
@@ -232,8 +275,9 @@ public class MonitorTypeController {
     public Object deleteTemplateBatch(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
-     * @api {POST} / SetFormula 设置计算公式
+     * @api {POST} /SetFormula 设置计算公式
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName SetFormula
@@ -245,6 +289,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
      * @apiParam (请求参数) {String} formulaList.formula  公式字符串
      * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
