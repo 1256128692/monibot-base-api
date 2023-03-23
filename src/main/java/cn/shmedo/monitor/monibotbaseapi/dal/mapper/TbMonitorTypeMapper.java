@@ -2,11 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 
-public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
+public interface TbMonitorTypeMapper {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorType record);

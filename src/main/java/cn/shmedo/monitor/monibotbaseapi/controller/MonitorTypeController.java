@@ -33,7 +33,6 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
-     * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
@@ -54,7 +53,7 @@ public class MonitorTypeController {
      * @apiName AddMonitorType
      * @apiDescription 新增自定义监测类型
      * @apiParam (请求参数) {Int} companyID
-     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
@@ -64,7 +63,6 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
-     * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
@@ -77,13 +75,56 @@ public class MonitorTypeController {
     public Object addCustomizedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
-
     /**
-     * @api {POST} /AddMonitorTypeField 新增监测类型字段
+     * @api {POST} /UpdateCustomizedMonitorType 更新自定义监测类型
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName UpdateCustomizedMonitorType
+     * @apiDescription 更新自定义监测类型
+     * @apiParam (请求参数) {Int} companyID
+     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {String} typeName 监测类型名称
+     * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
+     * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/UpdateCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateCustomizedMonitorType(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
+    /**
+     * @api {POST} /UpdateCustomizedMonitorTypeField 更新自定义监测类型属性
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName UpdateCustomizedMonitorTypeField
+     * @apiDescription 更新自定义监测类型属性
+     * @apiParam (请求参数) {Int} companyID
+     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {Object[]} fieldList 属性列表
+     * @apiParam (请求参数) {Int} fieldList.ID 属性ID
+     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
+     * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
+     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
+     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/UpdateCustomizedMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateCustomizedMonitorTypeField(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
+    /**
+     * @api {POST} /AddMonitorTypeField 新增监测类型属性
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName AddMonitorTypeField
-     * @apiDescription 新增监测类型字段 （需要校验未设置模板？）
+     * @apiDescription 新增监测类型属性 （需要校验未设置模板？）
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Object[]} fieldList 属性列表
@@ -107,14 +148,14 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} /DeleteMonitorTypeFieldBatch 批量删除监测类型字段
+     * @api {POST} /DeleteMonitorTypeFieldBatch 批量删除监测类型属性
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName DeleteMonitorTypeFieldBatch
-     * @apiDescription 批量删除监测类型字段 （需要校验未设置模板？）
+     * @apiDescription 批量删除监测类型属性 （需要校验未设置模板？）
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
-     * @apiParam (请求参数) {Int[]} templateFieldIDList  模板字段ID列表
+     * @apiParam (请求参数) {Int[]} templateFieldIDList  模板属性ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
@@ -132,10 +173,11 @@ public class MonitorTypeController {
      * @apiName QueryMonitorTypePage
      * @apiDescription 查询监测类型分页
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} [createType] 定义类型，01预定义自定义
+     * @apiParam (请求参数) {Int} [createType] 定义类型，01预定义自定义, 注意排序，自定义在前
      * @apiParam (请求参数) {String} [fuzzyTypeName] 模糊监测类型名称
-     * @apiParam (请求参数) {String} [fuzzyFieldName] 模糊字段名称
-     * @apiParam (请求参数) {String} [fuzzyFieldDesc] 模糊字段描述
+     * @apiParam (请求参数) {String} [fuzzyFieldName] 模糊属性名称
+     * @apiParam (请求参数) {String} [fuzzyFieldToken] 模糊字段属性
+     * @apiParam (请求参数) {Boolean} [allFiled] 全属性，否则fieldClass只展示12
      * @apiParam (请求参数) {Int} pageSize
      * @apiParam (请求参数) {Int} currentPage
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -210,7 +252,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypeDetail
      * @apiDescription 查看监测类型详情
-     * @apiParam (请求参数) {Int} companyID  公司ID
+     * @apiParam (请求参数) {Int} [companyID]  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiSuccess (返回结果) {Int} ID 监测类型ID
      * @apiSuccess (返回结果) {Int} monitorType 监测类型
@@ -231,6 +273,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型
      * @apiSuccess (返回结果) {String} [fieldList.exValue] 额外属性
      * @apiSuccess (返回结果) {String} [fieldList.desc] 描述
+     * @apiSuccess (返回结果) {Object[]} class3FieldList 类型3属性列表，字段与fieldList一致
      * @apiSuccess (返回结果) {Object[]} templateList 模板列表
      * @apiSuccess (返回结果) {Boolean} templateList.defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiSuccess (返回结果) {Int} templateList.monitorType  监测类型
@@ -269,8 +312,9 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {String} name  模板名称
-     * @apiParam (请求参数) {Int} createType  创建类型
-     * @apiParam (请求参数) {Int} calType  计算方式 123 公式，脚本，外部http
+     * @apiParam (请求参数) {Int} createType  创建类型  DataSourceComposeType
+     * @apiParam (请求参数) {Int}  dataSourceComposeType  模板数据来源类型 1单一物模型单一传感器,2多个物联网传感器（同一物模型多个或者不同物模型多个）3物联网传感器+监测传感器4单个监测传感器5多个监测传感器,100API 推送500 - 人工监测数据
+     * @apiParam (请求参数) {Int} [calType]  计算方式 1,2,3,-1 公式，脚本，外部http，不设置计算
      * @apiParam (请求参数) {Int} displayOrder  排序
      * @apiParam (请求参数) {String} [exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiParam (请求参数) {Object[]} tokenList  标识列表
@@ -344,11 +388,18 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Object[]} currentPageData  公式列表
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldID  监测类型ID
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 属性ID
+     * @apiSuccess (返回结果) {String} currentPageData.fieldName 属性名称
+     * @apiSuccess (返回结果) {String} currentPageData.fieldToken 属性标识
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiSuccess (返回结果) {String} currentPageData.fieldDataType 属性数据类型，String，Double，Long
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [currentPageData.parentID] 父属性ID
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldCalOrder 属性计算排序
+     * @apiSuccess (返回结果) {Int} currentPageData.createType 创建类型
+     * @apiSuccess (返回结果) {String} [currentPageData.exValue] 额外属性
      * @apiSuccess (返回结果) {String} currentPageData.formula  公式字符串
      * @apiSuccess (返回结果) {String} currentPageData.displayFormula  公式字符串展示用
-     * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
@@ -401,7 +452,6 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} paramList.paValue  参数值
      * @apiSuccess (返回结果) {String} paramList.paUnitID  参数单位
      * @apiSuccess (返回结果) {String} [paramList.paDesc] 参数描述
-     * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
@@ -410,4 +460,5 @@ public class MonitorTypeController {
     public Object queryParam(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
 }

@@ -1,37 +1,42 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 /**
-    * 模板公式
-    */
+ * 模板公式
+ */
 public class TbTemplateFormula {
     /**
-    * 主键
-    */
+     * 主键
+     */
     private Integer ID;
 
     /**
-    * 监测类型模板ID
-    */
+     * 监测类型模板ID
+     */
     private Integer templateID;
 
     /**
-    * 监测类型
-    */
+     * 监测类型
+     */
     private Integer monitorType;
 
     /**
-    * 字段ID
-    */
+     * 字段ID
+     */
     private Integer fieldID;
 
     /**
-    * 显示公式表达式
-    */
+     * 计算排序字段
+     */
+    private Integer fieldCalOrder;
+
+    /**
+     * 显示公式表达式
+     */
     private String displayFormula;
 
     /**
-    * 计算公式表达式
-    */
+     * 计算公式表达式
+     */
     private String formula;
 
     public Integer getID() {
@@ -64,6 +69,14 @@ public class TbTemplateFormula {
 
     public void setFieldID(Integer fieldID) {
         this.fieldID = fieldID;
+    }
+
+    public Integer getFieldCalOrder() {
+        return fieldCalOrder;
+    }
+
+    public void setFieldCalOrder(Integer fieldCalOrder) {
+        this.fieldCalOrder = fieldCalOrder;
     }
 
     public String getDisplayFormula() {

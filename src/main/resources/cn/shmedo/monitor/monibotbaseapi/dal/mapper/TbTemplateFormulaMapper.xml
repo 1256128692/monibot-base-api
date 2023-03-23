@@ -8,12 +8,13 @@
     <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
     <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
     <result column="FieldID" jdbcType="INTEGER" property="fieldID" />
+    <result column="FieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder" />
     <result column="DisplayFormula" jdbcType="VARCHAR" property="displayFormula" />
     <result column="Formula" jdbcType="VARCHAR" property="formula" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, TemplateID, MonitorType, FieldID, DisplayFormula, Formula
+    ID, TemplateID, MonitorType, FieldID, FieldCalOrder, DisplayFormula, Formula
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -30,9 +31,11 @@
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_template_formula (TemplateID, MonitorType, FieldID, 
-      DisplayFormula, Formula)
+      FieldCalOrder, DisplayFormula, Formula
+      )
     values (#{templateID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, #{fieldID,jdbcType=INTEGER}, 
-      #{displayFormula,jdbcType=VARCHAR}, #{formula,jdbcType=VARCHAR})
+      #{fieldCalOrder,jdbcType=INTEGER}, #{displayFormula,jdbcType=VARCHAR}, #{formula,jdbcType=VARCHAR}
+      )
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -46,6 +49,9 @@
       </if>
       <if test="fieldID != null">
         FieldID,
+      </if>
+      <if test="fieldCalOrder != null">
+        FieldCalOrder,
       </if>
       <if test="displayFormula != null">
         DisplayFormula,
@@ -63,6 +69,9 @@
       </if>
       <if test="fieldID != null">
         #{fieldID,jdbcType=INTEGER},
+      </if>
+      <if test="fieldCalOrder != null">
+        #{fieldCalOrder,jdbcType=INTEGER},
       </if>
       <if test="displayFormula != null">
         #{displayFormula,jdbcType=VARCHAR},
@@ -85,6 +94,9 @@
       <if test="fieldID != null">
         FieldID = #{fieldID,jdbcType=INTEGER},
       </if>
+      <if test="fieldCalOrder != null">
+        FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
+      </if>
       <if test="displayFormula != null">
         DisplayFormula = #{displayFormula,jdbcType=VARCHAR},
       </if>
@@ -100,6 +112,7 @@
     set TemplateID = #{templateID,jdbcType=INTEGER},
       MonitorType = #{monitorType,jdbcType=INTEGER},
       FieldID = #{fieldID,jdbcType=INTEGER},
+      FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
       DisplayFormula = #{displayFormula,jdbcType=VARCHAR},
       Formula = #{formula,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
