@@ -75,6 +75,7 @@ public class MonitorTypeController {
     public Object addCustomizedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /UpdateCustomizedMonitorType 更新自定义监测类型
      * @apiVersion 1.0.0
@@ -95,6 +96,7 @@ public class MonitorTypeController {
     public Object updateCustomizedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /UpdateCustomizedMonitorTypeField 更新自定义监测类型属性
      * @apiVersion 1.0.0
@@ -119,6 +121,7 @@ public class MonitorTypeController {
     public Object updateCustomizedMonitorTypeField(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /AddMonitorTypeField 新增监测类型属性
      * @apiVersion 1.0.0

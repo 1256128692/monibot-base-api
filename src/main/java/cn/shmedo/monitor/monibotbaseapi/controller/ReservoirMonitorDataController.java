@@ -423,7 +423,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
-     * @apiSuccessExample 响应结果示例
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
