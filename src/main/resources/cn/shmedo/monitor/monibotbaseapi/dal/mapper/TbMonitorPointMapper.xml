@@ -224,4 +224,13 @@
       UpdateUserID = #{updateUserID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+
+
+  <select id="selectMonitorTypeAndProIDByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+      select ProjectID,
+             MonitorType
+      from tb_monitor_point
+      where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID})
+  </select>
 </mapper>

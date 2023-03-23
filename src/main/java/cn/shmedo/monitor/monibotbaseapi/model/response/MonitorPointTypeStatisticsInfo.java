@@ -13,5 +13,5 @@ public class MonitorPointTypeStatisticsInfo {
 
     private List<MonitorTypeBaseInfo> typeInfoList;
 
-    private WarnInfo warnInfo;
+
 }
