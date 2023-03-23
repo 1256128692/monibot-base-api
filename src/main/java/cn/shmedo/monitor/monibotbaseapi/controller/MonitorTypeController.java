@@ -19,15 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MonitorTypeController {
     /**
-     * @api {POST} /AddMonitorType 新增监测类型
+     * @api {POST} /AddPredefinedMonitorType 新增预定义监测类型
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName AddMonitorType
-     * @apiDescription 新增监测类型
-     * @apiParam (请求参数) {Int} companyID
+     * @apiName AddPredefinedMonitorType
+     * @apiDescription 新增预定义监测类型
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {String} typeName 监测类型名称
-     * @apiParam (请求参数) {Int} createType 定义类型
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} thirdDataSource 开启第三方数据源
      * @apiParam (请求参数) {Object[]} fieldList 属性列表
@@ -45,11 +43,40 @@ public class MonitorTypeController {
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
-    @PostMapping(value = "/AddMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addMonitorType(@RequestBody @Validated Object request) {
+    @PostMapping(value = "/AddPredefinedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addPredefinedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
-
+    /**
+     * @api {POST} /AddCustomizedMonitorType 新增自定义监测类型
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName AddMonitorType
+     * @apiDescription 新增自定义监测类型
+     * @apiParam (请求参数) {Int} companyID
+     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {String} typeName 监测类型名称
+     * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
+     * @apiParam (请求参数) {Boolean} thirdDataSource 开启第三方数据源
+     * @apiParam (请求参数) {Object[]} fieldList 属性列表
+     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
+     * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
+     * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
+     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
+     * @apiParam (请求参数) {Int} fieldList.createType 创建类型
+     * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
+     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 xx
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/AddCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addCustomizedMonitorType(@RequestBody @Validated Object request) {
+        return ResultWrapper.successWithNothing();
+    }
     /**
      * @api {POST} /AddMonitorTypeField 新增监测类型字段
      * @apiVersion 1.0.0

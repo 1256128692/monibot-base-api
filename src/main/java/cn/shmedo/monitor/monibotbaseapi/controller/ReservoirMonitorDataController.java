@@ -488,7 +488,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} data.tbMonitors   监测点列表
      * @apiSuccess (响应结果) {Int} data.tbMonitors.ID   监测点id
      * @apiSuccess (响应结果) {String} data.tbMonitors.name   监测点名称
-     * @apiSuccessExample 响应结果示例
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
