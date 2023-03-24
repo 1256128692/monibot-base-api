@@ -60,20 +60,20 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
      * @apiSuccess (响应结果) {T} sensorData.data        传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} multiSensorData   多传感器最新数据
-     * @apiSuccess (响应结果) {Int} multiSensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {Int} multiSensorData.time      传感器ID
-     * @apiSuccess (响应结果) {Double} multiSensorData.deep  区分值，如:深度
-     * @apiSuccess (响应结果) {T} multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器最新数据
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.time      传感器ID
+     * @apiSuccess (响应结果) {Double} data.multiSensorData.deep  区分值，如:深度
+     * @apiSuccess (响应结果) {T} data.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
-     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
-     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * "data": [
      * {
@@ -226,18 +226,21 @@ public class ReservoirMonitorDataController {
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
-     * @apiSuccess (响应结果) {Object[]} typeInfo          监测类型统计信息
-     * @apiSuccess (响应结果) {Int} typeInfo.monitorType   监测类型
-     * @apiSuccess (响应结果) {String} typeInfo.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} typeInfo.monitorTypeAlias   监测类型别名
-     * @apiSuccess (响应结果) {Int} typeInfo.pointCount   监测类型监测点统计数量
-     * @apiSuccess (响应结果) {Object} warnInfo          监测点预警统计信息
+     * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
+     * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
+     * @apiSuccess (响应结果) {Int} typeInfoList.pointCount   监测类型监测点统计数量
+     * @apiSuccess (响应结果) {Object} typeInfoList.warnInfo          监测点预警统计信息
      * @apiSuccess (响应结果) {Int} warnInfo.normalCount         正常数量
      * @apiSuccess (响应结果) {Int} warnInfo.noDataCount         无数据数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelOneCount   一级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelTwoCount   二级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelThreeCount 三级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
+     * @apiSuccess (响应结果) {Object[]} typeInfoList.projectTypeList  工程类型信息
+     * @apiSuccess (响应结果) {Int} projectTypeList.ID  工程类型ID
+     * @apiSuccess (响应结果) {String} projectTypeList.typeName  工程类型名称
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */

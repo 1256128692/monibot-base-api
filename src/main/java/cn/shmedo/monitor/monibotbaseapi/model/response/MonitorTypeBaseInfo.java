@@ -16,5 +16,4 @@ public class MonitorTypeBaseInfo {
 
     private List<TbProjectType> projectTypeList;
 
-//    private ProjectType warnInfo;
 }
