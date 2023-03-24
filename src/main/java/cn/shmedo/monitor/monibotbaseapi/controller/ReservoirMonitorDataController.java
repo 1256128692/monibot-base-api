@@ -60,20 +60,20 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
      * @apiSuccess (响应结果) {T} sensorData.data        传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} multiSensorData   多传感器最新数据
-     * @apiSuccess (响应结果) {Int} multiSensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {Int} multiSensorData.time      传感器ID
-     * @apiSuccess (响应结果) {Double} multiSensorData.deep  区分值，如:深度
-     * @apiSuccess (响应结果) {T} multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器最新数据
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.time      传感器ID
+     * @apiSuccess (响应结果) {Double} data.multiSensorData.deep  区分值，如:深度
+     * @apiSuccess (响应结果) {T} data.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
-     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
-     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * "data": [
      * {
