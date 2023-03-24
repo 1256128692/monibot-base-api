@@ -21,10 +21,16 @@ public class MonitorPointHistoryData {
 
     private List<TbSensor> sensorList;
 
+
     /**
-     * 以time为分组的传感器历史数据
+     * 传感器历史数据
      */
-    Map<Date, List<Map<String, Object>>> dataList;
+    List<Map<String, Object>> dataList;
+
+//    /**
+//     * 以time为分组的传感器历史数据
+//     */
+//    Map<Date, List<Map<String, Object>>> dataList;
 
     /**
      * 监测类型属性字段列表

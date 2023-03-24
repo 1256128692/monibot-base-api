@@ -198,7 +198,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sensorIDOrString).append(" ) ");
-        sqlBuilder.append(" order by time asc ");
+        sqlBuilder.append(" order by time desc ");
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }
@@ -227,7 +227,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(").append(density).append(") fill(none) ");
-        sqlBuilder.append(" order by time asc ");
+        sqlBuilder.append(" order by time desc ");
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }
@@ -251,7 +251,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(").append(density).append(")  fill(none)  ");
-        sqlBuilder.append(" order by time asc ");
+        sqlBuilder.append(" order by time desc ");
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }

@@ -268,7 +268,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
-     * @apiSuccess (响应结果) {DateTime} dataList.time     数据采集时间
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
@@ -307,7 +306,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
-     * @apiSuccess (响应结果) {DateTime} dataList.time     数据采集时间
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
      * @apiSuccess (响应结果) {Int} dataList.timeDataList.sensorID      传感器ID
      * @apiSuccess (响应结果) {Double} dataList.timeDataList.deep    深度
@@ -349,7 +347,6 @@ public class ReservoirMonitorDataController {
      * }
      * ],
      * "dataList": {
-     * "2023-03-22 12:00:00": [
      * {
      * "deep": 10,
      * "time": "2023-03-22 12:00:00.000",
@@ -362,7 +359,6 @@ public class ReservoirMonitorDataController {
      * "v1": 28.3,
      * "sensorID": 21
      * }
-     * ]
      * },
      * "fieldList": [
      * {
@@ -411,7 +407,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
-     * @apiSuccess (响应结果) {DateTime} dataList.time     数据采集时间
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
      * @apiSuccess (响应结果) {Int} dataList.timeDataList.sensorID      传感器ID
      * @apiSuccess (响应结果) {Double} dataList.timeDataList.v1    降雨量
@@ -451,7 +446,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} data.timeDataList     时刻数据列表
      * @apiSuccess (响应结果) {Int} data.timeDataList.pointID      监测点ID
      * @apiSuccess (响应结果) {Int} data.timeDataList.pointName      监测点名称
-     * @apiSuccess (响应结果) {Double} data.timeDataList.sid   传感器ID
+     * @apiSuccess (响应结果) {Double} data.timeDataList.sensorID   传感器ID
      * @apiSuccess (响应结果) {T} data.timeDataList.value  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志

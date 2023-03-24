@@ -511,11 +511,11 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
 
 
         // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
+//        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,maps,fieldList,tbDataUnitList);
     }
 
 
@@ -569,11 +569,11 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
 
         // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
+//        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,maps,fieldList,tbDataUnitList);
     }
 
 
@@ -658,11 +658,11 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         handleRainTypeSensorHistoryDataList(maps, pa.getBegin(), pa.getEnd());
 
         // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(maps, false);
+//        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(maps, false);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,maps,fieldList,tbDataUnitList);
     }
 
     /**
