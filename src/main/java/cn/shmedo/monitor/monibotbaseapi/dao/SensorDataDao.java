@@ -99,7 +99,7 @@ public interface SensorDataDao {
     void deleteSensorData(Integer sensorID, List<Date> timeList, List<FieldSelectInfo> fieldSelectInfos, boolean b);
 
     List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
-                                                            boolean raw, Date maxTime, Integer limitCount, Integer monitorType);
+                                                            boolean raw, Integer limitCount, Integer monitorType);
 
 //    List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b);
 

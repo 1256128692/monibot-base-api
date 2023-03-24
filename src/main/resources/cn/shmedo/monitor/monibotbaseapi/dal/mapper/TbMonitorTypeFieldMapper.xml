@@ -12,14 +12,14 @@
     <result column="FieldClass" jdbcType="INTEGER" property="fieldClass" />
     <result column="FieldUnitID" jdbcType="INTEGER" property="fieldUnitID" />
     <result column="ParentID" jdbcType="INTEGER" property="parentID" />
-    <result column="FieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder" />
+    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
     <result column="CreateType" jdbcType="INTEGER" property="createType" />
     <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     ID, MonitorType, FieldName, FieldToken, FieldDataType, FieldClass, FieldUnitID, ParentID, 
-    FieldCalOrder, CreateType, ExValues
+    DisplayOrder, CreateType, ExValues
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -37,11 +37,11 @@
     <!--@mbg.generated-->
     insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken, 
       FieldDataType, FieldClass, FieldUnitID, 
-      ParentID, FieldCalOrder, CreateType, 
+      ParentID, DisplayOrder, CreateType, 
       ExValues)
     values (#{monitorType,jdbcType=INTEGER}, #{fieldName,jdbcType=VARCHAR}, #{fieldToken,jdbcType=VARCHAR}, 
       #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldUnitID,jdbcType=INTEGER}, 
-      #{parentID,jdbcType=INTEGER}, #{fieldCalOrder,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER}, 
+      #{parentID,jdbcType=INTEGER}, #{displayOrder,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER},
       #{exValues,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
@@ -69,8 +69,8 @@
       <if test="parentID != null">
         ParentID,
       </if>
-      <if test="fieldCalOrder != null">
-        FieldCalOrder,
+      <if test="displayOrder != null">
+        DisplayOrder,
       </if>
       <if test="createType != null">
         CreateType,
@@ -101,8 +101,8 @@
       <if test="parentID != null">
         #{parentID,jdbcType=INTEGER},
       </if>
-      <if test="fieldCalOrder != null">
-        #{fieldCalOrder,jdbcType=INTEGER},
+      <if test="displayOrder != null">
+        #{displayOrder,jdbcType=INTEGER},
       </if>
       <if test="createType != null">
         #{createType,jdbcType=INTEGER},
@@ -137,8 +137,8 @@
       <if test="parentID != null">
         ParentID = #{parentID,jdbcType=INTEGER},
       </if>
-      <if test="fieldCalOrder != null">
-        FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
+      <if test="displayOrder != null">
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       </if>
       <if test="createType != null">
         CreateType = #{createType,jdbcType=INTEGER},
@@ -159,7 +159,7 @@
       FieldClass = #{fieldClass,jdbcType=INTEGER},
       FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
       ParentID = #{parentID,jdbcType=INTEGER},
-      FieldCalOrder = #{fieldCalOrder,jdbcType=INTEGER},
+      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       CreateType = #{createType,jdbcType=INTEGER},
       ExValues = #{exValues,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}

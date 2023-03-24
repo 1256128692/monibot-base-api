@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dao.impl;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
@@ -8,6 +10,7 @@ import cn.shmedo.iot.entity.util.FieldUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -41,7 +44,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
     public List<Map<String, Object>> querySensorNewData(List<Integer> sensorIDList,
                                                         List<FieldSelectInfo> fieldSelectInfoList,
                                                         boolean raw, Integer monitorType) {
-       return querySensorNewDataByCondition(sensorIDList, fieldSelectInfoList, raw, null, null, monitorType);
+        return querySensorNewDataByCondition(sensorIDList, fieldSelectInfoList, raw, null, monitorType);
     }
 
     @Override
@@ -100,9 +103,9 @@ public class SensorDataDaoImpl implements SensorDataDao {
                                                      String density, List<FieldSelectInfo> fieldSelectInfoList,
                                                      boolean raw, Integer monitorType) {
         Boolean flag = true;
-        if (StringUtils.isNotBlank(density) && DbConstant.DENSITY_DAY.equals(density)){
+        if (StringUtils.isNotBlank(density) && DbConstant.DENSITY_DAY.equals(density)) {
             flag = true;
-        }else {
+        } else {
             flag = false;
         }
         // 截取最后一个字母,以此来判断查询密度,h:代表小时,d:代表天
@@ -125,7 +128,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
                 sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
                 break;
             case DbConstant.DENSITY_HOUR:
-                sql = getHourSensorDataSql(sidOrString, beginString, endString, measurement, selectField, density);
+                sql = getHourSensorDataSql(sidOrString, beginString, endString, measurement, selectField, density, monitorType);
                 break;
             case DbConstant.DENSITY_DAY:
                 sql = getDaySensorDataSql(sidOrString, beginString, endString, measurement, selectField, density);
@@ -149,7 +152,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         StringBuilder sensorIDListSql = new StringBuilder();
         sensorIDList.forEach(sid -> {
-            sensorIDListSql.append("sid = '" );
+            sensorIDListSql.append("sid = '");
             sensorIDListSql.append(sid).append("'").append(" or ");
         });
         String tempSidListSql = sensorIDListSql.toString();
@@ -157,8 +160,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sql = " select sum(v1) as currentRainfall from  " + measurement
                 + " where (" + sidListSql + ") and time>='" + beginString + "' and time<='" + endString
-                + "' group by sid;";
-//        " tz('Asia/Shanghai') "
+                + "' group by sid tz('Asia/Shanghai');";
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
         return InfluxSensorDataUtil.parseCurrentRainResult(queryResult);
     }
@@ -171,7 +173,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
         selectField.forEach(item -> {
-            querySql.append("first(").append(item).append(") as ").append(item).append(",");
+            querySql.append(item).append(",");
         });
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
 //        String selectFieldString = String.join(",", selectField);
@@ -188,12 +190,19 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
     private String getHourSensorDataSql(String sensorIDOrString, String beginString,
                                         String endString, String measurement,
-                                        List<String> selectField,String density) {
+                                        List<String> selectField, String density, Integer monitorType) {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
-        selectField.forEach(item -> {
-            querySql.append("first(").append(item).append(") as ").append(item).append(",");
-        });
+
+        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
+            selectField.forEach(item -> {
+                querySql.append("sum(").append(item).append(") as ").append(item).append(",");
+            });
+        } else {
+            selectField.forEach(item -> {
+                querySql.append("first(").append(item).append(") as ").append(item).append(",");
+            });
+        }
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
 //        String selectFieldString = String.join(",", selectField);
         sqlBuilder.append(" select ");
@@ -357,12 +366,14 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
     @Override
     public List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
-                                                                   boolean raw, Date maxTime, Integer limitCount, Integer monitorType) {
+                                                                   boolean raw, Integer limitCount, Integer monitorType) {
 
         // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
 
-//        FieldUtil.getSelectField(fieldSelectInfoList, false);
+        DateTime endTime = DateUtil.date();
+        DateTime startTime = DateUtil.offsetDay(endTime, -1);
+
         List<String> selectField = new LinkedList<>();
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
@@ -372,9 +383,10 @@ public class SensorDataDaoImpl implements SensorDataDao {
         String fieldString = String.join(",", selectField);
         StringBuilder sqlBuilder = new StringBuilder();
         sensorIDList.forEach(sid -> {
-            String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString()
-                    + "' " +
-                    (Objects.isNull(maxTime) ? "" : "and time <= '" + TimeUtil.formatInfluxTimeString(new Timestamp(maxTime.getTime())) + "'")
+            String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString() + "' " +
+                    (Objects.isNull(startTime) ? "" : "and time >= '" + TimeUtil.formatInfluxTimeString(new Timestamp(startTime.getTime())) + "'")
+                    +
+                    (Objects.isNull(endTime) ? "" : " and time <= '" + TimeUtil.formatInfluxTimeString(new Timestamp(endTime.getTime())) + "'")
                     + " order by time desc limit " +
                     (Objects.isNull(limitCount) ? "1" : limitCount)
                     + " tz('Asia/Shanghai') ; ";

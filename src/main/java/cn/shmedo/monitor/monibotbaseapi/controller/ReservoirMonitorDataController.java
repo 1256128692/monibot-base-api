@@ -226,18 +226,21 @@ public class ReservoirMonitorDataController {
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
-     * @apiSuccess (响应结果) {Object[]} typeInfo          监测类型统计信息
-     * @apiSuccess (响应结果) {Int} typeInfo.monitorType   监测类型
-     * @apiSuccess (响应结果) {String} typeInfo.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} typeInfo.monitorTypeAlias   监测类型别名
-     * @apiSuccess (响应结果) {Int} typeInfo.pointCount   监测类型监测点统计数量
-     * @apiSuccess (响应结果) {Object} warnInfo          监测点预警统计信息
+     * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
+     * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
+     * @apiSuccess (响应结果) {Int} typeInfoList.pointCount   监测类型监测点统计数量
+     * @apiSuccess (响应结果) {Object} typeInfoList.warnInfo          监测点预警统计信息
      * @apiSuccess (响应结果) {Int} warnInfo.normalCount         正常数量
      * @apiSuccess (响应结果) {Int} warnInfo.noDataCount         无数据数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelOneCount   一级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelTwoCount   二级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelThreeCount 三级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
+     * @apiSuccess (响应结果) {Object[]} typeInfoList.projectTypeList  工程类型信息
+     * @apiSuccess (响应结果) {Int} projectTypeList.ID  工程类型ID
+     * @apiSuccess (响应结果) {String} projectTypeList.typeName  工程类型名称
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */

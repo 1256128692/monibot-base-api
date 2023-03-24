@@ -53,14 +53,14 @@ public class TbMonitorTypeField implements Serializable {
     private Integer parentID;
 
     /**
-    * 计算排序字段
-    */
-    private Integer fieldCalOrder;
-
-    /**
     * 创建类型
     */
     private Integer createType;
+
+    /**
+     * 创建类型
+     */
+    private Integer displayOrder;
 
     /**
     * 拓展字段

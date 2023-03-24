@@ -27,10 +27,12 @@ import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -218,7 +220,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             }
             if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
                 for (Map<String, Object> mapEntry : maps) {
-                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0);
+                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0.0);
                     filteredMaps.add(mapEntry);
                 }
             }
@@ -285,8 +287,10 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     TbSensor tbSensor = snd.getSensorList().get(0);
                     if (!CollectionUtil.isNullOrEmpty(maps)) {
                         Map<String, Object> currentSensorData = maps.stream().filter(m -> m.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(tbSensor.getID())).findFirst().orElse(null);
-                        if (MapUtil.isNotEmpty(currentSensorData)) {
-                            currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
+                        if (MapUtil.isNotEmpty(currentSensorData) ) {
+                            if (tbSensor.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
+                                currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
+                            }
                             snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), snd.getMonitorItemID(), currentSensorData));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
                         }
@@ -346,7 +350,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             currentSensorData.put("windPower", v1);
         } else if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前降雨量
-            currentSensorData.put("currentRainfall", null);
+            currentSensorData.put("currentRainfall", 0.0);
         }
         return currentSensorData;
     }
@@ -363,7 +367,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             FieldSelectInfo fieldSelectInfo = new FieldSelectInfo();
             fieldSelectInfo.setFieldToken(modelField.getFieldToken());
             fieldSelectInfo.setFieldName(modelField.getFieldName());
-            fieldSelectInfo.setFieldOrder(modelField.getFieldCalOrder());
+            fieldSelectInfo.setFieldOrder(modelField.getDisplayOrder());
             fieldSelectInfo.setFieldType(FieldType.valueOfString(modelField.getFieldDataType()));
 //            fieldSelectInfo.setFieldStatisticsType(modelField.getFieldStatisticsType());
 //            fieldSelectInfo.setFieldJsonPath(modelField.getFieldJsonPath());
@@ -650,7 +654,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
-        handleRainTypeSensorHistoryDataList(maps);
+        // 处理雨量历史时间段的当前雨量
+        handleRainTypeSensorHistoryDataList(maps, pa.getBegin(), pa.getEnd());
 
         // 处理时间排序
         Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(maps, false);
@@ -686,15 +691,17 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
      * 处理传感器类型为雨量的历史数据,计算出每个时间段的当前数据
      * 计算规则,当天8点的当前雨量为0,当天8点后的数据,比如说10点的数据,就是(8点的v1 + 10点的v1)
      * 以此类推, 12点的数据就是 (8点的v1 + 10点的v1 + 12点的v1)
+     *
      * @param dataList
+     * @param begin
+     * @param end
      */
-    private void handleRainTypeSensorHistoryDataList(List<Map<String, Object>> dataList) {
+    private void handleRainTypeSensorHistoryDataList(List<Map<String, Object>> dataList, Timestamp begin, Timestamp end) {
 
-        DateTime today = DateUtil.date();
-        DateTime eightClockDateTime = DateUtil.offsetHour(DateUtil.beginOfDay(today), 8);
-
-        DateTime yesterday = DateUtil.offsetDay(today, -1);
-        DateTime yesterdayEightClockDateTime = DateUtil.offsetHour(DateUtil.beginOfDay(yesterday), 8);
+        String dateStr = DateUtil.format(DateUtil.beginOfDay(new Date(end.getTime())), "yyyy-MM-dd HH:mm:ss");
+        String resultStr = dateStr.substring(0, 10) + " 08:00:00";
+        Date eightClockDateTime = DateUtil.parse(resultStr, "yyyy-MM-dd HH:mm:ss");
+        DateTime yesterdayEightClockDateTime = DateUtil.offsetDay(eightClockDateTime, -1);
 
         List<Map<String, Object>> yesterdayDataList = new LinkedList<>();
         List<Map<String, Object>> todayDataList = new LinkedList<>();
@@ -721,7 +728,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     DateTime currentTime = DateUtil.parse(data1.get("time").toString());
                     DateTime otherTime = DateUtil.parse(data2.get("time").toString());
                     if (DateUtil.compare(currentTime, otherTime) >= 0 &&
-                            data1.get("sensorID").equals(data2.get("sensorID"))) {
+                            data1.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(data2.get("sensorID"))) {
                         // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
                         double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
                         double v1 = Double.parseDouble(data2.get("v1").toString());
@@ -763,8 +770,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 }
             }
         }
-
-        int i = 1;
 
     }
 
