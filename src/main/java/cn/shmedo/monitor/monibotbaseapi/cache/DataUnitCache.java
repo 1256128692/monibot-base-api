@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Component
 public class DataUnitCache {
 
-    private static List<TbDataUnit> dataUnits;
+    public static List<TbDataUnit> dataUnits;
     public static Map<Integer, TbDataUnit> dataUnitsMap;
 
 
