@@ -59,7 +59,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorData.sensorID         传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {T} sensorData.data        传感器数据(动态值)，参考监测项目属性字段列表
      * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器最新数据
      * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {Int} data.multiSensorData.time      传感器ID

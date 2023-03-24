@@ -27,7 +27,6 @@ import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -191,8 +190,9 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> filteredMaps,
                                              List<TbSensor> sensorList, List<FieldSelectInfo> fieldList,
                                              List<Map<String, Object>> maps) {
-        List<Integer> sensorIDList = sensorList.stream().map(TbSensor::getID).collect(Collectors.toList());
-
+        if (CollectionUtil.isNullOrEmpty(maps)) {
+            return;
+        }
         // 雨量单独处理
         if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前时间
@@ -205,7 +205,9 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
                 nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
             }
-            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(sensorIDList, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
+            //
+            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
+            int i = 10;
             if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
                 for (Map<String, Object> mapEntry : maps) {
                     for (Map<String, Object> currentRainMap : currentRainMaps) {
@@ -350,7 +352,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             currentSensorData.put("windPower", v1);
         } else if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前降雨量
-            currentSensorData.put("currentRainfall", 0.0);
         }
         return currentSensorData;
     }

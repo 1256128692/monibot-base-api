@@ -139,7 +139,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
     }
 
     @Override
-    public List<Map<String, Object>> querySensorRainStatisticsData(List<Integer> sensorIDList, Timestamp begin, Timestamp end, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
+    public List<Map<String, Object>> querySensorRainStatisticsData(List<Map<String, Object>> dataMaps, Timestamp begin, Timestamp end, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
 
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, false);
         List<String> selectField = new LinkedList<>();
@@ -147,21 +147,55 @@ public class SensorDataDaoImpl implements SensorDataDao {
         selectField.add(DbConstant.SENSOR_ID_TAG);
         // 当前雨量
         selectField.add(DbConstant.CURRENT_RAIN_FALL);
-        String beginString = TimeUtil.formatInfluxTimeString(begin);
-        String endString = TimeUtil.formatInfluxTimeString(end);
 
-        StringBuilder sensorIDListSql = new StringBuilder();
-        sensorIDList.forEach(sid -> {
-            sensorIDListSql.append("sid = '");
-            sensorIDListSql.append(sid).append("'").append(" or ");
-        });
-        String tempSidListSql = sensorIDListSql.toString();
-        String sidListSql = tempSidListSql.substring(0, tempSidListSql.length() - 3);
+//        StringBuilder sensorIDListSql = new StringBuilder();
+//        sensorIDList.forEach(sid -> {
+//            sensorIDListSql.append("sid = '");
+//            sensorIDListSql.append(sid).append("'").append(" or ");
+//        });
+//        String tempSidListSql = sensorIDListSql.toString();
+//        String sidListSql = tempSidListSql.substring(0, tempSidListSql.length() - 3);
+//
+//        StringBuilder finalSql = new StringBuilder();
+//        String sql = " select sum(v1) as currentRainfall from  " + measurement
+//                + " where (" + sidListSql + ") and time>='" + beginString + "' and time<='" + endString
+//                + "' group by sid tz('Asia/Shanghai');" ;
+//
+//        String sql1 = " select sum(v1) as currentRainfall from  " + measurement
+//                + " where (sid = '12' or sid = '13') and time>='2023-03-17T05:55:54Z' and time<='2023-03-24T05:55:54Z' group by sid tz('Asia/Shanghai');" ;
+//        String result = finalSql.append(sql).append(sql1).toString();
 
-        String sql = " select sum(v1) as currentRainfall from  " + measurement
-                + " where (" + sidListSql + ") and time>='" + beginString + "' and time<='" + endString
-                + "' group by sid tz('Asia/Shanghai');";
-        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+//        List<Map<String, Object>> processedMaps = new ArrayList<>(); // 存储处理后的数据列表
+
+        StringBuilder sql = new StringBuilder();
+        for (Map<String, Object> map : dataMaps) {
+            StringBuilder mapSql = new StringBuilder();
+            Date time = DateUtil.parse(map.get("time").toString(), "yyyy-MM-dd HH:mm:ss.SSS");
+            Timestamp startTime, endTime;
+
+            if (DateUtil.hour(time, true) >= 8) {
+                // 如果时间在当天8点之后，endTime为该time，startTime为time当天的8点
+                startTime = new Timestamp(DateUtil.offsetHour(DateUtil.beginOfDay(time), 8).getTime());
+                endTime = new Timestamp(time.getTime());
+            } else {
+                // 如果时间在当天8点之前，endTime为该time，startTime为time前一天的8点
+                DateTime currentDataTime = DateUtil.offsetDay(DateUtil.beginOfDay(time), -1);
+                startTime = new Timestamp(DateUtil.offsetHour(currentDataTime, 8).getTime());
+                endTime = new Timestamp(time.getTime());
+            }
+            String beginString = TimeUtil.formatInfluxTimeString(startTime);
+            String endString = TimeUtil.formatInfluxTimeString(endTime);
+
+            mapSql.append(" select sum(v1) as currentRainfall from ").append(measurement);
+            mapSql.append(" where sid ='").append(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN)).append("'");
+            mapSql.append(" and time>='").append(beginString).append("' ");
+            mapSql.append(" and time<='").append(endString).append("' ");
+            mapSql.append(" group by sid tz('Asia/Shanghai'); ");
+            sql.append(mapSql);
+        }
+        String result = sql.toString();
+
+        QueryResult queryResult = influxDB.query(new Query(result), TimeUnit.MILLISECONDS);
         return InfluxSensorDataUtil.parseCurrentRainResult(queryResult);
     }
 
@@ -371,8 +405,10 @@ public class SensorDataDaoImpl implements SensorDataDao {
         // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
 
-        DateTime endTime = DateUtil.date();
-        DateTime startTime = DateUtil.offsetDay(endTime, -1);
+//        DateTime endTime = DateUtil.date();
+//        DateTime startTime = DateUtil.offsetDay(endTime, -1);
+        DateTime endTime = null;
+        DateTime startTime = null;
 
         List<String> selectField = new LinkedList<>();
         selectField.add(DbConstant.TIME_FIELD);

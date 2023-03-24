@@ -38,13 +38,13 @@ public interface SensorDataDao {
     /**
      * 从实时表中查询传感器(雨量)的当前统计数据。查询返回数据含有：sensorID,time,currentRainfall
      *
-     * @param sensorIDList        传感器编号列表
+     * @param dataMaps        传感器数据列表
      * @param begin               开始时间(>=)
      * @param end                 结束时间(<)
      * @param fieldSelectInfoList 字段列表
      * @return 传感器天的统计数据
      */
-    List<Map<String, Object>> querySensorRainStatisticsData(List<Integer> sensorIDList, Timestamp begin, Timestamp end,
+    List<Map<String, Object>> querySensorRainStatisticsData(List<Map<String, Object>> dataMaps, Timestamp begin, Timestamp end,
                                                            List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType);
 
 
