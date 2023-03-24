@@ -148,25 +148,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
         // 当前雨量
         selectField.add(DbConstant.CURRENT_RAIN_FALL);
 
-//        StringBuilder sensorIDListSql = new StringBuilder();
-//        sensorIDList.forEach(sid -> {
-//            sensorIDListSql.append("sid = '");
-//            sensorIDListSql.append(sid).append("'").append(" or ");
-//        });
-//        String tempSidListSql = sensorIDListSql.toString();
-//        String sidListSql = tempSidListSql.substring(0, tempSidListSql.length() - 3);
-//
-//        StringBuilder finalSql = new StringBuilder();
-//        String sql = " select sum(v1) as currentRainfall from  " + measurement
-//                + " where (" + sidListSql + ") and time>='" + beginString + "' and time<='" + endString
-//                + "' group by sid tz('Asia/Shanghai');" ;
-//
-//        String sql1 = " select sum(v1) as currentRainfall from  " + measurement
-//                + " where (sid = '12' or sid = '13') and time>='2023-03-17T05:55:54Z' and time<='2023-03-24T05:55:54Z' group by sid tz('Asia/Shanghai');" ;
-//        String result = finalSql.append(sql).append(sql1).toString();
-
-//        List<Map<String, Object>> processedMaps = new ArrayList<>(); // 存储处理后的数据列表
-
         StringBuilder sql = new StringBuilder();
         for (Map<String, Object> map : dataMaps) {
             StringBuilder mapSql = new StringBuilder();

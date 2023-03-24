@@ -207,7 +207,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             }
             //
             List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
-            int i = 10;
             if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
                 for (Map<String, Object> mapEntry : maps) {
                     for (Map<String, Object> currentRainMap : currentRainMaps) {
