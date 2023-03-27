@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
+import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -60,6 +61,8 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
             }
         }
 
+        // 将 begin 的时间减去 2 小时
+        this.begin = new Timestamp(DateUtil.offsetHour(begin, -2).getTime());
         return null;
     }
 }
