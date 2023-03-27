@@ -307,9 +307,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
-     * @apiSuccess (响应结果) {Int} dataList.timeDataList.sensorID      传感器ID
-     * @apiSuccess (响应结果) {Double} dataList.timeDataList.deep    深度
-     * @apiSuccess (响应结果) {Double} dataList.timeDataList.v1  土壤含水量(%)
+     * @apiSuccess (响应结果) {Int} dataList.T.sensorID      传感器ID
+     * @apiSuccess (响应结果) {Double} dataList.T.deep    深度
+     * @apiSuccess (响应结果) {Double} dataList.T.v1  土壤含水量(%)
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
@@ -408,9 +408,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
-     * @apiSuccess (响应结果) {Int} dataList.timeDataList.sensorID      传感器ID
-     * @apiSuccess (响应结果) {Double} dataList.timeDataList.v1    降雨量
-     * @apiSuccess (响应结果) {Double} dataList.timeDataList.currentRainfall  当前降雨量
+     * @apiSuccess (响应结果) {Int} dataList.T.sensorID      传感器ID
+     * @apiSuccess (响应结果) {Double} dataList.T.v1    降雨量
+     * @apiSuccess (响应结果) {Double} dataList.T.currentRainfall  当前降雨量
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
@@ -424,7 +424,7 @@ public class ReservoirMonitorDataController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryRainPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
+    public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryRainMonitorPointSensorDataListParam pa) {
         return reservoirMonitorService.queryRainPointHistoryDataList(pa);
     }
 
@@ -432,26 +432,32 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryMonitorPointListHistoryDataList 查询多监测点历史数据列表
      * @apiVersion 1.0.0
      * @apiGroup 监测点数据模块
-     * @apiDescription 查询多监测点历史数据列表
+     * @apiDescription 查询多监测点历史数据列表,目前支持类型(水位)
      * @apiName QueryMonitorPointListHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
-     * @apiParam (请求体) {Int} pointIDList 监测点ID列表
+     * @apiParam (请求体) {Int} monitorPointIDs 监测点ID列表,监测点必须属于同一监测类型
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
      * @apiParamExample 请求体示例
      * {"pointIDList":[1,2,3],"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":66}
-     * @apiSuccess (响应结果) {Object[]} data   结果数据
-     * @apiSuccess (响应结果) {DateTime} data.time     数据采集时间
-     * @apiSuccess (响应结果) {Object[]} data.timeDataList     时刻数据列表
-     * @apiSuccess (响应结果) {Int} data.timeDataList.pointID      监测点ID
-     * @apiSuccess (响应结果) {Int} data.timeDataList.pointName      监测点名称
-     * @apiSuccess (响应结果) {Double} data.timeDataList.sensorID   传感器ID
-     * @apiSuccess (响应结果) {T} data.timeDataList.value  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} monitorPointList 监测点信息
+     * @apiSuccess (响应结果) {Int} monitorPointList.ID   监测点ID
+     * @apiSuccess (响应结果) {String} monitorPointList.name 监测点名称
+     * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
+     * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
+     * @apiSuccess (响应结果) {Object[]} dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
      * @apiSuccess (响应结果) {String} fieldList.fieldCalOrder  属性字段排序
+     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSuccessExample 响应结果示例
      * [{
      * "time":"2023-02-27 00:00:00",
@@ -483,8 +489,8 @@ public class ReservoirMonitorDataController {
      * @apiPermission 项目权限
      */
     @RequestMapping(value = "/QueryMonitorPointListHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
-        return null;
+    public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointsSensorDataListParam pa) {
+        return reservoirMonitorService.queryMonitorPointListHistoryDataList(pa);
     }
 
 
