@@ -53,24 +53,28 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
 
         if (CollectionUtil.isNullOrEmpty(tbMonitorPointList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未找到监测点数据");
-        }else {
+        } else {
             long monitorTypeCount = tbMonitorPointList.stream().map(TbMonitorPoint::getMonitorType).distinct().count();
             if (monitorTypeCount > 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表数据的监测类型需一致");
-            }else {
+            } else {
                 monitorType = tbMonitorPointList.get(0).getMonitorType();
             }
 
             long monitorItemIDCount = tbMonitorPointList.stream().map(TbMonitorPoint::getMonitorItemID).distinct().count();
             if (monitorItemIDCount > 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表数据的监测项目需一致");
-            }else {
+            } else {
                 monitorItemID = tbMonitorPointList.get(0).getMonitorItemID();
             }
 
+            long projectCount = tbMonitorPointList.stream().map(TbMonitorPoint::getProjectID).distinct().count();
+            if (projectCount > 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表数据的所属工程需一致");
+            }
         }
-        if (StringUtils.isNotBlank(density)){
-            if (!(density.endsWith("h")  || density.endsWith("d"))){
+        if (StringUtils.isNotBlank(density)) {
+            if (!(density.endsWith("h") || density.endsWith("d"))) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前查询密度条件错误");
             }
         }
