@@ -25,4 +25,6 @@ public class DbConstant {
 
 
     public static final String CURRENT_RAIN_FALL = "currentRainfall";
+
+    public static final String DAILY_RAINFALL = "dailyRainfall";
 }

@@ -21,7 +21,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryCompanyMonitorPointNewDataList 查询公司下所有监测点最新数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiName QueryMonitorPointNewDataList
      * @apiDescription 查询公司下所有监测点最新数据列表
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -169,7 +169,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QuerySingleMonitorPointNewData 查询单个监测点最新数据详情
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询单个监测点最新数据详情
      * @apiName QuerySingleMonitorPointNewData
      * @apiParam (请求体) {Int} projectID 项目ID
@@ -220,7 +220,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointTypeStatistics 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -251,7 +251,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointHistoryDataList 查询监测点历史数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询监测点历史数据列表
      * @apiName QueryMonitorPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
@@ -289,7 +289,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QuerySmcPointHistoryDataList 查询墒情监测点历史数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询墒情监测点历史数据列表
      * @apiName QuerySmcPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
@@ -390,7 +390,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryRainPointHistoryDataList 查询雨量监测点历史数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询雨量监测点历史数据列表
      * @apiName QueryRainPointHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
@@ -411,6 +411,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} dataList.T.sensorID      传感器ID
      * @apiSuccess (响应结果) {Double} dataList.T.v1    降雨量
      * @apiSuccess (响应结果) {Double} dataList.T.currentRainfall  当前降雨量
+     * @apiSuccess (响应结果) {Double} dailyRainfall   日降雨量
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
@@ -431,7 +432,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointListHistoryDataList 查询多监测点历史数据列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询多监测点历史数据列表,目前支持类型(水位)
      * @apiName QueryMonitorPointListHistoryDataList
      * @apiParam (请求体) {Int} projectID  项目ID
@@ -497,7 +498,7 @@ public class ReservoirMonitorDataController {
     /**
      * @api {POST} /QueryMonitorPointBaseInfoList 查询监测点基本信息
      * @apiVersion 1.0.0
-     * @apiGroup 监测点数据模块
+     * @apiGroup 水利监测点数据模块
      * @apiDescription 查询监测点基本信息
      * @apiName QueryMonitorPointBaseInfoList
      * @apiParam (请求体) {Int} projectID  工程ID
