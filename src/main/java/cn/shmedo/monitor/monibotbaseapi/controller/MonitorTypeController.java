@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypePageParam;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class MonitorTypeController {
+    private final MonitorTypeService monitorTypeService;
     /**
      * @api {POST} /AddPredefinedMonitorType 新增预定义监测类型
      * @apiVersion 1.0.0
@@ -209,8 +212,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypePage(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorTypePage(@RequestBody @Validated QueryMonitorTypePageParam request) {
+        return monitorTypeService.queryMonitorTypePage(request);
     }
 
     /**

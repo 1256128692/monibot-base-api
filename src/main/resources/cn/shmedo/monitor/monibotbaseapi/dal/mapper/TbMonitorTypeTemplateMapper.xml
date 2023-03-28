@@ -164,4 +164,13 @@
       DefaultTemplate = #{defaultTemplate,jdbcType=BIT}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <select id="countGroupByMonitorType" resultType="cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount">
+      select MonitorType as type, count(1) as count
+      from tb_monitor_type_template where MonitorType in
+      <foreach collection="list" item="type" separator="," open="(" close=")">
+          #{type}
+      </foreach>
+      group by MonitorType
+  </select>
 </mapper>

@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypePageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @create: 2023-03-20 16:53
  **/
 public interface MonitorTypeService extends IService<TbMonitorType> {
+    PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam request);
 }

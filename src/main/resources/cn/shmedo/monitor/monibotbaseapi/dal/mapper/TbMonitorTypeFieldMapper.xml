@@ -164,4 +164,21 @@
       ExValues = #{exValues,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+  <select id="queryByMonitorTypes" resultMap="BaseResultMap">
+    select * from tb_monitor_type_field where MonitorType in <foreach collection="list" item="type" separator="," open="(" close=")">
+      #{type}
+  </foreach>
+  </select>
+  <select id="queryMonitorTypeByFuzzyNameAndFuzzyToken" resultType="java.lang.Integer">
+    select distinct  MonitorType
+      from tb_monitor_type_field
+        <where>
+          <if test="fuzzyFieldName != null and fuzzyFieldName !=''">
+            FieldName like concat('%',#{fuzzyFieldName},'%')
+          </if>
+          <if test="fuzzyFieldToken != null and fuzzyFieldToken !=''">
+            and FieldToken like concat('%',#{fuzzyFieldToken},'%')
+          </if>
+        </where>
+  </select>
 </mapper>

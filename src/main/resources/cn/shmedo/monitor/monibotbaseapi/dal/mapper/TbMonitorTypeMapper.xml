@@ -165,4 +165,35 @@
       where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID})
       group by MonitorType
   </select>
+
+  <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web">
+    select * from tb_monitor_type
+    <where>
+      <if test="typeList != null and typeList.size > 0">
+        MonitorType in <foreach collection="typeList" item="type" separator="," open="(" close=")">
+        #{type}
+      </foreach>
+      </if>
+      <if test="fuzzyTypeName != null and fuzzyTypeName != ''">
+        and (
+        TypeName like  concat('%',#{fuzzyTypeName}, '%')
+        or TypeAlias like  concat('%',#{fuzzyTypeName}, '%')
+        )
+      </if>
+      <choose>
+        <when test="createType == null">
+          and (
+          CompanyID = #{companyID} or CompanyID = -1
+          )
+        </when>
+        <when test="createType == 0">
+          and CreateType = #{createType}
+        </when>
+        <otherwise>
+          and CompanyID = #{companyID}
+        </otherwise>
+      </choose>
+    </where>
+    order by CreateType desc, id desc
+    </select>
 </mapper>
