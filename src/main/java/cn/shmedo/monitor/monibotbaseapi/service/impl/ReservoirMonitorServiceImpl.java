@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
@@ -32,6 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -288,7 +291,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     TbSensor tbSensor = snd.getSensorList().get(0);
                     if (!CollectionUtil.isNullOrEmpty(maps)) {
                         Map<String, Object> currentSensorData = maps.stream().filter(m -> m.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(tbSensor.getID())).findFirst().orElse(null);
-                        if (MapUtil.isNotEmpty(currentSensorData) ) {
+                        if (MapUtil.isNotEmpty(currentSensorData)) {
                             if (tbSensor.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
                                 currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
                             }
@@ -431,7 +434,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     item.setMonitorTypeName(tbMonitorType.getTypeName());
                     item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
                 }
-
                 if (!projectTypeMap.isEmpty()) {
                     if (!CollectionUtil.isNullOrEmpty(monitorTypeAndProIDs)) {
                         Set<Integer> projectIDs = monitorTypeAndProIDs.stream().filter(m -> m.getMonitorType().equals(item.getMonitorType())).map(TbMonitorPoint::getProjectID).collect(Collectors.toSet());
@@ -446,12 +448,40 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     item.setProjectTypeList(projectTypeInfos);
                 }
 
-                if ( !CollectionUtil.isNullOrEmpty(sensorList)) {
+                if (!CollectionUtil.isNullOrEmpty(sensorList)) {
                     // 传感器警报信息
                     item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList())));
                 }
 
             });
+            if (!CollectionUtil.isNullOrEmpty(monitorTypeBaseInfos)) {
+                List<Integer> monitorTypeIDList = monitorTypeBaseInfos.stream().map(MonitorTypeBaseInfo::getMonitorType).collect(Collectors.toList());
+                Map<Integer, TbMonitorType> filteredMap = monitorTypeMap.entrySet().stream()
+                        .filter(entry -> !monitorTypeIDList.contains(entry.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                if (MapUtil.isNotEmpty(filteredMap)) {
+                    filteredMap.entrySet().forEach(entry -> {
+                        MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
+                        mtVo.setMonitorType(entry.getKey());
+                        mtVo.setMonitorTypeName(entry.getValue().getTypeName());
+                        mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
+                        mtVo.setPointCount(0);
+                        monitorTypeBaseInfos.add(mtVo);
+                    });
+                }
+            } else {
+                if (MapUtil.isNotEmpty(monitorTypeMap)) {
+                    monitorTypeMap.entrySet().forEach(entry -> {
+                        MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
+                        mtVo.setMonitorType(entry.getKey());
+                        mtVo.setMonitorTypeName(entry.getValue().getTypeName());
+                        mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
+                        mtVo.setPointCount(0);
+                        monitorTypeBaseInfos.add(mtVo);
+                    });
+                }
+            }
+
             vo.setTypeInfoList(monitorTypeBaseInfos);
         }
 
@@ -502,20 +532,21 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
-        maps.forEach(map -> {
-            // 如果当前数据为风力,水质,则进行单独处理
-            Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(), pa.getTbMonitorPoint().getMonitorItemID(), map);
-            resultMaps.add(stringObjectMap);
-        });
+        if (!CollectionUtil.isNullOrEmpty(maps)) {
+            maps.forEach(map -> {
+                // 如果当前数据为风力,水质,则进行单独处理
+                Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(), pa.getTbMonitorPoint().getMonitorItemID(), map);
+                resultMaps.add(stringObjectMap);
+            });
+        }
         handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
 
-
         // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
+//        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
         // 处理数据单位
-        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList);
     }
 
 
@@ -561,19 +592,19 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
-        maps.forEach(map -> {
-            // 处理墒情数据
-            Map<String, Object> stringObjectMap = handleShangQingType(map, tbSensors);
-            resultMaps.add(stringObjectMap);
-        });
+        if (!CollectionUtil.isNullOrEmpty(maps)) {
+            maps.forEach(map -> {
+                // 处理墒情数据
+                Map<String, Object> stringObjectMap = handleShangQingType(map, tbSensors);
+                resultMaps.add(stringObjectMap);
+            });
+        }
         handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
 
-        // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
         // 处理数据单位
-        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList);
     }
 
 
@@ -613,7 +644,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     }
 
     @Override
-    public MonitorPointHistoryData queryRainPointHistoryDataList(QueryMonitorPointSensorDataListParam pa) {
+    public MonitorPointHistoryData queryRainPointHistoryDataList(QueryRainMonitorPointSensorDataListParam pa) {
 
         Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
@@ -654,19 +685,116 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
-        // 处理雨量历史时间段的当前雨量
-        handleRainTypeSensorHistoryDataList(maps, pa.getBegin(), pa.getEnd());
+        if (!CollectionUtil.isNullOrEmpty(maps)) {
+            // 处理雨量历史时间段的降雨量
+            handleDataOrder(maps);
+            // 处理雨量历史时间段的当前雨量
+            handleRainTypeSensorHistoryDataList(maps, pa.getBegin(), pa.getEnd());
+        }
 
-        // 处理时间排序
-        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(maps, false);
         // 处理数据单位
-        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(),fieldList, dataUnitsMap);
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new MonitorPointHistoryData(pa.getTbMonitorPoint(),tbSensors,sortedGroupedMaps,fieldList,tbDataUnitList);
+        return new MonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList);
+    }
+
+    /**
+     * 遍历 dataList，找到 time 为 "2023-03-22 14:00:00.000" 的数据。
+     * 判断是否存在比该数据时间晚2小时的数据，如果存在，将比它晚2个小时的 "v1" 值赋值给该数据。
+     * 重复步骤1和2，直到遍历完整个 dataList。
+     * 将时间最早的数据从 dataList 中移除。
+     *
+     * @param dataList
+     */
+    private void handleDataOrder(List<Map<String, Object>> dataList) {
+        // 找到时间最早的数据
+        Map<String, Object> earliestData = dataList.stream()
+                .min((o1, o2) -> ObjectUtil.compare(DateUtil.parse((String) o1.get("time")), DateUtil.parse((String) o2.get("time"))))
+                .orElse(null);
+
+        if (earliestData != null) {
+            // 遍历 dataList，找到需要修改的数据并修改
+            dataList.forEach(data -> {
+                String currentTimeStr = (String) data.get("time");
+                DateTime targetTime = DateUtil.offsetHour(DateUtil.parseDateTime(currentTimeStr), 2); // 将当前时间加上 2 小时
+                String targetTimeStr = DateUtil.format(targetTime, "yyyy-MM-dd HH:mm:ss.SSS"); // 将 DateTime 对象格式化为字符串
+
+                Map<String, Object> targetData = dataList.stream()
+                        .filter(map -> targetTimeStr.equals(map.get("time")))
+                        .findFirst()
+                        .orElse(null);
+
+                if (targetData != null) {
+                    targetData.put("v1", data.get("v1"));
+                }
+
+                // 将时间最早的数据移除
+                if (earliestData.equals(data)) {
+                    dataList.remove(data);
+                }
+            });
+        }
+    }
+
+
+    @Override
+    public MonitorPointListHistoryData queryMonitorPointListHistoryDataList(QueryMonitorPointsSensorDataListParam pa) {
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+
+        LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, pa.getMonitorPointIDs());
+        // 1.传感器信息列表
+        List<TbSensor> tbSensors = tbSensorMapper.selectList(sensorLambdaQueryWrapper);
+        if (CollectionUtil.isNullOrEmpty(tbSensors)) {
+            return null;
+        }
+        List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
+
+        LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getMonitorItemID())
+                .eq(TbMonitorItemField::getEnable, true);
+        // 2. 监测项目与监测子字段类型关系表
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
+
+        // TODO:如果查不到对应关系.暂时先处理成查监测类下全部的监测子类型
+        // 3. 监测点类型子字段列表
+        List<TbMonitorTypeField> tbMonitorTypeFields = null;
+        if (!CollectionUtil.isNullOrEmpty(tbMonitorItemFields)) {
+            List<Integer> monitorTypeFieldIDs = tbMonitorItemFields.stream().map(TbMonitorItemField::getMonitorTypeFieldID).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .in(TbMonitorTypeField::getID, monitorTypeFieldIDs);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+
+        } else {
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .eq(TbMonitorTypeField::getMonitorType, pa.getMonitorType());
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+        }
+
+        // 监测子类型字段
+        List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+
+        // 通用类型的传感器数据
+        List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
+                fieldList, false, pa.getMonitorType());
+
+        List<Map<String, Object>> resultMaps = new LinkedList<>();
+        maps.forEach(map -> {
+            // 如果当前数据为风力,水质,则进行单独处理
+            Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), pa.getMonitorItemID(), map);
+            resultMaps.add(stringObjectMap);
+        });
+        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+
+        // 处理数据单位
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getMonitorType(), fieldList, dataUnitsMap);
+
+        return new MonitorPointListHistoryData(pa.getTbMonitorPointList(), tbSensors, maps, fieldList, tbDataUnitList);
     }
 
     /**
      * 处理数据单位
+     *
      * @param monitorType
      * @param fieldList
      * @param dataUnitsMap

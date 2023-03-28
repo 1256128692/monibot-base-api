@@ -233,4 +233,15 @@
       from tb_monitor_point
       where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID})
   </select>
+
+
+
+  <select id="selectMonitorTypeCount">
+    select count(distinct MonitorType)
+    from tb_monitor_point
+    where ID in
+    <foreach collection="monitorPointIDs" item="item" open="(" close=")" separator=",">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

@@ -31,7 +31,7 @@ public class MonitorTypeUtil {
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())){
             FieldSelectInfo vo = new FieldSelectInfo();
             vo.setFieldToken("waterQuality");
-            vo.setFieldName("水质");
+            vo.setFieldName("水质等级");
             vo.setFieldOrder(0);
             fieldList.add(vo);
         }

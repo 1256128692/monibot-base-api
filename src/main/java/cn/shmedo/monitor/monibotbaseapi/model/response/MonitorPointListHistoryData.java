@@ -8,16 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class MonitorPointHistoryData {
+public class MonitorPointListHistoryData {
 
-    private TbMonitorPoint monitorPoint;
+    private List<TbMonitorPoint> monitorPointList;
 
     private List<TbSensor> sensorList;
 
@@ -27,10 +26,6 @@ public class MonitorPointHistoryData {
      */
     List<Map<String, Object>> dataList;
 
-//    /**
-//     * 以time为分组的传感器历史数据
-//     */
-//    Map<Date, List<Map<String, Object>>> dataList;
 
     /**
      * 监测类型属性字段列表
@@ -41,6 +36,4 @@ public class MonitorPointHistoryData {
      * 监测类型属性字段单位列表
      */
     private List<TbDataUnit> dataUnitList;
-
-
 }

@@ -135,37 +135,39 @@ public class InfluxSensorDataUtil {
             // 单挑查询记录内容
             QueryResult.Result result = queryResult.getResults().get(i);
             List<QueryResult.Series> series = result.getSeries();
-            for (int j = 0; j < series.size(); j++) {
-                QueryResult.Series resultContent = series.get(j);
+            if (!CollectionUtil.isNullOrEmpty(series)) {
+                for (int j = 0; j < series.size(); j++) {
+                    QueryResult.Series resultContent = series.get(j);
 
-                // 分组信息
-                Map<String, String> tagMap = resultContent.getTags();
-                // 字段列
-                List<String> columns = resultContent.getColumns();
-                // 数值
-                List<List<Object>> rowList = resultContent.getValues();
-                if (CollectionUtil.isNullOrEmpty(rowList)) {
-                    return Collections.emptyList();
-                }
-
-                rowList.forEach(row -> {
-                    Map<String, Object> data = new HashMap<>();
-                    resultInfolList.add(data);
-
-                    if (tagMap != null && tagMap.containsKey(DbConstant.SENSOR_ID_TAG)) {
-                        data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(tagMap.get(DbConstant.SENSOR_ID_TAG)));
+                    // 分组信息
+                    Map<String, String> tagMap = resultContent.getTags();
+                    // 字段列
+                    List<String> columns = resultContent.getColumns();
+                    // 数值
+                    List<List<Object>> rowList = resultContent.getValues();
+                    if (CollectionUtil.isNullOrEmpty(rowList)) {
+                        return Collections.emptyList();
                     }
-                    for (int k = 0; k < row.size(); k++) {
-                        String columnName = columns.get(k);
-                        Object value = row.get(k);
 
-                        if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
-                            data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
-                        } else if ("currentRainfall".equals(columnName)) {
-                            data.put(columnName, value);
+                    rowList.forEach(row -> {
+                        Map<String, Object> data = new HashMap<>();
+                        resultInfolList.add(data);
+
+                        if (tagMap != null && tagMap.containsKey(DbConstant.SENSOR_ID_TAG)) {
+                            data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(tagMap.get(DbConstant.SENSOR_ID_TAG)));
                         }
-                    }
-                });
+                        for (int k = 0; k < row.size(); k++) {
+                            String columnName = columns.get(k);
+                            Object value = row.get(k);
+
+                            if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
+                                data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
+                            } else if ("currentRainfall".equals(columnName)) {
+                                data.put(columnName, value);
+                            }
+                        }
+                    });
+                }
             }
         }
         return resultInfolList;
