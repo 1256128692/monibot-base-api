@@ -459,33 +459,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
-     * @apiSuccessExample 响应结果示例
-     * [{
-     * "time":"2023-02-27 00:00:00",
-     * "timeDataList":[
-     * {
-     * "pointID":1,
-     * "pointName":"测点1",
-     * "value":1.5},
-     * {
-     * "pointID":2,
-     * "pointName":"测点2",
-     * "value":2.5}
-     * ]
-     * },
-     * {
-     * "time":"2023-02-27 02:00:00",
-     * "timeDataList":[
-     * {
-     * "pointID":1,
-     * "pointName":"测点1",
-     * "value":1.6},
-     * {
-     * "pointID":2,
-     * "pointName":"测点2",
-     * "value":2.4}
-     * ]
-     * }]
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
