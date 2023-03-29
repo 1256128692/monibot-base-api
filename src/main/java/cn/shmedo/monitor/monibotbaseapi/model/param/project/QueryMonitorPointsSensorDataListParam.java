@@ -71,6 +71,10 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
             long projectCount = tbMonitorPointList.stream().map(TbMonitorPoint::getProjectID).distinct().count();
             if (projectCount > 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表数据的所属工程需一致");
+            }else {
+                if (!projectID.equals(tbMonitorPointList.get(0).getProjectID())) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前请求工程ID与监测点所属工程ID不一致");
+                }
             }
         }
         if (StringUtils.isNotBlank(density)) {
