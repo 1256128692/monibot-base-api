@@ -341,43 +341,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
         });
     }
 
-//    @Override
-//    public List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean raw, Boolean fieldSort) {
-//        List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-//        String measurement = FieldUtil.getMeasurement(fieldTypeCount, raw, density.avgTable());
-//        String beginString = TimeUtil.formatInfluxTimeString(begin);
-//        String endString = TimeUtil.formatInfluxTimeString(end);
-//        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-//                .collect(Collectors.joining(" or "));
-//        List<String> selectField = FieldUtil.getSelectField(fieldSelectInfoList, density.avgField());
-//        String sql = null;
-//        switch (density) {
-//            case ALL:
-//                sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//            case HOUR:
-//                sql = getHourSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//            case DAY:
-//                sql = getDaySensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//            case WEEK:
-//                sql = getWeekSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//            case MONTH:
-//                sql = getMonthSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//            case YEAR:
-//                sql = getYearSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-//                break;
-//        }
-//        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-//        if (ObjectUtil.isNotNull(fieldSort) && fieldSort) {
-//            return queryResult2map(queryResult, fieldSelectInfoList);
-//        } else {
-//            return queryResult2map(queryResult);
-//        }
-//    }
 
     @Override
     public List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
@@ -414,11 +377,30 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    @Override
+    public List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
 
-//    @Override
-//    public List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b) {
-//        return querySensorOriginData(sensorIDList, fieldSelectInfoList, begin, end, density, b, null);
-//    }
+        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String endString = TimeUtil.formatInfluxTimeString(end);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append("select sum(v1) as dailyRainfall from tb_5 ");
+        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+        sqlBuilder.append(" and ( ");
+        sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
+        String sql = sqlBuilder.toString();
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+
+        List<String> selectField = new LinkedList<>();
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
+        selectField.add(DbConstant.DAILY_RAINFALL);
+
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
+
 
     private List<Map<String, Object>> queryResult2map(QueryResult queryResult) {
         return queryResult2map(queryResult, null);

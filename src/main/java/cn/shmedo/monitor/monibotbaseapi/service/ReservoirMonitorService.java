@@ -24,7 +24,7 @@ public interface ReservoirMonitorService {
 
     MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID);
 
-    MonitorPointHistoryData queryRainPointHistoryDataList(QueryRainMonitorPointSensorDataListParam pa);
+    RainMonitorPointHistoryData queryRainPointHistoryDataList(QueryRainMonitorPointSensorDataListParam pa);
 
     MonitorPointListHistoryData queryMonitorPointListHistoryDataList(QueryMonitorPointsSensorDataListParam pa);
 }
