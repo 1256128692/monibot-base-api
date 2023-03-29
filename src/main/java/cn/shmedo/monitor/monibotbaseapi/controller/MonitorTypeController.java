@@ -1,7 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.AddCustomizedMonitorTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypePageParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import lombok.AllArgsConstructor;
@@ -56,26 +59,29 @@ public class MonitorTypeController {
      * @apiName AddMonitorType
      * @apiDescription 新增自定义监测类型
      * @apiParam (请求参数) {Int} companyID
-     * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {String} typeName 监测类型名称
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型, 未设置则自动生成
+     * @apiParam (请求参数) {String} typeName 监测类型名称 (max=50)
+     * @apiParam (请求参数) {String} [typeAlias]  别名(max = 50 )未设置则用typeName
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
-     * @apiParam (请求参数) {Object[]} fieldList 属性列表
-     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
-     * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
+     * @apiParam (请求参数) {String} [exValues] 拓展数据
+     * @apiParam (请求参数) {Object[]} fieldList 属性列表 (max=50)
+     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
+     * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识(max=50)
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
-     * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
-     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiParam (请求参数) {String} [fieldList.fieldDesc] 属性描述(max = 500)
+     * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addCustomizedMonitorType(@RequestBody @Validated Object request) {
+    public Object addCustomizedMonitorType(@RequestBody @Validated AddCustomizedMonitorTypeParam pa) {
+        monitorTypeService.addCustomizedMonitorType(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -206,7 +212,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.createType 创建类型
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.exValue] 额外属性
-     * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 描述
+     * @apiSuccess (返回结果) {String} [currentPageData.fieldList.fieldDesc] 描述
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
@@ -286,7 +292,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} templateList.createType  创建类型
      * @apiSuccess (返回结果) {Int} templateList.calType  计算方式 123 公式，脚本，外部http
      * @apiSuccess (返回结果) {Int} templateList.displayOrder  排序
-     * @apiSuccess (返回结果) {String} [exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
+     * @apiSuccess (返回结果) {String} [templateList.exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
      * @apiSuccess (返回结果) {Int} templateList.tokenList.datasourceType  12 物联网，监测传感器
      * @apiSuccess (返回结果) {String} templateList.tokenList.token  标识
@@ -303,8 +309,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypeDetail(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorTypeDetail(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
+        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType());
     }
 
     /**
@@ -396,6 +402,8 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} list.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiSuccess (返回结果) {String} list.fieldDataType 属性数据类型，String，Double，Long
      * @apiSuccess (返回结果) {Int} list.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {String} list.engUnit 英文单位
+     * @apiSuccess (返回结果) {String} list.chnUnit 中文单位
      * @apiSuccess (返回结果) {Int} [list.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} list.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} list.createType 创建类型

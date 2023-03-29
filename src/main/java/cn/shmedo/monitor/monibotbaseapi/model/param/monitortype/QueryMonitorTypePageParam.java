@@ -40,7 +40,7 @@ public class QueryMonitorTypePageParam implements ParameterValidator, ResourcePe
 
     @Override
     public ResultWrapper<?> validate() {
-        if (createType!=null && !CreateType.validate(createType)){
+        if (createType!=null && !CreateType.isValid(createType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
         return null;

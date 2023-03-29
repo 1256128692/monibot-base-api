@@ -1,14 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.AddCustomizedMonitorTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -94,5 +93,36 @@ public class Param2DBEntityUtil {
             return obj;
         }).collect(Collectors.toList());
 
+    }
+
+    public static TbMonitorType fromAddCustomizedMonitorTypeParam2tbMonitorType(AddCustomizedMonitorTypeParam pa, Integer userID, Integer type) {
+        TbMonitorType obj = new TbMonitorType();
+        obj.setMonitorType(type);
+        obj.setTypeName(pa.getTypeName());
+        obj.setTypeAlias(StringUtils.isBlank(pa.getTypeAlias())?pa.getTypeName():pa.getTypeAlias());
+        obj.setDisplayOrder(null);
+        obj.setMultiSensor(pa.getMultiSensor());
+        obj.setApiDatasource(pa.getApiDataSource());
+        obj.setCreateType(CreateType.CUSTOMIZED.getType());
+        obj.setCompanyID(pa.getCompanyID());
+        obj.setExValues(pa.getExValues());
+        return obj;
+    }
+
+    public static List<TbMonitorTypeField> fromAddCustomizedMonitorTypeParam2TbMonitorTypeFieldList(AddCustomizedMonitorTypeParam pa, Integer userID, Integer type) {
+        return  pa.getFieldList().stream().map(item -> {
+            TbMonitorTypeField obj = new TbMonitorTypeField();
+            obj.setMonitorType(type);
+            obj.setFieldName(item.getFieldName());
+            obj.setFieldToken(item.getFieldToken());
+            obj.setFieldDataType(item.getFieldDataType());
+            obj.setFieldClass(item.getFieldClass());
+            obj.setFieldUnitID(item.getFieldUnitID());
+            obj.setParentID(null);
+            obj.setDisplayOrder(null);
+            obj.setExValues(item.getExValues());
+            obj.setCreateType(item.getCreateType());
+            return obj;
+        }).collect(Collectors.toList());
     }
 }

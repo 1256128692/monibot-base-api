@@ -23,7 +23,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        if (createType!=null &&!CreateType.validate(createType)){
+        if (createType!=null &&!CreateType.isValid(createType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
         return null;

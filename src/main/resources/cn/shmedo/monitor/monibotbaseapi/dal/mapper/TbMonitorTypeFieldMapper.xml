@@ -165,9 +165,14 @@
     where ID = #{ID,jdbcType=INTEGER}
   </update>
   <select id="queryByMonitorTypes" resultMap="BaseResultMap">
-    select * from tb_monitor_type_field where MonitorType in <foreach collection="list" item="type" separator="," open="(" close=")">
-      #{type}
-  </foreach>
+      select *
+      from tb_monitor_type_field where MonitorType in
+      <foreach collection="monitorTypes" item="type" separator="," open="(" close=")">
+          #{type}
+      </foreach>
+      <if test="allFiled == null || allFiled == false">
+          and FieldClass != 3
+      </if>
   </select>
   <select id="queryMonitorTypeByFuzzyNameAndFuzzyToken" resultType="java.lang.Integer">
     select distinct  MonitorType
@@ -181,4 +186,16 @@
           </if>
         </where>
   </select>
+  <insert id="insertBatch" >
+    insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
+    FieldDataType, FieldClass, FieldUnitID,
+    ParentID, DisplayOrder, CreateType,
+    ExValues)
+    values <foreach collection="list" item="item" separator=",">
+    (#{item.monitorType,jdbcType=INTEGER}, #{item.fieldName,jdbcType=VARCHAR}, #{item.fieldToken,jdbcType=VARCHAR},
+    #{item.fieldDataType,jdbcType=VARCHAR}, #{item.fieldClass,jdbcType=INTEGER}, #{item.fieldUnitID,jdbcType=INTEGER},
+    #{item.parentID,jdbcType=INTEGER}, #{item.displayOrder,jdbcType=INTEGER}, #{item.createType,jdbcType=INTEGER},
+    #{item.exValues,jdbcType=VARCHAR})
+  </foreach>
+  </insert>
 </mapper>

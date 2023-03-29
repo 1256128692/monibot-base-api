@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -21,5 +20,7 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(String fuzzyFieldName, String fuzzyFieldToken);
 
-    List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes);
+    List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes, Boolean allFiled);
+
+    void insertBatch(List<TbMonitorTypeField> list);
 }

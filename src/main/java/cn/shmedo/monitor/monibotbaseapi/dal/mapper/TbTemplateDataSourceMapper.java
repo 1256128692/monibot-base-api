@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateDataSource;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface TbTemplateDataSourceMapper {
+public interface TbTemplateDataSourceMapper extends BaseMapper<TbTemplateDataSource> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbTemplateDataSource record);

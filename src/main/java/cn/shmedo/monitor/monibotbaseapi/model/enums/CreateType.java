@@ -26,7 +26,7 @@ public enum CreateType {
         return typeStr;
     }
 
-    public static boolean validate( Byte type){
+    public static boolean isValid(Byte type){
         if (PREDEFINED.type.equals(type) || CUSTOMIZED.type.equals(type)){
             return true;
         }

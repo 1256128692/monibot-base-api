@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-public interface TbTemplateScriptMapper {
+public interface TbTemplateScriptMapper extends BaseMapper<TbTemplateScript> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbTemplateScript record);
