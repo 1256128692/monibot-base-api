@@ -304,15 +304,17 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             snd.setFieldList(finalFieldList);
 
             List<TbDataUnit> dataUnitList = new LinkedList<>();
-            for (int i = 0; i < finalFieldList.size(); i++) {
-                if (finalFieldList.get(i).getFieldExValue() != null) {
-                    if (!CollectionUtil.isNullOrEmpty(dataUnitList)) {
-                        List<Integer> dataUnitIDList = dataUnitList.stream().map(TbDataUnit::getID).collect(Collectors.toList());
-                        if (dataUnitIDList.contains(Integer.valueOf(finalFieldList.get(i).getFieldExValue()))) {
-                            continue;
+            if (!CollectionUtil.isNullOrEmpty(finalFieldList)){
+                for (int i = 0; i < finalFieldList.size(); i++) {
+                    if (finalFieldList.get(i).getFieldExValue() != null) {
+                        if (!CollectionUtil.isNullOrEmpty(dataUnitList)) {
+                            List<Integer> dataUnitIDList = dataUnitList.stream().map(TbDataUnit::getID).collect(Collectors.toList());
+                            if (dataUnitIDList.contains(Integer.valueOf(finalFieldList.get(i).getFieldExValue()))) {
+                                continue;
+                            }
                         }
+                        dataUnitList.add(dataUnitsMap.get(Integer.valueOf(finalFieldList.get(i).getFieldExValue())));
                     }
-                    dataUnitList.add(dataUnitsMap.get(Integer.valueOf(finalFieldList.get(i).getFieldExValue())));
                 }
             }
             snd.setDataUnitList(dataUnitList);
