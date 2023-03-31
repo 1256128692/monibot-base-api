@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -53,7 +54,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
     private List<@NotNull DataSourceTokenItem> tokenList;
     @Valid
     @Size(max = 100)
-    private List<@NotNull FormulaItme> formulaList;
+    private List<@NotNull FormulaItem> formulaList;
 
     @Override
     public ResultWrapper validate() {
@@ -73,7 +74,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         if (calType == null){
             calType = -1;
         }
-        if (!JSONUtil.isTypeJSON(exValues)){
+        if (!StringUtils.isBlank(exValues)&& !JSONUtil.isTypeJSON(exValues)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"额外属性不合法");
         }
         if (ObjectUtil.isAllNotEmpty(script, formulaList)){

@@ -36,7 +36,7 @@ public class SetFormulaParam implements ParameterValidator, ResourcePermissionPr
     @NotNull
     private Integer templateID;
     @Valid
-    private List<@NotNull FormulaItme> formulaList;
+    private List<@NotNull FormulaItem> formulaList;
 
     @Override
     public ResultWrapper validate() {

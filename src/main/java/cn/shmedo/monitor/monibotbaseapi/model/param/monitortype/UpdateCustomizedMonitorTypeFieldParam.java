@@ -12,8 +12,6 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.MonitorTypeFieldConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
@@ -42,7 +40,7 @@ public class UpdateCustomizedMonitorTypeFieldParam implements ParameterValidator
     @NotEmpty
     @Valid
     @Size(max = 10)
-    private List<UpdateFieldTime> fieldList;
+    private List<@NotNull UpdateFieldItem> fieldList;
     @Override
     public ResultWrapper validate() {
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);

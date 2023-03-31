@@ -201,10 +201,12 @@
 
   <select id="queryMonitorTypeFieldWithFormula"
           resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
-    select field.* , formula.Formula, formula.DisplayFormula
+      select field.*, formula.Formula, formula.DisplayFormula
       from tb_monitor_type_field as field
-    left join tb_template_formula as formula on formula.FieldID = field.ID
-    where field.MonitorType = #{monitorType} and FieldClass != 3 and formula.TemplateID = #{templateID}
+               left join (select * from tb_template_formula where TemplateID = #{templateID}) as formula
+                         on formula.FieldID = field.ID
+      where field.MonitorType = #{monitorType}
+        and FieldClass != 3
   </select>
 
   <update id="updateBatch">

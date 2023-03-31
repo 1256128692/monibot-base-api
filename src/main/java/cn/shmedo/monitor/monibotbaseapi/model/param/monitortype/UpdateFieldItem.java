@@ -1,10 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kotlin.internal.InlineOnly;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @program: monibot-base-api
@@ -12,8 +14,11 @@ import lombok.Data;
  * @create: 2023-03-30 19:09
  **/
 @Data
-public class UpdateFieldTime {
+@AllArgsConstructor
+@NoArgsConstructor
+public class UpdateFieldItem {
     @NotNull
+    @JsonProperty("ID")
     private Integer ID;
     @NotBlank
     @Size(max = 50)
