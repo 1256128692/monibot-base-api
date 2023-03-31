@@ -159,10 +159,22 @@ public class SensorDataDaoImpl implements SensorDataDao {
                 startTime = new Timestamp(DateUtil.offsetHour(DateUtil.beginOfDay(time), 8).getTime());
                 endTime = new Timestamp(time.getTime());
             } else {
-                // 如果时间在当天8点之前，endTime为该time，startTime为time前一天的8点
-                DateTime currentDataTime = DateUtil.offsetDay(DateUtil.beginOfDay(time), -1);
-                startTime = new Timestamp(DateUtil.offsetHour(currentDataTime, 8).getTime());
-                endTime = new Timestamp(time.getTime());
+                DateTime currentDataDay8 = DateUtil.offsetHour(DateUtil.beginOfDay(time), 8);
+                // 如果当前天的时间晚于当前天的8点,开始时间:当前天8点,结束时间:当前天的时间
+                if (time.after(currentDataDay8)) {
+                    // 当前天的8点
+                    startTime = new Timestamp(currentDataDay8.getTime());
+                    endTime = new Timestamp(time.getTime());
+                } else {
+                    // 如果当前天早于当前天的8点,开始时间:当前天的前一天的8点,结束时间:当前天的时间的点
+                    // 当前天的前一天
+                    DateTime currentDataYesterday = DateUtil.offsetDay(DateUtil.beginOfDay(time), -1);
+                    // 当前天的前一天8点
+                    DateTime currentDataTimeYesterday8 = DateUtil.offsetHour(currentDataYesterday, 8);
+                    startTime = new Timestamp(currentDataTimeYesterday8.getTime());
+                    endTime = new Timestamp(time.getTime());
+                }
+
             }
             String beginString = TimeUtil.formatInfluxTimeString(startTime);
             String endString = TimeUtil.formatInfluxTimeString(endTime);
