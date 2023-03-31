@@ -1,8 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-public class QueryMonitorPointSensorDataListParam implements ParameterValidator {
+public class QueryMonitorPointSensorDataListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull
     private Integer projectID;
@@ -64,5 +64,16 @@ public class QueryMonitorPointSensorDataListParam implements ParameterValidator 
         }
 
         return null;
+    }
+
+
+    @Override
+    public Resource parameter() {
+        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    @Override
+    public ResourcePermissionType resourcePermissionType() {
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 }

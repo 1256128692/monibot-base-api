@@ -1,9 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.date.DateUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Timestamp;
 
 @Data
-public class QueryRainMonitorPointSensorDataListParam implements ParameterValidator {
+public class QueryRainMonitorPointSensorDataListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer projectID;
 
@@ -64,5 +64,15 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
         // 将 begin 的时间减去 2 小时
 //        this.begin = new Timestamp(DateUtil.offsetHour(begin, -2).getTime());
         return null;
+    }
+
+    @Override
+    public Resource parameter() {
+        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    @Override
+    public ResourcePermissionType resourcePermissionType() {
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 }
