@@ -23,7 +23,7 @@ public class QueryMonitorPointBaseInfoListParam implements ParameterValidator, R
 
     @Override
     public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.PROJECT);
+        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
     }
 
     @Override
