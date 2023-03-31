@@ -1,9 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
+import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
+import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 public class MonitorPointController {
+
+    private ReservoirMonitorService reservoirMonitorService;
+
     /**
      * @api {POST} /AddMonitorPoint 新增监测点
      * @apiVersion 1.0.0
@@ -139,5 +152,36 @@ public class MonitorPointController {
      */
     public Object queryMonitorPointSimpleList(){
         return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryMonitorPointBaseInfoList 查询监测点基本信息
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiDescription 查询监测点基本信息
+     * @apiName QueryMonitorPointBaseInfoList
+     * @apiParam (请求体) {Int} projectID  工程ID
+     * @apiParamExample 请求体示例
+     * {"projectID":"1"}
+     * @apiSuccess (响应结果) {Object} data   结果数据
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitorTypes   监测类型列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitorItems.monitorType   监测类型
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.typeName   监测类型名称
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.typeAlias   监测类型别名
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitorItems   监测项目列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitorItems.ID   监测项目id
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.name   监测项目名称
+     * @apiSuccess (响应结果) {String} data.tbMonitorItems.alias   监测项目别名
+     * @apiSuccess (响应结果) {Object[]} data.tbMonitors   监测点列表
+     * @apiSuccess (响应结果) {Int} data.tbMonitors.ID   监测点id
+     * @apiSuccess (响应结果) {String} data.tbMonitors.name   监测点名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorPointBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointBaseInfoList(@Validated @RequestBody QueryMonitorPointBaseInfoListParam pa) {
+        return reservoirMonitorService.queryMonitorPointBaseInfoList(pa.getProjectID());
     }
 }
