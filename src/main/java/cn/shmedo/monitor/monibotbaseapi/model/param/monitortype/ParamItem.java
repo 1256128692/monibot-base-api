@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NonNull;
@@ -12,6 +14,9 @@ import lombok.NonNull;
  **/
 @Data
 public class ParamItem {
+    @NotNull
+    @JsonProperty("ID")
+    private Integer ID;
     @NonNull
     private Integer subjectID;
     @NotBlank

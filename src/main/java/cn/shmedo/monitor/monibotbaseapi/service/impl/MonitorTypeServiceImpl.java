@@ -162,9 +162,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void setParam(SetParamParam pa) {
-        List<TbParameter > parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
-        tbParameterMapper.deleteBatchByRecords(parameters);
-        tbParameterMapper.insertBatch(parameters);
+        tbParameterMapper.deleteBatchIds(pa.getParamList().stream().map(ParamItem::getID).collect(Collectors.toList()));
+        if (pa.getDeleteOnly() == null || !pa.getDeleteOnly()){
+            List<TbParameter> parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
+            tbParameterMapper.insertBatch(parameters);
+        }
     }
 
     @Override

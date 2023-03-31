@@ -28,6 +28,7 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
     private Integer companyID;
     @NonNull
     private Integer subjectType;
+    private Boolean deleteOnly;
     @Valid
     @NotEmpty
     @Size(max = 100)
