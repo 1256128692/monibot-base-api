@@ -207,8 +207,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
                 DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
                 nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
+//                nowDate = DateUtil.date();
             }
-            //
             List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
             if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
                 for (Map<String, Object> mapEntry : maps) {
@@ -319,7 +319,10 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             }
             snd.setDataUnitList(dataUnitList);
         });
-        return sensorNewDataInfoList;
+
+        return sensorNewDataInfoList.stream()
+                .sorted(Comparator.comparing(SensorNewDataInfo::getTime).reversed())
+                .collect(Collectors.toList());
     }
 
     /**
@@ -821,6 +824,10 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         Date eightClockDateTime = DateUtil.parse(resultStr, "yyyy-MM-dd HH:mm:ss");
         DateTime yesterdayEightClockDateTime = DateUtil.offsetDay(eightClockDateTime, -1);
 
+        String resultStr10 = dateStr.substring(0, 10) + " 10:00:00";
+        Date tenClockDateTime = DateUtil.parse(resultStr10, "yyyy-MM-dd HH:mm:ss");
+        DateTime yesterdaytenClockDateTime = DateUtil.offsetDay(tenClockDateTime, -1);
+
         List<Map<String, Object>> yesterdayDataList = new LinkedList<>();
         List<Map<String, Object>> todayDataList = new LinkedList<>();
 
@@ -850,7 +857,11 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                         // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
                         double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
                         double v1 = Double.parseDouble(data2.get("v1").toString());
-                        currentRainfall += v1;
+                        if (currentTime.equals(tenClockDateTime)) {
+                            currentRainfall = Double.parseDouble(data1.get("v1").toString());
+                        }else {
+                            currentRainfall += v1;
+                        }
                         BigDecimal bd = new BigDecimal(currentRainfall);
                         BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                         data1.put("currentRainfall", rounded);
@@ -876,7 +887,11 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                         // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
                         double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
                         double v1 = Double.parseDouble(data2.get("v1").toString());
-                        currentRainfall += v1;
+                        if (currentTime.equals(yesterdaytenClockDateTime)) {
+                            currentRainfall = Double.parseDouble(data1.get("v1").toString());
+                        }else {
+                            currentRainfall += v1;
+                        }
                         BigDecimal bd = new BigDecimal(currentRainfall);
                         BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
                         data1.put("currentRainfall", rounded);
