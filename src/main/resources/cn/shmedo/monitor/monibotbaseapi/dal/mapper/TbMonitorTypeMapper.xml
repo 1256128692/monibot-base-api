@@ -196,4 +196,18 @@
     </where>
     order by CreateType desc, id desc
     </select>
+  <select id="queryByTemplateIDList" resultMap="BaseResultMap">
+      select *
+      from tb_monitor_type where MonitorType in
+      (select MonitorType
+       from tb_monitor_type_template
+      where ID in<foreach collection="list" item="id" separator="," open="(" close=")">
+      #{id}
+  </foreach>)
+  </select>
+  <delete id="deleteByMonitorTypeList">
+    delete from tb_monitor_type where MonitorType in <foreach collection="list" item="type" separator="," close=")" open="(">
+      #{type}
+  </foreach>
+  </delete>
 </mapper>

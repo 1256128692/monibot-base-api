@@ -3,9 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.AddCustomizedMonitorTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypePageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -56,7 +54,7 @@ public class MonitorTypeController {
      * @api {POST} /AddCustomizedMonitorType 新增自定义监测类型
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName AddMonitorType
+     * @apiName AddCustomizedMonitorType
      * @apiDescription 新增自定义监测类型
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} [monitorType] 监测类型, 未设置则自动生成
@@ -64,7 +62,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [typeAlias]  别名(max = 50 )未设置则用typeName
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
-     * @apiParam (请求参数) {String} [exValues] 拓展数据
+     * @apiParam (请求参数) {String} [exValues] 拓展数据 (max = 500)
      * @apiParam (请求参数) {Object[]} fieldList 属性列表 (max=50)
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识(max=50)
@@ -93,15 +91,18 @@ public class MonitorTypeController {
      * @apiDescription 更新自定义监测类型
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
-     * @apiParam (请求参数) {String} typeName 监测类型名称
+     * @apiParam (请求参数) {String} typeName 监测类型名称 (max=50)
+     * @apiParam (请求参数) {String} typeAlias 监测类型别名
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
+     * @apiParam (请求参数) {String} exValues 开启api数据源(max = 500)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/UpdateCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateCustomizedMonitorType(@RequestBody @Validated Object request) {
+    public Object updateCustomizedMonitorType(@RequestBody @Validated UpdateCustomizedMonitorTypeParam pa) {
+        monitorTypeService.updateCustomizedMonitorType(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -113,9 +114,9 @@ public class MonitorTypeController {
      * @apiDescription 更新自定义监测类型属性
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
-     * @apiParam (请求参数) {Object[]} fieldList 属性列表
+     * @apiParam (请求参数) {Object[]} fieldList 属性列表(max = 10)
      * @apiParam (请求参数) {Int} fieldList.ID 属性ID
-     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
+     * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
@@ -126,7 +127,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/UpdateCustomizedMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateCustomizedMonitorTypeField(@RequestBody @Validated Object request) {
+    public Object updateCustomizedMonitorTypeField(@RequestBody @Validated UpdateCustomizedMonitorTypeFieldParam pa) {
+        monitorTypeService.updateCustomizedMonitorTypeField(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -154,7 +156,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addMonitorTypeField(@RequestBody @Validated Object request) {
+    public Object addMonitorTypeField(@RequestBody @Validated AddMonitorTypeFieldParam pa) {
+        monitorTypeService.addMonitorTypeField(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -166,14 +169,15 @@ public class MonitorTypeController {
      * @apiDescription 批量删除监测类型属性 （需要校验未设置模板？）
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
-     * @apiParam (请求参数) {Int[]} templateFieldIDList  模板属性ID列表
+     * @apiParam (请求参数) {Int[]} fieldIDList  模板属性ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated Object request) {
+    public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated DeleteMonitorTypeFieldBatchParam pa) {
+        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getFieldIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -236,7 +240,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteMonitorTypeBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteMonitorTypeBatch(@RequestBody @Validated Object request) {
+    public Object deleteMonitorTypeBatch(@RequestBody @Validated DeleteMonitorTypeBatchParam pa) {
+        monitorTypeService.deleteMonitorTypeBatch(pa.getMonitorTypeList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -290,7 +295,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} templateList.monitorType  监测类型
      * @apiSuccess (返回结果) {String} templateList.name  模板名称
      * @apiSuccess (返回结果) {Int} templateList.createType  创建类型
-     * @apiSuccess (返回结果) {Int} templateList.calType  计算方式 123 公式，脚本，外部http
+     * @apiSuccess (返回结果) {Int} templateList.calType  计算方式 1,2,3,-1 公式，脚本，外部http，不设置计算
      * @apiSuccess (返回结果) {Int} templateList.displayOrder  排序
      * @apiSuccess (返回结果) {String} [templateList.exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
@@ -322,28 +327,30 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} [companyID]  公司ID 预定义该项会设置为-1
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
-     * @apiParam (请求参数) {String} name  模板名称
-     * @apiParam (请求参数) {Int} createType  创建类型  DataSourceComposeType
+     * @apiParam (请求参数) {String} name  模板名称 (100) 无唯一性校验
+     * @apiParam (请求参数) {Int} createType  创建类型
      * @apiParam (请求参数) {Int}  dataSourceComposeType  模板数据来源类型 1单一物模型单一传感器,2多个物联网传感器（同一物模型多个或者不同物模型多个）3物联网传感器+监测传感器4单个监测传感器5多个监测传感器,100API 推送500 - 人工监测数据
      * @apiParam (请求参数) {Int} [calType]  计算方式 1,2,3,-1 公式，脚本，外部http，不设置计算
      * @apiParam (请求参数) {Int} displayOrder  排序
-     * @apiParam (请求参数) {String} [exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
-     * @apiParam (请求参数) {Object[]} tokenList  标识列表
+     * @apiParam (请求参数) {String} [exValues]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
+     * @apiParam (请求参数) {Object[]} tokenList  标识列表(max =10)
      * @apiParam (请求参数) {Int} tokenList.datasourceType  12 物联网，监测传感器
      * @apiParam (请求参数) {String} tokenList.token  标识
-     * @apiParam (请求参数) {String} [script]  计算脚本，与公式二选一
+     * @apiParam (请求参数) {String} [script]  计算脚本，与公式二选一 (max = 2000)
      * @apiParam (请求参数) {Object[]} [formulaList]  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
-     * @apiParam (请求参数) {String} formulaList.formula  公式字符串
-     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
+     * @apiParam (请求参数) {Int} formulaList.fieldCalOrder  计算排序
+     * @apiParam (请求参数) {String} formulaList.formula  公式字符串(max = 2000)
+     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用(max = 2000)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addTemplate(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object addTemplate(@RequestBody @Validated AddTemplateParam pa) {
+         monitorTypeService.addTemplate(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+         return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -353,14 +360,15 @@ public class MonitorTypeController {
      * @apiName DeleteTemplateBatch
      * @apiDescription 批量删除模板，数据源及公式一并删除，会进行校验
      * @apiParam (请求参数) {Int} companyID
-     * @apiParam (请求参数) {Int[]} templateIDList  模板ID列表
+     * @apiParam (请求参数) {Int[]} templateIDList(max =10)  模板ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 xx
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteTemplateBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteTemplateBatch(@RequestBody @Validated Object request) {
+    public Object deleteTemplateBatch(@RequestBody @Validated DeleteTemplateBatchParam pa) {
+        monitorTypeService.deleteTemplateBatch(pa.getTemplateIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -370,7 +378,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName SetFormula
      * @apiDescription 设置计算公式, 覆盖处理
-     * @apiParam (请求参数) {Int} companyID  公司ID 预定义该项会设置为-1
+     * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {Int} templateID  模板ID
      * @apiParam (请求参数) {Object[]} formulaList  公式列表
@@ -383,7 +391,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/SetFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object setFormula(@RequestBody @Validated Object request) {
+    public Object setFormula(@RequestBody @Validated SetFormulaParam pa) {
+        monitorTypeService.setFormula(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -415,8 +424,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeFieldWithFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypeFieldWithFormula(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorTypeFieldWithFormula(@RequestBody @Validated QueryMonitorTypeFieldWithFormulaParam pa) {
+        return monitorTypeService.queryMonitorTypeFieldWithFormula(pa);
     }
 
     /**
@@ -426,14 +435,14 @@ public class MonitorTypeController {
      * @apiName SetParam
      * @apiDescription 为公式，脚本，传感器设置参数, 覆盖处理
      * @apiParam (请求参数) {Int} companyID  公司ID
-     * @apiParam (请求参数) {Int} subjectType  类型123 公式脚本传感器
-     * @apiParam (请求参数) {Object[]} paramList  标识列表
+     * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
+     * @apiParam (请求参数) {Object[]} paramList  标识列表(max = 100)
      * @apiParam (请求参数) {Int} paramList.subjectID  主体ID
      * @apiParam (请求参数) {String} paramList.dataType  数据类型 String,Double,Long
-     * @apiParam (请求参数) {Int} paramList.token  参数标识
-     * @apiParam (请求参数) {String} paramList.name  参数名称
-     * @apiParam (请求参数) {String} paramList.paValue  参数值
-     * @apiParam (请求参数) {String} paramList.paUnitID  参数单位
+     * @apiParam (请求参数) {String} paramList.token  参数标识(max = 50)
+     * @apiParam (请求参数) {String} paramList.name  参数名称(max = 100)
+     * @apiParam (请求参数) {String} paramList.paValue  参数值    (max = 1000)
+     * @apiParam (请求参数) {Int} paramList.paUnitID  参数单位
      * @apiParam (请求参数) {String} [paramList.paDesc] 参数描述
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
@@ -441,7 +450,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/SetParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object setParam(@RequestBody @Validated Object request) {
+    public Object setParam(@RequestBody @Validated SetParamParam pa) {
+        monitorTypeService.setParam(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -452,8 +462,8 @@ public class MonitorTypeController {
      * @apiName QueryParam
      * @apiDescription 查询参数
      * @apiParam (请求参数) {Int} companyID  公司ID
-     * @apiParam (请求参数) {Int} subjectType  类型123 公式脚本传感器
-     * @apiParam (请求参数) {String[]} subjectTokenList  主体IDList
+     * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
+     * @apiParam (请求参数) {String[]} subjectTokenList  主体IDList(max=100)
      * @apiSuccess (返回结果) {String[]} paramList  参数列表
      * @apiSuccess (返回结果) {Int} paramList.subjectID  主体ID
      * @apiSuccess (返回结果) {String} paramList.dataType  数据类型 String,Double,Long
@@ -467,8 +477,8 @@ public class MonitorTypeController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryParam(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryParam(@RequestBody @Validated QueryParamParam pa) {
+        return monitorTypeService.queryParam(pa);
     }
 
 }

@@ -198,4 +198,51 @@
     #{item.exValues,jdbcType=VARCHAR})
   </foreach>
   </insert>
+
+  <select id="queryMonitorTypeFieldWithFormula"
+          resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
+    select field.* , formula.Formula, formula.DisplayFormula
+      from tb_monitor_type_field as field
+    left join tb_template_formula as formula on formula.FieldID = field.ID
+    where field.MonitorType = #{monitorType} and FieldClass != 3 and formula.TemplateID = #{templateID}
+  </select>
+
+  <update id="updateBatch">
+    update tb_monitor_type_field set
+    <trim prefix="fieldName = case" suffix="end,">
+      <foreach collection="fieldList" index="index" item="item">
+        when ID = #{item.ID} then #{item.fieldName}
+      </foreach>
+    </trim>
+    <trim prefix="fieldDataType = case" suffix="end,">
+      <foreach collection="fieldList" index="index" item="item">
+        when ID = #{item.ID} then #{item.fieldDataType}
+      </foreach>
+    </trim>
+    <trim prefix="fieldUnitID = case" suffix="end,">
+      <foreach collection="fieldList" index="index" item="item">
+        when ID = #{item.ID} then #{item.fieldUnitID}
+      </foreach>
+    </trim>
+    <trim prefix="FieldDesc = case" suffix="end,">
+      <foreach collection="fieldList" index="index" item="item">
+        when ID = #{item.ID} then #{item.desc}
+      </foreach>
+    </trim>
+    <trim prefix="ExValues = case" suffix="end">
+      <foreach collection="fieldList" index="index" item="item">
+        when ID = #{item.ID} then #{item.exValues}
+      </foreach>
+    </trim>
+    where ID in
+    <foreach collection="fieldList" separator="," open="(" item="item" close=")">
+      #{item.ID}
+    </foreach>
+
+  </update>
+  <delete id="deleteByMonitorTypeList">
+    delete from tb_monitor_type_field where MonitorType in <foreach collection="list" item="type" separator="," close=")" open="(">
+      #{type}
+  </foreach>
+  </delete>
 </mapper>

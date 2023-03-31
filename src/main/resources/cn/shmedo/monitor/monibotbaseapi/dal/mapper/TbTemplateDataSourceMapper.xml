@@ -82,4 +82,22 @@
       TemplateDataSourceToken = #{templateDataSourceToken,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+  <insert id="insertBatch">
+    insert into tb_template_data_source (TemplateDataSourceID, DataSourceType,
+    TemplateDataSourceToken)
+    values <foreach collection="list" item="item" separator=",">
+    (#{item.templateDataSourceID,jdbcType=VARCHAR}, #{item.dataSourceType,jdbcType=INTEGER},
+    #{item.templateDataSourceToken,jdbcType=VARCHAR})
+  </foreach>
+  </insert>
+
+  <delete id="deleteByTemplateIDList">
+      delete
+      from tb_template_data_source where TemplateDataSourceID in (select TemplateDataSourceID
+                                                                  from tb_monitor_type_template where id in
+      <foreach collection="list" item="id" open="(" close=")" separator=",">
+          #{id}
+      </foreach>
+      )
+  </delete>
 </mapper>

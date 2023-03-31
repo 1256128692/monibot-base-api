@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.UpdateFieldTime;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -23,4 +25,10 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
     List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes, Boolean allFiled);
 
     void insertBatch(List<TbMonitorTypeField> list);
+
+    List<MonitorTypeFieldWithFormula> queryMonitorTypeFieldWithFormula(Integer monitorType, Integer templateID);
+
+    void updateBatch(List<UpdateFieldTime> fieldList);
+
+    void deleteByMonitorTypeList(List<Integer> monitorTypeList);
 }

@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 public interface TbTemplateScriptMapper extends BaseMapper<TbTemplateScript> {
     int deleteByPrimaryKey(Integer ID);
 
@@ -15,4 +17,6 @@ public interface TbTemplateScriptMapper extends BaseMapper<TbTemplateScript> {
     int updateByPrimaryKeySelective(TbTemplateScript record);
 
     int updateByPrimaryKey(TbTemplateScript record);
+
+    void deleteByTemplateIDList(List<Integer> templateIDList);
 }

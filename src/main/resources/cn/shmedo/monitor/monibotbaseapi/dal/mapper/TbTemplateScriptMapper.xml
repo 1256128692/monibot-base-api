@@ -82,4 +82,11 @@
       Script = #{script,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+  <delete id="deleteByTemplateIDList">
+      delete
+      from tb_template_script  where TemplateID in
+      <foreach collection="list" item="tID" separator="," open="(" close=")">
+          #{tID}
+      </foreach>
+  </delete>
 </mapper>

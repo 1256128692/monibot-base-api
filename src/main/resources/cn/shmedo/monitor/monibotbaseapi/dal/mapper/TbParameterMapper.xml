@@ -139,4 +139,20 @@
       PaDesc = #{paDesc,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+  <delete id="deleteBatchByRecords">
+    delete from tb_parameter where <foreach collection="list" item="item" separator="or">
+    (SubjectType = #{item.subjectType} and SubjectID = #{item.subjectID} and Token = #{item.token})
+  </foreach>
+  </delete>
+  
+  <insert id="insertBatch">
+    insert into tb_parameter (SubjectID, SubjectType, DataType,
+    Token, `Name`, PaValue,
+    PaUnitID, PaDesc)
+    values <foreach collection="list" item="item" separator=",">
+    (#{item.subjectID,jdbcType=INTEGER}, #{item.subjectType,jdbcType=INTEGER}, #{item.dataType,jdbcType=VARCHAR},
+    #{item.token,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.paValue,jdbcType=VARCHAR},
+    #{item.paUnitID,jdbcType=INTEGER}, #{item.paDesc,jdbcType=VARCHAR})
+  </foreach>
+  </insert>
 </mapper>

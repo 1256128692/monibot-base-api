@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import lombok.Builder;
+
 /**
     * 模板数据来源
     */
+@Builder(toBuilder = true)
 public class TbTemplateDataSource {
     /**
     * 主键

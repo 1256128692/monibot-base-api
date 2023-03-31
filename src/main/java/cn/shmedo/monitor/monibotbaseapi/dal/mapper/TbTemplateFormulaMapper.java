@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.List;
+
 public interface TbTemplateFormulaMapper extends BaseMapper<TbTemplateFormula> {
     int deleteByPrimaryKey(Integer ID);
 
@@ -15,4 +17,10 @@ public interface TbTemplateFormulaMapper extends BaseMapper<TbTemplateFormula> {
     int updateByPrimaryKeySelective(TbTemplateFormula record);
 
     int updateByPrimaryKey(TbTemplateFormula record);
+
+    void insertBatch(List<TbTemplateFormula> list);
+
+    void deleteBatchByFieldIDS(List<Integer> fieldIDList);
+
+    void deleteByTemplateIDList(List<Integer> templateIDList);
 }

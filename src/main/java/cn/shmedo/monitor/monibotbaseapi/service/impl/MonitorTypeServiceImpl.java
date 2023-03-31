@@ -6,18 +6,16 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.AddCustomizedMonitorTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypePageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeDetail;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeTemplateDatasourceToken;
-import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
-import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorTypeTemplate4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
@@ -45,6 +43,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbTemplateDataSourceMapper tbTemplateDataSourceMapper;
     private final TbTemplateScriptMapper tbTemplateScriptMapper;
     private final TbTemplateFormulaMapper tbTemplateFormulaMapper;
+    private final TbParameterMapper tbParameterMapper;
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
@@ -89,7 +88,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         }
         TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddCustomizedMonitorTypeParam2tbMonitorType(pa, userID, type);
         tbMonitorTypeMapper.insert(tbMonitorType);
-        List<TbMonitorTypeField> list = Param2DBEntityUtil.fromAddCustomizedMonitorTypeParam2TbMonitorTypeFieldList(pa, userID, type);
+        List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
     }
 
@@ -142,4 +141,95 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         }
         return monitorTypeDetail;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addTemplate(AddTemplateParam pa, Integer userID) {
+        TbMonitorTypeTemplate record = Param2DBEntityUtil.fromAddTemplateParam2TbMonitorTypeTemplate(pa, userID);
+        tbMonitorTypeTemplateMapper.insert(record);
+        List<TbTemplateDataSource> sources = Param2DBEntityUtil.fromAddTemplateParam2TbTemplateDataSourceList(record.getTemplateDataSourceID(),pa);
+        tbTemplateDataSourceMapper.insertBatch(sources);
+        if (!StringUtils.isBlank(pa.getScript())){
+            TbTemplateScript script = Param2DBEntityUtil.buildTbMonitorTypeTemplate(record.getID(), pa.getMonitorType(), pa.getScript());
+            tbTemplateScriptMapper.insert(script);
+        }
+        if (ObjectUtil.isNotEmpty(pa.getFormulaList())){
+            List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(record.getID(), pa.getMonitorType(), pa.getFormulaList());
+            tbTemplateFormulaMapper.insertBatch(list);
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setParam(SetParamParam pa) {
+        List<TbParameter > parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
+        tbParameterMapper.deleteBatchByRecords(parameters);
+        tbParameterMapper.insertBatch(parameters);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setFormula(SetFormulaParam pa) {
+        List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(pa.getTemplateID(), pa.getMonitorType(), pa.getFormulaList());
+        tbTemplateFormulaMapper.deleteBatchByFieldIDS(list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
+        tbTemplateFormulaMapper.insertBatch(list);
+    }
+
+    @Override
+    public List<TbParameter> queryParam(QueryParamParam pa) {
+        return tbParameterMapper.selectList(new QueryWrapper<TbParameter>().eq("subjectType",pa.getSubjectType()).in("token",pa.getSubjectTokenList()));
+    }
+
+    @Override
+    public List<MonitorTypeFieldWithFormula> queryMonitorTypeFieldWithFormula(QueryMonitorTypeFieldWithFormulaParam pa) {
+        return tbMonitorTypeFieldMapper.queryMonitorTypeFieldWithFormula(pa.getMonitorType(), pa.getTemplateID());
+    }
+
+    @Override
+    public void updateCustomizedMonitorType(UpdateCustomizedMonitorTypeParam pa) {
+        tbMonitorTypeMapper.updateByPrimaryKey(
+                pa.update()
+        );
+    }
+
+    @Override
+    public void updateCustomizedMonitorTypeField(UpdateCustomizedMonitorTypeFieldParam pa) {
+        tbMonitorTypeFieldMapper.updateBatch(
+                pa.getFieldList()
+        );
+    }
+
+    @Override
+    public void addMonitorTypeField(AddMonitorTypeFieldParam pa) {
+        List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), pa.getMonitorType());
+        tbMonitorTypeFieldMapper.insertBatch(list);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteTemplateBatch(List<Integer> templateIDList) {
+        // 需要删除模板，数据源，公式或脚本
+        tbTemplateDataSourceMapper.deleteByTemplateIDList(templateIDList);
+        tbTemplateFormulaMapper.deleteByTemplateIDList(templateIDList);
+        tbTemplateScriptMapper.deleteByTemplateIDList(templateIDList);
+        tbMonitorTypeTemplateMapper.deleteBatchIds(templateIDList);
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteMonitorTypeBatch(List<Integer> monitorTypeList) {
+        List<TbMonitorTypeTemplate> typeTemplates = tbMonitorTypeTemplateMapper.selectList(new QueryWrapper<TbMonitorTypeTemplate>().in("monitorType", monitorTypeList));
+        if(ObjectUtil.isNotEmpty(typeTemplates)){
+            deleteTemplateBatch(typeTemplates.stream().map(TbMonitorTypeTemplate::getID).collect(Collectors.toList()));
+        }
+        tbMonitorTypeFieldMapper.deleteByMonitorTypeList(monitorTypeList);
+        tbMonitorTypeMapper.deleteByMonitorTypeList(monitorTypeList);
+    }
+
+    @Override
+    public void deleteMonitorTypeFieldBatch(List<Integer> fieldIDList) {
+        tbMonitorTypeFieldMapper.deleteBatchIds(fieldIDList);
+    }
+
 }
