@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -42,9 +43,8 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddPredefinedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addPredefinedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
@@ -74,7 +74,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -97,7 +97,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} exValues 开启api数据源(max = 500)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/UpdateCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -123,7 +123,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/UpdateCustomizedMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -152,7 +152,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性, 可包含默认值，是否多选，可选范围
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -172,7 +172,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int[]} fieldIDList  模板属性ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -218,7 +218,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.exValue] 额外属性
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.fieldDesc] 描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -236,7 +236,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int[]} monitorTypeList 监测类型列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteMonitorTypeBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -254,7 +254,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} [createType]  不填默认自定义
      * @apiSuccess (返回结果) {Int} monitorType 推荐的monitorType
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryRecommendedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -310,7 +310,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} templateList.formulaList.formula  公式字符串
      * @apiSuccess (返回结果) {String} templateList.formulaList.displayFormula  展示用公式字符串
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -344,7 +344,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用(max = 2000)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -363,7 +363,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int[]} templateIDList(max =10)  模板ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/DeleteTemplateBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -387,7 +387,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/SetFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -420,7 +420,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} list.formula  公式字符串
      * @apiSuccess (返回结果) {String} list.displayFormula  公式字符串展示用
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeFieldWithFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -446,7 +446,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [paramList.paDesc] 参数描述
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/SetParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -473,7 +473,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} paramList.paUnitID  参数单位
      * @apiSuccess (返回结果) {String} [paramList.paDesc] 参数描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限 xx
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)

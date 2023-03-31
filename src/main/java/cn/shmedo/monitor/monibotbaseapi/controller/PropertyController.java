@@ -46,7 +46,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} [modelPropertyList.exValue] 额外属性
      * @apiSuccess (返回结果) {Int} modelID  模板ID
      * @apiSampleRequest off
-     * @apiPermission 系统权限:mdmbase:AddModel
+     * @apiPermission 系统权限 mdmbase:AddModel
      */
     @LogParam(moduleName = "属性管理模块", operationName = "新增模板", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddModel")
@@ -82,7 +82,7 @@ public class PropertyController {
      * @apiSuccess (返回结果) {Int} [modelList.propertyList.displayOrder] 展示顺序
      * @apiSuccess (返回结果) {String} [modelList.propertyList.exValue] 拓展信息
      * @apiSampleRequest off
-     * @apiPermission 系统权限:mdmbase:DescribeModel
+     * @apiPermission 系统权限 mdmbase:DescribeModel
      */
     @Permission(permissionName = "mdmbase:DescribeModel")
     @RequestMapping(value = "QueryModelList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -103,7 +103,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} [modelValueList.value] 属性值
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 项目权限:mdmbase:UpdateBaseProject
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
     @LogParam(moduleName = "属性管理模块", operationName = "更新项目属性", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
@@ -126,7 +126,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} propertyName 属性名称
      * @apiSuccess (返回结果) {Object[]} data 属性值列表
      * @apiSampleRequest off
-     * @apiPermission 系统权限:mdmbase:DescribeModel
+     * @apiPermission 系统权限 mdmbase:DescribeModel
      */
     @Permission(permissionName = "mdmbase:DescribeModel")
     @PostMapping(value = "QueryPropertyValue", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)

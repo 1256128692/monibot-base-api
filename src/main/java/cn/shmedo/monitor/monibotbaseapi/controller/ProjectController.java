@@ -283,7 +283,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 系统权限:
+     * @apiPermission 系统权限 
      */
     @LogParam(moduleName = "项目管理模块", operationName = "转移项目", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
@@ -303,7 +303,7 @@ public class ProjectController {
      * @apiParam (请求体) {Date} newRetireDate 新有效期
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 项目权限:
+     * @apiPermission 项目权限 
      */
     @LogParam(moduleName = "项目管理模块", operationName = "推迟有效期", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
@@ -341,7 +341,7 @@ public class ProjectController {
      * @apiDescription 批量删除项目, 需要级联删除模板值，标签关系
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限:mdmbase:DeleteBaseProject
+     * @apiPermission 系统权限 mdmbase:DeleteBaseProject
      */
     @LogParam(moduleName = "项目管理模块", operationName = "删除项目", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeleteBaseProject")
@@ -363,7 +363,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} imageSuffix 图片格式
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限:mdmbase:UpdateBaseProject
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
     @LogParam(moduleName = "项目管理模块", operationName = "修改工程项目图片", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")

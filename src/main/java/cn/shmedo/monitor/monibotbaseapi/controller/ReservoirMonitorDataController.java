@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
@@ -157,9 +158,9 @@ public class ReservoirMonitorDataController {
      * ]
      * }]
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:ListCompanySensorData
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseProject")
+//    @Permission(permissionName = "mdmbase:ListCompanySensorData")
     @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
         return reservoirMonitorService.queryMonitorPointList(pa);
@@ -209,8 +210,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return reservoirMonitorService.querySingleMonitorPointNewData(pa);
@@ -241,8 +243,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} projectTypeList.ID  工程类型ID
      * @apiSuccess (响应结果) {String} projectTypeList.typeName  工程类型名称
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:DescribeBaseCompanyMonitor
      */
+//    @Permission(permissionName = "mdmbase:DescribeBaseCompanyMonitor")
     @RequestMapping(value = "/QueryMonitorPointTypeStatistics", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
         return reservoirMonitorService.queryMonitorPointTypeStatistics(pa);
@@ -279,8 +282,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
         return reservoirMonitorService.queryMonitorPointHistoryDataList(pa);
@@ -379,8 +383,9 @@ public class ReservoirMonitorDataController {
      * ]
      * }]
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySmcPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySmcPointHistoryDataList(@Validated @RequestBody QuerySmcPointHistoryDataListParam pa) {
         return reservoirMonitorService.querySmcPointHistoryDataList(pa);
@@ -422,8 +427,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryRainMonitorPointSensorDataListParam pa) {
         return reservoirMonitorService.queryRainPointHistoryDataList(pa);
@@ -460,8 +466,9 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointListHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointsSensorDataListParam pa) {
         return reservoirMonitorService.queryMonitorPointListHistoryDataList(pa);
@@ -472,7 +479,7 @@ public class ReservoirMonitorDataController {
      * @api {POST} /QueryMonitorPointBaseInfoList 查询监测点基本信息
      * @apiVersion 1.0.0
      * @apiGroup 水利监测点数据模块
-     * @apiDescription 查询监测点基本信息
+     * @apiDescription 查询监测点基本信息，TODO:迁移至监测点模块
      * @apiName QueryMonitorPointBaseInfoList
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParamExample 请求体示例
@@ -490,13 +497,13 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.tbMonitors.ID   监测点id
      * @apiSuccess (响应结果) {String} data.tbMonitors.name   监测点名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
      */
+//    @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointBaseInfoList(@Validated @RequestBody QueryMonitorPointBaseInfoListParam pa) {
         return reservoirMonitorService.queryMonitorPointBaseInfoList(pa.getProjectID());
     }
-
 }
 
 

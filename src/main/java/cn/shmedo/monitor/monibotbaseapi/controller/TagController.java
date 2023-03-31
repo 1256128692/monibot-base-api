@@ -41,7 +41,7 @@ public class TagController {
      * @apiSuccess (响应结果) {String} list.list.tagKey 标签键
      * @apiSuccess (响应结果) {String} [list.list.tagValue] 标签值
      * @apiSampleRequest off
-     * @apiPermission 系统权限:mdmbase:ListMdmbaseTag
+     * @apiPermission 系统权限 mdmbase:ListMdmbaseTag
      */
     @Permission(permissionName = "mdmbase:ListMdmbaseTag")
     @RequestMapping(value = "QueryTagList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)

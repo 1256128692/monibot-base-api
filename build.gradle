@@ -1,60 +1,76 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.0.2'
-    id 'io.spring.dependency-management' version '1.1.0'
+    id "java"
+    id "org.springframework.boot" version "3.0.2"
+    id "io.spring.dependency-management" version "1.1.0"
 }
 
-group = 'cn.shmedo.monitor'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '17'
+group = "cn.shmedo.monitor"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = "17"
+
+ext {
+    javaVersion = "17"
+    springbootVersion = "3.0.0"
+    nacosConfigVersion = "0.2.12"
+    influxdbVersion = "2.16"
+    mysqlConnectorVersion = "8.0.32"
+    druidVersion = "1.2.16"
+    iotEntityVersion = '1.0.59'
+    hutoolVersion = "5.8.12"
+    mybatisPlusVersion = "3.5.3.1"
+    openFeignVersion = "12.0"
+    mathParserVersion = "5.1.0"
+    rsApiVerison = "2.1"
+    lombokVersion = "1.18.26"
+    junitVersion = "4.13.1"
+}
 
 repositories {
-    maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url "https://maven.aliyun.com/repository/public/" }
     mavenCentral()
     maven {
-        url 'http://nexus.shmedo.cn/repository/maven-releases/'
+        url "http://nexus.shmedo.cn/repository/maven-releases/"
         allowInsecureProtocol true
         credentials {
-            username = 'medo_ldd'
-            password = 'medo420529'
+            username = "medo_ldd"
+            password = "medo420529"
         }
     }
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
-    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation group: 'org.influxdb', name: 'influxdb-java', version: '2.16'
-    implementation 'com.mysql:mysql-connector-j:8.0.32'
-    implementation("com.alibaba:druid:1.2.16")
+    implementation "org.springframework.boot:spring-boot-starter"
+    implementation "org.springframework.boot:spring-boot-starter-validation"
+    implementation "org.springframework.boot:spring-boot-starter-web"
+    implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.influxdb:influxdb-java:$influxdbVersion"
+    implementation "com.mysql:mysql-connector-j:$mysqlConnectorVersion"
+    implementation "com.alibaba:druid:$druidVersion"
 
-    implementation 'com.alibaba:druid-spring-boot-starter:1.2.16'
-    implementation ('com.baomidou:mybatis-plus-boot-starter:3.5.3.1')
-    //implementation('org.mybatis:mybatis:3.5.6')
-    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.0")
-    implementation group: 'com.alibaba.boot', name: 'nacos-config-spring-boot-starter', version: '0.2.12'
-    implementation("cn.shmedo.iot:entity:1.0.57")
+    implementation "com.alibaba:druid-spring-boot-starter:$druidVersion"
+    implementation "com.baomidou:mybatis-plus-boot-starter:$mybatisPlusVersion"
+    implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$springbootVersion"
+    implementation "com.alibaba.boot:nacos-config-spring-boot-starter:$nacosConfigVersion"
+    implementation "cn.shmedo.iot:entity:$iotEntityVersion"
 
 
-    implementation 'io.github.openfeign:feign-core:12.0'
-    implementation 'io.github.openfeign:feign-jackson:12.0'
-    implementation 'io.github.openfeign:feign-okhttp:12.0'
-    implementation 'io.github.openfeign:feign-hystrix:12.0'
-    testImplementation 'org.projectlombok:lombok:1.18.22'
+    implementation "io.github.openfeign:feign-core:$openFeignVersion"
+    implementation "io.github.openfeign:feign-jackson:$openFeignVersion"
+    implementation "io.github.openfeign:feign-okhttp:$openFeignVersion"
+    implementation "io.github.openfeign:feign-hystrix:$openFeignVersion"
+    testImplementation "org.projectlombok:lombok:$lombokVersion"
 
-    implementation group: 'javax.ws.rs', name: 'javax.ws.rs-api', version: '2.1'
+    implementation "javax.ws.rs:javax.ws.rs-api:$rsApiVerison"
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    implementation group: 'cn.hutool', name: 'hutool-all', version: '5.8.11'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'junit:junit:4.13.1'
+    compileOnly "org.projectlombok:lombok"
+    annotationProcessor "org.projectlombok:lombok"
+    implementation "cn.hutool:hutool-all:$hutoolVersion"
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
+    testImplementation "junit:junit:$junitVersion"
 }
 
-tasks.named('test') {
+tasks.named("test") {
     useJUnitPlatform()
 }
