@@ -32,11 +32,6 @@ public class QueryMonitorTypeDetailParam implements ParameterValidator, Resource
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
         QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
         wrapper.eq("monitorType",monitorType);
-        if (companyID == null){
-            wrapper.eq("companyID",-1);
-        }else {
-            wrapper.eq("companyID",companyID);
-        }
         if (tbMonitorTypeMapper.selectCount(wrapper) == 0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
         }

@@ -433,7 +433,7 @@ public class MonitorTypeController {
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName SetParam
-     * @apiDescription 为公式，脚本，传感器设置参数, 根据ID覆盖处理
+     * @apiDescription 设置参数, 根据ID覆盖处理
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
      * @apiParam (请求参数) {Boolean} [deleteOnly]  仅进行删除，根据ID
