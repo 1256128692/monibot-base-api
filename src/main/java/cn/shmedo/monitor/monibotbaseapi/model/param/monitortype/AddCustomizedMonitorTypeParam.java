@@ -59,6 +59,7 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
         QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
         wrapper.eq("typeName", typeName);
+        wrapper.eq("companyID", companyID).or().eq("companyID",-1).eq("typeName", typeName);
         if (tbMonitorTypeMapper.selectCount(wrapper) > 0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型名字已存在");
         }

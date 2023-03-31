@@ -6,20 +6,21 @@
     <!--@Table tb_monitor_type_field-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
     <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
-    <result column="FieldName" jdbcType="VARCHAR" property="fieldName" />
     <result column="FieldToken" jdbcType="VARCHAR" property="fieldToken" />
+    <result column="FieldName" jdbcType="VARCHAR" property="fieldName" />
     <result column="FieldDataType" jdbcType="VARCHAR" property="fieldDataType" />
     <result column="FieldClass" jdbcType="INTEGER" property="fieldClass" />
+    <result column="FieldDesc" jdbcType="VARCHAR" property="fieldDesc" />
     <result column="FieldUnitID" jdbcType="INTEGER" property="fieldUnitID" />
     <result column="ParentID" jdbcType="INTEGER" property="parentID" />
-    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
     <result column="CreateType" jdbcType="INTEGER" property="createType" />
     <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
+    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, MonitorType, FieldName, FieldToken, FieldDataType, FieldClass, FieldUnitID, ParentID, 
-    DisplayOrder, CreateType, ExValues
+    ID, MonitorType, FieldToken, FieldName, FieldDataType, FieldClass, FieldDesc, FieldUnitID, 
+    ParentID, CreateType, ExValues, DisplayOrder
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -35,14 +36,14 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken, 
-      FieldDataType, FieldClass, FieldUnitID, 
-      ParentID, DisplayOrder, CreateType, 
-      ExValues)
-    values (#{monitorType,jdbcType=INTEGER}, #{fieldName,jdbcType=VARCHAR}, #{fieldToken,jdbcType=VARCHAR}, 
-      #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldUnitID,jdbcType=INTEGER}, 
-      #{parentID,jdbcType=INTEGER}, #{displayOrder,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER},
-      #{exValues,jdbcType=VARCHAR})
+    insert into tb_monitor_type_field (MonitorType, FieldToken, FieldName, 
+      FieldDataType, FieldClass, FieldDesc, 
+      FieldUnitID, ParentID, CreateType, 
+      ExValues, DisplayOrder)
+    values (#{monitorType,jdbcType=INTEGER}, #{fieldToken,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR}, 
+      #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldDesc,jdbcType=VARCHAR}, 
+      #{fieldUnitID,jdbcType=INTEGER}, #{parentID,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER}, 
+      #{exValues,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -51,11 +52,11 @@
       <if test="monitorType != null">
         MonitorType,
       </if>
-      <if test="fieldName != null">
-        FieldName,
-      </if>
       <if test="fieldToken != null">
         FieldToken,
+      </if>
+      <if test="fieldName != null">
+        FieldName,
       </if>
       <if test="fieldDataType != null">
         FieldDataType,
@@ -63,14 +64,14 @@
       <if test="fieldClass != null">
         FieldClass,
       </if>
+      <if test="fieldDesc != null">
+        FieldDesc,
+      </if>
       <if test="fieldUnitID != null">
         FieldUnitID,
       </if>
       <if test="parentID != null">
         ParentID,
-      </if>
-      <if test="displayOrder != null">
-        DisplayOrder,
       </if>
       <if test="createType != null">
         CreateType,
@@ -78,16 +79,19 @@
       <if test="exValues != null">
         ExValues,
       </if>
+      <if test="displayOrder != null">
+        DisplayOrder,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="monitorType != null">
         #{monitorType,jdbcType=INTEGER},
       </if>
-      <if test="fieldName != null">
-        #{fieldName,jdbcType=VARCHAR},
-      </if>
       <if test="fieldToken != null">
         #{fieldToken,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName != null">
+        #{fieldName,jdbcType=VARCHAR},
       </if>
       <if test="fieldDataType != null">
         #{fieldDataType,jdbcType=VARCHAR},
@@ -95,20 +99,23 @@
       <if test="fieldClass != null">
         #{fieldClass,jdbcType=INTEGER},
       </if>
+      <if test="fieldDesc != null">
+        #{fieldDesc,jdbcType=VARCHAR},
+      </if>
       <if test="fieldUnitID != null">
         #{fieldUnitID,jdbcType=INTEGER},
       </if>
       <if test="parentID != null">
         #{parentID,jdbcType=INTEGER},
       </if>
-      <if test="displayOrder != null">
-        #{displayOrder,jdbcType=INTEGER},
-      </if>
       <if test="createType != null">
         #{createType,jdbcType=INTEGER},
       </if>
       <if test="exValues != null">
         #{exValues,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        #{displayOrder,jdbcType=INTEGER},
       </if>
     </trim>
   </insert>
@@ -119,11 +126,11 @@
       <if test="monitorType != null">
         MonitorType = #{monitorType,jdbcType=INTEGER},
       </if>
-      <if test="fieldName != null">
-        FieldName = #{fieldName,jdbcType=VARCHAR},
-      </if>
       <if test="fieldToken != null">
         FieldToken = #{fieldToken,jdbcType=VARCHAR},
+      </if>
+      <if test="fieldName != null">
+        FieldName = #{fieldName,jdbcType=VARCHAR},
       </if>
       <if test="fieldDataType != null">
         FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
@@ -131,20 +138,23 @@
       <if test="fieldClass != null">
         FieldClass = #{fieldClass,jdbcType=INTEGER},
       </if>
+      <if test="fieldDesc != null">
+        FieldDesc = #{fieldDesc,jdbcType=VARCHAR},
+      </if>
       <if test="fieldUnitID != null">
         FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
       </if>
       <if test="parentID != null">
         ParentID = #{parentID,jdbcType=INTEGER},
       </if>
-      <if test="displayOrder != null">
-        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-      </if>
       <if test="createType != null">
         CreateType = #{createType,jdbcType=INTEGER},
       </if>
       <if test="exValues != null">
         ExValues = #{exValues,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       </if>
     </set>
     where ID = #{ID,jdbcType=INTEGER}
@@ -153,21 +163,22 @@
     <!--@mbg.generated-->
     update tb_monitor_type_field
     set MonitorType = #{monitorType,jdbcType=INTEGER},
-      FieldName = #{fieldName,jdbcType=VARCHAR},
       FieldToken = #{fieldToken,jdbcType=VARCHAR},
+      FieldName = #{fieldName,jdbcType=VARCHAR},
       FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
       FieldClass = #{fieldClass,jdbcType=INTEGER},
+      FieldDesc = #{fieldDesc,jdbcType=VARCHAR},
       FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
       ParentID = #{parentID,jdbcType=INTEGER},
-      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       CreateType = #{createType,jdbcType=INTEGER},
-      ExValues = #{exValues,jdbcType=VARCHAR}
+      ExValues = #{exValues,jdbcType=VARCHAR},
+      DisplayOrder = #{displayOrder,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
   <select id="queryByMonitorTypes" resultMap="BaseResultMap">
       select *
       from tb_monitor_type_field where MonitorType in
-      <foreach collection="monitorTypes" item="type" separator="," open="(" close=")">
+      <foreach close=")" collection="monitorTypes" item="type" open="(" separator=",">
           #{type}
       </foreach>
       <if test="allFiled == null || allFiled == false">
@@ -186,7 +197,7 @@
           </if>
         </where>
   </select>
-  <insert id="insertBatch" >
+  <insert id="insertBatch">
     insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
     FieldDataType, FieldClass, FieldUnitID,
     ParentID, DisplayOrder, CreateType,
@@ -199,8 +210,7 @@
   </foreach>
   </insert>
 
-  <select id="queryMonitorTypeFieldWithFormula"
-          resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
+  <select id="queryMonitorTypeFieldWithFormula" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
       select field.*, formula.Formula, formula.DisplayFormula
       from tb_monitor_type_field as field
                left join (select * from tb_template_formula where TemplateID = #{templateID}) as formula
@@ -237,13 +247,13 @@
       </foreach>
     </trim>
     where ID in
-    <foreach collection="fieldList" separator="," open="(" item="item" close=")">
+    <foreach close=")" collection="fieldList" item="item" open="(" separator=",">
       #{item.ID}
     </foreach>
 
   </update>
   <delete id="deleteByMonitorTypeList">
-    delete from tb_monitor_type_field where MonitorType in <foreach collection="list" item="type" separator="," close=")" open="(">
+    delete from tb_monitor_type_field where MonitorType in <foreach close=")" collection="list" item="type" open="(" separator=",">
       #{type}
   </foreach>
   </delete>
