@@ -244,4 +244,40 @@
       #{item}
     </foreach>
   </select>
+
+
+
+
+  <select id="selectListByCondition" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo">
+      select tmp.ID,
+             tmp.ProjectID,
+             tmp.MonitorType,
+             tmp.MonitorItemID,
+             tmp.`Name`,
+             tmp.InstallLocation,
+             tmp.GpsLocation,
+             tmp.ImageLocation,
+             tmp.OverallViewLocation,
+             tmp.SpatialLocation,
+             tmp.ExValues,
+             tmp.DisplayOrder,
+             tmp.CreateTime,
+             tmp.CreateUserID,
+             tmp.UpdateTime,
+             tmp.UpdateUserID,
+             tmi.Name  as monitorItemName,
+             tmi.Alias as monitorItemAlias
+      from tb_monitor_point tmp
+               LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+      where tmp.ProjectID in
+      <foreach collection="projectIDList" item="projectID" open="(" close=")" separator=",">
+          #{projectID}
+      </foreach>
+      <if test="monitorType != null">
+          and tmp.MonitorType = #{monitorType}
+      </if>
+      <if test="monitorItemID != null">
+          and tmp.MonitorItemID = #{monitorItemID}
+      </if>
+  </select>
 </mapper>

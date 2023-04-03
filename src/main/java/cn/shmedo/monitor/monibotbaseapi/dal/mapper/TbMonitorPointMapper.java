@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -22,4 +23,6 @@ public interface TbMonitorPointMapper  extends BaseMapper<TbMonitorPoint> {
     List<TbMonitorPoint> selectMonitorTypeAndProIDByCompanyID(Integer companyID);
 
     Integer selectMonitorTypeCount(List<Integer> monitorPointIDs);
+
+    List<MonitorPointAndItemInfo> selectListByCondition(List<Integer> projectIDList, Integer monitorType, Integer monitorItemID);
 }
