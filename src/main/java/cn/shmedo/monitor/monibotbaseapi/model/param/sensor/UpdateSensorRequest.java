@@ -14,6 +14,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class UpdateSensorRequest extends SaveSensorRequest {
 
+    private Boolean enable;
+
     @NotNull(message = "传感器ID不能为空")
     private Integer sensorID;
 

@@ -18,6 +18,16 @@ import java.util.List;
 public class SensorInfoResponse extends TbSensor {
 
     /**
+     * 数据源名称
+     */
+    private List<String> dataSourceNames;
+
+    /**
+     * 监测类型名称
+     */
+    private String monitorTypeName;
+
+    /**
      * 扩展字段
      */
     private List<ExField> exFields;

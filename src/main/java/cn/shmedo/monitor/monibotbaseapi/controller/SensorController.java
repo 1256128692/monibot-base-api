@@ -30,8 +30,8 @@ public class SensorController {
      * @apiParam (请求体) {Int} currentPage 当前页码 (大于0)
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
-     * @apiParam (请求体) {String} [monitorType] 监测类型 模糊查询
-     * @apiParam (请求体) {String} [monitorPoint] 关联监测点
+     * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
+     * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.totalCount 总条数
      * @apiSuccess (响应结果) {Int} data.totalPage 总页数
@@ -39,13 +39,13 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.currentPageData.ID 传感器ID
      * @apiSuccess (响应结果) {Int} data.currentPageData.monitorType 监测类型 (Code)
      * @apiSuccess (响应结果) {String} data.currentPageData.monitorTypeName 监测类型名称
-     * @apiSuccess (响应结果) {String} data.currentPageData.name 传感器名称
+     * @apiSuccess (响应结果) {String} data.currentPageData.name 传感器名称 (由系统自动生成不可修改)
      * @apiSuccess (响应结果) {String} data.currentPageData.alias 传感器别名
      * @apiSuccess (响应结果) {Int} data.currentPageData.displayOrder 显示排序字段
      * @apiSuccess (响应结果) {Int} data.currentPageData.monitorPointID 关联监测点ID
      * @apiSuccess (响应结果) {String} data.currentPageData.monitorPointName 关联监测点名称
      * @apiSuccess (响应结果) {String} data.currentPageData.exValues 拓展信息
-     * @apiSuccess (响应结果) {Boolean} enable 是否启用
+     * @apiSuccess (响应结果) {Boolean} data.currentPageData.enable 是否启用, 不启用将不会接收数据
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"ID": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false}]}}
      * @apiPermission mdmbase:ListSensor
@@ -60,7 +60,6 @@ public class SensorController {
         return null;
     }
 
-
     /**
      * @api {POST} /DataSourceCascade 数据源级联查询
      * @apiVersion 1.0.0
@@ -68,14 +67,15 @@ public class SensorController {
      * @apiName DataSourceCascade
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {String} keyword 检索关键字
-     * @apiParam (请求参数) {Object} previous 上级选中值
+     * @apiParam (请求参数) {String} [keyword] 检索关键字
+     * @apiParam (请求参数) {Object} [previous] 上级选中值, 仅当 level=1 时可为空
      * @apiParam (请求参数) {Int} [level] 层级，默认为 1，最大为 3
      * @apiSuccess (响应结果) {Object[]} data
      * @apiSuccess (响应结果) {String} data.key 选项名称
      * @apiSuccess (响应结果) {String} data.value 选项值
+     * @apiSuccess (响应结果) {String} data.ID 选项ID
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": [{"key": "设备1","value": "10085L"},{"key": "设备2","value": "10086L"}]}
+     * {"code": 0,"msg": null,"data": [{"key": "设备1","value": "10085L", "ID": 1},{"key": "设备2","value": "10086L", "ID": 2}]}
      * @apiPermission mdmbase:ListDataSource
      */
 //    @Permission(permissionName = "mdmbase:ListDataSource")
@@ -148,23 +148,20 @@ public class SensorController {
      * @apiName AddSensor
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} [imagePath] 传感器图片路径
-     * @apiParam (请求体) {String} name 传感器名称
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {String} dataSource 数据源
+     * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API 推送
+     * @apiParam (请求体) {Object[]} dataSourceList 数据源ID
+     * @apiParam (请求体) {Int} dataSourceList.ID 数据源ID
+     * @apiParam (请求体) {String} dataSourceList.type 数据源类型 1-物联网传感器 2-监测传感器
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} exFields.ID 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
      * @apiParam (请求体) {Object[]} [paramFields] 参数列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} paramFields.ID 参数ID
      * @apiParam (请求体) {String} paramFields.value 参数值
-     * @apiParamExample 请求体示例
-     * {"exFields":[],"monitorType":7560,"imagePath":"pUm6","name":"xj9ir","paramFields":[],"projectID":5759,"dataSource":"MULTI_IOT"}
-     * @apiSuccess (响应结果) {Object} data 响应结果
-     * @apiSuccess (响应结果) {Int} data.ID 传感器ID
-     * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"ID": 10086}}
-     * @apiPermission mdmbase:UpdateSensor
+     * @apiParamExample {json} 请求体示例
+     * {"projectID": 0,"imagePath": "","name": "","alias": "","monitorType": 0,"dataSourceComposeType": 1,"dataSourceList": [{"type": "IOT","ID": 0}],"exFields": [{"ID": "","value": ""}],"paramFields": [{"ID": "","value": ""}]}
      */
     @LogParam(moduleName = "传感器模块", operationName = "新增传感器", operationProperty = OperationProperty.ADD)
 //    @Permission(permissionName = "mdmbase:UpdateSensor")
@@ -186,9 +183,11 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.ID 传感器ID
      * @apiSuccess (响应结果) {Int} data.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.templateID 模板ID
+     * @apiSuccess (响应结果) {String[]} data.dataSourceNames 数据源名称（如: 物联网数据>SN12345>传1）
      * @apiSuccess (响应结果) {String} data.dataSourceID 数据源ID
      * @apiSuccess (响应结果) {Int} data.dataSourceComposeType 数据源组合类型
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (响应结果) {String} data.monitorTypeName 监测类型名称
      * @apiSuccess (响应结果) {String} data.name 传感器名称
      * @apiSuccess (响应结果) {String} data.alias 传感器别名
      * @apiSuccess (响应结果) {Int} data.kind 传感器类型
@@ -200,6 +199,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Boolean} data.warnNoData 是否无数据报警
      * @apiSuccess (响应结果) {DateTime} data.monitorBeginTime 监测开始时间
      * @apiSuccess (响应结果) {String} data.imagePath 传感器图片路径
+     * @apiSuccess (响应结果) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
      * @apiSuccess (响应结果) {Int} data.exFields.ID 拓展字段ID
      * @apiSuccess (响应结果) {Int} data.exFields.monitorType 监测类型
@@ -260,16 +260,15 @@ public class SensorController {
      * @apiVersion 1.0.0
      * @apiGroup 传感器模块
      * @apiName UpdateSensor
-     * @apiParam (请求体) {Int} sensorID
+     * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} [imagePath] 传感器图片路径
-     * @apiParam (请求体) {String} [name] 传感器名称
      * @apiParam (请求体) {String} [alias] 传感器别名
-     * @apiParam (请求体) {String} [dataSource] 数据源
-     * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表
+     * @apiParam (请求体) {Boolean} [enable] 是否启用, 不启用将不会接收数据
+     * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表 (不传=不修改，修改时每次传全部)
      * @apiParam (请求体) {Int} exFields.ID 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
-     * @apiParam (请求体) {Object[]} [paramFields] 参数列表
+     * @apiParam (请求体) {Object[]} [paramFields] 参数列表 (不传=不修改，修改时每次传全部)
      * @apiParam (请求体) {Int} paramFields.ID 参数ID
      * @apiParam (请求体) {String} paramFields.value 参数值
      * @apiSuccess (响应结果) {Object} data 响应结果
@@ -286,7 +285,6 @@ public class SensorController {
         //传感器下拉搜索
         return null;
     }
-
 
     /**
      * @api {POST} /QueryTryingParam 获取试运行参数
@@ -338,7 +336,7 @@ public class SensorController {
      * @apiParam (请求体) {Int} calType 计算类型
      * @apiParam (请求体) {Object[]} paramList 参数列表
      * @apiSuccess (响应结果) {Object[]} data
-     * @apiSuccess (响应结果) {String} data.value
+     * @apiSuccess (响应结果) {Double} data.value
      * @apiSuccess (响应结果) {String} data.fieldToken
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": [{"value": "","fieldToken": ""}]}
