@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -49,29 +50,29 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
         Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         List<Integer> typeList;
-        if (ObjectUtil.isAllEmpty(pa.getFuzzyFieldName(), pa.getFuzzyFieldToken())){
+        if (ObjectUtil.isAllEmpty(pa.getFuzzyFieldName(), pa.getFuzzyFieldToken())) {
             typeList = null;
-        }else {
+        } else {
             typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(pa.getFuzzyFieldName(), pa.getFuzzyFieldToken());
-            if (ObjectUtil.isEmpty(typeList)){
+            if (ObjectUtil.isEmpty(typeList)) {
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData =  tbMonitorTypeMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getFuzzyTypeName(), typeList);
-        if (ObjectUtil.isEmpty(pageData.getRecords())){
+        IPage<TbMonitorType4web> pageData = tbMonitorTypeMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getFuzzyTypeName(), typeList);
+        if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
         // 处理字段和数据源统计
         List<Integer> monitorTypeList = pageData.getRecords().stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
         Map<Integer, List<TbMonitorTypeField>> typeMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
-        List<TypeAndCount>  countList= tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList);
+        List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList);
         Map<Integer, Integer> countMap = countList.stream().collect(Collectors.toMap(TypeAndCount::getType, TypeAndCount::getCount));
-        pageData.getRecords().forEach(item ->{
+        pageData.getRecords().forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
             item.setFieldList(typeMap.get(item.getMonitorType()));
         });
-        return new PageUtil.Page<>(pageData.getPages(),pageData.getRecords(),pageData.getTotal());
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
     @Override
@@ -81,10 +82,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         wrapper.orderByDesc("monitorType").last("limit 1");
         TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
         Integer type;
-        if (temp == null || temp.getMonitorType()<=20000){
+        if (temp == null || temp.getMonitorType() <= 20000) {
             type = 20001;
-        }else {
-            type = temp.getMonitorType() +1;
+        } else {
+            type = temp.getMonitorType() + 1;
         }
         TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddCustomizedMonitorTypeParam2tbMonitorType(pa, userID, type);
         tbMonitorTypeMapper.insert(tbMonitorType);
@@ -100,12 +101,12 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         MonitorTypeDetail monitorTypeDetail = new MonitorTypeDetail();
         BeanUtil.copyProperties(temp, monitorTypeDetail, false);
         List<TbMonitorTypeField> list = tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true);
-        monitorTypeDetail.setFieldList(list.stream().filter(item ->!item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
-        monitorTypeDetail.setClass3FieldList(list.stream().filter(item ->item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
+        monitorTypeDetail.setFieldList(list.stream().filter(item -> !item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
+        monitorTypeDetail.setClass3FieldList(list.stream().filter(item -> item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
         QueryWrapper<TbMonitorTypeTemplate> templateQueryWrapper = new QueryWrapper<>();
         templateQueryWrapper.eq("monitorType", monitorType);
         List<TbMonitorTypeTemplate> tbMonitorTypeTemplates = tbMonitorTypeTemplateMapper.selectList(templateQueryWrapper);
-        if (ObjectUtil.isNotEmpty(tbMonitorTypeTemplates)){
+        if (ObjectUtil.isNotEmpty(tbMonitorTypeTemplates)) {
             List<String> templateDataSourceIDList = tbMonitorTypeTemplates.stream().map(TbMonitorTypeTemplate::getTemplateDataSourceID).collect(Collectors.toList());
             List<Integer> templateIDList = tbMonitorTypeTemplates.stream().map(TbMonitorTypeTemplate::getID).toList();
 
@@ -113,7 +114,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             QueryWrapper<TbTemplateDataSource> dataSourceQueryWrapper = new QueryWrapper<>();
             dataSourceQueryWrapper.in("templateDataSourceID", templateDataSourceIDList);
             List<TbTemplateDataSource> tbTemplateDataSources = tbTemplateDataSourceMapper.selectList(dataSourceQueryWrapper);
-            if (ObjectUtil.isNotEmpty(tbTemplateDataSources)){
+            if (ObjectUtil.isNotEmpty(tbTemplateDataSources)) {
                 // TODO 需要处理物模型的其他数据
                 Map<String, List<TbTemplateDataSource>> collect = tbTemplateDataSources.stream().collect(Collectors.groupingBy(TbTemplateDataSource::getTemplateDataSourceID));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
@@ -123,12 +124,12 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             QueryWrapper<TbTemplateScript> scriptQueryWrapper = new QueryWrapper<>();
             scriptQueryWrapper.in("TemplateID", templateIDList);
             List<TbTemplateScript> scriptList = tbTemplateScriptMapper.selectList(scriptQueryWrapper);
-            if (ObjectUtil.isNotEmpty(scriptList)){
+            if (ObjectUtil.isNotEmpty(scriptList)) {
                 Map<Integer, TbTemplateScript> collect = scriptList.stream().collect(Collectors.toMap(TbTemplateScript::getTemplateID, Function.identity()));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
-                    if(collect.containsKey(item.getID())){
+                    if (collect.containsKey(item.getID())) {
                         item.setScript(collect.get(item.getID()).getScript());
-                    }else {
+                    } else {
                         item.setScript(null);
                     }
                 });
@@ -136,7 +137,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             QueryWrapper<TbTemplateFormula> formulaQueryWrapper = new QueryWrapper<>();
             formulaQueryWrapper.in("TemplateID", templateIDList);
             List<TbTemplateFormula> formulaList = tbTemplateFormulaMapper.selectList(formulaQueryWrapper);
-            if (ObjectUtil.isNotEmpty(formulaList)){
+            if (ObjectUtil.isNotEmpty(formulaList)) {
                 Map<Integer, List<TbTemplateFormula>> collect = formulaList.stream().collect(Collectors.groupingBy(TbTemplateFormula::getTemplateID));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
                     item.setFormulaList(collect.get(item.getID()));
@@ -151,13 +152,13 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public void addTemplate(AddTemplateParam pa, Integer userID) {
         TbMonitorTypeTemplate record = Param2DBEntityUtil.fromAddTemplateParam2TbMonitorTypeTemplate(pa, userID);
         tbMonitorTypeTemplateMapper.insert(record);
-        List<TbTemplateDataSource> sources = Param2DBEntityUtil.fromAddTemplateParam2TbTemplateDataSourceList(record.getTemplateDataSourceID(),pa);
+        List<TbTemplateDataSource> sources = Param2DBEntityUtil.fromAddTemplateParam2TbTemplateDataSourceList(record.getTemplateDataSourceID(), pa);
         tbTemplateDataSourceMapper.insertBatch(sources);
-        if (!StringUtils.isBlank(pa.getScript())){
+        if (!StringUtils.isBlank(pa.getScript())) {
             TbTemplateScript script = Param2DBEntityUtil.buildTbMonitorTypeTemplate(record.getID(), pa.getMonitorType(), pa.getScript());
             tbTemplateScriptMapper.insert(script);
         }
-        if (ObjectUtil.isNotEmpty(pa.getFormulaList())){
+        if (ObjectUtil.isNotEmpty(pa.getFormulaList())) {
             List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(record.getID(), pa.getMonitorType(), pa.getFormulaList());
             tbTemplateFormulaMapper.insertBatch(list);
         }
@@ -166,8 +167,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void setParam(SetParamParam pa) {
-        tbParameterMapper.deleteBatchIds(pa.getParamList().stream().map(ParamItem::getID).collect(Collectors.toList()));
-        if (pa.getDeleteOnly() == null || !pa.getDeleteOnly()){
+        List<Integer> idList = pa.getParamList().stream().map(ParamItem::getID).filter(Objects::nonNull).toList();
+        if (ObjectUtil.isNotEmpty(idList)) {
+            tbParameterMapper.deleteBatchIds(idList);
+        }
+        if (pa.getDeleteOnly() == null || !pa.getDeleteOnly()) {
             List<TbParameter> parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
             tbParameterMapper.insertBatch(parameters);
         }
@@ -183,7 +187,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public List<TbParameter> queryParam(QueryParamParam pa) {
-        return tbParameterMapper.selectList(new QueryWrapper<TbParameter>().eq("subjectType",pa.getSubjectType()).in("token",pa.getSubjectTokenList()));
+        return tbParameterMapper.selectList(new QueryWrapper<TbParameter>().eq("subjectType", pa.getSubjectType()).in("token", pa.getSubjectTokenList()));
     }
 
     @Override
@@ -226,7 +230,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Transactional(rollbackFor = Exception.class)
     public void deleteMonitorTypeBatch(List<Integer> monitorTypeList) {
         List<TbMonitorTypeTemplate> typeTemplates = tbMonitorTypeTemplateMapper.selectList(new QueryWrapper<TbMonitorTypeTemplate>().in("monitorType", monitorTypeList));
-        if(ObjectUtil.isNotEmpty(typeTemplates)){
+        if (ObjectUtil.isNotEmpty(typeTemplates)) {
             deleteTemplateBatch(typeTemplates.stream().map(TbMonitorTypeTemplate::getID).collect(Collectors.toList()));
         }
         tbMonitorTypeFieldMapper.deleteByMonitorTypeList(monitorTypeList);

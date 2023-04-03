@@ -19,8 +19,7 @@ import lombok.NonNull;
 @NoArgsConstructor
 public class FormulaItem {
     @NonNull
-    @JsonProperty("ID")
-    private Integer ID;
+    private Integer fieldID;
     @NotBlank
     @Size(max = 2000)
     private String formula;

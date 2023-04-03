@@ -18,7 +18,6 @@ import lombok.NonNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParamItem {
-    @NotNull
     @JsonProperty("ID")
     private Integer ID;
     @NonNull

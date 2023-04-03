@@ -41,6 +41,11 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
         if (!ParamSubjectType.isValid(subjectType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"参数类型有误");
         }
+        if (deleteOnly != null && deleteOnly){
+            if (paramList.stream().allMatch(item -> item.getID() == null)){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"删除请提供ID");
+            }
+        }
         // TODO 校验paramList
         return null;
     }

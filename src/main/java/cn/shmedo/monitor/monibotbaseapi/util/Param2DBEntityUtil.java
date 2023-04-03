@@ -147,7 +147,7 @@ public class Param2DBEntityUtil {
     }
 
     public static List<TbTemplateFormula> buildTbTemplateFormulaList(Integer templateID, Integer monitorType, List<FormulaItem> list) {
-        return list.stream().map(item -> TbTemplateFormula.builder().templateID(templateID).monitorType(monitorType).fieldID(item.getID()).displayFormula(item.getDisplayFormula()).formula(item.getFormula()).fieldCalOrder(item.getFieldCalOrder())
+        return list.stream().map(item -> TbTemplateFormula.builder().templateID(templateID).monitorType(monitorType).fieldID(item.getFieldID()).displayFormula(item.getDisplayFormula()).formula(item.getFormula()).fieldCalOrder(item.getFieldCalOrder())
                  .build()).collect(Collectors.toList());
     }
 
