@@ -37,7 +37,7 @@ public class QueryParamParam implements ParameterValidator, ResourcePermissionPr
     private List< @NotBlank String> subjectTokenList;
     @Override
     public ResultWrapper validate() {
-        if (ParamSubjectType.isValid(subjectType)){
+        if (!ParamSubjectType.isValid(subjectType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数类型不合法符");
         }
         return null;

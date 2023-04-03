@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TbDataUnit implements Serializable {
+    @JsonProperty("ID")
     private Integer ID;
 
     /**
