@@ -29,7 +29,7 @@ public class UpdateFieldItem {
     @NotNull
     private Integer fieldUnitID;
     @Size(max = 500)
-    private String desc;
+    private String fieldDesc;
     @Size(max = 500)
     private String exValues;
 }

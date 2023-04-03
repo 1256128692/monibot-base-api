@@ -94,7 +94,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} typeName 监测类型名称 (max=50)
      * @apiParam (请求参数) {String} typeAlias 监测类型别名
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
-     * @apiParam (请求参数) {String} exValues 开启api数据源(max = 500)
+     * @apiParam (请求参数) {String} [exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
@@ -119,8 +119,8 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
-     * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
-     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiParam (请求参数) {String} [fieldList.fieldDesc] 属性描述
+     * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType

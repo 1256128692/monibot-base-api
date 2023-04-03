@@ -238,7 +238,7 @@
     </trim>
     <trim prefix="FieldDesc = case" suffix="end,">
       <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.desc}
+        when ID = #{item.ID} then #{item.fieldDesc}
       </foreach>
     </trim>
     <trim prefix="ExValues = case" suffix="end">
