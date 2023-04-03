@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
@@ -13,6 +15,8 @@ import lombok.NonNull;
  * @create: 2023-03-30 14:30
  **/
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ParamItem {
     @NotNull
     @JsonProperty("ID")
@@ -30,7 +34,7 @@ public class ParamItem {
     @NotBlank
     @Size(max = 1000)
     private String paValue;
-    @NotBlank
+    @NotNull
     private Integer paUnitID;
     @Size(max = 200)
     private String paDesc;
