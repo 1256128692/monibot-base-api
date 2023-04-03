@@ -103,7 +103,7 @@ public class Param2DBEntityUtil {
         obj.setTypeAlias(StringUtils.isBlank(pa.getTypeAlias())?pa.getTypeName():pa.getTypeAlias());
         obj.setDisplayOrder(null);
         obj.setMultiSensor(pa.getMultiSensor());
-        obj.setApiDatasource(pa.getApiDataSource());
+        obj.setApiDataSource(pa.getApiDataSource());
         obj.setCreateType(CreateType.CUSTOMIZED.getType());
         obj.setCompanyID(pa.getCompanyID());
         obj.setExValues(pa.getExValues());

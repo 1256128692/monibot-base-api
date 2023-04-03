@@ -85,7 +85,7 @@ public class UpdateCustomizedMonitorTypeParam implements ParameterValidator, Res
     public TbMonitorType update() {
         tbMonitorType.setTypeName(typeName);
         tbMonitorType.setTypeAlias(typeAlias);
-        tbMonitorType.setApiDatasource(apiDataSource);
+        tbMonitorType.setApiDataSource(apiDataSource);
         tbMonitorType.setExValues(exValues);
         return tbMonitorType;
     }

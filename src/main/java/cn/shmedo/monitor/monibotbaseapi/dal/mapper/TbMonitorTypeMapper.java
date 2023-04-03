@@ -26,7 +26,7 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
 
     List<MonitorTypeBaseInfo> selectMonitorBaseInfo(Integer companyID);
 
-    IPage<TbMonitorType4web> queryPage(Page<TbMonitorType4web> page,  Integer companyID, Byte createType, String fuzzyTypeName, List<Integer> typeList);
+    IPage<TbMonitorType4web> queryPage(Page<TbMonitorType4web> page, Integer companyID, Byte createType, String fuzzyTypeName, List<Integer> typeList);
 
     List<TbMonitorType> queryByTemplateIDList(List<Integer> templateIDList);
 

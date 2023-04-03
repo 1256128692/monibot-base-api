@@ -10,14 +10,14 @@
     <result column="TypeAlias" jdbcType="VARCHAR" property="typeAlias" />
     <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
     <result column="MultiSensor" jdbcType="BIT" property="multiSensor" />
-    <result column="ApiDatasource" jdbcType="BIT" property="apiDatasource" />
+    <result column="ApiDataSource" jdbcType="BIT" property="apiDataSource" />
     <result column="CreateType" jdbcType="TINYINT" property="createType" />
     <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
     <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, ApiDatasource, CreateType, 
+    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, ApiDataSource, CreateType, 
     CompanyID, ExValues
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -35,11 +35,11 @@
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_monitor_type (MonitorType, TypeName, TypeAlias, 
-      DisplayOrder, MultiSensor, ApiDatasource, 
+      DisplayOrder, MultiSensor, ApiDataSource, 
       CreateType, CompanyID, ExValues
       )
     values (#{monitorType,jdbcType=INTEGER}, #{typeName,jdbcType=VARCHAR}, #{typeAlias,jdbcType=VARCHAR}, 
-      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{apiDatasource,jdbcType=BIT}, 
+      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{apiDataSource,jdbcType=BIT}, 
       #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, #{exValues,jdbcType=VARCHAR}
       )
   </insert>
@@ -62,8 +62,8 @@
       <if test="multiSensor != null">
         MultiSensor,
       </if>
-      <if test="apiDatasource != null">
-        ApiDatasource,
+      <if test="apiDataSource != null">
+        ApiDataSource,
       </if>
       <if test="createType != null">
         CreateType,
@@ -91,8 +91,8 @@
       <if test="multiSensor != null">
         #{multiSensor,jdbcType=BIT},
       </if>
-      <if test="apiDatasource != null">
-        #{apiDatasource,jdbcType=BIT},
+      <if test="apiDataSource != null">
+        #{apiDataSource,jdbcType=BIT},
       </if>
       <if test="createType != null">
         #{createType,jdbcType=TINYINT},
@@ -124,8 +124,8 @@
       <if test="multiSensor != null">
         MultiSensor = #{multiSensor,jdbcType=BIT},
       </if>
-      <if test="apiDatasource != null">
-        ApiDatasource = #{apiDatasource,jdbcType=BIT},
+      <if test="apiDataSource != null">
+        ApiDataSource = #{apiDataSource,jdbcType=BIT},
       </if>
       <if test="createType != null">
         CreateType = #{createType,jdbcType=TINYINT},
@@ -147,7 +147,7 @@
       TypeAlias = #{typeAlias,jdbcType=VARCHAR},
       DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       MultiSensor = #{multiSensor,jdbcType=BIT},
-      ApiDatasource = #{apiDatasource,jdbcType=BIT},
+      ApiDataSource = #{apiDataSource,jdbcType=BIT},
       CreateType = #{createType,jdbcType=TINYINT},
       CompanyID = #{companyID,jdbcType=INTEGER},
       ExValues = #{exValues,jdbcType=VARCHAR}
@@ -169,8 +169,8 @@
   <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web">
     select * from tb_monitor_type
     <where>
-      <if test="typeList != null and typeList.size > 0">
-        MonitorType in <foreach collection="typeList" item="type" separator="," open="(" close=")">
+      <if test="typeList != null and typeList.size &gt; 0">
+        MonitorType in <foreach close=")" collection="typeList" item="type" open="(" separator=",">
         #{type}
       </foreach>
       </if>
@@ -201,12 +201,12 @@
       from tb_monitor_type where MonitorType in
       (select MonitorType
        from tb_monitor_type_template
-      where ID in<foreach collection="list" item="id" separator="," open="(" close=")">
+      where ID in<foreach close=")" collection="list" item="id" open="(" separator=",">
       #{id}
   </foreach>)
   </select>
   <delete id="deleteByMonitorTypeList">
-    delete from tb_monitor_type where MonitorType in <foreach collection="list" item="type" separator="," close=")" open="(">
+    delete from tb_monitor_type where MonitorType in <foreach close=")" collection="list" item="type" open="(" separator=",">
       #{type}
   </foreach>
   </delete>

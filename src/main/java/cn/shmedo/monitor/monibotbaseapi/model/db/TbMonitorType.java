@@ -40,7 +40,7 @@ public class TbMonitorType {
     /**
      * 允许api数据源
      */
-    private Boolean apiDatasource;
+    private Boolean apiDataSource;
 
     /**
      * 创建类型
@@ -105,12 +105,12 @@ public class TbMonitorType {
         this.multiSensor = multiSensor;
     }
 
-    public Boolean getApiDatasource() {
-        return apiDatasource;
+    public Boolean getApiDataSource() {
+        return apiDataSource;
     }
 
-    public void setApiDatasource(Boolean apiDatasource) {
-        this.apiDatasource = apiDatasource;
+    public void setApiDataSource(Boolean apiDataSource) {
+        this.apiDataSource = apiDataSource;
     }
 
     public Byte getCreateType() {
