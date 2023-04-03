@@ -65,7 +65,7 @@ public class CommonController {
      * @apiGroup 通用模块
      * @apiName GetDataUnit
      * @apiSuccess (返回结果) {Object[]} list
-     * @apiSuccess (返回结果) {Int} list.ID
+     * @apiSuccess (返回结果) {Int} list.id
      * @apiSuccess (返回结果) {String} list.engUnit 单位英文名称
      * @apiSuccess (返回结果) {String} list.chnUnit 单位中文名称
      * @apiSuccess (返回结果) {String} list.unitClass 单位类别

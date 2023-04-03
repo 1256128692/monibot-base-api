@@ -126,7 +126,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             if (ObjectUtil.isNotEmpty(scriptList)){
                 Map<Integer, TbTemplateScript> collect = scriptList.stream().collect(Collectors.toMap(TbTemplateScript::getTemplateID, Function.identity()));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
-                    item.setScript(collect.get(item.getID()).getScript());
+                    if(collect.containsKey(item.getID())){
+                        item.setScript(collect.get(item.getID()).getScript());
+                    }else {
+                        item.setScript(null);
+                    }
                 });
             }
             QueryWrapper<TbTemplateFormula> formulaQueryWrapper = new QueryWrapper<>();

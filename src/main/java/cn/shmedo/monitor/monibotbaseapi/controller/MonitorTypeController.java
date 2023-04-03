@@ -115,7 +115,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Object[]} fieldList 属性列表(max = 10)
-     * @apiParam (请求参数) {Int} fieldList.ID 属性ID
+     * @apiParam (请求参数) {Int} fieldList.id 属性ID
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
@@ -198,7 +198,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.ID 监测类型ID
+     * @apiSuccess (返回结果) {Int} currentPageData.id 监测类型ID
      * @apiSuccess (返回结果) {Int} currentPageData.monitorType 监测类型
      * @apiSuccess (返回结果) {String} currentPageData.typeName 监测类型名称
      * @apiSuccess (返回结果) {String} currentPageData.typeAlias 监测类型别名
@@ -206,7 +206,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Boolean} currentPageData.multiSensor 多传感器么
      * @apiSuccess (返回结果) {Int} currentPageData.datasourceCount 数据源个数
      * @apiSuccess (返回结果) {Object[]} currentPageData.fieldList 属性列表
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.ID 属性ID
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.id 属性ID
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.fieldName 属性名称
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
@@ -270,7 +270,7 @@ public class MonitorTypeController {
      * @apiDescription 查看监测类型详情
      * @apiParam (请求参数) {Int} [companyID]  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
-     * @apiSuccess (返回结果) {Int} ID 监测类型ID
+     * @apiSuccess (返回结果) {Int} id 监测类型ID
      * @apiSuccess (返回结果) {Int} monitorType 监测类型
      * @apiSuccess (返回结果) {String} typeName 监测类型名称
      * @apiSuccess (返回结果) {String} typeAlias 监测类型别名
@@ -278,7 +278,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Boolean} multiSensor 多传感器么
      * @apiSuccess (返回结果) {Int} datasourceCount 数据源个数
      * @apiSuccess (返回结果) {Object[]} fieldList 属性列表
-     * @apiSuccess (返回结果) {Int} fieldList.ID 属性ID
+     * @apiSuccess (返回结果) {Int} fieldList.id 属性ID
      * @apiSuccess (返回结果) {String} fieldList.fieldName 属性名称
      * @apiSuccess (返回结果) {String} fieldList.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
@@ -405,7 +405,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {Int} templateID  模板ID
      * @apiSuccess (返回结果) {Object[]} list 当前页数据
-     * @apiSuccess (返回结果) {Int} list.ID 属性ID
+     * @apiSuccess (返回结果) {Int} list.id 属性ID
      * @apiSuccess (返回结果) {String} list.fieldName 属性名称
      * @apiSuccess (返回结果) {String} list.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} list.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
@@ -438,7 +438,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
      * @apiParam (请求参数) {Boolean} [deleteOnly]  仅进行删除，根据ID
      * @apiParam (请求参数) {Object[]} paramList  标识列表(max = 100)
-     * @apiParam (请求参数) {Int} paramList.ID  参数记录的ID
+     * @apiParam (请求参数) {Int} paramList.id  参数记录的ID
      * @apiParam (请求参数) {Int} paramList.subjectID  主体ID
      * @apiParam (请求参数) {String} paramList.dataType  数据类型 String,Double,Long
      * @apiParam (请求参数) {String} paramList.token  参数标识(max = 50)

@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TbDataUnit implements Serializable {
-    @JsonProperty("ID")
     private Integer ID;
 
     /**
