@@ -23,6 +23,7 @@ ext {
     rsApiVerison = "2.1"
     lombokVersion = "1.18.26"
     junitVersion = "4.13.1"
+    mathParserVersion = "5.1.0"
 }
 
 repositories {
@@ -63,6 +64,7 @@ dependencies {
     testImplementation "org.projectlombok:lombok:$lombokVersion"
 
     implementation "javax.ws.rs:javax.ws.rs-api:$rsApiVerison"
+    implementation "org.mariuszgromada.math:MathParser.org-mXparser:$mathParserVersion"
 
     compileOnly "org.projectlombok:lombok"
     annotationProcessor "org.projectlombok:lombok"
