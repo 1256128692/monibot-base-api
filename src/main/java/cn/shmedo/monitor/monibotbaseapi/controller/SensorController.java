@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorPageResponse;
+import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -20,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class SensorController {
+
+    private final SensorService sensorService;
 
     /**
      * @api {POST} /SensorPage 传感器分页
@@ -55,9 +59,7 @@ public class SensorController {
     @PostMapping(value = "/SensorPage", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public PageUtil.Page<SensorPageResponse> sensorPage(@RequestBody @Validated SensorPageRequest request) {
-        //传感器分页 传感器名称、监测类型、关联监测点过滤
-
-        return null;
+        return sensorService.sensorPage(request);
     }
 
     /**
@@ -81,8 +83,7 @@ public class SensorController {
     @PostMapping(value = "/DataSourceCascade", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object dataSourceCascade(DataSourceCascadeRequest request) {
-        //数据源下拉搜索, 三级级联
-        return null;
+        return sensorService.dataSourceCascade(request);
     }
 
     /**
@@ -136,9 +137,7 @@ public class SensorController {
     @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object monitorTypeCatalog(MonitorTypeCatalogRequest request) {
-        //MonitorTypeCatalogResponse
-        //监测类型下拉搜索
-        return null;
+        return sensorService.monitorTypeCatalog(request);
     }
 
     /**
@@ -162,14 +161,18 @@ public class SensorController {
      * @apiParam (请求体) {String} paramFields.value 参数值
      * @apiParamExample {json} 请求体示例
      * {"projectID": 0,"imagePath": "","name": "","alias": "","monitorType": 0,"dataSourceComposeType": 1,"dataSourceList": [{"type": 1,"value": 0}],"exFields": [{"ID": "","value": ""}],"paramFields": [{"ID": "","value": ""}]}
+     * @apiSuccess (响应结果) {Object} data 响应结果
+     * @apiSuccess (响应结果) {Int} data.ID 传感器ID
+     * @apiSuccessExample {json} 响应结果示例
+     * {"code": 0,"msg": null,"data": {"ID": 10086}}
+     * @apiPermission mdmbase:UpdateSensor
      */
     @LogParam(moduleName = "传感器模块", operationName = "新增传感器", operationProperty = OperationProperty.ADD)
 //    @Permission(permissionName = "mdmbase:UpdateSensor")
     @PostMapping(value = "/AddSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Integer addSensor(@RequestBody @Validated SaveSensorRequest request) {
-        //新增传感器
-        return null;
+    public Object addSensor(@RequestBody @Validated SaveSensorRequest request) {
+        return sensorService.addSensor(request);
     }
 
     /**
@@ -232,8 +235,7 @@ public class SensorController {
     @PostMapping(value = "/SensorInfo", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object sensorInfo(@RequestBody @Validated SensorInfoRequest request) {
-        //传感器详情
-        return null;
+        return sensorService.sensorInfo(request);
     }
 
     /**
@@ -251,8 +253,8 @@ public class SensorController {
     @PostMapping(value = "/DeleteSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object deleteSensor(@RequestBody @Validated DeleteSensorRequest request) {
-        //删除传感器
-        return null;
+        sensorService.deleteSensor(request);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -282,8 +284,7 @@ public class SensorController {
     @PostMapping(value = "/UpdateSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object updateSensor(@RequestBody @Validated UpdateSensorRequest request) {
-        //传感器下拉搜索
-        return null;
+        return sensorService.updateSensor(request);
     }
 
     /**
@@ -318,13 +319,13 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.paramList.type 参数类型 IOT-物模型数据源类型、MON-监测传感器数据类型、SLEF-自身数据、HISTORY-自身历史数据、CONS-常量、PARAM-参数、EX-扩展配置
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","ID": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
+     * @apiPermission mdmbase:DescribeSensor
      */
 //    @Permission(permissionName = "mdmbase:DescribeSensor")
     @PostMapping(value = "/QueryTryingParam", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object getTryingParam(@RequestBody @Validated QueryTryingParamRequest request) {
-        //获取试运行参数
-        return null;
+        return sensorService.getTryingParam(request);
     }
 
     /**
@@ -334,7 +335,7 @@ public class SensorController {
      * @apiName Trying
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {String} fieldToken 字段标识
+     * @apiParam (请求体) {Int} fieldID 监测类型字段ID
      * @apiParam (请求体) {Int} calType 计算类型
      * @apiParam (请求体) {Object[]} paramList 参数列表
      * @apiParam (请求体) {String} paramList.value 参数值
@@ -344,11 +345,12 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.fieldToken
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
+     * @apiPermission mdmbase:DescribeSensor
      */
 //    @Permission(permissionName = "mdmbase:DescribeSensor")
     @PostMapping(value = "/Trying", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object trying(@RequestBody @Validated TryingRequest request) {
-        return null;
+        return sensorService.trying(request);
     }
 }

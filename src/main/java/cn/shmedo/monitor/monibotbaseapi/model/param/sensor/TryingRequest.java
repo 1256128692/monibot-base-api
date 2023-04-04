@@ -30,9 +30,9 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
     private Integer monitorType;
 
     /**
-     * 字段标识
+     * 监测字段ID
      */
-    private String fieldToken;
+    private Integer fieldID;
 
     /**
      * 计算类型
