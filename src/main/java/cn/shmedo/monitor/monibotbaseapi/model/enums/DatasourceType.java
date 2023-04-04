@@ -8,7 +8,7 @@ import java.util.Map;
 
 @AllArgsConstructor
 @Getter
-public enum DataSourceType {
+public enum DatasourceType {
 
     IOT(1, "物联网数据源"),
     MONITOR(2, "监测数据源"),
@@ -19,10 +19,10 @@ public enum DataSourceType {
 
     private final String desc;
 
-    private static final Map<Integer, DataSourceType> VALUES_MAP = new HashMap<>();
+    private static final Map<Integer, DatasourceType> VALUES_MAP = new HashMap<>();
 
     static {
-        for (DataSourceType value : values()) {
+        for (DatasourceType value : values()) {
             VALUES_MAP.put(value.getCode(), value);
         }
     }
@@ -31,8 +31,8 @@ public enum DataSourceType {
 
 
 
-    public static DataSourceType codeOf(int code) {
-        DataSourceType dataSourceType = VALUES_MAP.get(code);
+    public static DatasourceType codeOf(int code) {
+        DatasourceType dataSourceType = VALUES_MAP.get(code);
         if (dataSourceType == null){
             throw new IllegalArgumentException("Invalid DataSourceComposeType code: " + code);
         }else {

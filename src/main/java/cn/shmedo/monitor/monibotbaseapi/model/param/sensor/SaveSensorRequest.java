@@ -6,7 +6,7 @@ import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -70,7 +70,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     public record Field(String ID, String value) {
     }
 
-    public record DataSource(DataSourceType type, Integer ID) {
+    public record DataSource(DatasourceType type, Integer ID) {
     }
 
     @Override
