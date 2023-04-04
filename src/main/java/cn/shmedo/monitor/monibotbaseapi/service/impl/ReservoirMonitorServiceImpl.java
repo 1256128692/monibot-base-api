@@ -112,8 +112,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
 
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, monitorItemIDs)
-                .eq(TbMonitorItemField::getEnable, true);
+                .in(TbMonitorItemField::getMonitorItemID, monitorItemIDs);
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -499,8 +498,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -561,8 +559,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -655,8 +652,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -736,8 +732,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 

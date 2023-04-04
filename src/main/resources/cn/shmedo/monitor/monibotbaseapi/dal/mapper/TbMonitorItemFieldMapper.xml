@@ -7,11 +7,10 @@
     <id column="ID" jdbcType="INTEGER" property="ID" />
     <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID" />
     <result column="MonitorTypeFieldID" jdbcType="INTEGER" property="monitorTypeFieldID" />
-    <result column="Enable" jdbcType="BIT" property="enable" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, MonitorItemID, MonitorTypeFieldID, `Enable`
+    ID, MonitorItemID, MonitorTypeFieldID
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -27,10 +26,8 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_monitor_item_field (MonitorItemID, MonitorTypeFieldID, 
-      `Enable`)
-    values (#{monitorItemID,jdbcType=INTEGER}, #{monitorTypeFieldID,jdbcType=INTEGER}, 
-      #{enable,jdbcType=BIT})
+    insert into tb_monitor_item_field (MonitorItemID, MonitorTypeFieldID)
+    values (#{monitorItemID,jdbcType=INTEGER}, #{monitorTypeFieldID,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -42,9 +39,6 @@
       <if test="monitorTypeFieldID != null">
         MonitorTypeFieldID,
       </if>
-      <if test="enable != null">
-        `Enable`,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="monitorItemID != null">
@@ -52,9 +46,6 @@
       </if>
       <if test="monitorTypeFieldID != null">
         #{monitorTypeFieldID,jdbcType=INTEGER},
-      </if>
-      <if test="enable != null">
-        #{enable,jdbcType=BIT},
       </if>
     </trim>
   </insert>
@@ -68,9 +59,6 @@
       <if test="monitorTypeFieldID != null">
         MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
       </if>
-      <if test="enable != null">
-        `Enable` = #{enable,jdbcType=BIT},
-      </if>
     </set>
     where ID = #{ID,jdbcType=INTEGER}
   </update>
@@ -78,8 +66,7 @@
     <!--@mbg.generated-->
     update tb_monitor_item_field
     set MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
-      MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
-      `Enable` = #{enable,jdbcType=BIT}
+      MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
 </mapper>
