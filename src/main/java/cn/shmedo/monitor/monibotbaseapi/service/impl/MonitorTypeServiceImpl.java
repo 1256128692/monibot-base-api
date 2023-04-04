@@ -4,17 +4,22 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,10 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,6 +53,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbTemplateScriptMapper tbTemplateScriptMapper;
     private final TbTemplateFormulaMapper tbTemplateFormulaMapper;
     private final TbParameterMapper tbParameterMapper;
+    private final FileConfig fileConfig;
+
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
@@ -86,9 +90,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public void addCustomizedMonitorType(AddCustomizedMonitorTypeParam pa, Integer userID) {
 
         Integer type;
-        if(pa.getMonitorType()!=null){
+        if (pa.getMonitorType() != null) {
             type = pa.getMonitorType();
-        }else {
+        } else {
             QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
             wrapper.orderByDesc("monitorType").last("limit 1");
             TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
@@ -106,7 +110,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     }
 
     @Override
-    public MonitorTypeDetail queryMonitorTypeDetail(Integer monitorType) {
+    public MonitorTypeDetail queryMonitorTypeDetail(Integer monitorType, Integer companyID) {
         QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
         wrapper.eq("monitorType", monitorType);
         TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
@@ -129,13 +133,42 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             if (ObjectUtil.isNotEmpty(tbTemplateDataSources)) {
                 Set<String> modelTokenList = tbTemplateDataSources.stream().filter(item -> item.getDataSourceType().equals(DatasourceType.IOT.getCode()))
                         .map(item -> item.getTemplateDataSourceToken().split("_")[0]).collect(Collectors.toSet());
-                // TODO 需要处理物模型的其他数据
-                MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.Iot);
+                Map<String, List<ModelField>> iotModelFieldMap;
+                if (ObjectUtil.isNotEmpty(modelTokenList)) {
+                    IotService iotService = ThirdHttpService.getInstance(IotService.class, ThirdHttpService.Iot);
+                    var thridParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
+                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thridParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                    if (!resultWrapper.apiSuccess()) {
+                        throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
+                    } else if (resultWrapper.getData() != null) {
+                        iotModelFieldMap = resultWrapper.getData();
+                    }else {
+                        iotModelFieldMap = Map.of();
+                    }
+
+                } else {
+                    iotModelFieldMap = Map.of();
+                }
+                Map<String, List<ModelField>> finalIotModelFieldMap = iotModelFieldMap;
 
                 Map<String, List<TbTemplateDataSource>> collect = tbTemplateDataSources.stream().collect(Collectors.groupingBy(TbTemplateDataSource::getTemplateDataSourceID));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
                     item.setTokenList(MonitorTypeTemplateDatasourceToken.valueOf(collect.get(item.getTemplateDataSourceID())));
                 });
+
+                if (finalIotModelFieldMap.size() > 0){
+                    monitorTypeDetail.getTemplateList().forEach(
+                            item ->{
+                                item.getTokenList().forEach(
+                                        token ->{
+                                            if (token.getIotModelToken() !=null){
+                                                token.setIotModelFieldList(finalIotModelFieldMap.get(token.getIotModelToken()));
+                                            }
+                                        }
+                                );
+                            }
+                    );
+                }
             }
             QueryWrapper<TbTemplateScript> scriptQueryWrapper = new QueryWrapper<>();
             scriptQueryWrapper.in("TemplateID", templateIDList);
@@ -204,8 +237,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     public List<TbParameter> queryParam(QueryParamParam pa) {
         QueryWrapper<TbParameter> queryWrapper = new QueryWrapper<TbParameter>().eq("subjectType", pa.getSubjectType()).in("subjectID", pa.getSubjectID());
-        if (ObjectUtil.isNotEmpty(pa.getSubjectTokenList())){
-            queryWrapper.in("token",pa.getSubjectTokenList());
+        if (ObjectUtil.isNotEmpty(pa.getSubjectTokenList())) {
+            queryWrapper.in("token", pa.getSubjectTokenList());
         }
         return tbParameterMapper.selectList(queryWrapper);
     }
@@ -267,20 +300,20 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public void addPredefinedMonitorType(AddPredefinedMonitorTypeParam pa, Integer usrID) {
 
         Integer type;
-        if (pa.getMonitorType()!=null){
-           type = pa.getMonitorType();
-        }else {
+        if (pa.getMonitorType() != null) {
+            type = pa.getMonitorType();
+        } else {
             QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
-            wrapper.between("monitorType", 1,20000);
+            wrapper.between("monitorType", 1, 20000);
             wrapper.orderByDesc("monitorType").last("limit 1");
             TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
-            if (temp == null){
+            if (temp == null) {
                 type = 1;
-            }else {
-                if (temp.getMonitorType() +1>20000){
+            } else {
+                if (temp.getMonitorType() + 1 > 20000) {
                     throw new CustomBaseException(ResultCode.SERVER_EXCEPTION.toInt(), "预定义的监测类型已经用尽");
-                }else {
-                    type = temp.getMonitorType() +1;
+                } else {
+                    type = temp.getMonitorType() + 1;
                 }
             }
         }

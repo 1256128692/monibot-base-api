@@ -21,7 +21,7 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
 
     void addCustomizedMonitorType(AddCustomizedMonitorTypeParam pa, Integer userID);
 
-    MonitorTypeDetail queryMonitorTypeDetail(Integer monitorType);
+    MonitorTypeDetail queryMonitorTypeDetail(Integer monitorType,  Integer companyID);
 
      void addTemplate(AddTemplateParam pa, Integer userID);
 

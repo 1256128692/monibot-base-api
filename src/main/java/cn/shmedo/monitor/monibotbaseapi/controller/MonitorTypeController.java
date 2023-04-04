@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -269,7 +268,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypeDetail
      * @apiDescription 查看监测类型详情
-     * @apiParam (请求参数) {Int} [companyID]  公司ID
+     * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiSuccess (返回结果) {Int} id 监测类型ID
      * @apiSuccess (返回结果) {Int} monitorType 监测类型
@@ -302,9 +301,16 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
      * @apiSuccess (返回结果) {Int} templateList.tokenList.datasourceType  12 物联网，监测传感器
      * @apiSuccess (返回结果) {String} templateList.tokenList.token  标识
-     * @apiSuccess (返回结果) {String} templateList.tokenList.name  名称
-     * @apiSuccess (返回结果) {String} templateList.tokenList.unit  单位
-     * @apiSuccess (返回结果) {String} templateList.tokenList.desc  描述
+     * @apiSuccess (返回结果) {Object[]} [templateList.tokenList.iotModelFieldList]  物模型字段列表
+     * @apiSuccess (响应结果) {Int} templateList.tokenList.iotModelFieldList.id 字段编号
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.fieldToken 字段标识
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.fieldName 字段名称
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.fieldDataType 字段数据类型。对于Object,Array字段类型，其childFieldList有值。其他类型childFieldList无值
+     * @apiSuccess (响应结果) {Int} templateList.tokenList.iotModelFieldList.fieldOrder 字段顺序。
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.fieldJsonPath 字段JSON提取路径。
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.fieldStatisticsType 字段数据聚合的统计方式
+     * @apiSuccess (响应结果) {String} templateList.tokenList.iotModelFieldList.exValues 字段额外属性，Json字符串
+     * @apiSuccess (响应结果) {Object[]} [templateList.tokenList.iotModelFieldList.childFieldList] 子字段列表
      * @apiSuccess (返回结果) {String} [templateList.script]  计算脚本，与公式二选一
      * @apiSuccess (返回结果) {Object[]} [templateList.formulaList]  公式列表
      * @apiSuccess (返回结果) {Int} templateList.formulaList.fieldID  监测类型ID
@@ -316,7 +322,7 @@ public class MonitorTypeController {
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeDetail(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
-        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType());
+        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType(), pa.getCompanyID());
     }
 
     /**
@@ -518,6 +524,6 @@ public class MonitorTypeController {
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeFiledInfo(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
-        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType());
+        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType(), pa.getCompanyID());
     }
 }

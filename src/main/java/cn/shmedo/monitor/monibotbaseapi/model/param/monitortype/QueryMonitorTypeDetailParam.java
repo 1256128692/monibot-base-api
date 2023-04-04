@@ -24,6 +24,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class QueryMonitorTypeDetailParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @NotNull
     private Integer companyID;
     @NotNull
     private Integer monitorType;

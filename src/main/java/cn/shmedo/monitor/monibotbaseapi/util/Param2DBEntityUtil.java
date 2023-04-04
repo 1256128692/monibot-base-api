@@ -123,6 +123,7 @@ public class Param2DBEntityUtil {
             obj.setDisplayOrder(null);
             obj.setExValues(item.getExValues());
             obj.setCreateType(item.getCreateType());
+            obj.setFieldDesc(item.getFieldDesc());
             return obj;
         }).collect(Collectors.toList());
     }
