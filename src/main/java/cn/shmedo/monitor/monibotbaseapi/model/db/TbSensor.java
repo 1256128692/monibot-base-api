@@ -1,10 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
-import java.io.Serializable;
-import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 传感器表
@@ -105,6 +106,11 @@ public class TbSensor implements Serializable {
      * 传感器图片
      */
     private String imagePath;
+
+    /**
+     * 是否开启，开启则平台接收实体传感器上传的数据，反之不接收
+     */
+    private Boolean enable;
 
     /**
      * 创建时间

@@ -5,8 +5,9 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSource;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -60,18 +61,13 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     /**
      * 扩展配置列表
      */
-    private List<Field> exFields;
+    private List<SensorConfigField> exFields;
 
     /**
      * 参数列表
      */
-    private List<Field> paramFields;
+    private List<SensorConfigField> paramFields;
 
-    public record Field(String ID, String value) {
-    }
-
-    public record DataSource(DatasourceType type, Integer ID) {
-    }
 
     @Override
     public ResultWrapper<?> validate() {

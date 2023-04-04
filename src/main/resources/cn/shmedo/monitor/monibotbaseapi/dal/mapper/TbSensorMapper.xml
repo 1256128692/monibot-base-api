@@ -21,6 +21,7 @@
     <result column="WarnNoData" jdbcType="BIT" property="warnNoData" />
     <result column="MonitorBeginTime" jdbcType="TIMESTAMP" property="monitorBeginTime" />
     <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
+    <result column="Enable" jdbcType="BIT" property="enable" />
     <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
     <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
@@ -28,9 +29,9 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, ProjectID, TemplateID, DataSourceID, DataSourceComposeType, MonitorType, `Name`, 
-    `Alias`, Kind, DisplayOrder, MonitorPointID, ConfigFieldValue, ExValues, `Status`, 
-    WarnNoData, MonitorBeginTime, ImagePath, CreateTime, CreateUserID, UpdateTime, UpdateUserID
+    ID, ProjectID, TemplateID, DataSourceID, DataSourceComposeType, MonitorType, `Name`,
+    `Alias`, Kind, DisplayOrder, MonitorPointID, ConfigFieldValue, ExValues, `Status`,
+    WarnNoData, MonitorBeginTime, ImagePath, `Enable`, CreateTime, CreateUserID, UpdateTime, UpdateUserID
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -241,6 +242,9 @@
       <if test="imagePath != null">
         ImagePath = #{imagePath,jdbcType=VARCHAR},
       </if>
+      <if test="enable != null ">
+        `Enable` = #{enable,jdbcType=BIT},
+      </if>
       <if test="createTime != null">
         CreateTime = #{createTime,jdbcType=TIMESTAMP},
       </if>
@@ -275,6 +279,7 @@
       WarnNoData = #{warnNoData,jdbcType=BIT},
       MonitorBeginTime = #{monitorBeginTime,jdbcType=TIMESTAMP},
       ImagePath = #{imagePath,jdbcType=VARCHAR},
+      `Enable` = #{enable,jdbcType=BIT},
       CreateTime = #{createTime,jdbcType=TIMESTAMP},
       CreateUserID = #{createUserID,jdbcType=INTEGER},
       UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
