@@ -116,7 +116,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Object[]} fieldList 属性列表(max = 10)
-     * @apiParam (请求参数) {Int} fieldList.id 属性ID
+     * @apiParam (请求参数) {Int} fieldList.ID 属性ID
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
@@ -167,7 +167,7 @@ public class MonitorTypeController {
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName DeleteMonitorTypeFieldBatch
-     * @apiDescription 批量删除监测类型属性 （需要校验未设置模板？）
+     * @apiDescription 批量删除监测类型属性, 对于删除的内容含有非3类的field，会校验是否有设置模板，设置模板则无法删除
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Int[]} fieldIDList  模板属性ID列表
@@ -485,5 +485,39 @@ public class MonitorTypeController {
     public Object queryParam(@RequestBody @Validated QueryParamParam pa) {
         return monitorTypeService.queryParam(pa);
     }
-
+    /**
+     * @api {POST} /QueryMonitorTypeFiledInfo 查看监测类型属性信息
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryMonitorTypeFiledInfo
+     * @apiDescription 查看监测类型属性信息
+     * @apiParam (请求参数) {Int} [companyID]  公司ID
+     * @apiParam (请求参数) {Int} monitorType  监测类型
+     * @apiSuccess (返回结果) {Int} id 监测类型ID
+     * @apiSuccess (返回结果) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {String} typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Int} createType 定义类型
+     * @apiSuccess (返回结果) {Boolean} multiSensor 是否多传感器
+     * @apiSuccess (返回结果) {Object[]} fieldList 属性列表
+     * @apiSuccess (返回结果) {Int} fieldList.id 属性ID
+     * @apiSuccess (返回结果) {String} fieldList.fieldName 属性名称
+     * @apiSuccess (返回结果) {String} fieldList.fieldToken 属性标识
+     * @apiSuccess (返回结果) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiSuccess (返回结果) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
+     * @apiSuccess (返回结果) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [fieldList.parentID] 父属性ID
+     * @apiSuccess (返回结果) {Int} fieldList.fieldCalOrder 属性计算排序
+     * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型
+     * @apiSuccess (返回结果) {String} [fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} [fieldList.desc] 描述
+     * @apiSuccess (返回结果) {String} [fieldList.formula] 公式
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeFiledInfo(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
+        return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType());
+    }
 }

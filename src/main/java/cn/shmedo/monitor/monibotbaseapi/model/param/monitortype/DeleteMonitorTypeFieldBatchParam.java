@@ -7,10 +7,13 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -53,12 +56,16 @@ public class DeleteMonitorTypeFieldBatchParam implements ParameterValidator, Res
         if (!tbMonitorType.getCompanyID().equals(companyID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不属于该公司");
         }
-        // 对于已经设置模板的监测类型，不可删除
-        TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
-        if (tbMonitorTypeTemplateMapper.selectCount(
-                new QueryWrapper<TbMonitorTypeTemplate>().eq("monitorType", monitorType)
-        ) > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型已经设置模板，不可删除");
+        // 如果包含非3类的field，对于已经设置模板的监测类型，不可删除
+        TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+        List<TbMonitorTypeField> tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectBatchIds(fieldIDList);
+        if (tbMonitorTypeFields.stream().anyMatch(item -> !item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()))){
+            TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
+            if (tbMonitorTypeTemplateMapper.selectCount(
+                    new QueryWrapper<TbMonitorTypeTemplate>().eq("monitorType", monitorType)
+            ) > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型已经设置模板，不可删除");
+            }
         }
         return null;
     }

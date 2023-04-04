@@ -12,13 +12,13 @@ public class MonitorGroupController {
      * @apiDescription 新建监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [parentID] 父监测组ID
-     * @apiParam (请求体) {String} name 监测组名称
+     * @apiParam (请求体) {String} name 监测组名称(20)
      * @apiParam (请求体) {Bool} enable 是否启用
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
     public void addMonitorGroup(){
     }
@@ -31,13 +31,13 @@ public class MonitorGroupController {
      * @apiDescription 修改监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} groupID 监测组ID
-     * @apiParam (请求体) {String} name 监测组名称
+     * @apiParam (请求体) {String} name 监测组名称(20)
      * @apiParam (请求体) {Bool} enable 是否启用
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
     public void updateMonitorMainGroup(){
     }
@@ -55,7 +55,7 @@ public class MonitorGroupController {
      * @apiParam (请求体) {String} fileContent 文件base64内容
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
     public void uploadMonitorGroupImage(){
     }
@@ -70,7 +70,7 @@ public class MonitorGroupController {
      * @apiParam (请求体) {Int[]} groupIDList 监测组ID列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorGroup
      * */
     public Object deleteMonitorGroup(){
         return null;
@@ -89,7 +89,7 @@ public class MonitorGroupController {
      * @apiParam (请求体) {String} pointLocationList.location 监测点位置
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      * */
     public Object configMonitorPointImageLocation(){
         return null;
@@ -112,6 +112,7 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Int} data.groupID 监测组ID
      * @apiSuccess (返回结果) {String} data.groupName 监测组名称
      * @apiSuccess (返回结果) {Boolean} data.enable 是否启用
+     * @apiSuccess (返回结果) {String} [data.imagePath] 底图地址
      * @apiSuccess (返回结果) {String} [data.exValue] 拓展字段
      * @apiSuccess (返回结果) {Int} data.displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} data.monitorItemList 监测项目列表
@@ -126,7 +127,7 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {String} data.monitorPointList.imageLocation 底图位置
      * @apiSuccess (返回结果) {Object[]} data.childGroupList 子监测组列表
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
      * */
     public Object queryMonitorGroupList(){
         return null;
@@ -143,6 +144,7 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Int} groupID 监测组ID
      * @apiSuccess (返回结果) {String} groupName 监测组名称
      * @apiSuccess (返回结果) {Boolean} enable 是否启用
+     * @apiSuccess (返回结果) {String} [imagePath] 底图地址
      * @apiSuccess (返回结果) {String} [exValue] 拓展字段
      * @apiSuccess (返回结果) {Int} displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} monitorItemList 监测项目列表
@@ -156,7 +158,7 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Int} monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} monitorPointList.imageLocation 底图位置
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorGroup
      */
     public Object queryMonitorGroupDetail(){
         return null;

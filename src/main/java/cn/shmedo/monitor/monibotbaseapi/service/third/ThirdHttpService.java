@@ -17,6 +17,7 @@ public class ThirdHttpService {
     public static final int Auth = 1;
 
     public static final int MdInfo = 2;
+    public static final int Iot = 3;
     public static <T> T getInstance(Class<T> tClass , int direct) {
         ObjectMapper objectMapper = ContextHolder.getBean(ObjectMapper.class);
         T instance = Feign.builder()
@@ -36,6 +37,9 @@ public class ThirdHttpService {
             }
             case MdInfo -> {
                 return fileConfig.getMdInfoServiceAddress();
+            }
+            case Iot -> {
+                return fileConfig.getIotServiceAddress();
             }
             default -> {
                 throw new CustomBaseException("获取第三方服务地址出错", new Exception());

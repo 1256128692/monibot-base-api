@@ -7,11 +7,14 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -123,7 +127,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             dataSourceQueryWrapper.in("templateDataSourceID", templateDataSourceIDList);
             List<TbTemplateDataSource> tbTemplateDataSources = tbTemplateDataSourceMapper.selectList(dataSourceQueryWrapper);
             if (ObjectUtil.isNotEmpty(tbTemplateDataSources)) {
+                Set<String> modelTokenList = tbTemplateDataSources.stream().filter(item -> item.getDataSourceType().equals(DatasourceType.IOT.getCode()))
+                        .map(item -> item.getTemplateDataSourceToken().split("_")[0]).collect(Collectors.toSet());
                 // TODO 需要处理物模型的其他数据
+                MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.Iot);
+
                 Map<String, List<TbTemplateDataSource>> collect = tbTemplateDataSources.stream().collect(Collectors.groupingBy(TbTemplateDataSource::getTemplateDataSourceID));
                 monitorTypeDetail.getTemplateList().forEach(item -> {
                     item.setTokenList(MonitorTypeTemplateDatasourceToken.valueOf(collect.get(item.getTemplateDataSourceID())));

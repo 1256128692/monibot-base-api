@@ -33,7 +33,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int[]} fieldIDList 监测类型字段ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateMonitorItem
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -56,7 +56,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int[]}   [fieldIDList] 监测类型字段ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateMonitorItem
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
 //    @Permission(permissionName = "mdmbase:UpdateMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -76,7 +76,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddCompanyMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:AddCompanyMonitorItem")
+//    @Permission(permissionName = "mdmbase:AddCompanyBaseMonitorItem")
     @PostMapping(value = "/AddCompanyMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addCompanyMonitorItem(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
@@ -115,9 +115,9 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 字段描述
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.unit 单位
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListMonitorItem
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:ListMonitorItem")
+//    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
     @PostMapping(value = "/QueryMonitorItemPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemPageList(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
@@ -133,9 +133,9 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int[]} monitorItemIDList
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DeleteMonitorItem
+     * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:DeleteMonitorItem")
+//    @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
     @PostMapping(value = "/DeleteMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorItem(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
