@@ -1,10 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
@@ -19,12 +17,12 @@ import cn.shmedo.monitor.monibotbaseapi.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WaterQuality;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
@@ -78,15 +76,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             return Collections.emptyList();
         }
         List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
-
-        LambdaQueryWrapper<TbMonitorPoint> monitorPointLambdaQueryWrapper = new LambdaQueryWrapper<TbMonitorPoint>()
-                .in(TbMonitorPoint::getProjectID, projectIDList)
-                .eq(TbMonitorPoint::getMonitorType, pa.getMonitorType());
-        if (pa.getMonitorItemID() != null) {
-            monitorPointLambdaQueryWrapper.eq(TbMonitorPoint::getMonitorItemID, pa.getMonitorItemID());
-        }
         // 2.监测点信息列表
-        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(monitorPointLambdaQueryWrapper);
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList, pa.getMonitorType(), pa.getMonitorItemID());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return Collections.emptyList();
         }
@@ -94,8 +85,14 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     }
 
 
+    /**
+     * @param tbProjectInfos  项目基本信息列表
+     * @param tbMonitorPoints 监测点基本信息列表
+     * @param monitorType     监测类型
+     * @return
+     */
     public List<SensorNewDataInfo> buildProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos,
-                                                                       List<TbMonitorPoint> tbMonitorPoints,
+                                                                       List<MonitorPointAndItemInfo> tbMonitorPoints,
                                                                        Integer monitorType) {
 
         List<SensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
@@ -104,8 +101,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
         Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
-        List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getID).collect(Collectors.toList());
-        List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
+        List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
+        List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
                 .in(TbSensor::getMonitorPointID, monitorPointIDs)
@@ -115,8 +112,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
 
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, monitorItemIDs)
-                .eq(TbMonitorItemField::getEnable, true);
+                .in(TbMonitorItemField::getMonitorItemID, monitorItemIDs);
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -135,13 +131,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
         }
 
-
-        LambdaQueryWrapper<TbMonitorItem> mIQueryWrapper = new LambdaQueryWrapper<TbMonitorItem>()
-                .in(TbMonitorItem::getID, monitorItemIDs);
-        // 3. 监测点项目列表
-        List<TbMonitorItem> TbMonitorItems = tbMonitorItemMapper.selectList(mIQueryWrapper);
-
-
         List<Integer> sensorIDList;
         if (!CollectionUtil.isNullOrEmpty(tbSensors)) {
             sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
@@ -153,7 +142,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
             List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
             sensorNewDataInfoList.add(SensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
-                    projectTypeMap, sensorList, monitorTypeMap, TbMonitorItems));
+                    projectTypeMap, sensorList, monitorTypeMap));
         });
 
         List<Map<String, Object>> maps;
@@ -208,7 +197,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
                 DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
                 nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
-//                nowDate = DateUtil.date();
             }
             List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
             if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
@@ -247,8 +235,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     }
                 }
             });
-
-            FieldSelectInfo fieldSelectInfo = new FieldSelectInfo();
         }
     }
 
@@ -324,7 +310,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         });
 
         return sensorNewDataInfoList.stream()
-                .sorted(Comparator.comparing(SensorNewDataInfo::getTime).reversed())
+                .sorted(Comparator.comparing(SensorNewDataInfo::getTime, Comparator.nullsLast(Comparator.reverseOrder())))
                 .collect(Collectors.toList());
     }
 
@@ -349,12 +335,12 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("v8"));
                 List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
-                currentSensorData.put("waterQuality", maxCategory);
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
 
             } else if (monitorItemID.equals(MonitoringItem.RESERVOIR_WATER_QUALITY.getKey())) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
                 int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
-                currentSensorData.put("waterQuality", v3);
+                currentSensorData.put("waterQuality",  WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
             // 风力
@@ -406,7 +392,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         LambdaQueryWrapper<TbMonitorPoint> monitorPointLambdaQueryWrapper = new LambdaQueryWrapper<TbMonitorPoint>()
                 .in(TbMonitorPoint::getID, pa.getMonitorPointID());
         // 2.监测点信息列表
-        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(monitorPointLambdaQueryWrapper);
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getMonitorPointID()), null, null);
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
         } else {
@@ -512,8 +498,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -574,8 +559,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -668,8 +652,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 
@@ -718,7 +701,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     }
 
     /**
-     * 遍历 dataList，找到 time 这样的"2023-03-22 14:00:00.000" 的数据。所有数据的时间都往后挪2小时
+     * 遍历 dataList，所有数据的时间都往后挪2小时
      *
      * @param dataList
      */
@@ -749,8 +732,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
 
         LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
-                .eq(TbMonitorItemField::getMonitorItemID, pa.getMonitorItemID())
-                .eq(TbMonitorItemField::getEnable, true);
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getMonitorItemID());
         // 2. 监测项目与监测子字段类型关系表
         List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
 

@@ -147,9 +147,9 @@ public class SensorNewDataInfo {
     private List<TbDataUnit> dataUnitList;
 
 
-    public static SensorNewDataInfo reBuildProAndMonitor(TbMonitorPoint tbMonitorPoint, TbProjectInfo tbProjectInfo,
+    public static SensorNewDataInfo reBuildProAndMonitor(MonitorPointAndItemInfo tbMonitorPoint, TbProjectInfo tbProjectInfo,
                                                          Map<Byte, TbProjectType> projectTypeMap, List<TbSensor> sensorList,
-                                                         Map<Integer, TbMonitorType> monitorTypeMap, List<TbMonitorItem> TbMonitorItems) {
+                                                         Map<Integer, TbMonitorType> monitorTypeMap) {
         SensorNewDataInfo vo = new SensorNewDataInfo();
         vo.setProjectID(tbProjectInfo.getID());
         vo.setProjectTypeID(tbProjectInfo.getProjectType());
@@ -173,8 +173,8 @@ public class SensorNewDataInfo {
         vo.setGpsLocation(tbMonitorPoint.getGpsLocation());
         vo.setImageLocation(tbMonitorPoint.getImageLocation());
         vo.setMonitorItemID(tbMonitorPoint.getMonitorItemID());
-        vo.setMonitorItemName(TbMonitorItems.stream().filter(tmi -> tmi.getID().equals(tbMonitorPoint.getMonitorItemID())).findFirst().get().getName());
-        vo.setMonitorItemAlias(TbMonitorItems.stream().filter(tmi -> tmi.getID().equals(tbMonitorPoint.getMonitorItemID())).findFirst().get().getAlias());
+        vo.setMonitorItemName(tbMonitorPoint.getMonitorItemName());
+        vo.setMonitorItemAlias(tbMonitorPoint.getMonitorItemAlias());
         vo.setSensorList(sensorList);
         if (!CollectionUtil.isNullOrEmpty(sensorList)){
             if (sensorList.size() > 1){
