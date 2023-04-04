@@ -62,7 +62,7 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
         }
 
         // 将 begin 的时间减去 2 小时
-//        this.begin = new Timestamp(DateUtil.offsetHour(begin, -2).getTime());
+        this.begin = new Timestamp(DateUtil.offsetHour(begin, -2).getTime());
         return null;
     }
 

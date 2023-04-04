@@ -28,12 +28,12 @@ import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -180,6 +180,13 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
 
     }
 
+    /**
+     * @param monitorType  监测类型
+     * @param sensorList   传感器信息列表
+     * @param fieldList    字段列表(v1,v2,xxx)
+     * @param maps         传感器数据列表
+     * @param filteredMaps 最终数据结果集
+     */
     private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> filteredMaps,
                                              List<TbSensor> sensorList, List<FieldSelectInfo> fieldList,
                                              List<Map<String, Object>> maps) {
@@ -315,7 +322,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
     }
 
     /**
-     * 处理特殊传感器类型的传感器值
+     * 处理特殊传感器类型的传感器的额外值
+     * 比如:水质,风力
      *
      * @param monitorType
      * @param monitorItemID
@@ -340,7 +348,7 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             } else if (monitorItemID.equals(MonitoringItem.RESERVOIR_WATER_QUALITY.getKey())) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
                 int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
-                currentSensorData.put("waterQuality",  WaterQuality.getValueByKey(v3));
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
             // 风力
@@ -679,11 +687,12 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         Double dailyRainfall = 0.0;
+        List<Map<String, Object>> resultList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-            handleDataOrder(maps);
+            resultList = handleDataOrder(maps, pa.getEnd());
             // 处理雨量历史时间段的当前雨量
-            handleRainTypeSensorHistoryDataList(maps, pa.getBegin(), pa.getEnd());
+            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
             DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(pa.getBegin()), 32);
             List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList, pa.getBegin(), new Timestamp(endTime.getTime()));
@@ -693,20 +702,23 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 }
             }
         }
-
+        // 处理需要计算的监测子类型返回token
+        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall);
     }
 
     /**
      * 遍历 dataList，所有数据的时间都往后挪2小时
      *
      * @param dataList
+     * @param end
      */
-    private void handleDataOrder(List<Map<String, Object>> dataList) {
-        // 找到时间最早的数据
+    private List<Map<String, Object>> handleDataOrder(List<Map<String, Object>> dataList, Timestamp end) {
+        List<Map<String, Object>> result = new LinkedList<>();
+
         dataList.forEach(data -> {
             String timeStr = (String) data.get("time");
             long timeMillis = DateUtil.parse(timeStr).getTime();
@@ -715,6 +727,15 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             String newTimeStr = DateUtil.formatDateTime(newTime);
             data.put("time", newTimeStr);
         });
+
+        dataList.forEach(item -> {
+            String timeStr = (String) item.get("time");
+            long timeMillis = DateUtil.parse(timeStr).getTime();
+            if (timeMillis <= end.getTime()) {
+                result.add(item);
+            }
+        });
+        return result;
     }
 
 
@@ -789,7 +810,6 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                     tbDataUnitList.add(entry.getValue());
                 }
             });
-            MonitorTypeUtil.handlefieldList(monitorType, fieldList);
         }
         return tbDataUnitList;
     }
@@ -875,49 +895,56 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
             }
         }
 
+        // 根据需求,不展示昨日的当前降雨量
         if (!CollectionUtil.isNullOrEmpty(yesterdayDataList)) {
-            double clock8v1 = 0.0;
-            for (Map<String, Object> map : yesterdayDataList) {
-                String timeStr = (String) map.get("time");
-                if (StrUtil.isNotBlank(timeStr)) {
-                    if (yesterdayEightClockDateTimeStr.equals(timeStr)) {
-                        clock8v1 = Double.parseDouble(map.get("v1").toString());
-                    }
-                }
-            }
             for (int i = 0; i < yesterdayDataList.size(); i++) {
                 Map<String, Object> data1 = yesterdayDataList.get(i);
-                for (int j = 0; j < yesterdayDataList.size(); j++) {
-                    Map<String, Object> data2 = yesterdayDataList.get(j);
-                    // 在这里执行 data1 和 data2 的比较
-                    DateTime currentTime = DateUtil.parse(data1.get("time").toString());
-                    DateTime otherTime = DateUtil.parse(data2.get("time").toString());
-                    if (DateUtil.compare(currentTime, otherTime) >= 0 &&
-                            data1.get("sensorID").equals(data2.get("sensorID"))) {
-                        // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
-                        double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
-                        double v1 = Double.parseDouble(data2.get("v1").toString());
-                        if (currentTime.equals(yesterdayEightClockDateTime)) {
-                            currentRainfall = 0.0;
-                        } else {
-                            currentRainfall += v1;
-                            currentRainfall = currentRainfall - clock8v1;
-                        }
-                        BigDecimal bd = new BigDecimal(currentRainfall);
-                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-                        data1.put("currentRainfall", rounded);
-                    }
-                }
-            }
-            for (int i = 0; i < yesterdayDataList.size(); i++) {
-                DateTime currentTime = DateUtil.parse(yesterdayDataList.get(i).get("time").toString());
-                if (!currentTime.equals(yesterdayEightClockDateTime)) {
-                    double currentRainfall = Double.parseDouble(yesterdayDataList.get(i).get("currentRainfall").toString());
-                    double result = currentRainfall - clock8v1;
-                    yesterdayDataList.get(i).put("currentRainfall", result);
-                }
+                data1.put("currentRainfall", null);
             }
         }
+//        if (!CollectionUtil.isNullOrEmpty(yesterdayDataList)) {
+//            double clock8v1 = 0.0;
+//            for (Map<String, Object> map : yesterdayDataList) {
+//                String timeStr = (String) map.get("time");
+//                if (StrUtil.isNotBlank(timeStr)) {
+//                    if (yesterdayEightClockDateTimeStr.equals(timeStr)) {
+//                        clock8v1 = Double.parseDouble(map.get("v1").toString());
+//                    }
+//                }
+//            }
+//            for (int i = 0; i < yesterdayDataList.size(); i++) {
+//                Map<String, Object> data1 = yesterdayDataList.get(i);
+//                for (int j = 0; j < yesterdayDataList.size(); j++) {
+//                    Map<String, Object> data2 = yesterdayDataList.get(j);
+//                    // 在这里执行 data1 和 data2 的比较
+//                    DateTime currentTime = DateUtil.parse(data1.get("time").toString());
+//                    DateTime otherTime = DateUtil.parse(data2.get("time").toString());
+//                    if (DateUtil.compare(currentTime, otherTime) >= 0 &&
+//                            data1.get("sensorID").equals(data2.get("sensorID"))) {
+//                        // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
+//                        double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
+//                        double v1 = Double.parseDouble(data2.get("v1").toString());
+//                        if (currentTime.equals(yesterdayEightClockDateTime)) {
+//                            currentRainfall = 0.0;
+//                        } else {
+//                            currentRainfall += v1;
+//                            currentRainfall = currentRainfall - clock8v1;
+//                        }
+//                        BigDecimal bd = new BigDecimal(currentRainfall);
+//                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+//                        data1.put("currentRainfall", rounded);
+//                    }
+//                }
+//            }
+//            for (int i = 0; i < yesterdayDataList.size(); i++) {
+//                DateTime currentTime = DateUtil.parse(yesterdayDataList.get(i).get("time").toString());
+//                if (!currentTime.equals(yesterdayEightClockDateTime)) {
+//                    double currentRainfall = Double.parseDouble(yesterdayDataList.get(i).get("currentRainfall").toString());
+//                    double result = currentRainfall - clock8v1;
+//                    yesterdayDataList.get(i).put("currentRainfall", result);
+//                }
+//            }
+//        }
 
     }
 
