@@ -17,7 +17,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,15 +31,13 @@ import java.util.List;
 /**
  * @program: monibot-base-api
  * @author: gaoxu
- * @create: 2023-03-28 15:06
+ * @create: 2023-04-03 16:41
  **/
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddCustomizedMonitorTypeParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NotNull
-    private Integer companyID;
-    @Min(20001)
+public class AddPredefinedMonitorTypeParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @Range(min = 1 , max = 20000)
     private Integer monitorType;
     @NotBlank
     @Size(max = 50)
@@ -55,12 +56,9 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
     private List<@NotNull MonitorTypeField4Param> fieldList;
     @Override
     public ResultWrapper validate() {
-
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-
         QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
         wrapper.eq("typeName", typeName);
-        wrapper.eq("companyID", companyID).or().eq("companyID",-1).eq("typeName", typeName);
         if (tbMonitorTypeMapper.selectCount(wrapper) > 0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型名字已存在");
         }
@@ -70,7 +68,7 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型已存在");
             }
         }
-        if (!StringUtils.isBlank(exValues)&&JSONUtil.isTypeJSON(exValues)){
+        if (!StringUtils.isBlank(exValues)&& JSONUtil.isTypeJSON(exValues)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型额外属性不合法");
         }
         if (fieldList.stream().anyMatch(item -> !MonitorTypeFieldConfig.DataTypeList.contains(item.getFieldDataType()))){

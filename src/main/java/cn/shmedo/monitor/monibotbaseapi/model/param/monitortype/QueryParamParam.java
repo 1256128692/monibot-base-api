@@ -31,7 +31,8 @@ public class QueryParamParam implements ParameterValidator, ResourcePermissionPr
     private Integer companyID;
     @NotNull
     private Integer subjectType;
-    @NotEmpty
+    @NotNull
+    private Integer subjectID;
     @Valid
     @Size(max = 100)
     private List< @NotBlank String> subjectTokenList;

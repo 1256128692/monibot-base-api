@@ -9,9 +9,14 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
@@ -22,6 +27,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -70,9 +76,14 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         if (!CreateType.isValid(createType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"创建类型不合法");
         }
-        // TODO 校验dataSourceComposeType, calType
         if (calType == null){
             calType = -1;
+        }
+        if (!CalType.isValid(calType)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "计算方式不合法");
+        }
+        if (!DataSourceComposeType.isValid(dataSourceComposeType)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板数据来源类型不合法");
         }
         if (!StringUtils.isBlank(exValues)&& !JSONUtil.isTypeJSON(exValues)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"额外属性不合法");
@@ -80,8 +91,23 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         if (ObjectUtil.isAllNotEmpty(script, formulaList)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"脚本与公式需要二选一");
         }
-        // TODO 校验tokenListdatasourceType
-        // TODO 校验formulaList中fieldID
+        if (ObjectUtil.isNotEmpty(tokenList)){
+            if (tokenList.stream().anyMatch(item -> !DatasourceType.isValid(item.getDatasourceType()))){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "数据源的类型非法");
+            }
+        }
+        if (ObjectUtil.isNotEmpty(formulaList)){
+            if (formulaList.stream().map(FormulaItem::getFieldID).distinct().count() != formulaList.size()){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不可重复设置公式");
+            }
+            TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+            if (tbMonitorTypeFieldMapper.selectCount(new QueryWrapper<TbMonitorTypeField>()
+                    .eq("monitorType", monitorType)
+                    .in("ID",formulaList.stream().map(FormulaItem::getFieldID).collect(Collectors.toList())))
+                    !=formulaList.size()){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有属性不属于该监测类型或不存在");
+            }
+        }
         return null;
     }
 

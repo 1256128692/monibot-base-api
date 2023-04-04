@@ -44,4 +44,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     void deleteMonitorTypeBatch(List<Integer> monitorTypeList);
 
     void deleteMonitorTypeFieldBatch(List<Integer> fieldIDList);
+
+    void addPredefinedMonitorType(AddPredefinedMonitorTypeParam pa, Integer usrID);
 }

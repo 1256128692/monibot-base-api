@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
@@ -78,15 +80,21 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addCustomizedMonitorType(AddCustomizedMonitorTypeParam pa, Integer userID) {
-        QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
-        wrapper.orderByDesc("monitorType").last("limit 1");
-        TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+
         Integer type;
-        if (temp == null || temp.getMonitorType() <= 20000) {
-            type = 20001;
-        } else {
-            type = temp.getMonitorType() + 1;
+        if(pa.getMonitorType()!=null){
+            type = pa.getMonitorType();
+        }else {
+            QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
+            wrapper.orderByDesc("monitorType").last("limit 1");
+            TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+            if (temp == null || temp.getMonitorType() <= 20000) {
+                type = 20001;
+            } else {
+                type = temp.getMonitorType() + 1;
+            }
         }
+
         TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddCustomizedMonitorTypeParam2tbMonitorType(pa, userID, type);
         tbMonitorTypeMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
@@ -187,7 +195,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public List<TbParameter> queryParam(QueryParamParam pa) {
-        return tbParameterMapper.selectList(new QueryWrapper<TbParameter>().eq("subjectType", pa.getSubjectType()).in("token", pa.getSubjectTokenList()));
+        QueryWrapper<TbParameter> queryWrapper = new QueryWrapper<TbParameter>().eq("subjectType", pa.getSubjectType()).in("subjectID", pa.getSubjectID());
+        if (ObjectUtil.isNotEmpty(pa.getSubjectTokenList())){
+            queryWrapper.in("token",pa.getSubjectTokenList());
+        }
+        return tbParameterMapper.selectList(queryWrapper);
     }
 
     @Override
@@ -240,6 +252,34 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     public void deleteMonitorTypeFieldBatch(List<Integer> fieldIDList) {
         tbMonitorTypeFieldMapper.deleteBatchIds(fieldIDList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addPredefinedMonitorType(AddPredefinedMonitorTypeParam pa, Integer usrID) {
+
+        Integer type;
+        if (pa.getMonitorType()!=null){
+           type = pa.getMonitorType();
+        }else {
+            QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
+            wrapper.between("monitorType", 1,20000);
+            wrapper.orderByDesc("monitorType").last("limit 1");
+            TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+            if (temp == null){
+                type = 1;
+            }else {
+                if (temp.getMonitorType() +1>20000){
+                    throw new CustomBaseException(ResultCode.SERVER_EXCEPTION.toInt(), "预定义的监测类型已经用尽");
+                }else {
+                    type = temp.getMonitorType() +1;
+                }
+            }
+        }
+        TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddPredefinedMonitorTypeParam2tbMonitorType(pa, usrID, type);
+        tbMonitorTypeMapper.insert(tbMonitorType);
+        List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
+        tbMonitorTypeFieldMapper.insertBatch(list);
     }
 
 }

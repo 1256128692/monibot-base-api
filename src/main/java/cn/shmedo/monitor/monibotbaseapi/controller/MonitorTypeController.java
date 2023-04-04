@@ -28,7 +28,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName AddPredefinedMonitorType
      * @apiDescription 新增预定义监测类型
-     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型[1,20000]
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
@@ -46,7 +46,8 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
     @PostMapping(value = "/AddPredefinedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addPredefinedMonitorType(@RequestBody @Validated Object request) {
+    public Object addPredefinedMonitorType(@RequestBody @Validated AddPredefinedMonitorTypeParam pa) {
+        monitorTypeService.addPredefinedMonitorType(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -57,7 +58,7 @@ public class MonitorTypeController {
      * @apiName AddCustomizedMonitorType
      * @apiDescription 新增自定义监测类型
      * @apiParam (请求参数) {Int} companyID
-     * @apiParam (请求参数) {Int} [monitorType] 监测类型, 未设置则自动生成
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型, 未设置则自动生成（> 20000）
      * @apiParam (请求参数) {String} typeName 监测类型名称 (max=50)
      * @apiParam (请求参数) {String} [typeAlias]  别名(max = 50 )未设置则用typeName
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
@@ -383,6 +384,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} templateID  模板ID
      * @apiParam (请求参数) {Object[]} formulaList  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
+     * @apiParam (请求参数) {Int} formulaList.fieldCalOrder  排序
      * @apiParam (请求参数) {String} formulaList.formula  公式字符串
      * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
      * @apiSuccess (返回结果) {String} none 无
@@ -438,7 +440,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
      * @apiParam (请求参数) {Boolean} [deleteOnly]  仅进行删除，根据ID
      * @apiParam (请求参数) {Object[]} paramList  标识列表(max = 100)
-     * @apiParam (请求参数) {Int} paramList.id  参数记录的ID
+     * @apiParam (请求参数) {Int} [paramList.ID] 参数记录的ID
      * @apiParam (请求参数) {Int} paramList.subjectID  主体ID
      * @apiParam (请求参数) {String} paramList.dataType  数据类型 String,Double,Long
      * @apiParam (请求参数) {String} paramList.token  参数标识(max = 50)
@@ -465,7 +467,8 @@ public class MonitorTypeController {
      * @apiDescription 查询参数
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
-     * @apiParam (请求参数) {String[]} subjectTokenList  主体IDList(max=100)
+     * @apiParam (请求参数) {Int} subjectID  主体ID
+     * @apiParam (请求参数) {String[]} [subjectTokenList]  参数标识列表(max=100)
      * @apiSuccess (返回结果) {String[]} paramList  参数列表
      * @apiSuccess (返回结果) {Int} paramList.subjectID  主体ID
      * @apiSuccess (返回结果) {String} paramList.dataType  数据类型 String,Double,Long

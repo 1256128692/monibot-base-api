@@ -163,4 +163,18 @@ public class Param2DBEntityUtil {
                         .build()
         ).collect(Collectors.toList());
     }
+
+    public static TbMonitorType fromAddPredefinedMonitorTypeParam2tbMonitorType(AddPredefinedMonitorTypeParam pa, Integer usrID, Integer type) {
+        TbMonitorType obj = new TbMonitorType();
+        obj.setMonitorType(type);
+        obj.setTypeName(pa.getTypeName());
+        obj.setTypeAlias(StringUtils.isBlank(pa.getTypeAlias())?pa.getTypeName():pa.getTypeAlias());
+        obj.setDisplayOrder(null);
+        obj.setMultiSensor(pa.getMultiSensor());
+        obj.setApiDataSource(pa.getApiDataSource());
+        obj.setCreateType(CreateType.PREDEFINED.getType());
+        obj.setCompanyID(-1);
+        obj.setExValues(pa.getExValues());
+        return obj;
+    }
 }

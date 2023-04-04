@@ -7,9 +7,11 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
@@ -19,6 +21,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -56,7 +59,16 @@ public class SetFormulaParam implements ParameterValidator, ResourcePermissionPr
         if (!tbMonitorType.getCompanyID().equals(-1) && !tbMonitorType.getCompanyID().equals(companyID)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"监测类型不属于公司");
         }
-        // TODO 校验formulaList
+        if (formulaList.stream().map(FormulaItem::getFieldID).distinct().count() != formulaList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不可重复设置公式");
+        }
+        TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+        if (tbMonitorTypeFieldMapper.selectCount(new QueryWrapper<TbMonitorTypeField>()
+                .eq("monitorType", monitorType)
+                .in("ID",formulaList.stream().map(FormulaItem::getFieldID).collect(Collectors.toList())))
+                    !=formulaList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有属性不属于该监测类型或不存在");
+        }
         return null;
     }
 
