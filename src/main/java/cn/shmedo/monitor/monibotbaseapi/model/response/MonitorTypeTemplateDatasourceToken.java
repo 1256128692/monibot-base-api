@@ -18,9 +18,8 @@ import java.util.stream.Collectors;
 public class MonitorTypeTemplateDatasourceToken {
     private Integer datasourceType;
     private String token;
-    private String name;
-    private String unit;
-    private String desc;
+
+    //List<xxxxx>
 
     public static List<MonitorTypeTemplateDatasourceToken> valueOf(List<TbTemplateDataSource> list){
         if (ObjectUtil.isEmpty(list)){

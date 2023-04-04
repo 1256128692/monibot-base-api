@@ -40,7 +40,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
-     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性
+     * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
@@ -150,7 +150,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
-     * @apiParam (请求参数) {String} [fieldList.exValue] 额外属性, 可包含默认值，是否多选，可选范围
+     * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性, 可包含默认值，是否多选，可选范围
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
@@ -216,7 +216,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} [currentPageData.fieldList.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.createType 创建类型
-     * @apiSuccess (返回结果) {String} [currentPageData.fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} [currentPageData.fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.fieldDesc] 描述
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
@@ -288,7 +288,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} [fieldList.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型
-     * @apiSuccess (返回结果) {String} [fieldList.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} [fieldList.desc] 描述
      * @apiSuccess (返回结果) {Object[]} class3FieldList 类型3属性列表，字段与fieldList一致
      * @apiSuccess (返回结果) {Object[]} templateList 模板列表
@@ -298,7 +298,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} templateList.createType  创建类型
      * @apiSuccess (返回结果) {Int} templateList.calType  计算方式 1,2,3,-1 公式，脚本，外部http，不设置计算
      * @apiSuccess (返回结果) {Int} templateList.displayOrder  排序
-     * @apiSuccess (返回结果) {String} [templateList.exValue]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
+     * @apiSuccess (返回结果) {String} [templateList.exValues]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiSuccess (返回结果) {Object[]} templateList.tokenList  标识列表
      * @apiSuccess (返回结果) {Int} templateList.tokenList.datasourceType  12 物联网，监测传感器
      * @apiSuccess (返回结果) {String} templateList.tokenList.token  标识
@@ -418,7 +418,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Int} [list.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} list.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} list.createType 创建类型
-     * @apiSuccess (返回结果) {String} [list.exValue] 额外属性
+     * @apiSuccess (返回结果) {String} [list.exValues] 额外属性
      * @apiSuccess (返回结果) {String} list.formula  公式字符串
      * @apiSuccess (返回结果) {String} list.displayFormula  公式字符串展示用
      * @apiSampleRequest off

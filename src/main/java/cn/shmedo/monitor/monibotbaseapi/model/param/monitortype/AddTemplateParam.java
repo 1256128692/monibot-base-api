@@ -16,7 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
@@ -92,7 +92,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"脚本与公式需要二选一");
         }
         if (ObjectUtil.isNotEmpty(tokenList)){
-            if (tokenList.stream().anyMatch(item -> !DatasourceType.isValid(item.getDatasourceType()))){
+            if (tokenList.stream().anyMatch(item -> !DataSourceType.isValid(item.getDatasourceType()))){
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "数据源的类型非法");
             }
         }

@@ -1,44 +1,42 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 模板的数据源的类型
- * @program: monibot-base-api
- * @author: gaoxu
- * @create: 2023-04-03 17:42
- **/
-public enum DatasourceType {
-    IotSensor(1, "物联网传感器"),
-    MonitorSensor(2, "监测传感器");
+@AllArgsConstructor
+@Getter
+public enum DataSourceType {
 
-    private static final Map<Integer, DatasourceType> VALUES_MAP = new HashMap<>();
+    IOT(1, "物联网数据源"),
+    MONITOR(2, "监测数据源"),
+
+    ;
+
+    private final int code;
+
+    private final String desc;
+
+    private static final Map<Integer, DataSourceType> VALUES_MAP = new HashMap<>();
 
     static {
-        for (DatasourceType value : values()) {
-            VALUES_MAP.put(value.getType(), value);
+        for (DataSourceType value : values()) {
+            VALUES_MAP.put(value.getCode(), value);
         }
     }
-    private Integer type;
-    private String typeStr;
 
+    public static DataSourceType codeOf(int code) {
+        DataSourceType dataSourceType = VALUES_MAP.get(code);
+        if (dataSourceType == null){
+            throw new IllegalArgumentException("Invalid DataSourceComposeType code: " + code);
+        }else {
+            return dataSourceType;
+        }
 
-    DatasourceType(Integer type, String typeStr) {
-        this.type = type;
-        this.typeStr = typeStr;
     }
-
-    public Integer getType() {
-        return type;
-    }
-
-    public String getTypeStr() {
-        return typeStr;
-    }
-
     public static boolean isValid(Integer value) {
         return VALUES_MAP.containsKey(value);
     }
-
 }
