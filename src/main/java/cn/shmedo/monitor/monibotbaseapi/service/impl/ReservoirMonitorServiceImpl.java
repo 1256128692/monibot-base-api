@@ -889,7 +889,9 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                 DateTime currentTime = DateUtil.parse(todayDataList.get(i).get("time").toString());
                 if (!currentTime.equals(eightClockDateTime)) {
                     double currentRainfall = Double.parseDouble(todayDataList.get(i).get("currentRainfall").toString());
-                    double result = currentRainfall - clock8v1;
+                    BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    BigDecimal bd2 = new BigDecimal(clock8v1);
+                    BigDecimal result = rounded.subtract(bd2);
                     todayDataList.get(i).put("currentRainfall", result);
                 }
             }

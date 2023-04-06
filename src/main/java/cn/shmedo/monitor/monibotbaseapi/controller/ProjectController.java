@@ -372,4 +372,30 @@ public class ProjectController {
         projectService.updateProjectImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
+
+    /**
+     * @api {post} /QueryProjectList 查询工程项目列表
+     * @apiDescription 查询工程项目列表
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryProjectList
+     * @apiParam (请求体) {Int} companyID 企业名称-先调用接口查询具体企业，发送id
+     * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
+     * @apiSuccess (返回结果) {Object[]} data 项目信息列表
+     * @apiSuccess (返回结果) {Int} data.id 项目id
+     * @apiSuccess (返回结果) {String} data.projectName 项目名称
+     * @apiSuccess (返回结果) {String} data.shortName 项目简称
+     * @apiSuccess (返回结果) {Int} data.projectType 项目类型
+     * @apiSuccess (返回结果) {String} data.projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} data.projectMainTypeName 项目主类型名称
+     * @apiSuccess (返回结果) {String} [currentPageData.imagePath] 项目图片地址
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "QueryProjectList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectListByProjectName(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
 }
