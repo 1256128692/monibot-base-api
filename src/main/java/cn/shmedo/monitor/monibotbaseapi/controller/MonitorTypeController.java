@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -27,6 +28,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName AddPredefinedMonitorType
      * @apiDescription 新增预定义监测类型
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [monitorType] 监测类型[1,20000]
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
@@ -44,6 +46,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
+     @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
     @PostMapping(value = "/AddPredefinedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addPredefinedMonitorType(@RequestBody @Validated AddPredefinedMonitorTypeParam pa) {
         monitorTypeService.addPredefinedMonitorType(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -391,8 +394,8 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Object[]} formulaList  公式列表
      * @apiParam (请求参数) {Int} formulaList.fieldID  监测类型ID
      * @apiParam (请求参数) {Int} formulaList.fieldCalOrder  排序
-     * @apiParam (请求参数) {String} formulaList.formula  公式字符串
-     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用
+     * @apiParam (请求参数) {String} formulaList.formula  公式字符串 (2000)
+     * @apiParam (请求参数) {String} formulaList.displayFormula  公式字符串展示用(5000)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType

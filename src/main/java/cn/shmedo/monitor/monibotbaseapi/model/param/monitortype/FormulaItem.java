@@ -24,7 +24,7 @@ public class FormulaItem {
     @Size(max = 2000)
     private String formula;
     @NotBlank
-    @Size(max = 2000)
+    @Size(max = 5000)
     private String displayFormula;
     @NotNull
     private Integer fieldCalOrder;
