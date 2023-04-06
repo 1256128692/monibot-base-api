@@ -50,6 +50,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} data.locationInfo      第四级区域名称
      * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
      * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
+     * @apiSuccess (响应结果) {String} data.density       监测点查询密度
      * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
      * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器id
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
@@ -228,6 +229,8 @@ public class ReservoirMonitorDataController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
      * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
+     * @apiSuccess (响应结果) {Int} typeInfoList.monitorClass   监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测)
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorClassName   监测类别中文名
      * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
@@ -474,6 +477,51 @@ public class ReservoirMonitorDataController {
         return reservoirMonitorService.queryMonitorPointListHistoryDataList(pa);
     }
 
+
+
+    /**
+     * @api {POST} /QueryDisplacementPointHistoryDataList 查询内部三轴位移监测点历史数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 查询内部三轴位移监测点历史数据列表
+     * @apiName QueryDisplacementPointHistoryDataList
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {String} axisPosition 轴位,(x代表A轴 y代表B轴 z代表C轴)
+     * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParamExample 请求体示例
+     * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861,"axisPosition":"x"}
+     * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息
+     * @apiSuccess (响应结果) {Int} monitorPoint.id   监测点ID
+     * @apiSuccess (响应结果) {String} monitorPoint.name 监测点名称
+     * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
+     * @apiSuccess (响应结果) {Int} sensorList.id      传感器ID
+     * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
+     * @apiSuccess (响应结果) {Object[]} dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
+     * @apiSuccess (响应结果) {Int} dataList.T.sensorID      传感器ID
+     * @apiSuccess (响应结果) {Double} dataList.T.deep    深度
+     * @apiSuccess (响应结果) {Double} dataList.T.x  位移(可能是x 或者y 或者z)
+     * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
+     * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
+     * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {String} axisPositionCnName 轴位名称,(A轴:x B轴:y C轴:z)
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryDisplacementPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryDisplacementPointHistoryDataList(@Validated @RequestBody Object pa) {
+        return null;
+    }
 }
 
 
