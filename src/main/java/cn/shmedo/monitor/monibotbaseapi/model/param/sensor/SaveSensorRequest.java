@@ -5,9 +5,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSource;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -51,7 +49,12 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
      * 5多个监测传感器<br/>
      * 100API 推送
      */
-    private DataSourceComposeType dataSourceComposeType = DataSourceComposeType.SINGLE_IOT;
+    private Integer dataSourceComposeType = 1;
+
+    /**
+     * 监测类型模板分布式唯一ID
+     */
+    private String templateDataSourceID;
 
     /**
      * 数据源列表
@@ -67,6 +70,33 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
      * 参数列表
      */
     private List<SensorConfigField> paramFields;
+
+
+    @Data
+    public static class DataSource {
+
+        /**
+         * 数据源类型 1-物联网传感器 2-监测传感器
+         */
+        private Integer dataSourceType;
+
+        /**
+         * 模板数据源标识
+         */
+        @NotNull(message = "模板数据源标识不能为空")
+        private String templateDataSourceToken;
+
+        /**
+         * (监测/物联网)传感器名称
+         */
+        @NotNull(message = "传感器名称不能为空")
+        private String sensorName;
+
+        /**
+         * 设备传感器标识 数据源类型为1时必填
+         */
+        private String uniqueToken;
+    }
 
 
     @Override

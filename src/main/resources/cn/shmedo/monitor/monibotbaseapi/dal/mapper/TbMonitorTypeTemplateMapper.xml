@@ -173,4 +173,42 @@
       </foreach>
       group by MonitorType
   </select>
+
+  <resultMap id="dataSourceCatalogMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.DataSourceCatalogResponse">
+    <id column="ID" property="ID" jdbcType="INTEGER"/>
+    <result column="Name" property="name" jdbcType="VARCHAR"/>
+    <result column="DataSourceComposeType" property="dataSourceComposeType" jdbcType="INTEGER"/>
+    <result column="TemplateDataSourceID" property="templateDataSourceID" jdbcType="VARCHAR"/>
+    <result column="MonitorType" property="monitorType" jdbcType="INTEGER"/>
+    <result column="CalType" property="calType" jdbcType="INTEGER"/>
+    <result column="DisplayOrder" property="displayOrder" jdbcType="INTEGER"/>
+    <result column="ExValues" property="exValues" jdbcType="VARCHAR"/>
+    <result column="CreateType" property="createType" jdbcType="TINYINT"/>
+    <result column="CompanyID" property="companyID" jdbcType="INTEGER"/>
+    <result column="DefaultTemplate" property="defaultTemplate" jdbcType="BIT"/>
+    <collection property="dataSourceList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.DataSourceCatalogResponse$DataSource">
+      <result column="DataSourceType" property="dataSourceType" jdbcType="INTEGER"/>
+      <result column="TemplateDataSourceToken" property="templateDataSourceToken" jdbcType="VARCHAR"/>
+    </collection>
+  </resultMap>
+
+  <select id="dataSourceCatalog" resultMap="dataSourceCatalogMap">
+    SELECT
+      tmtt.ID, tmtt.Name, tmtt.DataSourceComposeType, tmtt.TemplateDataSourceID, tmtt.MonitorType, tmtt.CalType, tmtt.DisplayOrder, tmtt.ExValues, tmtt.CreateType, tmtt.CompanyID, tmtt.DefaultTemplate
+    , ttds.TemplateDataSourceToken, ttds.DataSourceType
+    FROM
+      `tb_monitor_type_template` tmtt
+        LEFT JOIN `tb_template_data_source` ttds ON tmtt.TemplateDataSourceID = ttds.TemplateDataSourceID
+    <where>
+      <trim suffixOverrides="AND">
+        <if test="dataSourceComposeType != null">
+          tmtt.DataSourceComposeType = #{dataSourceComposeType} AND
+        </if>
+        <if test="monitorType != null">
+          tmtt.MonitorType = #{monitorType} AND
+        </if>
+      </trim>
+    </where>
+
+    </select>
 </mapper>

@@ -2,8 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.config;
 
 
 import cn.shmedo.monitor.monibotbaseapi.factory.FeignFactory;
+import cn.shmedo.monitor.monibotbaseapi.factory.IotServiceFallbackFactory;
 import cn.shmedo.monitor.monibotbaseapi.factory.UserServiceFallbackFactory;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
@@ -28,6 +30,7 @@ public class FeignBeans {
 
     private final ObjectMapper objectMapper;
     private final UserServiceFallbackFactory userServiceFallbackFactory;
+    private final IotServiceFallbackFactory iotServiceFallbackFactory;
     @Bean
     @Primary
     public UserService userService() {
@@ -36,6 +39,13 @@ public class FeignBeans {
                         .decoder(new JacksonDecoder(objectMapper))
                         .requestInterceptor(template -> template
                                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
+    }
+
+    @Bean
+    @Primary
+    public IotService iotService() {
+        return FeignFactory.hystrixClient(IotService.class, config.getIotServiceAddress(),
+                iotServiceFallbackFactory, generalHandler());
     }
 
 

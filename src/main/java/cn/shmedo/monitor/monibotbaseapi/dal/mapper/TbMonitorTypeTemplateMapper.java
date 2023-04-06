@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.DataSourceCatalogRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.DataSourceCatalogResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -20,4 +22,6 @@ public interface TbMonitorTypeTemplateMapper extends BaseMapper<TbMonitorTypeTem
     int updateByPrimaryKey(TbMonitorTypeTemplate record);
 
     List<TypeAndCount> countGroupByMonitorType(List<Integer> monitorTypeList);
+
+    List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
 }

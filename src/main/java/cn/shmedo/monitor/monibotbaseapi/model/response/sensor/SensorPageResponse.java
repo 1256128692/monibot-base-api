@@ -48,7 +48,7 @@ public class SensorPageResponse {
     /**
      * 关联监测点名称
      */
-    private Integer monitorPointName;
+    private String monitorPointName;
 
     /**
      * 拓展信息

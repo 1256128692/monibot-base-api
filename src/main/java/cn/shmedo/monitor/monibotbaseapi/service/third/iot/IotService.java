@@ -1,9 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import feign.Headers;
 import feign.Param;
@@ -23,4 +23,7 @@ public interface IotService {
     ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo,
                                                                       @Param("appKey") String appKey,
                                                                       @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDeviceAndSensorList")
+    ResultWrapper<List<DeviceWithSensor>> queryDeviceAndSensorList(QueryDeviceAndSensorRequest request);
 }

@@ -51,7 +51,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.currentPageData.exValues 拓展信息
      * @apiSuccess (响应结果) {Boolean} data.currentPageData.enable 是否启用, 不启用将不会接收数据
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"ID": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false}]}}
+     * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"id": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false}]}}
      * @apiPermission mdmbase:ListSensor
      */
     @LogParam(moduleName = "传感器模块", operationName = "查询传感器", operationProperty = OperationProperty.QUERY)
@@ -63,27 +63,51 @@ public class SensorController {
     }
 
     /**
-     * @api {POST} /DataSourceCascade 数据源级联查询
+     * @api {POST} /DataSourceCatalog 数据源选择
      * @apiVersion 1.0.0
      * @apiGroup 传感器模块
-     * @apiName DataSourceCascade
-     * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {String} [keyword] 检索关键字
-     * @apiParam (请求参数) {Object} [previous] 上级选中值, 仅当 level=1 时可为空
-     * @apiParam (请求参数) {Int} [level] 层级，默认为 1，最大为 3
-     * @apiSuccess (响应结果) {Object[]} data
-     * @apiSuccess (响应结果) {String} data.key 选项名称
-     * @apiSuccess (响应结果) {Int} data.value 选项值
+     * @apiName DataSourceCatalog
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} dataSourceComposeType 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {String} [keyword] 检索关键字
+     * @apiParamExample 请求体示例
+     * {"monitorType":1,"dataSourceComposeType":"1","keyword":"11B","projectID":5411}
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {String} data.id 监测类型模板ID
+     * @apiSuccess (响应结果) {String} data.name 监测类型模板名称
+     * @apiSuccess (响应结果) {Int} data.dataSourceComposeType 模板数据来源类型
+     * @apiSuccess (响应结果) {String} data.templateDataSourceID 监测类型模板分布式唯一ID
+     * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (响应结果) {Int} data.calType 计算类型 1 - 公式计算 2 - 脚本计算 3 - 外部HTTP计算 -1 不计算
+     * @apiSuccess (响应结果) {Int} data.displayOrder 显示排序字段
+     * @apiSuccess (响应结果) {String} data.exValues 拓展信息
+     * @apiSuccess (响应结果) {Int} data.createType 创建类型 0 - 系统创建 1 - 用户创建
+     * @apiSuccess (响应结果) {Int} data.companyID 公司ID
+     * @apiSuccess (响应结果) {Boolean} data.defaultTemplate 是否为默认模板
+     * @apiSuccess (响应结果) {Object[]} data.dataSourceList 数据源列表
+     * @apiSuccess (响应结果) {Int} data.dataSourceList.dataSourceType 数据源类型 1 - 物联网传感器 2 - 监测传感器 3 - 外部HTTP 4 - 脚本 5 - 公式
+     * @apiSuccess (响应结果) {String} data.dataSourceList.templateDataSourceToken 模板数据源标识
+     * @apiSuccess (响应结果) {Object[]} data.dataSourceList.childList 数据源列表
+     * @apiSuccess (响应结果) {Int} data.dataSourceList.childList.id 设备ID/监测传感器ID
+     * @apiSuccess (响应结果) {String} [data.dataSourceList.childList.deviceName] 设备名称/监测传感器名称
+     * @apiSuccess (响应结果) {String} [data.dataSourceList.childList.uniqueToken] 设备传感器标识
+     * @apiSuccess (响应结果) {String} [data.dataSourceList.childList.deviceToken] 设备Token
+     * @apiSuccess (响应结果) {String} [data.dataSourceList.childList.alias] 监测传感器别名
+     * @apiSuccess (响应结果) {Object[]} [data.dataSourceList.childList.sensorList] 传感器列表
+     * @apiSuccess (响应结果) {String} data.dataSourceList.childList.sensorList.sensorName 传感器名称
+     * @apiSuccess (响应结果) {String} data.dataSourceList.childList.sensorList.alias 传感器别名
+     * @apiSuccess (响应结果) {String} data.dataSourceList.childList.sensorList.iotSensorType 传感器类型
+     * @apiSuccess (响应结果) {Int} data.dataSourceList.childList.sensorList.id 传感器ID
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": [{"key": "物联网数据","value": 1},{"key": "监测数据源","value": 2},{"key": "API外部数据","value": -1}]}
+     * {"code": 0,"msg": null,"data": [{"id": 0,"name": "物模型1","dataSourceComposeType": 1,"templateDataSourceID": "777d75e0-f2de-4c0b-a759-d98fe9091d05","monitorType": 1,"calType": 1,"displayOrder": 1,"exValues": "","createType": 0,"companyID": 0,"defaultTemplate": false,"dataSourceList": [{"dataSourceType": 1,"childList": [{"productID": 385,"deviceName": "test2023","deviceToken": "test2023","uniqueToken": "D8DB467AB743476CA4B6F6F909704FBB","sensorList": [{"id": 353,"sensorName": "103_1","iotSensorType": "103","alias": "103_1"}],"id": 15567}],"templateDataSourceToken": "103"},{"dataSourceType": 2,"childList": [{"id": 1,"deviceName": "10086_1","alias": "监测传感器"}],"templateDataSourceToken": "10086"}]}]}
      * @apiPermission mdmbase:ListDataSource
      */
 //    @Permission(permissionName = "mdmbase:ListDataSource")
-    @PostMapping(value = "/DataSourceCascade", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/DataSourceCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object dataSourceCascade(DataSourceCascadeRequest request) {
-        return sensorService.dataSourceCascade(request);
+    public Object dataSourceCate(@RequestBody @Validated DataSourceCatalogRequest request) {
+        return sensorService.dataSourceCatalog(request);
     }
 
     /**
@@ -92,9 +116,8 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName MonitorTypeCatalog
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Object[]} [dataSourceList] 数据源列表
-     * @apiParam (请求参数) {Int} dataSourceList.value 数据源标识（级联最后一级value）
-     * @apiParam (请求参数) {String} dataSourceList.type 数据源类型（级联第一级value） 1-物联网传感器 2-监测传感器 -1-API
+     * @apiParam (请求参数) {String} dataSourceComposeType 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
+     * @apiParam (请求参数) {String} templateDataSourceID 监测类型模板分布式唯一ID
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 监测类型ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
@@ -130,14 +153,14 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.paramFields.paUnitID 字段单位ID
      * @apiSuccess (响应结果) {String} data.paramFields.paDesc 字段描述
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": [{"ID": 0,"monitorType": 0,"typeName": "","typeAlias": "","displayOrder": 0,"multiSensor": false,"apiDatasource": false,"createType": 0,"companyID": 0,"exValues": "","exFields": [{"ID": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"ID": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}]}]}
+     * {"code": 0,"msg": null,"data": [{"ID": 0,"monitorType": 0,"typeName": "","typeAlias": "","displayOrder": 0,"multiSensor": false,"apiDatasource": false,"createType": 0,"companyID": 0,"exValues": "","exFields": [{"id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}]}]}
      * @apiPermission mdmbase:ListMonitorType
      */
 //    @Permission(permissionName = "mdmbase:ListMonitorType")
     @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object monitorTypeCatalog(MonitorTypeCatalogRequest request) {
-        return sensorService.monitorTypeCatalog(request);
+        return sensorService.monitorTypeCate(request);
     }
 
     /**
@@ -149,23 +172,26 @@ public class SensorController {
      * @apiParam (请求体) {String} [imagePath] 传感器图片路径
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {String} templateDataSourceID 监测类型模板分布式唯一ID
      * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API 推送
      * @apiParam (请求体) {Object[]} dataSourceList 数据源列表, 仅当dataSourceComposeType为100时不需要
-     * @apiParam (请求体) {Int} dataSourceList.value 数据源标识（级联最后一级value）
-     * @apiParam (请求体) {String} dataSourceList.type 数据源类型（级联第一级value） 1-物联网传感器 2-监测传感器 -1-API
+     * @apiParam (请求体) {Int} dataSourceList.dataSourceType 数据源类型 1-物联网传感器 2-监测传感器
+     * @apiParam (请求体) {String} dataSourceList.templateDataSourceToken 模板数据源标识
+     * @apiParam (请求体) {String} dataSourceList.sensorName (监测/物联网)传感器名称
+     * @apiParam (请求体) {String} dataSourceList.uniqueToken 设备传感器标识 数据源类型为1时必填
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
      * @apiParam (请求体) {Object[]} [paramFields] 参数列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} paramFields.id 参数ID
      * @apiParam (请求体) {String} paramFields.value 参数值
-     * @apiParamExample {json} 请求体示例
-     * {"projectID": 0,"imagePath": "","name": "","alias": "","monitorType": 0,"dataSourceComposeType": 1,"dataSourceList": [{"type": 1,"value": 0}],"exFields": [{"ID": "","value": ""}],"paramFields": [{"ID": "","value": ""}]}
      * @apiSuccess (响应结果) {Object} data 响应结果
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
-     * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"ID": 10086}}
      * @apiPermission mdmbase:UpdateSensor
+     * @apiParamExample {json} 请求体示例
+     * {"projectID": 0,"imagePath": "","alias": "","monitorType": 0,"dataSourceComposeType": 0,"templateDataSourceID": "","dataSourceList": [{"dataSourceType": 0,"templateDataSourceToken": "","sensorName": "","uniqueToken": ""}],"exFields": [{"id": "","value": ""}],"paramFields": [{"id": "","value": ""}]}
+     * @apiSuccessExample {json} 响应结果示例
+     * {"code": 0,"msg": null,"data": {"id": 10086}}
      */
     @LogParam(moduleName = "传感器模块", operationName = "新增传感器", operationProperty = OperationProperty.ADD)
 //    @Permission(permissionName = "mdmbase:UpdateSensor")
@@ -228,7 +254,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.paramFields.paUnitID 字段单位ID
      * @apiSuccess (响应结果) {String} data.paramFields.paDesc 字段描述
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"exFields": [{"value": "","ID": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"value": "","ID": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}],"ID": 0,"projectID": 0,"templateID": 0,"dataSourceID": "","dataSourceComposeType": 0,"monitorType": 0,"name": "","alias": "","kind": 0,"displayOrder": 0,"monitorPointID": 0,"configFieldValue": "","exValues": "","status": 0,"warnNoData": false,"monitorBeginTime": "2023-04-03 11:41:06","imagePath": "","createTime": "2023-04-03 11:41:06","createUserID": 0,"updateTime": "2023-04-03 11:41:06","updateUserID": 0}}
+     * {"code": 0,"msg": null,"data": {"exFields": [{"value": "","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"value": "","id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}],"id": 0,"projectID": 0,"templateID": 0,"dataSourceID": "","dataSourceComposeType": 0,"monitorType": 0,"name": "","alias": "","kind": 0,"displayOrder": 0,"monitorPointID": 0,"configFieldValue": "","exValues": "","status": 0,"warnNoData": false,"monitorBeginTime": "2023-04-03 11:41:06","imagePath": "","createTime": "2023-04-03 11:41:06","createUserID": 0,"updateTime": "2023-04-03 11:41:06","updateUserID": 0}}
      * @apiPermission mdmbase:DescribeSensor
      */
 //    @Permission(permissionName = "mdmbase:DescribeSensor")
@@ -276,7 +302,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Object} data 响应结果
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"ID": 10086}}
+     * {"code": 0,"msg": null,"data": {"id": 10086}}
      * @apiPermission mdmbase:UpdateSensor
      */
     @LogParam(moduleName = "传感器管理", operationName = "更新传感器", operationProperty = OperationProperty.UPDATE)
@@ -318,7 +344,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.paramList.token 物模型字段标识
      * @apiSuccess (响应结果) {String} data.paramList.type 参数类型 IOT-物模型数据源类型、MON-监测传感器数据类型、SLEF-自身数据、HISTORY-自身历史数据、CONS-常量、PARAM-参数、EX-扩展配置
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","ID": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
+     * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
      * @apiPermission mdmbase:DescribeSensor
      */
 //    @Permission(permissionName = "mdmbase:DescribeSensor")

@@ -5,11 +5,9 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSource;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * 监测类型目录查询
@@ -26,9 +24,14 @@ public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePe
     private Integer projectID;
 
     /**
-     * 数据源列表
+     * 模板数据来源类型
      */
-    private List<DataSource> dataSourceList;
+    private DataSourceComposeType dataSourceComposeType;
+
+    /**
+     * 监测类型模板分布式唯一ID
+     */
+    private String templateDataSourceID;
 
     @Override
     public ResultWrapper<?> validate() {

@@ -2,12 +2,11 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.DataSourceCascadeResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeCatalogResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorPageResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 public interface SensorService extends IService<TbSensor> {
 
@@ -22,10 +21,10 @@ public interface SensorService extends IService<TbSensor> {
     /**
      * 数据源级联
      *
-     * @param request {@link DataSourceCascadeRequest}
-     * @return {@link DataSourceCascadeResponse}
+     * @param request {@link DataSourceCatalogRequest}
+     * @return {@link DataSourceCatalogResponse}
      */
-    DataSourceCascadeResponse dataSourceCascade(DataSourceCascadeRequest request);
+    List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
 
     /**
      * 监测类型（下拉）目录
@@ -33,7 +32,7 @@ public interface SensorService extends IService<TbSensor> {
      * @param request {@link MonitorTypeCatalogRequest}
      * @return {@link MonitorTypeCatalogResponse}
      */
-    MonitorTypeCatalogResponse monitorTypeCatalog(MonitorTypeCatalogRequest request);
+    MonitorTypeCatalogResponse monitorTypeCate(MonitorTypeCatalogRequest request);
 
     /**
      * 添加传感器
