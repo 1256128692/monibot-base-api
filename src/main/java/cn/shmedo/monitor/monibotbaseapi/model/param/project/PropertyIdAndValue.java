@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class PropertyIdAndValue {
     @NotNull
-    @JsonProperty("ID")
     private Integer ID;
     private String value;
 }

@@ -51,7 +51,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
      * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
      * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
-     * @apiSuccess (响应结果) {Int} data.sensorList.ID        传感器id
+     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器id
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {Byte} data.sensorList.status         传感器状态 -1 无数据 0 正常 1,2,3,4对应预警级别
@@ -240,7 +240,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} warnInfo.levelThreeCount 三级警报数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
      * @apiSuccess (响应结果) {Object[]} typeInfoList.projectTypeList  工程类型信息
-     * @apiSuccess (响应结果) {Int} projectTypeList.ID  工程类型ID
+     * @apiSuccess (响应结果) {Int} projectTypeList.id  工程类型ID
      * @apiSuccess (响应结果) {String} projectTypeList.typeName  工程类型名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseCompanyMonitor
@@ -265,10 +265,10 @@ public class ReservoirMonitorDataController {
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":5861}
      * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息
-     * @apiSuccess (响应结果) {Int} monitorPoint.ID   监测点ID
+     * @apiSuccess (响应结果) {Int} monitorPoint.id   监测点ID
      * @apiSuccess (响应结果) {String} monitorPoint.name 监测点名称
      * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
-     * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
+     * @apiSuccess (响应结果) {Int} sensorList.id      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
@@ -304,10 +304,10 @@ public class ReservoirMonitorDataController {
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861}
      * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息
-     * @apiSuccess (响应结果) {Int} monitorPoint.ID   监测点ID
+     * @apiSuccess (响应结果) {Int} monitorPoint.id   监测点ID
      * @apiSuccess (响应结果) {String} monitorPoint.name 监测点名称
      * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
-     * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
+     * @apiSuccess (响应结果) {Int} sensorList.id      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
@@ -406,10 +406,10 @@ public class ReservoirMonitorDataController {
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861}
      * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息
-     * @apiSuccess (响应结果) {Int} monitorPoint.ID   监测点ID
+     * @apiSuccess (响应结果) {Int} monitorPoint.id   监测点ID
      * @apiSuccess (响应结果) {String} monitorPoint.name 监测点名称
      * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
-     * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
+     * @apiSuccess (响应结果) {Int} sensorList.id      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
@@ -449,10 +449,10 @@ public class ReservoirMonitorDataController {
      * @apiParamExample 请求体示例
      * {"pointIDList":[1,2,3],"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":66}
      * @apiSuccess (响应结果) {Object[]} monitorPointList 监测点信息
-     * @apiSuccess (响应结果) {Int} monitorPointList.ID   监测点ID
+     * @apiSuccess (响应结果) {Int} monitorPointList.id   监测点ID
      * @apiSuccess (响应结果) {String} monitorPointList.name 监测点名称
      * @apiSuccess (响应结果) {Object[]} sensorList 传感器数据列表
-     * @apiSuccess (响应结果) {Int} sensorList.ID      传感器ID
+     * @apiSuccess (响应结果) {Int} sensorList.id      传感器ID
      * @apiSuccess (响应结果) {String} sensorList.name   传感器名称
      * @apiSuccess (响应结果) {Object[]} dataList   数据列表
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表

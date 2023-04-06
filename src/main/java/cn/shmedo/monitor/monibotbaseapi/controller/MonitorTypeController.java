@@ -115,7 +115,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParam (请求参数) {Object[]} fieldList 属性列表(max = 10)
-     * @apiParam (请求参数) {Int} fieldList.ID 属性ID
+     * @apiParam (请求参数) {Int} fieldList.id 属性ID
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
      * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
@@ -446,7 +446,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} subjectType  类型1234 公式脚本传感器模板
      * @apiParam (请求参数) {Boolean} [deleteOnly]  仅进行删除，根据ID
      * @apiParam (请求参数) {Object[]} paramList  标识列表(max = 100)
-     * @apiParam (请求参数) {Int} [paramList.ID] 参数记录的ID
+     * @apiParam (请求参数) {Int} [paramList.id] 参数记录的ID
      * @apiParam (请求参数) {Int} paramList.subjectID  主体ID
      * @apiParam (请求参数) {String} paramList.dataType  数据类型 String,Double,Long
      * @apiParam (请求参数) {String} paramList.token  参数标识(max = 50)

@@ -202,11 +202,11 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {String} data.tbMonitorItems.typeName   监测类型名称
      * @apiSuccess (返回结果) {String} data.tbMonitorItems.typeAlias   监测类型别名
      * @apiSuccess (返回结果) {Object[]} data.tbMonitorItems   监测项目列表
-     * @apiSuccess (返回结果) {Int} data.tbMonitorItems.ID   监测项目id
+     * @apiSuccess (返回结果) {Int} data.tbMonitorItems.id   监测项目id
      * @apiSuccess (返回结果) {String} data.tbMonitorItems.name   监测项目名称
      * @apiSuccess (返回结果) {String} data.tbMonitorItems.alias   监测项目别名
      * @apiSuccess (返回结果) {Object[]} data.tbMonitors   监测点列表
-     * @apiSuccess (返回结果) {Int} data.tbMonitors.ID   监测点id
+     * @apiSuccess (返回结果) {Int} data.tbMonitors.id   监测点id
      * @apiSuccess (返回结果) {String} data.tbMonitors.name   监测点名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint

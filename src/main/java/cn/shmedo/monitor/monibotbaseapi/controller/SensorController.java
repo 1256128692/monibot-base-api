@@ -40,7 +40,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.totalCount 总条数
      * @apiSuccess (响应结果) {Int} data.totalPage 总页数
      * @apiSuccess (响应结果) {Object[]} data.currentPageData 当前页数据
-     * @apiSuccess (响应结果) {Int} data.currentPageData.ID 传感器ID
+     * @apiSuccess (响应结果) {Int} data.currentPageData.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.currentPageData.monitorType 监测类型 (Code)
      * @apiSuccess (响应结果) {String} data.currentPageData.monitorTypeName 监测类型名称
      * @apiSuccess (响应结果) {String} data.currentPageData.name 传感器名称 (由系统自动生成不可修改)
@@ -96,7 +96,7 @@ public class SensorController {
      * @apiParam (请求参数) {Int} dataSourceList.value 数据源标识（级联最后一级value）
      * @apiParam (请求参数) {String} dataSourceList.type 数据源类型（级联第一级value） 1-物联网传感器 2-监测传感器 -1-API
      * @apiSuccess (响应结果) {Object} data
-     * @apiSuccess (响应结果) {Int} data.ID 监测类型ID
+     * @apiSuccess (响应结果) {Int} data.id 监测类型ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
      * @apiSuccess (响应结果) {String} data.typeName 监测类型名称
      * @apiSuccess (响应结果) {String} data.typeAlias 监测类型别名
@@ -107,7 +107,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.companyID 公司ID
      * @apiSuccess (响应结果) {String} data.exValues 拓展信息
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
-     * @apiSuccess (响应结果) {Int} data.exFields.ID 拓展字段ID
+     * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID
      * @apiSuccess (响应结果) {Int} data.exFields.monitorType 监测类型
      * @apiSuccess (响应结果) {String} data.exFields.fieldToken 字段标识
      * @apiSuccess (响应结果) {String} data.exFields.fieldName 字段名称
@@ -120,7 +120,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.exFields.exValues 拓展信息
      * @apiSuccess (响应结果) {Int} data.exFields.displayOrder 显示排序字段
      * @apiSuccess (响应结果) {Object[]} data.paramFields 参数列表
-     * @apiSuccess (响应结果) {Int} data.paramFields.ID 参数字段ID
+     * @apiSuccess (响应结果) {Int} data.paramFields.id 参数字段ID
      * @apiSuccess (响应结果) {Int} data.paramFields.subjectID 主体ID
      * @apiSuccess (响应结果) {Int} data.paramFields.subjectType 主体类型
      * @apiSuccess (响应结果) {String} data.paramFields.dataType 数据类型
@@ -154,15 +154,15 @@ public class SensorController {
      * @apiParam (请求体) {Int} dataSourceList.value 数据源标识（级联最后一级value）
      * @apiParam (请求体) {String} dataSourceList.type 数据源类型（级联第一级value） 1-物联网传感器 2-监测传感器 -1-API
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
-     * @apiParam (请求体) {Int} exFields.ID 扩展配置参数ID
+     * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
      * @apiParam (请求体) {Object[]} [paramFields] 参数列表，由监测类型决定是否需要
-     * @apiParam (请求体) {Int} paramFields.ID 参数ID
+     * @apiParam (请求体) {Int} paramFields.id 参数ID
      * @apiParam (请求体) {String} paramFields.value 参数值
      * @apiParamExample {json} 请求体示例
      * {"projectID": 0,"imagePath": "","name": "","alias": "","monitorType": 0,"dataSourceComposeType": 1,"dataSourceList": [{"type": 1,"value": 0}],"exFields": [{"ID": "","value": ""}],"paramFields": [{"ID": "","value": ""}]}
      * @apiSuccess (响应结果) {Object} data 响应结果
-     * @apiSuccess (响应结果) {Int} data.ID 传感器ID
+     * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"ID": 10086}}
      * @apiPermission mdmbase:UpdateSensor
@@ -183,7 +183,7 @@ public class SensorController {
      * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (响应结果) {Object} data 响应结果
-     * @apiSuccess (响应结果) {Int} data.ID 传感器ID
+     * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.templateID 模板ID
      * @apiSuccess (响应结果) {String[]} data.dataSourceNames 数据源名称（如: 物联网数据>SN12345>传1）
@@ -204,7 +204,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.imagePath 传感器图片路径
      * @apiSuccess (响应结果) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
-     * @apiSuccess (响应结果) {Int} data.exFields.ID 拓展字段ID
+     * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID
      * @apiSuccess (响应结果) {Int} data.exFields.monitorType 监测类型
      * @apiSuccess (响应结果) {String} data.exFields.fieldToken 字段标识
      * @apiSuccess (响应结果) {String} data.exFields.fieldName 字段名称
@@ -218,7 +218,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.exFields.displayOrder 显示排序字段
      * @apiSuccess (响应结果) {Int} data.exFields.value 字段值
      * @apiSuccess (响应结果) {Object[]} data.paramFields 参数列表
-     * @apiSuccess (响应结果) {Int} data.paramFields.ID 参数字段ID
+     * @apiSuccess (响应结果) {Int} data.paramFields.id 参数字段ID
      * @apiSuccess (响应结果) {Int} data.paramFields.subjectID 主体ID
      * @apiSuccess (响应结果) {Int} data.paramFields.subjectType 主体类型
      * @apiSuccess (响应结果) {String} data.paramFields.dataType 数据类型
@@ -268,13 +268,13 @@ public class SensorController {
      * @apiParam (请求体) {String} [alias] 传感器别名
      * @apiParam (请求体) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表 (不传=不修改，修改时每次传全部)
-     * @apiParam (请求体) {Int} exFields.ID 扩展配置参数ID
+     * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
      * @apiParam (请求体) {Object[]} [paramFields] 参数列表 (不传=不修改，修改时每次传全部)
-     * @apiParam (请求体) {Int} paramFields.ID 参数ID
+     * @apiParam (请求体) {Int} paramFields.id 参数ID
      * @apiParam (请求体) {String} paramFields.value 参数值
      * @apiSuccess (响应结果) {Object} data 响应结果
-     * @apiSuccess (响应结果) {Int} data.ID 传感器ID
+     * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"ID": 10086}}
      * @apiPermission mdmbase:UpdateSensor
@@ -297,7 +297,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Object} data 响应结果
      * @apiSuccess (响应结果) {Int} data.calType 计算类型 1公式计算 2脚本计算 3外部HTTP计算 -1不计算
      * @apiSuccess (响应结果) {Object[]} data.fieldList 监测类型字段列表
-     * @apiSuccess (响应结果) {Int} data.fieldList.ID 字段ID
+     * @apiSuccess (响应结果) {Int} data.fieldList.id 字段ID
      * @apiSuccess (响应结果) {String} [data.fieldList.formula] 公式 仅当calType=1时存在
      * @apiSuccess (响应结果) {String} data.fieldList.monitorType 监测类型
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken 字段标识

@@ -99,7 +99,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.ID 监测项目ID
+     * @apiSuccess (返回结果) {Int} currentPageData.id 监测项目ID
      * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} currentPageData.name 监测项目名称
      * @apiSuccess (返回结果) {String} currentPageData.alias 监测项目别名
@@ -109,7 +109,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} currentPageData.createType 创建类型
      * @apiSuccess (返回结果) {Int} [currentPageData.enable] 项目中是否可见
      * @apiSuccess (返回结果) {Object[]} currentPageData.fieldList 字段列表
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.ID 字段ID
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.id 字段ID
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.token 字段标识
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.name 字段名称
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 字段描述

@@ -59,7 +59,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} [monitorTypeList] 检测类型列表
      * @apiParam (请求体) {Int} [modelID] 自定义模型ID
      * @apiParam (请求体) {Object[]} [modelValueList] 模型值列表(预定义与自定义部分的合集)
-     * @apiParam (请求体) {String} modelValueList.ID 属性ID
+     * @apiParam (请求体) {String} modelValueList.id 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值（<=50） 可为null， 不能为空字符串
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
@@ -121,7 +121,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 修改用户ID
      * @apiSuccess (返回结果) {Object} company 公司信息
-     * @apiSuccess (返回结果) {Int} company.ID ID
+     * @apiSuccess (返回结果) {Int} company.id id
      * @apiSuccess (返回结果) {String} company.ShortName 公司简称
      * @apiSuccess (返回结果) {String} company.FullName 所属公司全称
      * @apiSuccess (返回结果) {Int} company.ParentID 所属公司id
@@ -135,7 +135,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} company.WebSite 网站
      * @apiSuccess (返回结果) {String} company.displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} tagInfo 标签信息
-     * @apiSuccess (返回结果) {Int} tagInfo.ID 标签id
+     * @apiSuccess (返回结果) {Int} tagInfo.id 标签id
      * @apiSuccess (返回结果) {String} tagInfo.tagKey 标签键
      * @apiSuccess (返回结果) {String} tagInfo.tagValue 标签值
      * @apiSuccess (返回结果) {Object[]} propertyList 项目基础信息列表
@@ -169,8 +169,8 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectInfo
-     * @apiParam (请求体) {Int} ID 项目ID
-     * @apiSuccess (返回结果) {Int} ID 项目ID
+     * @apiParam (请求体) {Int} id 项目ID
+     * @apiSuccess (返回结果) {Int} id 项目ID
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
@@ -192,7 +192,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
      * @apiSuccess (返回结果) {Int} updateUserID 修改用户ID
      * @apiSuccess (返回结果) {Object} company 公司信息
-     * @apiSuccess (返回结果) {Int} company.ID ID
+     * @apiSuccess (返回结果) {Int} company.id ID
      * @apiSuccess (返回结果) {String} company.ShortName 公司简称
      * @apiSuccess (返回结果) {String} company.FullName 所属公司全称
      * @apiSuccess (返回结果) {Int} company.ParentID 所属公司id
@@ -254,7 +254,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} tagList.key 标签键
      * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Object[]} [propertyList] 属性值列表
-     * @apiParam (请求体) {String} propertyList.ID 属性ID
+     * @apiParam (请求体) {String} propertyList.id 属性ID
      * @apiParam (请求体) {String} [propertyList.value] 属性值
      * @apiParam (请求体) {String} [fileName] 文件名称,不要带后缀 ,需要与imageContent，imageSuffix均存在才可更新图片
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
@@ -320,7 +320,7 @@ public class ProjectController {
      * @apiName QueryProjectType
      * @apiDescription 查询项目类型
      * @apiSuccess (返回结果) {Object[]} projectType 项目类型
-     * @apiSuccess (返回结果) {int} projectType.ID ID
+     * @apiSuccess (返回结果) {int} projectType.id ID
      * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
      * @apiSuccess (返回结果) {String} projectType.mainType 主类型名称
      * @apiSampleRequest off

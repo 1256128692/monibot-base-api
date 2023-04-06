@@ -18,7 +18,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateFieldItem {
     @NotNull
-    @JsonProperty("ID")
     private Integer ID;
     @NotBlank
     @Size(max = 50)

@@ -25,7 +25,6 @@ public class QueryProjectInfoParam implements ParameterValidator, ResourcePermis
     /**
      * 项目ID
      */
-    @JsonProperty(value = "ID")
     @NotNull(message = "项目ID不能为空")
     @Range(min = 1, message = "项目ID必须大于0")
     private Integer ID;

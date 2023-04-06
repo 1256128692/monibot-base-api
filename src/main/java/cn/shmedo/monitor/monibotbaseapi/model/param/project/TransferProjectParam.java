@@ -6,8 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Arrays;
@@ -24,7 +23,7 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
     @NotNull
     Integer projectID;
 
-    @JsonProperty()
+    @JsonIgnore
     private Integer rowCompanyID;
 
     @Override
