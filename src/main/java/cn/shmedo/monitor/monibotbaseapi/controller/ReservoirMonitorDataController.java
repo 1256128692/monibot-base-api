@@ -522,6 +522,62 @@ public class ReservoirMonitorDataController {
     public Object queryDisplacementPointHistoryDataList(@Validated @RequestBody Object pa) {
         return null;
     }
+
+    /**
+     * @api {POST} /QueryDisplacementMonitorPointNewDataList 查询内部三轴位移所有监测点最新数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiName QueryDisplacementMonitorPointNewDataList
+     * @apiDescription 查询公司下所有监测点最新数据列表
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} monitorType 监测类型(内部三轴位移)
+     * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [areaCode] 行政区划编码
+     * @apiParamExample 请求体示例
+     * {"companyID":138,"projectTypeID":1,"areaCode":"110102014","monitorType":11,"monitorItemID":12}
+     * @apiSuccess (响应结果) {Object[]} data                 结果列表
+     * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
+     * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型别名
+     * @apiSuccess (响应结果) {Int} data.monitorItemID        监测项目ID
+     * @apiSuccess (响应结果) {String} data.monitorItemName   监测项目名称
+     * @apiSuccess (响应结果) {String} data.monitorItemAlias  监测项目别名
+     * @apiSuccess (响应结果) {Int} data.projectTypeID        工程项目类型ID
+     * @apiSuccess (响应结果) {String} data.projectTypeName   工程项目类型名称
+     * @apiSuccess (响应结果) {Int} data.projectID            工程项目ID
+     * @apiSuccess (响应结果) {String} data.projectName       工程项目名称
+     * @apiSuccess (响应结果) {String} data.projectShortName  工程项目简称
+     * @apiSuccess (响应结果) {String} data.location          四级行政区域信息
+     * @apiSuccess (响应结果) {String} data.locationInfo      第四级区域名称
+     * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
+     * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
+     * @apiSuccess (响应结果) {String} data.density       监测点查询密度
+     * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
+     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器id
+     * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
+     * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
+     * @apiSuccess (响应结果) {Byte} data.sensorList.status         传感器状态 -1 无数据 0 正常 1,2,3,4对应预警级别
+     * @apiSuccess (响应结果) {Object} data.sensorData       传感器最新数据,(最新时间内,数据值最大这笔数据展示出来,已经它对应的深度)
+     * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
+     * @apiSuccess (响应结果) {Double} data.sensorData.x_deep       A轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.x_value      A轴数据
+     * @apiSuccess (响应结果) {Double} data.sensorData.y_deep       B轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.y_value      B轴数据
+     * @apiSuccess (响应结果) {Double} data.sensorData.z_deep       C轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.z_value      C轴数据
+
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListCompanySensorData
+     */
+    @Permission(permissionName = "mdmbase:ListCompanySensorData")
+    @RequestMapping(value = "/QueryDisplacementMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryDisplacementMonitorPointNewDataList(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
 }
 
 

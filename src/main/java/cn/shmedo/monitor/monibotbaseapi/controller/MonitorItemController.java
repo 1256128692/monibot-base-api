@@ -143,26 +143,30 @@ public class MonitorItemController {
 
 
     /**
-     * @api {POST} /QueryMonitorItemList 查询监测项目列表
+     * @api {POST} /QueryWtMonitorItemList 查询水利监测项目列表
      * @apiVersion 1.0.0
      * @apiGroup 监测项目模块
-     * @apiName QueryMonitorItemList
-     * @apiDescription 查询监测项目列表
+     * @apiName QueryWtMonitorItemList
+     * @apiDescription 查询水利监测项目列表
      * @apiParam (请求参数) {Int} projectID 工程项目ID
-     * @apiParam (请求参数) {Int} [monitorClass] 监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测)
-     * @apiSuccess (返回结果) {Object[]} data 当前页数据
-     * @apiSuccess (返回结果) {Int} data.monitorItemID 监测项目ID
-     * @apiSuccess (返回结果) {Int} data.projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} data.name 监测项目名称
-     * @apiSuccess (返回结果) {String} data.alias 监测项目别名
-     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
-     * @apiSuccess (返回结果) {String} data.typeName 监测类型名称
-     * @apiSuccess (返回结果) {String} data.typeAlias 监测类型别名
+     * @apiParam (请求参数) {Int} [monitorClass] 监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测 空:all)
+     * @apiSuccess (返回结果) {Object[]} data.monitorClassList 监测类别列表
+     * @apiSuccess (返回结果) {Int} monitorClassList.monitorClass 监测类别ID
+     * @apiSuccess (返回结果) {Object[]} monitorClassList.monitorTypeList 监测类型列表
+     * @apiSuccess (返回结果) {Int} monitorTypeList.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} monitorTypeList.typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} monitorTypeList.typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Object[]} monitorTypeList.monitorItemList 监测项目列表
+     * @apiSuccess (返回结果) {Int} monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} monitorItemList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} monitorItemList.name 监测项目名称
+     * @apiSuccess (返回结果) {String} monitorItemList.alias 监测项目别名
+
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
      */
 //    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
-    @PostMapping(value = "/QueryMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryWtMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemList(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }

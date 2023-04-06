@@ -17,22 +17,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class MonitorClassController {
 
     /**
-     * @api {POST} /UpdateMonitorClass 编辑监测类别配置
+     * @api {POST} /UpdateWtMonitorClass 编辑监测类别配置
      * @apiVersion 1.0.0
      * @apiGroup 监测类别模块
-     * @apiName UpdateMonitorClass
+     * @apiName UpdateWtMonitorClass
      * @apiDescription 编辑监测类别配置, 比如配置工程下的监测类别的密度配置
      * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {Int} monitorClass 监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测)
+     * @apiParam (请求参数) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求参数) {Boolean} enable 是否启用
      * @apiParam (请求参数) {String} density 密度,例如(30分钟:30m  1小时:1h  2小时:2h)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateMonitorClass
+     * @apiPermission 项目权限 mdmbase:UpdateWtMonitorClass
      */
 //    @Permission(permissionName = "mdmbase:UpdateMonitorClass")
-    @PostMapping(value = "/UpdateMonitorClass", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateMonitorClass(@RequestBody @Validated Object request) {
+    @PostMapping(value = "/UpdateWtMonitorClass", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateWtMonitorClass(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
     }
 
