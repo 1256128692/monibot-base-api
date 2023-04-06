@@ -67,6 +67,12 @@ public class DeleteMonitorTypeFieldBatchParam implements ParameterValidator, Res
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型已经设置模板，不可删除");
             }
         }
+        // 校验不能全部删除完
+        if (tbMonitorTypeFieldMapper.selectCount(
+                new QueryWrapper<TbMonitorTypeField>().notIn("id",fieldIDList).eq("monitorType", monitorType)) <1){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "删除后该监测类型下将不剩任何属性");
+        }
+
         return null;
     }
 

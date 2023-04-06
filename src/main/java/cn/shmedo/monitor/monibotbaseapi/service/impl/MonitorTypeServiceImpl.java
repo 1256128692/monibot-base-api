@@ -88,7 +88,6 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addCustomizedMonitorType(AddCustomizedMonitorTypeParam pa, Integer userID) {
-
         Integer type;
         if (pa.getMonitorType() != null) {
             type = pa.getMonitorType();

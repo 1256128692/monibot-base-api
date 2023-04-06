@@ -199,12 +199,12 @@
   </select>
   <insert id="insertBatch">
     insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
-    FieldDataType, FieldClass, FieldUnitID,
+    FieldDataType, FieldClass,FieldDesc, FieldUnitID,
     ParentID, DisplayOrder, CreateType,
     ExValues)
     values <foreach collection="list" item="item" separator=",">
     (#{item.monitorType,jdbcType=INTEGER}, #{item.fieldName,jdbcType=VARCHAR}, #{item.fieldToken,jdbcType=VARCHAR},
-    #{item.fieldDataType,jdbcType=VARCHAR}, #{item.fieldClass,jdbcType=INTEGER}, #{item.fieldUnitID,jdbcType=INTEGER},
+    #{item.fieldDataType,jdbcType=VARCHAR}, #{item.fieldClass,jdbcType=INTEGER},#{item.fieldDesc,jdbcType=INTEGER}, #{item.fieldUnitID,jdbcType=INTEGER},
     #{item.parentID,jdbcType=INTEGER}, #{item.displayOrder,jdbcType=INTEGER}, #{item.createType,jdbcType=INTEGER},
     #{item.exValues,jdbcType=VARCHAR})
   </foreach>
