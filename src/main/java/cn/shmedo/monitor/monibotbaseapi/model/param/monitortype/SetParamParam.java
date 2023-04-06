@@ -73,11 +73,8 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
         if (ObjectUtil.isNotEmpty(temp)) {
             queryWrapper.notIn("id", temp);
         }
-        queryWrapper.or(wrapper -> {
-            paramList.forEach(item -> {
-                queryWrapper.eq("subjectID", item.getSubjectID()).eq("token", item.getToken()).or();
-            });
-            wrapper.last("1=2");
+        paramList.forEach(item -> {
+            queryWrapper.eq("subjectID", item.getSubjectID()).eq("token", item.getToken()).or();
         });
         if (tbParameterMapper.selectCount(queryWrapper) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数已经存在");

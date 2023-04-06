@@ -8,7 +8,10 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +44,10 @@ public class DeleteTemplateBatchParam implements ParameterValidator, ResourcePer
         if (list.stream().anyMatch(item -> item.getCompanyID().equals(-1) || !item.getCompanyID().equals(companyID))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板对应的监测类型不是自定义或不属于该公司");
         }
-        // TODO  校验是否使用
+        TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+        if (tbSensorMapper.selectCount(new QueryWrapper<TbSensor>().in("templateID", templateIDList))>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板已有传感器使用，不可删除");
+        }
         return null;
     }
 
