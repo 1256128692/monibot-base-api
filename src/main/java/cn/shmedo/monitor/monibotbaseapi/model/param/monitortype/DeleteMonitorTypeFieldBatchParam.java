@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -70,20 +67,21 @@ public class DeleteMonitorTypeFieldBatchParam implements ParameterValidator, Res
         // 校验不能全部删除完
         if (tbMonitorTypeFieldMapper.selectCount(
                 new QueryWrapper<TbMonitorTypeField>().notIn("id",fieldIDList).eq("monitorType", monitorType)) <1){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "删除后该监测类型下将不剩任何属性");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "请至少保留一个属性");
         }
 
         return null;
     }
 
+
     @Override
     public Resource parameter() {
-        return null;
+        return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionProvider.super.resourcePermissionType();
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 }
 

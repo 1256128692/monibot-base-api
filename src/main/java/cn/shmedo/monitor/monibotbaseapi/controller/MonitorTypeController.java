@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MonitorTypeController {
     private final MonitorTypeService monitorTypeService;
+
     /**
      * @api {POST} /AddPredefinedMonitorType 新增预定义监测类型
      * @apiVersion 1.0.0
@@ -46,7 +49,8 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-     @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "新增预定义监测类型", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "/AddPredefinedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addPredefinedMonitorType(@RequestBody @Validated AddPredefinedMonitorTypeParam pa) {
         monitorTypeService.addPredefinedMonitorType(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -79,7 +83,8 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "新增自定义监测类型", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "/AddCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addCustomizedMonitorType(@RequestBody @Validated AddCustomizedMonitorTypeParam pa) {
         monitorTypeService.addCustomizedMonitorType(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -102,7 +107,8 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "更新自定义监测类型", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "/UpdateCustomizedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateCustomizedMonitorType(@RequestBody @Validated UpdateCustomizedMonitorTypeParam pa) {
         monitorTypeService.updateCustomizedMonitorType(pa);
@@ -128,7 +134,8 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "更新自定义监测类型属性", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "/UpdateCustomizedMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateCustomizedMonitorTypeField(@RequestBody @Validated UpdateCustomizedMonitorTypeFieldParam pa) {
         monitorTypeService.updateCustomizedMonitorTypeField(pa);
@@ -157,7 +164,9 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "新增监测类型属性", operationProperty = OperationProperty.UPDATE)
+
     @PostMapping(value = "/AddMonitorTypeField", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorTypeField(@RequestBody @Validated AddMonitorTypeFieldParam pa) {
         monitorTypeService.addMonitorTypeField(pa);
@@ -177,7 +186,9 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DeleteBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "批量删除监测类型属性", operationProperty = OperationProperty.UPDATE)
+
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated DeleteMonitorTypeFieldBatchParam pa) {
         monitorTypeService.deleteMonitorTypeFieldBatch(pa.getFieldIDList());
@@ -223,7 +234,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
     @PostMapping(value = "/QueryMonitorTypePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypePage(@RequestBody @Validated QueryMonitorTypePageParam request) {
         return monitorTypeService.queryMonitorTypePage(request);
@@ -241,7 +252,9 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DeleteBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "批量删除监测类型", operationProperty = OperationProperty.DELETE)
+
     @PostMapping(value = "/DeleteMonitorTypeBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorTypeBatch(@RequestBody @Validated DeleteMonitorTypeBatchParam pa) {
         monitorTypeService.deleteMonitorTypeBatch(pa.getMonitorTypeList());
@@ -249,7 +262,7 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} /QueryRecommendedMonitorType 推荐监测类型
+     * @api {POST} /QueryRecommendedMonitorType 推荐监测类型（暂不用）
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName QueryRecommendedMonitorType
@@ -259,7 +272,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
     @PostMapping(value = "/QueryRecommendedMonitorType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryRecommendedMonitorType(@RequestBody @Validated Object request) {
         return ResultWrapper.successWithNothing();
@@ -322,7 +335,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
     @PostMapping(value = "/QueryMonitorTypeDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeDetail(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
         return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType(), pa.getCompanyID());
@@ -356,11 +369,13 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "添加模板", operationProperty = OperationProperty.ADD)
+
     @PostMapping(value = "/AddTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addTemplate(@RequestBody @Validated AddTemplateParam pa) {
-         monitorTypeService.addTemplate(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-         return ResultWrapper.successWithNothing();
+        monitorTypeService.addTemplate(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -375,7 +390,9 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DeleteBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "批量删除模板", operationProperty = OperationProperty.DELETE)
+
     @PostMapping(value = "/DeleteTemplateBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteTemplateBatch(@RequestBody @Validated DeleteTemplateBatchParam pa) {
         monitorTypeService.deleteTemplateBatch(pa.getTemplateIDList());
@@ -400,7 +417,9 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "设置计算公式", operationProperty = OperationProperty.UPDATE)
+
     @PostMapping(value = "/SetFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object setFormula(@RequestBody @Validated SetFormulaParam pa) {
         monitorTypeService.setFormula(pa);
@@ -413,6 +432,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypeFieldWithFormula
      * @apiDescription 查询监测类型属性与公式, 只包含12类型的属性
+     * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {Int} templateID  模板ID
      * @apiSuccess (返回结果) {Object[]} list 当前页数据
@@ -433,7 +453,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
     @PostMapping(value = "/QueryMonitorTypeFieldWithFormula", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeFieldWithFormula(@RequestBody @Validated QueryMonitorTypeFieldWithFormulaParam pa) {
         return monitorTypeService.queryMonitorTypeFieldWithFormula(pa);
@@ -461,7 +481,8 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
+    @LogParam(moduleName = "监测类型模块", operationName = "设置参数", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "/SetParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object setParam(@RequestBody @Validated SetParamParam pa) {
         monitorTypeService.setParam(pa);
@@ -489,11 +510,13 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+
     @PostMapping(value = "/QueryParam", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryParam(@RequestBody @Validated QueryParamParam pa) {
         return monitorTypeService.queryParam(pa);
     }
+
     /**
      * @api {POST} /QueryMonitorTypeFiledInfo 查看监测类型属性信息
      * @apiVersion 1.0.0
@@ -524,7 +547,7 @@ public class MonitorTypeController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorType")
     @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeFiledInfo(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
         return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType(), pa.getCompanyID());
