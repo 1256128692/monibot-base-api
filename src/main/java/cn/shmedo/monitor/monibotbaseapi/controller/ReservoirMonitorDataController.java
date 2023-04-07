@@ -234,6 +234,10 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
      * @apiSuccess (响应结果) {Int} typeInfoList.pointCount   监测类型监测点统计数量
+     * @apiSuccess (响应结果) {Object[]} typeInfoList.monitorItemList   监测项目类型
+     * @apiSuccess (响应结果) {Int} typeInfoList.monitorItemList.monitorItemID   监测项目ID
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.name   监测项目名称
+     * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.alias   监测项目别名
      * @apiSuccess (响应结果) {Object} typeInfoList.warnInfo          监测点预警统计信息
      * @apiSuccess (响应结果) {Int} warnInfo.normalCount         正常数量
      * @apiSuccess (响应结果) {Int} warnInfo.noDataCount         无数据数量
@@ -243,7 +247,6 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {Int} warnInfo.levelFourCount  四级警报数量
      * @apiSuccess (响应结果) {Object[]} typeInfoList.projectTypeList  工程类型信息
      * @apiSuccess (响应结果) {Int} projectTypeList.id  工程类型ID
-     * @apiSuccess (响应结果) {String} projectTypeList.typeName  工程类型名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseCompanyMonitor
      */

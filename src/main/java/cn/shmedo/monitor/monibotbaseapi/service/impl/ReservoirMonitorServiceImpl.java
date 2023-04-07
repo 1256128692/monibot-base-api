@@ -59,6 +59,8 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
 
     private final TbMonitorTypeMapper tbMonitorTypeMapper;
 
+    private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
+
     @Override
     public List<SensorNewDataInfo> queryMonitorPointList(QueryMonitorPointListParam pa) {
 
@@ -421,72 +423,96 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
+        // TODO WarnInfo待处理,统计方式:处理统计成为单个监测点下最差情况
         List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID());
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(pa.getCompanyID());
-        List<TbMonitorPoint> monitorTypeAndProIDs = tbMonitorPointMapper.selectMonitorTypeAndProIDByCompanyID(pa.getCompanyID());
+
+        // 当前公司下没有工程,则没有监测类型,返回空
+        if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
+            return null;
+        }
+        // 查询该公司下  已经存在监测点配置监测类别  的数据
+        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
+        LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
+                .eq(TbProjectMonitorClass::getMonitorClass, pa.getQueryType())
+                .in(TbProjectMonitorClass::getProjectID, projectIDList)
+                .eq(TbProjectMonitorClass::getEnable, true);
+        List<TbProjectMonitorClass> proMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
+
+        // 当前公司下有工程,但是工程都没有配置监测类别,返回空
+        if (CollectionUtil.isNullOrEmpty(proMonitorClassList)) {
+            return null;
+        }
+        List<Integer> proIDList = proMonitorClassList.stream().map(TbProjectMonitorClass::getProjectID).collect(Collectors.toList());
+        List<TbMonitorPoint> tbMonitorPointList = tbMonitorPointMapper.selectMonitorTypeAndProIDByProIDList(proIDList);
+
+        // 监测项目列表
+        List<MonitorItemBaseInfo> monitorItemList = tbMonitorItemMapper.selectListByCondition(pa.getCompanyID(), proIDList, pa.getQueryType());
 
         MonitorPointTypeStatisticsInfo vo = new MonitorPointTypeStatisticsInfo();
-        if (pa.getQueryType().equals(0)) {
-            List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(pa.getCompanyID());
-            monitorTypeBaseInfos.forEach(item -> {
-                List<TbProjectType> projectTypeInfos = new LinkedList<>();
-                if (!monitorTypeMap.isEmpty()) {
-                    // 监测类型相关信息
-                    TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
-                    item.setMonitorTypeName(tbMonitorType.getTypeName());
-                    item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
-                }
-                if (!projectTypeMap.isEmpty()) {
-                    if (!CollectionUtil.isNullOrEmpty(monitorTypeAndProIDs)) {
-                        Set<Integer> projectIDs = monitorTypeAndProIDs.stream().filter(m -> m.getMonitorType().equals(item.getMonitorType())).map(TbMonitorPoint::getProjectID).collect(Collectors.toSet());
-                        Set<Byte> projectTypes = tbProjectInfos.stream().filter(pi -> projectIDs.contains(pi.getID())).map(TbProjectInfo::getProjectType).collect(Collectors.toSet());
-                        projectTypeMap.entrySet().forEach(p -> {
-                            if (projectTypes.contains(p.getKey())) {
-                                projectTypeInfos.add(p.getValue());
-                            }
-                        });
-                    }
-                    // 工程类型信息
-                    item.setProjectTypeList(projectTypeInfos);
-                }
 
-                if (!CollectionUtil.isNullOrEmpty(sensorList)) {
-                    // 传感器警报信息
-                    item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList())));
-                }
-
-            });
-            if (!CollectionUtil.isNullOrEmpty(monitorTypeBaseInfos)) {
-                List<Integer> monitorTypeIDList = monitorTypeBaseInfos.stream().map(MonitorTypeBaseInfo::getMonitorType).collect(Collectors.toList());
-                Map<Integer, TbMonitorType> filteredMap = monitorTypeMap.entrySet().stream()
-                        .filter(entry -> !monitorTypeIDList.contains(entry.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                if (MapUtil.isNotEmpty(filteredMap)) {
-                    filteredMap.entrySet().forEach(entry -> {
-                        MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-                        mtVo.setMonitorType(entry.getKey());
-                        mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-                        mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-                        mtVo.setPointCount(0);
-                        monitorTypeBaseInfos.add(mtVo);
+        List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(proIDList);
+        monitorTypeBaseInfos.forEach(item -> {
+            List<TbProjectType> projectTypeInfos = new LinkedList<>();
+            if (!monitorTypeMap.isEmpty()) {
+                // 监测类型相关信息
+                TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
+                item.setMonitorTypeName(tbMonitorType.getTypeName());
+                item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
+            }
+            if (!projectTypeMap.isEmpty()) {
+                // 工程类型信息
+                if (!CollectionUtil.isNullOrEmpty(tbMonitorPointList)) {
+                    Set<Integer> projectIDs = tbMonitorPointList.stream().filter(m -> m.getMonitorType().equals(item.getMonitorType())).map(TbMonitorPoint::getProjectID).collect(Collectors.toSet());
+                    Set<Byte> projectTypes = tbProjectInfos.stream().filter(pi -> projectIDs.contains(pi.getID())).map(TbProjectInfo::getProjectType).collect(Collectors.toSet());
+                    projectTypeMap.entrySet().forEach(p -> {
+                        if (projectTypes.contains(p.getKey())) {
+                            projectTypeInfos.add(p.getValue());
+                        }
                     });
                 }
-            } else {
-                if (MapUtil.isNotEmpty(monitorTypeMap)) {
-                    monitorTypeMap.entrySet().forEach(entry -> {
-                        MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-                        mtVo.setMonitorType(entry.getKey());
-                        mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-                        mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-                        mtVo.setPointCount(0);
-                        monitorTypeBaseInfos.add(mtVo);
-                    });
-                }
+                item.setProjectTypeList(projectTypeInfos);
+            }
+            if (!CollectionUtil.isNullOrEmpty(sensorList)) {
+                // 传感器警报信息
+                item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList())));
+            }
+            if (!CollectionUtil.isNullOrEmpty(monitorItemList)){
+                // 监测项目信息列表
+                List<MonitorItemBaseInfo> list = monitorItemList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList());
+                item.setMonitorItemList(list);
             }
 
-            vo.setTypeInfoList(monitorTypeBaseInfos);
-        }
+        });
+//        if (!CollectionUtil.isNullOrEmpty(monitorTypeBaseInfos)) {
+//            List<Integer> monitorTypeIDList = monitorTypeBaseInfos.stream().map(MonitorTypeBaseInfo::getMonitorType).collect(Collectors.toList());
+//            Map<Integer, TbMonitorType> filteredMap = monitorTypeMap.entrySet().stream()
+//                    .filter(entry -> !monitorTypeIDList.contains(entry.getKey()))
+//                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//            if (MapUtil.isNotEmpty(filteredMap)) {
+//                filteredMap.entrySet().forEach(entry -> {
+//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
+//                    mtVo.setMonitorType(entry.getKey());
+//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
+//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
+//                    mtVo.setPointCount(0);
+//                    monitorTypeBaseInfos.add(mtVo);
+//                });
+//            }
+//        } else {
+//            if (MapUtil.isNotEmpty(monitorTypeMap)) {
+//                monitorTypeMap.entrySet().forEach(entry -> {
+//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
+//                    mtVo.setMonitorType(entry.getKey());
+//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
+//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
+//                    mtVo.setPointCount(0);
+//                    monitorTypeBaseInfos.add(mtVo);
+//                });
+//            }
+//        }
 
+        vo.setTypeInfoList(monitorTypeBaseInfos);
         return vo;
     }
 
