@@ -552,4 +552,36 @@ public class MonitorTypeController {
     public Object queryMonitorTypeFiledInfo(@RequestBody @Validated QueryMonitorTypeDetailParam pa) {
         return monitorTypeService.queryMonitorTypeDetail(pa.getMonitorType(), pa.getCompanyID());
     }
+
+    /**
+     * @api {POST} /QueryFormulaParams 查看公式参数列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryFormulaParams
+     * @apiDescription 查看公式参数列表
+     * @apiParam (请求参数) {Int} projectID  项目ID
+     * @apiParam (请求参数) {Int} templateID  模板ID
+     * @apiParam (请求参数) {Int} monitorType  监测类型
+     * @apiSuccess (返回结果) {Object} iot iot参数列表
+     * @apiSuccess (返回结果) {String[]} iot.children 物模型数据源名称列表
+     * @apiSuccess (返回结果) {Object} iot.T 物模型数据源信息，如220_a,220_b
+     * @apiSuccess (返回结果) {String[]} iot.T.children 物模型数据源子字段名称列表
+     * @apiSuccess (返回结果) {Object} mon mon参数列表
+     * @apiSuccess (返回结果) {String[]} mon.children 监测数据源名称列表
+     * @apiSuccess (返回结果) {Object} mon.T 监测数据源名称列表，如22_a,35_b
+     * @apiSuccess (返回结果) {String[]} mon.T.children 监测数据源子字段名称列表
+     * @apiSuccess (返回结果) {Object} self self参数列表
+     * @apiSuccess (返回结果) {String[]} self.children 自身传感器数据字段列表
+     * @apiSuccess (返回结果) {Object} param param参数列表
+     * @apiSuccess (返回结果) {String[]} param.children 公式参数列表
+     * @apiSuccess (返回结果) {Object} ex ex参数列表
+     * @apiSuccess (返回结果) {String[]} ex.children 拓展配置字段列表
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorType")
+    @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryFormulaParams(@RequestBody @Validated Object pa) {
+        return null;
+    }
 }
