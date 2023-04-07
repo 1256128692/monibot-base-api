@@ -380,6 +380,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectList
      * @apiParam (请求体) {Int} companyID 企业名称-先调用接口查询具体企业，发送id
+     * @apiParam (请求体) {Int} [projectType] 项目类型,-1:查全部
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiSuccess (返回结果) {Object[]} data 项目信息列表
      * @apiSuccess (返回结果) {Int} data.id 项目id

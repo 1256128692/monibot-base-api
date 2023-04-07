@@ -1,7 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.QueryWtMonitorItemListParam;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
+import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 public class MonitorItemController {
+
+    private MonitorItemService monitorItemService;
 
     /**
      * @api {POST} /AddMonitorItem 新增监测项目
@@ -152,22 +158,22 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [monitorClass] 监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测 空:all)
      * @apiSuccess (返回结果) {Object[]} data.monitorClassList 监测类别列表
      * @apiSuccess (返回结果) {Int} monitorClassList.monitorClass 监测类别ID
-     * @apiSuccess (返回结果) {Object[]} monitorClassList.monitorTypeList 监测类型列表
-     * @apiSuccess (返回结果) {Int} monitorTypeList.monitorType 监测类型
-     * @apiSuccess (返回结果) {String} monitorTypeList.typeName 监测类型名称
-     * @apiSuccess (返回结果) {String} monitorTypeList.typeAlias 监测类型别名
-     * @apiSuccess (返回结果) {Object[]} monitorTypeList.monitorItemList 监测项目列表
-     * @apiSuccess (返回结果) {Int} monitorItemList.monitorItemID 监测项目ID
-     * @apiSuccess (返回结果) {Int} monitorItemList.projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} monitorItemList.name 监测项目名称
-     * @apiSuccess (返回结果) {String} monitorItemList.alias 监测项目别名
+     * @apiSuccess (返回结果) {Object[]} data.monitorClassList.monitorTypeList 监测类型列表
+     * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Object[]} data.monitorClassList.monitorTypeList.monitorItemList 监测项目列表
+     * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.name 监测项目名称
+     * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.alias 监测项目别名
 
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
     @PostMapping(value = "/QueryWtMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorItemList(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryWtMonitorItemList (@RequestBody @Validated QueryWtMonitorItemListParam request) {
+        return monitorItemService.queryWtMonitorItemList(request);
     }
 }

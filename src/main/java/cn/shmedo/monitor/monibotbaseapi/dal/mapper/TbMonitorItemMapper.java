@@ -1,7 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     int deleteByPrimaryKey(Integer ID);
@@ -15,4 +18,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     int updateByPrimaryKeySelective(TbMonitorItem record);
 
     int updateByPrimaryKey(TbMonitorItem record);
+
+    List<MonitorItemBaseInfo> selectListByMonitorClassAndProID(List<Integer> monitorClassIDList, Integer projectID);
 }

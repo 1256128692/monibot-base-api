@@ -191,6 +191,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} projectShortName 工程项目简称
      * @apiSuccess (响应结果) {String} location         四级行政区域信息
      * @apiSuccess (响应结果) {String} locationInfo     第四级区域名称
+     * @apiSuccess (响应结果) {String} density       监测点查询密度
      * @apiSuccess (响应结果) {Bool} multiSensor       是否为关联多传感器
      * @apiSuccess (响应结果) {String} sensorStatus     传感器状态 -1:无数据 0:正常 1-4:警报等级
      * @apiSuccess (响应结果) {Object} sensorData        传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
@@ -229,8 +230,6 @@ public class ReservoirMonitorDataController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
      * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
-     * @apiSuccess (响应结果) {Int} typeInfoList.monitorClass   监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测)
-     * @apiSuccess (响应结果) {String} typeInfoList.monitorClassName   监测类别中文名
      * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
@@ -489,7 +488,7 @@ public class ReservoirMonitorDataController {
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {String} axisPosition 轴位,(x代表A轴 y代表B轴 z代表C轴)
+     * @apiParam (请求体) {Int} axisPosition 轴位,(1代表A轴 2代表B轴 3代表C轴)
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861,"axisPosition":"x"}
@@ -513,7 +512,7 @@ public class ReservoirMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {String} axisPositionCnName 轴位名称,(A轴:x B轴:y C轴:z)
+     * @apiSuccess (响应结果) {String} axisPositionCnName 轴位名称,(A轴 B轴 C轴)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
