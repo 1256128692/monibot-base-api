@@ -347,7 +347,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName AddTemplate
      * @apiDescription 为监测类型添加模板(模板 + 数据源 + 公式 / 脚本)
-     * @apiParam (请求参数) {Int} [companyID]  公司ID 预定义该项会设置为-1
+     * @apiParam (请求参数) {Int} companyID  公司ID 预定义该项会设置为-1
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {String} name  模板名称 (100) 无唯一性校验
@@ -580,7 +580,7 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorType")
-    @PostMapping(value = "/QueryFormulaParams", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryFormulaParams(@RequestBody @Validated Object pa) {
         return null;
     }

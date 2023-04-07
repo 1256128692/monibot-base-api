@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
  **/
 
 @Slf4j
-//@RestControllerAdvice
+@RestControllerAdvice
 public class ExceptionController {
 
     /**
@@ -72,16 +72,17 @@ public class ExceptionController {
     public ResultWrapper<?> handleValidationException(HttpServletRequest request, Exception e) {
         //参数校验异常
         if (e instanceof ConstraintViolationException ex) {
-            String msg = ex.getConstraintViolations().stream()
-                    .map(ConstraintViolation::getMessage).collect(Collectors.joining(StrUtil.COMMA));
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, StrUtil.isEmpty(msg) ? "参数校验不通过" : msg);
+//            String msg = ex.getConstraintViolations().stream()
+//                    .map(ConstraintViolation::getMessage).collect(Collectors.joining(StrUtil.COMMA));
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数校验不通过:******"  + e.getMessage());
         }
 
         //参数绑定异常
         if (e instanceof BindException ex) {
-            String msg = ex.getBindingResult().getAllErrors().stream()
-                    .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(StrUtil.COMMA));
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, StrUtil.isEmpty(msg) ? "参数校验不通过" : msg);
+//            String msg = ex.getBindingResult().getAllErrors().stream()
+//                    .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(StrUtil.COMMA));
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数校验不通过:********"  + e.getMessage());
+
         }
 
         //http消息转换异常，通常由错误的参数格式引起

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
  **/
 @Data
 public class AddTemplateParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-
+    @NotNull
     private Integer companyID;
     @NotNull
     private Boolean defaultTemplate;
@@ -61,13 +61,14 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
 
     @Override
     public ResultWrapper validate() {
-        if (companyID == null){
-            companyID = -1;
-        }
+
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-        QueryWrapper<TbMonitorType> monitorTypeQueryWrapper = new QueryWrapper<>();
-        monitorTypeQueryWrapper.eq("companyID", companyID).eq("monitorType",monitorType);
-        if (tbMonitorTypeMapper.selectOne(monitorTypeQueryWrapper) == null){
+        QueryWrapper<TbMonitorType> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("monitorType",monitorType);
+        queryWrapper.and(
+                wrapper -> wrapper.eq("companyID", companyID).or().eq("companyID", -1 )
+        );
+        if (tbMonitorTypeMapper.selectOne(queryWrapper) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"监测类型不存在");
         }
         if (!CreateType.isValid(createType)){
