@@ -580,7 +580,7 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorType")
-    @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryFormulaParams", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryFormulaParams(@RequestBody @Validated Object pa) {
         return null;
     }
