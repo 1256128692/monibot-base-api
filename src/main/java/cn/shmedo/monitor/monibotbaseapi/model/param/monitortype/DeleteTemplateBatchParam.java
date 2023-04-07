@@ -5,9 +5,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -36,10 +39,13 @@ public class DeleteTemplateBatchParam implements ParameterValidator, ResourcePer
     private List<@NotNull Integer> templateIDList;
     @Override
     public ResultWrapper validate() {
-        TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-        List<TbMonitorType> list = tbMonitorTypeMapper.queryByTemplateIDList(templateIDList);
-        if (list.stream().anyMatch(item -> item.getCompanyID().equals(-1) || !item.getCompanyID().equals(companyID))){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板对应的监测类型不是自定义或不属于该公司");
+        TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper  =ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
+        List<TbMonitorTypeTemplate> tbMonitorTypeTemplates = tbMonitorTypeTemplateMapper.selectBatchIds(templateIDList);
+        if (tbMonitorTypeTemplates.stream().anyMatch(item -> item.getCreateType().equals(CreateType.PREDEFINED.getType()))){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"预定义模板不可删除");
+        }
+        if (tbMonitorTypeTemplates.stream().anyMatch(item -> !item.getCompanyID().equals(companyID))){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"有模板不属于该公司");
         }
         TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
         if (tbSensorMapper.selectCount(new QueryWrapper<TbSensor>().in("templateID", templateIDList))>0){
