@@ -20,7 +20,7 @@ public interface TbMonitorPointMapper  extends BaseMapper<TbMonitorPoint> {
 
     int updateByPrimaryKey(TbMonitorPoint record);
 
-    List<TbMonitorPoint> selectMonitorTypeAndProIDByCompanyID(Integer companyID);
+    List<TbMonitorPoint> selectMonitorTypeAndProIDByProIDList(List<Integer> proIDList);
 
     Integer selectMonitorTypeCount(List<Integer> monitorPointIDs);
 

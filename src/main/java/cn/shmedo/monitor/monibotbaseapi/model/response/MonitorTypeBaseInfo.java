@@ -13,6 +13,7 @@ public class MonitorTypeBaseInfo {
     private String monitorTypeAlias;
     private Integer pointCount;
     private WarnInfo warnInfo;
+    private List<MonitorItemBaseInfo> monitorItemList;
 
     private List<TbProjectType> projectTypeList;
 

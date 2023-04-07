@@ -23,6 +23,14 @@ public class TbMonitorItem implements Serializable {
     */
     private Integer companyID;
 
+
+    /**
+     * 监测类型
+     */
+    private Integer projectID;
+
+    private Integer monitorClass;
+
     /**
     * 监测类型
     */
