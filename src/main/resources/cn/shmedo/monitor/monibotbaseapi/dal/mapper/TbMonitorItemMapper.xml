@@ -7,6 +7,8 @@
     <id column="ID" jdbcType="INTEGER" property="ID" />
     <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
     <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="MonitorClass" jdbcType="INTEGER" property="monitorClass" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
     <result column="Name" jdbcType="VARCHAR" property="name" />
     <result column="Alias" jdbcType="VARCHAR" property="alias" />
     <result column="CreateType" jdbcType="TINYINT" property="createType" />
@@ -21,7 +23,7 @@
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     ID, CompanyID, MonitorType, `Name`, `Alias`, CreateType, ProjectType, ExValue, DisplayOrder, 
-    CreateTime, CreateUserID, UpdateTime, UpdateUserID
+    CreateTime, CreateUserID, UpdateTime, UpdateUserID, MonitorClass, ProjectID
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -200,5 +202,18 @@
       <foreach collection="monitorClassIDList" item="monitorClassID" open="(" close=")" separator=",">
           #{monitorClassID}
       </foreach>
+  </select>
+
+
+
+  <select id="selectListByCondition" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo">
+      select ID as monitorItemID, ProjectID, `Name`, `Alias`, MonitorType, MonitorClass
+      from tb_monitor_item
+      where ProjectID in
+      <foreach collection="proIDList" item="proID" open="(" close=")" separator=",">
+          #{proID}
+      </foreach>
+      and MonitorClass = #{queryType}
+      and CompanyID = #{companyID}
   </select>
 </mapper>
