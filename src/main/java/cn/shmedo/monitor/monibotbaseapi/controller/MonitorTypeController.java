@@ -36,6 +36,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} typeName 监测类型名称
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
+     * @apiParam (请求参数) {String} [monitorTypeClass] 监测类型类别 （50）
      * @apiParam (请求参数) {Object[]} fieldList 属性列表
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
@@ -69,6 +70,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} [typeAlias]  别名(max = 50 )未设置则用typeName
      * @apiParam (请求参数) {Boolean} multiSensor 多传感器么
      * @apiParam (请求参数) {Boolean} apiDataSource 开启api数据源
+     * @apiParam (请求参数) {String} [monitorTypeClass] 监测类型类别 （50）
      * @apiParam (请求参数) {String} [exValues] 拓展数据 (max = 500)
      * @apiParam (请求参数) {Object[]} fieldList 属性列表 (max=50)
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
@@ -218,6 +220,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} currentPageData.typeAlias 监测类型别名
      * @apiSuccess (返回结果) {Int} currentPageData.createType 定义类型
      * @apiSuccess (返回结果) {Boolean} currentPageData.multiSensor 多传感器么
+     * @apiSuccess (返回结果) {String} [currentPageData.monitorTypeClass] 监测类型类别
      * @apiSuccess (返回结果) {Int} currentPageData.datasourceCount 数据源个数
      * @apiSuccess (返回结果) {Object[]} currentPageData.fieldList 属性列表
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.id 属性ID
@@ -292,7 +295,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} typeAlias 监测类型别名
      * @apiSuccess (返回结果) {Int} createType 定义类型
      * @apiSuccess (返回结果) {Boolean} multiSensor 多传感器么
-     * @apiSuccess (返回结果) {Int} datasourceCount 数据源个数
+     * @apiSuccess (返回结果) {String} [currentPageData.monitorTypeClass] 监测类型类别
      * @apiSuccess (返回结果) {Object[]} fieldList 属性列表
      * @apiSuccess (返回结果) {Int} fieldList.id 属性ID
      * @apiSuccess (返回结果) {String} fieldList.fieldName 属性名称
@@ -347,7 +350,7 @@ public class MonitorTypeController {
      * @apiGroup 监测类型模块
      * @apiName AddTemplate
      * @apiDescription 为监测类型添加模板(模板 + 数据源 + 公式 / 脚本)
-     * @apiParam (请求参数) {Int} [companyID]  公司ID 预定义该项会设置为-1
+     * @apiParam (请求参数) {Int} companyID  公司ID 预定义该项会设置为-1
      * @apiParam (请求参数) {Boolean} defaultTemplate  默认模板 对于单一物模型，单一物联网触感其的模板，是否作为默认模板使用
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {String} name  模板名称 (100) 无唯一性校验
@@ -580,7 +583,7 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:DescribeBaseMonitorType
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorType")
-    @PostMapping(value = "/QueryFormulaParams", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryMonitorTypeFiledInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryFormulaParams(@RequestBody @Validated Object pa) {
         return null;
     }

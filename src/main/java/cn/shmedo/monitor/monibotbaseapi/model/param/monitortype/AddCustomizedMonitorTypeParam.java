@@ -46,6 +46,8 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
     private Boolean apiDataSource;
     @Size(max = 500)
     private String exValues;
+    @Size(max = 50)
+    private String monitorTypeClass;
     @NotEmpty
     @Valid
     @Size(max = 50)
