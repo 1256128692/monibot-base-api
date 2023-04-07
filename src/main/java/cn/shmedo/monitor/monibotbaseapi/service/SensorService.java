@@ -32,7 +32,7 @@ public interface SensorService extends IService<TbSensor> {
      * @param request {@link MonitorTypeCatalogRequest}
      * @return {@link MonitorTypeCatalogResponse}
      */
-    MonitorTypeCatalogResponse monitorTypeCate(MonitorTypeCatalogRequest request);
+    List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request);
 
     /**
      * 添加传感器

@@ -224,4 +224,32 @@
       #{type}
   </foreach>
   </delete>
+
+  <resultMap id="monitorTypeWithFieldMap" extends="BaseResultMap"
+             type="cn.shmedo.monitor.monibotbaseapi.model.dto.MonitorTypeWithField">
+    <collection property="fieldList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+      <id column="fID" jdbcType="INTEGER" property="ID" />
+      <result column="fMonitorType" jdbcType="INTEGER" property="monitorType" />
+      <result column="fFieldToken" jdbcType="VARCHAR" property="fieldToken" />
+      <result column="fFieldName" jdbcType="VARCHAR" property="fieldName" />
+      <result column="fFieldDataType" jdbcType="VARCHAR" property="fieldDataType" />
+      <result column="fFieldClass" jdbcType="INTEGER" property="fieldClass" />
+      <result column="fFieldDesc" jdbcType="VARCHAR" property="fieldDesc" />
+      <result column="fFieldUnitID" jdbcType="INTEGER" property="fieldUnitID" />
+      <result column="fParentID" jdbcType="INTEGER" property="parentID" />
+      <result column="fCreateType" jdbcType="INTEGER" property="createType" />
+      <result column="fExValues" jdbcType="VARCHAR" property="exValues" />
+      <result column="fDisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+    </collection>
+  </resultMap>
+
+  <select id="queryMonitorTypeWithField" resultMap="monitorTypeWithFieldMap">
+    SELECT tmt.*, tmtf.ID AS fID, tmtf.MonitorType AS fMonitorType, tmtf.FieldToken AS fFieldToken,
+    tmtf.FieldName AS fFieldName, tmtf.FieldDataType AS fFieldDataType, tmtf.FieldClass AS fFieldClass,
+    tmtf.FieldDesc AS fFieldDesc, tmtf.FieldUnitID AS fFieldUnitID,tmtf.ParentID AS fParentID,
+    tmtf.CreateType AS fCreateType, tmtf.ExValues AS fExValues, tmtf.DisplayOrder AS fDisplayOrder
+    FROM `tb_monitor_type` tmt
+           LEFT JOIN `tb_monitor_type_field` tmtf ON tmt.`MonitorType` = tmtf.`MonitorType`
+      ${ew.customSqlSegment}
+  </select>
 </mapper>

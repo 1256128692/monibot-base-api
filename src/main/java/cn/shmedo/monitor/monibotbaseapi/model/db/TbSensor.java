@@ -1,5 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +21,7 @@ public class TbSensor implements Serializable {
     /**
      * 主键
      */
+    @TableId(type = IdType.AUTO)
     private Integer ID;
 
     /**
@@ -115,6 +120,7 @@ public class TbSensor implements Serializable {
     /**
      * 创建时间
      */
+    @TableField(insertStrategy = FieldStrategy.NEVER)
     private Date createTime;
 
     /**
@@ -125,6 +131,7 @@ public class TbSensor implements Serializable {
     /**
      * 修改时间
      */
+    @TableField(insertStrategy = FieldStrategy.NEVER)
     private Date updateTime;
 
     /**

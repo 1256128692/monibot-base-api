@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -26,12 +27,19 @@ public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePe
     /**
      * 模板数据来源类型
      */
-    private DataSourceComposeType dataSourceComposeType;
+    private Integer dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
 
     /**
      * 监测类型模板分布式唯一ID
      */
+    @NotEmpty(message = "监测类型模板分布式唯一ID不能为空")
     private String templateDataSourceID;
+
+    /**
+     * 监测类型模板ID
+     */
+    @NotNull(message = "监测类型模板ID不能为空")
+    private Integer templateID;
 
     @Override
     public ResultWrapper<?> validate() {

@@ -45,23 +45,7 @@
     delete from tb_sensor
     where ID = #{ID,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_sensor (ProjectID, TemplateID, DataSourceID, 
-      DataSourceComposeType, MonitorType, `Name`, 
-      `Alias`, Kind, DisplayOrder, 
-      MonitorPointID, ConfigFieldValue, ExValues, 
-      `Status`, WarnNoData, MonitorBeginTime, 
-      ImagePath, CreateTime, CreateUserID, 
-      UpdateTime, UpdateUserID)
-    values (#{projectID,jdbcType=INTEGER}, #{templateID,jdbcType=INTEGER}, #{dataSourceID,jdbcType=VARCHAR}, 
-      #{dataSourceComposeType,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
-      #{alias,jdbcType=VARCHAR}, #{kind,jdbcType=TINYINT}, #{displayOrder,jdbcType=INTEGER}, 
-      #{monitorPointID,jdbcType=INTEGER}, #{configFieldValue,jdbcType=VARCHAR}, #{exValues,jdbcType=VARCHAR}, 
-      #{status,jdbcType=TINYINT}, #{warnNoData,jdbcType=BIT}, #{monitorBeginTime,jdbcType=TIMESTAMP}, 
-      #{imagePath,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER})
-  </insert>
+
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_sensor
@@ -325,5 +309,12 @@
       </trim>
     </where>
     ORDER BY ts.DisplayOrder
+  </select>
+
+  <select id="getNameSerialNumber" resultType="java.lang.Integer">
+    SELECT IFNULL(MAX(CONVERT(SUBSTRING_INDEX(`Name`, '_', - 1), UNSIGNED)), 0) + 1
+    FROM `tb_sensor`
+    WHERE MonitorType = #{monitorType}
+      AND ProjectID = #{projectID}
   </select>
 </mapper>

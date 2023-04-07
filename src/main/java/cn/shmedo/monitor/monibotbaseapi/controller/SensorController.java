@@ -116,8 +116,9 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName MonitorTypeCatalog
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {String} dataSourceComposeType 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
+     * @apiParam (请求参数) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
      * @apiParam (请求参数) {String} templateDataSourceID 监测类型模板分布式唯一ID
+     * @apiParam (请求参数) {String} templateID 监测类型模板ID
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 监测类型ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
@@ -159,8 +160,8 @@ public class SensorController {
 //    @Permission(permissionName = "mdmbase:ListMonitorType")
     @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object monitorTypeCatalog(MonitorTypeCatalogRequest request) {
-        return sensorService.monitorTypeCate(request);
+    public Object monitorTypeCatalog(@RequestBody @Validated MonitorTypeCatalogRequest request) {
+        return sensorService.monitorTypeCatalog(request);
     }
 
     /**
@@ -189,7 +190,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiPermission mdmbase:UpdateSensor
      * @apiParamExample {json} 请求体示例
-     * {"projectID": 0,"imagePath": "","alias": "","monitorType": 0,"dataSourceComposeType": 0,"templateDataSourceID": "","dataSourceList": [{"dataSourceType": 0,"templateDataSourceToken": "","sensorName": "","uniqueToken": ""}],"exFields": [{"id": "","value": ""}],"paramFields": [{"id": "","value": ""}]}
+     * {"projectID": 0,"imagePath": "","alias": "","monitorType": 20010,"dataSourceComposeType": 0,"templateDataSourceID": "dae6e561-4d01-4c22-9306-1a7b3d6171aa","templateID": 38,"dataSourceList": [{"dataSourceType": 1,"templateDataSourceToken": "103","sensorName": "test2023","uniqueToken": "D8DB467AB743476CA4B6F6F909704FBB"}],"exFields": [{"id": "180","value": "321"}],"paramFields": [{"id": "7","value": "666"}]}
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"id": 10086}}
      */

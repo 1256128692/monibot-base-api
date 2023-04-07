@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Builder;
 
 /**
@@ -10,6 +12,7 @@ public class TbParameter {
     /**
      * 主键
      */
+    @TableId(type = IdType.AUTO)
     private Integer ID;
 
     /**
@@ -21,6 +24,7 @@ public class TbParameter {
      * 主体类型 1 - 公式
      * 2 - 脚本
      * 3 - 传感器
+     * 4 - 模板
      */
     private Integer subjectType;
 

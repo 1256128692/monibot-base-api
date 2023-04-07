@@ -52,6 +52,7 @@ dependencies {
 
     implementation "com.alibaba:druid-spring-boot-starter:$druidVersion"
     implementation "com.baomidou:mybatis-plus-boot-starter:$mybatisPlusVersion"
+    implementation "com.baomidou:mybatis-plus-extension:$mybatisPlusVersion"
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:$springbootVersion"
     implementation "com.alibaba.boot:nacos-config-spring-boot-starter:$nacosConfigVersion"
     implementation "cn.shmedo.iot:entity:$iotEntityVersion"
