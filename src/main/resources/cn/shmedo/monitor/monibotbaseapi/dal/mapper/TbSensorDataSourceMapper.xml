@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorDataSourceMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource">
+    <!--@mbg.generated-->
+    <!--@Table tb_sensor_data_source-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="DataSourceID" jdbcType="VARCHAR" property="dataSourceID" />
+    <result column="DataSourceType" jdbcType="INTEGER" property="dataSourceType" />
+    <result column="DataSourceToken" jdbcType="VARCHAR" property="dataSourceToken" />
+    <result column="TemplateDataSourceToken" jdbcType="VARCHAR" property="templateDataSourceToken" />
+    <result column="DataSourceComposeType" jdbcType="INTEGER" property="dataSourceComposeType" />
+    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, DataSourceID, DataSourceType, DataSourceToken, TemplateDataSourceToken, DataSourceComposeType, 
+    ExValues
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_sensor_data_source
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_sensor_data_source
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_sensor_data_source (DataSourceID, DataSourceType, DataSourceToken, 
+      TemplateDataSourceToken, DataSourceComposeType, 
+      ExValues)
+    values (#{dataSourceID,jdbcType=VARCHAR}, #{dataSourceType,jdbcType=INTEGER}, #{dataSourceToken,jdbcType=VARCHAR}, 
+      #{templateDataSourceToken,jdbcType=VARCHAR}, #{dataSourceComposeType,jdbcType=INTEGER}, 
+      #{exValues,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_sensor_data_source
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dataSourceID != null">
+        DataSourceID,
+      </if>
+      <if test="dataSourceType != null">
+        DataSourceType,
+      </if>
+      <if test="dataSourceToken != null">
+        DataSourceToken,
+      </if>
+      <if test="templateDataSourceToken != null">
+        TemplateDataSourceToken,
+      </if>
+      <if test="dataSourceComposeType != null">
+        DataSourceComposeType,
+      </if>
+      <if test="exValues != null">
+        ExValues,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dataSourceID != null">
+        #{dataSourceID,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceType != null">
+        #{dataSourceType,jdbcType=INTEGER},
+      </if>
+      <if test="dataSourceToken != null">
+        #{dataSourceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="templateDataSourceToken != null">
+        #{templateDataSourceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceComposeType != null">
+        #{dataSourceComposeType,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        #{exValues,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource">
+    <!--@mbg.generated-->
+    update tb_sensor_data_source
+    <set>
+      <if test="dataSourceID != null">
+        DataSourceID = #{dataSourceID,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceType != null">
+        DataSourceType = #{dataSourceType,jdbcType=INTEGER},
+      </if>
+      <if test="dataSourceToken != null">
+        DataSourceToken = #{dataSourceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="templateDataSourceToken != null">
+        TemplateDataSourceToken = #{templateDataSourceToken,jdbcType=VARCHAR},
+      </if>
+      <if test="dataSourceComposeType != null">
+        DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        ExValues = #{exValues,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource">
+    <!--@mbg.generated-->
+    update tb_sensor_data_source
+    set DataSourceID = #{dataSourceID,jdbcType=VARCHAR},
+      DataSourceType = #{dataSourceType,jdbcType=INTEGER},
+      DataSourceToken = #{dataSourceToken,jdbcType=VARCHAR},
+      TemplateDataSourceToken = #{templateDataSourceToken,jdbcType=VARCHAR},
+      DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+      ExValues = #{exValues,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

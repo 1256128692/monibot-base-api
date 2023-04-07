@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbUserLogMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog">
+    <!--@mbg.generated-->
+    <!--@Table tb_user_log-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="UserID" jdbcType="INTEGER" property="userID" />
+    <result column="UserName" jdbcType="VARCHAR" property="userName" />
+    <result column="OperationDate" jdbcType="TIMESTAMP" property="operationDate" />
+    <result column="OperationIP" jdbcType="VARCHAR" property="operationIP" />
+    <result column="ModuleName" jdbcType="VARCHAR" property="moduleName" />
+    <result column="OperationName" jdbcType="VARCHAR" property="operationName" />
+    <result column="OperationProperty" jdbcType="VARCHAR" property="operationProperty" />
+    <result column="OperationPath" jdbcType="VARCHAR" property="operationPath" />
+    <result column="OperationParams" jdbcType="VARCHAR" property="operationParams" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, UserID, UserName, OperationDate, OperationIP, ModuleName, OperationName, 
+    OperationProperty, OperationPath, OperationParams
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_user_log
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_user_log
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_user_log (CompanyID, UserID, UserName, 
+      OperationDate, OperationIP, ModuleName, 
+      OperationName, OperationProperty, OperationPath, 
+      OperationParams)
+    values (#{companyID,jdbcType=INTEGER}, #{userID,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, 
+      #{operationDate,jdbcType=TIMESTAMP}, #{operationIP,jdbcType=VARCHAR}, #{moduleName,jdbcType=VARCHAR}, 
+      #{operationName,jdbcType=VARCHAR}, #{operationProperty,jdbcType=VARCHAR}, #{operationPath,jdbcType=VARCHAR}, 
+      #{operationParams,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_user_log
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
+        CompanyID,
+      </if>
+      <if test="userID != null">
+        UserID,
+      </if>
+      <if test="userName != null">
+        UserName,
+      </if>
+      <if test="operationDate != null">
+        OperationDate,
+      </if>
+      <if test="operationIP != null">
+        OperationIP,
+      </if>
+      <if test="moduleName != null">
+        ModuleName,
+      </if>
+      <if test="operationName != null">
+        OperationName,
+      </if>
+      <if test="operationProperty != null">
+        OperationProperty,
+      </if>
+      <if test="operationPath != null">
+        OperationPath,
+      </if>
+      <if test="operationParams != null">
+        OperationParams,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
+        #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="userID != null">
+        #{userID,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null">
+        #{operationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="operationIP != null">
+        #{operationIP,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleName != null">
+        #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationName != null">
+        #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationProperty != null">
+        #{operationProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="operationPath != null">
+        #{operationPath,jdbcType=VARCHAR},
+      </if>
+      <if test="operationParams != null">
+        #{operationParams,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog">
+    <!--@mbg.generated-->
+    update tb_user_log
+    <set>
+      <if test="companyID != null">
+        CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="userID != null">
+        UserID = #{userID,jdbcType=INTEGER},
+      </if>
+      <if test="userName != null">
+        UserName = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null">
+        OperationDate = #{operationDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="operationIP != null">
+        OperationIP = #{operationIP,jdbcType=VARCHAR},
+      </if>
+      <if test="moduleName != null">
+        ModuleName = #{moduleName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationName != null">
+        OperationName = #{operationName,jdbcType=VARCHAR},
+      </if>
+      <if test="operationProperty != null">
+        OperationProperty = #{operationProperty,jdbcType=VARCHAR},
+      </if>
+      <if test="operationPath != null">
+        OperationPath = #{operationPath,jdbcType=VARCHAR},
+      </if>
+      <if test="operationParams != null">
+        OperationParams = #{operationParams,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog">
+    <!--@mbg.generated-->
+    update tb_user_log
+    set CompanyID = #{companyID,jdbcType=INTEGER},
+      UserID = #{userID,jdbcType=INTEGER},
+      UserName = #{userName,jdbcType=VARCHAR},
+      OperationDate = #{operationDate,jdbcType=TIMESTAMP},
+      OperationIP = #{operationIP,jdbcType=VARCHAR},
+      ModuleName = #{moduleName,jdbcType=VARCHAR},
+      OperationName = #{operationName,jdbcType=VARCHAR},
+      OperationProperty = #{operationProperty,jdbcType=VARCHAR},
+      OperationPath = #{operationPath,jdbcType=VARCHAR},
+      OperationParams = #{operationParams,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <delete id="cleanUserLog">
+    DELETE FROM tb_user_log WHERE OperationDate <![CDATA[ <= ]]> DATE_SUB(NOW(),INTERVAL 30 day);
+  </delete>
+
+</mapper>

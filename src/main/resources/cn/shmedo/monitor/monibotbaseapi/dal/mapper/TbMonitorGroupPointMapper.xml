@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_group_point-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="MonitorGroupID" jdbcType="INTEGER" property="monitorGroupID" />
+    <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID" />
+    <result column="ImageLocation" jdbcType="VARCHAR" property="imageLocation" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, MonitorGroupID, MonitorPointID, ImageLocation
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_group_point
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_group_point
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_group_point (MonitorGroupID, MonitorPointID, ImageLocation
+      )
+    values (#{monitorGroupID,jdbcType=INTEGER}, #{monitorPointID,jdbcType=INTEGER}, #{imageLocation,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_group_point
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="monitorGroupID != null">
+        MonitorGroupID,
+      </if>
+      <if test="monitorPointID != null">
+        MonitorPointID,
+      </if>
+      <if test="imageLocation != null">
+        ImageLocation,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="monitorGroupID != null">
+        #{monitorGroupID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorPointID != null">
+        #{monitorPointID,jdbcType=INTEGER},
+      </if>
+      <if test="imageLocation != null">
+        #{imageLocation,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint">
+    <!--@mbg.generated-->
+    update tb_monitor_group_point
+    <set>
+      <if test="monitorGroupID != null">
+        MonitorGroupID = #{monitorGroupID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorPointID != null">
+        MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+      </if>
+      <if test="imageLocation != null">
+        ImageLocation = #{imageLocation,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint">
+    <!--@mbg.generated-->
+    update tb_monitor_group_point
+    set MonitorGroupID = #{monitorGroupID,jdbcType=INTEGER},
+      MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+      ImageLocation = #{imageLocation,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

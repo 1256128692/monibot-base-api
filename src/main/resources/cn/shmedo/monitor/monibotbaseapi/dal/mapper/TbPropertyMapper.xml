@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty">
+        <!--@mbg.generated-->
+        <!--@Table tb_property-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="ProjectType" jdbcType="TINYINT" property="projectType"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Type" jdbcType="TINYINT" property="type"/>
+        <result column="Unit" jdbcType="VARCHAR" property="unit"/>
+        <result column="Required" jdbcType="BIT" property="required"/>
+        <result column="MultiSelect" jdbcType="BIT" property="multiSelect"/>
+        <result column="EnumField" jdbcType="VARCHAR" property="enumField"/>
+        <result column="CreateType" jdbcType="TINYINT" property="createType"/>
+        <result column="ClassName" jdbcType="VARCHAR" property="className"/>
+        <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+        <result column="ModelID" jdbcType="INTEGER" property="modelID"/>
+        <result column="ExValue" jdbcType="VARCHAR" property="exValue"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID, ProjectType, `Name`, `Type`, Unit, Required, MultiSelect, EnumField, CreateType,
+        ClassName, DisplayOrder, ModelID, ExValue
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_property
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete from tb_property
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_property (ProjectType, `Name`, `Type`,
+        Unit, Required, MultiSelect,
+        EnumField, CreateType, ClassName,
+        DisplayOrder, ModelID, ExValue
+        )
+        values (#{projectType,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT},
+        #{unit,jdbcType=VARCHAR}, #{required,jdbcType=BIT}, #{multiSelect,jdbcType=BIT},
+        #{enumField,jdbcType=VARCHAR}, #{createType,jdbcType=TINYINT}, #{className,jdbcType=VARCHAR},
+        #{displayOrder,jdbcType=INTEGER}, #{modelID,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}
+        )
+    </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectType != null">
+                ProjectType,
+            </if>
+            <if test="name != null">
+                `Name`,
+            </if>
+            <if test="type != null">
+                `Type`,
+            </if>
+            <if test="unit != null">
+                Unit,
+            </if>
+            <if test="required != null">
+                Required,
+            </if>
+            <if test="multiSelect != null">
+                MultiSelect,
+            </if>
+            <if test="enumField != null">
+                EnumField,
+            </if>
+            <if test="createType != null">
+                CreateType,
+            </if>
+            <if test="className != null">
+                ClassName,
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder,
+            </if>
+            <if test="modelID != null">
+                ModelID,
+            </if>
+            <if test="exValue != null">
+                ExValue,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectType != null">
+                #{projectType,jdbcType=TINYINT},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=TINYINT},
+            </if>
+            <if test="unit != null">
+                #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="required != null">
+                #{required,jdbcType=BIT},
+            </if>
+            <if test="multiSelect != null">
+                #{multiSelect,jdbcType=BIT},
+            </if>
+            <if test="enumField != null">
+                #{enumField,jdbcType=VARCHAR},
+            </if>
+            <if test="createType != null">
+                #{createType,jdbcType=TINYINT},
+            </if>
+            <if test="className != null">
+                #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="modelID != null">
+                #{modelID,jdbcType=INTEGER},
+            </if>
+            <if test="exValue != null">
+                #{exValue,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty">
+        <!--@mbg.generated-->
+        update tb_property
+        <set>
+            <if test="projectType != null">
+                ProjectType = #{projectType,jdbcType=TINYINT},
+            </if>
+            <if test="name != null">
+                `Name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                `Type` = #{type,jdbcType=TINYINT},
+            </if>
+            <if test="unit != null">
+                Unit = #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="required != null">
+                Required = #{required,jdbcType=BIT},
+            </if>
+            <if test="multiSelect != null">
+                MultiSelect = #{multiSelect,jdbcType=BIT},
+            </if>
+            <if test="enumField != null">
+                EnumField = #{enumField,jdbcType=VARCHAR},
+            </if>
+            <if test="createType != null">
+                CreateType = #{createType,jdbcType=TINYINT},
+            </if>
+            <if test="className != null">
+                ClassName = #{className,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="modelID != null">
+                ModelID = #{modelID,jdbcType=INTEGER},
+            </if>
+            <if test="exValue != null">
+                ExValue = #{exValue,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty">
+        <!--@mbg.generated-->
+        update tb_property
+        set ProjectType = #{projectType,jdbcType=TINYINT},
+        `Name` = #{name,jdbcType=VARCHAR},
+        `Type` = #{type,jdbcType=TINYINT},
+        Unit = #{unit,jdbcType=VARCHAR},
+        Required = #{required,jdbcType=BIT},
+        MultiSelect = #{multiSelect,jdbcType=BIT},
+        EnumField = #{enumField,jdbcType=VARCHAR},
+        CreateType = #{createType,jdbcType=TINYINT},
+        ClassName = #{className,jdbcType=VARCHAR},
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+        ModelID = #{modelID,jdbcType=INTEGER},
+        ExValue = #{exValue,jdbcType=VARCHAR}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+
+    <select id="queryByPID" resultMap="BaseResultMap">
+        select * from tb_property where
+        ModelID = (
+        select ModelID from tb_project_info where ID = #{projectID})
+    </select>
+
+    <select id="countByPIDAndNames" resultType="int">
+        select count(1) from tb_property as p
+        left join tb_project_info as pinfo on pinfo.ModelID = p.ModelID
+        where p.ID = #{projectID} and p.Name in
+        <foreach close=")" collection="nameList" item="name" open="(" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
+    <insert id="insertBatch">
+        insert into tb_property
+        (projecttype, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid,
+        exvalue)
+        value
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectType}, #{item.name}, #{item.type}, #{item.unit}, #{item.required}, #{item.multiSelect},
+            #{item.enumField}
+            , #{item.createType}, #{item.className}, #{item.displayOrder}, #{item.modelID}, #{item.exValue})
+        </foreach>
+    </insert>
+
+    <select id="countByMIDAndNames" resultType="int">
+        select count(1) from tb_property as p
+        left join tb_property_model as m on m.ID = p.ModelID
+        where m.ID = #{modelID} and p.Name in
+        <foreach close=")" collection="nameList" item="name" open="(" separator=",">
+            #{name}
+        </foreach>
+    </select>
+
+    <select id="queryByMID" resultMap="BaseResultMap">
+        select * from tb_property where ModelID = #{modelID}
+    </select>
+
+    <select id="selectByModelIDs" resultMap="BaseResultMap">
+        select * from tb_property where ModelID in
+        <foreach collection="list" item="modelID" separator="," open="(" close=")">
+            #{modelID}
+        </foreach>
+    </select>
+
+    <select id="queryByCreateType" resultMap="BaseResultMap">
+        select * from tb_property where CreateType = #{createType}
+    </select>
+</mapper>

@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_type-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="TypeName" jdbcType="VARCHAR" property="typeName" />
+    <result column="TypeAlias" jdbcType="VARCHAR" property="typeAlias" />
+    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+    <result column="MultiSensor" jdbcType="BIT" property="multiSensor" />
+    <result column="ApiDataSource" jdbcType="BIT" property="apiDataSource" />
+    <result column="CreateType" jdbcType="TINYINT" property="createType" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, ApiDataSource, CreateType, 
+    CompanyID, ExValues
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_type
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_type
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type (MonitorType, TypeName, TypeAlias, 
+      DisplayOrder, MultiSensor, ApiDataSource, 
+      CreateType, CompanyID, ExValues
+      )
+    values (#{monitorType,jdbcType=INTEGER}, #{typeName,jdbcType=VARCHAR}, #{typeAlias,jdbcType=VARCHAR}, 
+      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{apiDataSource,jdbcType=BIT}, 
+      #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, #{exValues,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_type
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="typeName != null">
+        TypeName,
+      </if>
+      <if test="typeAlias != null">
+        TypeAlias,
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder,
+      </if>
+      <if test="multiSensor != null">
+        MultiSensor,
+      </if>
+      <if test="apiDataSource != null">
+        ApiDataSource,
+      </if>
+      <if test="createType != null">
+        CreateType,
+      </if>
+      <if test="companyID != null">
+        CompanyID,
+      </if>
+      <if test="exValues != null">
+        ExValues,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="typeName != null">
+        #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeAlias != null">
+        #{typeAlias,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="multiSensor != null">
+        #{multiSensor,jdbcType=BIT},
+      </if>
+      <if test="apiDataSource != null">
+        #{apiDataSource,jdbcType=BIT},
+      </if>
+      <if test="createType != null">
+        #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="companyID != null">
+        #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        #{exValues,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType">
+    <!--@mbg.generated-->
+    update tb_monitor_type
+    <set>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="typeName != null">
+        TypeName = #{typeName,jdbcType=VARCHAR},
+      </if>
+      <if test="typeAlias != null">
+        TypeAlias = #{typeAlias,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="multiSensor != null">
+        MultiSensor = #{multiSensor,jdbcType=BIT},
+      </if>
+      <if test="apiDataSource != null">
+        ApiDataSource = #{apiDataSource,jdbcType=BIT},
+      </if>
+      <if test="createType != null">
+        CreateType = #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="companyID != null">
+        CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="exValues != null">
+        ExValues = #{exValues,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType">
+    <!--@mbg.generated-->
+    update tb_monitor_type
+    set MonitorType = #{monitorType,jdbcType=INTEGER},
+      TypeName = #{typeName,jdbcType=VARCHAR},
+      TypeAlias = #{typeAlias,jdbcType=VARCHAR},
+      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      MultiSensor = #{multiSensor,jdbcType=BIT},
+      ApiDataSource = #{apiDataSource,jdbcType=BIT},
+      CreateType = #{createType,jdbcType=TINYINT},
+      CompanyID = #{companyID,jdbcType=INTEGER},
+      ExValues = #{exValues,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from tb_monitor_type
+  </select>
+
+
+  <select id="selectMonitorBaseInfo" parameterType="java.lang.Integer" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo">
+      select count(ID) PointCount, MonitorType
+      from tb_monitor_point
+      where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID})
+      group by MonitorType
+  </select>
+
+  <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web">
+    select * from tb_monitor_type
+    <where>
+      <if test="typeList != null and typeList.size &gt; 0">
+        MonitorType in <foreach close=")" collection="typeList" item="type" open="(" separator=",">
+        #{type}
+      </foreach>
+      </if>
+      <if test="fuzzyTypeName != null and fuzzyTypeName != ''">
+        and (
+        TypeName like  concat('%',#{fuzzyTypeName}, '%')
+        or TypeAlias like  concat('%',#{fuzzyTypeName}, '%')
+        )
+      </if>
+      <choose>
+        <when test="createType == null">
+          and (
+          CompanyID = #{companyID} or CompanyID = -1
+          )
+        </when>
+        <when test="createType == 0">
+          and CreateType = #{createType}
+        </when>
+        <otherwise>
+          and CompanyID = #{companyID}
+        </otherwise>
+      </choose>
+    </where>
+    order by CreateType desc, id desc
+    </select>
+  <select id="queryByTemplateIDList" resultMap="BaseResultMap">
+      select *
+      from tb_monitor_type where MonitorType in
+      (select MonitorType
+       from tb_monitor_type_template
+      where ID in<foreach close=")" collection="list" item="id" open="(" separator=",">
+      #{id}
+  </foreach>)
+  </select>
+  <delete id="deleteByMonitorTypeList">
+    delete from tb_monitor_type where MonitorType in <foreach close=")" collection="list" item="type" open="(" separator=",">
+      #{type}
+  </foreach>
+  </delete>
+</mapper>

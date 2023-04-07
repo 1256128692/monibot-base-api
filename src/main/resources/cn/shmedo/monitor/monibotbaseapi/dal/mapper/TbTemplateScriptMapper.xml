@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTemplateScriptMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript">
+    <!--@mbg.generated-->
+    <!--@Table tb_template_script-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="Script" jdbcType="VARCHAR" property="script" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, TemplateID, MonitorType, Script
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_template_script
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_template_script
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_template_script (TemplateID, MonitorType, Script
+      )
+    values (#{templateID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, #{script,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_template_script
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="templateID != null">
+        TemplateID,
+      </if>
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="script != null">
+        Script,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="templateID != null">
+        #{templateID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="script != null">
+        #{script,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript">
+    <!--@mbg.generated-->
+    update tb_template_script
+    <set>
+      <if test="templateID != null">
+        TemplateID = #{templateID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="script != null">
+        Script = #{script,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript">
+    <!--@mbg.generated-->
+    update tb_template_script
+    set TemplateID = #{templateID,jdbcType=INTEGER},
+      MonitorType = #{monitorType,jdbcType=INTEGER},
+      Script = #{script,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <delete id="deleteByTemplateIDList">
+      delete
+      from tb_template_script  where TemplateID in
+      <foreach collection="list" item="tID" separator="," open="(" close=")">
+          #{tID}
+      </foreach>
+  </delete>
+</mapper>

@@ -1,0 +1,25 @@
+{
+  "name": "monibot-base-api",
+  "version": "1.0.0",
+  "description": "monibot-base-api rest api 接口文档",
+  "title": "monibot-base-api api",
+  "url": "http://172.168.5.190:10181/monitor/base/api/v1",
+  "sampleUrl": "http://172.168.5.190:10181/monitor/base/api/v1",
+  "template": {
+    "forceLanguage": "zh_cn",
+    "withCompare": true,
+    "withGenerator": true,
+    "jQueryAjaxSetup": {
+      "dataType": "json",
+      "contentType": "application/json;charset=UTF-8"
+    }
+  },
+  "header": {
+    "title": "接口说明",
+    "filename": "common_usage.md"
+  },
+  "footer": {
+    "title": "版权信息",
+    "filename": "common_footer.md"
+  }
+}

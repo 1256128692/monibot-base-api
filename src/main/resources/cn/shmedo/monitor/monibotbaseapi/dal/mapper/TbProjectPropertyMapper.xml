@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
+        <!--@mbg.generated-->
+        <!--@Table tb_project_property-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="PropertyID" jdbcType="INTEGER" property="propertyID"/>
+        <result column="Value" jdbcType="VARCHAR" property="value"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
+        ProjectID,
+        PropertyID,
+        `Value`
+    </sql>
+    <sql id="Property_LIst">
+        <!--@mbg.generated-->
+        ProjectID,
+        PropertyID,
+        ProjectType,
+        ClassName,
+        Name,
+        Type,
+        Required,
+        MultiSelect,
+        CreateType,
+        EnumField,
+        Unit,
+        Value,
+        ExValue
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_project_property
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete
+        from tb_project_property
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_project_property (ProjectID, PropertyID, `Value`)
+        values (#{projectID,jdbcType=INTEGER}, #{propertyID,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR})
+    </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_project_property
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                ProjectID,
+            </if>
+            <if test="propertyID != null">
+                PropertyID,
+            </if>
+            <if test="value != null">
+                `Value`,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="propertyID != null">
+                #{propertyID,jdbcType=INTEGER},
+            </if>
+            <if test="value != null">
+                #{value,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
+        <!--@mbg.generated-->
+        update tb_project_property
+        <set>
+            <if test="projectID != null">
+                ProjectID = #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="propertyID != null">
+                PropertyID = #{propertyID,jdbcType=INTEGER},
+            </if>
+            <if test="value != null">
+                `Value` = #{value,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
+        <!--@mbg.generated-->
+        update tb_project_property
+        set ProjectID  = #{projectID,jdbcType=INTEGER},
+            PropertyID = #{propertyID,jdbcType=INTEGER},
+            `Value`    = #{value,jdbcType=VARCHAR}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+
+    <update id="updateBatch">
+        update tb_project_property set
+        <trim prefix="Value = case" suffix="end">
+            <foreach collection="projectPropertyList" index="index" item="item">
+                when PropertyID = #{item.propertyID} then #{item.value}
+            </foreach>
+        </trim>
+        where PropertyID in
+        <foreach collection="projectPropertyList" separator="," open="(" item="item" close=")">
+            #{item.propertyID}
+        </foreach>
+        and ProjectID = #{projectID,jdbcType=INTEGER}
+    </update>
+
+    <insert id="insertBatch">
+        insert into tb_project_property(ProjectID, PropertyID, Value) value
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectID}, #{item.propertyID}, #{item.value})
+        </foreach>
+    </insert>
+
+    <select id="getPropertyValue" resultType="java.lang.String">
+        SELECT
+        DISTINCT tpp.`Value`
+        FROM
+        `tb_project_property` tpp
+        LEFT JOIN `tb_project_info` tpi ON tpi.ID = tpp.ProjectID
+        LEFT JOIN `tb_property` tp ON tp.ID = tpp.PropertyID
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="companyID != null">
+                    tpi.CompanyID = #{companyID} AND
+                </if>
+                <if test="projectID != null">
+                    tpi.ID = #{projectID} AND
+                </if>
+                <if test="projectType != null">
+                    tpi.ProjectType = #{projectType} AND
+                </if>
+                <if test="propertyName != null">
+                    tp.`Name` = #{propertyName} AND
+                </if>
+                <if test="createType != null">
+                    tp.CreateType = #{createType} AND
+                </if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="queryPropertyByProjectID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto">
+        SELECT
+            tpp.ID, tpp.ProjectID, tpp.PropertyID, tpp.Value, tp.`ProjectType`, tp.`Name`, tp.`Type`, tp.`Unit`,
+            tp.`Required`,tp.`MultiSelect`, tp.`EnumField`, tp.`CreateType`,  tp.`ClassName`, tp.`DisplayOrder`,
+            tp.`ModelID`, tp.`ExValue`
+        FROM `tb_property` tp
+                 LEFT JOIN `tb_project_property` tpp ON tp.ID = tpp.PropertyID
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="createType != null">
+                    tp.CreateType = #{createType}
+                </if>
+                <if test="list != null and list.size() > 0">
+                    AND tpp.ProjectID IN
+                    <foreach collection="list" item="item" separator="," open="(" close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
+    </select>
+    <delete id="deleteProjectPropertyList" parameterType="java.lang.Integer">
+        DELETE tb_project_property from tb_project_property where ProjectID in
+        <foreach collection="idList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </delete>
+</mapper>

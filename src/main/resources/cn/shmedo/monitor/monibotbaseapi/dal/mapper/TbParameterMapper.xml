@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbParameterMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+    <!--@mbg.generated-->
+    <!--@Table tb_parameter-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="SubjectID" jdbcType="INTEGER" property="subjectID" />
+    <result column="SubjectType" jdbcType="INTEGER" property="subjectType" />
+    <result column="DataType" jdbcType="VARCHAR" property="dataType" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="PaValue" jdbcType="VARCHAR" property="paValue" />
+    <result column="PaUnitID" jdbcType="INTEGER" property="paUnitID" />
+    <result column="PaDesc" jdbcType="VARCHAR" property="paDesc" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, SubjectID, SubjectType, DataType, Token, `Name`, PaValue, PaUnitID, PaDesc
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_parameter
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_parameter
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_parameter (SubjectID, SubjectType, DataType, 
+      Token, `Name`, PaValue, 
+      PaUnitID, PaDesc)
+    values (#{subjectID,jdbcType=INTEGER}, #{subjectType,jdbcType=INTEGER}, #{dataType,jdbcType=VARCHAR}, 
+      #{token,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{paValue,jdbcType=VARCHAR}, 
+      #{paUnitID,jdbcType=INTEGER}, #{paDesc,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_parameter
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="subjectID != null">
+        SubjectID,
+      </if>
+      <if test="subjectType != null">
+        SubjectType,
+      </if>
+      <if test="dataType != null">
+        DataType,
+      </if>
+      <if test="token != null">
+        Token,
+      </if>
+      <if test="name != null">
+        `Name`,
+      </if>
+      <if test="paValue != null">
+        PaValue,
+      </if>
+      <if test="paUnitID != null">
+        PaUnitID,
+      </if>
+      <if test="paDesc != null">
+        PaDesc,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="subjectID != null">
+        #{subjectID,jdbcType=INTEGER},
+      </if>
+      <if test="subjectType != null">
+        #{subjectType,jdbcType=INTEGER},
+      </if>
+      <if test="dataType != null">
+        #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null">
+        #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="paValue != null">
+        #{paValue,jdbcType=VARCHAR},
+      </if>
+      <if test="paUnitID != null">
+        #{paUnitID,jdbcType=INTEGER},
+      </if>
+      <if test="paDesc != null">
+        #{paDesc,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+    <!--@mbg.generated-->
+    update tb_parameter
+    <set>
+      <if test="subjectID != null">
+        SubjectID = #{subjectID,jdbcType=INTEGER},
+      </if>
+      <if test="subjectType != null">
+        SubjectType = #{subjectType,jdbcType=INTEGER},
+      </if>
+      <if test="dataType != null">
+        DataType = #{dataType,jdbcType=VARCHAR},
+      </if>
+      <if test="token != null">
+        Token = #{token,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null">
+        `Name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="paValue != null">
+        PaValue = #{paValue,jdbcType=VARCHAR},
+      </if>
+      <if test="paUnitID != null">
+        PaUnitID = #{paUnitID,jdbcType=INTEGER},
+      </if>
+      <if test="paDesc != null">
+        PaDesc = #{paDesc,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+    <!--@mbg.generated-->
+    update tb_parameter
+    set SubjectID = #{subjectID,jdbcType=INTEGER},
+      SubjectType = #{subjectType,jdbcType=INTEGER},
+      DataType = #{dataType,jdbcType=VARCHAR},
+      Token = #{token,jdbcType=VARCHAR},
+      `Name` = #{name,jdbcType=VARCHAR},
+      PaValue = #{paValue,jdbcType=VARCHAR},
+      PaUnitID = #{paUnitID,jdbcType=INTEGER},
+      PaDesc = #{paDesc,jdbcType=VARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <delete id="deleteBatchByRecords">
+    delete from tb_parameter where <foreach collection="list" item="item" separator="or">
+    (SubjectType = #{item.subjectType} and SubjectID = #{item.subjectID} and Token = #{item.token})
+  </foreach>
+  </delete>
+  
+  <insert id="insertBatch">
+    insert into tb_parameter (SubjectID, SubjectType, DataType,
+    Token, `Name`, PaValue,
+    PaUnitID, PaDesc)
+    values <foreach collection="list" item="item" separator=",">
+    (#{item.subjectID,jdbcType=INTEGER}, #{item.subjectType,jdbcType=INTEGER}, #{item.dataType,jdbcType=VARCHAR},
+    #{item.token,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.paValue,jdbcType=VARCHAR},
+    #{item.paUnitID,jdbcType=INTEGER}, #{item.paDesc,jdbcType=VARCHAR})
+  </foreach>
+  </insert>
+</mapper>
