@@ -33,6 +33,11 @@ public class TbMonitorType {
     private Integer displayOrder;
 
     /**
+     * 监测类型的类别
+     */
+    private String monitorTypeClass;
+
+    /**
      * 监测点允许关联多传感器标识
      */
     private Boolean multiSensor;
@@ -95,6 +100,14 @@ public class TbMonitorType {
 
     public void setDisplayOrder(Integer displayOrder) {
         this.displayOrder = displayOrder;
+    }
+
+    public String getMonitorTypeClass() {
+        return monitorTypeClass;
+    }
+
+    public void setMonitorTypeClass(String monitorTypeClass) {
+        this.monitorTypeClass = monitorTypeClass;
     }
 
     public Boolean getMultiSensor() {

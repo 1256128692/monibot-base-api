@@ -9,6 +9,7 @@
     <result column="TypeName" jdbcType="VARCHAR" property="typeName" />
     <result column="TypeAlias" jdbcType="VARCHAR" property="typeAlias" />
     <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+    <result column="MonitorTypeClass" jdbcType="VARCHAR" property="monitorTypeClass" />
     <result column="MultiSensor" jdbcType="BIT" property="multiSensor" />
     <result column="ApiDataSource" jdbcType="BIT" property="apiDataSource" />
     <result column="CreateType" jdbcType="TINYINT" property="createType" />
@@ -17,8 +18,8 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MultiSensor, ApiDataSource, CreateType, 
-    CompanyID, ExValues
+    ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MonitorTypeClass, MultiSensor, 
+    ApiDataSource, CreateType, CompanyID, ExValues
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -35,13 +36,13 @@
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_monitor_type (MonitorType, TypeName, TypeAlias, 
-      DisplayOrder, MultiSensor, ApiDataSource, 
-      CreateType, CompanyID, ExValues
-      )
+      DisplayOrder, MonitorTypeClass, MultiSensor, 
+      ApiDataSource, CreateType, CompanyID, 
+      ExValues)
     values (#{monitorType,jdbcType=INTEGER}, #{typeName,jdbcType=VARCHAR}, #{typeAlias,jdbcType=VARCHAR}, 
-      #{displayOrder,jdbcType=INTEGER}, #{multiSensor,jdbcType=BIT}, #{apiDataSource,jdbcType=BIT}, 
-      #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, #{exValues,jdbcType=VARCHAR}
-      )
+      #{displayOrder,jdbcType=INTEGER}, #{monitorTypeClass,jdbcType=VARCHAR}, #{multiSensor,jdbcType=BIT}, 
+      #{apiDataSource,jdbcType=BIT}, #{createType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, 
+      #{exValues,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType" useGeneratedKeys="true">
     <!--@mbg.generated-->
@@ -58,6 +59,9 @@
       </if>
       <if test="displayOrder != null">
         DisplayOrder,
+      </if>
+      <if test="monitorTypeClass != null">
+        MonitorTypeClass,
       </if>
       <if test="multiSensor != null">
         MultiSensor,
@@ -87,6 +91,9 @@
       </if>
       <if test="displayOrder != null">
         #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="monitorTypeClass != null">
+        #{monitorTypeClass,jdbcType=VARCHAR},
       </if>
       <if test="multiSensor != null">
         #{multiSensor,jdbcType=BIT},
@@ -121,6 +128,9 @@
       <if test="displayOrder != null">
         DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       </if>
+      <if test="monitorTypeClass != null">
+        MonitorTypeClass = #{monitorTypeClass,jdbcType=VARCHAR},
+      </if>
       <if test="multiSensor != null">
         MultiSensor = #{multiSensor,jdbcType=BIT},
       </if>
@@ -146,6 +156,7 @@
       TypeName = #{typeName,jdbcType=VARCHAR},
       TypeAlias = #{typeAlias,jdbcType=VARCHAR},
       DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      MonitorTypeClass = #{monitorTypeClass,jdbcType=VARCHAR},
       MultiSensor = #{multiSensor,jdbcType=BIT},
       ApiDataSource = #{apiDataSource,jdbcType=BIT},
       CreateType = #{createType,jdbcType=TINYINT},

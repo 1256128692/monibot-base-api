@@ -107,6 +107,7 @@ public class Param2DBEntityUtil {
         obj.setCreateType(CreateType.CUSTOMIZED.getType());
         obj.setCompanyID(pa.getCompanyID());
         obj.setExValues(pa.getExValues());
+        obj.setMonitorTypeClass(pa.getMonitorTypeClass());
         return obj;
     }
 
@@ -138,7 +139,11 @@ public class Param2DBEntityUtil {
         obj.setDisplayOrder(pa.getDisplayOrder());
         obj.setExValues(pa.getExValues());
         obj.setCreateType(pa.getCreateType());
-        obj.setCompanyID(pa.getCompanyID());
+        if (obj.getCreateType().equals(CreateType.CUSTOMIZED.getType())){
+            obj.setCompanyID(pa.getCompanyID());
+        }else {
+            obj.setCompanyID(-1);
+        }
         obj.setDefaultTemplate(pa.getDefaultTemplate());
         return obj;
     }
@@ -176,6 +181,7 @@ public class Param2DBEntityUtil {
         obj.setCreateType(CreateType.PREDEFINED.getType());
         obj.setCompanyID(-1);
         obj.setExValues(pa.getExValues());
+        obj.setMonitorTypeClass(pa.getMonitorTypeClass());
         return obj;
     }
 }
