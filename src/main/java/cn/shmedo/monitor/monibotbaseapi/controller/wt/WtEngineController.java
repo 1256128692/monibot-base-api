@@ -119,7 +119,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} engineDesc 引擎简介(200字)
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
      * @apiParam (请求参数) {Int} monitorPointID 监测点ID
-     * @apiSuccess (响应结果) Int[] engineID 引擎ID
+     * @apiSuccess (响应结果) Int engineID 引擎ID
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
      */
@@ -146,12 +146,12 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} dataList.metadata 源数据
      * @apiParam (请求参数) {String} dataList.compareRule 比较区间json
      * @apiParam (请求参数) {String} dataList.triggerRule 触发规则json
-     * @apiSuccess (返回结果) {Object[]} dataList.action 动作描述list
-     * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID
-     * @apiSuccess (返回结果) {Int} dataList.action.triggerID 触发报警ID
-     * @apiSuccess (返回结果) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
-     * @apiSuccess (返回结果) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
-     * @apiSuccess (返回结果) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiParam (请求参数) {Object[]} dataList.action 动作描述list
+     * @apiParam (请求参数) {Int} dataList.action.ID 动作ID
+     * @apiParam (请求参数) {Int} dataList.action.triggerID 触发报警ID
+     * @apiParam (请求参数) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiParam (请求参数) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
+     * @apiParam (请求参数) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
@@ -170,8 +170,7 @@ public class WtEngineController {
      * @apiDescription 规则引擎批量启用、停用
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Boolean} enable 启用状态
-     * @apiParam (请求参数) {Object[]} dataList 引擎list
-     * @apiParam (请求参数) {Int} dataList.ID 需要操作的引擎ID
+     * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -190,8 +189,7 @@ public class WtEngineController {
      * @apiName DeleteWtEngine
      * @apiDescription 规则引擎批量删除
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Object[]} dataList 引擎list
-     * @apiParam (请求参数) {Int} dataList.ID 需要操作的引擎id
+     * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限
