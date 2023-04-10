@@ -16,6 +16,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
@@ -130,6 +132,11 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
          */
         private String uniqueToken;
 
+        /**
+         * 扩展配置
+         */
+        private String exValues;
+
         public void setDataSourceType(Integer dataSourceType) {
             this.dataSourceType = DatasourceType.codeOf(dataSourceType);
         }
@@ -151,7 +158,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
             Map<Integer, String> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                     .eq(TbMonitorTypeField::getMonitorType, monitorType)
-                    .eq(TbMonitorTypeField::getFieldClass, 3)
+                    .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())
                     .in(TbMonitorTypeField::getID, exFields.stream().map(SensorConfigField::getId).toList())
                     .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
             ).stream().collect(Collectors.toMap(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName));
@@ -171,7 +178,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         if (paramFields.isEmpty()) {
             TbParameterMapper parameterMapper = SpringUtil.getBean(TbParameterMapper.class);
             Map<Integer, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                    .eq(TbParameter::getSubjectType, 4)
+                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
                     .eq(TbParameter::getSubjectID, templateID)
             ).stream().collect(Collectors.toMap(TbParameter::getID, e -> e));
 
@@ -180,7 +187,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                 TbParameter param = paramMap.get(e.getId());
                 param.setID(null);
                 param.setSubjectID(null);
-                param.setSubjectType(3);
+                param.setSubjectType(ParamSubjectType.Sensor.getType());
                 return param;
             }).toList();
         }

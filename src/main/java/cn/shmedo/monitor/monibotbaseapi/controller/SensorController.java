@@ -4,9 +4,7 @@ import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
-import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -58,7 +56,7 @@ public class SensorController {
 //    @Permission(permissionName = "mdmbase:ListSensor")
     @PostMapping(value = "/SensorPage", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public PageUtil.Page<SensorPageResponse> sensorPage(@RequestBody @Validated SensorPageRequest request) {
+    public Object sensorPage(@RequestBody @Validated SensorPageRequest request) {
         return sensorService.sensorPage(request);
     }
 
@@ -111,14 +109,13 @@ public class SensorController {
     }
 
     /**
-     * @api {POST} /MonitorTypeCatalog 监测类型(下拉)目录查询
+     * @api {POST} /MonitorTypeCatalog 监测类型选择
      * @apiVersion 1.0.0
      * @apiGroup 传感器模块
      * @apiName MonitorTypeCatalog
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
-     * @apiParam (请求参数) {String} templateDataSourceID 监测类型模板分布式唯一ID
-     * @apiParam (请求参数) {String} templateID 监测类型模板ID
+     * @apiParam (请求参数) {String} [templateDataSourceID] 监测类型模板分布式唯一ID
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 监测类型ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
@@ -129,6 +126,29 @@ public class SensorController {
      * @apiSuccess (响应结果) {Boolean} data.apiDatasource 是否API数据源
      * @apiSuccess (响应结果) {Int} data.createType 创建类型
      * @apiSuccess (响应结果) {Int} data.companyID 公司ID
+     * @apiSuccess (响应结果) {String} data.exValues 拓展信息
+     * @apiSuccessExample {json} 响应结果示例
+     * {"code": 0,"msg": null,"data": [{"ID": 0,"monitorType": 0,"typeName": "","typeAlias": "","displayOrder": 0,"multiSensor": false,"apiDatasource": false,"createType": 0,"companyID": 0,"exValues": ""}]}
+     * @apiPermission mdmbase:ListMonitorType
+     */
+//    @Permission(permissionName = "mdmbase:ListMonitorType")
+    @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object monitorTypeCatalog(@RequestBody @Validated MonitorTypeCatalogRequest request) {
+        return sensorService.monitorTypeCatalog(request);
+    }
+
+    /**
+     * @api {POST} /BaseConfig 基础配置
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName BaseConfig
+     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求参数) {String} templateID 监测类型模板ID
+     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParamExample 请求体示例
+     * {"monitorType":4646,"templateID":5116,"projectID":2730}
+     * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {String} data.exValues 拓展信息
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
      * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID
@@ -154,14 +174,14 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.paramFields.paUnitID 字段单位ID
      * @apiSuccess (响应结果) {String} data.paramFields.paDesc 字段描述
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": [{"ID": 0,"monitorType": 0,"typeName": "","typeAlias": "","displayOrder": 0,"multiSensor": false,"apiDatasource": false,"createType": 0,"companyID": 0,"exValues": "","exFields": [{"id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}]}]}
+     * {"code": 0,"msg": null,"data": {"exFields": [{"id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}]}}
      * @apiPermission mdmbase:ListMonitorType
      */
-//    @Permission(permissionName = "mdmbase:ListMonitorType")
-    @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
+    //    @Permission(permissionName = "mdmbase:ListMonitorType")
+    @PostMapping(value = "/BaseConfig", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object monitorTypeCatalog(@RequestBody @Validated MonitorTypeCatalogRequest request) {
-        return sensorService.monitorTypeCatalog(request);
+    public Object baseConfig(@RequestBody @Validated BaseConfigRequest request) {
+        return sensorService.baseConfig(request);
     }
 
     /**
@@ -213,7 +233,14 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.templateID 模板ID
-     * @apiSuccess (响应结果) {String[]} data.dataSourceNames 数据源名称（如: 物联网数据>SN12345>传1）
+     * @apiSuccess (响应结果) {Object[]} data.dataSourceList 数据源列表
+     * @apiSuccess (响应结果) {Int} data.dataSourceList.id 数据源id
+     * @apiSuccess (响应结果) {String} data.dataSourceList.dataSourceID 数据源分布式唯一ID
+     * @apiSuccess (响应结果) {Int} data.dataSourceList.dataSourceType 数据源类型 1-物联网传感器 2-监测传感器
+     * @apiSuccess (响应结果) {String} data.dataSourceList.templateDataSourceToken 模板数据源标识
+     * @apiSuccess (响应结果) {String} data.dataSourceList.dataSourceToken 数据源标识
+     * @apiSuccess (响应结果) {String} data.dataSourceList.dataSourceComposeType 数据源组合类型
+     * @apiSuccess (响应结果) {String} data.dataSourceList.exValues 扩展字段
      * @apiSuccess (响应结果) {String} data.dataSourceID 数据源ID
      * @apiSuccess (响应结果) {Int} data.dataSourceComposeType 数据源组合类型
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型

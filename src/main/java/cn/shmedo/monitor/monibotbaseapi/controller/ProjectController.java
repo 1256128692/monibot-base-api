@@ -63,7 +63,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} [modelValueList.value] 属性值（<=50） 可为null， 不能为空字符串
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission xx权限:
+     * @apiPermission 系统权限 mdmbase:AddBaseProject
      */
     @LogParam(moduleName = "项目管理模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddBaseProject")
@@ -79,10 +79,10 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectPageList
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
      * @apiParam (请求体) {String} [location] 行政区域
-     * @apiParam (请求体) {Int} companyID 企业名称-先调用接口查询具体企业，发送id
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
@@ -154,7 +154,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} [propertyList.exValue] 属性拓展信息
      * @apiSuccess (返回结果) {Int} [propertyList.displayOrder] 排序字段
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
 //    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -225,7 +225,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} [propertyList.exValue] 属性拓展信息
      * @apiSuccess (返回结果) {Int} [propertyList.displayOrder] 排序字段
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryProjectInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -263,7 +263,7 @@ public class ProjectController {
      * @apiParam (请求体) {Date}  [newRetireDate] 新有效期
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
     @LogParam(moduleName = "项目管理模块", operationName = "修改项目信息", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -283,7 +283,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 
+     * @apiPermission 系统权限 mdmbase:UpdateBaseProjectCompany
      */
     @LogParam(moduleName = "项目管理模块", operationName = "转移项目", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProjectCompany")
@@ -303,7 +303,7 @@ public class ProjectController {
      * @apiParam (请求体) {Date} newRetireDate 新有效期
      * @apiSuccess (返回结果) {String} none  无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
     @LogParam(moduleName = "项目管理模块", operationName = "推迟有效期", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
@@ -379,8 +379,8 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectList
-     * @apiParam (请求体) {Int} companyID 企业名称-先调用接口查询具体企业，发送id
-     * @apiParam (请求体) {Int} [projectType] 项目类型,-1:查全部
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiSuccess (返回结果) {Object[]} data 项目信息列表
      * @apiSuccess (返回结果) {Int} data.id 项目id
@@ -391,11 +391,42 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} data.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {String} [currentPageData.imagePath] 项目图片地址
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseProject
      */
 //    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectListByProjectName(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+    /**
+     * @api {post} /QueryWtProjectSimpleList 查询水利工程项目简要列表
+     * @apiDescription 查询水利工程项目简要列表,水利一张图开放API
+     * @apiVersion 1.0.0
+     * @apiGroup QueryWtProjectSimpleList
+     * @apiName QueryProjectList
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [projectType] 水利项目类型 null:全部,1:水库,2:河道,3:堤防
+     * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
+     * @apiParam (请求体) {String} [v1] 水库规模/河道起点/堤防级别,支持模糊查询
+     * @apiParam (请求体) {String} [v2] 所在河流/河道重点/堤防类型,支持模糊查询
+     * @apiSuccess (返回结果) {Object[]} waterInfo 水利项目信息
+     * @apiSuccess (返回结果) {Int} reservoirInfo.type 水利项目类型
+     * @apiSuccess (返回结果) {Int} reservoirInfo.typeName 水利项目类型名称
+     * @apiSuccess (返回结果) {Int} reservoirInfo.count 项目数量
+     * @apiSuccess (返回结果) {Object[]} reservoirInfo.dataList 水库列表
+     * @apiSuccess (返回结果) {Int} reservoirInfo.dataList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectShortName 工程项目简称
+     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.location 工程项目位置
+     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.v1 水库规模/河道起点/堤防级别
+     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.v2 所在河流/河道重点/堤防类型
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 + 应用权限 mdmbase:ListBaseProject
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "QueryWtProjectSimpleList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryWtProjectSimpleList(@Validated @RequestBody Object pa) {
         return null;
     }
 
