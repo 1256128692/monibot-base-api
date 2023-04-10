@@ -17,10 +17,10 @@ public class WtWarnController {
     /**
      * @api {POST} /QueryWtWarnPage 查询报警分页
      * @apiVersion 1.0.0
-     * @apiGroup 水利警报模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtWarnPage
      * @apiDescription 查询报警分页
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 0.预留 1.实时记录 2.历史记录
      * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
@@ -63,10 +63,10 @@ public class WtWarnController {
     /**
      * @api {POST} /QueryWtWarnInfoDetail 查询报警详情
      * @apiVersion 1.0.0
-     * @apiGroup 水利警报模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtWarnInfoDetail
      * @apiDescription 查询报警详情
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnID 报警记录ID
      * @apiSuccess (返回结果) {String} name 报警名称
      * @apiSuccess (返回结果) {Int} projectID 工程ID

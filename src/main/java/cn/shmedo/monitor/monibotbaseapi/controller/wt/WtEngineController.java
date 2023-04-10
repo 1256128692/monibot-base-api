@@ -23,7 +23,8 @@ public class WtEngineController {
      * @apiGroup 警报规则引擎模块
      * @apiName QueryEnginePage
      * @apiDescription 查询规则引擎分页
-     * @apiParam (请求参数) {Int} [projectID] 工程项目ID //TODO 必要字段、且可能通过该字段auth
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {String} [engineName] 规则名称,支持模糊查询
      * @apiParam (请求参数) {Boolean} [enable] 启用状态
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
@@ -46,7 +47,12 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.alarmID 报警状态ID
      * @apiSuccess (返回结果) {String} currentPageData.dataList.alarmName 报警名称
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.alarmLevel 报警等级
-     * @apiSuccess (返回结果) {String} currentPageData.dataList.action 动作描述json
+     * @apiSuccess (返回结果) {Object[]} currentPageData.dataList.action 动作描述list
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ID 动作ID
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.triggerID 触发报警ID
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarnRule
      */
@@ -63,7 +69,7 @@ public class WtEngineController {
      * @apiGroup 警报规则引擎模块
      * @apiName QueryWtEngineDetail
      * @apiDescription 查询规则引擎详情
-     * @apiParam (请求参数) {Int} projectID 工程项目ID //TODO auth
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} engineID 引擎ID
      * @apiSuccess (返回结果) {Int} engineID 引擎ID
      * @apiSuccess (返回结果) {String} engineName 引擎名称
@@ -85,6 +91,12 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.metadata 源数据
      * @apiSuccess (返回结果) {String} dataList.compareRule 比较区间json
      * @apiSuccess (返回结果) {String} dataList.triggerRule 触发规则json
+     * @apiSuccess (返回结果) {Object[]} dataList.action 动作描述list
+     * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID
+     * @apiSuccess (返回结果) {Int} dataList.action.triggerID 触发报警ID
+     * @apiSuccess (返回结果) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiSuccess (返回结果) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
      */
@@ -101,13 +113,13 @@ public class WtEngineController {
      * @apiGroup 警报规则引擎模块
      * @apiName AddWtEngine
      * @apiDescription 新增规则引擎
-     * @apiParam (请求参数) {Int} projectID 工程项目ID //TODO 必要字段、且可能通过该字段auth
-     * @apiParam (请求参数) {String} engineName 引擎名称
-     * @apiParam (请求参数) {String} engineDesc 引擎简介
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {String} engineName 引擎名称(30字)
+     * @apiParam (请求参数) {String} engineDesc 引擎简介(200字)
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
      * @apiParam (请求参数) {Int} monitorPointID 监测点ID
-     * @apiSuccess (响应结果) {Object} data 响应结果
-     * @apiSuccess (响应结果) {Int} data.ID 引擎ID
+     * @apiSuccess (响应结果) Int[] engineID 引擎ID
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
      */
@@ -124,22 +136,27 @@ public class WtEngineController {
      * @apiGroup 警报规则引擎模块
      * @apiName UpdateWtEngine
      * @apiDescription 编辑规则引擎
-     * @apiParam (请求参数) {Int} projectID 工程项目ID //TODO auth
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} engineID 引擎ID
-     * @apiParam (请求参数) {String} [engineName] 引擎名称
-     * @apiParam (请求参数) {String} [engineDesc] 引擎简介
-     * @apiParam (请求参数) {Object[]} [datalist] 报警状态
-     * @apiParam (请求参数) {Int} [datalist.alarmID] 报警状态ID,若没有视为新增
-     * @apiParam (请求参数) {String} [datalist.alarmLevel] 报警等级
-     * @apiParam (请求参数) {String} [datalist.metadata] 源数据
-     * @apiParam (请求参数) {String} [datalist.compareRule] 比较区间json
-     * @apiParam (请求参数) {String} [datalist.triggerRule] 触发规则json
+     * @apiParam (请求参数) {String} [engineName] 引擎名称(30字)
+     * @apiParam (请求参数) {String} [engineDesc] 引擎简介(200字)
+     * @apiParam (请求参数) {Object[]} [dataList] 报警状态列表
+     * @apiParam (请求参数) {Int} [dataList.alarmID] 报警状态ID,若没有视为新增
+     * @apiParam (请求参数) {Int} dataList.alarmLevel 报警等级
+     * @apiParam (请求参数) {String} dataList.metadata 源数据
+     * @apiParam (请求参数) {String} dataList.compareRule 比较区间json
+     * @apiParam (请求参数) {String} dataList.triggerRule 触发规则json
+     * @apiSuccess (返回结果) {Object[]} dataList.action 动作描述list
+     * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID
+     * @apiSuccess (返回结果) {Int} dataList.action.triggerID 触发报警ID
+     * @apiSuccess (返回结果) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiSuccess (返回结果) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
      */
 //    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
-    @Deprecated
     @PostMapping(value = "/updateWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngine(@Valid @RequestBody Object param) {
         return ResultWrapper.successWithNothing();
@@ -148,13 +165,13 @@ public class WtEngineController {
     /**
      * @api {POST} /UpdateWtEngineEnable 规则引擎批量启用、停用
      * @apiVersion 1.0.0
-     * @apiGroup 水利在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName UpdateWtEngineEnable
      * @apiDescription 规则引擎批量启用、停用
-     * @apiParam (请求参数) {Int} projectID 工程项目ID //TODO auth
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Boolean} enable 启用状态
      * @apiParam (请求参数) {Object[]} dataList 引擎list
-     * @apiParam (请求参数) {Int} dataList.ID 需要操作的引擎id
+     * @apiParam (请求参数) {Int} dataList.ID 需要操作的引擎ID
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -169,10 +186,10 @@ public class WtEngineController {
     /**
      * @api {POST} /DeleteWtEngine 规则引擎批量删除
      * @apiVersion 1.0.0
-     * @apiGroup 水利在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName DeleteWtEngine
      * @apiDescription 规则引擎批量删除
-     * @apiParam (请求参数) {Int} projectID 工程项目ID //TODO auth
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Object[]} dataList 引擎list
      * @apiParam (请求参数) {Int} dataList.ID 需要操作的引擎id
      * @apiSuccess (返回结果) {String} none 无
@@ -189,11 +206,11 @@ public class WtEngineController {
     /**
      * @api {POST} /DeleteWtAlarmStatus 删除报警状态
      * @apiVersion 1.0.0
-     * @apiGroup 水利在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName DeleteWtAlarmStatus
      * @apiDescription 删除报警状态
-     * @apiParam (请求参数) {Int}  projectID 工程项目ID //TODO auth
-     * @apiParam (请求参数) {Int} alarmID 删除的报警状态ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int[]} alarmIDList 删除的报警状态ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限
