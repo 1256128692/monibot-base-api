@@ -80,4 +80,6 @@ public interface SensorService extends IService<TbSensor> {
      * @return
      */
     Object trying(TryingRequest request);
+
+    BaseConfigResponse baseConfig(BaseConfigRequest request);
 }

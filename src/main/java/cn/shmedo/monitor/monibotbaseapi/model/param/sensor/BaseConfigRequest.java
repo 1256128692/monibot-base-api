@@ -5,17 +5,14 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
- * 监测类型目录查询
- *
- * @author Chengfs on 2023/3/31
+ * @author Chengfs on 2023/4/10
  */
 @Data
-public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class BaseConfigRequest implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     /**
      * 项目ID
@@ -24,14 +21,16 @@ public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePe
     private Integer projectID;
 
     /**
-     * 模板数据来源类型
+     * 监测类型模板ID
      */
-    private Integer dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
+    @NotNull(message = "监测类型模板ID不能为空")
+    private Integer templateID;
 
     /**
-     * 监测类型模板分布式唯一ID
+     * 监测类型
      */
-    private String templateDataSourceID;
+    @NotNull(message = "监测类型不能为空")
+    private Integer monitorType;
 
     @Override
     public ResultWrapper<?> validate() {
