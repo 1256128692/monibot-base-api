@@ -46,11 +46,12 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         WtMonitorItemInfo result = new WtMonitorItemInfo();
         List<MonitorClassInfo> monitorClassList = new LinkedList<>();
         Map<Integer, List<MonitorItemBaseInfo>> monitorClassGroup = new HashMap<>();
-        // 查询全部类型,并返回
+
         if (request.getMonitorClass() == null) {
+            // 查询该工程的全部监测类别,并返回该工程监测类别下的监测类型和监测项目
             LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
                     .eq(TbProjectMonitorClass::getProjectID, request.getProjectID());
-            // 1.项目配置监测类别密度信息列表
+            // 项目配置监测类别密度信息列表
             List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
             if (!CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
                 List<Integer> monitorClassIDList = tbProjectMonitorClassList.stream().map(TbProjectMonitorClass::getMonitorClass).collect(Collectors.toList());
@@ -74,30 +75,45 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                 monitorClassList.add(vo);
             }
         } else {
+            // 查询该工程的全部的监测项目
             MonitorClassType monitorClassType = MonitorClassType.fromInt(request.getMonitorClass());
             MonitorClassInfo vo = new MonitorClassInfo();
             vo.setMonitorClass(monitorClassType.getValue());
             vo.setMonitorClassCnName(monitorClassType.getName());
 
-            LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
-                    .eq(TbProjectMonitorClass::getProjectID, request.getProjectID())
-                    .eq(TbProjectMonitorClass::getMonitorClass, request.getMonitorClass());
-            // 1.项目配置监测类别密度信息列表
-            List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
-            if (!CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
-                List<Integer> monitorClassIDList = tbProjectMonitorClassList.stream().map(TbProjectMonitorClass::getMonitorClass).collect(Collectors.toList());
-                List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(monitorClassIDList, request.getProjectID());
-
-                // 处理监测类型列表
-                handleMonitorTypeList(vo, monitorItemBaseInfos);
-
-            }
+            List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(null, request.getProjectID());
+            // 处理监测类型列表
+            handleMonitorTypeList(vo, monitorItemBaseInfos);
             monitorClassList.add(vo);
         }
 
         result.setMonitorClassList(monitorClassList);
+
+        // 处理密度
+        handleMonitorClassDensity(request.getProjectID(), result);
         return result;
     }
+
+    private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {
+
+        List<Integer> monitorClassIDList = result.getMonitorClassList().stream().map(MonitorClassInfo::getMonitorClass).collect(Collectors.toList());
+        LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
+                .eq(TbProjectMonitorClass::getProjectID, projectID)
+                .in(TbProjectMonitorClass::getMonitorClass, monitorClassIDList);
+        // 项目配置监测类别密度信息列表
+        List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
+
+        result.getMonitorClassList().stream().forEach(item -> {
+            if (!CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
+                TbProjectMonitorClass vo = tbProjectMonitorClassList.stream().filter(pojo -> pojo.getMonitorClass().equals(item.getMonitorClass())).findFirst().orElse(null);
+                if (vo != null) {
+                    item.setDensity(vo.getDensity());
+                    item.setEnable(vo.getEnable());
+                }
+            }
+        });
+    }
+
 
     /**
      * 处理监测类型列表
