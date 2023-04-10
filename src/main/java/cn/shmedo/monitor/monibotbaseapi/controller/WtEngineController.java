@@ -10,16 +10,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * TODO:不要批量修改，添加批量删除API，统一项目权限(projectID校验)
+ */
 @RestController
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WtEngineController {
     /**
      * @api {POST} /QueryWtEnginePage 查询规则引擎分页
      * @apiVersion 1.0.0
-     * @apiGroup 水利平台在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryEnginePage
      * @apiDescription 查询规则引擎分页
-     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {String} [engineName] 规则名称,支持模糊查询
      * @apiParam (请求参数) {Boolean} [enable] 启用状态
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
@@ -44,9 +47,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.alarmLevel 报警等级
      * @apiSuccess (返回结果) {String} currentPageData.dataList.action 动作描述json
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseWarnRule
      */
-    @Permission(permissionName = "")
+//    @Permission(permissionName = "mdmbase:ListBaseWarnRule")
     @PostMapping(value = "/queryWtEnginePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEnginePage(@Valid @RequestBody Object param) {
         //TODO 规则列表
@@ -56,9 +59,10 @@ public class WtEngineController {
     /**
      * @api {POST} /QueryWtEngineDetail 查询规则引擎详情
      * @apiVersion 1.0.0
-     * @apiGroup 水利平台在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtEngineDetail
      * @apiDescription 查询规则引擎详情
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {Int} engineID 引擎ID
      * @apiSuccess (返回结果) {String} engineName 引擎名称
      * @apiSuccess (返回结果) {String} ruleIntroduce 引擎简介
@@ -79,9 +83,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.metadata 源数据
      * @apiSuccess (返回结果) {String} dataList.desc 规则描述json
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
      */
-    @Permission(permissionName = "")
+//    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
     @PostMapping(value = "/queryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEngineDetail(@Valid @RequestBody Object param) {
         //TODO 查询规则详情
@@ -91,18 +95,19 @@ public class WtEngineController {
     /**
      * @api {POST} /QueryWtAlarmStatus 查询报警状态详情
      * @apiVersion 1.0.0
-     * @apiGroup 水利平台在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtAlarmStatus
      * @apiDescription 查询报警状态详情
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {Int} alarmID 报警状态ID
      * @apiSuccess (返回结果) {String} dataList.alarmName 报警名称
      * @apiSuccess (返回结果) {Int} dataList.alarmLevel 报警等级
      * @apiSuccess (返回结果) {String} dataList.metadata 源数据
      * @apiSuccess (返回结果) {String} dataList.desc 规则描述json
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
      */
-    @Permission(permissionName = "")
+//    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
     @PostMapping(value = "/queryWtAlarmStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtAlarmStatus(@Valid @RequestBody Object param) {
         //TODO 报警状态详情
@@ -112,13 +117,12 @@ public class WtEngineController {
     /**
      * @api {POST} /CreateWtEngine 新增规则引擎
      * @apiVersion 1.0.0
-     * @apiGroup 水利平台在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName CreateWtEngine
      * @apiDescription 新增规则引擎
-     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {String} engineName 引擎名称
      * @apiParam (请求参数) {Boolean} enable 启用状态
-     * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
      * @apiParam (请求参数) {Int} monitorPointID 测点ID
      * @apiParam (请求参数) {Object[]} dataList 报警状态List
@@ -144,6 +148,7 @@ public class WtEngineController {
      * @apiGroup 水利在线监测管理模块
      * @apiName UpdateWtEngine
      * @apiDescription 编辑规则引擎
+     * @apiParam (请求参数) {Int}  projectID 工程项目ID
      * @apiParam (请求参数) {Object[]} dataList 引擎list
      * @apiParam (请求参数) {Int} dataList.engineID 引擎ID
      * @apiParam (请求参数) {Boolean} [dataList.enable] 启用状态
