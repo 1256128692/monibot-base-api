@@ -10,9 +10,14 @@ import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
@@ -20,7 +25,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.FormulaUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -34,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Chengfs on 2023/4/4
@@ -44,11 +52,13 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     private final IotService iotService;
     private final TbMonitorTypeTemplateMapper monitorTypeTemplateMapper;
-    private final TbTemplateDataSourceMapper templateDataSourceMapper;
     private final TbMonitorTypeMapper monitorTypeMapper;
     private final TbParameterMapper parameterMapper;
     private final TbSensorDataSourceMapper sensorDataSourceMapper;
     private final TbMonitorTypeFieldMapper monitorTypeFieldMapper;
+    private final TbTemplateScriptMapper templateScriptMapper;
+    private final TbTemplateFormulaMapper templateFormulaMapper;
+    private final RedisService redisService;
 
     @Override
     public PageUtil.Page<SensorPageResponse> sensorPage(SensorPageRequest request) {
@@ -119,7 +129,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object addSensor(SaveSensorRequest request) {
+    public IdRecord addSensor(SaveSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         //传感器
         TbSensor sensor = new TbSensor();
@@ -156,8 +166,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             request.getParameterList().forEach(item -> item.setSubjectID(sensor.getID()));
             parameterMapper.insertBatch(request.getParameterList());
         }
-
-        return Dict.of("id", sensor.getID());
+        return new IdRecord(sensor.getID());
     }
 
     @Override
@@ -188,18 +197,132 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteSensor(DeleteSensorRequest request) {
-
+        sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
+                .in(TbSensorDataSource::getDataSourceID, request.getSensorIDList()));
+        parameterMapper.delete(new LambdaQueryWrapper<TbParameter>()
+                .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
+                .in(TbParameter::getSubjectID, request.getSensorIDList()));
+        removeBatchByIds(request.getSensorIDList());
     }
 
     @Override
-    public Object updateSensor(UpdateSensorRequest request) {
-        return null;
+    @Transactional(rollbackFor = Exception.class)
+    public IdRecord updateSensor(UpdateSensorRequest request) {
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        Optional.ofNullable(request.getImagePath()).ifPresent(imagePath -> request.getSensor().setImagePath(imagePath));
+        Optional.ofNullable(request.getAlias()).ifPresent(alias -> request.getSensor().setAlias(alias));
+        Optional.ofNullable(request.getEnable()).ifPresent(enable -> request.getSensor().setEnable(enable));
+        Optional.ofNullable(request.getDisplayOrder()).ifPresent(displayOrder -> request.getSensor().setDisplayOrder(displayOrder));
+        Optional.ofNullable(request.getExValues()).ifPresent(exValues -> request.getSensor().setExValues(exValues));
+        request.getSensor().setUpdateUserID(subject.getSubjectID());
+        request.getSensor().setUpdateTime(null);
+        //更新传感器、参数
+        updateById(request.getSensor());
+        Optional.of(request.getParamList()).filter(e -> !e.isEmpty()).ifPresent(parameterMapper::replaceBatch);
+        return new IdRecord(request.getSensor().getID());
     }
 
     @Override
-    public Object getTryingParam(QueryTryingParamRequest request) {
-        return null;
+    public TryingParamResponse getTryingParam(QueryTryingParamRequest request) {
+        TryingParamResponse result = new TryingParamResponse();
+        result.setCalType(request.getMonitorTypeTemplate().getCalType());
+        switch (result.getCalType()) {
+            case 1:
+                Map<Integer, TbTemplateFormula> formulaMap = templateFormulaMapper
+                        .selectList(new LambdaQueryWrapper<TbTemplateFormula>()
+                                .eq(TbTemplateFormula::getTemplateID, request.getTemplateID())
+                                .eq(TbTemplateFormula::getMonitorType, request.getMonitorType()))
+                        .stream().collect(Collectors.toMap(TbTemplateFormula::getFieldID, e -> e));
+                result.setFieldList(request.getTypeFields().stream()
+                        .filter(e -> formulaMap.containsKey(e.getID())).map(typeField -> {
+                            Field field = Field.valueOf(typeField);
+                            field.setFormula(formulaMap.get(typeField.getID()).getFormula());
+                            return field;
+                        }).toList());
+                break;
+            case 2:
+                TbTemplateScript tbTemplateScript = templateScriptMapper.selectOne(new LambdaQueryWrapper<TbTemplateScript>()
+                        .eq(TbTemplateScript::getTemplateID, request.getTemplateID())
+                        .eq(TbTemplateScript::getMonitorType, request.getMonitorType())
+                        .select(TbTemplateScript::getScript));
+                result.setScript(tbTemplateScript.getScript());
+                break;
+            case 3: //TODO HTTP计算未实现
+                break;
+            default:
+                break;
+        }
+
+        Map<FormulaUtil.DataType, Set<FormulaUtil.Source>> sourceMap = result.getFieldList().stream()
+                .map(Field::getFormula)
+                .flatMap(e -> FormulaUtil.parse(e).entrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> {
+                    a.addAll(b);
+                    return a;
+                }));
+
+        Set<Object> modelTokens = sourceMap.get(FormulaUtil.DataType.IOT).stream()
+                .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
+                .map(e -> (Object) e)
+                .collect(Collectors.toSet());
+        Map<String, Map<String, Model.Field>> modelMap = redisService.multiGet(RedisKeys.MODEL, modelTokens, Model.class)
+                .stream().collect(Collectors.toMap(Model::getModelToken,
+                        e -> e.getModelFieldList().stream().collect(Collectors.toMap(Model.Field::getFieldToken, f -> f))));
+        List<Param> paramList = sourceMap.entrySet().stream().flatMap(entry -> {
+            switch (entry.getKey()) {
+                case IOT -> {
+
+                    return entry.getValue().stream().map(e -> {
+                        String modelToken = StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false);
+                        Assert.isTrue(modelMap.containsKey(modelToken), "模型{}不存在", modelToken);
+                        Assert.isTrue(modelMap.get(modelToken).containsKey(e.getFieldToken()),
+                                "模型{}不存在字段 {}", modelToken, e.getFieldToken());
+                        return Param.valueOf(modelMap.get(modelToken).get(e.getFieldToken()),
+                                e.getOrigin(), entry.getKey());
+                    });
+                }
+                case PARAM -> {
+                    List<String> paramTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
+                    Map<String, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
+                                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                                    .eq(TbParameter::getSubjectID, request.getTemplateID())
+                                    .in(TbParameter::getToken, paramTokens))
+                            .stream().collect(Collectors.toMap(TbParameter::getToken, e -> e));
+                    return entry.getValue().stream()
+                            .map(e -> {
+                                Assert.isTrue(paramMap.containsKey(e.getFieldToken()),
+                                        "模板参数{}找不到", e.getFieldToken());
+                                return Param.valueOf(paramMap.get(e.getFieldToken()),
+                                        e.getOrigin(), entry.getKey());
+                            });
+                }
+                case EX -> {
+                    List<String> exTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
+                    if (exTokens.isEmpty()) {
+                        return Stream.empty();
+                    }
+                    Map<String, TbMonitorTypeField> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
+                            .eq(TbMonitorTypeField::getMonitorType, request.getMonitorType())
+                            .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())
+                            .in(TbMonitorTypeField::getFieldToken, exTokens)
+                            .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
+                    ).stream().collect(Collectors.toMap(TbMonitorTypeField::getFieldToken, e -> e));
+                    return entry.getValue().stream().map(e -> {
+                        Assert.isTrue(exMap.containsKey(e.getFieldToken()),
+                                "扩展字段{}找不到", e.getFieldToken());
+                        return Param.valueOf(exMap.get(e.getFieldToken()), e.getOrigin(), entry.getKey());
+                    });
+                }
+                default -> {
+                    //TODO SELF、MON、HISTORY 待实现
+                    return Stream.empty();
+                }
+            }
+        }).toList();
+        result.setParamList(paramList);
+        return result;
     }
 
     @Override
