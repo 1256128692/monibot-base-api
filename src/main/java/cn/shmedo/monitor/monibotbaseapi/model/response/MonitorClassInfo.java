@@ -11,6 +11,10 @@ public class MonitorClassInfo {
 
     private String monitorClassCnName;
 
+    private Boolean enable;
+
+    private String density;
+
     private List<MonitorTypeAndChildMonitorItemInfo> monitorTypeList;
 
 }

@@ -26,6 +26,21 @@ public class MonitorTypeCatalogResponse extends TbMonitorType {
      * 参数
      */
     private List<TbParameter> paramFields;
+
+    public static <T extends TbMonitorType> MonitorTypeCatalogResponse valueOf(T t) {
+        MonitorTypeCatalogResponse response = new MonitorTypeCatalogResponse();
+        response.setID(t.getID());
+        response.setMonitorType(t.getMonitorType());
+        response.setTypeName(t.getTypeName());
+        response.setTypeAlias(t.getTypeAlias());
+        response.setDisplayOrder(t.getDisplayOrder());
+        response.setMultiSensor(t.getMultiSensor());
+        response.setApiDataSource(t.getApiDataSource());
+        response.setCreateType(t.getCreateType());
+        response.setCompanyID(t.getCompanyID());
+        response.setExValues(t.getExValues());
+        return response;
+    }
 }
 
     

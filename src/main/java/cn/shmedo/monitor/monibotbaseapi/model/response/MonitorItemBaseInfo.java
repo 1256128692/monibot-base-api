@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response;
 
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
@@ -19,7 +18,6 @@ public class MonitorItemBaseInfo {
     @JsonIgnore
     private Integer monitorType;
 
-    @JsonIgnore
     private Integer monitorClass;
 
 }

@@ -22,4 +22,8 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     List<MonitorItemBaseInfo> selectListByMonitorClassAndProID(List<Integer> monitorClassIDList, Integer projectID);
 
     List<MonitorItemBaseInfo> selectListByCondition(Integer companyID, List<Integer> proIDList, Integer queryType);
+
+    void updateByCondition(Integer projectID, Integer monitorClass, List<Integer> monitorItemIDList);
+
+    void updateMonitorClassToNull(Integer projectID, Integer monitorClass);
 }

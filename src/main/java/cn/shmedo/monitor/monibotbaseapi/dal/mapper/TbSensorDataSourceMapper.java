@@ -2,7 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource;
 
-public interface TbSensorDataSourceMapper {
+public interface TbSensorDataSourceMapper extends BasicMapper<TbSensorDataSource> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbSensorDataSource record);

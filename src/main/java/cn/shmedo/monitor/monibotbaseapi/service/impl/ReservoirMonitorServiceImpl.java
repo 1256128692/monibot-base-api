@@ -283,7 +283,9 @@ public class ReservoirMonitorServiceImpl implements ReservoirMonitorService {
                         });
                     }
                     snd.setMultiSensorData(result);
-                    snd.setTime(DateUtil.parse((String) result.get(0).get(DbConstant.TIME_FIELD)));
+                    if(!CollectionUtil.isNullOrEmpty(result)){
+                        snd.setTime(DateUtil.parse((String) result.get(0).get(DbConstant.TIME_FIELD)));
+                    }
                 } else {
                     // 单个传感器
                     TbSensor tbSensor = snd.getSensorList().get(0);
