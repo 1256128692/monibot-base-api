@@ -81,7 +81,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {DateTime} WarnTime 报警时间
-     * @apiSuccess (返回结果) {String} desc 规则描述json
+     * @apiSuccess (返回结果) {String} compareRule 比较区间json
+     * @apiSuccess (返回结果) {String} triggerRule 触发规则json
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Double} dataList.value 源数据值
      * @apiSuccess (返回结果) {Boolean} [dataList.warnStartMark] 开始报警标记,仅当当前项为开始报警的时间点才存在该标记,始终为true
