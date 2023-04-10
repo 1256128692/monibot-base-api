@@ -282,9 +282,11 @@
                tmp.UpdateTime,
                tmp.UpdateUserID,
                tmi.Name  as monitorItemName,
-               tmi.Alias as monitorItemAlias
+               tmi.Alias as monitorItemAlias,
+               tpmc.Density
         from tb_monitor_point tmp
                  LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+                 LEFT JOIN tb_project_monitor_class tpmc ON tmi.MonitorClass = tpmc.MonitorClass
         where tmp.ProjectID in
         <foreach collection="projectIDList" item="projectID" open="(" close=")" separator=",">
             #{projectID}

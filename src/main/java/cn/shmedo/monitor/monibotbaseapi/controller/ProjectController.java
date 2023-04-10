@@ -404,7 +404,7 @@ public class ProjectController {
      * @apiDescription 查询水利工程项目简要列表,水利一张图开放API
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
-     * @apiName QueryProjectList
+     * @apiName QueryWtProjectSimpleList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectType] 水利项目类型 null:全部,1:水库,2:河道,3:堤防
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
@@ -414,7 +414,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} reservoirInfo.type 水利项目类型
      * @apiSuccess (返回结果) {Int} reservoirInfo.typeName 水利项目类型名称
      * @apiSuccess (返回结果) {Int} reservoirInfo.count 项目数量
-     * @apiSuccess (返回结果) {Object[]} reservoirInfo.dataList 水库列表
+     * @apiSuccess (返回结果) {Object[]} reservoirInfo.dataList 工程项目列表
      * @apiSuccess (返回结果) {Int} reservoirInfo.dataList.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectShortName 工程项目简称
