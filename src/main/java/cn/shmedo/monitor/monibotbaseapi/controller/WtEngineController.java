@@ -135,7 +135,7 @@ public class WtEngineController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @Permission(permissionName = "")
+//    @Permission(permissionName = "")
     @PostMapping(value = "/createWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object createWtEngine(@Valid @RequestBody Object param) {
         //TODO 新增规则引擎
@@ -165,7 +165,8 @@ public class WtEngineController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @Permission(permissionName = "")
+//    @Permission(permissionName = "")
+    @Deprecated
     @PostMapping(value = "/updateWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngine(@Valid @RequestBody Object param) {
         //TODO 批量停用、启用、编辑、删除规则
@@ -176,6 +177,35 @@ public class WtEngineController {
         //TODO      如果json中仅有id,将这些报警模板添加到删除List;
         //TODO      否则认为是更新的报警模板,将这些报警模板添加到更新List;
         //TODO 处理报警模板
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /UpdateWtEngineEnable 规则引擎批量启用、停用
+     * @apiVersion 1.0.0
+     * @apiGroup 水利在线监测管理模块
+     * @apiName UpdateWtEngineEnable
+     * @apiDescription 规则引擎批量启用、停用
+     * @apiParam (请求参数) {Int}  projectID 工程项目ID
+     * @apiParam (请求参数) {Object[]} dataList 引擎list
+     * @apiParam (请求参数) {Int} dataList.engineID 引擎ID
+     * @apiParam (请求参数) {Boolean} [dataList.enable] 启用状态
+     * @apiParam (请求参数) {String} [dataList.engineName] 引擎名称
+     * @apiParam (请求参数) {String} [dataList.engineIntroduce] 引擎介绍
+     * @apiParam (请求参数) {Object[]} [dataList.alarmStatusList] 报警状态list
+     * @apiParam (请求参数) {Int} [dataList.alarmStatusList.alarmID] 报警状态ID
+     * @apiParam (请求参数) {String} [dataList.alarmStatusList.alarmName] 报警名称
+     * @apiParam (请求参数) {Int} [dataList.alarmStatusList.alarmLevel] 报警等级
+     * @apiParam (请求参数) {String} [dataList.alarmStatusList.metadata] 源数据
+     * @apiParam (请求参数) {String} [dataList.alarmStatusList.desc] 规则描述json
+     * @apiParam (请求参数) {String} [dataList.alarmStatusList.action] 动作描述json
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+//    @Permission(permissionName = "")
+    @PostMapping(value = "/updateWtEngineEnable",produces = DefaultConstant.JSON,consumes = DefaultConstant.JSON)
+    public Object updateWtEngineEnable(@Valid @RequestBody Object param){
         return ResultWrapper.successWithNothing();
     }
 }
