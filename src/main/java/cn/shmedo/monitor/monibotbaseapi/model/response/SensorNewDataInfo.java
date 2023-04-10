@@ -110,6 +110,11 @@ public class SensorNewDataInfo {
     private String imageLocation;
 
     /**
+     * 查询密度
+     */
+    private String density;
+
+    /**
      * 传感器信息
      */
     private List<TbSensor> sensorList;
@@ -183,6 +188,7 @@ public class SensorNewDataInfo {
                 vo.setMultiSensor(false);
             }
         }
+        vo.setDensity(tbMonitorPoint.getDensity());
         return vo;
     }
 }

@@ -102,5 +102,11 @@ public class MonitorPointAndItemInfo {
      */
     private Integer updateUserID;
 
+
+    /**
+     * 查询密度
+     */
+    private String density;
+
     private static final long serialVersionUID = 1L;
 }

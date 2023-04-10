@@ -400,10 +400,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
 
         Integer monitorType = -1;
-        LambdaQueryWrapper<TbMonitorPoint> monitorPointLambdaQueryWrapper = new LambdaQueryWrapper<TbMonitorPoint>()
-                .in(TbMonitorPoint::getID, pa.getMonitorPointID());
         // 2.监测点信息列表
-        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getMonitorPointID()), null, null);
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null);
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
         } else {
