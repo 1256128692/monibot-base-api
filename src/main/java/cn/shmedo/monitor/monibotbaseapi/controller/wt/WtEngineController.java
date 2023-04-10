@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.controller;
+package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -133,9 +133,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} dataList.action 动作描述json
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
      */
-//    @Permission(permissionName = "")
+//    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
     @PostMapping(value = "/createWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object createWtEngine(@Valid @RequestBody Object param) {
         //TODO 新增规则引擎
@@ -145,7 +145,7 @@ public class WtEngineController {
     /**
      * @api {POST} /UpdateWtEngine 编辑规则引擎
      * @apiVersion 1.0.0
-     * @apiGroup 水利在线监测管理模块
+     * @apiGroup 警报规则引擎模块
      * @apiName UpdateWtEngine
      * @apiDescription 编辑规则引擎
      * @apiParam (请求参数) {Int}  projectID 工程项目ID
@@ -163,10 +163,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} [dataList.alarmStatusList.action] 动作描述json
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
      */
-//    @Permission(permissionName = "")
-    @Deprecated
+//    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
     @PostMapping(value = "/updateWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngine(@Valid @RequestBody Object param) {
         //TODO 批量停用、启用、编辑、删除规则

@@ -4,7 +4,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
-import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @AllArgsConstructor
 public class MonitorPointController {
-    private ReservoirMonitorService reservoirMonitorService;
+    private WtMonitorService reservoirMonitorService;
 
     /**
      * @api {POST} /AddMonitorPoint 新增监测点

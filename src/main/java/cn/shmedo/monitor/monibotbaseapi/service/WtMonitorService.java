@@ -7,7 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 
 import java.util.List;
 
-public interface ReservoirMonitorService {
+public interface WtMonitorService {
 
     List<SensorNewDataInfo> queryMonitorPointList(QueryMonitorPointListParam pa);
 
