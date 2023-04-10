@@ -403,7 +403,7 @@ public class ProjectController {
      * @api {post} /QueryWtProjectSimpleList 查询水利工程项目简要列表
      * @apiDescription 查询水利工程项目简要列表,水利一张图开放API
      * @apiVersion 1.0.0
-     * @apiGroup QueryWtProjectSimpleList
+     * @apiGroup 工程项目管理模块
      * @apiName QueryProjectList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectType] 水利项目类型 null:全部,1:水库,2:河道,3:堤防

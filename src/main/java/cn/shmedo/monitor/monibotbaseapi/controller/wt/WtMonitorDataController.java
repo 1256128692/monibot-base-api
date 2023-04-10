@@ -1,10 +1,10 @@
-package cn.shmedo.monitor.monibotbaseapi.controller;
+package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
-import cn.shmedo.monitor.monibotbaseapi.service.ReservoirMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-public class ReservoirMonitorDataController {
+public class WtMonitorDataController {
 
 
-    private ReservoirMonitorService reservoirMonitorService;
+    private WtMonitorService wtMonitorService;
 
     /**
      * @api {POST} /QueryCompanyMonitorPointNewDataList 查询公司下所有监测点最新数据列表
@@ -164,7 +164,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListCompanySensorData")
     @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-        return reservoirMonitorService.queryMonitorPointList(pa);
+        return wtMonitorService.queryMonitorPointList(pa);
     }
 
 
@@ -217,7 +217,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
-        return reservoirMonitorService.querySingleMonitorPointNewData(pa);
+        return wtMonitorService.querySingleMonitorPointNewData(pa);
     }
 
 
@@ -253,7 +253,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:DescribeBaseCompanyMonitor")
     @RequestMapping(value = "/QueryMonitorPointTypeStatistics", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
-        return reservoirMonitorService.queryMonitorPointTypeStatistics(pa);
+        return wtMonitorService.queryMonitorPointTypeStatistics(pa);
     }
 
     /**
@@ -292,7 +292,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointHistoryDataList(@Validated @RequestBody QueryMonitorPointSensorDataListParam pa) {
-        return reservoirMonitorService.queryMonitorPointHistoryDataList(pa);
+        return wtMonitorService.queryMonitorPointHistoryDataList(pa);
     }
 
     /**
@@ -393,7 +393,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySmcPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySmcPointHistoryDataList(@Validated @RequestBody QuerySmcPointHistoryDataListParam pa) {
-        return reservoirMonitorService.querySmcPointHistoryDataList(pa);
+        return wtMonitorService.querySmcPointHistoryDataList(pa);
     }
 
 
@@ -437,7 +437,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryRainPointHistoryDataList(@Validated @RequestBody QueryRainMonitorPointSensorDataListParam pa) {
-        return reservoirMonitorService.queryRainPointHistoryDataList(pa);
+        return wtMonitorService.queryRainPointHistoryDataList(pa);
     }
 
     /**
@@ -476,7 +476,7 @@ public class ReservoirMonitorDataController {
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointListHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointListHistoryDataList(@Validated @RequestBody QueryMonitorPointsSensorDataListParam pa) {
-        return reservoirMonitorService.queryMonitorPointListHistoryDataList(pa);
+        return wtMonitorService.queryMonitorPointListHistoryDataList(pa);
     }
 
 
