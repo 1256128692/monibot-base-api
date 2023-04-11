@@ -24,6 +24,8 @@ ext {
     lombokVersion = "1.18.26"
     junitVersion = "4.13.1"
     mathParserVersion = "5.1.0"
+    jedisVersion = "3.7.0"
+    lettuceVersion = "6.2.2.RELEASE"
 }
 
 repositories {
@@ -45,10 +47,12 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-aop"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
-    implementation "org.springframework.boot:spring-boot-starter-data-redis"
+    implementation "org.springframework.data:spring-data-redis:$springbootVersion"
     implementation "org.influxdb:influxdb-java:$influxdbVersion"
     implementation "com.mysql:mysql-connector-j:$mysqlConnectorVersion"
     implementation "com.alibaba:druid:$druidVersion"
+    implementation "redis.clients:jedis:$jedisVersion"
+    implementation "io.lettuce:lettuce-core:$lettuceVersion"
 
     implementation "com.alibaba:druid-spring-boot-starter:$druidVersion"
     implementation "com.baomidou:mybatis-plus-boot-starter:$mybatisPlusVersion"

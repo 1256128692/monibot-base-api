@@ -24,6 +24,35 @@ public class SensorController {
     private final SensorService sensorService;
 
     /**
+     * @api {POST} /SensorList 传感器列表
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName SensorList
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
+     * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
+     * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {Int} data.id 传感器ID
+     * @apiSuccess (响应结果) {Int} data.monitorType 监测类型 (Code)
+     * @apiSuccess (响应结果) {String} data.monitorTypeName 监测类型名称
+     * @apiSuccess (响应结果) {String} data.name 传感器名称 (由系统自动生成不可修改)
+     * @apiSuccess (响应结果) {String} data.alias 传感器别名
+     * @apiSuccess (响应结果) {Int} data.displayOrder 显示排序字段
+     * @apiSuccess (响应结果) {Int} data.monitorPointID 关联监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName 关联监测点名称
+     * @apiSuccess (响应结果) {String} data.exValues 拓展信息
+     * @apiSuccess (响应结果) {Boolean} data.enable 是否启用, 不启用将不会接收数据
+     * @apiPermission mdmbase:ListSensor
+     */
+//    @Permission(permissionName = "mdmbase:ListSensor")
+    @PostMapping(value = "/SensorList", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object sensorList(@RequestBody @Validated SensorListRequest request) {
+        return sensorService.sensorList(request);
+    }
+
+    /**
      * @api {POST} /SensorPage 传感器分页
      * @apiVersion 1.0.0
      * @apiGroup 传感器模块

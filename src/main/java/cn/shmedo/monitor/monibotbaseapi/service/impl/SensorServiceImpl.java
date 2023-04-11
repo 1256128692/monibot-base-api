@@ -10,6 +10,7 @@ import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -35,7 +36,8 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +50,6 @@ import java.util.stream.Stream;
  * @author Chengfs on 2023/4/4
  */
 @Service
-@AllArgsConstructor
 public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> implements SensorService {
 
     private final IotService iotService;
@@ -59,12 +60,33 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private final TbMonitorTypeFieldMapper monitorTypeFieldMapper;
     private final TbTemplateScriptMapper templateScriptMapper;
     private final TbTemplateFormulaMapper templateFormulaMapper;
-    private final RedisService redisService;
+    private final  RedisService redisService;
+
+    @Autowired
+    public SensorServiceImpl(IotService iotService,
+                             TbMonitorTypeTemplateMapper monitorTypeTemplateMapper,
+                             TbMonitorTypeMapper monitorTypeMapper,
+                             TbParameterMapper parameterMapper,
+                             TbSensorDataSourceMapper sensorDataSourceMapper,
+                             TbMonitorTypeFieldMapper monitorTypeFieldMapper,
+                             TbTemplateScriptMapper templateScriptMapper,
+                             TbTemplateFormulaMapper templateFormulaMapper,
+                             @Qualifier(RedisConstant.IOT_REDIS_SERVICE) RedisService redisService) {
+        this.iotService = iotService;
+        this.monitorTypeTemplateMapper = monitorTypeTemplateMapper;
+        this.monitorTypeMapper = monitorTypeMapper;
+        this.parameterMapper = parameterMapper;
+        this.sensorDataSourceMapper = sensorDataSourceMapper;
+        this.monitorTypeFieldMapper = monitorTypeFieldMapper;
+        this.templateScriptMapper = templateScriptMapper;
+        this.templateFormulaMapper = templateFormulaMapper;
+        this.redisService = redisService;
+    }
 
     @Override
-    public PageUtil.Page<SensorPageResponse> sensorPage(SensorPageRequest request) {
-        Page<SensorPageResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
-        IPage<SensorPageResponse> pageData = this.baseMapper.selectSensorPage(page, request);
+    public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
+        Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
+        IPage<SensorListResponse> pageData = this.baseMapper.selectSensorPage(page, request);
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
@@ -269,7 +291,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
                 .map(e -> (Object) e)
                 .collect(Collectors.toSet());
-        Map<String, Map<String, Model.Field>> modelMap = redisService.multiGet(RedisKeys.MODEL, modelTokens, Model.class)
+        Map<String, Map<String, Model.Field>> modelMap = redisService.multiGet(RedisKeys.IOT_MODEL_KEY, modelTokens, Model.class)
                 .stream().collect(Collectors.toMap(Model::getModelToken,
                         e -> e.getModelFieldList().stream().collect(Collectors.toMap(Model.Field::getFieldToken, f -> f))));
         List<Param> paramList = sourceMap.entrySet().stream().flatMap(entry -> {
@@ -364,6 +386,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             return item;
         }).toList();
         return CollUtil.getFirst(list);
+    }
+
+    @Override
+    public List<SensorListResponse> sensorList(SensorListRequest request) {
+        return this.baseMapper.selectSensorList(request);
     }
 
     /**
