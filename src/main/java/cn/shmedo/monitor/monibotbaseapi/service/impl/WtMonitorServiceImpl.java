@@ -186,7 +186,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
      * @param sensorList   传感器信息列表
      * @param fieldList    字段列表(v1,v2,xxx)
      * @param maps         传感器数据列表
-     * @param filteredMaps 最终数据结果集
+     * @param filteredMaps 雨量的传感器数据列表
      */
     private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> filteredMaps,
                                              List<TbSensor> sensorList, List<FieldSelectInfo> fieldList,
@@ -243,6 +243,47 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     }
                 }
             });
+        } else if (monitorType.equals(MonitorType.STRESS.getKey())
+                || monitorType.equals(MonitorType.PRESSURE.getKey())
+                || monitorType.equals(MonitorType.LEVEL.getKey())) {
+
+            String key = "";
+            if (monitorType.equals(MonitorType.STRESS.getKey())) {
+                key = "stressChange";
+            }else  if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
+                key = "pressureChange";
+            }else {
+                key = "levelChange";
+            }
+            // 处理压力变化值,规则当前的数据减去上一笔的数据
+            for (int i = 0; i < maps.size(); i++) {
+                Map<String, Object> map = maps.get(i);
+                String timeStr = (String) map.get("time");
+                long time = DateUtil.parse(timeStr).getTime();
+
+                // 找到两个小时之前的时间戳
+                long twoHoursAgo = time - 2 * 60 * 60 * 1000;
+
+                // 在之前的Map对象中查找相应的v1值
+                for (int j = 0; j < maps.size(); j++) {
+                    Map<String, Object> prevMap = maps.get(j);
+                    String prevTimeStr = (String) prevMap.get("time");
+                    long prevTime = DateUtil.parse(prevTimeStr).getTime();
+                    if (prevTime == twoHoursAgo) {
+                        // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
+                        if (prevMap.containsKey("v1")) {
+                            double v1TwoHoursAgo = (double) prevMap.get("v1");
+                            // 计算stressChange并添加到当前Map对象中
+                            double stressChange = (double) map.get("v1") - v1TwoHoursAgo;
+                            BigDecimal stressChangeBD = new BigDecimal(stressChange);
+                            BigDecimal rounded = stressChangeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+                            map.put(key, rounded);
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
     }
 
@@ -282,7 +323,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         });
                     }
                     snd.setMultiSensorData(result);
-                    if(!CollectionUtil.isNullOrEmpty(result)){
+                    if (!CollectionUtil.isNullOrEmpty(result)) {
                         snd.setTime(DateUtil.parse((String) result.get(0).get(DbConstant.TIME_FIELD)));
                     }
                 } else {
@@ -359,6 +400,15 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             currentSensorData.put("windPower", v1);
         } else if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前降雨量
+        } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
+            // 压力变化
+            currentSensorData.put("stressChange", 0.0);
+        } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
+            // 压强变化
+            currentSensorData.put("pressureChange", 0.0);
+        } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
+            // 水位变化
+            currentSensorData.put("levelChange", 0.0);
         }
         return currentSensorData;
     }
@@ -476,7 +526,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 // 传感器警报信息
                 item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList())));
             }
-            if (!CollectionUtil.isNullOrEmpty(monitorItemList)){
+            if (!CollectionUtil.isNullOrEmpty(monitorItemList)) {
                 // 监测项目信息列表
                 List<MonitorItemBaseInfo> list = monitorItemList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList());
                 item.setMonitorItemList(list);

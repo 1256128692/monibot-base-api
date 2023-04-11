@@ -66,6 +66,36 @@ public class MonitorTypeUtil {
             fieldList.add(vo);
         }
 
+        // 压力
+        if (monitorType.equals(MonitorType.STRESS.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("stressChange");
+            vo.setFieldName("压力变化");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("13");
+            fieldList.add(vo);
+        }
+
+        // 压强
+        if (monitorType.equals(MonitorType.PRESSURE.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("pressureChange");
+            vo.setFieldName("压强变化");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("11");
+            fieldList.add(vo);
+        }
+
+        // 物液位
+        if (monitorType.equals(MonitorType.LEVEL.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("levelChange");
+            vo.setFieldName("水位变化");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("9");
+            fieldList.add(vo);
+        }
+
         return fieldList;
     }
 }

@@ -73,6 +73,11 @@ public class SensorNewDataInfo {
     private String monitorTypeName;
 
     /**
+     * 监测类型别名
+     */
+    private String monitorTypeAlias;
+
+    /**
      * 监测项ID
      */
     private Integer monitorItemID;
@@ -167,6 +172,7 @@ public class SensorNewDataInfo {
         vo.setMonitorPointName(tbMonitorPoint.getName());
         // 缓存
         vo.setMonitorTypeName(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeName());
+        vo.setMonitorTypeAlias(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeAlias());
         vo.setLocation(tbProjectInfo.getLocation());
         if (StringUtils.isNotBlank(tbProjectInfo.getLocation())){
             if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {
