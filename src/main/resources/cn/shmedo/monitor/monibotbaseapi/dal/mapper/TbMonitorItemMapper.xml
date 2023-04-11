@@ -276,30 +276,31 @@
     </update>
 
     <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web">
-        select *
-        from tb_monitor_item
+        select it.* ,t.TypeName, t.TypeAlias
+        from tb_monitor_item as it
+        left join  tb_monitor_type as t on t.MonitorType = it.MonitorType
         <where>
             <if test="projectID != null">
-                ProjectID = #{projectID}
+                it.ProjectID = #{projectID}
             </if>
             <if test="createType != null">
-                and CreateType = #{createType}
+                and  it.CreateType = #{createType}
             </if>
             <if test="monitorItemName != null and monitorItemName != ''">
-                and Name like concat('%', #{monitorItemName}, '%')
+                and  it.Name like concat('%', #{monitorItemName}, '%')
             </if>
             <if test="monitorType != null">
-                and monitorType = #{monitorType}
+                and  it.monitorType = #{monitorType}
             </if>
             <if test="idList != null and idList.size &gt; 0">
-                and id in
+                and  it.id in
                 <foreach close=")" collection="idList" item="id" open="(" separator=",">
                     #{id}
                 </foreach>
             </if>
 
         </where>
-        order by id desc
+        order by  it.id desc
     </select>
 
     <select id="queryMonitorItemV1By" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1">
