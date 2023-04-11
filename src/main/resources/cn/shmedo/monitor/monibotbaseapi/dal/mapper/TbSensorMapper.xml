@@ -306,6 +306,9 @@
         <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
             tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%') AND
         </if>
+        <if test="pa.projectID != null and pa.projectID != ''">
+          ts.ProjectID = #{pa.projectID} AND
+        </if>
       </trim>
     </where>
     ORDER BY ts.UpdateTime DESC
@@ -344,6 +347,9 @@
         </if>
         <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
           tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%') AND
+        </if>
+        <if test="pa.projectID != null and pa.projectID != ''">
+          ts.ProjectID = #{pa.projectID} AND
         </if>
       </trim>
     </where>

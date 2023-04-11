@@ -1,8 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorPageRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorPageResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -23,7 +23,9 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     List<TbSensor> selectStatisticsCountByCompanyID(Integer companyID);
 
-    IPage<SensorPageResponse> selectSensorPage(IPage<SensorPageResponse> page, @Param("pa") SensorPageRequest request);
+    <T extends SensorListRequest> IPage<SensorListResponse> selectSensorPage(IPage<SensorListResponse> page, @Param("pa") T request);
+
+    <T extends SensorListRequest> List<SensorListResponse> selectSensorList(@Param("pa") T request);
 
     /**
      * 获取传感器名称序列号（已经+1）<br/>
