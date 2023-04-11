@@ -1,219 +1,224 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper">
-    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
-        <!--@mbg.generated-->
-        <!--@Table tb_monitor_item-->
-        <id column="ID" jdbcType="INTEGER" property="ID"/>
-        <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
-        <result column="MonitorType" jdbcType="INTEGER" property="monitorType"/>
-        <result column="MonitorClass" jdbcType="INTEGER" property="monitorClass"/>
-        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
-        <result column="Name" jdbcType="VARCHAR" property="name"/>
-        <result column="Alias" jdbcType="VARCHAR" property="alias"/>
-        <result column="CreateType" jdbcType="TINYINT" property="createType"/>
-        <result column="ProjectType" jdbcType="INTEGER" property="projectType"/>
-        <result column="ExValue" jdbcType="VARCHAR" property="exValue"/>
-        <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
-        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
-        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
-        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        <!--@mbg.generated-->
-        ID,
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
+    <!--@mbg.generated-->
+    <!--@Table tb_monitor_item-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="MonitorClass" jdbcType="TINYINT" property="monitorClass" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Alias" jdbcType="VARCHAR" property="alias" />
+    <result column="CreateType" jdbcType="TINYINT" property="createType" />
+    <result column="ProjectType" jdbcType="INTEGER" property="projectType" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, ProjectID, MonitorType, MonitorClass, `Name`, `Alias`, CreateType, 
+    ProjectType, ExValue, DisplayOrder, CreateTime, CreateUserID, UpdateTime, UpdateUserID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_monitor_item
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_monitor_item
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_item (CompanyID, ProjectID, MonitorType, 
+      MonitorClass, `Name`, `Alias`, 
+      CreateType, ProjectType, ExValue, 
+      DisplayOrder, CreateTime, CreateUserID, 
+      UpdateTime, UpdateUserID)
+    values (#{companyID,jdbcType=INTEGER}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, 
+      #{monitorClass,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{alias,jdbcType=VARCHAR}, 
+      #{createType,jdbcType=TINYINT}, #{projectType,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}, 
+      #{displayOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
+      #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_monitor_item
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
         CompanyID,
+      </if>
+      <if test="projectID != null">
+        ProjectID,
+      </if>
+      <if test="monitorType != null">
         MonitorType,
-        `Name`,
-        `Alias`,
-        CreateType,
-        ProjectType,
-        ExValue,
-        DisplayOrder,
-        CreateTime,
-        CreateUserID,
-        UpdateTime,
-        UpdateUserID,
+      </if>
+      <if test="monitorClass != null">
         MonitorClass,
-        ProjectID
-    </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from tb_monitor_item
-        where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        <!--@mbg.generated-->
-        delete
-        from tb_monitor_item
-        where ID = #{ID,jdbcType=INTEGER}
-    </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_monitor_item (CompanyID, MonitorType, `Name`,
-                                     `Alias`, CreateType, ProjectType,
-                                     ExValue, DisplayOrder, CreateTime,
-                                     CreateUserID, UpdateTime, UpdateUserID)
-        values (#{companyID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR},
-                #{alias,jdbcType=VARCHAR}, #{createType,jdbcType=TINYINT}, #{projectType,jdbcType=INTEGER},
-                #{exValue,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
-                #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER})
-    </insert>
-    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_monitor_item
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="companyID != null">
-                CompanyID,
-            </if>
-            <if test="monitorType != null">
-                MonitorType,
-            </if>
-            <if test="name != null">
-                `Name`,
-            </if>
-            <if test="alias != null">
-                `Alias`,
-            </if>
-            <if test="createType != null">
-                CreateType,
-            </if>
-            <if test="projectType != null">
-                ProjectType,
-            </if>
-            <if test="exValue != null">
-                ExValue,
-            </if>
-            <if test="displayOrder != null">
-                DisplayOrder,
-            </if>
-            <if test="createTime != null">
-                CreateTime,
-            </if>
-            <if test="createUserID != null">
-                CreateUserID,
-            </if>
-            <if test="updateTime != null">
-                UpdateTime,
-            </if>
-            <if test="updateUserID != null">
-                UpdateUserID,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="companyID != null">
-                #{companyID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorType != null">
-                #{monitorType,jdbcType=INTEGER},
-            </if>
-            <if test="name != null">
-                #{name,jdbcType=VARCHAR},
-            </if>
-            <if test="alias != null">
-                #{alias,jdbcType=VARCHAR},
-            </if>
-            <if test="createType != null">
-                #{createType,jdbcType=TINYINT},
-            </if>
-            <if test="projectType != null">
-                #{projectType,jdbcType=INTEGER},
-            </if>
-            <if test="exValue != null">
-                #{exValue,jdbcType=VARCHAR},
-            </if>
-            <if test="displayOrder != null">
-                #{displayOrder,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="createUserID != null">
-                #{createUserID,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUserID != null">
-                #{updateUserID,jdbcType=INTEGER},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
-        <!--@mbg.generated-->
-        update tb_monitor_item
-        <set>
-            <if test="companyID != null">
-                CompanyID = #{companyID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorType != null">
-                MonitorType = #{monitorType,jdbcType=INTEGER},
-            </if>
-            <if test="name != null">
-                `Name` = #{name,jdbcType=VARCHAR},
-            </if>
-            <if test="alias != null">
-                `Alias` = #{alias,jdbcType=VARCHAR},
-            </if>
-            <if test="createType != null">
-                CreateType = #{createType,jdbcType=TINYINT},
-            </if>
-            <if test="projectType != null">
-                ProjectType = #{projectType,jdbcType=INTEGER},
-            </if>
-            <if test="exValue != null">
-                ExValue = #{exValue,jdbcType=VARCHAR},
-            </if>
-            <if test="displayOrder != null">
-                DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                CreateTime = #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="createUserID != null">
-                CreateUserID = #{createUserID,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUserID != null">
-                UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-            </if>
-        </set>
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
-        <!--@mbg.generated-->
-        update tb_monitor_item
-        set CompanyID    = #{companyID,jdbcType=INTEGER},
-            MonitorType  = #{monitorType,jdbcType=INTEGER},
-            `Name`       = #{name,jdbcType=VARCHAR},
-            `Alias`      = #{alias,jdbcType=VARCHAR},
-            CreateType   = #{createType,jdbcType=TINYINT},
-            ProjectType  = #{projectType,jdbcType=INTEGER},
-            ExValue      = #{exValue,jdbcType=VARCHAR},
-            DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-            CreateTime   = #{createTime,jdbcType=TIMESTAMP},
-            CreateUserID = #{createUserID,jdbcType=INTEGER},
-            UpdateTime   = #{updateTime,jdbcType=TIMESTAMP},
-            UpdateUserID = #{updateUserID,jdbcType=INTEGER}
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
+      </if>
+      <if test="name != null">
+        `Name`,
+      </if>
+      <if test="alias != null">
+        `Alias`,
+      </if>
+      <if test="createType != null">
+        CreateType,
+      </if>
+      <if test="projectType != null">
+        ProjectType,
+      </if>
+      <if test="exValue != null">
+        ExValue,
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder,
+      </if>
+      <if test="createTime != null">
+        CreateTime,
+      </if>
+      <if test="createUserID != null">
+        CreateUserID,
+      </if>
+      <if test="updateTime != null">
+        UpdateTime,
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="companyID != null">
+        #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="projectID != null">
+        #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="monitorClass != null">
+        #{monitorClass,jdbcType=TINYINT},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="alias != null">
+        #{alias,jdbcType=VARCHAR},
+      </if>
+      <if test="createType != null">
+        #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="projectType != null">
+        #{projectType,jdbcType=INTEGER},
+      </if>
+      <if test="exValue != null">
+        #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
+    <!--@mbg.generated-->
+    update tb_monitor_item
+    <set>
+      <if test="companyID != null">
+        CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
+      <if test="projectID != null">
+        ProjectID = #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="monitorClass != null">
+        MonitorClass = #{monitorClass,jdbcType=TINYINT},
+      </if>
+      <if test="name != null">
+        `Name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="alias != null">
+        `Alias` = #{alias,jdbcType=VARCHAR},
+      </if>
+      <if test="createType != null">
+        CreateType = #{createType,jdbcType=TINYINT},
+      </if>
+      <if test="projectType != null">
+        ProjectType = #{projectType,jdbcType=INTEGER},
+      </if>
+      <if test="exValue != null">
+        ExValue = #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="displayOrder != null">
+        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
+    <!--@mbg.generated-->
+    update tb_monitor_item
+    set CompanyID = #{companyID,jdbcType=INTEGER},
+      ProjectID = #{projectID,jdbcType=INTEGER},
+      MonitorType = #{monitorType,jdbcType=INTEGER},
+      MonitorClass = #{monitorClass,jdbcType=TINYINT},
+      `Name` = #{name,jdbcType=VARCHAR},
+      `Alias` = #{alias,jdbcType=VARCHAR},
+      CreateType = #{createType,jdbcType=TINYINT},
+      ProjectType = #{projectType,jdbcType=INTEGER},
+      ExValue = #{exValue,jdbcType=VARCHAR},
+      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      CreateUserID = #{createUserID,jdbcType=INTEGER},
+      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
 
 
-    <select id="selectListByMonitorClassAndProID"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo">
+    <select id="selectListByMonitorClassAndProID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo">
         select ID as monitorItemID, ProjectID, `Name`, `Alias`, MonitorType, MonitorClass
         from tb_monitor_item
         where ProjectID = #{projectID}
         <if test="monitorClassIDList != null">
             and MonitorClass in
-            <foreach collection="monitorClassIDList" item="monitorClassID" open="(" close=")" separator=",">
+            <foreach close=")" collection="monitorClassIDList" item="monitorClassID" open="(" separator=",">
                 #{monitorClassID}
             </foreach>
         </if>
@@ -224,7 +229,7 @@
         select ID as monitorItemID, ProjectID, `Name`, `Alias`, MonitorType, MonitorClass
         from tb_monitor_item
         where ProjectID in
-        <foreach collection="proIDList" item="proID" open="(" close=")" separator=",">
+        <foreach close=")" collection="proIDList" item="proID" open="(" separator=",">
             #{proID}
         </foreach>
         and MonitorClass = #{queryType}
@@ -241,7 +246,7 @@
         </set>
         where ProjectID = #{projectID}
           and ID in
-        <foreach collection="monitorItemIDList" item="monitorItemID" open="(" close=")" separator=",">
+        <foreach close=")" collection="monitorItemIDList" item="monitorItemID" open="(" separator=",">
             #{monitorItemID}
         </foreach>
     </update>
@@ -259,13 +264,13 @@
         </set>
     </update>
 
-    <update id="updateCompanyIDBatch">
+    <update id="updateProjectIDBatch">
         update tb_monitor_item
-        set CompanyID    = #{companyID},
+        set ProjectID    = #{projectID},
             UpdateUserID = #{userID},
             UpdateTime   = #{now}
         where ID in
-        <foreach collection="monitorItemIDList" item="id" separator="," open="(" close=")">
+        <foreach close=")" collection="monitorItemIDList" item="id" open="(" separator=",">
             #{id}
         </foreach>
     </update>
@@ -286,18 +291,18 @@
             <if test="monitorType != null">
                 and monitorType = #{monitorType}
             </if>
-            <if test="monitorTypeList != null and monitorTypeList.size > 0">
-                and MonitorType in
-                <foreach collection="monitorTypeList" item="type" separator="," open="(" close=")">
-                    #{type}
+            <if test="idList != null and idList.size &gt; 0">
+                and id in
+                <foreach close=")" collection="idList" item="id" open="(" separator=",">
+                    #{id}
                 </foreach>
             </if>
-            order by  id desc
+
         </where>
+        order by id desc
     </select>
 
-    <select id="queryMonitorItemV1By"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1">
+    <select id="queryMonitorItemV1By" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1">
         select it.id as itemID, it.Name as itemName, it.Alias as itemAlias, it.MonitorType, t.TypeName, t.TypeAlias, it.CreateType
         from tb_monitor_item as it left join  tb_monitor_type as t on t.MonitorType = it.MonitorType
         where ProjectID = #{projectID}
@@ -308,7 +313,7 @@
             )
         </if>
         <if test="monitorType != null">
-            and monitorType = #{monitorType}
+            and it.monitorType = #{monitorType}
         </if>
         order by  it.id desc
     </select>
