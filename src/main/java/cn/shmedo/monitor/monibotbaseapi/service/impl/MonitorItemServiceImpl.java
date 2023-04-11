@@ -5,7 +5,6 @@ import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
@@ -22,7 +21,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -30,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @EnableTransactionManagement
@@ -120,7 +117,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMonitorItem(UpdateMonitorItemParam pa, Integer userID) {
         tbMonitorItemMapper.updateByPrimaryKey(pa.update(userID, new Date()));
-        if (CollectionUtils.isEmpty(pa.getFieldIDList())) {
+        if (CollectionUtils.isNotEmpty(pa.getFieldIDList())) {
             tbMonitorItemFieldMapper.deleteByMonitorItemIDList(List.of(pa.getMonitorItemID()));
             tbMonitorItemFieldMapper.insertBatch(pa.getMonitorItemID(), pa.getFieldIDList());
         }
@@ -128,7 +125,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     @Override
     public void addCompanyMonitorItem(AddCompanyMonitorItemParam pa, Integer userID) {
-        tbMonitorItemMapper.updateCompanyIDBatch(
+        tbMonitorItemMapper.updateProjectIDBatch(
                 pa.getMonitorItemIDList(), -1, userID, new Date()
         );
     }
@@ -137,21 +134,15 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     public PageUtil.Page<MonitorItem4Web> queryMonitorItemPageList(QueryMonitorItemPageListParam pa) {
         Page<MonitorItem4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
-        List<Integer> monitorTypeList = null;
-        if (ObjectUtil.isAllNotEmpty(pa.getMonitorFieldName(), pa.getMonitorFieldToken())) {
-            QueryWrapper<TbMonitorTypeField> qu = new QueryWrapper<>();
-            qu.like(!StringUtils.isBlank(pa.getMonitorFieldName()), "fieldName", pa.getMonitorFieldName());
-            qu.like(!StringUtils.isBlank(pa.getMonitorFieldToken()), "fieldToken", pa.getMonitorFieldToken());
-            List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.selectList(qu);
-            if (CollectionUtils.isEmpty(temp)) {
+        List<Integer> idList = null;
+        if (StringUtils.isNotBlank(pa.getFieldName()) || StringUtils.isNotBlank(pa.getFieldToken())) {
+            idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(pa.getFieldName(), pa.getFieldToken());
+            if (CollectionUtils.isEmpty(idList)){
                 return PageUtil.Page.empty();
-            }
-            monitorTypeList = temp.stream().map(TbMonitorTypeField::getMonitorType).distinct().collect(Collectors.toList());
-            if (pa.getMonitorType() != null && !monitorTypeList.contains(pa.getMonitorType())) {
-                return PageUtil.Page.empty();
+
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), monitorTypeList);
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList);
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
