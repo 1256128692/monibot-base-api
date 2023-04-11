@@ -8,7 +8,7 @@ import lombok.Data;
  * @author Chengfs on 2023/3/31
  */
 @Data
-public class SensorPageResponse {
+public class SensorListResponse {
 
     /**
      * 传感器ID

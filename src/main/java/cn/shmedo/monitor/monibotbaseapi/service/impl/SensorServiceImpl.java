@@ -84,9 +84,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     }
 
     @Override
-    public PageUtil.Page<SensorPageResponse> sensorPage(SensorPageRequest request) {
-        Page<SensorPageResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
-        IPage<SensorPageResponse> pageData = this.baseMapper.selectSensorPage(page, request);
+    public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
+        Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
+        IPage<SensorListResponse> pageData = this.baseMapper.selectSensorPage(page, request);
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
@@ -386,6 +386,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             return item;
         }).toList();
         return CollUtil.getFirst(list);
+    }
+
+    @Override
+    public List<SensorListResponse> sensorList(SensorListRequest request) {
+        return this.baseMapper.selectSensorList(request);
     }
 
     /**

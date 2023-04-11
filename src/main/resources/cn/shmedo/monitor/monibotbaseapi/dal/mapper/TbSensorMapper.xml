@@ -279,7 +279,7 @@
                                where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID}))
   </select>
 
-  <select id="selectSensorPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorPageResponse">
+  <select id="selectSensorPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
     SELECT
       ts.ID,
       ts.MonitorType AS monitorType,
@@ -308,7 +308,7 @@
         </if>
       </trim>
     </where>
-    ORDER BY ts.DisplayOrder
+    ORDER BY ts.UpdateTime DESC
   </select>
 
   <select id="getNameSerialNumber" resultType="java.lang.Integer">
@@ -316,5 +316,37 @@
     FROM `tb_sensor`
     WHERE MonitorType = #{monitorType}
       AND ProjectID = #{projectID}
+  </select>
+
+  <select id="selectSensorList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
+    SELECT
+    ts.ID,
+    ts.MonitorType AS monitorType,
+    ts.`Name` AS name,
+    ts.Alias AS alias,
+    ts.DisplayOrder AS displayOrder,
+    ts.monitorPointID AS monitorPointID,
+    ts.exValues AS exValues,
+    ts.Enable AS enable,
+    tmp.`Name` AS monitorPointName,
+    tmt.TypeName AS monitorTypeName
+    FROM
+    `tb_sensor` ts
+    INNER JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
+    INNER JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+    <where>
+      <trim suffixOverrides="AND">
+        <if test="pa.sensorName != null and pa.sensorName != ''">
+          ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%') AND
+        </if>
+        <if test="pa.monitorType != null and pa.monitorType != ''">
+          tmt.MonitorType LIKE CONCAT('%', #{pa.monitorType}, '%') AND
+        </if>
+        <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
+          tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%') AND
+        </if>
+      </trim>
+    </where>
+    ORDER BY ts.UpdateTime DESC
   </select>
 </mapper>
