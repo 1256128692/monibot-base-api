@@ -31,4 +31,6 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
     void updateBatch(List<UpdateFieldItem> fieldList);
 
     void deleteByMonitorTypeList(List<Integer> monitorTypeList);
+
+    List<TbMonitorTypeField> queryByMonitorItemIDs(List<Integer> monitorItemIDList);
 }

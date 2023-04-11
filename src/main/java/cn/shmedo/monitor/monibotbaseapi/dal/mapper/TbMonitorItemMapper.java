@@ -2,8 +2,13 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
@@ -26,4 +31,8 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     void updateByCondition(Integer projectID, Integer monitorClass, List<Integer> monitorItemIDList);
 
     void updateMonitorClassToNull(Integer projectID, Integer monitorClass);
+
+    void updateCompanyIDBatch(List<Integer> monitorItemIDList, Integer companyID, Integer userID, Date now);
+
+    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer projectID, Byte createType, String monitorItemName, Integer monitorType,  List<Integer> monitorTypeList);
 }

@@ -1,32 +1,33 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.QueryWtMonitorItemListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorClassInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeAndChildMonitorItemInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
+import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @EnableTransactionManagement
@@ -34,11 +35,13 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MonitorItemServiceImpl implements MonitorItemService {
 
-    private final TbProjectInfoMapper tbProjectInfoMapper;
 
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
 
     private final TbMonitorItemMapper tbMonitorItemMapper;
+
+    private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
+    private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
 
     @Override
     public WtMonitorItemInfo queryWtMonitorItemList(QueryWtMonitorItemListParam request) {
@@ -92,6 +95,70 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         // 处理密度
         handleMonitorClassDensity(request.getProjectID(), result);
         return result;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addMonitorItem(AddMonitorItemParam pa, Integer userID) {
+        TbMonitorItem tbMonitorItem = Param2DBEntityUtil.fromAddMonitorItemParam2TbMonitorItem(pa, userID);
+        tbMonitorItemMapper.insert(tbMonitorItem);
+
+        tbMonitorItemFieldMapper.insertBatch(tbMonitorItem.getID(), pa.getFieldIDList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteMonitorItem(List<Integer> monitorItemIDList) {
+        tbMonitorItemMapper.deleteBatchIds(monitorItemIDList);
+        tbMonitorItemFieldMapper.deleteByMonitorItemIDList(monitorItemIDList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateMonitorItem(UpdateMonitorItemParam pa, Integer userID) {
+        tbMonitorItemMapper.updateByPrimaryKey(pa.update(userID, new Date()));
+        if (CollectionUtils.isEmpty(pa.getFieldIDList())) {
+            tbMonitorItemFieldMapper.deleteByMonitorItemIDList(List.of(pa.getMonitorItemID()));
+            tbMonitorItemFieldMapper.insertBatch(pa.getMonitorItemID(), pa.getFieldIDList());
+        }
+    }
+
+    @Override
+    public void addCompanyMonitorItem(AddCompanyMonitorItemParam pa, Integer userID) {
+        tbMonitorItemMapper.updateCompanyIDBatch(
+                pa.getMonitorItemIDList(), -1, userID, new Date()
+        );
+    }
+
+    @Override
+    public PageUtil.Page<MonitorItem4Web> queryMonitorItemPageList(QueryMonitorItemPageListParam pa) {
+        Page<MonitorItem4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+
+        List<Integer> monitorTypeList = null;
+        if (ObjectUtil.isAllNotEmpty(pa.getMonitorFieldName(), pa.getMonitorFieldToken())) {
+            QueryWrapper<TbMonitorTypeField> qu = new QueryWrapper<>();
+            qu.like(!StringUtils.isBlank(pa.getMonitorFieldName()), "fieldName", pa.getMonitorFieldName());
+            qu.like(!StringUtils.isBlank(pa.getMonitorFieldToken()), "fieldToken", pa.getMonitorFieldToken());
+            List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.selectList(qu);
+            if (CollectionUtils.isEmpty(temp)) {
+                return PageUtil.Page.empty();
+            }
+            monitorTypeList = temp.stream().map(TbMonitorTypeField::getMonitorType).distinct().collect(Collectors.toList());
+            if (pa.getMonitorType() != null && !monitorTypeList.contains(pa.getMonitorType())) {
+                return PageUtil.Page.empty();
+            }
+        }
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), monitorTypeList);
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
+            return PageUtil.Page.empty();
+        }
+        List<Integer> monitorItemIDList = pageData.getRecords().stream().map(MonitorItem4Web::getID).collect(Collectors.toList());
+        List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorItemIDs(monitorItemIDList);
+        Map<Integer, List<TbMonitorTypeField>> fieldMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
+        pageData.getRecords().forEach(item -> {
+            item.setFieldList(fieldMap.get(item.getMonitorType()));
+        });
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {

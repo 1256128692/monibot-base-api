@@ -251,10 +251,48 @@
         UPDATE tb_monitor_item AS t1
             INNER JOIN (SELECT ID
                         FROM tb_monitor_item
-                        WHERE ProjectID = #{projectID} AND MonitorClass = #{monitorClass}) AS t2
+                        WHERE ProjectID = #{projectID}
+                          AND MonitorClass = #{monitorClass}) AS t2
             ON t1.ID = t2.ID
         <set>
             t1.MonitorClass = null
         </set>
     </update>
+
+    <update id="updateCompanyIDBatch">
+        update tb_monitor_item
+        set CompanyID    = #{companyID},
+            UpdateUserID = #{userID},
+            UpdateTime   = #{now}
+        where ID in
+        <foreach collection="monitorItemIDList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web">
+        select *
+        from tb_monitor_item
+        <where>
+            <if test="projectID != null">
+                ProjectID = #{projectID}
+            </if>
+            <if test="createType != null">
+                and CreateType = #{createType}
+            </if>
+            <if test="monitorItemName != null and monitorItemName != ''">
+                and Name like concat('%', #{monitorItemName}, '%')
+            </if>
+            <if test="monitorType != null">
+                and monitorType = #{monitorType}
+            </if>
+            <if test="monitorTypeList != null and monitorTypeList.size > 0">
+                and MonitorType in
+                <foreach collection="monitorTypeList" item="type" separator="," open="(" close=")">
+                    #{type}
+                </foreach>
+            </if>
+            order by  id desc
+        </where>
+    </select>
 </mapper>

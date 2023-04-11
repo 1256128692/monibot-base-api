@@ -252,4 +252,8 @@
            LEFT JOIN `tb_monitor_type_field` tmtf ON tmt.`MonitorType` = tmtf.`MonitorType`
       ${ew.customSqlSegment}
   </select>
+
+  <select id="queryByType" resultMap="BaseResultMap">
+    select * from tb_monitor_type where MonitorType = #{type}
+    </select>
 </mapper>

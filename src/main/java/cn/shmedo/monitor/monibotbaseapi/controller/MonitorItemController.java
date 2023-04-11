@@ -1,9 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.QueryWtMonitorItemListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -32,7 +33,6 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} monitorType 监测类型，预定义时，该项不能为自定义的监测类型
      * @apiParam (请求参数) {String} monitorItemName 监测项目名称(20)
      * @apiParam (请求参数) {Int} createType 创建类型 0:预定义,1:自定义
-     * @apiParam (请求参数) {Boolean} enable 监测项目是否开启
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
      * @apiParam (请求参数) {Int[]} fieldIDList 监测类型字段ID列表
@@ -42,7 +42,8 @@ public class MonitorItemController {
      */
 //    @Permission(permissionName = "xx")
     @PostMapping(value = "/AddMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addMonitorItem(@RequestBody @Validated Object request) {
+    public Object addMonitorItem(@RequestBody @Validated AddMonitorItemParam pa) {
+        monitorItemService.addMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -54,8 +55,7 @@ public class MonitorItemController {
      * @apiDescription 修改监测项目
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求参数) {String} alias 别名
-     * @apiParam (请求参数) {Boolean} enable 是否开启
+     * @apiParam (请求参数) {String} alias 别名(max = 20)
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
      * @apiParam (请求参数) {Int[]}   [fieldIDList] 监测类型字段ID列表
@@ -65,7 +65,8 @@ public class MonitorItemController {
      */
 //    @Permission(permissionName = "mdmbase:UpdateMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateMonitorItem(@RequestBody @Validated Object request) {
+    public Object updateMonitorItem(@RequestBody @Validated UpdateMonitorItemParam pa) {
+        monitorItemService.updateMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -83,7 +84,8 @@ public class MonitorItemController {
      */
 //    @Permission(permissionName = "mdmbase:AddCompanyBaseMonitorItem")
     @PostMapping(value = "/AddCompanyMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addCompanyMonitorItem(@RequestBody @Validated Object request) {
+    public Object addCompanyMonitorItem(@RequestBody @Validated AddCompanyMonitorItemParam pa) {
+        monitorItemService.addCompanyMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -94,13 +96,13 @@ public class MonitorItemController {
      * @apiName QueryMonitorItemPageList
      * @apiDescription 查询监测项目分页
      * @apiParam (请求参数) {Int} projectID 工程项目ID
-     * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称
+     * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称, 模糊查询
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {Int} [fieldToken] 属性标识
-     * @apiParam (请求参数) {Int} [fieldName] 属性名称
+     * @apiParam (请求参数) {Int} [fieldToken] 属性标识, 模糊查询
+     * @apiParam (请求参数) {Int} [fieldName] 属性名称, 模糊查询
      * @apiParam (请求参数) {Int} [createType] 创建类型 null:所有,0:预定义,1:自定义
-     * @apiParam (请求参数) {Int} pageSize
-     * @apiParam (请求参数) {Int} currentPage
+     * @apiParam (请求参数) {Int} pageSize （1-100）
+     * @apiParam (请求参数) {Int} currentPage（>=1）
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
@@ -124,8 +126,8 @@ public class MonitorItemController {
      */
 //    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
     @PostMapping(value = "/QueryMonitorItemPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorItemPageList(@RequestBody @Validated Object request) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorItemPageList(@RequestBody @Validated QueryMonitorItemPageListParam pa) {
+        return monitorItemService.queryMonitorItemPageList(pa);
     }
 
     /**
@@ -142,7 +144,8 @@ public class MonitorItemController {
      */
 //    @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
     @PostMapping(value = "/DeleteMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteMonitorItem(@RequestBody @Validated Object request) {
+    public Object deleteMonitorItem(@RequestBody @Validated DeleteMonitorItemParam pa) {
+        monitorItemService.deleteMonitorItem(pa.getMonitorItemIDList());
         return ResultWrapper.successWithNothing();
     }
 

@@ -257,4 +257,15 @@
       #{type}
   </foreach>
   </delete>
+
+  <select id="queryByMonitorItemIDs" resultMap="BaseResultMap">
+      select *
+      from tb_monitor_type_field where id in
+      (select MonitorTypeFieldID
+       from tb_monitor_item_field where MonitorItemID in
+      <foreach collection="list" item="id" separator="," open="(" close=")">
+          #{id}
+      </foreach>
+      )
+  </select>
 </mapper>

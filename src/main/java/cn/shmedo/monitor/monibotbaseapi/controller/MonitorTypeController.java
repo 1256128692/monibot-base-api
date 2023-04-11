@@ -437,7 +437,7 @@ public class MonitorTypeController {
      * @apiDescription 查询监测类型属性与公式, 只包含12类型的属性
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
-     * @apiParam (请求参数) {Int} templateID  模板ID
+     * @apiParam (请求参数) {Int} [templateID]  模板ID  该项不存在则只查询属性
      * @apiSuccess (返回结果) {Object[]} list 当前页数据
      * @apiSuccess (返回结果) {Int} list.id 属性ID
      * @apiSuccess (返回结果) {String} list.fieldName 属性名称
@@ -586,5 +586,32 @@ public class MonitorTypeController {
     @PostMapping(value = "/QueryFormulaParams", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryFormulaParams(@RequestBody @Validated Object pa) {
         return null;
+    }
+
+    /**
+     * @api {POST} /QuerySimpleMonitorTypeList  查询监测类型简单信息的列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QuerySimpleMonitorTypeList
+     * @apiDescription 查询监测类型简单信息的列表
+     * @apiParam (请求参数) {Int} companyID  公司ID
+     * @apiParam (请求参数) {Int} [createType]  创建类型
+     * @apiParam (请求参数) {Boolean} [grouped]  是否分组， 该项为true时候，结果为以monitorTypeClass为key， list为value的map
+     * @apiSuccess (返回结果) {Object[]} list  参数列表
+     * @apiSuccess (返回结果) {Int} list.id
+     * @apiSuccess (返回结果) {Int} list.monitorType  监测类型
+     * @apiSuccess (返回结果) {Int} list.companyID  公司ID
+     * @apiSuccess (返回结果) {String} [list.monitorTypeClass] 监测类型分类
+     * @apiSuccess (返回结果) {String} list.typeName  类型名称
+     * @apiSuccess (返回结果) {String} list.typeAlias  类型别名
+     * @apiSuccess (返回结果) {Int} list.createType  创建类型
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+
+    @PostMapping(value = "/QuerySimpleMonitorTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySimpleMonitorTypeList(@RequestBody @Validated QuerySimpleMonitorTypeListParam pa) {
+        return monitorTypeService.querySimpleMonitorTypeList(pa);
     }
 }
