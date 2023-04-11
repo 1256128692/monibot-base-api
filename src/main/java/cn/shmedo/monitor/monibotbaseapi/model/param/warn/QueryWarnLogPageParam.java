@@ -1,6 +1,5 @@
-package cn.shmedo.monitor.monibotbaseapi.model.param.alarm;
+package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
@@ -23,7 +22,7 @@ public class QueryWarnLogPageParam implements ParameterValidator, ResourcePermis
     private String queryCode;
     private Integer monitorTypeID;
     private Integer monitorItemID;
-    private Integer alarmLevel;
+    private Integer warnLevel;
     private Integer orderType;
     private Integer currentPage;
     private Integer pageSize;
