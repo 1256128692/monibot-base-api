@@ -66,6 +66,10 @@ public class SetFormulaParam implements ParameterValidator, ResourcePermissionPr
                     !=formulaList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有属性不属于该监测类型或不存在");
         }
+        if (formulaList.stream().map(FormulaItem::getDisplayFormula).distinct().count()!=formulaList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "公式顺序不可重复");
+        }
+        // TODO 校验公式
         return null;
     }
 

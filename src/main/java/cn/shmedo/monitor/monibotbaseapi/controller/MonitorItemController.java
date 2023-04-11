@@ -95,7 +95,7 @@ public class MonitorItemController {
      * @apiGroup 监测项目模块
      * @apiName QueryMonitorItemPageList
      * @apiDescription 查询监测项目分页
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称, 模糊查询
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {Int} [fieldToken] 属性标识, 模糊查询

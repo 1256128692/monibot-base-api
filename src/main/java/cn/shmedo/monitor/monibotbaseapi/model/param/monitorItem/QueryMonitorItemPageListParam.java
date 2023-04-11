@@ -24,7 +24,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class QueryMonitorItemPageListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NotNull
     private Integer projectID;
     private String monitorItemName;
     private Integer monitorType;
@@ -44,10 +43,12 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper validate() {
-        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        var tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
-        if (tbProjectInfo == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程项目不存在");
+        if (projectID!= null){
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            var tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+            if (tbProjectInfo == null) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程项目不存在");
+            }
         }
         return null;
     }
