@@ -15,5 +15,5 @@ import java.util.List;
 @Data
 public class MonitorItem4Web extends TbMonitorItem {
 
-    private List<TbMonitorTypeField> fieldList;
+    private List<TbMonitorTypeFieldWithItemID> fieldList;
 }

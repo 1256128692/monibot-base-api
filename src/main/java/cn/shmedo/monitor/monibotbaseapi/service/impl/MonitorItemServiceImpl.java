@@ -9,6 +9,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -153,12 +156,27 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             return PageUtil.Page.empty();
         }
         List<Integer> monitorItemIDList = pageData.getRecords().stream().map(MonitorItem4Web::getID).collect(Collectors.toList());
-        List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorItemIDs(monitorItemIDList);
-        Map<Integer, List<TbMonitorTypeField>> fieldMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
+        List<TbMonitorTypeFieldWithItemID> temp = tbMonitorTypeFieldMapper.queryByMonitorItemIDs(monitorItemIDList);
+        Map<Integer, List<TbMonitorTypeFieldWithItemID>> fieldMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeFieldWithItemID::getItemID));
         pageData.getRecords().forEach(item -> {
-            item.setFieldList(fieldMap.get(item.getMonitorType()));
+            item.setFieldList(fieldMap.get(item.getID()));
         });
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+    }
+
+    @Override
+    public List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa) {
+        List<MonitorItemV1> list= tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType());
+        if (CollectionUtils.isNotEmpty(list)){
+            List<Integer> monitorItemIDList = list.stream().map(MonitorItemV1::getItemID).collect(Collectors.toList());
+            List<MonitorTypeFieldV1> temp = tbMonitorTypeFieldMapper.queryMonitorTypeFieldV1ByMonitorItems(monitorItemIDList);
+            Map<Integer, List<MonitorTypeFieldV1>> fieldMap = temp.stream().collect(Collectors.groupingBy(MonitorTypeFieldV1::getItemID));
+            list.forEach(item -> {
+                item.setFieldList(fieldMap.get(item.getItemID()));
+
+            });
+        }
+        return list;
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {

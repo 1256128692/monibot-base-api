@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,4 +36,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     void updateCompanyIDBatch(List<Integer> monitorItemIDList, Integer companyID, Integer userID, Date now);
 
     IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer projectID, Byte createType, String monitorItemName, Integer monitorType,  List<Integer> monitorTypeList);
+
+    List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType);
 }
