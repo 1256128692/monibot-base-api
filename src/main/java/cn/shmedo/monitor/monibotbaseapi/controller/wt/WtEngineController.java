@@ -44,11 +44,11 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} currentPageData.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {Object[]} currentPageData.dataList 报警状态列表
+     * @apiSuccess (返回结果) {Object[]} [currentPageData.dataList] 报警状态列表
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnID 报警状态ID
      * @apiSuccess (返回结果) {String} currentPageData.dataList.warnName 报警名称
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnLevel 报警等级
-     * @apiSuccess (返回结果) {Object[]} currentPageData.dataList.action 动作描述list
+     * @apiSuccess (返回结果) {Object[]} [currentPageData.dataList.action] 动作描述list
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ID 动作ID
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.triggerID 触发报警ID
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
@@ -91,12 +91,12 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.metadata 源数据
      * @apiSuccess (返回结果) {String} dataList.compareRule 比较区间json
      * @apiSuccess (返回结果) {String} dataList.triggerRule 触发规则json
-     * @apiSuccess (返回结果) {Object[]} dataList.action 动作描述list
+     * @apiSuccess (返回结果) {Object[]} [dataList.action] 动作描述list
      * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID
      * @apiSuccess (返回结果) {Int} dataList.action.triggerID 触发报警ID
      * @apiSuccess (返回结果) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
-     * @apiSuccess (返回结果) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
-     * @apiSuccess (返回结果) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiSuccess (返回结果) {Int} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {Int} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
      */
@@ -146,12 +146,12 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} dataList.metadata 源数据
      * @apiParam (请求参数) {String} dataList.compareRule 比较区间json
      * @apiParam (请求参数) {String} dataList.triggerRule 触发规则json
-     * @apiParam (请求参数) {Object[]} dataList.action 动作描述list
-     * @apiParam (请求参数) {Int} dataList.action.ID 动作ID
+     * @apiParam (请求参数) {Object[]} [dataList.action] 动作描述list
+     * @apiParam (请求参数) {Int} [dataList.action.ID] 动作ID,若没有视为新增
      * @apiParam (请求参数) {Int} dataList.action.triggerID 触发报警ID
      * @apiParam (请求参数) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
-     * @apiParam (请求参数) {Int} dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
-     * @apiParam (请求参数) {Int} dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiParam (请求参数) {Int} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiParam (请求参数) {Int} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
