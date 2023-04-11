@@ -4,6 +4,8 @@ import cn.hutool.core.lang.Dict;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.engine.QueryWtEnginePageParam;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnRuleService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * TODO:不要批量修改，添加批量删除API，统一项目权限(projectID校验)
- */
 @RestController
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WtEngineController {
+    private final ITbWarnRuleService tbWarnRuleService;
+
     /**
      * @api {POST} /QueryWtEnginePage 查询规则引擎分页
      * @apiVersion 1.0.0
@@ -44,23 +45,22 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Object[]} currentPageData.dataList 报警状态列表
-     * @apiSuccess (返回结果) {Int} currentPageData.dataList.alarmID 报警状态ID
-     * @apiSuccess (返回结果) {String} currentPageData.dataList.alarmName 报警名称
-     * @apiSuccess (返回结果) {Int} currentPageData.dataList.alarmLevel 报警等级
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnID 报警状态ID
+     * @apiSuccess (返回结果) {String} currentPageData.dataList.warnName 报警名称
+     * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnLevel 报警等级
      * @apiSuccess (返回结果) {Object[]} currentPageData.dataList.action 动作描述list
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ID 动作ID
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.triggerID 触发报警ID
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
-     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ActionTarget 动作目标json,推送的企业通讯录信息
-     * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.Desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiSuccess (返回结果) {String} currentPageData.dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {String} currentPageData.dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarnRule
      */
 //    @Permission(permissionName = "mdmbase:ListBaseWarnRule")
     @PostMapping(value = "/queryWtEnginePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtEnginePage(@Valid @RequestBody Object param) {
-        //TODO 规则列表
-        return null;
+    public Object queryWtEnginePage(@Valid @RequestBody QueryWtEnginePageParam param) {
+        return tbWarnRuleService.queryWtEnginePage(param);
     }
 
     /**
@@ -85,9 +85,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} createUserID 创建人ID
      * @apiSuccess (返回结果) {String} createUserName 创建人名称
      * @apiSuccess (返回结果) {Object[]} dataList 报警状态列表
-     * @apiSuccess (返回结果) {Int} dataList.alarmID 报警状态ID
-     * @apiSuccess (返回结果) {String} dataList.alarmName 报警名称
-     * @apiSuccess (返回结果) {Int} dataList.alarmLevel 报警等级
+     * @apiSuccess (返回结果) {Int} dataList.warnID 报警状态ID
+     * @apiSuccess (返回结果) {String} dataList.warnName 报警名称
+     * @apiSuccess (返回结果) {Int} dataList.warnLevel 报警等级
      * @apiSuccess (返回结果) {String} dataList.metadata 源数据
      * @apiSuccess (返回结果) {String} dataList.compareRule 比较区间json
      * @apiSuccess (返回结果) {String} dataList.triggerRule 触发规则json
@@ -141,8 +141,8 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} [engineName] 引擎名称(30字)
      * @apiParam (请求参数) {String} [engineDesc] 引擎简介(200字)
      * @apiParam (请求参数) {Object[]} [dataList] 报警状态列表
-     * @apiParam (请求参数) {Int} [dataList.alarmID] 报警状态ID,若没有视为新增
-     * @apiParam (请求参数) {Int} dataList.alarmLevel 报警等级
+     * @apiParam (请求参数) {Int} [dataList.warnID] 报警状态ID,若没有视为新增
+     * @apiParam (请求参数) {Int} dataList.warnLevel 报警等级
      * @apiParam (请求参数) {String} dataList.metadata 源数据
      * @apiParam (请求参数) {String} dataList.compareRule 比较区间json
      * @apiParam (请求参数) {String} dataList.triggerRule 触发规则json
@@ -178,7 +178,7 @@ public class WtEngineController {
 //    @Permission(permissionName = "")
     @PostMapping(value = "/updateWtEngineEnable", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngineEnable(@Valid @RequestBody Object param) {
-        //TODO ps.ensure all engines owned alarm status.
+        //TODO ps.ensure all engines owned warn status.
         return ResultWrapper.successWithNothing();
     }
 
@@ -197,24 +197,24 @@ public class WtEngineController {
 //    @Permission(permissionName = "")
     @PostMapping(value = "/deleteWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWtEngine(@Valid @RequestBody Object param) {
-        //TODO clear engines and owned alarm status.
+        //TODO clear engines and owned warn status.
         return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /DeleteWtAlarmStatus 删除报警状态
+     * @api {POST} /DeleteWtWarnStatus 删除报警状态
      * @apiVersion 1.0.0
      * @apiGroup 警报规则引擎模块
-     * @apiName DeleteWtAlarmStatus
+     * @apiName DeleteWtWarnStatus
      * @apiDescription 删除报警状态
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int[]} alarmIDList 删除的报警状态ID list
+     * @apiParam (请求参数) {Int[]} warnIDList 删除的报警状态ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @PostMapping(value = "/deleteWtAlarmStatus")
-    public Object deleteWtAlarmStatus(@Valid @RequestBody Object param) {
+    @PostMapping(value = "/deleteWtWarnStatus")
+    public Object deleteWtWarnStatus(@Valid @RequestBody Object param) {
         return ResultWrapper.successWithNothing();
     }
 }

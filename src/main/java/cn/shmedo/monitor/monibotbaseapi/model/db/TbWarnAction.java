@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.io.Serial;
 import java.util.Date;
 
 @Data
+@Accessors(chain = true)
 @TableName("tb_warn_action")
 public class TbWarnAction {
     @TableId(value = "ID", type = IdType.AUTO)

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
+        <id column="ID" property="ID" jdbcType="INTEGER"/>
+        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="MonitorType" jdbcType="INTEGER" property="monitorType"/>
+        <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+        <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+        <result column="SensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Enable" jdbcType="BIT" property="enable"/>
+        <result column="Desc" jdbcType="VARCHAR" property="desc"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
+        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID,ProjectID,MonitorType,MonitorItemID,MonitorPointID,SensorID,`Name`,Enable,`Desc`,CreateTime,CreateUserID,UpdateTime,UpdateUserID
+    </sql>
+
+    <select id="selectWarnRuleByPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
+        SELECT <include refid="Base_Column_List"/>
+        FROM
+            tb_warn_rule
+        WHERE `ProjectID` IN
+        <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="param.engineName != null and param.engineName !=''">
+            AND `Name` LIKE CONCAT('%',#{param.engineName},'%')
+        </if>
+        <if test="param.projectID != null">
+            AND `ProjectID`=#{param.projectID}
+        </if>
+        <if test="param.enable != null">
+            AND `Enable`=#{param.enable}
+        </if>
+        <if test="param.monitorItemID != null">
+            AND `MonitorItemID`=#{param.monitorItemID}
+        </if>
+        <if test="param.monitorPointID != null">
+            AND `MonitorPointID`=#{param.monitorPointID}
+        </if>
+    </select>
+</mapper>

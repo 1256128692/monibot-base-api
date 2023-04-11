@@ -25,7 +25,7 @@ public class TbWarnLog {
     @TableField("SensorID")
     private Integer sensorID;
     @TableField("Name")
-    private String alarmName;
+    private String warnName;
     @TableField("WarnTime")
     private Date warnTime;
     @TableField("WarnLevel")

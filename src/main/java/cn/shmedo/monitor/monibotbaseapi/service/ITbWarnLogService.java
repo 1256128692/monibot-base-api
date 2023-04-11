@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
-import cn.shmedo.monitor.monibotbaseapi.model.param.alarm.QueryWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWarnLogPageParam;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
