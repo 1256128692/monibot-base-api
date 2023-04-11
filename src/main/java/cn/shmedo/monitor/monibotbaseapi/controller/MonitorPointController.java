@@ -143,7 +143,7 @@ public class MonitorPointController {
     /**
      * @api {POST} /QueryMonitorPointSimpleList 查询监测点简要信息列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测组模块
+     * @apiGroup 监测点模块
      * @apiName QueryMonitorPointSimpleList
      * @apiDescription 查询监测点简要信息列表
      * @apiParam (请求体) {Int} projectID 工程项目ID
@@ -162,7 +162,7 @@ public class MonitorPointController {
     /**
      * @api {POST} /QueryMonitorItemPointList 查询监测项目下监测点列表
      * @apiVersion 1.0.0
-     * @apiGroup 监测组模块
+     * @apiGroup 监测点模块
      * @apiName QueryMonitorItemPointList
      * @apiDescription 查询监测项目下监测点列表
      * @apiParam (请求体) {Int} projectID 工程项目ID

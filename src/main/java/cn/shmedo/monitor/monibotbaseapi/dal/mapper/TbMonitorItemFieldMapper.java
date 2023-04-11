@@ -22,4 +22,5 @@ public interface TbMonitorItemFieldMapper extends BaseMapper<TbMonitorItemField>
 
     void deleteByMonitorItemIDList(List<Integer> monitorItemIDList);
 
+    List<Integer> queryItemListByFieldTokenAndName(String monitorFieldName, String monitorFieldToken);
 }

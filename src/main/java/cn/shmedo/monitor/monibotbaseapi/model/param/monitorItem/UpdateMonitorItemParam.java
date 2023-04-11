@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -13,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -41,8 +43,6 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
     @NotBlank
     @Size(max = 20)
     private String alias;
-    @NotNull
-    private Boolean enable;
     @Size(max = 500)
     private String exValue;
     private Integer displayOrder;
@@ -73,10 +73,13 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
         if (ObjectUtil.isNotEmpty(fieldIDList)){
             TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
             if (tbMonitorTypeFieldMapper.selectCount(
-                    new QueryWrapper<TbMonitorTypeField>().eq("monitorTyep", tbMonitorItem.getMonitorType()).in("id", fieldIDList)
+                    new QueryWrapper<TbMonitorTypeField>().eq("monitorType", tbMonitorItem.getMonitorType()).in("id", fieldIDList)
             ) != fieldIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性有不属于该监测类型的");
             }
+        }
+        if (StringUtils.isNotBlank(exValue) && JSONUtil.isTypeJSON(exValue)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目额外属性不合法");
         }
         return null;
     }

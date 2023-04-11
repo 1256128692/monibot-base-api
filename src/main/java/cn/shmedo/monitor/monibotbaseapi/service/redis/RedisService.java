@@ -5,13 +5,11 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -23,12 +21,12 @@ import java.util.stream.Collectors;
  * 使用 {@link StringRedisTemplate} 在设/取值前后进行手动序列化/反序列化<br>
  * 该工具类只提供了常用的方法，如有需要，可调用 {@link RedisService#getTemplate()} 的相关方法
  **/
-@Component
+//@Component
 public class RedisService {
 
     private final StringRedisTemplate template;
 
-    @Autowired
+//    @Autowired
     public RedisService(StringRedisTemplate template) {
         this.template = template;
     }

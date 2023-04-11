@@ -29,8 +29,8 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
     private Integer monitorType;
     private Byte createType;
 
-    private String monitorFieldName;
-    private String monitorFieldToken;
+    private String fieldToken;
+    private String fieldName;
 
     @NotNull
     @Positive
