@@ -37,7 +37,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
      * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型别名
+     * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
      * @apiSuccess (响应结果) {Int} data.monitorItemID        监测项目ID
      * @apiSuccess (响应结果) {String} data.monitorItemName   监测项目名称
      * @apiSuccess (响应结果) {String} data.monitorItemAlias  监测项目别名
@@ -180,19 +180,19 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} monitorType         监测类型
      * @apiSuccess (响应结果) {String} monitorTypeName  监测类型名称
-     * @apiSuccess (响应结果) {String} monitorTypeName  监测类型别名
+     * @apiSuccess (响应结果) {String} monitorTypeAlias 监测类型别名
      * @apiSuccess (响应结果) {Int} monitorItemID       监测项目ID
      * @apiSuccess (响应结果) {String} monitorItemName  监测项目名称
-     * @apiSuccess (响应结果) {String} monitorItemAlias  监测项目别名
+     * @apiSuccess (响应结果) {String} monitorItemAlias 监测项目别名
      * @apiSuccess (响应结果) {Int} projectTypeID       工程项目类型ID
-     * @apiSuccess (响应结果) {String} projectTypeName     工程项目类型名称
+     * @apiSuccess (响应结果) {String} projectTypeName  工程项目类型名称
      * @apiSuccess (响应结果) {Int} projectID           工程项目ID
      * @apiSuccess (响应结果) {String} projectName      工程项目名称
      * @apiSuccess (响应结果) {String} projectShortName 工程项目简称
      * @apiSuccess (响应结果) {String} location         四级行政区域信息
      * @apiSuccess (响应结果) {String} locationInfo     第四级区域名称
-     * @apiSuccess (响应结果) {String} density       监测点查询密度
-     * @apiSuccess (响应结果) {Bool} multiSensor       是否为关联多传感器
+     * @apiSuccess (响应结果) {String} density          监测点查询密度
+     * @apiSuccess (响应结果) {Bool} multiSensor        是否为关联多传感器
      * @apiSuccess (响应结果) {String} sensorStatus     传感器状态 -1:无数据 0:正常 1-4:警报等级
      * @apiSuccess (响应结果) {Object} sensorData        传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
      * @apiSuccess (响应结果) {Int} sensorData.sid       传感器ID

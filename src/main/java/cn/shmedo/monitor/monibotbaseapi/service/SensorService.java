@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -38,9 +39,9 @@ public interface SensorService extends IService<TbSensor> {
      * 添加传感器
      *
      * @param request {@link SaveSensorRequest}
-     * @return
+     * @return {@link IdRecord}
      */
-    Object addSensor(SaveSensorRequest request);
+    IdRecord addSensor(SaveSensorRequest request);
 
     /**
      * 传感器详情
@@ -61,17 +62,17 @@ public interface SensorService extends IService<TbSensor> {
      * 更新传感器
      *
      * @param request {@link UpdateSensorRequest}
-     * @return
+     * @return {@link IdRecord}
      */
-    Object updateSensor(UpdateSensorRequest request);
+    IdRecord updateSensor(UpdateSensorRequest request);
 
     /**
      * 获取试运行参数
      *
      * @param request {@link QueryTryingParamRequest}
-     * @return
+     * @return {@link TryingParamResponse}
      */
-    Object getTryingParam(QueryTryingParamRequest request);
+    TryingParamResponse getTryingParam(QueryTryingParamRequest request);
 
     /**
      * 传感器试运行
@@ -81,5 +82,11 @@ public interface SensorService extends IService<TbSensor> {
      */
     Object trying(TryingRequest request);
 
+    /**
+     * 传感器基础配置
+     *
+     * @param request {@link BaseConfigRequest}
+     * @return {@link BaseConfigResponse}
+     */
     BaseConfigResponse baseConfig(BaseConfigRequest request);
 }

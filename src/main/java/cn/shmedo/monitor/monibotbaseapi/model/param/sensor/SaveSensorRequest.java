@@ -147,7 +147,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     public ResultWrapper<?> validate() {
         if (CollUtil.isNotEmpty(dataSourceList)) {
             dataSourceList.forEach(e -> {
-                Assert.notNull(e.getDataSourceType(), "数据源类型不能为空1");
+                Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
                 if (e.getDataSourceType() == DatasourceType.IOT) {
                     Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
                 }

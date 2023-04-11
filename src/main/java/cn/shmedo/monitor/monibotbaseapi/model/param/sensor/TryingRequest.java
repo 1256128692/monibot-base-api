@@ -5,7 +5,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.TryingDto;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
@@ -43,7 +43,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
     /**
      * 参数列表
      */
-    private List<TryingDto.Param> paramList;
+    private List<Param> paramList;
 
     @Override
     public ResultWrapper<?> validate() {

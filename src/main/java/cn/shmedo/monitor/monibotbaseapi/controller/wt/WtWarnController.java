@@ -17,13 +17,13 @@ public class WtWarnController {
     /**
      * @api {POST} /QueryWtWarnPage 查询报警分页
      * @apiVersion 1.0.0
-     * @apiGroup 水利警报模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtWarnPage
      * @apiDescription 查询报警分页
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 0.预留 1.实时记录 2.历史记录
      * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容
-     * @apiParam (请求参数) {String} [monitorType] 监测类型
+     * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
@@ -63,10 +63,10 @@ public class WtWarnController {
     /**
      * @api {POST} /QueryWtWarnInfoDetail 查询报警详情
      * @apiVersion 1.0.0
-     * @apiGroup 水利警报模块
+     * @apiGroup 警报规则引擎模块
      * @apiName QueryWtWarnInfoDetail
      * @apiDescription 查询报警详情
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnID 报警记录ID
      * @apiSuccess (返回结果) {String} name 报警名称
      * @apiSuccess (返回结果) {Int} projectID 工程ID
@@ -81,7 +81,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {DateTime} WarnTime 报警时间
-     * @apiSuccess (返回结果) {String} desc 规则描述json
+     * @apiSuccess (返回结果) {String} compareRule 比较区间json
+     * @apiSuccess (返回结果) {String} triggerRule 触发规则json
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Double} dataList.value 源数据值
      * @apiSuccess (返回结果) {Boolean} [dataList.warnStartMark] 开始报警标记,仅当当前项为开始报警的时间点才存在该标记,始终为true

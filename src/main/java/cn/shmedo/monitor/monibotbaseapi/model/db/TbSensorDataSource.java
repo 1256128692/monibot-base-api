@@ -2,10 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 /**
  * 传感器数据来源
  */
+@NoArgsConstructor
+@AllArgsConstructor
 public class TbSensorDataSource {
     /**
      * 主键

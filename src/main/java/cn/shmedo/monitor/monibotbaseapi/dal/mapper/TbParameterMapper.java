@@ -21,4 +21,6 @@ public interface TbParameterMapper extends BaseMapper<TbParameter> {
     void deleteBatchByRecords(List<TbParameter> parameters);
 
     void insertBatch(List<TbParameter> parameters);
+
+    int replaceBatch(List<TbParameter> parameters);
 }

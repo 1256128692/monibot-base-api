@@ -10,7 +10,13 @@ public enum MonitorType {
     HUMIDITY(7, "湿度"),
     WIND_SPEED(8, "风速"),
     SOIL_MOISTURE(9, "墒情"),
-    SAND_CONTENT(10, "含沙量");
+    SAND_CONTENT(10, "含沙量"),
+    THREE_DIMENSIONAL_DISPLACEMENT(11, "表面三维位移"),
+    ONE_DIMENSIONAL_DISPLACEMENT(12, "表面一维位移"),
+    INTERNAL_TRIAXIAL_DISPLACEMENT(13, "内部三轴位移"),
+    STRESS(14, "压力"),
+    PRESSURE(15, "压强"),
+    LEVEL(16, "物液位");
 
     private final int key;
     private final String value;
