@@ -8,13 +8,44 @@ import lombok.Data;
 
 @Data
 public class Param {
+    /**
+     * 字段名称
+     */
     private String name;
+
+    /**
+     * 字段值
+     */
     private String value;
+
+    /**
+     * 字段单位
+     */
     private Integer unit;
+
+    /**
+     * 字段原始标识
+     */
     private String origin;
+
+    /**
+     * 字段标识
+     */
     private String token;
+
+    /**
+     * 字段数据类型
+     */
     private String dataType;
+
+    /**
+     * 字段扩展值
+     */
     private String exValues;
+
+    /**
+     * 字段类型
+     */
     private String type;
 
     public static Param valueOf(Model.Field field, String origin, FormulaUtil.DataType type) {

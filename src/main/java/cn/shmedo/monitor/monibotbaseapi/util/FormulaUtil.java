@@ -120,6 +120,7 @@ public class FormulaUtil {
         //调用mathParser进行计算
         log.debug("计算公式：{}", formula);
         Expression e = new Expression(formula);
+//        Assert.isTrue(e.checkLexSyntax(), "公式语法错误");
         return e.calculate();
     }
 

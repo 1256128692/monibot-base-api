@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @program: monibot-base-api
@@ -40,6 +41,10 @@ public enum CalType {
 
     public static boolean isValid(Integer value) {
         return VALUES_MAP.containsKey(value);
+    }
+
+    public static CalType codeOf(Integer value) {
+        return Optional.of(VALUES_MAP.get(value)).orElseThrow(() -> new IllegalArgumentException("Invalid CalType value: " + value));
     }
 
 }

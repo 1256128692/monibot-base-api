@@ -394,8 +394,8 @@ public class SensorController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} fieldID 监测类型字段ID
-     * @apiParam (请求体) {Int} calType 计算类型
-     * @apiParam (请求体) {Object[]} paramList 参数列表
+     * @apiParam (请求体) {Int} templateID 监测类型模板ID
+     * @apiParam (请求体) {Object[]} [paramList] 参数列表
      * @apiParam (请求体) {String} paramList.value 参数值
      * @apiParam (请求体) {String} paramList.origin 源参数
      * @apiSuccess (响应结果) {Object[]} data

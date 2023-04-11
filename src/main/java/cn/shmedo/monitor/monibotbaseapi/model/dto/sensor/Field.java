@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.sensor;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,9 +14,15 @@ public class Field extends TbMonitorTypeField {
     private String value;
 
     /**
-     * 公式
+     * 显示公式
      */
     private String formula;
+
+    /**
+     * 计算公式
+     */
+    @JsonIgnore
+    private String realFormula;
 
 
     public static Field valueOf(TbMonitorTypeField typeField) {
