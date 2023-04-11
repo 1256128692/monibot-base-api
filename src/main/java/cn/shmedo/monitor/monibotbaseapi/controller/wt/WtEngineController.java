@@ -84,7 +84,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
      * @apiSuccess (返回结果) {Int} createUserID 创建人ID
      * @apiSuccess (返回结果) {String} createUserName 创建人名称
-     * @apiSuccess (返回结果) {Object[]} dataList 报警状态列表
+     * @apiSuccess (返回结果) {Object[]} [dataList] 报警状态列表
      * @apiSuccess (返回结果) {Int} dataList.warnID 报警状态ID
      * @apiSuccess (返回结果) {String} dataList.warnName 报警名称
      * @apiSuccess (返回结果) {Int} dataList.warnLevel 报警等级
