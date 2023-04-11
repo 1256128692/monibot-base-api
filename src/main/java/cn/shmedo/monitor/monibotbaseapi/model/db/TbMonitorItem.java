@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 import java.io.Serializable;
 import java.util.Date;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class TbMonitorItem implements Serializable {
     /**
     * 主键

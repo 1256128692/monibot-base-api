@@ -102,8 +102,10 @@ public class MonitorPointController {
      * @apiName QueryMonitorPointPageList
      * @apiDescription 分页查询监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {String} [Name] 监测点名称,模糊查询
-     * @apiParam (请求体) {Int} [MonitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [pointName] 监测点名称,模糊查询
+     * @apiParam (请求体) {Int} [monitorType] 监测项目
+     * @apiParam (请求体) {String} [monitorItemName] 监测项目名称
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量

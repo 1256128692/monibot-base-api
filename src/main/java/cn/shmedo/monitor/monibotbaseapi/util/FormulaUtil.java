@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import org.mariuszgromada.math.mxparser.Expression;
 
@@ -36,7 +37,7 @@ public class FormulaUtil {
 
     }
 
-    public static Map<DataType, List<Source>> parse(String formula) {
+    public static Map<DataType, Set<Source>> parse(String formula) {
         return Arrays.stream(StrUtil.subBetweenAll(formula, FORMULA_PREFIX, FORMULA_SUFFIX))
                 .map(variable -> {
                     String head = StrUtil.subBefore(variable, StrUtil.COLON, false);
@@ -96,11 +97,11 @@ public class FormulaUtil {
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(Map.Entry::getKey,
-                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())));
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toSet())));
 
     }
 
-    public static Object calculate(String formula, Map<DataType, List<Source>> map) {
+    public static Object calculate(String formula, Map<DataType, Set<Source>> map) {
 
         map.values().forEach(sources -> sources.forEach(source -> {
             if (source.getFieldValue() == null) {
@@ -119,16 +120,18 @@ public class FormulaUtil {
         //调用mathParser进行计算
         log.debug("计算公式：{}", formula);
         Expression e = new Expression(formula);
+//        Assert.isTrue(e.checkLexSyntax(), "公式语法错误");
         return e.calculate();
     }
 
-    public static Object calculate(String formula, Consumer<Map<DataType, List<Source>>> consumer) {
-        Map<DataType, List<Source>> dataMap = parse(formula);
+    public static Object calculate(String formula, Consumer<Map<DataType, Set<Source>>> consumer) {
+        Map<DataType, Set<Source>> dataMap = parse(formula);
         consumer.accept(dataMap);
         return calculate(formula, dataMap);
     }
 
     @Data
+    @EqualsAndHashCode
     public static class Source {
 
         /**
@@ -167,7 +170,7 @@ public class FormulaUtil {
          * 结束时间
          */
         private Date endDate;
-
+        
     }
 }
 

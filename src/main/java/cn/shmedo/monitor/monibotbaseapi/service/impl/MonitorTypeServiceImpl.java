@@ -23,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -139,7 +140,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                         throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
                     } else if (resultWrapper.getData() != null) {
                         iotModelFieldMap = resultWrapper.getData();
-                    }else {
+                    } else {
                         iotModelFieldMap = Map.of();
                     }
 
@@ -153,12 +154,12 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                     item.setTokenList(MonitorTypeTemplateDatasourceToken.valueOf(collect.get(item.getTemplateDataSourceID())));
                 });
 
-                if (finalIotModelFieldMap.size() > 0){
+                if (finalIotModelFieldMap.size() > 0) {
                     monitorTypeDetail.getTemplateList().forEach(
-                            item ->{
+                            item -> {
                                 item.getTokenList().forEach(
-                                        token ->{
-                                            if (token.getIotModelToken() !=null){
+                                        token -> {
+                                            if (token.getIotModelToken() != null) {
                                                 token.setIotModelFieldList(finalIotModelFieldMap.get(token.getIotModelToken()));
                                             }
                                         }
@@ -242,7 +243,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public List<MonitorTypeFieldWithFormula> queryMonitorTypeFieldWithFormula(QueryMonitorTypeFieldWithFormulaParam pa) {
-        return tbMonitorTypeFieldMapper.queryMonitorTypeFieldWithFormula(pa.getMonitorType(), pa.getTemplateID());
+        return tbMonitorTypeFieldMapper.queryMonitorTypeFieldWithFormula(pa.getMonitorType(), pa.getTemplateID() == null ? -1 : pa.getTemplateID());
     }
 
     @Override
@@ -318,6 +319,26 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         tbMonitorTypeMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
+    }
+
+    @Override
+    public Object querySimpleMonitorTypeList(QuerySimpleMonitorTypeListParam pa) {
+        QueryWrapper<TbMonitorType> qu = new QueryWrapper<>();
+        qu.eq(pa.getCreateType() != null, "createType", pa.getCreateType());
+        qu.orderByDesc("id");
+        List<TbMonitorType> list = tbMonitorTypeMapper.selectList(qu);
+        if (pa.getGrouped() != null && pa.getGrouped()) {
+            if (CollectionUtils.isEmpty(list)) {
+                return Map.of();
+            }
+            list.forEach(item -> {
+                if (StringUtils.isBlank(item.getMonitorTypeClass())) {
+                    item.setMonitorTypeClass("未定义");
+                }
+            });
+            return list.stream().collect(Collectors.groupingBy(TbMonitorType::getMonitorTypeClass));
+        }
+        return list;
     }
 
 }

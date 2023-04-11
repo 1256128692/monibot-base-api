@@ -155,4 +155,20 @@
     #{item.paUnitID,jdbcType=INTEGER}, #{item.paDesc,jdbcType=VARCHAR})
   </foreach>
   </insert>
+
+  <update id="replaceBatch" >
+    replace into `tb_parameter` (`ID`, SubjectID, SubjectType, DataType,Token, `Name`, PaValue, PaUnitID, PaDesc)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.ID,jdbcType=INTEGER},
+      #{item.subjectID,jdbcType=INTEGER},
+      #{item.subjectType,jdbcType=INTEGER},
+      #{item.dataType,jdbcType=VARCHAR},
+      #{item.token,jdbcType=VARCHAR},
+      #{item.name,jdbcType=VARCHAR},
+      #{item.paValue,jdbcType=VARCHAR},
+      #{item.paUnitID,jdbcType=INTEGER},
+      #{item.paDesc,jdbcType=VARCHAR})
+    </foreach>
+  </update>
 </mapper>

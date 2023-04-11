@@ -347,6 +347,7 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName QueryTryingParam
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} templateID 监测类型模板ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiSuccess (响应结果) {Object} data 响应结果
      * @apiSuccess (响应结果) {Int} data.calType 计算类型 1公式计算 2脚本计算 3外部HTTP计算 -1不计算
@@ -369,7 +370,10 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.paramList.name 参数名称
      * @apiSuccess (响应结果) {String} data.paramList.unit 参数单位
      * @apiSuccess (响应结果) {String} data.paramList.origin 源参数
-     * @apiSuccess (响应结果) {String} data.paramList.token 物模型字段标识
+     * @apiSuccess (响应结果) {String} data.paramList.token 参数标识
+     * @apiSuccess (响应结果) {String} data.paramList.value 参数值 (部分参数拥有默认值)
+     * @apiSuccess (响应结果) {String} data.paramList.exValues 参数扩展字段
+     * @apiSuccess (响应结果) {String} data.paramList.dataType 参数数据类型
      * @apiSuccess (响应结果) {String} data.paramList.type 参数类型 IOT-物模型数据源类型、MON-监测传感器数据类型、SLEF-自身数据、HISTORY-自身历史数据、CONS-常量、PARAM-参数、EX-扩展配置
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
@@ -390,8 +394,8 @@ public class SensorController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} fieldID 监测类型字段ID
-     * @apiParam (请求体) {Int} calType 计算类型
-     * @apiParam (请求体) {Object[]} paramList 参数列表
+     * @apiParam (请求体) {Int} templateID 监测类型模板ID
+     * @apiParam (请求体) {Object[]} [paramList] 参数列表
      * @apiParam (请求体) {String} paramList.value 参数值
      * @apiParam (请求体) {String} paramList.origin 源参数
      * @apiSuccess (响应结果) {Object[]} data

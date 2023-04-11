@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
@@ -182,6 +183,32 @@ public class Param2DBEntityUtil {
         obj.setCompanyID(-1);
         obj.setExValues(pa.getExValues());
         obj.setMonitorTypeClass(pa.getMonitorTypeClass());
+        return obj;
+    }
+
+    public static TbMonitorItem fromAddMonitorItemParam2TbMonitorItem(AddMonitorItemParam pa, Integer userID) {
+        Date now = new Date();
+        TbMonitorItem obj = new TbMonitorItem();
+        if (pa.getCreateType().equals(CreateType.PREDEFINED.getType())){
+            obj.setCompanyID(-1);
+            obj.setProjectID(-1);
+            obj.setProjectType(null);
+        }else {
+            obj.setCompanyID(pa.getTbProjectInfo().getCompanyID());
+            obj.setProjectID(pa.getProjectID());
+            obj.setProjectType(pa.getTbProjectInfo().getProjectType().intValue());
+        }
+        obj.setMonitorClass(null);
+        obj.setMonitorType(pa.getMonitorType());
+        obj.setName(pa.getMonitorItemName());
+        obj.setAlias(obj.getName());
+        obj.setCreateType(pa.getCreateType());
+        obj.setExValue(pa.getExValue());
+        obj.setDisplayOrder(pa.getDisplayOrder());
+        obj.setCreateTime(now);
+        obj.setUpdateTime(now);
+        obj.setCreateUserID(userID);
+        obj.setUpdateUserID(userID);
         return obj;
     }
 }

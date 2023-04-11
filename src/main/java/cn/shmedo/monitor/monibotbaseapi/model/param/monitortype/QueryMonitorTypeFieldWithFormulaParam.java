@@ -27,17 +27,18 @@ public class QueryMonitorTypeFieldWithFormulaParam implements ParameterValidator
     private Integer companyID;
     @NotNull
     private Integer monitorType;
-    @NotNull
     private Integer templateID;
     @Override
     public ResultWrapper validate() {
-        TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
-        TbMonitorTypeTemplate tbMonitorTypeTemplate = tbMonitorTypeTemplateMapper.selectByPrimaryKey(templateID);
-        if (tbMonitorTypeTemplate == null){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不存在");
-        }
-        if (!tbMonitorTypeTemplate.getMonitorType().equals(monitorType)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不属于监测类型");
+        if (templateID != null){
+            TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
+            TbMonitorTypeTemplate tbMonitorTypeTemplate = tbMonitorTypeTemplateMapper.selectByPrimaryKey(templateID);
+            if (tbMonitorTypeTemplate == null){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不存在");
+            }
+            if (!tbMonitorTypeTemplate.getMonitorType().equals(monitorType)){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不属于监测类型");
+            }
         }
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
         TbMonitorType tbMonitorType = tbMonitorTypeMapper.selectOne(new QueryWrapper<TbMonitorType>().eq("MonitorType", monitorType));

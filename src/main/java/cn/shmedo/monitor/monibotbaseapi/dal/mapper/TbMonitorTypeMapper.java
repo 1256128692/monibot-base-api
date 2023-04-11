@@ -42,4 +42,5 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
      * @return  {@link MonitorTypeWithField}
      */
     List<MonitorTypeWithField> queryMonitorTypeWithField(@Param(Constants.WRAPPER) Wrapper<Void> wrapper);
+    TbMonitorType queryByType(Integer type);
 }
