@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -17,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.Timestamp;
 
 @Data
-public class QuerySmcPointHistoryDataListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryDisplacementPointHistoryParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull
     private Integer projectID;
@@ -51,8 +50,8 @@ public class QuerySmcPointHistoryDataListParam implements ParameterValidator, Re
             if (!tbMonitorPoint.getProjectID().equals(projectID)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点的项目ID与条件项目ID不符");
             }
-            if ( !tbMonitorPoint.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测类型不为墒情");
+            if (!tbMonitorPoint.getMonitorType().equals(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持查询内部三轴位移类型");
             }
         }
 
@@ -68,6 +67,7 @@ public class QuerySmcPointHistoryDataListParam implements ParameterValidator, Re
 
         return null;
     }
+
 
     @Override
     public Resource parameter() {

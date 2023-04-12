@@ -23,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
@@ -250,9 +251,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             String key = "";
             if (monitorType.equals(MonitorType.STRESS.getKey())) {
                 key = "stressChange";
-            }else  if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
+            } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
                 key = "pressureChange";
-            }else {
+            } else {
                 key = "levelChange";
             }
             // 处理压力变化值,规则当前的数据减去上一笔的数据
@@ -866,6 +867,235 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getMonitorType(), fieldList, dataUnitsMap);
 
         return new MonitorPointListHistoryData(pa.getTbMonitorPointList(), tbSensors, maps, fieldList, tbDataUnitList);
+    }
+
+
+    @Override
+    public TriaxialDisplacementMonitorPointHistoryData queryDisplacementPointHistoryDataList(QueryDisplacementPointHistoryParam pa) {
+
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+
+        LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, pa.getMonitorPointID());
+        // 1.传感器信息列表
+        List<TbSensor> tbSensors = tbSensorMapper.selectList(sensorLambdaQueryWrapper);
+        if (CollectionUtil.isNullOrEmpty(tbSensors)) {
+            return null;
+        }
+        List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
+
+        LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
+        // 2. 监测项目与监测子字段类型关系表
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
+
+        // TODO:如果查不到对应关系.暂时先处理成查监测类下全部的监测子类型
+        // 3. 监测点类型子字段列表
+        List<TbMonitorTypeField> tbMonitorTypeFields = null;
+        if (!CollectionUtil.isNullOrEmpty(tbMonitorItemFields)) {
+            List<Integer> monitorTypeFieldIDs = tbMonitorItemFields.stream().map(TbMonitorItemField::getMonitorTypeFieldID).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .in(TbMonitorTypeField::getID, monitorTypeFieldIDs);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+
+        } else {
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .eq(TbMonitorTypeField::getMonitorType, pa.getTbMonitorPoint().getMonitorType());
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+        }
+
+        // 监测子类型字段
+        List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+
+        // 通用类型的传感器数据
+        List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+
+        List<Map<String, Object>> resultMaps = new LinkedList<>();
+        if (!CollectionUtil.isNullOrEmpty(maps)) {
+            maps.forEach(map -> {
+                // 处理内部三轴位移数据
+                Map<String, Object> stringObjectMap = handleTriaxialDisplacementType(map, tbSensors);
+                resultMaps.add(stringObjectMap);
+            });
+        }
+        // 处理需要计算的监测子类型返回token
+        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+
+        // 处理时间排序
+        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
+        // 处理数据单位
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
+
+        return new TriaxialDisplacementMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, sortedGroupedMaps, fieldList, tbDataUnitList);
+    }
+
+    @Override
+    public List<TriaxialDisplacementSensorNewDataInfo> queryDisplacementMonitorPointNewDataList(QueryDisplacementMonitorPointNewDataParam pa) {
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID());
+        if (pa.getProjectTypeID() != null) {
+            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectTypeID());
+        }
+        if (!StringUtil.isNullOrEmpty(pa.getAreaCode())) {
+            wrapper.like(TbProjectInfo::getLocation, pa.getAreaCode());
+        }
+        // 1.项目信息列表
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
+        if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
+            return Collections.emptyList();
+        }
+        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
+        // 2.监测点信息列表
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList, pa.getMonitorType(), pa.getMonitorItemID());
+        if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
+            return Collections.emptyList();
+        }
+        return buildTDProjectAndMonitorAndSensorInfo(tbProjectInfos, tbMonitorPoints, pa.getMonitorType());
+    }
+
+    private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
+
+        List<TriaxialDisplacementSensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
+        // 获取项目类型(方式缓存)
+        Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+
+        List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
+        List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());
+
+        LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, monitorPointIDs)
+                .eq(TbSensor::getMonitorType, monitorType);
+        // 1.传感器信息列表
+        List<TbSensor> tbSensors = tbSensorMapper.selectList(sensorLambdaQueryWrapper);
+
+
+        LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
+                .in(TbMonitorItemField::getMonitorItemID, monitorItemIDs);
+        // 2. 监测项目与监测子字段类型关系表
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
+
+        // TODO:如果查不到对应关系.暂时先处理成查监测类下全部的监测子类型
+        // 3. 监测点类型子字段列表
+        List<TbMonitorTypeField> tbMonitorTypeFields = null;
+        if (!CollectionUtil.isNullOrEmpty(tbMonitorItemFields)) {
+            List<Integer> monitorTypeFieldIDs = tbMonitorItemFields.stream().map(TbMonitorItemField::getMonitorTypeFieldID).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .in(TbMonitorTypeField::getID, monitorTypeFieldIDs);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+
+        } else {
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .eq(TbMonitorTypeField::getMonitorType, monitorType);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+        }
+
+        List<Integer> sensorIDList;
+        if (!CollectionUtil.isNullOrEmpty(tbSensors)) {
+            sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
+        } else {
+            sensorIDList = null;
+        }
+
+        tbMonitorPoints.forEach(item -> {
+            TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
+            List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
+            sensorNewDataInfoList.add(TriaxialDisplacementSensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
+                    projectTypeMap, sensorList, monitorTypeMap));
+        });
+
+        List<Map<String, Object>> maps;
+        List<FieldSelectInfo> fieldList;
+        List<Map<String, Object>> filteredMaps = new LinkedList<>();
+        // 根据传感器ID列表和传感器类型,查传感器最新数据
+        if (!CollectionUtil.isNullOrEmpty(sensorIDList)) {
+            fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+            // 3. 传感器数据列表
+            maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
+            handleTriaxialDisplacementSensorDataList(maps, sensorNewDataInfoList);
+        }
+
+        return sensorNewDataInfoList;
+    }
+
+    private void handleTriaxialDisplacementSensorDataList(List<Map<String, Object>> dataList,
+                                                          List<TriaxialDisplacementSensorNewDataInfo> monitorPointInfos) {
+
+        Collection<Object> areas = monitorPointInfos
+                .stream().map(TriaxialDisplacementSensorNewDataInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+
+        monitorPointInfos.forEach(pojo -> {
+            List<Integer> sensorIDs = pojo.getSensorList().stream().map(TbSensor::getID).collect(Collectors.toList());
+
+            // 过滤出来当前监测点下的传感器数据列表
+            List<Map<String, Object>> newDataList = dataList.stream()
+                    .filter(data -> sensorIDs.contains(Integer.valueOf(data.get("sensorID").toString())))
+                    .collect(Collectors.toList());
+
+            // 找到最大的 v1 和对应的深度
+            Optional<Map<String, Object>> maxV1Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("v1")));
+            Integer sensorIDByV1 = maxV1Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
+
+            // 找到最大的 v3 和对应的深度
+            Optional<Map<String, Object>> maxV3Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("v3")));
+            Integer sensorIDByV3 = maxV3Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
+
+            // 找到最大的 v5 和对应的深度
+            Optional<Map<String, Object>> maxV5Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("v5")));
+            Integer sensorIDByV5 = maxV5Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
+
+            // 构建新的数据集
+            Map<String, Object> newData = new HashMap<>();
+            newData.put("xValue", maxV1Data.map(data -> data.get("v1")).orElse(Double.NaN));
+            newData.put("yValue", maxV3Data.map(data -> data.get("v3")).orElse(Double.NaN));
+            newData.put("zValue", maxV5Data.map(data -> data.get("v5")).orElse(Double.NaN));
+            newData.put("xDeep", xDeep);
+            newData.put("yDeep", yDeep);
+            newData.put("zDeep", zDeep);
+
+            pojo.setLocationInfo(areaMap.getOrDefault(pojo.getLocationInfo(), null));
+            pojo.setSensorData(newData);
+
+            Optional<Map<String, Object>> latest = newDataList.stream()
+                    .sorted(Comparator.comparing((Map<String, Object> data) -> (String) data.get("time")).reversed())
+                    .findFirst();
+            if (latest.isPresent()) {
+                String latestTime = (String) latest.get().get("time");
+                pojo.setTime(DateUtil.parse(latestTime, "yyyy-MM-dd HH:mm:ss.SSS"));
+            }
+
+        });
+
+    }
+
+    /**
+     * 处理内部三轴位移
+     *
+     * @param map       传感器数据
+     * @param tbSensors 传感器列表
+     * @return
+     */
+    private Map<String, Object> handleTriaxialDisplacementType(Map<String, Object> map, List<TbSensor> tbSensors) {
+        TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
+        if (sensor != null) {
+            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.deep"));
+        }
+        return map;
     }
 
     /**

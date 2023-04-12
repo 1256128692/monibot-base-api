@@ -491,10 +491,9 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {Int} monitorPointID 监测点ID
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Int} axisPosition 轴位,(1代表A轴 2代表B轴 3代表C轴)
-     * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度),null或者all:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
      * @apiParamExample 请求体示例
-     * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861,"axisPosition":"x"}
+     * {"monitorPointID":9182,"density":"2h","begin":"2022-09-27 00:00:00","end":"2022-09-28 00:00:00","projectID":5861}
      * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息
      * @apiSuccess (响应结果) {Int} monitorPoint.id   监测点ID
      * @apiSuccess (响应结果) {String} monitorPoint.name 监测点名称
@@ -505,7 +504,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} dataList.T     时刻数据列表
      * @apiSuccess (响应结果) {Int} dataList.T.sensorID      传感器ID
      * @apiSuccess (响应结果) {Double} dataList.T.deep    深度
-     * @apiSuccess (响应结果) {Double} dataList.T.x  位移(可能是x 或者y 或者z)
+     * @apiSuccess (响应结果) {Double} dataList.T.v1  位移
      * @apiSuccess (响应结果) {Object[]} fieldList         监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  属性字段名称
@@ -515,14 +514,13 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {String} axisPositionCnName 轴位名称,(A轴 B轴 C轴)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
-//    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryDisplacementPointHistoryDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryDisplacementPointHistoryDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryDisplacementPointHistoryDataList(@Validated @RequestBody QueryDisplacementPointHistoryParam pa) {
+        return wtMonitorService.queryDisplacementPointHistoryDataList(pa);
     }
 
     /**
@@ -537,7 +535,7 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求体) {String} [areaCode] 行政区划编码
      * @apiParamExample 请求体示例
-     * {"companyID":138,"projectTypeID":1,"areaCode":"110102014","monitorType":11,"monitorItemID":12}
+     * {"companyID":138,"projectTypeID":1,"areaCode":"110102014","monitorType":13,"monitorItemID":12}
      * @apiSuccess (响应结果) {Object[]} data                 结果列表
      * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
@@ -557,27 +555,26 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.gpsLocation       监测点地图经纬度
      * @apiSuccess (响应结果) {String} data.imageLocation     监测点底图位置
      * @apiSuccess (响应结果) {String} data.density       监测点查询密度
+     * @apiSuccess (响应结果) {Date} data.time            查询时间
      * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
      * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器id
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {Byte} data.sensorList.status         传感器状态 -1 无数据 0 正常 1,2,3,4对应预警级别
      * @apiSuccess (响应结果) {Object} data.sensorData       传感器最新数据,(最新时间内,数据值最大这笔数据展示出来,已经它对应的深度)
-     * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
-     * @apiSuccess (响应结果) {Double} data.sensorData.x_deep       A轴深度
-     * @apiSuccess (响应结果) {Double} data.sensorData.x_value      A轴数据
-     * @apiSuccess (响应结果) {Double} data.sensorData.y_deep       B轴深度
-     * @apiSuccess (响应结果) {Double} data.sensorData.y_value      B轴数据
-     * @apiSuccess (响应结果) {Double} data.sensorData.z_deep       C轴深度
-     * @apiSuccess (响应结果) {Double} data.sensorData.z_value      C轴数据
-
+     * @apiSuccess (响应结果) {Double} data.sensorData.xDeep       A轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.xValue      A轴数据
+     * @apiSuccess (响应结果) {Double} data.sensorData.yDeep       B轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.yValue      B轴数据
+     * @apiSuccess (响应结果) {Double} data.sensorData.zDeep       C轴深度
+     * @apiSuccess (响应结果) {Double} data.sensorData.zValue      C轴数据
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListCompanySensorData
      */
     @Permission(permissionName = "mdmbase:ListCompanySensorData")
     @RequestMapping(value = "/QueryDisplacementMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryDisplacementMonitorPointNewDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryDisplacementMonitorPointNewDataList(@Validated @RequestBody QueryDisplacementMonitorPointNewDataParam pa) {
+        return wtMonitorService.queryDisplacementMonitorPointNewDataList(pa);
     }
 
 }
