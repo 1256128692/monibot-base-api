@@ -21,6 +21,21 @@ public class RedisKeys {
      * 物模型缓存
      */
     public static final String IOT_MODEL_KEY = "cn.shmedo.iot.model";
+
+    /**
+     * 监测类型缓存
+     */
+    public static final String MONITOR_TYPE_KEY = "cn.shmedo.iot.monitor.monitorType";
+
+    /**
+     * 监测类型模板缓存
+     */
+    public static final String MONITOR_TYPE_TEMPLATE_KEY = "cn.shmedo.iot.monitor.monitorTypeTemplate";
+
+    /**
+     * 参数缓存
+     */
+    public static final String PARAMETER_PREFIX_KEY = "cn.shmedo.iot.monitor.parameter:";
 }
 
     

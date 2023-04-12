@@ -126,7 +126,7 @@
         where ID = #{ID,jdbcType=INTEGER}
     </update>
 
-    <insert id="insertBatch">
+    <insert id="insertBatch"  keyProperty="ID" useGeneratedKeys="true">
         insert into tb_template_formula (TemplateID, MonitorType, FieldID,
                                          FieldCalOrder, DisplayFormula, Formula)
         values
