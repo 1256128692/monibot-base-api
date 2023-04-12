@@ -2,25 +2,36 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.BaseFormulaParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -53,7 +64,6 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbTemplateFormulaMapper tbTemplateFormulaMapper;
     private final TbParameterMapper tbParameterMapper;
     private final FileConfig fileConfig;
-
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
@@ -341,4 +351,73 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         return list;
     }
 
+    @Override
+    public QueryFormulaParamsResult queryFormulaParams(QueryFormulaParamsRequest request) {
+        QueryFormulaParamsResult result = new QueryFormulaParamsResult();
+        TbMonitorTypeTemplate monitorTypeTemplate = request.getMonitorTypeTemplate();
+        List<TbTemplateDataSource> templateDataSourceList = tbTemplateDataSourceMapper
+                .selectList(new LambdaQueryWrapper<TbTemplateDataSource>()
+                        .eq(TbTemplateDataSource::getTemplateDataSourceID, monitorTypeTemplate.getTemplateDataSourceID()));
+        if (!CollUtil.isEmpty(templateDataSourceList)) {
+            templateDataSourceList.stream().collect(Collectors.groupingBy(TbTemplateDataSource::getDataSourceType))
+                    .forEach((type, list) -> {
+                        List<String> sourceTokenList = list.stream()
+                                .map(TbTemplateDataSource::getTemplateDataSourceToken).collect(Collectors.toList());
+                        switch (DatasourceType.codeOf(type)) {
+                            case IOT:
+
+                                Set<Object> iotModelTokens = list.stream()
+                                        .map(s -> StrUtil.subBefore(s.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
+                                        .map(e -> (Object) e)
+                                        .collect(Collectors.toSet());
+                                RedisService redisService = ContextHolder.getBean(RedisConstant.IOT_REDIS_SERVICE);
+                                Map<String, List<String>> modelMap = redisService
+                                        .multiGet(RedisKeys.IOT_MODEL_KEY, iotModelTokens, Model.class)
+                                        .stream().collect(Collectors.toMap(Model::getModelToken,
+                                                e -> e.getModelFieldList().stream().map(Model.Field::getFieldToken)
+                                                        .collect(Collectors.toList())));
+                                result.setIot(BaseFormulaParam.builder().nameList(sourceTokenList).childList(modelMap).build());
+                                break;
+                            case MONITOR:
+                                List<Integer> monitorTypes = list.stream()
+                                        .map(s -> Integer.valueOf(StrUtil.subBefore(s.getTemplateDataSourceToken(),
+                                                StrUtil.UNDERLINE, false)))
+                                        .toList();
+                                Map<String, List<String>> typeChildMap = tbMonitorTypeFieldMapper
+                                        .queryByMonitorTypes(monitorTypes, false).stream()
+                                        .collect(Collectors.groupingBy(mt -> mt.getMonitorType().toString(),
+                                                Collectors.mapping(TbMonitorTypeField::getFieldToken, Collectors.toList())));
+                                result.setMon(BaseFormulaParam.builder().nameList(sourceTokenList).childList(typeChildMap).build());
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+        }
+        List<String> exList= new LinkedList<>();
+        List<String> selfList= new LinkedList<>();
+        tbMonitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
+                .eq(TbMonitorTypeField::getMonitorType, monitorTypeTemplate.getMonitorType())).stream()
+                .collect(Collectors.groupingBy(TbMonitorTypeField::getFieldClass))
+                .forEach((fc, list) -> {
+                    switch (MonitorTypeFieldClass.codeOf(fc)) {
+                        case BaseProperties:
+                        case ExtendedProperties:
+                            selfList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
+                            break;
+                        case ExtendedConfigurations:
+                            exList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
+                            break;
+                        default:
+                            break;
+                    }
+                });
+        result.setExList(exList);
+        result.setSelfList(selfList);
+        List<String> paramList = tbParameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
+                .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                .in(TbParameter::getSubjectID, request.getTemplateID())).stream().map(TbParameter::getName).collect(Collectors.toList());
+        result.setParamList(paramList);
+        return result;
+    }
 }
