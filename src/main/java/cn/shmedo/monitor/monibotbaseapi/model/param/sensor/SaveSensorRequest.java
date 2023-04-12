@@ -11,8 +11,10 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbParameterMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
@@ -51,6 +53,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     /**
      * 传感器别名
      */
+    @NotEmpty(message = "传感器名称不能为空")
     private String alias;
 
     /**
@@ -68,34 +71,22 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
      * 5多个监测传感器<br/>
      * 100API 推送
      */
-    @NotNull(message = "数据来源类型不能为空")
     private DataSourceComposeType dataSourceComposeType = DataSourceComposeType.SINGLE_IOT;
-
-    /**
-     * 监测类型模板分布式唯一ID
-     */
-    @NotNull(message = "监测类型模板分布式唯一ID不能为空")
-    private String templateDataSourceID;
 
     /**
      * 监测类型模板ID
      */
-    @NotNull(message = "监测类型模板ID不能为空")
     private Integer templateID;
 
     /**
      * 数据源列表
      */
-    @NotEmpty(message = "数据源列表不能为空")
     private List<DataSource> dataSourceList;
 
     /**
      * 扩展配置列表
      */
     private List<SensorConfigField> exFields;
-
-    @JsonIgnore
-    private String configFieldValue;
 
     /**
      * 参数列表
@@ -104,6 +95,9 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
 
     @JsonIgnore
     private List<TbParameter> parameterList = Collections.emptyList();
+
+    @JsonIgnore
+    private String configFieldValue;
 
 
     @Data
@@ -145,6 +139,21 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
 
     @Override
     public ResultWrapper<?> validate() {
+        //校验名称
+        TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
+        Long count = sensorMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
+                .eq(TbSensor::getProjectID, projectID)
+                .eq(TbSensor::getAlias, alias));
+        Assert.isTrue(count == 0, "传感器名称已存在");
+
+        //校验数据源
+        if (dataSourceComposeType != DataSourceComposeType.API) {
+            Assert.notNull(templateID, "监测类型模板ID不能为空");
+            Assert.notEmpty(dataSourceList, "数据源列表不能为空");
+        } else {
+            templateID = -1;
+        }
+
         if (CollUtil.isNotEmpty(dataSourceList)) {
             dataSourceList.forEach(e -> {
                 Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
@@ -198,6 +207,10 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     @Override
     public Resource parameter() {
         return new Resource(this.projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    public void setDataSourceComposeType(Integer dataSourceComposeType) {
+        this.dataSourceComposeType = DataSourceComposeType.codeOf(dataSourceComposeType);
     }
 }
 

@@ -172,18 +172,20 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         baseMapper.insert(sensor);
 
         //传感器数据源
-        List<TbSensorDataSource> sensorDataSources = request.getDataSourceList().stream().map(source -> {
-            TbSensorDataSource dataSource = new TbSensorDataSource();
-            dataSource.setDataSourceID(sensor.getDataSourceID());
-            dataSource.setDataSourceType(source.getDataSourceType().getCode());
-            dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
-            dataSource.setDataSourceToken(DatasourceType.IOT.equals(source.getDataSourceType()) ?
-                    source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
-            dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
-            dataSource.setExValues(source.getExValues());
-            return dataSource;
-        }).toList();
-        sensorDataSourceMapper.insertBatchSomeColumn(sensorDataSources);
+        if (CollUtil.isNotEmpty(request.getDataSourceList())) {
+            List<TbSensorDataSource> sensorDataSources = request.getDataSourceList().stream().map(source -> {
+                TbSensorDataSource dataSource = new TbSensorDataSource();
+                dataSource.setDataSourceID(sensor.getDataSourceID());
+                dataSource.setDataSourceType(source.getDataSourceType().getCode());
+                dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
+                dataSource.setDataSourceToken(DatasourceType.IOT.equals(source.getDataSourceType()) ?
+                        source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
+                dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
+                dataSource.setExValues(source.getExValues());
+                return dataSource;
+            }).toList();
+            sensorDataSourceMapper.insertBatchSomeColumn(sensorDataSources);
+        }
 
         //传感器参数
         if (!request.getParameterList().isEmpty()) {
@@ -205,6 +207,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                         .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()))
                 .stream().collect(Collectors.toMap(TbMonitorTypeField::getFieldName, e -> e));
         Dict exConfig = JSONUtil.toBean(response.getConfigFieldValue(), Dict.class);
+        exConfig = exConfig == null ? Dict.create() : exConfig;
         response.setExFields(exConfig.entrySet().stream().filter(e -> typeFields.containsKey(e.getKey()))
                 .map(e -> SensorInfoResponse.ExField.valueOf(typeFields.get(e.getKey()),
                         e.getValue().toString())).toList());
@@ -472,7 +475,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
      * @return 传感器名称
      */
     private synchronized String genSensorName(Integer monitorType, Integer projectID) {
-        Integer number = this.baseMapper.getNameSerialNumber(monitorType, projectID);
+        Integer number = this.baseMapper.getNameSerialNumber(projectID, monitorType);
         return monitorType + StrUtil.UNDERLINE + number;
     }
 }
