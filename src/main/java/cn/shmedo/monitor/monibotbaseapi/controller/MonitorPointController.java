@@ -1,9 +1,16 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.ConfigMonitorPointSensorsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.DeleteMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.UpdateMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class MonitorPointController {
     private WtMonitorService reservoirMonitorService;
+    private MonitorPointService monitorPointService;
 
     /**
      * @api {POST} /AddMonitorPoint 新增监测点
@@ -23,19 +31,23 @@ public class MonitorPointController {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求体) {String} name 监测点名称
+     * @apiParam (请求体) {String} name 监测点名称(max = 50)
      * @apiParam (请求体) {Bool} enable 是否启用
      * @apiParam (请求体) {String} [gpsLocation] 地图位置
      * @apiParam (请求体) {String} [imageLocation] 底图位置
      * @apiParam (请求体) {String} [overallViewLocation] 全景位置
      * @apiParam (请求体) {String} [spatialLocation] 三维位置
+     * @apiParam (请求体) {String} [exValues] 额外属性（500）
+     * @apiParam (请求体) {Int} [displayOrder] 排序
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
 //    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
     @PostMapping(value = "/AddMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public void addMonitorPoint() {
+    public Object addMonitorPoint(@Validated @RequestBody AddMonitorPointParam pa) {
+        monitorPointService.addMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -52,13 +64,17 @@ public class MonitorPointController {
      * @apiParam (请求体) {String} [imageLocation] 底图位置
      * @apiParam (请求体) {String} [overallViewLocation] 全景位置
      * @apiParam (请求体) {String} [spatialLocation] 三维位置
+     * @apiParam (请求体) {String} [exValues] 额外属性（500）
+     * @apiParam (请求体) {Int} [displayOrder] 排序
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     //    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public void updateMonitorPoint() {
+    public Object updateMonitorPoint(@Validated @RequestBody UpdateMonitorPointParam pa) {
+        monitorPointService.updateMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -66,7 +82,7 @@ public class MonitorPointController {
      * @apiVersion 1.0.0
      * @apiGroup 监测点模块
      * @apiName DeleteMonitorPoint
-     * @apiDescription 删除监测点
+     * @apiDescription 删除监测点, 会判断点下传感器
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int[]} pointIDList 监测点ID列表
      * @apiSuccess (返回结果) {String} none 空
@@ -75,7 +91,9 @@ public class MonitorPointController {
      */
     //    @Permission(permissionName = "mdmbase:DeleteMonitorPoint")
     @PostMapping(value = "/DeleteMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public void deleteMonitorPoint() {
+    public Object deleteMonitorPoint(@Validated @RequestBody DeleteMonitorPointParam pa) {
+        monitorPointService.deleteMonitorPoint(pa.getPointIDList());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -86,13 +104,15 @@ public class MonitorPointController {
      * @apiDescription 配置监测点传感器
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} pointID 监测点ID
-     * @apiParam (请求体) {Int[]} sensorIDList 配置传感器列表
+     * @apiParam (请求体) {Int[]} sensorIDList 配置传感器列表(max = 100)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @PostMapping(value = "/ConfigMonitorPointSensors", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public void configMonitorPointSensors() {
+    public Object configMonitorPointSensors(@Validated @RequestBody ConfigMonitorPointSensorsParam pa) {
+        monitorPointService.configMonitorPointSensors(pa.getPointID(), pa.getSensorIDList(), CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**

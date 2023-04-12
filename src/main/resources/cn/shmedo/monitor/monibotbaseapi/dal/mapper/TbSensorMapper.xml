@@ -357,4 +357,12 @@
     </where>
     ORDER BY ts.UpdateTime DESC
   </select>
+
+  <update id="updatePoint">
+    update tb_sensor
+    set MonitorPointID = #{pointID}, UpdateTime = #{date}, UpdateUserID = #{userID}
+      where ID in <foreach collection="sensorIDList" item="id" separator="," open="(" close=")">
+    #{id}
+  </foreach>
+  </update>
 </mapper>

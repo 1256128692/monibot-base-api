@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 @Mapper
@@ -36,4 +37,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
      * @return 传感器序列号
      */
     Integer getNameSerialNumber(@Param("projectID") Integer projectID, @Param("monitorType") Integer monitorType);
+
+    void updatePoint(Integer pointID, List<Integer> sensorIDList, Integer userID, Date date);
 }
