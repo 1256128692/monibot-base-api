@@ -61,7 +61,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private final TbMonitorTypeFieldMapper monitorTypeFieldMapper;
     private final TbTemplateScriptMapper templateScriptMapper;
     private final TbTemplateFormulaMapper templateFormulaMapper;
-    private final  RedisService redisService;
+    private final RedisService redisService;
 
     @Autowired
     public SensorServiceImpl(IotService iotService,
@@ -223,11 +223,18 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSensor(DeleteSensorRequest request) {
-        sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
-                .in(TbSensorDataSource::getDataSourceID, request.getSensorIDList()));
+        //删除传感器数据源
+        Set<String> dataSourceIds = request.getSensorList().stream()
+                .map(TbSensor::getDataSourceID).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        Optional.of(dataSourceIds).filter(CollUtil::isNotEmpty).ifPresent(idSet ->
+                sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
+                        .in(TbSensorDataSource::getDataSourceID, idSet)));
+        //删除传感器参数
         parameterMapper.delete(new LambdaQueryWrapper<TbParameter>()
                 .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
                 .in(TbParameter::getSubjectID, request.getSensorIDList()));
+        //删除传感器
         removeBatchByIds(request.getSensorIDList());
     }
 
@@ -288,7 +295,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     return a;
                 }));
 
-        Set<Object> modelTokens = sourceMap.get(FormulaUtil.DataType.IOT).stream()
+        Set<Object> modelTokens = sourceMap.getOrDefault(FormulaUtil.DataType.IOT, Collections.emptySet()).stream()
                 .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
                 .map(e -> (Object) e)
                 .collect(Collectors.toSet());
@@ -410,9 +417,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     /**
      * 根据物联网传感器类型获取设备和传感器信息
-     * @param consumer  传感器类型
-     * @param searchToken   搜索设备token
-     * @return  key:iotSensorType value: {@link DeviceWithSensor}
+     *
+     * @param consumer    传感器类型
+     * @param searchToken 搜索设备token
+     * @return key:iotSensorType value: {@link DeviceWithSensor}
      */
     private Map<String, List<DeviceWithSensor>> getIotMap(Supplier<Set<String>> consumer, String searchToken) {
         Set<String> iotSensorTypes = consumer.get();

@@ -281,15 +281,15 @@
 
   <select id="selectSensorPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
       SELECT ts.ID,
-             ts.MonitorType    AS monitorType,
-             ts.`Name`         AS name,
-             ts.Alias          AS alias,
-             ts.DisplayOrder   AS displayOrder,
-             ts.monitorPointID AS monitorPointID,
-             ts.exValues       AS exValues,
-             ts.Enable         AS enable,
-             tmp.`Name`        AS monitorPointName,
-             tmt.TypeName      AS monitorTypeName
+             ts.MonitorType    AS `monitorType`,
+             ts.`Name`         AS `name`,
+             ts.Alias          AS `alias`,
+             ts.DisplayOrder   AS `displayOrder`,
+             ts.monitorPointID AS `monitorPointID`,
+             ts.exValues       AS `exValues`,
+             ts.Enable         AS `enable`,
+             tmp.`Name`        AS `monitorPointName`,
+             tmt.TypeName      AS `monitorTypeName`
       FROM `tb_sensor` ts
                LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
@@ -300,7 +300,7 @@
                     AND
               </if>
               <if test="pa.monitorType != null and pa.monitorType != ''">
-                  tmt.MonitorType LIKE CONCAT('%', #{pa.monitorType}, '%')
+                  tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
                     AND
               </if>
               <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
@@ -324,15 +324,15 @@
 
   <select id="selectSensorList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
     SELECT ts.ID,
-           ts.MonitorType    AS monitorType,
-           ts.`Name`         AS name,
-           ts.Alias          AS alias,
-           ts.DisplayOrder   AS displayOrder,
-           ts.monitorPointID AS monitorPointID,
-           ts.exValues       AS exValues,
-           ts.Enable         AS enable,
-           tmp.`Name`        AS monitorPointName,
-           tmt.TypeName      AS monitorTypeName
+           ts.MonitorType    AS `monitorType`,
+           ts.`Name`         AS `name`,
+           ts.Alias          AS `alias`,
+           ts.DisplayOrder   AS `displayOrder`,
+           ts.monitorPointID AS `monitorPointID`,
+           ts.exValues       AS `exValues`,
+           ts.Enable         AS `enable`,
+           tmp.`Name`        AS `monitorPointName`,
+           tmt.TypeName      AS `monitorTypeName`
     FROM `tb_sensor` ts
            LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
            LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
@@ -343,7 +343,7 @@
             AND
         </if>
         <if test="pa.monitorType != null and pa.monitorType != ''">
-          tmt.MonitorType LIKE CONCAT('%', #{pa.monitorType}, '%')
+          tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
             AND
         </if>
         <if test="pa.monitorPoint != null and pa.monitorPoint != ''">

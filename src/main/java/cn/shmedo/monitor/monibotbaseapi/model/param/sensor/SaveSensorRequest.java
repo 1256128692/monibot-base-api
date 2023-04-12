@@ -175,7 +175,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         }
 
         //校验参数
-        if (paramFields.isEmpty()) {
+        if (CollUtil.isNotEmpty(paramFields)) {
             TbParameterMapper parameterMapper = SpringUtil.getBean(TbParameterMapper.class);
             Map<Integer, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
                     .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
@@ -188,6 +188,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                 param.setID(null);
                 param.setSubjectID(null);
                 param.setSubjectType(ParamSubjectType.Sensor.getType());
+                param.setPaValue(e.getValue());
                 return param;
             }).toList();
         }
