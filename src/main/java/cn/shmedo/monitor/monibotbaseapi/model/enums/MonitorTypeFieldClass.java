@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 监测类型属性的类型
@@ -40,5 +41,9 @@ public enum MonitorTypeFieldClass {
 
     public String getFieldStr() {
         return fieldStr;
+    }
+
+    public static MonitorTypeFieldClass codeOf(Integer value) {
+        return Optional.of(VALUES_MAP.get(value)).orElseThrow(() -> new IllegalArgumentException("Invalid MonitorTypeFieldClass value: " + value));
     }
 }

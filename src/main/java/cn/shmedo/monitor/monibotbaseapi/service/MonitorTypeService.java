@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -48,4 +49,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     void addPredefinedMonitorType(AddPredefinedMonitorTypeParam pa, Integer usrID);
 
     Object querySimpleMonitorTypeList(QuerySimpleMonitorTypeListParam pa);
+
+    QueryFormulaParamsResult queryFormulaParams(QueryFormulaParamsRequest request);
 }
