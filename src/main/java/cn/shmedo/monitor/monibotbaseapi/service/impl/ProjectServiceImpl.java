@@ -7,8 +7,11 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.auth.OpenAuthQueryResourceListByPermissionParameter;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -24,6 +27,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRe
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -33,9 +37,11 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -356,4 +362,52 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         handlerImagePathToRealPath(result);
         return result;
     }
+
+    @Override
+    public List<ProjectBaseInfo> queryProjectListByProjectName(QueryProjectListParam pa) {
+
+        List<Integer> projectIDs = getUserProjectIDs(pa.getCompanyID(), pa.getAccessToken());
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
+                .in(TbProjectInfo::getID, projectIDs);
+        if (!CollectionUtil.isNotEmpty(projectIDs)) {
+            wrapper.in(TbProjectInfo::getID, projectIDs);
+        }
+        if (!StringUtil.isNullOrEmpty(pa.getProjectName())) {
+            wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
+        }
+        if (pa.getProjectType() != null) {
+            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
+        }
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
+        if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
+            Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
+
+            List<ProjectBaseInfo> projectBaseInfos = tbProjectInfos.stream().map(item -> ProjectBaseInfo.toNewVo(item,projectTypeMap)).collect(Collectors.toList());
+            return projectBaseInfos;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取用户在该公司中具有权限的项目
+     * @return
+     */
+    @Override
+    public List<Integer> getUserProjectIDs(Integer companyID, String accessToken) {
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        QueryResourceListByPermissionParameter pa = new QueryResourceListByPermissionParameter();
+        pa.setCompanyID(companyID);
+        pa.setServiceName(DefaultConstant.MDNET_SERVICE_NAME);
+        pa.setPermissionToken(DefaultConstant.LIST_PROJECT);
+        pa.setResourceType(ResourceType.BASE_PROJECT.toInt());
+        ResultWrapper<List<String>> info = instance.queryResourceListByPermission(pa, accessToken);
+        if (!info.apiSuccess()) {
+            throw new CustomBaseException(info.getCode(), info.getMsg());
+        }
+        List<Integer> pids = info.getData().stream().distinct().map(Integer::parseInt).collect(Collectors.toList());
+        return pids;
+    }
+
 }

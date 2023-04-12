@@ -20,4 +20,8 @@ public class DefaultConstant {
 
     //上海米度测控有限公司ID
     public static final Integer MD_ID = 138;
+
+    public static final String MDNET_SERVICE_NAME = "mdmbase";
+
+    public static final String LIST_PROJECT = "ListProject";
 }

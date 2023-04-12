@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
@@ -50,4 +52,16 @@ public interface ProjectService {
     PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa);
 
     ProjectInfo queryProjectInfo(QueryProjectInfoParam pa);
+
+    List<ProjectBaseInfo> queryProjectListByProjectName(QueryProjectListParam pa);
+
+    /**
+     * 获取用户的项目ID
+     * 高频访问方法，使用Spring AOP做特殊缓存
+     *
+     * @param companyID 获取用户在该公司中的项目，如果为null,则获取用户在所有具有权限的公司中的项目
+     * @param accessToken    访问id
+     * @return
+     */
+    List<Integer> getUserProjectIDs(Integer companyID, String accessToken);
 }
