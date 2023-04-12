@@ -453,13 +453,22 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Integer monitorType = -1;
         // 2.监测点信息列表
         List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null);
+        List<MonitorPointAndItemInfo> result = new ArrayList<>();
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
         } else {
-            monitorType = tbMonitorPoints.get(0).getMonitorType();
+            MonitorPointAndItemInfo monitorPointAndItemInfo = tbMonitorPoints.stream().filter(pojo ->
+                pojo.getID().equals(pa.getMonitorPointID())
+            ).findFirst().orElse(null);
+            if (monitorPointAndItemInfo != null) {
+                monitorType = monitorPointAndItemInfo.getMonitorType();
+                result.add(monitorPointAndItemInfo);
+            }else {
+                return null;
+            }
         }
 
-        List<SensorNewDataInfo> sensorNewDataInfoList = buildProjectAndMonitorAndSensorInfo(tbProjectInfos, tbMonitorPoints, monitorType);
+        List<SensorNewDataInfo> sensorNewDataInfoList = buildProjectAndMonitorAndSensorInfo(tbProjectInfos, result, monitorType);
         if (CollectionUtil.isNullOrEmpty(sensorNewDataInfoList)) {
             return null;
         } else {
