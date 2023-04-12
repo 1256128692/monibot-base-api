@@ -298,7 +298,9 @@
                     #{id}
                 </foreach>
             </if>
-
+            <if test="companyItem!=null and companyItem == true ">
+                and it.ProjectID = -1
+            </if>
         </where>
         order by  it.id desc
     </select>

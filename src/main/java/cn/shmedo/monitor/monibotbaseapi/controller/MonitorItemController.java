@@ -98,9 +98,10 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称, 模糊查询
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {Int} [fieldToken] 属性标识, 模糊查询
-     * @apiParam (请求参数) {Int} [fieldName] 属性名称, 模糊查询
+     * @apiParam (请求参数) {String} [fieldToken] 属性标识, 模糊查询
+     * @apiParam (请求参数) {String} [fieldName] 属性名称, 模糊查询
      * @apiParam (请求参数) {Int} [createType] 创建类型 null:所有,0:预定义,1:自定义
+     * @apiParam (请求参数) {Boolean} [companyItem] 公司监测项目模板？
      * @apiParam (请求参数) {Int} pageSize （1-100）
      * @apiParam (请求参数) {Int} currentPage（>=1）
      * @apiSuccess (返回结果) {Int} totalCount 数据总量

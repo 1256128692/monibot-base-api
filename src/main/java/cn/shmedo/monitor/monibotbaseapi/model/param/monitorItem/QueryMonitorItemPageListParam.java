@@ -31,6 +31,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     private String fieldToken;
     private String fieldName;
+    private Boolean companyItem;
 
     @NotNull
     @Positive
