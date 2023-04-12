@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
@@ -391,6 +392,20 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public List<SensorListResponse> sensorList(SensorListRequest request) {
         return this.baseMapper.selectSensorList(request);
+    }
+
+    @Override
+    public List<DataSourceWithSensor> querySensorDataSource(SourceWithSensorRequest request) {
+        return sensorDataSourceMapper.selectDataSourceWithSensor(request);
+    }
+
+    @Override
+    public void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request) {
+        TbSensor sensor = new TbSensor();
+        sensor.setID(request.getSensorID());
+        Optional.ofNullable(request.getSensorStatus()).ifPresent(e -> sensor.setStatus(e.byteValue()));
+        Optional.ofNullable(request.getMonitorBeginTime()).ifPresent(sensor::setMonitorBeginTime);
+        this.updateById(sensor);
     }
 
     /**
