@@ -15,8 +15,8 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
@@ -30,6 +30,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.util.FormulaUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -62,6 +63,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private final TbTemplateScriptMapper templateScriptMapper;
     private final TbTemplateFormulaMapper templateFormulaMapper;
     private final RedisService redisService;
+    private final FileService fileService;
 
     @Autowired
     public SensorServiceImpl(IotService iotService,
@@ -72,7 +74,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                              TbMonitorTypeFieldMapper monitorTypeFieldMapper,
                              TbTemplateScriptMapper templateScriptMapper,
                              TbTemplateFormulaMapper templateFormulaMapper,
-                             @Qualifier(RedisConstant.IOT_REDIS_SERVICE) RedisService redisService) {
+                             @Qualifier(RedisConstant.IOT_REDIS_SERVICE) RedisService redisService,
+                             FileService fileService) {
         this.iotService = iotService;
         this.monitorTypeTemplateMapper = monitorTypeTemplateMapper;
         this.monitorTypeMapper = monitorTypeMapper;
@@ -82,6 +85,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         this.templateScriptMapper = templateScriptMapper;
         this.templateFormulaMapper = templateFormulaMapper;
         this.redisService = redisService;
+        this.fileService = fileService;
     }
 
     @Override
@@ -169,6 +173,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
         sensor.setUpdateUserID(subject.getSubjectID());
+        Optional.of(request.getImagePath()).filter(StrUtil::isNotBlank)
+                .ifPresent(base64 -> sensor.setImagePath(fileService.base64Upload(base64)));
         baseMapper.insert(sensor);
 
         //传感器数据源
@@ -201,6 +207,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Assert.notNull(sensor, "传感器不存在");
 
         SensorInfoResponse response = SensorInfoResponse.valueOf(sensor);
+        //图片
+        response.setImagePath(fileService.getFileUrl(sensor.getImagePath()));
         //扩展配置
         Map<String, TbMonitorTypeField> typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                         .eq(TbMonitorTypeField::getMonitorType, response.getMonitorType())
@@ -245,7 +253,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Transactional(rollbackFor = Exception.class)
     public IdRecord updateSensor(UpdateSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-        Optional.ofNullable(request.getImagePath()).ifPresent(imagePath -> request.getSensor().setImagePath(imagePath));
+        Optional.of(request.getImagePath()).filter(StrUtil::isNotBlank)
+                .ifPresent(base64 -> request.getSensor().setImagePath(fileService.base64Upload(base64)));
         Optional.ofNullable(request.getAlias()).ifPresent(alias -> request.getSensor().setAlias(alias));
         Optional.ofNullable(request.getEnable()).ifPresent(enable -> request.getSensor().setEnable(enable));
         Optional.ofNullable(request.getDisplayOrder()).ifPresent(displayOrder -> request.getSensor().setDisplayOrder(displayOrder));

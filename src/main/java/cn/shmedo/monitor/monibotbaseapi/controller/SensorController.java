@@ -220,7 +220,7 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName AddSensor
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} [imagePath] 传感器图片路径
+     * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} [templateID] 监测类型模板ID, 仅当dataSourceComposeType为100时不需要
@@ -348,7 +348,7 @@ public class SensorController {
      * @apiName UpdateSensor
      * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} [imagePath] 传感器图片路径
+     * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} [alias] 传感器别名
      * @apiParam (请求体) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表 (不传=不修改，修改时每次传全部)
