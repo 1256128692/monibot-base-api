@@ -6,12 +6,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.auth.OpenAuthQueryResourceListByPermissionParameter;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
-import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -69,6 +66,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final FileConfig fileConfig;
     private final RedisService redisService;
     private final PropertyService propertyService;
+    private final MdInfoService mdInfoService;
 
     private static final String TOKEN_HEADER = "Authorization";
 
@@ -130,7 +128,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,
                                     Integer companyID) {
-        MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         AddFileUploadRequest pojo = new AddFileUploadRequest();
         if (StrUtil.isBlank(fileName)) {
             pojo.setFileName(UUID.randomUUID().toString());
@@ -142,7 +139,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         pojo.setFileType(imageSuffix);
         pojo.setUserID(userID);
         pojo.setCompanyID(companyID);
-        ResultWrapper<FilePathResponse> info = instance.AddFileUpload(pojo,fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
         } else {
@@ -188,11 +185,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private <T extends TbProjectInfo> void handlerImagePathToRealPath(T projectInfo) {
         if (!StrUtil.isBlank(projectInfo.getImagePath())) {
-            MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
             pojo.setFilePath(projectInfo.getImagePath());
-            ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            ResultWrapper<FileInfoResponse> info = mdInfoService.queryFileInfo(pojo);
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             } else {

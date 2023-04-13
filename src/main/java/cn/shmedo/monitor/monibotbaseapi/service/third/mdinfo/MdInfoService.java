@@ -6,7 +6,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import feign.Headers;
-import feign.Param;
 import feign.RequestLine;
 
 public interface MdInfoService {
@@ -14,13 +13,9 @@ public interface MdInfoService {
 
     @RequestLine("POST /AddFileUpload")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<FilePathResponse> AddFileUpload(AddFileUploadRequest addFileUploadRequest,
-                                                  @Param("appKey") String appKey,
-                                                  @Param("appSecret") String appSecret);
+    ResultWrapper<FilePathResponse> addFileUpload(AddFileUploadRequest addFileUploadRequest);
 
     @RequestLine("POST /QueryFileInfo")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<FileInfoResponse> queryFileInfo(QueryFileInfoRequest pojo,
-                                                  @Param("appKey") String appKey,
-                                                  @Param("appSecret") String appSecret);
+    ResultWrapper<FileInfoResponse> queryFileInfo(QueryFileInfoRequest pojo);
 }

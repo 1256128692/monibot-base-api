@@ -5,7 +5,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.config.CommonBeans;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -13,12 +12,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRe
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
-import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
+import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -28,7 +25,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
-@DependsOn(CommonBeans.CAMEL_OBJECT_MAPPER)
+@AllArgsConstructor
 public class FileService {
 
     private final FileConfig fileConfig;
@@ -36,12 +33,6 @@ public class FileService {
     private final MdInfoService mdInfoService;
 
     private static final String BASE64_FLAG = ";base64,";
-
-    @Autowired
-    public FileService(FileConfig fileConfig) {
-        this.mdInfoService = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
-        this.fileConfig = fileConfig;
-    }
 
     /**
      * base64 文件上传
@@ -63,8 +54,7 @@ public class FileService {
         pojo.setFileType(fileSuffix);
         pojo.setUserID(subject.getSubjectID());
         pojo.setCompanyID(subject.getCompanyID());
-        ResultWrapper<FilePathResponse> info = mdInfoService.AddFileUpload(pojo,
-                fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
         } else {
@@ -84,8 +74,7 @@ public class FileService {
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
             pojo.setFilePath(ossPath);
-            ResultWrapper<FileInfoResponse> info = mdInfoService
-                    .queryFileInfo(pojo, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            ResultWrapper<FileInfoResponse> info = mdInfoService.queryFileInfo(pojo);
             if (info.apiSuccess()) {
                 return info.getData().getAbsolutePath();
             } else {
