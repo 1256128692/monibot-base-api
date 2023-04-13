@@ -103,13 +103,17 @@ public class SensorDataDaoImpl implements SensorDataDao {
                                                      String density, List<FieldSelectInfo> fieldSelectInfoList,
                                                      boolean raw, Integer monitorType) {
         Boolean flag = true;
-        if (StringUtils.isNotBlank(density) && DbConstant.DENSITY_DAY.equals(density)) {
+        String endStr = "";
+        if (StringUtils.isNotBlank(density) && density.substring(density.length() - 1, density.length()).equals(DbConstant.DENSITY_DAY)) {
             flag = true;
+        } else if (StringUtils.isNotBlank(density)) {
+            // 截取最后一个字母,以此来判断查询密度,h:代表小时,d:代表天
+            endStr = density.substring(density.length() - 1, density.length());
+            flag = false;
         } else {
             flag = false;
         }
-        // 截取最后一个字母,以此来判断查询密度,h:代表小时,d:代表天
-        String endStr = density.substring(density.length() - 1, density.length());
+
 
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, flag);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
