@@ -27,15 +27,12 @@ import java.util.UUID;
 @Component
 public class FileService {
 
-    private final MdInfoService mdInfoService;
-
     private final FileConfig fileConfig;
 
     private static final String BASE64_FLAG = ";base64,";
 
     @Autowired
     public FileService(FileConfig fileConfig) {
-        this.mdInfoService = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         this.fileConfig = fileConfig;
     }
 
@@ -59,7 +56,7 @@ public class FileService {
         pojo.setFileType(fileSuffix);
         pojo.setUserID(subject.getSubjectID());
         pojo.setCompanyID(subject.getCompanyID());
-        ResultWrapper<FilePathResponse> info = mdInfoService.AddFileUpload(pojo,
+        ResultWrapper<FilePathResponse> info = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo).AddFileUpload(pojo,
                 fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
@@ -79,7 +76,7 @@ public class FileService {
         QueryFileInfoRequest pojo = new QueryFileInfoRequest();
         pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
         pojo.setFilePath(ossPath);
-        ResultWrapper<FileInfoResponse> info = mdInfoService.queryFileInfo(pojo,
+        ResultWrapper<FileInfoResponse> info = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo).queryFileInfo(pojo,
                 fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (!info.apiSuccess()) {
             log.error("获取文件 {} 信息失败，{} => {}", ossPath, info.getCode(), info.getMsg());
