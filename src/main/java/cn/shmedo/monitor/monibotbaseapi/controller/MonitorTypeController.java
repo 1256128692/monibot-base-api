@@ -568,11 +568,11 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {Object} iot 物模型数据源列表
      * @apiSuccess (返回结果) {String[]} iot.nameList 物模型数据源名称列表
      * @apiSuccess (返回结果) {String} iot.T 物模型数据源子字段名称,如220_a,220_b
-     * @apiSuccess (返回结果) {String[]} iot.T.childList 物模型数据源子字段名称列表
+     * @apiSuccess (返回结果) {String[]} iot.T.nameList 物模型数据源子字段名称列表
      * @apiSuccess (返回结果) {Object} mon mon参数列表
      * @apiSuccess (返回结果) {String[]} mon.nameList 监测数据源名称列表
      * @apiSuccess (返回结果) {String} mon.T 监测数据源名称列表，如22_a,35_b
-     * @apiSuccess (返回结果) {String[]} mon.T.childList 监测数据源子字段名称列表
+     * @apiSuccess (返回结果) {String[]} mon.T.nameList 监测数据源子字段名称列表
      * @apiSuccess (返回结果) {String[]} selfList 自身传感器数据字段列表
      * @apiSuccess (返回结果) {String[]} paramList 公式参数列表
      * @apiSuccess (返回结果) {String[]} exList 拓展配置字段列表

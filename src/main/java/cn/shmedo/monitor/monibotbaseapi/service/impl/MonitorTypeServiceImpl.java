@@ -10,6 +10,7 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
@@ -432,7 +433,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                         .collect(Collectors.toSet());
                                 RedisService redisService = ContextHolder.getBean(RedisConstant.IOT_REDIS_SERVICE);
                                 List<Model> models = redisService.multiGet(RedisKeys.IOT_MODEL_KEY, iotModelTokens, Model.class);
-                                Map<String, List<String>> modelMap = sourceTokenList.stream()
+                                Map<String, Object> modelMap = sourceTokenList.stream()
                                         .collect(Collectors.toMap(s -> s, s -> {
                                             String mt = StrUtil.subBefore(s, StrUtil.UNDERLINE, false);
                                             Model model = models.stream()
@@ -442,9 +443,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                             }
                                             return model.getModelFieldList().stream()
                                                     .map(Model.Field::getFieldToken)
-                                                    .collect(Collectors.toList());
+                                                    .collect(Collectors.toMap(k ->
+                                                            DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, CollUtil::newArrayList));
                                         }));
-                                result.setIot(BaseFormulaParam.builder().nameList(sourceTokenList).childList(modelMap).build());
+                                modelMap.put(DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, sourceTokenList);
+                                result.setIot(modelMap);
                                 break;
                             case MONITOR:
                                 List<Integer> monitorTypes = list.stream()
@@ -453,15 +456,17 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                         .toList();
                                 List<TbMonitorTypeField> typeFields = tbMonitorTypeFieldMapper
                                         .queryByMonitorTypes(monitorTypes, false);
-                                Map<String, List<String>> typeChildMap = sourceTokenList.stream()
+                                Map<String, Object> typeChildMap = sourceTokenList.stream()
                                         .collect(Collectors.toMap(s -> s, s -> {
                                             Integer mt = Integer.valueOf(StrUtil.subBefore(s, StrUtil.UNDERLINE, false));
                                             return typeFields.stream()
                                                     .filter(f -> f.getMonitorType().equals(mt))
                                                     .map(TbMonitorTypeField::getFieldToken)
-                                                    .collect(Collectors.toList());
+                                                    .collect(Collectors.toMap(k ->
+                                                            DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, CollUtil::newArrayList));
                                         }));
-                                result.setMon(BaseFormulaParam.builder().nameList(sourceTokenList).childList(typeChildMap).build());
+                                typeChildMap.put(DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, sourceTokenList);
+                                result.setMon(typeChildMap);
                                 break;
                             default:
                                 break;
