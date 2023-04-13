@@ -1,8 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.interceptor;
 
-import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.exception.BaseException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,26 +20,26 @@ public class ResultWrapperInterceptor {
     private static final Logger logger = LoggerFactory.getLogger(ResultWrapperInterceptor.class);
 
     @Around(value = "cn.shmedo.monitor.monibotbaseapi.interceptor.ResourcePointcuts.resourceMethod()")
-    public Object aroundResourceMethod(ProceedingJoinPoint joinPoint) {
-        try {
+    public Object aroundResourceMethod(ProceedingJoinPoint joinPoint) throws Throwable {
+//        try {
             Object result = joinPoint.proceed();
             if (!(result instanceof ResultWrapper)) {
                 result = ResultWrapper.success(result);
             }
             return result;
-        } catch (Throwable throwable) {
-            logException(throwable);
-            if (throwable instanceof BaseException) {
-                BaseException baseException = (BaseException) throwable;
-                ResultCode resultCode = ResultCode.valueOfCode(baseException.errCode());
-                String message = baseException.getMessage();
-                if (message == null || message.length() <= 0) {
-                    message = resultCode.toString();
-                }
-                return ResultWrapper.withCode(resultCode, message);
-            }
-            return ResultWrapper.fail(throwable);
-        }
+//        } catch (Throwable throwable) {
+//            logException(throwable);
+//            if (throwable instanceof BaseException) {
+//                BaseException baseException = (BaseException) throwable;
+//                ResultCode resultCode = ResultCode.valueOfCode(baseException.errCode());
+//                String message = baseException.getMessage();
+//                if (message == null || message.length() <= 0) {
+//                    message = resultCode.toString();
+//                }
+//                return ResultWrapper.withCode(resultCode, message);
+//            }
+//            return ResultWrapper.fail(throwable);
+//        }
     }
 
     /**
