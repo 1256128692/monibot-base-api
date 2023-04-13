@@ -431,11 +431,19 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                         .map(e -> (Object) e)
                                         .collect(Collectors.toSet());
                                 RedisService redisService = ContextHolder.getBean(RedisConstant.IOT_REDIS_SERVICE);
-                                Map<String, List<String>> modelMap = redisService
-                                        .multiGet(RedisKeys.IOT_MODEL_KEY, iotModelTokens, Model.class)
-                                        .stream().collect(Collectors.toMap(Model::getModelToken,
-                                                e -> e.getModelFieldList().stream().map(Model.Field::getFieldToken)
-                                                        .collect(Collectors.toList())));
+                                List<Model> models = redisService.multiGet(RedisKeys.IOT_MODEL_KEY, iotModelTokens, Model.class);
+                                Map<String, List<String>> modelMap = sourceTokenList.stream()
+                                        .collect(Collectors.toMap(s -> s, s -> {
+                                            String mt = StrUtil.subBefore(s, StrUtil.UNDERLINE, false);
+                                            Model model = models.stream()
+                                                    .filter(m -> m.getModelToken().equals(mt)).findFirst().orElse(null);
+                                            if (model == null || CollUtil.isEmpty(model.getModelFieldList())) {
+                                                return CollUtil.newArrayList();
+                                            }
+                                            return model.getModelFieldList().stream()
+                                                    .map(Model.Field::getFieldToken)
+                                                    .collect(Collectors.toList());
+                                        }));
                                 result.setIot(BaseFormulaParam.builder().nameList(sourceTokenList).childList(modelMap).build());
                                 break;
                             case MONITOR:
@@ -443,10 +451,16 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                         .map(s -> Integer.valueOf(StrUtil.subBefore(s.getTemplateDataSourceToken(),
                                                 StrUtil.UNDERLINE, false)))
                                         .toList();
-                                Map<String, List<String>> typeChildMap = tbMonitorTypeFieldMapper
-                                        .queryByMonitorTypes(monitorTypes, false).stream()
-                                        .collect(Collectors.groupingBy(mt -> mt.getMonitorType().toString(),
-                                                Collectors.mapping(TbMonitorTypeField::getFieldToken, Collectors.toList())));
+                                List<TbMonitorTypeField> typeFields = tbMonitorTypeFieldMapper
+                                        .queryByMonitorTypes(monitorTypes, false);
+                                Map<String, List<String>> typeChildMap = sourceTokenList.stream()
+                                        .collect(Collectors.toMap(s -> s, s -> {
+                                            Integer mt = Integer.valueOf(StrUtil.subBefore(s, StrUtil.UNDERLINE, false));
+                                            return typeFields.stream()
+                                                    .filter(f -> f.getMonitorType().equals(mt))
+                                                    .map(TbMonitorTypeField::getFieldToken)
+                                                    .collect(Collectors.toList());
+                                        }));
                                 result.setMon(BaseFormulaParam.builder().nameList(sourceTokenList).childList(typeChildMap).build());
                                 break;
                             default:
