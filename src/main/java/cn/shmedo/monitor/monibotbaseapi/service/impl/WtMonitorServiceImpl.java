@@ -141,9 +141,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
 
         tbMonitorPoints.forEach(item -> {
-            TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
+            TbProjectInfo projectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
             List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
-            sensorNewDataInfoList.add(SensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
+            sensorNewDataInfoList.add(SensorNewDataInfo.reBuildProAndMonitor(item, projectInfo,
                     projectTypeMap, sensorList, monitorTypeMap));
         });
 
@@ -229,33 +229,24 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
 
             // 流量计算
-            maps.forEach(da -> {
-                TbSensor tbSensor = sensorList.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
-                // 将JSON字符串转换为JSON对象
-                if (tbSensor != null) {
-                    da.put(DbConstant.RESERVOIR_AREA, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.area"));
-                    if (!StringUtil.isNullOrEmpty(da.get(DbConstant.RESERVOIR_AREA).toString())) {
-                        double area = Double.parseDouble(da.get(DbConstant.RESERVOIR_AREA).toString());
-                        double speed = Double.parseDouble(da.get("speed").toString());
-                        Double result = area * speed;
-                        BigDecimal bd = new BigDecimal(result);
-                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-                        da.put(DbConstant.RESERVOIR_FLOW, rounded);
-                    }
-                }
-            });
-        } else if (monitorType.equals(MonitorType.STRESS.getKey())
-                || monitorType.equals(MonitorType.PRESSURE.getKey())
-                || monitorType.equals(MonitorType.LEVEL.getKey())) {
+//            maps.forEach(da -> {
+//                TbSensor tbSensor = sensorList.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
+//                // 将JSON字符串转换为JSON对象
+//                if (tbSensor != null) {
+//                    da.put(DbConstant.RESERVOIR_AREA, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.area"));
+//                    if (!StringUtil.isNullOrEmpty(da.get(DbConstant.RESERVOIR_AREA).toString())) {
+//                        double area = Double.parseDouble(da.get(DbConstant.RESERVOIR_AREA).toString());
+//                        double speed = Double.parseDouble(da.get("speed").toString());
+//                        Double result = area * speed;
+//                        BigDecimal bd = new BigDecimal(result);
+//                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
+//                        da.put(DbConstant.RESERVOIR_FLOW, rounded);
+//                    }
+//                }
+//            });
+        } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
 
-            String key = "";
-            if (monitorType.equals(MonitorType.STRESS.getKey())) {
-                key = "stressChange";
-            } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
-                key = "pressureChange";
-            } else {
-                key = "levelChange";
-            }
+            String key = "levelChange";
             // 处理压力变化值,规则当前的数据减去上一笔的数据
             for (int i = 0; i < maps.size(); i++) {
                 Map<String, Object> map = maps.get(i);
@@ -272,12 +263,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     long prevTime = DateUtil.parse(prevTimeStr).getTime();
                     if (prevTime == twoHoursAgo) {
                         // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
-                        if (prevMap.containsKey("v1")) {
-                            double v1TwoHoursAgo = (double) prevMap.get("v1");
+                        if (prevMap.containsKey("distance")) {
+                            double v1TwoHoursAgo = (double) prevMap.get("distance");
                             // 计算stressChange并添加到当前Map对象中
-                            double stressChange = (double) map.get("v1") - v1TwoHoursAgo;
-                            BigDecimal stressChangeBD = new BigDecimal(stressChange);
-                            BigDecimal rounded = stressChangeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+                            double changeValue = (double) map.get("distance") - v1TwoHoursAgo;
+                            BigDecimal changeBD = new BigDecimal(changeValue);
+                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
                             map.put(key, rounded);
                             break;
                         }
@@ -306,9 +297,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         sensorNewDataInfoList.forEach(snd -> {
             snd.setLocationInfo(areaMap.getOrDefault(snd.getLocationInfo(), null));
-            // 存在多个传感器
             if (snd.getMultiSensor() != null) {
                 if (snd.getMultiSensor()) {
+                    // 存在多个传感器
                     List<Integer> currentMonitorPointIncludeSensorIDList = snd.getSensorList().stream().map(TbSensor::getID).collect(Collectors.toList());
                     List<Map<String, Object>> result = new LinkedList<>();
                     if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -397,16 +388,16 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
             // 风力
-            int v1 = WindPowerUtil.getV1Category((Double) currentSensorData.get("v1"));
+            int v1 = WindPowerUtil.getV1Category((Double) currentSensorData.get("windSpeed"));
             currentSensorData.put("windPower", v1);
         } else if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前降雨量
         } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
             // 压力变化
-            currentSensorData.put("stressChange", 0.0);
+//            currentSensorData.put("stressChange", 0.0);
         } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
             // 压强变化
-            currentSensorData.put("pressureChange", 0.0);
+//            currentSensorData.put("pressureChange", 0.0);
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
             // 水位变化
             currentSensorData.put("levelChange", 0.0);
@@ -543,34 +534,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
 
         });
-//        if (!CollectionUtil.isNullOrEmpty(monitorTypeBaseInfos)) {
-//            List<Integer> monitorTypeIDList = monitorTypeBaseInfos.stream().map(MonitorTypeBaseInfo::getMonitorType).collect(Collectors.toList());
-//            Map<Integer, TbMonitorType> filteredMap = monitorTypeMap.entrySet().stream()
-//                    .filter(entry -> !monitorTypeIDList.contains(entry.getKey()))
-//                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//            if (MapUtil.isNotEmpty(filteredMap)) {
-//                filteredMap.entrySet().forEach(entry -> {
-//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-//                    mtVo.setMonitorType(entry.getKey());
-//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-//                    mtVo.setPointCount(0);
-//                    monitorTypeBaseInfos.add(mtVo);
-//                });
-//            }
-//        } else {
-//            if (MapUtil.isNotEmpty(monitorTypeMap)) {
-//                monitorTypeMap.entrySet().forEach(entry -> {
-//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-//                    mtVo.setMonitorType(entry.getKey());
-//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-//                    mtVo.setPointCount(0);
-//                    monitorTypeBaseInfos.add(mtVo);
-//                });
-//            }
-//        }
-
         vo.setTypeInfoList(monitorTypeBaseInfos);
         return vo;
     }
@@ -1018,7 +981,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         List<Map<String, Object>> maps;
         List<FieldSelectInfo> fieldList;
-        List<Map<String, Object>> filteredMaps = new LinkedList<>();
         // 根据传感器ID列表和传感器类型,查传感器最新数据
         if (!CollectionUtil.isNullOrEmpty(sensorIDList)) {
             fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
@@ -1049,30 +1011,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
             // 找到最大的 v1 和对应的深度
             Optional<Map<String, Object>> maxV1Data = newDataList.stream()
-                    .max(Comparator.comparingDouble(data -> (Double) data.get("v1")));
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("aAccu")));
             Integer sensorIDByV1 = maxV1Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
 
             // 找到最大的 v3 和对应的深度
             Optional<Map<String, Object>> maxV3Data = newDataList.stream()
-                    .max(Comparator.comparingDouble(data -> (Double) data.get("v3")));
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("bAccu")));
             Integer sensorIDByV3 = maxV3Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
 
             // 找到最大的 v5 和对应的深度
             Optional<Map<String, Object>> maxV5Data = newDataList.stream()
-                    .max(Comparator.comparingDouble(data -> (Double) data.get("v5")));
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("cOriginal")));
             Integer sensorIDByV5 = maxV5Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
 
             // 构建新的数据集
             Map<String, Object> newData = new HashMap<>();
-            newData.put("xValue", maxV1Data.map(data -> data.get("v1")).orElse(Double.NaN));
-            newData.put("yValue", maxV3Data.map(data -> data.get("v3")).orElse(Double.NaN));
-            newData.put("zValue", maxV5Data.map(data -> data.get("v5")).orElse(Double.NaN));
+            newData.put("xValue", maxV1Data.map(data -> data.get("aAccu")).orElse(Double.NaN));
+            newData.put("yValue", maxV3Data.map(data -> data.get("bAccu")).orElse(Double.NaN));
+            newData.put("zValue", maxV5Data.map(data -> data.get("cOriginal")).orElse(Double.NaN));
             newData.put("xDeep", xDeep);
             newData.put("yDeep", yDeep);
             newData.put("zDeep", zDeep);
@@ -1143,12 +1105,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         String dateStr = DateUtil.format(DateUtil.beginOfDay(new Date(end.getTime())), "yyyy-MM-dd HH:mm:ss");
         String resultStr = dateStr.substring(0, 10) + " 08:00:00";
         Date eightClockDateTime = DateUtil.parse(resultStr, "yyyy-MM-dd HH:mm:ss");
-        DateTime yesterdayEightClockDateTime = DateUtil.offsetDay(eightClockDateTime, -1);
-        String yesterdayEightClockDateTimeStr = DateUtil.formatDateTime(yesterdayEightClockDateTime);
-
-        String resultStr10 = dateStr.substring(0, 10) + " 10:00:00";
-        Date tenClockDateTime = DateUtil.parse(resultStr10, "yyyy-MM-dd HH:mm:ss");
-        DateTime yesterdaytenClockDateTime = DateUtil.offsetDay(tenClockDateTime, -1);
 
         List<Map<String, Object>> yesterdayDataList = new LinkedList<>();
         List<Map<String, Object>> todayDataList = new LinkedList<>();
@@ -1172,7 +1128,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 String timeStr = (String) map.get("time");
                 if (StrUtil.isNotBlank(timeStr)) {
                     if (resultStr.equals(timeStr)) {
-                        clock8v1 = Double.parseDouble(map.get("v1").toString());
+                        clock8v1 = Double.parseDouble(map.get("rainfall").toString());
                     }
                 }
             }
@@ -1187,7 +1143,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             data1.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(data2.get("sensorID"))) {
                         // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
                         double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
-                        double v1 = Double.parseDouble(data2.get("v1").toString());
+                        double v1 = Double.parseDouble(data2.get("rainfall").toString());
                         if (currentTime.equals(eightClockDateTime)) {
                             currentRainfall = 0.0;
                         } else {
@@ -1218,49 +1174,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 data1.put("currentRainfall", null);
             }
         }
-//        if (!CollectionUtil.isNullOrEmpty(yesterdayDataList)) {
-//            double clock8v1 = 0.0;
-//            for (Map<String, Object> map : yesterdayDataList) {
-//                String timeStr = (String) map.get("time");
-//                if (StrUtil.isNotBlank(timeStr)) {
-//                    if (yesterdayEightClockDateTimeStr.equals(timeStr)) {
-//                        clock8v1 = Double.parseDouble(map.get("v1").toString());
-//                    }
-//                }
-//            }
-//            for (int i = 0; i < yesterdayDataList.size(); i++) {
-//                Map<String, Object> data1 = yesterdayDataList.get(i);
-//                for (int j = 0; j < yesterdayDataList.size(); j++) {
-//                    Map<String, Object> data2 = yesterdayDataList.get(j);
-//                    // 在这里执行 data1 和 data2 的比较
-//                    DateTime currentTime = DateUtil.parse(data1.get("time").toString());
-//                    DateTime otherTime = DateUtil.parse(data2.get("time").toString());
-//                    if (DateUtil.compare(currentTime, otherTime) >= 0 &&
-//                            data1.get("sensorID").equals(data2.get("sensorID"))) {
-//                        // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
-//                        double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
-//                        double v1 = Double.parseDouble(data2.get("v1").toString());
-//                        if (currentTime.equals(yesterdayEightClockDateTime)) {
-//                            currentRainfall = 0.0;
-//                        } else {
-//                            currentRainfall += v1;
-//                            currentRainfall = currentRainfall - clock8v1;
-//                        }
-//                        BigDecimal bd = new BigDecimal(currentRainfall);
-//                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-//                        data1.put("currentRainfall", rounded);
-//                    }
-//                }
-//            }
-//            for (int i = 0; i < yesterdayDataList.size(); i++) {
-//                DateTime currentTime = DateUtil.parse(yesterdayDataList.get(i).get("time").toString());
-//                if (!currentTime.equals(yesterdayEightClockDateTime)) {
-//                    double currentRainfall = Double.parseDouble(yesterdayDataList.get(i).get("currentRainfall").toString());
-//                    double result = currentRainfall - clock8v1;
-//                    yesterdayDataList.get(i).put("currentRainfall", result);
-//                }
-//            }
-//        }
 
     }
 
