@@ -173,8 +173,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
         sensor.setUpdateUserID(subject.getSubjectID());
-        Optional.of(request.getImagePath()).filter(StrUtil::isNotBlank)
-                .ifPresent(base64 -> sensor.setImagePath(fileService.base64Upload(base64)));
+        if (StrUtil.isNotBlank(request.getImagePath())) {
+            sensor.setImagePath(fileService.base64Upload(request.getImagePath()));
+        }
         baseMapper.insert(sensor);
 
         //传感器数据源
@@ -250,9 +251,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Set<String> dataSourceIds = request.getSensorList().stream()
                 .map(TbSensor::getDataSourceID).filter(Objects::nonNull)
                 .collect(Collectors.toSet());
-        Optional.of(dataSourceIds).filter(CollUtil::isNotEmpty).ifPresent(idSet ->
-                sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
-                        .in(TbSensorDataSource::getDataSourceID, idSet)));
+        if (CollUtil.isNotEmpty(dataSourceIds)) {
+            sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
+                    .in(TbSensorDataSource::getDataSourceID, dataSourceIds));
+        }
         //删除传感器参数
         parameterMapper.delete(new LambdaQueryWrapper<TbParameter>()
                 .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
@@ -265,25 +267,30 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Transactional(rollbackFor = Exception.class)
     public IdRecord updateSensor(UpdateSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-        Optional.of(request.getImagePath()).filter(StrUtil::isNotBlank)
-                .ifPresent(base64 -> request.getSensor().setImagePath(fileService.base64Upload(base64)));
-        Optional.of(request.getAlias()).filter(StrUtil::isNotBlank).ifPresent(alias -> {
-                    //校验别名是否重复
-                    Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
-                            .eq(TbSensor::getAlias, alias)
-                            .ne(TbSensor::getProjectID, request.getProjectID()));
-                    Assert.isTrue( count == null || count > 0, "别名已存在");
-                    request.getSensor().setAlias(alias);});
         Optional.ofNullable(request.getEnable()).ifPresent(enable -> request.getSensor().setEnable(enable));
         Optional.ofNullable(request.getDisplayOrder())
                 .ifPresent(displayOrder -> request.getSensor().setDisplayOrder(displayOrder));
-        Optional.of(request.getExValues()).filter(StrUtil::isNotBlank)
-                .ifPresent(exValues -> request.getSensor().setExValues(exValues));
+        if (StrUtil.isNotBlank(request.getExValues())) {
+            request.getSensor().setExValues(request.getExValues());
+        }
+        if (StrUtil.isNotBlank(request.getImagePath())) {
+            request.getSensor().setImagePath(fileService.base64Upload(request.getImagePath()));
+        }
+        if (StrUtil.isNotBlank(request.getAlias()) && !request.getSensor().getAlias().equals(request.getAlias())) {
+            //校验别名是否重复
+            Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getAlias, request.getAlias())
+                    .ne(TbSensor::getProjectID, request.getProjectID()));
+            Assert.isTrue( count == null || count == 0, "名称已存在");
+            request.getSensor().setAlias(request.getAlias());
+        }
         request.getSensor().setUpdateUserID(subject.getSubjectID());
         request.getSensor().setUpdateTime(null);
         //更新传感器、参数
         updateById(request.getSensor());
-        Optional.of(request.getParamList()).filter(e -> !e.isEmpty()).ifPresent(parameterMapper::replaceBatch);
+        if (CollUtil.isNotEmpty(request.getParamList())) {
+            parameterMapper.replaceBatch(request.getParamList());
+        }
         return new IdRecord(request.getSensor().getID());
     }
 

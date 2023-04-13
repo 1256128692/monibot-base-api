@@ -1,9 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
-import java.util.Arrays;
+import cn.hutool.core.lang.Assert;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * 监测类型属性的类型
@@ -44,6 +44,7 @@ public enum MonitorTypeFieldClass {
     }
 
     public static MonitorTypeFieldClass codeOf(Integer value) {
-        return Optional.of(VALUES_MAP.get(value)).orElseThrow(() -> new IllegalArgumentException("Invalid MonitorTypeFieldClass value: " + value));
+        Assert.isTrue(isValid(value), "Invalid CalType value: {}", value);
+        return VALUES_MAP.get(value);
     }
 }
