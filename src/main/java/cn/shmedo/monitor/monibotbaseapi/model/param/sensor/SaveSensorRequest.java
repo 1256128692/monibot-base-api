@@ -152,16 +152,14 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             Assert.notEmpty(dataSourceList, "数据源列表不能为空");
         } else {
             templateID = -1;
+            dataSourceList = Collections.emptyList();
         }
-
-        if (CollUtil.isNotEmpty(dataSourceList)) {
-            dataSourceList.forEach(e -> {
-                Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
-                if (e.getDataSourceType() == DatasourceType.IOT) {
-                    Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
-                }
-            });
-        }
+        dataSourceList.forEach(e -> {
+            Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
+            if (e.getDataSourceType() == DatasourceType.IOT) {
+                Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
+            }
+        });
         //校验扩展配置
         if (CollUtil.isNotEmpty(exFields)) {
             TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
@@ -210,7 +208,8 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     }
 
     public void setDataSourceComposeType(Integer dataSourceComposeType) {
-        this.dataSourceComposeType = DataSourceComposeType.codeOf(dataSourceComposeType);
+        this.dataSourceComposeType = dataSourceComposeType == null ?
+                DataSourceComposeType.SINGLE_IOT : DataSourceComposeType.codeOf(dataSourceComposeType);
     }
 }
 

@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.CommonBeans;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -14,8 +15,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -25,14 +28,18 @@ import java.util.UUID;
  */
 @Slf4j
 @Component
+@DependsOn(CommonBeans.CAMEL_OBJECT_MAPPER)
 public class FileService {
 
     private final FileConfig fileConfig;
+
+    private final MdInfoService mdInfoService;
 
     private static final String BASE64_FLAG = ";base64,";
 
     @Autowired
     public FileService(FileConfig fileConfig) {
+        this.mdInfoService = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         this.fileConfig = fileConfig;
     }
 
@@ -56,7 +63,7 @@ public class FileService {
         pojo.setFileType(fileSuffix);
         pojo.setUserID(subject.getSubjectID());
         pojo.setCompanyID(subject.getCompanyID());
-        ResultWrapper<FilePathResponse> info = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo).AddFileUpload(pojo,
+        ResultWrapper<FilePathResponse> info = mdInfoService.AddFileUpload(pojo,
                 fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
@@ -71,19 +78,21 @@ public class FileService {
      * @param ossPath 文件路径
      * @return 文件访问地址
      */
+    @SneakyThrows
     public String getFileUrl(String ossPath) {
-        Assert.notBlank(ossPath, "文件路径为空");
-        QueryFileInfoRequest pojo = new QueryFileInfoRequest();
-        pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
-        pojo.setFilePath(ossPath);
-        ResultWrapper<FileInfoResponse> info = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo).queryFileInfo(pojo,
-                fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
-        if (!info.apiSuccess()) {
-            log.error("获取文件 {} 信息失败，{} => {}", ossPath, info.getCode(), info.getMsg());
-            return null;
-        } else {
-            return info.getData().getAbsolutePath();
+        if (StrUtil.isNotEmpty(ossPath)) {
+            QueryFileInfoRequest pojo = new QueryFileInfoRequest();
+            pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
+            pojo.setFilePath(ossPath);
+            ResultWrapper<FileInfoResponse> info = mdInfoService
+                    .queryFileInfo(pojo, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            if (info.apiSuccess()) {
+                return info.getData().getAbsolutePath();
+            } else {
+                log.error("获取文件 {} 信息失败，{} => {}", ossPath, info.getCode(), info.getMsg());
+            }
         }
+        return null;
     }
 }
 

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
+import cn.hutool.core.lang.Assert;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
@@ -26,7 +27,7 @@ public class DataSourceCatalogRequest implements ParameterValidator, ResourcePer
     /**
      * 数据源类型
      */
-    private Integer dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
+    private Integer dataSourceComposeType;
 
     /**
      * 监测类型
@@ -41,6 +42,11 @@ public class DataSourceCatalogRequest implements ParameterValidator, ResourcePer
 
     @Override
     public ResultWrapper<?> validate() {
+        if (dataSourceComposeType != null) {
+            Assert.isTrue(DataSourceComposeType.isValid(dataSourceComposeType), "数据来源类型不合法");
+        } else {
+            dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
+        }
         return null;
     }
 
