@@ -27,7 +27,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.BaseFormulaParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
@@ -281,10 +280,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private void updateTemplateFormulaCache(Integer templateID, TbMonitorTypeTemplate template, List<TbTemplateDataSource> sources,
                                             List<TbTemplateFormula> formulaList, List<TbTemplateScript> scriptList) {
         String cacheDataJson = redisService.get(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateID.toString());
-        MonitorTypeTemplateCacheData cacheData = JSONUtil.toBean(cacheDataJson, MonitorTypeTemplateCacheData.class);
-        if (ObjectUtil.isEmpty(cacheData)) {
+        if (StrUtil.isEmpty(cacheDataJson)) {
             return;
         }
+        MonitorTypeTemplateCacheData cacheData = JSONUtil.toBean(cacheDataJson, MonitorTypeTemplateCacheData.class);
         if (ObjectUtil.isNotEmpty(template)) {
             BeanUtil.copyProperties(template, cacheData, "templateDataSourceList", "templateFormulaList", "templateScriptList");
         }
