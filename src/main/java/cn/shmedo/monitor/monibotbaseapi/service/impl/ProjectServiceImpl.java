@@ -381,10 +381,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
-            Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
-            List<ProjectBaseInfo> projectBaseInfos = tbProjectInfos.stream().map(item -> ProjectBaseInfo.toNewVo(item,projectTypeMap)).collect(Collectors.toList());
-            return projectBaseInfos;
+            List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
+            tbProjectInfos.forEach(item -> {
+                ProjectBaseInfo result = new ProjectBaseInfo();
+                BeanUtil.copyProperties(item, result);
+                handlerImagePathToRealPath(result);
+                projectBaseInfoList.add(result);
+            });
+
+            return projectBaseInfoList;
         }else{
             return null;
         }
