@@ -13,7 +13,7 @@ public enum CalType {
     Formula(1, "公式"),
     Script(2, "脚本"),
     HTTP(3, "外部http"),
-    NoCal(-1, "公式");
+    NoCal(-1, "不计算");
 
     private static final Map<Integer, CalType> VALUES_MAP = new HashMap<>();
 

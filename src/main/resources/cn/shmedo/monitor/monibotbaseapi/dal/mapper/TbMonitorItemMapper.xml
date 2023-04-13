@@ -320,4 +320,15 @@
         </if>
         order by  it.id desc
     </select>
+
+  <select id="queryMonitorItemWithPointBy"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint">
+      select id as monitorItemID, Name as monitorItemName, Alias as monitorItemAlias
+          from tb_monitor_item where ProjectID = #{projectID}
+      <if test="monitorItemIDList !=null and monitorItemIDList.size > 0">
+          and id in <foreach collection="monitorItemIDList" item="id" separator="," open="(" close=")">
+      #{id}
+      </foreach>
+      </if>
+    </select>
 </mapper>

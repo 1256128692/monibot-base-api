@@ -17,5 +17,6 @@ public class MonitorItem4Web extends TbMonitorItem {
     private String typeName;
     private String typeAlias;
 
+
     private List<TbMonitorTypeFieldWithItemID> fieldList;
 }
