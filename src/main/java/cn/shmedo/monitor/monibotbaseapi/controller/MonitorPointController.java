@@ -132,6 +132,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorTypeName 监测类型名称
      * @apiSuccess (返回结果) {Int} dataList.monitorTypeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorTypeMultiSensor 监测类型是否多传感器
      * @apiSuccess (返回结果) {Int} dataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {Int} dataList.monitorItemAlias 监测项目别名
@@ -191,6 +192,9 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} list.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} list.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {String} list.monitorTypeAlias 监测类型别名
      * @apiSuccess (返回结果) {Object[]} list.monitorPointList 监测点列表
      * @apiSuccess (返回结果) {Int} list.monitorPointList.id 监测点ID
      * @apiSuccess (返回结果) {String} list.monitorPointList.name 监测点名称

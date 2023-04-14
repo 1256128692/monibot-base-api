@@ -18,5 +18,8 @@ public class MonitorPoint4Web extends TbMonitorPoint {
 
     private String monitorItemName;
     private String monitorItemAlias;
+
+    private String monitorTypeMultiSensor;
+
     private List<TbSensor> sensorList;
 }

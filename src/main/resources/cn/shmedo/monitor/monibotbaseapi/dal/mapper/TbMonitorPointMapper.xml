@@ -295,27 +295,27 @@
     </select>
     <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
         select p.*,
-               t.TypeName  as monitorTypeName,
-               t.TypeAlias as monitorTypeAlias,
-               it.Name     as monitorItemName,
-               it.Alias    as monitorItemAlias
+               t.TypeName    as monitorTypeName,
+               t.TypeAlias   as monitorTypeAlias,
+               t.MultiSensor as monitorTypeMultiSensor,
+               it.Name       as monitorItemName,
+               it.Alias      as monitorItemAlias
         from tb_monitor_point as p
                  left join tb_monitor_type as t on t.MonitorType = p.MonitorType
                  left join tb_monitor_item as it on it.id = p.MonitorItemID
                  left join tb_sensor as s on s.MonitorPointID = p.ID
         where p.ProjectID = #{projectID}
-        <if test="monitorType!=null">
-         and  p.MonitorType = #{monitorType}
+        <if test="monitorType != null">
+            and p.MonitorType = #{monitorType}
         </if>
-        <if test="monitorItemName!=null and monitorItemName != ''">
-          and
-          (it.Alias like concat('%',#{monitorItemName},'%')
-          or it.name like concat('%',#{monitorItemName},'%')
-          )
+        <if test="monitorItemName != null and monitorItemName != ''">
+            and (it.Alias like concat('%', #{monitorItemName}, '%')
+                or it.name like concat('%', #{monitorItemName}, '%')
+                )
         </if>
-      <if test="sensorID!=null">
-        and s.ID = #{sensorID}
-      </if>
+        <if test="sensorID != null">
+            and s.ID = #{sensorID}
+        </if>
     </select>
   <select id="querySimpleBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias">
       select id, Name
