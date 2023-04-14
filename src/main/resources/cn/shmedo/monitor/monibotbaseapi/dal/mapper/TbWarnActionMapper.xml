@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnActionMapper">
+
+    <select id="selectTriggerActionCount" resultType="java.lang.Integer" parameterType="cn.shmedo.iot.entity.base.Tuple">
+        SELECT
+            COUNT( * )
+        FROM
+            tb_warn_trigger twt
+            RIGHT JOIN tb_warn_action twa ON twa.triggerID = twt.ID
+        WHERE (twa.ID, twt.ID) IN
+        <foreach collection="list" item="tuple" index="index" open="(" close=")" separator=",">
+            (#{tuple.item1},#{tuple.item2})
+        </foreach>
+    </select>
+</mapper>

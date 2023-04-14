@@ -5,6 +5,36 @@
     <select id="queryWarnStatusByEngineIds"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.WtTriggerActionInfo"
             parameterType="list">
---         TODO
+        SELECT
+            twr.ID warnID,
+            twr.RuleID engineID,
+            twr.`Name` warnName,
+            twr.WarnLevel warnLevel,
+            twr.FieldID fieldID,
+            twr.CompareRule compareRule,
+            twr.TriggerRule triggerRule,
+            twa.ID,
+            twa.triggerID,
+            twa.ActionType actionType,
+            twa.ActionTarget actionTarget,
+            twa.`Desc` `desc`
+        FROM
+            tb_warn_trigger twr
+        LEFT JOIN tb_warn_action twa ON twr.ID = twa.triggerID
+        WHERE twr.RuleID IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectRuleTriggerCount" resultType="java.lang.Integer" parameterType="cn.shmedo.iot.entity.base.Tuple">
+        SELECT
+            COUNT( * )
+        FROM
+            tb_warn_rule twr
+        RIGHT JOIN tb_warn_trigger twt ON twr.ID = twt.RuleID
+        WHERE (twt.ID, twr.ID) IN
+        <foreach collection="list" item="tuple" index="index" open="(" close=")" separator=",">
+            (#{tuple.item1},#{tuple.item2})
+        </foreach>
     </select>
 </mapper>

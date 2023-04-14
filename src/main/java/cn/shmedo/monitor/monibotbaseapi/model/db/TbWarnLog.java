@@ -24,7 +24,7 @@ public class TbWarnLog {
     private Integer monitorPointID;
     @TableField("SensorID")
     private Integer sensorID;
-    @TableField("Name")
+    @TableField("`Name`")
     private String warnName;
     @TableField("WarnTime")
     private Date warnTime;
@@ -35,7 +35,7 @@ public class TbWarnLog {
     /**
      * 处置状态，1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
      */
-    @TableField("Status")
+    @TableField("`Status`")
     private Integer status;
     @TableField("WorkOrder")
     private String workOrder;

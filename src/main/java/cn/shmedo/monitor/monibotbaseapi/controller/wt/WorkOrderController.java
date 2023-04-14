@@ -42,7 +42,7 @@ public class WorkOrderController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @PostMapping(value = "/queryWorkOrderPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryWorkOrderPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWorkOrderPage(@Valid @RequestBody Object param) {
         return null;
     }
@@ -73,7 +73,7 @@ public class WorkOrderController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @PostMapping(value = "/queryWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnDetail(@Valid @RequestBody Object param) {
         return null;
     }
@@ -90,7 +90,7 @@ public class WorkOrderController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    @PostMapping(value = "/deleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWorkOrder(@Valid @RequestBody Object param) {
         return null;
     }

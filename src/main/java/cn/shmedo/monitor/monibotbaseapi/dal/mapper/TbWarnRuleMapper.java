@@ -11,5 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface TbWarnRuleMapper extends BaseMapper<TbWarnRule> {
-    IPage<TbWarnRule> selectWarnRuleByPage(IPage<?> page, @Param("param") QueryWtEnginePageParam param, @Param("projectIdList") List<Integer> projectIDList);
+    IPage<TbWarnRule> selectWarnRuleByPage(IPage<?> page, @Param("param") QueryWtEnginePageParam param, @Param("projectIDList") List<Integer> projectIDList);
+
+    List<Integer> selectRuleWarnIDListByRuleIDList(List<Integer> engineIDList);
 }

@@ -28,9 +28,9 @@ public class TbWarnRule {
     private Integer createUserID;
     @TableField("UpdateUserID")
     private Integer updateUserID;
-    @TableField("Name")
+    @TableField("`Name`")
     private String name;
-    @TableField("Desc")
+    @TableField("`Desc`")
     private String desc;
     @TableField("CreateTime")
     private Date createTime;

@@ -19,7 +19,7 @@ public class TbWarnTrigger {
     private Integer warnLevel;
     @TableField("FieldID")
     private Integer fieldID;
-    @TableField("Name")
+    @TableField("`Name`")
     private String warnName;
     @TableField("CompareRule")
     private String compareRule;

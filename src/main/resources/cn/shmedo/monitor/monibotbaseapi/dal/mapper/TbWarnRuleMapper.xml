@@ -44,4 +44,17 @@
             AND `MonitorPointID`=#{param.monitorPointID}
         </if>
     </select>
+    <select id="selectRuleWarnIDListByRuleIDList" resultType="integer" parameterType="list">
+        SELECT
+            twr.ID engineID
+        FROM
+            tb_warn_rule twr
+        LEFT JOIN tb_warn_trigger twt ON twr.ID = twt.RuleID
+        WHERE
+            twt.ID IS NOT NULL
+            AND twr.ID IN
+        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

@@ -52,7 +52,7 @@ public class WtWarnController {
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
 //    @Permission(permissionName = "mdmbase:ListBaseWarn")
-    @PostMapping(value = "/queryWtWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryWtWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtWarnPage(@Valid @RequestBody Object param) {
         // table name: tbbbb
         // select tb.* from tbbbb tb left join (select MAX(time) latest_time,group_id from tbbbb group by group_id) tb1 on tb.group_id=tb1.group_id where tb1.latest_time=tb.time
@@ -88,7 +88,7 @@ public class WtWarnController {
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseWarn")
-    @PostMapping(value = "/queryWtWarnInfoDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/QueryWtWarnInfoDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtWarnInfoDetail(@Valid @RequestBody Object param) {
         //TODO 获取对应报警记录,获取对应规则(获取限制),将点位、时间数据（前3天后3天）传输至第三方服务后获取并封装对应测点曲线数据
         return null;

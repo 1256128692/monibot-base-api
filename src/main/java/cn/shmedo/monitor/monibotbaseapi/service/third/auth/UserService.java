@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -48,4 +49,11 @@ public interface UserService {
     ResultWrapper<Boolean> queryHasPermissionInBatchResource(OpenAuthQueryHasPermissionInBatchResourceParameter pa,
                                                              @Param("accessToken") String accessToken);
 
+    /**
+     * 批量查询用户名称
+     */
+    @RequestLine("POST /QueryUserIDName")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> queryUserIDName(QueryUserIDNameParameter pa,
+                                          @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 }
