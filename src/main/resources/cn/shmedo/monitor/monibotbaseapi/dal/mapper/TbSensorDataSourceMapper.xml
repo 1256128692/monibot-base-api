@@ -118,4 +118,57 @@
       ExValues = #{exValues,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <resultMap id="dataSourceWithSensorMap" extends="BaseResultMap"
+             type="cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor">
+    <collection property="sensorInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
+      <id column="SID" jdbcType="INTEGER" property="ID" />
+      <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+      <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
+      <result column="DataSourceID" jdbcType="VARCHAR" property="dataSourceID" />
+      <result column="DataSourceComposeType" jdbcType="INTEGER" property="dataSourceComposeType" />
+      <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+      <result column="Name" jdbcType="VARCHAR" property="name" />
+      <result column="Alias" jdbcType="VARCHAR" property="alias" />
+      <result column="Kind" jdbcType="TINYINT" property="kind" />
+      <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
+      <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID" />
+      <result column="ConfigFieldValue" jdbcType="VARCHAR" property="configFieldValue" />
+      <result column="SExValues" jdbcType="VARCHAR" property="exValues" />
+      <result column="Status" jdbcType="TINYINT" property="status" />
+      <result column="WarnNoData" jdbcType="BIT" property="warnNoData" />
+      <result column="MonitorBeginTime" jdbcType="TIMESTAMP" property="monitorBeginTime" />
+      <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
+      <result column="Enable" jdbcType="BIT" property="enable" />
+      <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+      <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+      <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+      <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+    </collection>
+  </resultMap>
+
+  <select id="selectDataSourceWithSensor" resultMap="dataSourceWithSensorMap"
+          parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SourceWithSensorRequest"
+          resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor">
+    SELECT
+      tds.*,ts.ID AS SID, ts.ProjectID, ts.TemplateID, ts.DataSourceID, ts.DataSourceComposeType, ts.MonitorType,
+      ts.`Name`,ts.`Alias`, ts.Kind, ts.DisplayOrder, ts.MonitorPointID, ts.ConfigFieldValue, ts.ExValues AS SExValues,
+      ts.`Status`,ts.WarnNoData, ts.MonitorBeginTime, ts.ImagePath, ts.`Enable`, ts.CreateTime, ts.CreateUserID,
+      ts.UpdateTime, ts.UpdateUserID
+    FROM
+      `tb_sensor_data_source` tds
+        LEFT JOIN `tb_sensor` ts ON tds.DataSourceID = ts.DataSourceID
+    WHERE ts.Enable = 1 AND
+      <trim suffixOverrides="AND">
+        <if test="projectID != null">
+          ts.ProjectID = #{projectID,jdbcType=INTEGER} AND
+        </if>
+        <if test="dataSourceComposeType != null">
+          tds.DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER} AND
+        </if>
+        <if test="dataSourceToken != null and dataSourceToken != ''">
+          tds.DataSourceToken = #{dataSourceToken,jdbcType=VARCHAR} AND
+        </if>
+      </trim>
+  </select>
 </mapper>

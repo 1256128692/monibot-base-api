@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
@@ -210,5 +211,14 @@ public class Param2DBEntityUtil {
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);
         return obj;
+    }
+
+    public static TbMonitorPoint fromAddMonitorPointParam2TbMonitorPoint(AddMonitorPointParam pa, Integer userID) {
+        Date now = new Date();
+        return TbMonitorPoint.builder()
+                .projectID(pa.getProjectID()).monitorType(pa.getMonitorType()).monitorItemID(pa.getMonitorItemID()).name(pa.getName())
+                .installLocation(null).gpsLocation(pa.getGpsLocation()).imageLocation(pa.getImageLocation()).spatialLocation(pa.getSpatialLocation())
+                .exValues(pa.getExValues()).enable(pa.getEnable()).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
+                .build();
     }
 }

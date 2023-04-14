@@ -90,4 +90,26 @@
             #{itemID}
         </foreach>
     </delete>
+
+    <select id="queryItemListByFieldTokenAndName" resultType="java.lang.Integer">
+        select MonitorItemID from tb_monitor_item_field
+        where MonitorTypeFieldID in (
+            select  id from tb_monitor_type_field
+            <where>
+                <if test="monitorFieldName!=null and monitorFieldName!=''">
+                    FieldName like concat('%',#{monitorFieldName},'%')
+                </if>
+                <if test="monitorFieldToken!=null and monitorFieldToken!=''">
+                   and FieldToken like concat('%',#{monitorFieldToken},'%')
+                </if>
+            </where>
+            )
+    </select>
+
+    <insert id="insertEntityBatch">
+        insert into tb_monitor_item_field (MonitorItemID, MonitorTypeFieldID)values
+        <foreach collection="collection" item="item" separator=",">
+            (#{item.monitorItemID}, #{item.monitorTypeFieldID})
+        </foreach>
+    </insert>
 </mapper>

@@ -82,7 +82,7 @@
       TemplateDataSourceToken = #{templateDataSourceToken,jdbcType=VARCHAR}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
-  <insert id="insertBatch">
+  <insert id="insertBatch" keyProperty="ID" useGeneratedKeys="true">
     insert into tb_template_data_source (TemplateDataSourceID, DataSourceType,
     TemplateDataSourceToken)
     values <foreach collection="list" item="item" separator=",">

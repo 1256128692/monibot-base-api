@@ -56,9 +56,13 @@ public class QuerySmcPointHistoryDataListParam implements ParameterValidator, Re
             }
         }
 
-        if (StringUtils.isNotBlank(density)){
-            if (!(density.endsWith("h")  || density.endsWith("d"))){
+        if (StringUtils.isNotBlank(density)) {
+            if (!(density.endsWith("h") || density.endsWith("d") || density.endsWith("m") || density.equals("all"))) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前查询密度条件错误");
+            }
+            // 传输条件为all时,置空查询密度,即可查询全部数据
+            if (density.equals("all")){
+                density = null;
             }
         }
 

@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
@@ -15,9 +16,9 @@ public interface SensorService extends IService<TbSensor> {
      * 传感器分页，仅返回部分字段
      *
      * @param request {@link SensorPageRequest}
-     * @return {@link PageUtil.Page<SensorPageResponse>}
+     * @return {@link PageUtil.Page< SensorListResponse >}
      */
-    PageUtil.Page<SensorPageResponse> sensorPage(SensorPageRequest request);
+    PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request);
 
     /**
      * 数据源级联
@@ -89,4 +90,27 @@ public interface SensorService extends IService<TbSensor> {
      * @return {@link BaseConfigResponse}
      */
     BaseConfigResponse baseConfig(BaseConfigRequest request);
+
+    /**
+     * 传感器列表
+     *
+     * @param request {@link SensorListRequest}
+     * @return {@link SensorListResponse}
+     */
+    List<SensorListResponse> sensorList(SensorListRequest request);
+
+    /**
+     * 查询传感器和其数据源信息
+     *
+     * @param request {@link SourceWithSensorRequest}
+     * @return {@link DataSourceWithSensor}
+     */
+    List<DataSourceWithSensor> querySensorDataSource(SourceWithSensorRequest request);
+
+    /**
+     * 更新传感器状态和监测开始时间
+     *
+     * @param request {@link UpdateSensorStatusRequest}
+     */
+    void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request);
 }

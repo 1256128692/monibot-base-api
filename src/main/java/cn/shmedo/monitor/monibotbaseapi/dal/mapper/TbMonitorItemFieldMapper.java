@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface TbMonitorItemFieldMapper extends BaseMapper<TbMonitorItemField> {
@@ -23,4 +24,6 @@ public interface TbMonitorItemFieldMapper extends BaseMapper<TbMonitorItemField>
     void deleteByMonitorItemIDList(List<Integer> monitorItemIDList);
 
     List<Integer> queryItemListByFieldTokenAndName(String monitorFieldName, String monitorFieldToken);
+
+    void insertEntityBatch(Collection<TbMonitorItemField> collect);
 }

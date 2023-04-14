@@ -6,7 +6,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -24,6 +24,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRe
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -33,9 +34,11 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -63,6 +66,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final FileConfig fileConfig;
     private final RedisService redisService;
     private final PropertyService propertyService;
+    private final MdInfoService mdInfoService;
 
     private static final String TOKEN_HEADER = "Authorization";
 
@@ -124,7 +128,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,
                                     Integer companyID) {
-        MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
         AddFileUploadRequest pojo = new AddFileUploadRequest();
         if (StrUtil.isBlank(fileName)) {
             pojo.setFileName(UUID.randomUUID().toString());
@@ -136,7 +139,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         pojo.setFileType(imageSuffix);
         pojo.setUserID(userID);
         pojo.setCompanyID(companyID);
-        ResultWrapper<FilePathResponse> info = instance.AddFileUpload(pojo,fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
         } else {
@@ -182,11 +185,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private <T extends TbProjectInfo> void handlerImagePathToRealPath(T projectInfo) {
         if (!StrUtil.isBlank(projectInfo.getImagePath())) {
-            MdInfoService instance = ThirdHttpService.getInstance(MdInfoService.class, ThirdHttpService.MdInfo);
             QueryFileInfoRequest pojo = new QueryFileInfoRequest();
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
             pojo.setFilePath(projectInfo.getImagePath());
-            ResultWrapper<FileInfoResponse> info = instance.queryFileInfo(pojo, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            ResultWrapper<FileInfoResponse> info = mdInfoService.queryFileInfo(pojo);
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             } else {
@@ -356,4 +358,58 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         handlerImagePathToRealPath(result);
         return result;
     }
+
+    @Override
+    public List<ProjectBaseInfo> queryProjectListByProjectName(QueryProjectListParam pa) {
+
+        List<Integer> projectIDs = getUserProjectIDs(pa.getCompanyID(), pa.getAccessToken());
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
+                .in(TbProjectInfo::getID, projectIDs);
+        if (!CollectionUtil.isNotEmpty(projectIDs)) {
+            wrapper.in(TbProjectInfo::getID, projectIDs);
+        }
+        if (!StringUtil.isNullOrEmpty(pa.getProjectName())) {
+            wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
+        }
+        if (pa.getProjectType() != null) {
+            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
+        }
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
+        if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
+
+            List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
+            tbProjectInfos.forEach(item -> {
+                ProjectBaseInfo result = new ProjectBaseInfo();
+                BeanUtil.copyProperties(item, result);
+                handlerImagePathToRealPath(result);
+                projectBaseInfoList.add(result);
+            });
+
+            return projectBaseInfoList;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * 获取用户在该公司中具有权限的项目
+     * @return
+     */
+    @Override
+    public List<Integer> getUserProjectIDs(Integer companyID, String accessToken) {
+        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
+        QueryResourceListByPermissionParameter pa = new QueryResourceListByPermissionParameter();
+        pa.setCompanyID(companyID);
+        pa.setServiceName(DefaultConstant.MDNET_SERVICE_NAME);
+        pa.setPermissionToken(DefaultConstant.LIST_PROJECT);
+        pa.setResourceType(ResourceType.BASE_PROJECT.toInt());
+        ResultWrapper<List<String>> info = instance.queryResourceListByPermission(pa, accessToken);
+        if (!info.apiSuccess()) {
+            throw new CustomBaseException(info.getCode(), info.getMsg());
+        }
+        List<Integer> pids = info.getData().stream().distinct().map(Integer::parseInt).collect(Collectors.toList());
+        return pids;
+    }
+
 }

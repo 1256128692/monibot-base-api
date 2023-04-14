@@ -22,9 +22,13 @@ public interface WtMonitorService {
 
     MonitorPointHistoryData querySmcPointHistoryDataList(QuerySmcPointHistoryDataListParam pa);
 
-    MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID);
+    MonitorPointAllInfo queryMonitorPointBaseInfoList(QueryMonitorPointBaseInfoListParam pa);
 
     RainMonitorPointHistoryData queryRainPointHistoryDataList(QueryRainMonitorPointSensorDataListParam pa);
 
     MonitorPointListHistoryData queryMonitorPointListHistoryDataList(QueryMonitorPointsSensorDataListParam pa);
+
+    TriaxialDisplacementMonitorPointHistoryData queryDisplacementPointHistoryDataList(QueryDisplacementPointHistoryParam pa);
+
+    List<TriaxialDisplacementSensorNewDataInfo> queryDisplacementMonitorPointNewDataList(QueryDisplacementMonitorPointNewDataParam pa);
 }

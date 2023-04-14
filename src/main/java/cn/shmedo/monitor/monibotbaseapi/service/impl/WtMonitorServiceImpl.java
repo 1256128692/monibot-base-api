@@ -23,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
@@ -140,9 +141,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
 
         tbMonitorPoints.forEach(item -> {
-            TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
+            TbProjectInfo projectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
             List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
-            sensorNewDataInfoList.add(SensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
+            sensorNewDataInfoList.add(SensorNewDataInfo.reBuildProAndMonitor(item, projectInfo,
                     projectTypeMap, sensorList, monitorTypeMap));
         });
 
@@ -226,35 +227,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 }
             }
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
+            // 流量暂不计算
+        } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
 
-            // 流量计算
-            maps.forEach(da -> {
-                TbSensor tbSensor = sensorList.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
-                // 将JSON字符串转换为JSON对象
-                if (tbSensor != null) {
-                    da.put(DbConstant.RESERVOIR_AREA, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.area"));
-                    if (!StringUtil.isNullOrEmpty(da.get(DbConstant.RESERVOIR_AREA).toString())) {
-                        double area = Double.parseDouble(da.get(DbConstant.RESERVOIR_AREA).toString());
-                        double speed = Double.parseDouble(da.get("speed").toString());
-                        Double result = area * speed;
-                        BigDecimal bd = new BigDecimal(result);
-                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-                        da.put(DbConstant.RESERVOIR_FLOW, rounded);
-                    }
-                }
-            });
-        } else if (monitorType.equals(MonitorType.STRESS.getKey())
-                || monitorType.equals(MonitorType.PRESSURE.getKey())
-                || monitorType.equals(MonitorType.LEVEL.getKey())) {
-
-            String key = "";
-            if (monitorType.equals(MonitorType.STRESS.getKey())) {
-                key = "stressChange";
-            }else  if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
-                key = "pressureChange";
-            }else {
-                key = "levelChange";
-            }
+            String key = "levelChange";
             // 处理压力变化值,规则当前的数据减去上一笔的数据
             for (int i = 0; i < maps.size(); i++) {
                 Map<String, Object> map = maps.get(i);
@@ -271,12 +247,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     long prevTime = DateUtil.parse(prevTimeStr).getTime();
                     if (prevTime == twoHoursAgo) {
                         // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
-                        if (prevMap.containsKey("v1")) {
-                            double v1TwoHoursAgo = (double) prevMap.get("v1");
+                        if (prevMap.containsKey("distance")) {
+                            double v1TwoHoursAgo = (double) prevMap.get("distance");
                             // 计算stressChange并添加到当前Map对象中
-                            double stressChange = (double) map.get("v1") - v1TwoHoursAgo;
-                            BigDecimal stressChangeBD = new BigDecimal(stressChange);
-                            BigDecimal rounded = stressChangeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+                            double changeValue = (double) map.get("distance") - v1TwoHoursAgo;
+                            BigDecimal changeBD = new BigDecimal(changeValue);
+                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
                             map.put(key, rounded);
                             break;
                         }
@@ -305,9 +281,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         sensorNewDataInfoList.forEach(snd -> {
             snd.setLocationInfo(areaMap.getOrDefault(snd.getLocationInfo(), null));
-            // 存在多个传感器
             if (snd.getMultiSensor() != null) {
                 if (snd.getMultiSensor()) {
+                    // 存在多个传感器
                     List<Integer> currentMonitorPointIncludeSensorIDList = snd.getSensorList().stream().map(TbSensor::getID).collect(Collectors.toList());
                     List<Map<String, Object>> result = new LinkedList<>();
                     if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -380,32 +356,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())) {
             if (monitorItemID.equals(MonitoringItem.RIVER_WATER_QUALITY.getKey())) {
                 // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("v1"));
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
-                int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("v6"));
-                int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("v7"));
-                int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("v8"));
+                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("dissolvedOxygen"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
+                int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
+                int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
                 List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
 
             } else if (monitorItemID.equals(MonitoringItem.RESERVOIR_WATER_QUALITY.getKey())) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
             // 风力
-            int v1 = WindPowerUtil.getV1Category((Double) currentSensorData.get("v1"));
+            int v1 = WindPowerUtil.getV1Category((Double) currentSensorData.get("windSpeed"));
             currentSensorData.put("windPower", v1);
         } else if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
             // 当前降雨量
         } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
             // 压力变化
-            currentSensorData.put("stressChange", 0.0);
         } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
             // 压强变化
-            currentSensorData.put("pressureChange", 0.0);
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
             // 水位变化
             currentSensorData.put("levelChange", 0.0);
@@ -452,13 +426,22 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Integer monitorType = -1;
         // 2.监测点信息列表
         List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null);
+        List<MonitorPointAndItemInfo> result = new ArrayList<>();
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
         } else {
-            monitorType = tbMonitorPoints.get(0).getMonitorType();
+            MonitorPointAndItemInfo monitorPointAndItemInfo = tbMonitorPoints.stream().filter(pojo ->
+                    pojo.getID().equals(pa.getMonitorPointID())
+            ).findFirst().orElse(null);
+            if (monitorPointAndItemInfo != null) {
+                monitorType = monitorPointAndItemInfo.getMonitorType();
+                result.add(monitorPointAndItemInfo);
+            } else {
+                return null;
+            }
         }
 
-        List<SensorNewDataInfo> sensorNewDataInfoList = buildProjectAndMonitorAndSensorInfo(tbProjectInfos, tbMonitorPoints, monitorType);
+        List<SensorNewDataInfo> sensorNewDataInfoList = buildProjectAndMonitorAndSensorInfo(tbProjectInfos, result, monitorType);
         if (CollectionUtil.isNullOrEmpty(sensorNewDataInfoList)) {
             return null;
         } else {
@@ -533,34 +516,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
 
         });
-//        if (!CollectionUtil.isNullOrEmpty(monitorTypeBaseInfos)) {
-//            List<Integer> monitorTypeIDList = monitorTypeBaseInfos.stream().map(MonitorTypeBaseInfo::getMonitorType).collect(Collectors.toList());
-//            Map<Integer, TbMonitorType> filteredMap = monitorTypeMap.entrySet().stream()
-//                    .filter(entry -> !monitorTypeIDList.contains(entry.getKey()))
-//                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-//            if (MapUtil.isNotEmpty(filteredMap)) {
-//                filteredMap.entrySet().forEach(entry -> {
-//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-//                    mtVo.setMonitorType(entry.getKey());
-//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-//                    mtVo.setPointCount(0);
-//                    monitorTypeBaseInfos.add(mtVo);
-//                });
-//            }
-//        } else {
-//            if (MapUtil.isNotEmpty(monitorTypeMap)) {
-//                monitorTypeMap.entrySet().forEach(entry -> {
-//                    MonitorTypeBaseInfo mtVo = new MonitorTypeBaseInfo();
-//                    mtVo.setMonitorType(entry.getKey());
-//                    mtVo.setMonitorTypeName(entry.getValue().getTypeName());
-//                    mtVo.setMonitorTypeAlias(entry.getValue().getTypeAlias());
-//                    mtVo.setPointCount(0);
-//                    monitorTypeBaseInfos.add(mtVo);
-//                });
-//            }
-//        }
-
         vo.setTypeInfoList(monitorTypeBaseInfos);
         return vo;
     }
@@ -686,11 +641,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
 
     @Override
-    public MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID) {
+    public MonitorPointAllInfo queryMonitorPointBaseInfoList(QueryMonitorPointBaseInfoListParam pa) {
 
         MonitorPointAllInfo vo = new MonitorPointAllInfo();
         LambdaQueryWrapper<TbMonitorPoint> wrapper = new LambdaQueryWrapper<TbMonitorPoint>()
-                .eq(TbMonitorPoint::getProjectID, projectID);
+                .eq(TbMonitorPoint::getProjectID, pa.getProjectID());
         List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(wrapper);
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
@@ -712,7 +667,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorItemIDs)) {
             LambdaQueryWrapper<TbMonitorItem> tmiWrapper = new LambdaQueryWrapper<TbMonitorItem>()
-                    .in(TbMonitorItem::getID, monitorItemIDs);
+                    .in(TbMonitorItem::getID, monitorItemIDs)
+                    .eq(TbMonitorItem::getMonitorClass, pa.getMonitorClass());
             List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(tmiWrapper);
             vo.setTbMonitorItems(tbMonitorItems);
         }
@@ -868,6 +824,234 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new MonitorPointListHistoryData(pa.getTbMonitorPointList(), tbSensors, maps, fieldList, tbDataUnitList);
     }
 
+
+    @Override
+    public TriaxialDisplacementMonitorPointHistoryData queryDisplacementPointHistoryDataList(QueryDisplacementPointHistoryParam pa) {
+
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+
+        LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, pa.getMonitorPointID());
+        // 1.传感器信息列表
+        List<TbSensor> tbSensors = tbSensorMapper.selectList(sensorLambdaQueryWrapper);
+        if (CollectionUtil.isNullOrEmpty(tbSensors)) {
+            return null;
+        }
+        List<Integer> sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
+
+        LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
+                .eq(TbMonitorItemField::getMonitorItemID, pa.getTbMonitorPoint().getMonitorItemID());
+        // 2. 监测项目与监测子字段类型关系表
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
+
+        // TODO:如果查不到对应关系.暂时先处理成查监测类下全部的监测子类型
+        // 3. 监测点类型子字段列表
+        List<TbMonitorTypeField> tbMonitorTypeFields = null;
+        if (!CollectionUtil.isNullOrEmpty(tbMonitorItemFields)) {
+            List<Integer> monitorTypeFieldIDs = tbMonitorItemFields.stream().map(TbMonitorItemField::getMonitorTypeFieldID).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .in(TbMonitorTypeField::getID, monitorTypeFieldIDs);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+
+        } else {
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .eq(TbMonitorTypeField::getMonitorType, pa.getTbMonitorPoint().getMonitorType());
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+        }
+
+        // 监测子类型字段
+        List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+
+        // 通用类型的传感器数据
+        List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+
+        List<Map<String, Object>> resultMaps = new LinkedList<>();
+        if (!CollectionUtil.isNullOrEmpty(maps)) {
+            maps.forEach(map -> {
+                // 处理内部三轴位移数据
+                Map<String, Object> stringObjectMap = handleTriaxialDisplacementType(map, tbSensors);
+                resultMaps.add(stringObjectMap);
+            });
+        }
+        // 处理需要计算的监测子类型返回token
+        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+
+        // 处理时间排序
+        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
+        // 处理数据单位
+        List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
+
+        return new TriaxialDisplacementMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, sortedGroupedMaps, fieldList, tbDataUnitList);
+    }
+
+    @Override
+    public List<TriaxialDisplacementSensorNewDataInfo> queryDisplacementMonitorPointNewDataList(QueryDisplacementMonitorPointNewDataParam pa) {
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID());
+        if (pa.getProjectTypeID() != null) {
+            wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectTypeID());
+        }
+        if (!StringUtil.isNullOrEmpty(pa.getAreaCode())) {
+            wrapper.like(TbProjectInfo::getLocation, pa.getAreaCode());
+        }
+        // 1.项目信息列表
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
+        if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
+            return Collections.emptyList();
+        }
+        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
+        // 2.监测点信息列表
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList, pa.getMonitorType(), pa.getMonitorItemID());
+        if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
+            return Collections.emptyList();
+        }
+        return buildTDProjectAndMonitorAndSensorInfo(tbProjectInfos, tbMonitorPoints, pa.getMonitorType());
+    }
+
+    private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
+
+        List<TriaxialDisplacementSensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
+        // 获取项目类型(方式缓存)
+        Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+
+        List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
+        List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());
+
+        LambdaQueryWrapper<TbSensor> sensorLambdaQueryWrapper = new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, monitorPointIDs)
+                .eq(TbSensor::getMonitorType, monitorType);
+        // 1.传感器信息列表
+        List<TbSensor> tbSensors = tbSensorMapper.selectList(sensorLambdaQueryWrapper);
+
+
+        LambdaQueryWrapper<TbMonitorItemField> mIFQueryWrapper = new LambdaQueryWrapper<TbMonitorItemField>()
+                .in(TbMonitorItemField::getMonitorItemID, monitorItemIDs);
+        // 2. 监测项目与监测子字段类型关系表
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(mIFQueryWrapper);
+
+        // TODO:如果查不到对应关系.暂时先处理成查监测类下全部的监测子类型
+        // 3. 监测点类型子字段列表
+        List<TbMonitorTypeField> tbMonitorTypeFields = null;
+        if (!CollectionUtil.isNullOrEmpty(tbMonitorItemFields)) {
+            List<Integer> monitorTypeFieldIDs = tbMonitorItemFields.stream().map(TbMonitorItemField::getMonitorTypeFieldID).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .in(TbMonitorTypeField::getID, monitorTypeFieldIDs);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+
+        } else {
+            LambdaQueryWrapper<TbMonitorTypeField> mTQueryWrapper = new LambdaQueryWrapper<TbMonitorTypeField>()
+                    .eq(TbMonitorTypeField::getMonitorType, monitorType);
+            tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectList(mTQueryWrapper);
+        }
+
+        List<Integer> sensorIDList;
+        if (!CollectionUtil.isNullOrEmpty(tbSensors)) {
+            sensorIDList = tbSensors.stream().map(TbSensor::getID).collect(Collectors.toList());
+        } else {
+            sensorIDList = null;
+        }
+
+        tbMonitorPoints.forEach(item -> {
+            TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
+            List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
+            sensorNewDataInfoList.add(TriaxialDisplacementSensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
+                    projectTypeMap, sensorList, monitorTypeMap));
+        });
+
+        List<Map<String, Object>> maps;
+        List<FieldSelectInfo> fieldList;
+        // 根据传感器ID列表和传感器类型,查传感器最新数据
+        if (!CollectionUtil.isNullOrEmpty(sensorIDList)) {
+            fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+            // 3. 传感器数据列表
+            maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
+            handleTriaxialDisplacementSensorDataList(maps, sensorNewDataInfoList);
+        }
+
+        return sensorNewDataInfoList;
+    }
+
+    private void handleTriaxialDisplacementSensorDataList(List<Map<String, Object>> dataList,
+                                                          List<TriaxialDisplacementSensorNewDataInfo> monitorPointInfos) {
+
+        Collection<Object> areas = monitorPointInfos
+                .stream().map(TriaxialDisplacementSensorNewDataInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+
+        monitorPointInfos.forEach(pojo -> {
+            List<Integer> sensorIDs = pojo.getSensorList().stream().map(TbSensor::getID).collect(Collectors.toList());
+
+            // 过滤出来当前监测点下的传感器数据列表
+            List<Map<String, Object>> newDataList = dataList.stream()
+                    .filter(data -> sensorIDs.contains(Integer.valueOf(data.get("sensorID").toString())))
+                    .collect(Collectors.toList());
+
+            // 找到最大的 v1 和对应的深度
+            Optional<Map<String, Object>> maxV1Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("aAccu")));
+            Integer sensorIDByV1 = maxV1Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
+
+            // 找到最大的 v3 和对应的深度
+            Optional<Map<String, Object>> maxV3Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("bAccu")));
+            Integer sensorIDByV3 = maxV3Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
+
+            // 找到最大的 v5 和对应的深度
+            Optional<Map<String, Object>> maxV5Data = newDataList.stream()
+                    .max(Comparator.comparingDouble(data -> (Double) data.get("cOriginal")));
+            Integer sensorIDByV5 = maxV5Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
+            String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
+            Double zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
+
+            // 构建新的数据集
+            Map<String, Object> newData = new HashMap<>();
+            newData.put("xValue", maxV1Data.map(data -> data.get("aAccu")).orElse(Double.NaN));
+            newData.put("yValue", maxV3Data.map(data -> data.get("bAccu")).orElse(Double.NaN));
+            newData.put("zValue", maxV5Data.map(data -> data.get("cOriginal")).orElse(Double.NaN));
+            newData.put("xDeep", xDeep);
+            newData.put("yDeep", yDeep);
+            newData.put("zDeep", zDeep);
+
+            pojo.setLocationInfo(areaMap.getOrDefault(pojo.getLocationInfo(), null));
+            pojo.setSensorData(newData);
+
+            Optional<Map<String, Object>> latest = newDataList.stream()
+                    .sorted(Comparator.comparing((Map<String, Object> data) -> (String) data.get("time")).reversed())
+                    .findFirst();
+            if (latest.isPresent()) {
+                String latestTime = (String) latest.get().get("time");
+                pojo.setTime(DateUtil.parse(latestTime, "yyyy-MM-dd HH:mm:ss.SSS"));
+            }
+
+        });
+
+    }
+
+    /**
+     * 处理内部三轴位移
+     *
+     * @param map       传感器数据
+     * @param tbSensors 传感器列表
+     * @return
+     */
+    private Map<String, Object> handleTriaxialDisplacementType(Map<String, Object> map, List<TbSensor> tbSensors) {
+        TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
+        if (sensor != null) {
+            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.deep"));
+        }
+        return map;
+    }
+
     /**
      * 处理数据单位
      *
@@ -904,12 +1088,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         String dateStr = DateUtil.format(DateUtil.beginOfDay(new Date(end.getTime())), "yyyy-MM-dd HH:mm:ss");
         String resultStr = dateStr.substring(0, 10) + " 08:00:00";
         Date eightClockDateTime = DateUtil.parse(resultStr, "yyyy-MM-dd HH:mm:ss");
-        DateTime yesterdayEightClockDateTime = DateUtil.offsetDay(eightClockDateTime, -1);
-        String yesterdayEightClockDateTimeStr = DateUtil.formatDateTime(yesterdayEightClockDateTime);
-
-        String resultStr10 = dateStr.substring(0, 10) + " 10:00:00";
-        Date tenClockDateTime = DateUtil.parse(resultStr10, "yyyy-MM-dd HH:mm:ss");
-        DateTime yesterdaytenClockDateTime = DateUtil.offsetDay(tenClockDateTime, -1);
 
         List<Map<String, Object>> yesterdayDataList = new LinkedList<>();
         List<Map<String, Object>> todayDataList = new LinkedList<>();
@@ -933,7 +1111,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 String timeStr = (String) map.get("time");
                 if (StrUtil.isNotBlank(timeStr)) {
                     if (resultStr.equals(timeStr)) {
-                        clock8v1 = Double.parseDouble(map.get("v1").toString());
+                        clock8v1 = Double.parseDouble(map.get("rainfall").toString());
                     }
                 }
             }
@@ -948,7 +1126,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             data1.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(data2.get("sensorID"))) {
                         // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
                         double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
-                        double v1 = Double.parseDouble(data2.get("v1").toString());
+                        double v1 = Double.parseDouble(data2.get("rainfall").toString());
                         if (currentTime.equals(eightClockDateTime)) {
                             currentRainfall = 0.0;
                         } else {
@@ -979,49 +1157,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 data1.put("currentRainfall", null);
             }
         }
-//        if (!CollectionUtil.isNullOrEmpty(yesterdayDataList)) {
-//            double clock8v1 = 0.0;
-//            for (Map<String, Object> map : yesterdayDataList) {
-//                String timeStr = (String) map.get("time");
-//                if (StrUtil.isNotBlank(timeStr)) {
-//                    if (yesterdayEightClockDateTimeStr.equals(timeStr)) {
-//                        clock8v1 = Double.parseDouble(map.get("v1").toString());
-//                    }
-//                }
-//            }
-//            for (int i = 0; i < yesterdayDataList.size(); i++) {
-//                Map<String, Object> data1 = yesterdayDataList.get(i);
-//                for (int j = 0; j < yesterdayDataList.size(); j++) {
-//                    Map<String, Object> data2 = yesterdayDataList.get(j);
-//                    // 在这里执行 data1 和 data2 的比较
-//                    DateTime currentTime = DateUtil.parse(data1.get("time").toString());
-//                    DateTime otherTime = DateUtil.parse(data2.get("time").toString());
-//                    if (DateUtil.compare(currentTime, otherTime) >= 0 &&
-//                            data1.get("sensorID").equals(data2.get("sensorID"))) {
-//                        // 处理相同传感器 ID 的数据 并且 当前传感器采集时间大于或者等于其余传感器采集时间
-//                        double currentRainfall = Double.parseDouble(data1.get("currentRainfall").toString());
-//                        double v1 = Double.parseDouble(data2.get("v1").toString());
-//                        if (currentTime.equals(yesterdayEightClockDateTime)) {
-//                            currentRainfall = 0.0;
-//                        } else {
-//                            currentRainfall += v1;
-//                            currentRainfall = currentRainfall - clock8v1;
-//                        }
-//                        BigDecimal bd = new BigDecimal(currentRainfall);
-//                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-//                        data1.put("currentRainfall", rounded);
-//                    }
-//                }
-//            }
-//            for (int i = 0; i < yesterdayDataList.size(); i++) {
-//                DateTime currentTime = DateUtil.parse(yesterdayDataList.get(i).get("time").toString());
-//                if (!currentTime.equals(yesterdayEightClockDateTime)) {
-//                    double currentRainfall = Double.parseDouble(yesterdayDataList.get(i).get("currentRainfall").toString());
-//                    double result = currentRainfall - clock8v1;
-//                    yesterdayDataList.get(i).put("currentRainfall", result);
-//                }
-//            }
-//        }
 
     }
 

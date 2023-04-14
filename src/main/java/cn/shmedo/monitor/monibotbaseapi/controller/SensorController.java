@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,35 @@ import org.springframework.web.bind.annotation.RestController;
 public class SensorController {
 
     private final SensorService sensorService;
+
+    /**
+     * @api {POST} /SensorList 传感器列表
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName SensorList
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
+     * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
+     * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {Int} data.id 传感器ID
+     * @apiSuccess (响应结果) {Int} data.monitorType 监测类型 (Code)
+     * @apiSuccess (响应结果) {String} data.monitorTypeName 监测类型名称
+     * @apiSuccess (响应结果) {String} data.name 传感器名称 (由系统自动生成不可修改)
+     * @apiSuccess (响应结果) {String} data.alias 传感器别名
+     * @apiSuccess (响应结果) {Int} data.displayOrder 显示排序字段
+     * @apiSuccess (响应结果) {Int} data.monitorPointID 关联监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName 关联监测点名称
+     * @apiSuccess (响应结果) {String} data.exValues 拓展信息
+     * @apiSuccess (响应结果) {Boolean} data.enable 是否启用, 不启用将不会接收数据
+     * @apiPermission mdmbase:ListSensor
+     */
+//    @Permission(permissionName = "mdmbase:ListSensor")
+    @PostMapping(value = "/SensorList", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object sensorList(@RequestBody @Validated SensorListRequest request) {
+        return sensorService.sensorList(request);
+    }
 
     /**
      * @api {POST} /SensorPage 传感器分页
@@ -66,8 +96,8 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName DataSourceCatalog
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} dataSourceComposeType 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
-     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParam (请求体) {String} [keyword] 检索关键字
      * @apiParamExample 请求体示例
      * {"monitorType":1,"dataSourceComposeType":"1","keyword":"11B","projectID":5411}
@@ -190,12 +220,12 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName AddSensor
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} [imagePath] 传感器图片路径
+     * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {String} templateDataSourceID 监测类型模板分布式唯一ID
+     * @apiParam (请求体) {Int} [templateID] 监测类型模板ID, 仅当dataSourceComposeType为100时不需要
      * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API 推送
-     * @apiParam (请求体) {Object[]} dataSourceList 数据源列表, 仅当dataSourceComposeType为100时不需要
+     * @apiParam (请求体) {Object[]} [dataSourceList] 数据源列表, 仅当dataSourceComposeType为100时不需要
      * @apiParam (请求体) {Int} dataSourceList.dataSourceType 数据源类型 1-物联网传感器 2-监测传感器
      * @apiParam (请求体) {String} dataSourceList.templateDataSourceToken 模板数据源标识
      * @apiParam (请求体) {String} dataSourceList.sensorName (监测/物联网)传感器名称
@@ -318,7 +348,7 @@ public class SensorController {
      * @apiName UpdateSensor
      * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} [imagePath] 传感器图片路径
+     * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} [alias] 传感器别名
      * @apiParam (请求体) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表 (不传=不修改，修改时每次传全部)
@@ -410,5 +440,68 @@ public class SensorController {
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object trying(@RequestBody @Validated TryingRequest request) {
         return sensorService.trying(request);
+    }
+
+    /**
+     * @api {POST} /QuerySensorDataSource  查询传感器数据源
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QuerySensorDataSource
+     * @apiDescription 查询传感器数据源 (!仅限应用调用)
+     * @apiParam (请求参数) {Int} projectID  项目ID
+     * @apiParam (请求参数) {String} dataSourceToken 数据源标识
+     * @apiParam (请求参数) {String} [dataSourceComposeType] 模板数据来源类型
+     * @apiSuccess (返回结果) {Object[]} dataSourceList  传感器数据源列表
+     * @apiSuccess (返回结果) {Int} dataSourceList.ID  传感器数据源ID
+     * @apiSuccess (返回结果) {String} dataSourceList.dataSourceID 数据源分布式唯一ID
+     * @apiSuccess (返回结果) {Int} dataSourceList.dataSourceType  数据源类型 1 - 物联网传感器 2 - 监测传感器
+     * @apiSuccess (返回结果) {String} dataSourceList.dataSourceToken  数据源标识
+     * @apiSuccess (返回结果) {Int} dataSourceList.dataSourceComposeType  模板数据源标识
+     * @apiSuccess (返回结果) {String} [dataSourceList.exValues]  拓展字段
+     * @apiSuccess (返回结果) {Object[]} dataSourceList.sensorInfoList  传感器列表
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.ID  传感器ID
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.projectID  项目ID
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.templateID 模板ID
+     * @apiSuccess (返回结果) {String} dataSourceList.sensorInfoList.dataSourceID 数据源分布式唯一ID
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.dataSourceComposeType 模板数据源标识
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} dataSourceList.sensorInfoList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataSourceList.sensorInfoList.alias 传感器别名
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.kind 传感器类型　1-自动化传感器 2-融合传感器 3-人工传感器
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.displayOrder 排序字段
+     * @apiSuccess (返回结果) {Int} [dataSourceList.sensorInfoList.monitorPointID] 关联监测点ID
+     * @apiSuccess (返回结果) {String} [dataSourceList.sensorInfoList.configFieldValue] 存储监测类型拓展配置值
+     * @apiSuccess (返回结果) {String} [dataSourceList.sensorInfoList.exValues] 拓展字段
+     * @apiSuccess (返回结果) {Int} dataSourceList.sensorInfoList.status 传感器状态
+     * @apiSuccess (返回结果) {Bool} dataSourceList.sensorInfoList.warnNoData 无数据报警
+     * @apiSuccess (返回结果) {DateTime} [dataSourceList.sensorInfoList.monitorBeginTime] 开始监测时间
+     * @apiSampleRequest off
+     * @apiPermission 项目权限+应用权限
+     */
+//    @Permission(permissionName = "mdmbase:ListSensor", allowApplication = true, allowUser = false)
+    @PostMapping(value = "/QuerySensorDataSource", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySensorDataSource(@RequestBody @Validated SourceWithSensorRequest request) {
+        return sensorService.querySensorDataSource(request);
+    }
+
+    /**
+     * @api {POST} /UpdateSensorStatusAndMonitorBeginTime  更新传感器状态与开始监测时间
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName UpdateSensorStatusAndMonitorBeginTime
+     * @apiDescription 更新传感器状态与开始监测时间 (!仅限应用调用)
+     * @apiParam (请求参数) {Int} projectID  项目ID
+     * @apiParam (请求参数) {Int} sensorID 传感器ID
+     * @apiParam (请求参数) {Int} [sensorStatus] 传感器状态
+     * @apiParam (请求参数) {DateTime} [monitorBeginTime] 开始监测时间
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限+应用权限
+     */
+//    @Permission(permissionName = "mdmbase:ListSensor", allowApplication = true, allowUser = false)
+    @PostMapping(value = "/UpdateSensorStatusAndMonitorBeginTime", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateSensorStatusAndMonitorBeginTime(@RequestBody @Validated UpdateSensorStatusRequest request) {
+        sensorService.updateSensorStatusAndMonitorBeginTime(request);
+        return ResultWrapper.successWithNothing();
     }
 }

@@ -16,6 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
@@ -27,6 +28,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.FormulaUtil;
@@ -60,7 +62,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private final TbMonitorTypeFieldMapper monitorTypeFieldMapper;
     private final TbTemplateScriptMapper templateScriptMapper;
     private final TbTemplateFormulaMapper templateFormulaMapper;
-    private final  RedisService redisService;
+    private final RedisService redisService;
+    private final FileService fileService;
 
     @Autowired
     public SensorServiceImpl(IotService iotService,
@@ -71,7 +74,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                              TbMonitorTypeFieldMapper monitorTypeFieldMapper,
                              TbTemplateScriptMapper templateScriptMapper,
                              TbTemplateFormulaMapper templateFormulaMapper,
-                             @Qualifier(RedisConstant.IOT_REDIS_SERVICE) RedisService redisService) {
+                             @Qualifier(RedisConstant.IOT_REDIS_SERVICE) RedisService redisService,
+                             FileService fileService) {
         this.iotService = iotService;
         this.monitorTypeTemplateMapper = monitorTypeTemplateMapper;
         this.monitorTypeMapper = monitorTypeMapper;
@@ -81,12 +85,13 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         this.templateScriptMapper = templateScriptMapper;
         this.templateFormulaMapper = templateFormulaMapper;
         this.redisService = redisService;
+        this.fileService = fileService;
     }
 
     @Override
-    public PageUtil.Page<SensorPageResponse> sensorPage(SensorPageRequest request) {
-        Page<SensorPageResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
-        IPage<SensorPageResponse> pageData = this.baseMapper.selectSensorPage(page, request);
+    public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
+        Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
+        IPage<SensorListResponse> pageData = this.baseMapper.selectSensorPage(page, request);
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
@@ -136,7 +141,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     public List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request) {
         LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = new LambdaQueryWrapper<TbMonitorTypeTemplate>()
                 .eq(TbMonitorTypeTemplate::getDataSourceComposeType, request.getDataSourceComposeType());
-        if (request.getTemplateDataSourceID() != null) {
+        if (StrUtil.isNotBlank(request.getTemplateDataSourceID())) {
             wrapper.eq(TbMonitorTypeTemplate::getTemplateDataSourceID, request.getTemplateDataSourceID());
         }
         Set<Integer> monitorTypes = monitorTypeTemplateMapper.selectList(wrapper)
@@ -168,21 +173,26 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
         sensor.setUpdateUserID(subject.getSubjectID());
+        if (StrUtil.isNotBlank(request.getImagePath())) {
+            sensor.setImagePath(fileService.base64Upload(request.getImagePath()));
+        }
         baseMapper.insert(sensor);
 
         //传感器数据源
-        List<TbSensorDataSource> sensorDataSources = request.getDataSourceList().stream().map(source -> {
-            TbSensorDataSource dataSource = new TbSensorDataSource();
-            dataSource.setDataSourceID(sensor.getDataSourceID());
-            dataSource.setDataSourceType(source.getDataSourceType().getCode());
-            dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
-            dataSource.setDataSourceToken(DatasourceType.IOT.equals(source.getDataSourceType()) ?
-                    source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
-            dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
-            dataSource.setExValues(source.getExValues());
-            return dataSource;
-        }).toList();
-        sensorDataSourceMapper.insertBatchSomeColumn(sensorDataSources);
+        if (CollUtil.isNotEmpty(request.getDataSourceList())) {
+            List<TbSensorDataSource> sensorDataSources = request.getDataSourceList().stream().map(source -> {
+                TbSensorDataSource dataSource = new TbSensorDataSource();
+                dataSource.setDataSourceID(sensor.getDataSourceID());
+                dataSource.setDataSourceType(source.getDataSourceType().getCode());
+                dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
+                dataSource.setDataSourceToken(DatasourceType.IOT.equals(source.getDataSourceType()) ?
+                        source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
+                dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
+                dataSource.setExValues(source.getExValues());
+                return dataSource;
+            }).toList();
+            sensorDataSourceMapper.insertBatchSomeColumn(sensorDataSources);
+        }
 
         //传感器参数
         if (!request.getParameterList().isEmpty()) {
@@ -198,19 +208,34 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Assert.notNull(sensor, "传感器不存在");
 
         SensorInfoResponse response = SensorInfoResponse.valueOf(sensor);
+        //图片
+        response.setImagePath(fileService.getFileUrl(sensor.getImagePath()));
         //扩展配置
-        Map<String, TbMonitorTypeField> typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
-                        .eq(TbMonitorTypeField::getMonitorType, response.getMonitorType())
-                        .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()))
-                .stream().collect(Collectors.toMap(TbMonitorTypeField::getFieldName, e -> e));
-        Dict exConfig = JSONUtil.toBean(response.getConfigFieldValue(), Dict.class);
-        response.setExFields(exConfig.entrySet().stream().filter(e -> typeFields.containsKey(e.getKey()))
-                .map(e -> SensorInfoResponse.ExField.valueOf(typeFields.get(e.getKey()),
-                        e.getValue().toString())).toList());
+        List<TbMonitorTypeField> typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
+                .eq(TbMonitorTypeField::getMonitorType, response.getMonitorType())
+                .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()));
+        Dict exConfig = JSONUtil.isTypeJSON(response.getConfigFieldValue()) ?
+                JSONUtil.toBean(response.getConfigFieldValue(), Dict.class) : Dict.create();
+        response.setExFields(typeFields.stream().map(e -> {
+                    SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
+                    exField.setValue(exConfig.getStr(e.getFieldName()));
+                    return exField;
+                }).toList());
         //参数
-        response.setParamFields(parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
-                .eq(TbParameter::getSubjectID, response.getID())));
+        Map<Integer, Map<String, TbParameter>> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
+                .or(wrapper -> wrapper
+                        .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
+                        .eq(TbParameter::getSubjectID, response.getID()))
+                .or(wrapper -> {
+                    wrapper.eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                            .eq(TbParameter::getSubjectID, response.getTemplateID());
+                })).stream().collect(Collectors.groupingBy(TbParameter::getSubjectType,
+                Collectors.toMap(TbParameter::getToken, e -> e)));
+        if (paramMap.containsKey(ParamSubjectType.Template.getType())) {
+            Map<String, TbParameter> sensorParamMap = paramMap.getOrDefault(ParamSubjectType.Sensor.getType(), Map.of());
+            response.setParamFields(paramMap.get(ParamSubjectType.Template.getType()).values().stream()
+                    .peek(p -> p.setPaValue(sensorParamMap.getOrDefault(p.getToken(), p).getPaValue())).toList());
+        }
         //数据源
         response.setDataSourceList(sensorDataSourceMapper
                 .selectList(new LambdaQueryWrapper<TbSensorDataSource>()
@@ -222,11 +247,19 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteSensor(DeleteSensorRequest request) {
-        sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
-                .in(TbSensorDataSource::getDataSourceID, request.getSensorIDList()));
+        //删除传感器数据源
+        Set<String> dataSourceIds = request.getSensorList().stream()
+                .map(TbSensor::getDataSourceID).filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        if (CollUtil.isNotEmpty(dataSourceIds)) {
+            sensorDataSourceMapper.delete(new LambdaQueryWrapper<TbSensorDataSource>()
+                    .in(TbSensorDataSource::getDataSourceID, dataSourceIds));
+        }
+        //删除传感器参数
         parameterMapper.delete(new LambdaQueryWrapper<TbParameter>()
                 .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
                 .in(TbParameter::getSubjectID, request.getSensorIDList()));
+        //删除传感器
         removeBatchByIds(request.getSensorIDList());
     }
 
@@ -234,16 +267,30 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Transactional(rollbackFor = Exception.class)
     public IdRecord updateSensor(UpdateSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-        Optional.ofNullable(request.getImagePath()).ifPresent(imagePath -> request.getSensor().setImagePath(imagePath));
-        Optional.ofNullable(request.getAlias()).ifPresent(alias -> request.getSensor().setAlias(alias));
         Optional.ofNullable(request.getEnable()).ifPresent(enable -> request.getSensor().setEnable(enable));
-        Optional.ofNullable(request.getDisplayOrder()).ifPresent(displayOrder -> request.getSensor().setDisplayOrder(displayOrder));
-        Optional.ofNullable(request.getExValues()).ifPresent(exValues -> request.getSensor().setExValues(exValues));
+        Optional.ofNullable(request.getDisplayOrder())
+                .ifPresent(displayOrder -> request.getSensor().setDisplayOrder(displayOrder));
+        if (StrUtil.isNotBlank(request.getExValues())) {
+            request.getSensor().setExValues(request.getExValues());
+        }
+        if (StrUtil.isNotBlank(request.getImagePath())) {
+            request.getSensor().setImagePath(fileService.base64Upload(request.getImagePath()));
+        }
+        if (StrUtil.isNotBlank(request.getAlias()) && !request.getSensor().getAlias().equals(request.getAlias())) {
+            //校验别名是否重复
+            Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getAlias, request.getAlias())
+                    .ne(TbSensor::getProjectID, request.getProjectID()));
+            Assert.isTrue( count == null || count == 0, "名称已存在");
+            request.getSensor().setAlias(request.getAlias());
+        }
         request.getSensor().setUpdateUserID(subject.getSubjectID());
         request.getSensor().setUpdateTime(null);
         //更新传感器、参数
         updateById(request.getSensor());
-        Optional.of(request.getParamList()).filter(e -> !e.isEmpty()).ifPresent(parameterMapper::replaceBatch);
+        if (CollUtil.isNotEmpty(request.getParamList())) {
+            parameterMapper.replaceBatch(request.getParamList());
+        }
         return new IdRecord(request.getSensor().getID());
     }
 
@@ -287,7 +334,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     return a;
                 }));
 
-        Set<Object> modelTokens = sourceMap.get(FormulaUtil.DataType.IOT).stream()
+        Set<Object> modelTokens = sourceMap.getOrDefault(FormulaUtil.DataType.IOT, Collections.emptySet()).stream()
                 .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
                 .map(e -> (Object) e)
                 .collect(Collectors.toSet());
@@ -388,11 +435,31 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         return CollUtil.getFirst(list);
     }
 
+    @Override
+    public List<SensorListResponse> sensorList(SensorListRequest request) {
+        return this.baseMapper.selectSensorList(request);
+    }
+
+    @Override
+    public List<DataSourceWithSensor> querySensorDataSource(SourceWithSensorRequest request) {
+        return sensorDataSourceMapper.selectDataSourceWithSensor(request);
+    }
+
+    @Override
+    public void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request) {
+        TbSensor sensor = new TbSensor();
+        sensor.setID(request.getSensorID());
+        Optional.ofNullable(request.getSensorStatus()).ifPresent(e -> sensor.setStatus(e.byteValue()));
+        Optional.ofNullable(request.getMonitorBeginTime()).ifPresent(sensor::setMonitorBeginTime);
+        this.updateById(sensor);
+    }
+
     /**
      * 根据物联网传感器类型获取设备和传感器信息
-     * @param consumer  传感器类型
-     * @param searchToken   搜索设备token
-     * @return  key:iotSensorType value: {@link DeviceWithSensor}
+     *
+     * @param consumer    传感器类型
+     * @param searchToken 搜索设备token
+     * @return key:iotSensorType value: {@link DeviceWithSensor}
      */
     private Map<String, List<DeviceWithSensor>> getIotMap(Supplier<Set<String>> consumer, String searchToken) {
         Set<String> iotSensorTypes = consumer.get();
@@ -444,7 +511,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
      * @return 传感器名称
      */
     private synchronized String genSensorName(Integer monitorType, Integer projectID) {
-        Integer number = this.baseMapper.getNameSerialNumber(monitorType, projectID);
+        Integer number = this.baseMapper.getNameSerialNumber(projectID, monitorType);
         return monitorType + StrUtil.UNDERLINE + number;
     }
 }

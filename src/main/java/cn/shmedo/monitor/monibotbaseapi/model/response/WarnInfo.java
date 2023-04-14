@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response;
 
+import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorSatusType;
 import com.alibaba.nacos.client.naming.utils.CollectionUtils;
@@ -24,21 +25,23 @@ public class WarnInfo {
         WarnInfo vo = new WarnInfo();
         if (!CollectionUtils.isEmpty(sensorList)) {
             Map<Byte, List<TbSensor>> listMap = sensorList.stream().collect(Collectors.groupingBy(TbSensor::getStatus));
-            listMap.entrySet().forEach(item -> {
-                if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_0.getKey()))) {
-                    vo.setNormalCount(item.getValue().size());
-                } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_1.getKey()))) {
-                    vo.setLevelOneCount(item.getValue().size());
-                } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_2.getKey()))) {
-                    vo.setLevelTwoCount(item.getValue().size());
-                } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_3.getKey()))) {
-                    vo.setLevelThreeCount(item.getValue().size());
-                } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_4.getKey()))) {
-                    vo.setLevelFourCount(item.getValue().size());
-                } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_ERROR.getKey()))) {
-                    vo.setNoDataCount(item.getValue().size());
-                }
-            });
+            if (MapUtil.isNotEmpty(listMap)){
+                listMap.entrySet().forEach(item -> {
+                    if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_0.getKey()))) {
+                        vo.setNormalCount(item.getValue().size());
+                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_1.getKey()))) {
+                        vo.setLevelOneCount(item.getValue().size());
+                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_2.getKey()))) {
+                        vo.setLevelTwoCount(item.getValue().size());
+                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_3.getKey()))) {
+                        vo.setLevelThreeCount(item.getValue().size());
+                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_4.getKey()))) {
+                        vo.setLevelFourCount(item.getValue().size());
+                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_ERROR.getKey()))) {
+                        vo.setNoDataCount(item.getValue().size());
+                    }
+                });
+            }
         }
         vo.setNoDataCount(vo.getNoDataCount() == null ? 0 : vo.getNoDataCount());
         vo.setNormalCount(vo.getNormalCount() == null ? 0 : vo.getNormalCount());

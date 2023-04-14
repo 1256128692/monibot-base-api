@@ -4,12 +4,15 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     int deleteByPrimaryKey(Integer ID);
@@ -34,7 +37,11 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     void updateProjectIDBatch(List<Integer> monitorItemIDList, Integer projectID, Integer userID, Date now);
 
-    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer projectID, Byte createType, String monitorItemName, Integer monitorType, List<Integer> idList);
+    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer projectID, Byte createType, String monitorItemName, Integer monitorType, List<Integer> idList, Boolean companyItem);
 
     List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType);
+
+    List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList);
+
+    void insertBatch(Collection<TbMonitorItem> collection);
 }

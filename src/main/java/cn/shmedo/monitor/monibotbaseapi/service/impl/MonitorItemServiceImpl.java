@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -124,10 +123,30 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addCompanyMonitorItem(AddCompanyMonitorItemParam pa, Integer userID) {
-        tbMonitorItemMapper.updateProjectIDBatch(
-                pa.getMonitorItemIDList(), -1, userID, new Date()
+        List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectBatchIds(pa.getMonitorItemIDList());
+        List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(
+                new QueryWrapper<TbMonitorItemField>().in("MonitorItemID", pa.getMonitorItemIDList())
         );
+        Map<Integer, List<TbMonitorItemField>> temp = tbMonitorItemFields.stream().collect(Collectors.groupingBy(TbMonitorItemField::getMonitorItemID));
+        Map<TbMonitorItem, List<TbMonitorItemField>> map = new HashMap<>();
+        Date now = new Date();
+        for (TbMonitorItem tbMonitorItem : tbMonitorItems) {
+            map.put(tbMonitorItem, temp.get(tbMonitorItem.getID()));
+            tbMonitorItem.setProjectID(-1);
+            tbMonitorItem.setCreateTime(now);
+            tbMonitorItem.setCreateUserID(userID);
+            tbMonitorItem.setUpdateTime(now);
+            tbMonitorItem.setUpdateUserID(userID);
+        }
+        tbMonitorItemMapper.insertBatch(map.keySet());
+        map.forEach((key, value)->{
+            value.forEach(item ->{
+                item.setMonitorItemID(key.getID());
+            });
+        });
+        tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
     }
 
     @Override
@@ -142,7 +161,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList);
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.BaseException;
@@ -10,14 +9,14 @@ import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintDeclarationException;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -79,9 +78,13 @@ public class ExceptionController {
 
         //参数绑定异常
         if (e instanceof BindException ex) {
-//            String msg = ex.getBindingResult().getAllErrors().stream()
-//                    .map(DefaultMessageSourceResolvable::getDefaultMessage).collect(Collectors.joining(StrUtil.COMMA));
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数校验不通过:********"  + e.getMessage());
+            String msg = ex.getBindingResult().getAllErrors().stream()
+                    .map(item -> {
+                        String fieldName = item instanceof FieldError error ? error.getField() : item.getObjectName();
+                        return fieldName + StrUtil.COLON + StrUtil.SPACE + item.getDefaultMessage();
+                    }).collect(Collectors.joining(StrUtil.COMMA));
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,
+                    StrUtil.isEmpty(msg) ? "参数校验不通过: " + e.getMessage() : msg);
 
         }
 
@@ -137,6 +140,11 @@ public class ExceptionController {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "请求方式错误");
         }
 
+        //请求格式异常 通常由错误的 Content-Type 引起
+        if (e instanceof HttpMediaTypeException ex) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "请求格式错误");
+        }
+
         //数据库异常
         if (e instanceof DataAccessException) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "数据库异常");
@@ -166,8 +174,7 @@ public class ExceptionController {
      * @param e       {@link Exception}
      */
     private static void outputLog(HttpServletRequest request, Exception e) {
-        log.error("{}请求发生异常, 路径: {}，参数: {}", request.getMethod(), request.getRequestURI(),
-                JSONUtil.toJsonStr(request.getParameterMap()));
+        log.error("{} {} => {}", request.getMethod(), request.getRequestURI(), e.getMessage());
         log.error(ExceptionUtil.stacktraceToString(e));
     }
 

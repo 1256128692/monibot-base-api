@@ -389,14 +389,14 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} data.projectType 项目类型
      * @apiSuccess (返回结果) {String} data.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} data.projectMainTypeName 项目主类型名称
-     * @apiSuccess (返回结果) {String} [currentPageData.imagePath] 项目图片地址
+     * @apiSuccess (返回结果) {String} [data.imagePath] 项目图片地址
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseProject
+     * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectListByProjectName(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryProjectListByProjectName(@Validated @RequestBody QueryProjectListParam pa) {
+        return projectService.queryProjectListByProjectName(pa);
     }
 
     /**
@@ -427,6 +427,45 @@ public class ProjectController {
 //    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryWtProjectSimpleList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryWtProjectSimpleList(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {post} /SetProjectImg 设置项目图片
+     * @apiDescription 设置项目图片
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName SetProjectImg
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} imgType 图片类型：底图，三维等
+     * @apiParam (请求体) {String} [imgContent] 图片内容，base64格式
+     * @apiParam (请求体) {String} [imgSuffix] 图片后缀
+     * @apiSuccess (返回结果) {String} imgURL 图片可用url
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseProject
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "SetProjectImg", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object setProjectImg(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+    /**
+     * @api {post} /QueryProjectImg 查询项目图片
+     * @apiDescription 查询项目图片
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryProjectImg
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} imgType 图片类型：底图，三维等
+     * @apiSuccess (返回结果) {String} imgURL 图片可用url
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseProject
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "QueryProjectImg", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectImg(@Validated @RequestBody Object pa) {
         return null;
     }
 

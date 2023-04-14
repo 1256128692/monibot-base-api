@@ -16,6 +16,9 @@ public class QueryMonitorPointBaseInfoListParam implements ParameterValidator, R
     private Integer projectID;
 
 
+    private Integer monitorClass;
+
+
     @Override
     public ResultWrapper validate() {
         return null;

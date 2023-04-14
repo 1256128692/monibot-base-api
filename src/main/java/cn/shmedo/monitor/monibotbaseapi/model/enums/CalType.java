@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import cn.hutool.core.lang.Assert;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * @program: monibot-base-api
@@ -13,7 +14,7 @@ public enum CalType {
     Formula(1, "公式"),
     Script(2, "脚本"),
     HTTP(3, "外部http"),
-    NoCal(-1, "公式");
+    NoCal(-1, "不计算");
 
     private static final Map<Integer, CalType> VALUES_MAP = new HashMap<>();
 
@@ -44,7 +45,8 @@ public enum CalType {
     }
 
     public static CalType codeOf(Integer value) {
-        return Optional.of(VALUES_MAP.get(value)).orElseThrow(() -> new IllegalArgumentException("Invalid CalType value: " + value));
+        Assert.isTrue(isValid(value), "Invalid CalType value: {}", value);
+        return VALUES_MAP.get(value);
     }
 
 }

@@ -2,25 +2,41 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ScriptCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.TemplateDataSourceCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -53,7 +69,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbTemplateFormulaMapper tbTemplateFormulaMapper;
     private final TbParameterMapper tbParameterMapper;
     private final FileConfig fileConfig;
-
+    private final RedisService redisService;
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
@@ -201,14 +217,32 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         tbMonitorTypeTemplateMapper.insert(record);
         List<TbTemplateDataSource> sources = Param2DBEntityUtil.fromAddTemplateParam2TbTemplateDataSourceList(record.getTemplateDataSourceID(), pa);
         tbTemplateDataSourceMapper.insertBatch(sources);
+        TbTemplateScript script = null;
         if (!StringUtils.isBlank(pa.getScript())) {
-            TbTemplateScript script = Param2DBEntityUtil.buildTbMonitorTypeTemplate(record.getID(), pa.getMonitorType(), pa.getScript());
+            script = Param2DBEntityUtil.buildTbMonitorTypeTemplate(record.getID(), pa.getMonitorType(), pa.getScript());
             tbTemplateScriptMapper.insert(script);
         }
+        List<TbTemplateFormula> formulaList = null;
         if (ObjectUtil.isNotEmpty(pa.getFormulaList())) {
-            List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(record.getID(), pa.getMonitorType(), pa.getFormulaList());
-            tbTemplateFormulaMapper.insertBatch(list);
+            formulaList = Param2DBEntityUtil.buildTbTemplateFormulaList(record.getID(), pa.getMonitorType(), pa.getFormulaList());
+            tbTemplateFormulaMapper.insertBatch(formulaList);
         }
+        // 添加监测类型模板缓存
+        addTemplateCache(record, sources, formulaList, ObjectUtil.isEmpty(script) ? null : Arrays.asList(script));
+    }
+
+    /**
+     * 添加监测类型模板缓存
+     *
+     * @param template
+     * @param sources
+     * @param formulaList
+     * @param scriptList
+     */
+    private void addTemplateCache(TbMonitorTypeTemplate template, List<TbTemplateDataSource> sources,
+                                  List<TbTemplateFormula> formulaList, List<TbTemplateScript> scriptList) {
+        MonitorTypeTemplateCacheData cacheData = MonitorTypeTemplateCacheData.valueOf(template, sources, formulaList, scriptList);
+        redisService.put(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, template.getID().toString(), JSONUtil.toJsonStr(cacheData));
     }
 
     @Override
@@ -230,6 +264,42 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(pa.getTemplateID(), pa.getMonitorType(), pa.getFormulaList());
         tbTemplateFormulaMapper.deleteBatchByFieldIDS(list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
         tbTemplateFormulaMapper.insertBatch(list);
+        //修改缓存
+        updateTemplateFormulaCache(pa.getTemplateID(), null, null, list, null);
+    }
+
+    /**
+     * 更新监测类型模板公式缓存
+     *
+     * @param templateID
+     * @param template
+     * @param sources
+     * @param formulaList
+     * @param scriptList
+     */
+    private void updateTemplateFormulaCache(Integer templateID, TbMonitorTypeTemplate template, List<TbTemplateDataSource> sources,
+                                            List<TbTemplateFormula> formulaList, List<TbTemplateScript> scriptList) {
+        String cacheDataJson = redisService.get(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateID.toString());
+        if (StrUtil.isEmpty(cacheDataJson)) {
+            return;
+        }
+        MonitorTypeTemplateCacheData cacheData = JSONUtil.toBean(cacheDataJson, MonitorTypeTemplateCacheData.class);
+        if (ObjectUtil.isNotEmpty(template)) {
+            BeanUtil.copyProperties(template, cacheData, "templateDataSourceList", "templateFormulaList", "templateScriptList");
+        }
+        if (ObjectUtil.isNotEmpty(sources)) {
+            List<TemplateDataSourceCacheData> templateDataSourceList = BeanUtil.copyToList(sources, TemplateDataSourceCacheData.class);
+            cacheData.setTemplateDataSourceList(templateDataSourceList);
+        }
+        if (CollUtil.isNotEmpty(formulaList)) {
+            List<FormulaCacheData> templateFormulaList = BeanUtil.copyToList(formulaList, FormulaCacheData.class);
+            cacheData.setTemplateFormulaList(templateFormulaList);
+        }
+        if (CollUtil.isNotEmpty(scriptList)) {
+            List<ScriptCacheData> templateScriptList = BeanUtil.copyToList(scriptList, ScriptCacheData.class);
+            cacheData.setTemplateScriptList(templateScriptList);
+        }
+        redisService.put(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateID.toString(), JSONUtil.toJsonStr(cacheData));
     }
 
     @Override
@@ -274,7 +344,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         tbTemplateFormulaMapper.deleteByTemplateIDList(templateIDList);
         tbTemplateScriptMapper.deleteByTemplateIDList(templateIDList);
         tbMonitorTypeTemplateMapper.deleteBatchIds(templateIDList);
-
+        // 删除缓存
+        redisService.remove(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateIDList.stream().map(String::valueOf).collect(Collectors.toList()));
     }
 
     @Override
@@ -341,4 +412,90 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         return list;
     }
 
+    @Override
+    public QueryFormulaParamsResult queryFormulaParams(QueryFormulaParamsRequest request) {
+        QueryFormulaParamsResult result = new QueryFormulaParamsResult();
+        TbMonitorTypeTemplate monitorTypeTemplate = request.getMonitorTypeTemplate();
+        List<TbTemplateDataSource> templateDataSourceList = tbTemplateDataSourceMapper
+                .selectList(new LambdaQueryWrapper<TbTemplateDataSource>()
+                        .eq(TbTemplateDataSource::getTemplateDataSourceID, monitorTypeTemplate.getTemplateDataSourceID()));
+        if (!CollUtil.isEmpty(templateDataSourceList)) {
+            templateDataSourceList.stream().collect(Collectors.groupingBy(TbTemplateDataSource::getDataSourceType))
+                    .forEach((type, list) -> {
+                        List<String> sourceTokenList = list.stream()
+                                .map(TbTemplateDataSource::getTemplateDataSourceToken).collect(Collectors.toList());
+                        switch (DatasourceType.codeOf(type)) {
+                            case IOT:
+                                Set<Object> iotModelTokens = list.stream()
+                                        .map(s -> StrUtil.subBefore(s.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
+                                        .map(e -> (Object) e)
+                                        .collect(Collectors.toSet());
+                                RedisService redisService = ContextHolder.getBean(RedisConstant.IOT_REDIS_SERVICE);
+                                List<Model> models = redisService.multiGet(RedisKeys.IOT_MODEL_KEY, iotModelTokens, Model.class);
+                                Map<String, Object> modelMap = sourceTokenList.stream()
+                                        .collect(Collectors.toMap(s -> s, s -> {
+                                            String mt = StrUtil.subBefore(s, StrUtil.UNDERLINE, false);
+                                            Model model = models.stream()
+                                                    .filter(m -> m.getModelToken().equals(mt)).findFirst().orElse(null);
+                                            if (model == null || CollUtil.isEmpty(model.getModelFieldList())) {
+                                                return CollUtil.newArrayList();
+                                            }
+                                            return model.getModelFieldList().stream()
+                                                    .map(Model.Field::getFieldToken)
+                                                    .collect(Collectors.toMap(k ->
+                                                            DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, CollUtil::newArrayList));
+                                        }));
+                                modelMap.put(DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, sourceTokenList);
+                                result.setIot(modelMap);
+                                break;
+                            case MONITOR:
+                                List<Integer> monitorTypes = list.stream()
+                                        .map(s -> Integer.valueOf(StrUtil.subBefore(s.getTemplateDataSourceToken(),
+                                                StrUtil.UNDERLINE, false)))
+                                        .toList();
+                                List<TbMonitorTypeField> typeFields = tbMonitorTypeFieldMapper
+                                        .queryByMonitorTypes(monitorTypes, false);
+                                Map<String, Object> typeChildMap = sourceTokenList.stream()
+                                        .collect(Collectors.toMap(s -> s, s -> {
+                                            Integer mt = Integer.valueOf(StrUtil.subBefore(s, StrUtil.UNDERLINE, false));
+                                            return typeFields.stream()
+                                                    .filter(f -> f.getMonitorType().equals(mt))
+                                                    .map(TbMonitorTypeField::getFieldToken)
+                                                    .collect(Collectors.toMap(k ->
+                                                            DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, CollUtil::newArrayList));
+                                        }));
+                                typeChildMap.put(DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, sourceTokenList);
+                                result.setMon(typeChildMap);
+                                break;
+                            default:
+                                break;
+                        }
+                    });
+        }
+        List<String> exList = new LinkedList<>();
+        List<String> selfList = new LinkedList<>();
+        tbMonitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
+                        .eq(TbMonitorTypeField::getMonitorType, monitorTypeTemplate.getMonitorType())).stream()
+                .collect(Collectors.groupingBy(TbMonitorTypeField::getFieldClass))
+                .forEach((fc, list) -> {
+                    switch (MonitorTypeFieldClass.codeOf(fc)) {
+                        case BaseProperties:
+                        case ExtendedProperties:
+                            selfList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
+                            break;
+                        case ExtendedConfigurations:
+                            exList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
+                            break;
+                        default:
+                            break;
+                    }
+                });
+        result.setExList(exList);
+        result.setSelfList(selfList);
+        List<String> paramList = tbParameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
+                .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                .in(TbParameter::getSubjectID, request.getTemplateID())).stream().map(TbParameter::getName).collect(Collectors.toList());
+        result.setParamList(paramList);
+        return result;
+    }
 }

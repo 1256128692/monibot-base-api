@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
-import java.util.Arrays;
+import cn.hutool.core.lang.Assert;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,5 +41,10 @@ public enum MonitorTypeFieldClass {
 
     public String getFieldStr() {
         return fieldStr;
+    }
+
+    public static MonitorTypeFieldClass codeOf(Integer value) {
+        Assert.isTrue(isValid(value), "Invalid CalType value: {}", value);
+        return VALUES_MAP.get(value);
     }
 }
