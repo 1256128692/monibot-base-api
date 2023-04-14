@@ -75,7 +75,7 @@ public class MonitorItemController {
      * @apiVersion 1.0.0
      * @apiGroup 监测项目模块
      * @apiName AddCompanyMonitorItem
-     * @apiDescription 保存为公司监测项目模板
+     * @apiDescription 保存为公司监测项目模板, 本质是进行复制
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int[]}  monitorItemIDList 监测项目列表
      * @apiSuccess (返回结果) {String} none 无

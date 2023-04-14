@@ -9,8 +9,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     int deleteByPrimaryKey(Integer ID);
@@ -40,4 +42,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType);
 
     List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList);
+
+    void insertBatch(Collection<TbMonitorItem> collection);
 }

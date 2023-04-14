@@ -105,4 +105,11 @@
             </where>
             )
     </select>
+
+    <insert id="insertEntityBatch">
+        insert into tb_monitor_item_field (MonitorItemID, MonitorTypeFieldID)values
+        <foreach collection="collection" item="item" separator=",">
+            (#{item.monitorItemID}, #{item.monitorTypeFieldID})
+        </foreach>
+    </insert>
 </mapper>
