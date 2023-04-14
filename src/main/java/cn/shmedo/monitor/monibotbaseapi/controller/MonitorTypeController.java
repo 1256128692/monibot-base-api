@@ -194,7 +194,7 @@ public class MonitorTypeController {
 
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated DeleteMonitorTypeFieldBatchParam pa) {
-        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getFieldIDList());
+        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getMonitorType(),pa.getFieldIDList());
         return ResultWrapper.successWithNothing();
     }
 

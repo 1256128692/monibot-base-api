@@ -1,11 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
+import cn.shmedo.iot.entity.base.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 监测类型
@@ -60,6 +64,35 @@ public class MonitorTypeCacheData extends AbstractCacheData {
      * 监测类型字段列表
      */
     private List<Field> monitortypeFieldList;
+
+    public static MonitorTypeCacheData valueof(TbMonitorType tbMonitorType, List<TbMonitorTypeField> list) {
+        MonitorTypeCacheData monitorTypeCacheData = new MonitorTypeCacheData();
+        monitorTypeCacheData.setID(tbMonitorType.getID());
+        monitorTypeCacheData.setMonitorType(tbMonitorType.getMonitorType());
+        monitorTypeCacheData.setTypeName(tbMonitorType.getTypeName());
+        monitorTypeCacheData.setTypeAlias(tbMonitorType.getTypeAlias());
+        monitorTypeCacheData.setDisplayOrder(tbMonitorType.getDisplayOrder());
+        monitorTypeCacheData.setMultiSensor(tbMonitorType.getMultiSensor());
+        monitorTypeCacheData.setCreateType(tbMonitorType.getCreateType().intValue());
+        monitorTypeCacheData.setCompanyID(tbMonitorType.getCompanyID());
+        monitorTypeCacheData.setExValues(tbMonitorType.getExValues());
+        monitorTypeCacheData.setMonitortypeFieldList(
+                list.stream().map(tbMonitorTypeField -> {
+                    Field field = new Field();
+                    field.setID(tbMonitorTypeField.getID());
+                    field.setFieldToken(tbMonitorTypeField.getFieldToken());
+                    field.setFieldName(tbMonitorTypeField.getFieldName());
+                    field.setFieldDataType(FieldType.valueOfString(tbMonitorTypeField.getFieldDataType()));
+                    field.setFieldClass(MonitorTypeFieldClass.codeOf(tbMonitorTypeField.getFieldClass()));
+                    field.setParentID(tbMonitorTypeField.getParentID());
+                    field.setFieldCalOrder(null);
+                    field.setExValues(tbMonitorTypeField.getExValues());
+                    field.setOperator(null);
+                    return field;
+                }).collect(Collectors.toList())
+        );
+        return monitorTypeCacheData;
+    }
 
     @Data
     @EqualsAndHashCode(callSuper = true)
