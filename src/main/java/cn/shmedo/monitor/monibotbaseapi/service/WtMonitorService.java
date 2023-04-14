@@ -22,7 +22,7 @@ public interface WtMonitorService {
 
     MonitorPointHistoryData querySmcPointHistoryDataList(QuerySmcPointHistoryDataListParam pa);
 
-    MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID);
+    MonitorPointAllInfo queryMonitorPointBaseInfoList(QueryMonitorPointBaseInfoListParam pa);
 
     RainMonitorPointHistoryData queryRainPointHistoryDataList(QueryRainMonitorPointSensorDataListParam pa);
 

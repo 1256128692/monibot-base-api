@@ -431,12 +431,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             return null;
         } else {
             MonitorPointAndItemInfo monitorPointAndItemInfo = tbMonitorPoints.stream().filter(pojo ->
-                pojo.getID().equals(pa.getMonitorPointID())
+                    pojo.getID().equals(pa.getMonitorPointID())
             ).findFirst().orElse(null);
             if (monitorPointAndItemInfo != null) {
                 monitorType = monitorPointAndItemInfo.getMonitorType();
                 result.add(monitorPointAndItemInfo);
-            }else {
+            } else {
                 return null;
             }
         }
@@ -641,11 +641,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
 
     @Override
-    public MonitorPointAllInfo queryMonitorPointBaseInfoList(Integer projectID) {
+    public MonitorPointAllInfo queryMonitorPointBaseInfoList(QueryMonitorPointBaseInfoListParam pa) {
 
         MonitorPointAllInfo vo = new MonitorPointAllInfo();
         LambdaQueryWrapper<TbMonitorPoint> wrapper = new LambdaQueryWrapper<TbMonitorPoint>()
-                .eq(TbMonitorPoint::getProjectID, projectID);
+                .eq(TbMonitorPoint::getProjectID, pa.getProjectID());
         List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(wrapper);
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
@@ -667,7 +667,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorItemIDs)) {
             LambdaQueryWrapper<TbMonitorItem> tmiWrapper = new LambdaQueryWrapper<TbMonitorItem>()
-                    .in(TbMonitorItem::getID, monitorItemIDs);
+                    .in(TbMonitorItem::getID, monitorItemIDs)
+                    .eq(TbMonitorItem::getMonitorClass, pa.getMonitorClass());
             List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(tmiWrapper);
             vo.setTbMonitorItems(tbMonitorItems);
         }

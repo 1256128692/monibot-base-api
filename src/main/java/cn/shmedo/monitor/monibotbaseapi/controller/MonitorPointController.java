@@ -224,6 +224,7 @@ public class MonitorPointController {
      * @apiDescription 查询监测点基本信息
      * @apiName QueryMonitorPointBaseInfoList
      * @apiParam (请求体) {Int} projectID  工程ID
+     * @apiParam (请求体) {Int} monitorClass  监测类别
      * @apiParamExample 请求体示例
      * {"projectID":"1"}
      * @apiSuccess (返回结果) {Object} data   结果数据
