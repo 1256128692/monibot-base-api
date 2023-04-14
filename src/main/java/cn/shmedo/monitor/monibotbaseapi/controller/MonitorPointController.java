@@ -245,6 +245,6 @@ public class MonitorPointController {
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorPointBaseInfoList(@Validated @RequestBody QueryMonitorPointBaseInfoListParam pa) {
-        return reservoirMonitorService.queryMonitorPointBaseInfoList(pa.getProjectID());
+        return reservoirMonitorService.queryMonitorPointBaseInfoList(pa);
     }
 }
