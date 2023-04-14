@@ -227,23 +227,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 }
             }
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
-
-            // 流量计算
-//            maps.forEach(da -> {
-//                TbSensor tbSensor = sensorList.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
-//                // 将JSON字符串转换为JSON对象
-//                if (tbSensor != null) {
-//                    da.put(DbConstant.RESERVOIR_AREA, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.area"));
-//                    if (!StringUtil.isNullOrEmpty(da.get(DbConstant.RESERVOIR_AREA).toString())) {
-//                        double area = Double.parseDouble(da.get(DbConstant.RESERVOIR_AREA).toString());
-//                        double speed = Double.parseDouble(da.get("speed").toString());
-//                        Double result = area * speed;
-//                        BigDecimal bd = new BigDecimal(result);
-//                        BigDecimal rounded = bd.setScale(2, BigDecimal.ROUND_HALF_UP);
-//                        da.put(DbConstant.RESERVOIR_FLOW, rounded);
-//                    }
-//                }
-//            });
+            // 流量暂不计算
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
 
             String key = "levelChange";
@@ -372,18 +356,18 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())) {
             if (monitorItemID.equals(MonitoringItem.RIVER_WATER_QUALITY.getKey())) {
                 // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("v1"));
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
-                int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("v6"));
-                int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("v7"));
-                int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("v8"));
+                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("dissolvedOxygen"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
+                int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
+                int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
                 List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
 
             } else if (monitorItemID.equals(MonitoringItem.RESERVOIR_WATER_QUALITY.getKey())) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("v3"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
@@ -394,10 +378,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 当前降雨量
         } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
             // 压力变化
-//            currentSensorData.put("stressChange", 0.0);
         } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
             // 压强变化
-//            currentSensorData.put("pressureChange", 0.0);
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
             // 水位变化
             currentSensorData.put("levelChange", 0.0);
