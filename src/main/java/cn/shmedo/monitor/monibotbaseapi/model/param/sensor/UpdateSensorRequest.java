@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
@@ -19,9 +20,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,11 +67,13 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
     /**
      * 扩展配置列表
      */
+    @Valid
     private List<SensorConfigField> exFields;
 
     /**
      * 参数列表
      */
+    @Valid
     private List<SensorConfigField> paramFields;
 
     /**
@@ -120,16 +123,21 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
         if (CollUtil.isNotEmpty(paramFields)) {
             TbParameterMapper parameterMapper = SpringUtil.getBean(TbParameterMapper.class);
             Map<Integer, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                    .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
-                    .eq(TbParameter::getSubjectID, sensor.getID())
+                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                    .eq(TbParameter::getSubjectID, sensor.getTemplateID())
             ).stream().collect(Collectors.toMap(TbParameter::getID, e -> e));
 
-            paramList = paramFields.stream().map(e -> {
-                Assert.isTrue(paramMap.containsKey(e.getId()), "参数配置项 [" + e.getId() + "]不存在");
-                TbParameter param = paramMap.get(e.getId());
-                param.setPaValue(e.getValue());
-                return param;
-            }).toList();
+            paramList = paramFields.stream()
+                    .map(e -> {
+                        Assert.notBlank(e.getValue(), "参数 {} 值不能为空", e.getId());
+                        Assert.isTrue(paramMap.containsKey(e.getId()), "参数 {} 不存在", e.getId());
+                        TbParameter param = paramMap.get(e.getId());
+                        param.setSubjectType(ParamSubjectType.Sensor.getType());
+                        param.setSubjectID(sensorID);
+                        param.setPaValue(e.getValue());
+                        param.setID(null);
+                        return param;
+                    }).toList();
         }
         return null;
     }

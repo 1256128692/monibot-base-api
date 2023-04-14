@@ -183,7 +183,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             String beginString = TimeUtil.formatInfluxTimeString(startTime);
             String endString = TimeUtil.formatInfluxTimeString(endTime);
 
-            mapSql.append(" select sum(v1) as currentRainfall from ").append(measurement);
+            mapSql.append(" select sum(rainfall) as currentRainfall from ").append(measurement);
             mapSql.append(" where sid ='").append(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN)).append("'");
             mapSql.append(" and time>='").append(beginString).append("' ");
             mapSql.append(" and time<='").append(endString).append("' ");
