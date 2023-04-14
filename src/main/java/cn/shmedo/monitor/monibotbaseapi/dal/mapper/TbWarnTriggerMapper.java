@@ -2,7 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnTrigger;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtTriggerActionInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 

@@ -3,7 +3,7 @@
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnTriggerMapper">
 
     <select id="queryWarnStatusByEngineIds"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.WtTriggerActionInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo"
             parameterType="list">
         SELECT
             twr.ID warnID,

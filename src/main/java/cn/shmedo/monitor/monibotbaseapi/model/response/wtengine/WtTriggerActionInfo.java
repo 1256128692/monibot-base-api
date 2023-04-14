@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.response;
+package cn.shmedo.monitor.monibotbaseapi.model.response.wtengine;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
 import lombok.AllArgsConstructor;

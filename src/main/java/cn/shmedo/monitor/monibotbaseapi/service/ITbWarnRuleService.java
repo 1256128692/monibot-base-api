@@ -3,8 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtEngineDetail;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtEngineInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 

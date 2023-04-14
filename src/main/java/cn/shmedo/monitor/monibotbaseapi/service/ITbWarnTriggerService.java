@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnTrigger;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtTriggerActionInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

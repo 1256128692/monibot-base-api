@@ -5,7 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnActionMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnTriggerMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnTrigger;
-import cn.shmedo.monitor.monibotbaseapi.model.response.WtTriggerActionInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
