@@ -53,7 +53,7 @@ public class WorkOrderController {
      * @apiGroup 在线监测工单模块
      * @apiName QueryWarnDetail
      * @apiDescription 查询报警详情记录
-     * @apiParam (请求参数) {Int} companyrID 公司ID
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} workOrderID 工单ID
      * @apiSuccess (返回结果) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {String} projectName 工程名称
@@ -71,7 +71,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
      * @apiSuccess (返回结果) {String} warnContext 报警内容
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 系统权限
      */
     @PostMapping(value = "/QueryWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnDetail(@Valid @RequestBody Object param) {
@@ -85,13 +85,30 @@ public class WorkOrderController {
      * @apiName DeleteWorkOrder
      * @apiDescription 删除工单
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int[]} workOrderIDList 工单IDList
+     * @apiParam (请求参数) {Int[]} workOrderIDList 工单ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 系统权限
      */
     @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWorkOrder(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /DispatchWorkOrder 下派工单
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName DispatchWorkOrder
+     * @apiDescription 下派工单
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int[]} warnLogIDList 警报ID列表
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
+     */
+    @PostMapping(value = "/DispatchWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object dispatchWorkOrder(@Valid @RequestBody Object param) {
         return null;
     }
 }
