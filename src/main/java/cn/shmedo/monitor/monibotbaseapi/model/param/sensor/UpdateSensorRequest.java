@@ -8,6 +8,8 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbParameterMapper;
@@ -16,8 +18,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -105,7 +105,7 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
             TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
             Map<Integer, String> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                     .eq(TbMonitorTypeField::getMonitorType, sensor.getMonitorType())
-                    .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())
+                    .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode())
                     .in(TbMonitorTypeField::getID, exFields.stream().map(SensorConfigField::getId).toList())
                     .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
             ).stream().collect(Collectors.toMap(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName));
@@ -123,7 +123,7 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
         if (CollUtil.isNotEmpty(paramFields)) {
             TbParameterMapper parameterMapper = SpringUtil.getBean(TbParameterMapper.class);
             Map<Integer, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                    .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                     .eq(TbParameter::getSubjectID, sensor.getTemplateID())
             ).stream().collect(Collectors.toMap(TbParameter::getID, e -> e));
 
@@ -132,7 +132,7 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                         Assert.notBlank(e.getValue(), "参数 {} 值不能为空", e.getId());
                         Assert.isTrue(paramMap.containsKey(e.getId()), "参数 {} 不存在", e.getId());
                         TbParameter param = paramMap.get(e.getId());
-                        param.setSubjectType(ParamSubjectType.Sensor.getType());
+                        param.setSubjectType(ParameterSubjectType.SENSOR.getCode());
                         param.setSubjectID(sensorID);
                         param.setPaValue(e.getValue());
                         param.setID(null);

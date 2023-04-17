@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
@@ -13,8 +15,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -88,8 +88,8 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
         // 校验监测类型字段
         TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
         Map<Integer, TbMonitorTypeField> fieldMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
-                        .in(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.BaseProperties.getFieldClass(),
-                                MonitorTypeFieldClass.ExtendedProperties.getFieldClass())
+                        .in(TbMonitorTypeField::getFieldClass, FieldClass.BASIC.getCode(),
+                                FieldClass.EXTEND.getCode())
                         .eq(TbMonitorTypeField::getMonitorType, this.monitorType))
                 .stream().collect(Collectors.toMap(TbMonitorTypeField::getID, e -> e));
         Optional.ofNullable(fieldMap.get(fieldID))
@@ -97,7 +97,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
 
         this.calType = CalType.codeOf(monitorTypeTemplate.getCalType());
         switch (calType) {
-            case Formula:
+            case FORMULA:
                 //获取所有公式，按计算顺序提取至当前字段
                 TbTemplateFormulaMapper templateFormulaMapper = SpringUtil.getBean(TbTemplateFormulaMapper.class);
                 List<TbTemplateFormula> formulaList = templateFormulaMapper.selectList(new LambdaQueryWrapper<TbTemplateFormula>()
@@ -117,7 +117,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
                     }
                 }
                 break;
-            case Script:
+            case SCRIPT:
                 TbTemplateScriptMapper templateScriptMapper = SpringUtil.getBean(TbTemplateScriptMapper.class);
                 TbTemplateScript templateScript = templateScriptMapper.selectOne(new LambdaQueryWrapper<TbTemplateScript>()
                         .eq(TbTemplateScript::getTemplateID, this.templateID)
@@ -128,7 +128,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
                 break;
             case HTTP:
                 break;
-            case NoCal:
+            case NONE:
                 return ResultWrapper.withCode(ResultCode.SUCCESS, "无需计算");
         }
 

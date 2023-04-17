@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -10,7 +11,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -56,7 +56,7 @@ public class DeleteMonitorTypeFieldBatchParam implements ParameterValidator, Res
         // 如果包含非3类的field，对于已经设置模板的监测类型，不可删除
         TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
         List<TbMonitorTypeField> tbMonitorTypeFields = tbMonitorTypeFieldMapper.selectBatchIds(fieldIDList);
-        if (tbMonitorTypeFields.stream().anyMatch(item -> !item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()))){
+        if (tbMonitorTypeFields.stream().anyMatch(item -> !item.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode()))){
             TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
             if (tbMonitorTypeTemplateMapper.selectCount(
                     new QueryWrapper<TbMonitorTypeTemplate>().eq("monitorType", monitorType)

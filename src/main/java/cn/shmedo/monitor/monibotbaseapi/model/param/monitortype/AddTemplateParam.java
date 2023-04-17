@@ -3,6 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -10,10 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
@@ -75,10 +75,10 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         if (!CreateType.isValid(createType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"创建类型不合法");
         }
-        if (!CalType.isValid(calType)){
+        if (CalType.codeOf(calType) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "计算方式不合法");
         }
-        if (!DataSourceComposeType.isValid(dataSourceComposeType)){
+        if (DataSourceComposeType.codeOf(dataSourceComposeType) != null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板数据来源类型不合法");
         }
         if (!StringUtils.isBlank(exValues)&& !JSONUtil.isTypeJSON(exValues)){
@@ -88,7 +88,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"脚本与公式需要二选一");
         }
         if (ObjectUtil.isNotEmpty(tokenList)){
-            if (tokenList.stream().anyMatch(item -> !DatasourceType.isValid(item.getDatasourceType()))){
+            if (tokenList.stream().anyMatch(item -> DataSourceType.codeOf(item.getDatasourceType()) == null)){
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "数据源的类型非法");
             }
         }

@@ -1,6 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -16,7 +16,7 @@ public class TemplateDataSourceCacheData extends AbstractCacheData {
     /**
      * 数据源类型
      */
-    private DatasourceType dataSourceType;
+    private DataSourceType dataSourceType;
 
     /**
      * 模板数据源标识，使用代号<br/>

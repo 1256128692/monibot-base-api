@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
@@ -9,10 +10,8 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.MonitorTypeFieldConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbParameterMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -48,7 +47,7 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
 
     @Override
     public ResultWrapper validate() {
-        if (!ParamSubjectType.isValid(subjectType)) {
+        if (ParameterSubjectType.codeOf(subjectType) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数类型有误");
         }
         if (deleteOnly != null && deleteOnly) {
@@ -76,7 +75,7 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
         if (tbParameterMapper.selectCount(queryWrapper) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数已经存在");
         }
-        if (subjectType.equals(ParamSubjectType.Template.getType())) {
+        if (subjectType.equals(ParameterSubjectType.TEMPLATE.getCode())) {
             // 模板时候
             Set<Integer> subIDList = paramList.stream().map(ParamItem::getSubjectID).collect(Collectors.toSet());
             TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);

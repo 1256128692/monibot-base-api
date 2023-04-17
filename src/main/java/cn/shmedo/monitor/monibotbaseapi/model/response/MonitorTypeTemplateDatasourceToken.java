@@ -1,8 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateDataSource;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import lombok.Builder;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class MonitorTypeTemplateDatasourceToken {
         }
         return list.stream().map(item -> MonitorTypeTemplateDatasourceToken.builder().
                 datasourceType(item.getDataSourceType()).token(item.getTemplateDataSourceToken())
-                .iotModelToken(item.getDataSourceType().equals(DatasourceType.IOT.getCode()) ? item.getTemplateDataSourceToken().split("_")[0] : null)
+                .iotModelToken(item.getDataSourceType().equals(DataSourceType.IOT_SENSOR.getCode()) ? item.getTemplateDataSourceToken().split("_")[0] : null)
                 .build()).collect(Collectors.toList());
     }
 }
