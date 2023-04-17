@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -251,18 +252,29 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     /**
      * @param idList      删除的
      * @param parameters  新增的
-     * @param subjectType  类型
+     * @param subjectType 类型
      */
     @Transactional(rollbackFor = Exception.class)
     public void setParamCache(List<Integer> idList, List<TbParameter> parameters, Integer subjectType) {
-
+        Map<String, String> strMap = redisService.getAll(RedisKeys.PARAMETER_PREFIX_KEY + subjectType);
+        Map<String, List<ParameterCacheData>> subIDMap = new HashMap<>();
+        strMap.entrySet().forEach(
+                entry -> {
+                    List<ParameterCacheData> list = JSONUtil.toList(JSONUtil.parseArray(entry.getValue()), ParameterCacheData.class);
+                    subIDMap.put(entry.getKey(), list);
+                }
+        );
         if (CollectionUtils.isNotEmpty(idList)) {
-            redisService.remove(RedisKeys.PARAMETER_PREFIX_KEY, idList.stream().map(String::valueOf).toArray(String[]::new));
+            subIDMap.values().forEach(
+                    list -> list.removeIf(item -> idList.contains(item.getID()))
+            );
         }
         if (CollectionUtils.isNotEmpty(parameters)) {
-            Map<String, ParameterCacheData> cacheDataMap = ParameterCacheData.valueof2RedisMap(parameters);
-            redisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY+ subjectType, cacheDataMap);
+            Map<String, List<ParameterCacheData>> cacheDataMap = ParameterCacheData.valueof2RedisMap(parameters);
+            subIDMap.putAll(cacheDataMap);
         }
+        redisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + subjectType, subIDMap);
+
     }
 
     @Override
