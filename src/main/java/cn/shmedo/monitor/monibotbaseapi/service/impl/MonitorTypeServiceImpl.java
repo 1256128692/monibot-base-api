@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -15,10 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.ScriptCacheData;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.TemplateDataSourceCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
@@ -121,6 +119,12 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         tbMonitorTypeMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
+        setMonitorTypeCache(tbMonitorType, list);
+    }
+
+    private void setMonitorTypeCache(TbMonitorType tbMonitorType, List<TbMonitorTypeField> list) {
+        MonitorTypeCacheData cacheData = MonitorTypeCacheData.valueof(tbMonitorType, list);
+        redisService.put(RedisKeys.MONITOR_TYPE_KEY, tbMonitorType.getMonitorType().toString(), cacheData);
     }
 
     @Override
@@ -245,6 +249,34 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         redisService.put(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, template.getID().toString(), JSONUtil.toJsonStr(cacheData));
     }
 
+    /**
+     * @param idList      删除的
+     * @param parameters  新增的
+     * @param subjectType 类型
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void setParamCache(List<Integer> idList, List<TbParameter> parameters, Integer subjectType) {
+        Map<String, String> strMap = redisService.getAll(RedisKeys.PARAMETER_PREFIX_KEY + subjectType);
+        Map<String, List<ParameterCacheData>> subIDMap = new HashMap<>();
+        strMap.entrySet().forEach(
+                entry -> {
+                    List<ParameterCacheData> list = JSONUtil.toList(JSONUtil.parseArray(entry.getValue()), ParameterCacheData.class);
+                    subIDMap.put(entry.getKey(), list);
+                }
+        );
+        if (CollectionUtils.isNotEmpty(idList)) {
+            subIDMap.values().forEach(
+                    list -> list.removeIf(item -> idList.contains(item.getID()))
+            );
+        }
+        if (CollectionUtils.isNotEmpty(parameters)) {
+            Map<String, List<ParameterCacheData>> cacheDataMap = ParameterCacheData.valueof2RedisMap(parameters);
+            subIDMap.putAll(cacheDataMap);
+        }
+        redisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + subjectType, subIDMap);
+
+    }
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void setParam(SetParamParam pa) {
@@ -252,11 +284,16 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (ObjectUtil.isNotEmpty(idList)) {
             tbParameterMapper.deleteBatchIds(idList);
         }
+        List<TbParameter> parameters = null;
         if (pa.getDeleteOnly() == null || !pa.getDeleteOnly()) {
-            List<TbParameter> parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
+            parameters = Param2DBEntityUtil.fromSetParamParam2TbParameterList(pa);
             tbParameterMapper.insertBatch(parameters);
         }
+
+        setParamCache(idList, parameters, pa.getSubjectType());
+
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -317,23 +354,41 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCustomizedMonitorType(UpdateCustomizedMonitorTypeParam pa) {
+        TbMonitorType tbMonitorTypeNew = pa.update();
         tbMonitorTypeMapper.updateByPrimaryKey(
-                pa.update()
+                tbMonitorTypeNew
+        );
+
+        // 更新缓存
+        setMonitorTypeCache(tbMonitorTypeNew,
+                tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(tbMonitorTypeNew.getMonitorType()), true
+                )
         );
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateCustomizedMonitorTypeField(UpdateCustomizedMonitorTypeFieldParam pa) {
         tbMonitorTypeFieldMapper.updateBatch(
                 pa.getFieldList()
         );
+        setMonitorTypeCache(
+                tbMonitorTypeMapper.selectByPrimaryKey(pa.getMonitorType()),
+                tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
+        );
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addMonitorTypeField(AddMonitorTypeFieldParam pa) {
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), pa.getMonitorType());
         tbMonitorTypeFieldMapper.insertBatch(list);
+        setMonitorTypeCache(
+                tbMonitorTypeMapper.selectByPrimaryKey(pa.getMonitorType()),
+                tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
+        );
     }
 
     @Override
@@ -357,11 +412,21 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         }
         tbMonitorTypeFieldMapper.deleteByMonitorTypeList(monitorTypeList);
         tbMonitorTypeMapper.deleteByMonitorTypeList(monitorTypeList);
+        deleteMonitorTypeCache(monitorTypeList);
+    }
+
+    private void deleteMonitorTypeCache(List<Integer> monitorTypeList) {
+        redisService.remove(RedisKeys.MONITOR_TYPE_KEY, monitorTypeList.stream().map(String::valueOf).collect(Collectors.toList()));
     }
 
     @Override
-    public void deleteMonitorTypeFieldBatch(List<Integer> fieldIDList) {
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteMonitorTypeFieldBatch(Integer monitorType, List<Integer> fieldIDList) {
         tbMonitorTypeFieldMapper.deleteBatchIds(fieldIDList);
+        setMonitorTypeCache(
+                tbMonitorTypeMapper.selectByPrimaryKey(monitorType),
+                tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true)
+        );
     }
 
     @Override
@@ -390,6 +455,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         tbMonitorTypeMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
+
+        setMonitorTypeCache(tbMonitorType, list);
     }
 
     @Override

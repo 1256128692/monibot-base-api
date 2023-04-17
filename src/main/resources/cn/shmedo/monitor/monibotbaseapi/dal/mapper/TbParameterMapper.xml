@@ -145,7 +145,7 @@
   </foreach>
   </delete>
   
-  <insert id="insertBatch">
+  <insert id="insertBatch" keyColumn="ID" keyProperty="ID"  useGeneratedKeys="true">
     insert into tb_parameter (SubjectID, SubjectType, DataType,
     Token, `Name`, PaValue,
     PaUnitID, PaDesc)

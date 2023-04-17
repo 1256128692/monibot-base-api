@@ -194,7 +194,7 @@ public class MonitorTypeController {
 
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated DeleteMonitorTypeFieldBatchParam pa) {
-        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getFieldIDList());
+        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getMonitorType(),pa.getFieldIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -357,7 +357,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} name  模板名称 (100) 无唯一性校验
      * @apiParam (请求参数) {Int} createType  创建类型
      * @apiParam (请求参数) {Int}  dataSourceComposeType  模板数据来源类型 1单一物模型单一传感器,2多个物联网传感器（同一物模型多个或者不同物模型多个）3物联网传感器+监测传感器4单个监测传感器5多个监测传感器,100API 推送500 - 人工监测数据
-     * @apiParam (请求参数) {Int} [calType]  计算方式 1,2,3,-1 公式，脚本，外部http，不设置计算
+     * @apiParam (请求参数) {Int} calType  计算方式 1,2,3公式，脚本，外部http
      * @apiParam (请求参数) {Int} displayOrder  排序
      * @apiParam (请求参数) {String} [exValues]  拓展信息。比如：对于 大于1个的物联网传感器，大于1个的监测传感器，物联网传感器+监测传感器组合的数据源，存储计算触发模式，限定数据时间边界等。
      * @apiParam (请求参数) {Object[]} tokenList  标识列表(max =10)

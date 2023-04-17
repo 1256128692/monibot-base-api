@@ -4,8 +4,12 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateWtMonitorClassParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectMonitorClassBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorClassService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,7 +40,6 @@ public class MonitorClassServiceImpl implements MonitorClassService {
             // 存在则更新
             tbProjectMonitorClassMapper.updateByCondition(request);
         } else {
-            int i = 10;
             // 不存在则新增
             tbProjectMonitorClassMapper.insertByCondition(request);
         }
@@ -46,5 +49,17 @@ public class MonitorClassServiceImpl implements MonitorClassService {
 
         // 然后再去绑定新的监测类别与监测项目
         tbMonitorItemMapper.updateByCondition(request.getProjectID(), request.getMonitorClass(), request.getMonitorItemIDList());
+    }
+
+    @Override
+    public List<ProjectMonitorClassBaseInfo> queryMonitorClassList(QueryMonitorClassParam request) {
+
+        List<ProjectMonitorClassBaseInfo> list = tbProjectMonitorClassMapper.selectListByProjectIDAndEnable(request);
+        if (!CollectionUtil.isNullOrEmpty(list)){
+            list.forEach(item -> {
+                item.setMonitorClassCnName(MonitorClassType.getNameFromInt(item.getMonitorClass()));
+            });
+        }
+        return list;
     }
 }

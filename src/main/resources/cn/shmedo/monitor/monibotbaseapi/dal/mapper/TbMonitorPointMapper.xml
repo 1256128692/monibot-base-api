@@ -292,6 +292,7 @@
         <if test="monitorItemID != null">
             and tmp.MonitorItemID = #{monitorItemID}
         </if>
+        group by tmp.ID
     </select>
     <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
         select p.*,

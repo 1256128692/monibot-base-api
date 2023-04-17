@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
@@ -149,7 +150,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         List<Map<String, Object>> maps;
         List<FieldSelectInfo> fieldList;
-        List<Map<String, Object>> filteredMaps = new LinkedList<>();
+        List<Map<String, Object>> rainFailMaps = new LinkedList<>();
         // 根据传感器ID列表和传感器类型,查传感器最新数据
         if (!CollectionUtil.isNullOrEmpty(sensorIDList)) {
             fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
@@ -158,39 +159,32 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理需要计算的监测子类型返回token
             fieldList = MonitorTypeUtil.handlefieldList(monitorType, fieldList);
 
-            handleSpecialSensorDataList(monitorType, filteredMaps, tbSensors, fieldList, maps);
+            handleSpecialSensorDataList(monitorType, rainFailMaps, fieldList, maps);
         } else {
             fieldList = null;
             maps = null;
         }
 
-        Collection<Object> areas = sensorNewDataInfoList
-                .stream().map(SensorNewDataInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
-        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
-                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
-        areas.clear();
-
         // 最终将传感器数据封装结果集
         List<FieldSelectInfo> finalFieldList = fieldList;
 
         // 处理最终返回结果集,如果是雨量则单独处理
-        if (!CollectionUtil.isNullOrEmpty(filteredMaps)) {
-            return handleFinalResultInfo(sensorNewDataInfoList, areaMap, filteredMaps, tbSensors, finalFieldList, dataUnitsMap);
+        if (!CollectionUtil.isNullOrEmpty(rainFailMaps)) {
+            return handleFinalResultInfo(sensorNewDataInfoList, rainFailMaps, tbSensors, finalFieldList, dataUnitsMap);
         } else {
-            return handleFinalResultInfo(sensorNewDataInfoList, areaMap, maps, tbSensors, finalFieldList, dataUnitsMap);
+            return handleFinalResultInfo(sensorNewDataInfoList, maps, tbSensors, finalFieldList, dataUnitsMap);
         }
 
     }
 
     /**
      * @param monitorType  监测类型
-     * @param sensorList   传感器信息列表
      * @param fieldList    字段列表(v1,v2,xxx)
      * @param maps         传感器数据列表
-     * @param filteredMaps 雨量的传感器数据列表
+     * @param rainFailMaps 雨量的传感器数据列表
      */
-    private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> filteredMaps,
-                                             List<TbSensor> sensorList, List<FieldSelectInfo> fieldList,
+    private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> rainFailMaps,
+                                             List<FieldSelectInfo> fieldList,
                                              List<Map<String, Object>> maps) {
         if (CollectionUtil.isNullOrEmpty(maps)) {
             return;
@@ -214,8 +208,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
                         String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
                         if (currentSid.equals(sid)) {
-                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, currentRainMap.get(DbConstant.CURRENT_RAIN_FALL));
-                            filteredMaps.add(mapEntry);
+                            Double currentRainfall = Double.parseDouble(currentRainMap.get(DbConstant.CURRENT_RAIN_FALL).toString());
+                            BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
+                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL,rounded);
+                            rainFailMaps.add(mapEntry);
                         }
                     }
                 }
@@ -223,7 +219,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
                 for (Map<String, Object> mapEntry : maps) {
                     mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0.0);
-                    filteredMaps.add(mapEntry);
+                    rainFailMaps.add(mapEntry);
                 }
             }
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
@@ -266,18 +262,22 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
     /**
      * @param sensorNewDataInfoList 最终返回信息
-     * @param areaMap               行政区域信息
      * @param maps                  传感器数据列表
      * @param tbSensors             传感器基本信息
      * @param finalFieldList        监测类型子类型列表
      * @return
      */
     private List<SensorNewDataInfo> handleFinalResultInfo(List<SensorNewDataInfo> sensorNewDataInfoList,
-                                                          Map<String, String> areaMap,
                                                           List<Map<String, Object>> maps,
                                                           List<TbSensor> tbSensors,
                                                           List<FieldSelectInfo> finalFieldList,
                                                           Map<Integer, TbDataUnit> dataUnitsMap) {
+
+        Collection<Object> areas = sensorNewDataInfoList
+                .stream().map(SensorNewDataInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
 
         sensorNewDataInfoList.forEach(snd -> {
             snd.setLocationInfo(areaMap.getOrDefault(snd.getLocationInfo(), null));
@@ -311,7 +311,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             if (tbSensor.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
                                 currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
                             }
-                            snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), snd.getMonitorItemID(), currentSensorData));
+                            snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), currentSensorData));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
                         }
                     }
@@ -343,18 +343,19 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
     /**
      * 处理特殊传感器类型的传感器的额外值
-     * 比如:水质,风力
+     * 比如:水质,风力,水位
      *
      * @param monitorType
-     * @param monitorItemID
      * @param currentSensorData
      * @return
      */
-    private Map<String, Object> handleSpecialType(Integer monitorType, Integer monitorItemID, Map<String, Object> currentSensorData) {
+    private Map<String, Object> handleSpecialType(Integer monitorType, Map<String, Object> currentSensorData) {
 
         // 水质
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())) {
-            if (monitorItemID.equals(MonitoringItem.RIVER_WATER_QUALITY.getKey())) {
+            Object phosphorusTotal = currentSensorData.get("phosphorusTotal");
+            Object temperature = currentSensorData.get("temperature");
+            if (ObjectUtil.isNotNull(phosphorusTotal)) {
                 // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
                 int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("dissolvedOxygen"));
                 int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
@@ -365,7 +366,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
 
-            } else if (monitorItemID.equals(MonitoringItem.RESERVOIR_WATER_QUALITY.getKey())) {
+            } else if (ObjectUtil.isNotNull(temperature)) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
                 int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
@@ -566,13 +567,13 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             maps.forEach(map -> {
                 // 如果当前数据为风力,水质,则进行单独处理
-                Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(), pa.getTbMonitorPoint().getMonitorItemID(), map);
+                Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(), map);
                 resultMaps.add(stringObjectMap);
             });
         }
         // 处理需要计算的监测子类型返回token
         MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
 
         // 处理时间排序
 //        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
@@ -631,7 +632,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 resultMaps.add(stringObjectMap);
             });
         }
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
 
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
@@ -813,10 +814,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         maps.forEach(map -> {
             // 如果当前数据为风力,水质,则进行单独处理
-            Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), pa.getMonitorItemID(), map);
+            Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), map);
             resultMaps.add(stringObjectMap);
         });
-        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps, fieldList, maps);
 
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getMonitorType(), fieldList, dataUnitsMap);
@@ -876,7 +877,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         // 处理需要计算的监测子类型返回token
         MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, tbSensors, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
 
         // 处理时间排序
         Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
@@ -1097,6 +1098,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Map<String, Object> data1 = dataList.get(i);
             dataList.get(i).put("currentRainfall", 0.0);
             DateTime currentTime = DateUtil.parse(data1.get("time").toString());
+            Double rainfall = Double.parseDouble(dataList.get(i).get("rainfall").toString());
+            BigDecimal rounded = new BigDecimal(rainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
+            dataList.get(i).put("rainfall",rounded);
             if (DateUtil.compare(currentTime, eightClockDateTime) >= 0) {
                 todayDataList.add(data1);
             } else {
