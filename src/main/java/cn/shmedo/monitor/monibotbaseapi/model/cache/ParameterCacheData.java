@@ -35,7 +35,7 @@ public class ParameterCacheData extends AbstractCacheData {
 
     private String paDesc;
 
-    public static Map<String, ParameterCacheData> valueof2RedisMap(List<TbParameter> parameters) {
+    public static Map<String, List<ParameterCacheData>> valueof2RedisMap(List<TbParameter> parameters) {
       return   parameters.stream().map(
               item -> {
                 ParameterCacheData parameterCacheData = new ParameterCacheData();
@@ -50,7 +50,7 @@ public class ParameterCacheData extends AbstractCacheData {
                 parameterCacheData.setPaDesc(item.getPaDesc());
                 return parameterCacheData;
               }
-      ).collect(Collectors.toMap(item -> item.getSubjectID().toString(), Function.identity()));
+      ).collect(Collectors.groupingBy(item -> item.getSubjectID().toString()));
     }
 }
 
