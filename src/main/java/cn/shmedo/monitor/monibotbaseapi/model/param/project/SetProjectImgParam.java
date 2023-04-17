@@ -47,7 +47,7 @@ public class SetProjectImgParam implements ParameterValidator, ResourcePermissio
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前projectID不存在");
         }
-        if (ProjectImageType.isValidate(imgType)) {
+        if (!ProjectImageType.isValidate(imgType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目图片类型非法");
         }
         this.companyID = tbProjectInfo.getCompanyID();

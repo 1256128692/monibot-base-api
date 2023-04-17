@@ -426,8 +426,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //TODO  项目图片使用group:img key:projectImg
         TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
                 new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
-                        .eq("group", "img")
-                        .eq("key", "projectImg")
+                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .eq(TbProjectConfig::getKey, "projectImg")
         );
         if (tbProjectConfig == null) {
             tbProjectConfig = new TbProjectConfig();
@@ -454,8 +454,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public String queryProjectImg(QueryProjectImgParam pa) {
         TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
                 new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
-                        .eq("group", "img")
-                        .eq("key", "projectImg")
+                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .eq(TbProjectConfig::getKey, "projectImg")
         );
         if (tbProjectConfig != null && StrUtil.isNotEmpty(tbProjectConfig.getValue())) {
             String value = tbProjectConfig.getValue();

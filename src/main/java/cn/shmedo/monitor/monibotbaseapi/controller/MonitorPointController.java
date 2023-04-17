@@ -70,7 +70,8 @@ public class MonitorPointController {
      */
 //    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
     @PostMapping(value = "/AddMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addMonitorPointBatch(@Validated @RequestBody Object pa) {
+    public Object addMonitorPointBatch(@Validated @RequestBody AddMonitorPointBatchParam pa) {
+        monitorPointService.addMonitorPointBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
     /**
@@ -123,7 +124,8 @@ public class MonitorPointController {
      */
     //    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateMonitorPointBatch(@Validated @RequestBody Object pa) {
+    public Object updateMonitorPointBatch(@Validated @RequestBody UpdateMonitorPointBatchParam pa) {
+        monitorPointService.updateMonitorPointBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 

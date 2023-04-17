@@ -32,4 +32,8 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
     IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, String monitorItemName, Integer sensorID);
 
     List<IDNameAlias> querySimpleBy(Integer projectID, Integer groupID, List<Integer> monitorItemIDList);
+
+    void insertBatch(List<TbMonitorPoint> list);
+
+    void updateBatch(List<TbMonitorPoint> list);
 }

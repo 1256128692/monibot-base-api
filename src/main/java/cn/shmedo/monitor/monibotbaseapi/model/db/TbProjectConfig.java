@@ -1,13 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 public class TbProjectConfig {
     private Integer ID;
 
     private Integer projectID;
+    @TableField(value = "`group`")
+
 
     private String group;
-
+    @TableField(value = "`key`")
     private String key;
+    @TableField(value = "`value`")
 
     private String value;
 
