@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -24,12 +25,12 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
     @NotNull(message = "公司ID不能为空")
     @Min(value = 1, message = "公司ID不能小于1")
     private Integer companyID;
-    @NotNull(message = "工程项目ID不能为空")
+    @NotNull(message = "请选择所属工程项目")
     @Min(value = 1, message = "工程项目ID不能小于1")
     private Integer projectID;
-    @NotEmpty(message = "引擎名称不能为空")
+    @NotEmpty(message = "请填写规则名称")
     private String engineName;
-    @NotEmpty(message = "引擎描述不能为空")
+    @NotEmpty(message = "请填写规则简介")
     private String engineDesc;
     @NotNull(message = "监测项目ID不能为空")
     private Integer monitorItemID;
@@ -52,6 +53,10 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
 
     @Override
     public ResultWrapper validate() {
+        TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
+        if(tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) != null){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"规则名称重复");
+        }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (tbProjectInfoMapper.selectOne(new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getID, projectID).select(TbProjectInfo::getID)) == null) {

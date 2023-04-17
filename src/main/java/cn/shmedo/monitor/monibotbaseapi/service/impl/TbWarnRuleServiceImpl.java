@@ -87,7 +87,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                                 .orElse("--"))
                         .setDataList(Optional.ofNullable(engineIdWarnMap.get(u.getID())).map(w -> w.stream()
                                 .map(WtTriggerActionInfo::build).collect(Collectors.toList())).orElse(new ArrayList<>())))
-                .sorted((t1, t2) -> t2.getEngineID() - t1.getEngineID()).collect(Collectors.toList());
+                .collect(Collectors.toList());
         return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
     }
 
