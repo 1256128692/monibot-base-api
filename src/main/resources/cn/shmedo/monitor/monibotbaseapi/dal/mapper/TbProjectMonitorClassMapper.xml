@@ -149,4 +149,16 @@
         where ProjectID = #{projectID,jdbcType=INTEGER}
           and MonitorClass = #{monitorClass,jdbcType=INTEGER}
     </update>
+
+
+
+    <select id="selectListByProjectIDAndEnable" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectMonitorClassBaseInfo">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_project_monitor_class
+        where ProjectID = #{projectID,jdbcType=INTEGER}
+        <if test="enable != null">
+            and `Enable` = #{enable}
+        </if>
+    </select>
 </mapper>

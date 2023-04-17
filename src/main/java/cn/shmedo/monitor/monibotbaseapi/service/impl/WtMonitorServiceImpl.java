@@ -1097,6 +1097,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Map<String, Object> data1 = dataList.get(i);
             dataList.get(i).put("currentRainfall", 0.0);
             DateTime currentTime = DateUtil.parse(data1.get("time").toString());
+            Double rainfall = Double.parseDouble(dataList.get(i).get("rainfall").toString());
+            BigDecimal rounded = new BigDecimal(rainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
+            dataList.get(i).put("rainfall",rounded);
             if (DateUtil.compare(currentTime, eightClockDateTime) >= 0) {
                 todayDataList.add(data1);
             } else {
