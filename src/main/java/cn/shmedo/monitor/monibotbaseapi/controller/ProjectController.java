@@ -269,7 +269,7 @@ public class ProjectController {
     @RequestMapping(value = "UpdateProject", method = RequestMethod.POST, produces = CommonVariable.JSON)
     @Permission(permissionName = "mdmbase:UpdateBaseProject")
     public Object updateProject(@Validated @RequestBody UpdateProjectParameter pa) {
-        projectService.updateProject(pa , CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        projectService.updateProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -278,7 +278,7 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName TransferProject
-     * @apiDescription 项目转移到其他企业,同事会删除设备的标签
+     * @apiDescription 项目转移到其他企业, 同事会删除设备的标签
      * @apiParam (请求体) {Int} companyID 目标公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} none  无
@@ -401,7 +401,7 @@ public class ProjectController {
 
     /**
      * @api {post} /QueryWtProjectSimpleList 查询水利工程项目简要列表
-     * @apiDescription 查询水利工程项目简要列表,水利一张图开放API
+     * @apiDescription 查询水利工程项目简要列表, 水利一张图开放API
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryWtProjectSimpleList
@@ -438,17 +438,18 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName SetProjectImg
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} imgType 图片类型：底图，三维等
-     * @apiParam (请求体) {String} [imgContent] 图片内容，base64格式
-     * @apiParam (请求体) {String} [imgSuffix] 图片后缀
+     * @apiParam (请求体) {String} imgType 图片类型Img，OverallView，SpatialView:地图，全景，三维
+     * @apiParam (请求体) {String} fileName  图片名称
+     * @apiParam (请求体) {String} imgContent 图片内容，base64格式
+     * @apiParam (请求体) {String} imgSuffix 图片后缀
      * @apiSuccess (返回结果) {String} imgURL 图片可用url
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @RequestMapping(value = "SetProjectImg", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object setProjectImg(@Validated @RequestBody Object pa) {
-        return null;
+    public Object setProjectImg(@Validated @RequestBody SetProjectImgParam pa) {
+        return projectService.setProjectImg(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 
     /**
@@ -463,10 +464,10 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "QueryProjectImg", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectImg(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryProjectImg(@Validated @RequestBody QueryProjectImgParam pa) {
+        return projectService.queryProjectImg(pa);
     }
 
 }

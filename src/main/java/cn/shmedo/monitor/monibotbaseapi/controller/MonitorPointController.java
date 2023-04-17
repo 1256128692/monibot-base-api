@@ -46,7 +46,33 @@ public class MonitorPointController {
         monitorPointService.addMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
-
+    /**
+     * @api {POST} /AddMonitorPointBatch 批量新增监测点
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName AddMonitorPointBatch
+     * @apiDescription 批量新增监测点
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求体) {Object[]} addPointItemList 新增监测点列表(max = 10)
+     * @apiParam (请求体) {String} addPointItemList.name 监测点名称(max = 50)
+     * @apiParam (请求体) {Bool} addPointItemList.enable 是否启用
+     * @apiParam (请求体) {String} [addPointItemList.gpsLocation] 地图位置
+     * @apiParam (请求体) {String} [addPointItemList.imageLocation] 底图位置
+     * @apiParam (请求体) {String} [addPointItemList.overallViewLocation] 全景位置
+     * @apiParam (请求体) {String} [addPointItemList.spatialLocation] 三维位置
+     * @apiParam (请求体) {String} [addPointItemList.exValues] 额外属性（500）
+     * @apiParam (请求体) {Int} [addPointItemList.displayOrder] 排序
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
+     */
+//    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @PostMapping(value = "/AddMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addMonitorPointBatch(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
     /**
      * @api {POST} /UpdateMonitorPoint 修改监测点
      * @apiVersion 1.0.0
@@ -71,6 +97,33 @@ public class MonitorPointController {
     @PostMapping(value = "/UpdateMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPoint(@Validated @RequestBody UpdateMonitorPointParam pa) {
         monitorPointService.updateMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /UpdateMonitorPointBatch 批量修改监测点
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName UpdateMonitorPointBatch
+     * @apiDescription 批量修改监测点
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Object[]} updatePointItemList 修改监测点列表(max = 10)
+     * @apiParam (请求体) {Int} updatePointItemList.pointID 监测点ID
+     * @apiParam (请求体) {String} updatePointItemList.name 监测点名称
+     * @apiParam (请求体) {Bool} updatePointItemList.enable 是否启用
+     * @apiParam (请求体) {String} [updatePointItemList.gpsLocation] 地图位置
+     * @apiParam (请求体) {String} [updatePointItemList.imageLocation] 底图位置
+     * @apiParam (请求体) {String} [updatePointItemList.overallViewLocation] 全景位置
+     * @apiParam (请求体) {String} [updatePointItemList.spatialLocation] 三维位置
+     * @apiParam (请求体) {String} [updatePointItemList.exValues] 额外属性（500）
+     * @apiParam (请求体) {Int} [updatePointItemList.displayOrder] 排序
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
+     */
+    //    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @PostMapping(value = "/UpdateMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateMonitorPointBatch(@Validated @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();
     }
 

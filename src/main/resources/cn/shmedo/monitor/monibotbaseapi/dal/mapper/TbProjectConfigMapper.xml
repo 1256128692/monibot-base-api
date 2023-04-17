@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectConfigMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig">
+    <!--@mbg.generated-->
+    <!--@Table tb_project_config-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="Group" jdbcType="VARCHAR" property="group" />
+    <result column="Key" jdbcType="VARCHAR" property="key" />
+    <result column="Value" jdbcType="LONGVARCHAR" property="value" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, ProjectID, `Group`, `Key`, `Value`
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_project_config
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_project_config
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_config (ProjectID, `Group`, `Key`, 
+      `Value`)
+    values (#{projectID,jdbcType=INTEGER}, #{group,jdbcType=VARCHAR}, #{key,jdbcType=VARCHAR}, 
+      #{value,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_project_config
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="projectID != null">
+        ProjectID,
+      </if>
+      <if test="group != null">
+        `Group`,
+      </if>
+      <if test="key != null">
+        `Key`,
+      </if>
+      <if test="value != null">
+        `Value`,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="projectID != null">
+        #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="group != null">
+        #{group,jdbcType=VARCHAR},
+      </if>
+      <if test="key != null">
+        #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig">
+    <!--@mbg.generated-->
+    update tb_project_config
+    <set>
+      <if test="projectID != null">
+        ProjectID = #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="group != null">
+        `Group` = #{group,jdbcType=VARCHAR},
+      </if>
+      <if test="key != null">
+        `Key` = #{key,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        `Value` = #{value,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig">
+    <!--@mbg.generated-->
+    update tb_project_config
+    set ProjectID = #{projectID,jdbcType=INTEGER},
+      `Group` = #{group,jdbcType=VARCHAR},
+      `Key` = #{key,jdbcType=VARCHAR},
+      `Value` = #{value,jdbcType=LONGVARCHAR}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>
