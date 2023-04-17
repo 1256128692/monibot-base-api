@@ -1,11 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
-
 public interface ITbWarnLogService extends IService<TbWarnLog> {
-    List<TbWarnLog> selectByPage(QueryWarnLogPageParam param);
+    PageUtil.Page<WtWarnLogInfo> queryByPage(QueryWtWarnLogPageParam param);
+
+    WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param);
 }

@@ -32,13 +32,10 @@ public class TbWarnLog {
     private Integer warnLevel;
     @TableField("WarnContent")
     private String warnContent;
-    /**
-     * 处置状态，1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
-     */
-    @TableField("`Status`")
-    private Integer status;
-    @TableField("WorkOrder")
-    private String workOrder;
+    @TableField("WorkOrderID")
+    private Integer workOrderID;
+    @TableField("triggerID")
+    private Integer triggerID;
     @Serial
     private static final long serialVersionUID = 1L;
 }
