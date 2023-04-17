@@ -46,6 +46,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
     private Byte createType;
     @NotNull
     private Integer dataSourceComposeType;
+    @NotNull
     private Integer calType;
     @NotNull
     private Integer displayOrder;
@@ -73,9 +74,6 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         }
         if (!CreateType.isValid(createType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"创建类型不合法");
-        }
-        if (calType == null){
-            calType = -1;
         }
         if (!CalType.isValid(calType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "计算方式不合法");
