@@ -8,15 +8,15 @@ public enum MonitorType {
     RAINFALL(5, "雨量"),
     TEMPERATURE(6, "温度"),
     HUMIDITY(7, "湿度"),
-    WIND_SPEED(8, "风速"),
+    WIND_SPEED(8, "风象"),
     SOIL_MOISTURE(9, "墒情"),
     SAND_CONTENT(10, "含沙量"),
-    THREE_DIMENSIONAL_DISPLACEMENT(11, "表面三维位移"),
-    ONE_DIMENSIONAL_DISPLACEMENT(12, "表面一维位移"),
-    INTERNAL_TRIAXIAL_DISPLACEMENT(13, "内部三轴位移"),
-    STRESS(14, "压力"),
-    PRESSURE(15, "压强"),
-    LEVEL(16, "物液位");
+    STRESS(11, "压力"),
+    PRESSURE(12, "压强"),
+    LEVEL(13, "物液位"),
+    THREE_DIMENSIONAL_DISPLACEMENT(19, "表面三维形变（相对）"),
+    ONE_DIMENSIONAL_DISPLACEMENT(24, "表面一维形变（相对）"),
+    INTERNAL_TRIAXIAL_DISPLACEMENT(20, "内部三轴位移");
 
     private final int key;
     private final String value;
