@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NonNull;
@@ -26,12 +27,12 @@ import java.util.List;
  **/
 @Data
 public class DeleteMonitorGroupParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NonNull
+    @NotNull
     private Integer projectID;
     @NotEmpty
     @Valid
     @Size(min = 10)
-    private List<@NonNull Integer> groupIDList;
+    private List< @NotNull Integer> groupIDList;
 
     @Override
     public ResultWrapper validate() {

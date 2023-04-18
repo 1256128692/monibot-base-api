@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
 import lombok.AllArgsConstructor;
@@ -72,8 +71,8 @@ public class MonitorGroupController {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} groupID 监测组ID
      * @apiParam (请求体) {String} fileName 文件名称(100)
-     * @apiParam (请求体) {String} fileSuffix 文件后缀
-     * @apiParam (请求体) {String} fileContent 文件base64内容
+     * @apiParam (请求体) {String} imageSuffix 文件后缀
+     * @apiParam (请求体) {String} imageContent 文件base64内容
      * @apiSuccess (返回结果) {String} url 可用图片地址
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup

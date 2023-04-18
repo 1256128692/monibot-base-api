@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -21,9 +22,9 @@ import lombok.NonNull;
  **/
 @Data
 public class QueryMonitorGroupDetailParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NonNull
+    @NotNull
     private Integer projectID;
-    @NonNull
+    @NotNull
     private Integer groupID;
     @JsonIgnore
     private TbMonitorGroup tbMonitorGroup;

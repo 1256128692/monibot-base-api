@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -35,7 +36,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SetParamParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NonNull
+    @NotNull
     private Integer companyID;
     @NonNull
     private Integer subjectType;
@@ -43,7 +44,7 @@ public class SetParamParam implements ParameterValidator, ResourcePermissionProv
     @Valid
     @NotEmpty
     @Size(max = 100)
-    private List<@NonNull ParamItem> paramList;
+    private List<@NotNull ParamItem> paramList;
 
     @Override
     public ResultWrapper validate() {

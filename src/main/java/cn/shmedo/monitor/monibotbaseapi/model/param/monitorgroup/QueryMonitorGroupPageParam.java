@@ -9,6 +9,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.NonNull;
@@ -20,15 +21,15 @@ import lombok.NonNull;
  **/
 @Data
 public class QueryMonitorGroupPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NonNull
+    @NotNull
     private Integer projectID;
     private String name;
     private Integer monitorItemID;
-    @NonNull
+    @NotNull
     @Positive
     @Max(100)
     private Integer pageSize;
-    @NonNull
+    @NotNull
     @Positive
     private Integer currentPage;
     @Override

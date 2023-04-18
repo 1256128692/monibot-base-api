@@ -1,7 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 /**
@@ -10,10 +14,12 @@ import lombok.NonNull;
  * @create: 2023-04-18 13:20
  **/
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PointIDAndLocation {
-    @NonNull
+    @NotNull
     private Integer pointID;
-    // regex : "12.13,12,13"
-    @Pattern(regexp = "^(\\d+\\.\\d+,){2}\\d+\\.\\d+$")
+    @Pattern(regexp = "\\d+(.\\d+)?,\\d+(.\\d+)?", message = "坐标格式错误")
+    @NotBlank
     private String location;
 }

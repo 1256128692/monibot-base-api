@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Builder;
 
 /**
@@ -10,6 +12,7 @@ public class TbMonitorGroupItem {
     /**
     * ID
     */
+    @TableId(type = IdType.AUTO)
     private Integer ID;
 
     /**

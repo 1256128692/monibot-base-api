@@ -18,7 +18,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FormulaItem {
-    @NonNull
+    @NotNull
     private Integer fieldID;
     @NotBlank
     @Size(max = 2000)

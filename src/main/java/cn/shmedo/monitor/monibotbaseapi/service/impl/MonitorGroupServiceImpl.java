@@ -143,7 +143,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     public PageUtil.Page<Group4Web> queryMonitorGroupPage(QueryMonitorGroupPageParam pa) {
         Page<Group4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        IPage<Group4Web> pageData= tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getName(), pa.getMonitorItemID(), false);
+        IPage<Group4Web> pageData= tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getName(), pa.getMonitorItemID(), true);
         if (CollectionUtils.isEmpty(pageData.getRecords())){
             return PageUtil.Page.empty();
         }
@@ -155,7 +155,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     }
 
     private void handleGroup4Web(List<Group4Web> parentGroupList, List<Group4Web> sonGroupList) {
-        List<Integer> allGroupIDList = new java.util.ArrayList<>(sonGroupList.stream().map(Group4Web::getID).toList());
+        List<Integer> allGroupIDList = new java.util.ArrayList<>(parentGroupList.stream().map(Group4Web::getID).toList());
         allGroupIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
         List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allGroupIDList);
         Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));

@@ -12,14 +12,14 @@
     <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
     <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
     <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
-    <result column="CreatTime" jdbcType="TIMESTAMP" property="creatTime" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
     <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
     <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, ParentID, ProjectID, `Name`, `Enable`, ImagePath, ExValue, DisplayOrder, CreatTime, 
+    ID, ParentID, ProjectID, `Name`, `Enable`, ImagePath, ExValue, DisplayOrder, CreateTime, 
     CreateUserID, UpdateTime, UpdateUserID
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -38,11 +38,11 @@
     <!--@mbg.generated-->
     insert into tb_monitor_group (ParentID, ProjectID, `Name`, 
       `Enable`, ImagePath, ExValue, 
-      DisplayOrder, CreatTime, CreateUserID, 
+      DisplayOrder, CreateTime, CreateUserID, 
       UpdateTime, UpdateUserID)
     values (#{parentID,jdbcType=INTEGER}, #{projectID,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
       #{enable,jdbcType=BIT}, #{imagePath,jdbcType=VARCHAR}, #{exValue,jdbcType=VARCHAR}, 
-      #{displayOrder,jdbcType=INTEGER}, #{creatTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
+      #{displayOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{createUserID,jdbcType=INTEGER}, 
       #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup" useGeneratedKeys="true">
@@ -70,8 +70,8 @@
       <if test="displayOrder != null">
         DisplayOrder,
       </if>
-      <if test="creatTime != null">
-        CreatTime,
+      <if test="createTime != null">
+        CreateTime,
       </if>
       <if test="createUserID != null">
         CreateUserID,
@@ -105,8 +105,8 @@
       <if test="displayOrder != null">
         #{displayOrder,jdbcType=INTEGER},
       </if>
-      <if test="creatTime != null">
-        #{creatTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createUserID != null">
         #{createUserID,jdbcType=INTEGER},
@@ -144,8 +144,8 @@
       <if test="displayOrder != null">
         DisplayOrder = #{displayOrder,jdbcType=INTEGER},
       </if>
-      <if test="creatTime != null">
-        CreatTime = #{creatTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createUserID != null">
         CreateUserID = #{createUserID,jdbcType=INTEGER},
@@ -169,7 +169,7 @@
       ImagePath = #{imagePath,jdbcType=VARCHAR},
       ExValue = #{exValue,jdbcType=VARCHAR},
       DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-      CreatTime = #{creatTime,jdbcType=TIMESTAMP},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
       CreateUserID = #{createUserID,jdbcType=INTEGER},
       UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
       UpdateUserID = #{updateUserID,jdbcType=INTEGER}
@@ -210,7 +210,7 @@
       select *
       from tb_monitor_group
       where ParentID in
-      <foreach collection="parentIDList" item="id" open="(" separator="," close=")">
+      <foreach close=")" collection="parentIDList" item="id" open="(" separator=",">
           #{id}
       </foreach>
   </select>

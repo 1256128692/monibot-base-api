@@ -98,7 +98,7 @@
         set
         <trim prefix=" ImageLocation = case" suffix="end">
             <foreach collection="pointLocationList" index="index" item="item">
-                when ID = #{item.pointID} then #{item.location}
+                when MonitorPointID = #{item.pointID} then #{item.location}
             </foreach>
         </trim>
         where MonitorGroupID = #{groupID}

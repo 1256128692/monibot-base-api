@@ -14,64 +14,64 @@ import java.util.Date;
 @AllArgsConstructor
 public class TbMonitorGroup {
     /**
-    * ID
-    */
+     * ID
+     */
     private Integer ID;
 
     /**
-    * 父级ID
-    */
+     * 父级ID
+     */
     private Integer parentID;
 
     /**
-    * 工程项目ID
-    */
+     * 工程项目ID
+     */
     private Integer projectID;
 
     /**
-    * 分组名称
-    */
+     * 分组名称
+     */
     private String name;
 
     /**
-    * 是否启用
-1:启用，0停用
-    */
+     * 是否启用
+     * 1:启用，0停用
+     */
     private Boolean enable;
 
     /**
-    * 底图路径
-    */
+     * 底图路径
+     */
     private String imagePath;
 
     /**
-    * 拓展字段
-    */
+     * 拓展字段
+     */
     private String exValue;
 
     /**
-    * 排序字段
-    */
+     * 排序字段
+     */
     private Integer displayOrder;
 
     /**
-    * 创建时间
-    */
-    private Date creatTime;
+     * 创建时间
+     */
+    private Date createTime;
 
     /**
-    * 创建用户ID
-    */
+     * 创建用户ID
+     */
     private Integer createUserID;
 
     /**
-    * 更新时间
-    */
+     * 更新时间
+     */
     private Date updateTime;
 
     /**
-    * 更新用户ID
-    */
+     * 更新用户ID
+     */
     private Integer updateUserID;
 
     public Integer getID() {
@@ -138,12 +138,12 @@ public class TbMonitorGroup {
         this.displayOrder = displayOrder;
     }
 
-    public Date getCreatTime() {
-        return creatTime;
+    public Date getCreateTime() {
+        return createTime;
     }
 
-    public void setCreatTime(Date creatTime) {
-        this.creatTime = creatTime;
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public Integer getCreateUserID() {
@@ -169,4 +169,5 @@ public class TbMonitorGroup {
     public void setUpdateUserID(Integer updateUserID) {
         this.updateUserID = updateUserID;
     }
+
 }

@@ -238,7 +238,7 @@ public class Param2DBEntityUtil {
         Date now = new Date();
         return TbMonitorGroup.builder()
                 .projectID(pa.getProjectID()).parentID(pa.getParentID()).name(pa.getName()).enable(pa.getEnable())
-                .imagePath(null).exValue(null).displayOrder(null).createUserID(userID).creatTime(now).updateTime(now).updateUserID(userID)
+                .imagePath(null).exValue(null).displayOrder(null).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
                 .build();
 
     }

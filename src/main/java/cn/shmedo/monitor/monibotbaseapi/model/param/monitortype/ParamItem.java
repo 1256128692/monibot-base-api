@@ -19,7 +19,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class ParamItem {
     private Integer ID;
-    @NonNull
+    @NotNull
     private Integer subjectID;
     @NotBlank
     private String dataType;
