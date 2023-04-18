@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.engine;
 
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -13,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnTriggerMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnTrigger;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -22,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Data
 public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -53,6 +54,13 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎不存在");
         }
         if (!CollectionUtil.isNullOrEmpty(dataList)) {
+            TbWarnTriggerMapper tbWarnTriggerMapper = ContextHolder.getBean(TbWarnTriggerMapper.class);
+            Map<Integer, String> updatedWarnIDNameMap = tbWarnTriggerMapper.selectList(
+                            new LambdaQueryWrapper<TbWarnTrigger>().eq(TbWarnTrigger::getRuleID, engineID)
+                                    .select(TbWarnTrigger::getID, TbWarnTrigger::getWarnName))
+                    .stream().collect(Collectors.toMap(TbWarnTrigger::getID, TbWarnTrigger::getWarnName));
+            List<String> createWarnNameList = new ArrayList<>();
+
             // 可空ID -> warnID、actionID,若为空视为新增的 告警状态、动作,所以校验 规则、告警状态、动作 三者间关系时要排除新增的部分
             List<Tuple<Integer, Integer>> updateTriggerRuleIDList = new ArrayList<>();
             List<Tuple<Integer, Integer>> updatActionTriggerIDList = new ArrayList<>();
@@ -62,10 +70,12 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             Tuple<Integer, String> checkActionTuple = new Tuple<>();
             dataList.stream().peek(u -> Optional.ofNullable(u.getMetadataID()).ifPresent(fieldSet::add))
                     .peek(u -> {
-                        if (Objects.isNull(u.getWarnID())) {
+                        Integer warnID = u.getWarnID();
+                        String warnName = u.getWarnName();
+                        if (Objects.isNull(warnID)) {
                             try {
-                                Assert.notEmpty(u.getWarnName(), "请输入报警名称");
-                                Assert.notNull(u.getWarnLevel(), "请输入报警等级");
+                                Assert.notEmpty(warnName, "请输入报警名称");
+                                Assert.notNull(u.getWarnLevel(), "请选择报警等级");
                                 Assert.checkBetween(u.getWarnLevel(), 1, 4, "报警等级不合法");
                                 Assert.notNull(u.getMetadataID(), "请选择源数据");
                                 Assert.notEmpty(u.getCompareRule(), "请选择比较区间");
@@ -76,8 +86,10 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                                     checkTriggerTuple.setItem2(e.getMessage());
                                 }
                             }
+                            createWarnNameList.add(warnName);
                         } else {
-                            updateTriggerRuleIDList.add(new Tuple<>(u.getWarnID(), engineID));
+                            Optional.ofNullable(warnName).ifPresent(n -> updatedWarnIDNameMap.put(warnID, n));
+                            updateTriggerRuleIDList.add(new Tuple<>(warnID, engineID));
                         }
                         Optional.ofNullable(u.getAction()).filter(s -> !CollectionUtil.isNullOrEmpty(s)).ifPresent(w -> {
                             w.stream().peek(m -> {
@@ -105,6 +117,10 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                         });
                     }).toList();
 
+            if (createWarnNameList.stream().distinct().toList().size() != createWarnNameList.size()
+                    || createWarnNameList.stream().anyMatch(updatedWarnIDNameMap::containsValue)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一源数据不同报警状态，报警名称不能重复");
+            }
             if (checkTriggerTuple.getItem1() != null && checkTriggerTuple.getItem1() == 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, checkTriggerTuple.getItem2());
             }
@@ -121,13 +137,12 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有数据源不存在");
                 }
             }
-            if (ObjectUtil.isNotEmpty(updateTriggerRuleIDList)) {
-                TbWarnTriggerMapper tbWarnTriggerMapper = ContextHolder.getBean(TbWarnTriggerMapper.class);
+            if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(updateTriggerRuleIDList)) {
                 if (updateTriggerRuleIDList.size() != tbWarnTriggerMapper.selectRuleTriggerCount(updateTriggerRuleIDList)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有需修改的告警状态不合法");
                 }
             }
-            if (ObjectUtil.isNotEmpty(updatActionTriggerIDList)) {
+            if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(updatActionTriggerIDList)) {
                 TbWarnActionMapper tbWarnActionMapper = ContextHolder.getBean(TbWarnActionMapper.class);
                 if (updatActionTriggerIDList.size() != tbWarnActionMapper.selectTriggerActionCount(updatActionTriggerIDList)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有需修改的动作不合法");

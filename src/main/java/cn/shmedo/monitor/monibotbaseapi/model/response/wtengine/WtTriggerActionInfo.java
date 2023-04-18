@@ -1,16 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.wtengine;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
