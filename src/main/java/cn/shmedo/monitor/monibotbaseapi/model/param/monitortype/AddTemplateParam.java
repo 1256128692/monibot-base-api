@@ -78,7 +78,7 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
         if (CalType.codeOf(calType) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "计算方式不合法");
         }
-        if (DataSourceComposeType.codeOf(dataSourceComposeType) != null){
+        if (DataSourceComposeType.codeOf(dataSourceComposeType) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板数据来源类型不合法");
         }
         if (!StringUtils.isBlank(exValues)&& !JSONUtil.isTypeJSON(exValues)){
