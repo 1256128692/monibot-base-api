@@ -56,6 +56,7 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
 
     @Override
     public ResultWrapper validate() {
+        this.engineName = engineName.trim();
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
         if (tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) != null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则名称重复");
