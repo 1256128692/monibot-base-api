@@ -101,7 +101,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                                     updatActionTriggerIDList.add(new Tuple<>(actionID, m.getTriggerID()));
                                 }
                                 Optional.ofNullable(actionType).ifPresent(actionTypeSet::add);
-                            });
+                            }).toList();
                         });
                     }).toList();
 

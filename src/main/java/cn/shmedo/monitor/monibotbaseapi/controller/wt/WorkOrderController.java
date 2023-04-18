@@ -67,6 +67,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} monitorPointLocation 监测点位置
+     * @apiSuccess (返回结果) {String} InstallLocation 安装位置
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} warnLevel 报警等级
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
