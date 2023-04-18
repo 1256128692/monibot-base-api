@@ -1,8 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-public interface TbMonitorGroupMapper {
+import java.util.Date;
+import java.util.List;
+
+public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorGroup record);
@@ -14,4 +20,10 @@ public interface TbMonitorGroupMapper {
     int updateByPrimaryKeySelective(TbMonitorGroup record);
 
     int updateByPrimaryKey(TbMonitorGroup record);
+
+    void updateImg(String path, Integer groupID, Integer userID, Date date);
+
+    IPage<Group4Web> queryPage(Page<Group4Web> page, Integer projectID, String name, Integer monitorItemID, Boolean parented);
+
+    List<Group4Web> queryGroup4WebByParentIDs(List<Integer> parentIDList);
 }

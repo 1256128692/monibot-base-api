@@ -35,6 +35,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -132,20 +133,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,
                                     Integer companyID) {
-        AddFileUploadRequest pojo = new AddFileUploadRequest();
-        if (StrUtil.isBlank(fileName)) {
-            pojo.setFileName(UUID.randomUUID().toString());
-        } else {
-            pojo.setFileName(fileName);
-        }
-        pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
-        pojo.setFileContent(imageContent);
-        pojo.setFileType(imageSuffix);
-        pojo.setUserID(userID);
-        pojo.setCompanyID(companyID);
+        AddFileUploadRequest pojo = ParamBuilder.buildAddFileUploadRequest(imageContent, imageSuffix, userID, fileName, companyID);
         ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
-            return ErrorConstant.IMAGE_INSERT_FAIL;
+            throw new CustomBaseException(info.getCode(), ErrorConstant.IMAGE_INSERT_FAIL) ;
         } else {
             return info.getData().getPath();
         }

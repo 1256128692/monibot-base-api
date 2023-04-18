@@ -1,9 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
+import lombok.AllArgsConstructor;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 public class MonitorGroupController {
+    private final MonitorGroupService monitorGroupService;
+
     /**
      * @api {POST} /AddMonitorGroup 新建监测组
      * @apiVersion 1.0.0
@@ -12,15 +25,19 @@ public class MonitorGroupController {
      * @apiDescription 新建监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [parentID] 父监测组ID
-     * @apiParam (请求体) {String} name 监测组名称(20)
+     * @apiParam (请求体) {String} name 监测组名称(50)
      * @apiParam (请求体) {Bool} enable 是否启用
-     * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
-     * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
+     * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表(50)
+     * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表(50)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-    public void addMonitorGroup(){
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/AddMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addMonitorGroup(@RequestBody @Validated AddMonitorGroupParam pa) {
+        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -31,7 +48,7 @@ public class MonitorGroupController {
      * @apiDescription 修改监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} groupID 监测组ID
-     * @apiParam (请求体) {String} name 监测组名称(20)
+     * @apiParam (请求体) {String} name 监测组名称(50)
      * @apiParam (请求体) {Bool} enable 是否启用
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
@@ -39,7 +56,11 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-    public void updateMonitorMainGroup(){
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/UpdateMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateMonitorGroup(@RequestBody @Validated UpdateMonitorGroupParam pa) {
+        monitorGroupService.updateMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -50,14 +71,17 @@ public class MonitorGroupController {
      * @apiDescription 修改监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} groupID 监测组ID
-     * @apiParam (请求体) {String} fileName 文件名称
-     * @apiParam (请求体) {String} filePrefix 文件后缀
+     * @apiParam (请求体) {String} fileName 文件名称(100)
+     * @apiParam (请求体) {String} fileSuffix 文件后缀
      * @apiParam (请求体) {String} fileContent 文件base64内容
-     * @apiSuccess (返回结果) {String} none 空
+     * @apiSuccess (返回结果) {String} url 可用图片地址
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-    public void uploadMonitorGroupImage(){
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/UploadMonitorGroupImage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object uploadMonitorGroupImage(@RequestBody @Validated UploadMonitorGroupImageParam pa) {
+        return monitorGroupService.uploadMonitorGroupImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 
     /**
@@ -67,13 +91,16 @@ public class MonitorGroupController {
      * @apiName DeleteMonitorGroup
      * @apiDescription 删除监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {Int[]} groupIDList 监测组ID列表
+     * @apiParam (请求体) {Int[]} groupIDList 监测组ID列表(max = 10)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorGroup
-     * */
-    public Object deleteMonitorGroup(){
-        return null;
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/DeleteMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deleteMonitorGroup(@RequestBody @Validated DeleteMonitorGroupParam pa) {
+        monitorGroupService.deleteMonitorGroup(pa.getGroupIDList());
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -84,22 +111,25 @@ public class MonitorGroupController {
      * @apiDescription 配置监测点底图定位
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} groupID 监测组ID
-     * @apiParam (请求体) {Object[]} pointLocationList 监测点位置列表
+     * @apiParam (请求体) {Object[]} pointLocationList 监测点位置列表(max=20)
      * @apiParam (请求体) {Int} pointLocationList.pointID 监测点ID
      * @apiParam (请求体) {String} pointLocationList.location 监测点位置
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
-     * */
-    public Object configMonitorPointImageLocation(){
-        return null;
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/ConfigMonitorPointImageLocation", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object configMonitorPointImageLocation(@RequestBody @Validated ConfigMonitorPointImageLocationParam pa) {
+        monitorGroupService.configMonitorPointImageLocation(pa);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /QueryMonitorGroupList 分页查询监测组列表
+     * @api {POST} /QueryMonitorGroupPage 分页查询监测组列表
      * @apiVersion 1.0.0
      * @apiGroup 监测组模块
-     * @apiName QueryMonitorGroupList
+     * @apiName QueryMonitorGroupPage
      * @apiDescription 分页查询监测组列表
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {String} [name] 监测组名称
@@ -128,9 +158,11 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Object[]} data.childGroupList 子监测组列表
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
-     * */
-    public Object queryMonitorGroupList(){
-        return null;
+     */
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/QueryMonitorGroupPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupPage(@RequestBody @Validated QueryMonitorGroupPageParam pa) {
+        return monitorGroupService.queryMonitorGroupPage(pa);
     }
 
     /**
@@ -160,7 +192,9 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorGroup
      */
-    public Object queryMonitorGroupDetail(){
-        return null;
+//    @Permission(permissionName = "xx")
+    @PostMapping(value = "/QueryMonitorGroupDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupDetail(@RequestBody @Validated QueryMonitorGroupDetailParam pa) {
+       return monitorGroupService.queryMonitorGroupDetail(pa.getTbMonitorGroup());
     }
 }

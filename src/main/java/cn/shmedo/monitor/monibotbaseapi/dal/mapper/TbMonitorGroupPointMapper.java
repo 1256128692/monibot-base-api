@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.PointIDAndLocation;
 
-public interface TbMonitorGroupPointMapper {
+import java.util.List;
+
+public interface TbMonitorGroupPointMapper extends BasicMapper<TbMonitorGroupPoint>{
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorGroupPoint record);
@@ -14,4 +17,8 @@ public interface TbMonitorGroupPointMapper {
     int updateByPrimaryKeySelective(TbMonitorGroupPoint record);
 
     int updateByPrimaryKey(TbMonitorGroupPoint record);
+
+    List<Integer> queryPointIDByGroupID(Integer groupID);
+
+    void updateImgLocation(List<PointIDAndLocation> pointLocationList, Integer groupID);
 }

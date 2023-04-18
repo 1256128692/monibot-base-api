@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -36,4 +37,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
     void insertBatch(List<TbMonitorPoint> list);
 
     void updateBatch(List<TbMonitorPoint> list);
+
+    List<GroupPoint> queryGroupPointByGroupIDs(List<Integer> allGroupIDList);
 }

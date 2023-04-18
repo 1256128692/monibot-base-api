@@ -365,7 +365,7 @@
     </select>
 
     <insert id="insertBatch" keyColumn="ID" keyProperty="ID"
-             useGeneratedKeys="true">
+            useGeneratedKeys="true">
         insert into tb_monitor_item (CompanyID, ProjectID, MonitorType,
                                      MonitorClass, `Name`, `Alias`,
                                      CreateType, ProjectType, ExValue,
@@ -373,11 +373,25 @@
                                      UpdateTime, UpdateUserID)
         values
         <foreach collection="collection" item="item" separator=",">
-            (#{item.companyID,jdbcType=INTEGER}, #{item.projectID,jdbcType=INTEGER}, #{item.monitorType,jdbcType=INTEGER},
-            #{item.monitorClass,jdbcType=TINYINT}, #{item.name,jdbcType=VARCHAR}, #{item.alias,jdbcType=VARCHAR},
-            #{item.createType,jdbcType=TINYINT}, #{item.projectType,jdbcType=INTEGER}, #{item.exValue,jdbcType=VARCHAR},
-            #{item.displayOrder,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP}, #{item.createUserID,jdbcType=INTEGER},
-            #{item.updateTime,jdbcType=TIMESTAMP}, #{item.updateUserID,jdbcType=INTEGER})
+            (#{item.companyID,jdbcType=INTEGER}, #{item.projectID,jdbcType=INTEGER},
+             #{item.monitorType,jdbcType=INTEGER},
+             #{item.monitorClass,jdbcType=TINYINT}, #{item.name,jdbcType=VARCHAR}, #{item.alias,jdbcType=VARCHAR},
+             #{item.createType,jdbcType=TINYINT}, #{item.projectType,jdbcType=INTEGER},
+             #{item.exValue,jdbcType=VARCHAR},
+             #{item.displayOrder,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP},
+             #{item.createUserID,jdbcType=INTEGER},
+             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.updateUserID,jdbcType=INTEGER})
         </foreach>
     </insert>
+
+    <select id="queryMonitorItemByGroupIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupMonitorItem">
+        select it.id as monitorItemID, it.Name as monitorItemName, it.Alias as monitorItemAlias
+        from tb_monitor_item as it
+        right join tb_monitor_group_item gi on it.ID = gi.MonitorItemID
+        where gi.MonitorGroupID in
+        <foreach collection="list" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>
