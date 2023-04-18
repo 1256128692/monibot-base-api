@@ -197,7 +197,7 @@
           </if>
         </where>
   </select>
-  <insert id="insertBatch">
+  <insert id="insertBatch" keyColumn="ID" keyProperty="ID"  useGeneratedKeys="true">
     insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
     FieldDataType, FieldClass,FieldDesc, FieldUnitID,
     ParentID, DisplayOrder, CreateType,

@@ -439,7 +439,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName SetProjectImg
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} imgType 图片类型Img，OverallView，SpatialView:地图，全景，三维
+     * @apiParam (请求体) {String} imgType 图片类型Image，OverallView，SpatialView:底图，全景，三维
      * @apiParam (请求体) {String} fileName  图片名称
      * @apiParam (请求体) {String} imgContent 图片内容，base64格式
      * @apiParam (请求体) {String} imgSuffix 图片后缀
@@ -460,7 +460,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectImg
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {String} imgType 图片类型：底图，三维等
+     * @apiParam (请求体) {String} imgType 图片类型Image，OverallView，SpatialView:底图，全景，三维
      * @apiSuccess (返回结果) {String} imgURL 图片可用url
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseProject

@@ -11,7 +11,7 @@ public enum ProjectImageType {
     /**
      * 底图
      */
-    Img("Img"),
+    Img("Image"),
     /**
      * 全景
      */
