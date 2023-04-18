@@ -28,4 +28,8 @@ public interface MonitorPointService {
     List<IDNameAlias> queryMonitorPointSimpleList(QueryMonitorPointSimpleListParam pa);
 
     List<MonitorItemWithPoint> queryMonitorItemPointList(QueryMonitorItemPointListParam pa);
+
+    void addMonitorPointBatch(AddMonitorPointBatchParam pa, Integer userID);
+
+    void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID);
 }

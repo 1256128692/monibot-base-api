@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
@@ -10,7 +11,6 @@ import cn.shmedo.monitor.monibotbaseapi.config.MonitorTypeFieldConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
@@ -18,7 +18,6 @@ import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 
 import java.util.List;
 
@@ -75,7 +74,7 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
         if (fieldList.stream().anyMatch(item -> !MonitorTypeFieldConfig.DataTypeList.contains(item.getFieldDataType()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性数据类型不合法");
         }
-        if (fieldList.stream().anyMatch(item -> !MonitorTypeFieldClass.isValid(item.getFieldClass()))){
+        if (fieldList.stream().anyMatch(item -> FieldClass.codeOf(item.getFieldClass()) == null)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性类型不合法");
         }
         if (fieldList.stream().anyMatch(item -> !CreateType.isValid(item.getCreateType().byteValue()))){

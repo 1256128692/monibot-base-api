@@ -1,13 +1,16 @@
 package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateDataSource;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateFormula;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTemplateScript;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Collections;

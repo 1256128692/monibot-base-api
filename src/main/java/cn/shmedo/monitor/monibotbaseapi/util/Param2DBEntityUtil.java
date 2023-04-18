@@ -4,7 +4,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.UpdateMonitorPointBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
@@ -221,4 +223,14 @@ public class Param2DBEntityUtil {
                 .exValues(pa.getExValues()).enable(pa.getEnable()).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
                 .build();
     }
+
+    public static List<TbMonitorPoint> fromAddMonitorPointBatchParam2TbMonitorPoint(AddMonitorPointBatchParam pa, Integer userID) {
+        Date now = new Date();
+        return pa.getAddPointItemList().stream().map(item -> TbMonitorPoint.builder()
+                .projectID(pa.getProjectID()).monitorType(pa.getMonitorType()).monitorItemID(pa.getMonitorItemID()).name(item.getName())
+                .installLocation(null).gpsLocation(item.getGpsLocation()).imageLocation(item.getImageLocation()).spatialLocation(item.getSpatialLocation())
+                .exValues(item.getExValues()).enable(item.getEnable()).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
+                .build()).collect(Collectors.toList());
+    }
+
 }

@@ -15,7 +15,7 @@ ext {
     influxdbVersion = "2.16"
     mysqlConnectorVersion = "8.0.32"
     druidVersion = "1.2.16"
-    iotEntityVersion = '1.0.60'
+    iotEntityVersion = '1.0.62'
     hutoolVersion = "5.8.12"
     mybatisPlusVersion = "3.5.3.1"
     openFeignVersion = "12.0"

@@ -7,7 +7,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
@@ -100,5 +99,17 @@ public class MonitorPointServiceImpl implements MonitorPointService {
             });
         }
         return list;
+    }
+
+    @Override
+    public void addMonitorPointBatch(AddMonitorPointBatchParam pa, Integer userID) {
+        List<TbMonitorPoint> list = Param2DBEntityUtil.fromAddMonitorPointBatchParam2TbMonitorPoint(pa, userID);
+        tbMonitorPointMapper.insertBatch(list);
+    }
+
+    @Override
+    public void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID) {
+        tbMonitorPointMapper.updateBatch(pa.updateBatch(userID));
+
     }
 }

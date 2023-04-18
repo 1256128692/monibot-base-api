@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
@@ -64,4 +63,8 @@ public interface ProjectService {
      * @return
      */
     List<Integer> getUserProjectIDs(Integer companyID, String accessToken);
+
+    String setProjectImg(SetProjectImgParam pa, Integer userID);
+
+    String queryProjectImg(QueryProjectImgParam pa);
 }

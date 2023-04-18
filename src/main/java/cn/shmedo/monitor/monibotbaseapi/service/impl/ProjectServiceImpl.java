@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -28,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
@@ -35,6 +37,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -67,7 +70,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final RedisService redisService;
     private final PropertyService propertyService;
     private final MdInfoService mdInfoService;
-
+    private final TbProjectConfigMapper tbProjectConfigMapper;
+    private final FileService fileService;
     private static final String TOKEN_HEADER = "Authorization";
 
     @Override
@@ -153,6 +157,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
         return list;
     }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void transferProject(TransferProjectParam param, CurrentSubject currentSubject) {
@@ -249,16 +254,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             tbTagRelationMapper.insertBatch(tagID4DBList, pa.getProjectID());
         }
         // 处理属性
-        if(ObjectUtil.isNotEmpty(pa.getPropertyList())){
+        if (ObjectUtil.isNotEmpty(pa.getPropertyList())) {
             propertyService.updateProperty(pa.getProjectID(), pa.getPropertyList(), pa.getProperties());
         }
-        if (pa.getNewCompanyID()!=null){
+        if (pa.getNewCompanyID() != null) {
             transferProject(userID, pa.getProjectID(), pa.getNewCompanyID(), projectInfo.getCompanyID());
         }
-        if (ObjectUtil.isAllNotEmpty(pa.getFileName(), pa.getImageContent(), pa.getImageSuffix())){
-            updateProjectImage(pa.getImageContent(), pa.getImageSuffix(), pa.getFileName(),userID,
-                    pa.getNewCompanyID() == null?projectInfo.getCompanyID():pa.getNewCompanyID()
-                    ,  pa.getProjectID());
+        if (ObjectUtil.isAllNotEmpty(pa.getFileName(), pa.getImageContent(), pa.getImageSuffix())) {
+            updateProjectImage(pa.getImageContent(), pa.getImageSuffix(), pa.getFileName(), userID,
+                    pa.getNewCompanyID() == null ? projectInfo.getCompanyID() : pa.getNewCompanyID()
+                    , pa.getProjectID());
         }
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
@@ -278,11 +283,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public void updateProjectImage(UpdateProjectImageParam pa, Integer userID) {
-        updateProjectImage(pa.getImageContent(), pa.getImageSuffix(),pa.getFileName(),  userID,pa.getCompanyID(),pa.getProjectID());
+        updateProjectImage(pa.getImageContent(), pa.getImageSuffix(), pa.getFileName(), userID, pa.getCompanyID(), pa.getProjectID());
     }
 
     public void updateProjectImage(String imageContent, String imageSuffix, String fileName, Integer userID, Integer compnayID, Integer projectID) {
-        String path = handlerImagePath(imageContent,imageSuffix, userID, fileName, compnayID);
+        String path = handlerImagePath(imageContent, imageSuffix, userID, fileName, compnayID);
         if (StringUtils.isNotBlank(path)) {
             tbProjectInfoMapper.updatePathByID(path, projectID);
         }
@@ -326,7 +331,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<Company> companies = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class);
             System.out.println(companies);
             Map<Integer, Company> companyMap = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class)
-                    .stream().collect(Collectors.toMap(e->e.getId(), e -> e));
+                    .stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
             companyData.clear();
 
             pageData.getRecords().forEach(item -> {
@@ -387,13 +392,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             });
 
             return projectBaseInfoList;
-        }else{
+        } else {
             return null;
         }
     }
 
     /**
      * 获取用户在该公司中具有权限的项目
+     *
      * @return
      */
     @Override
@@ -410,6 +416,55 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         List<Integer> pids = info.getData().stream().distinct().map(Integer::parseInt).collect(Collectors.toList());
         return pids;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public String setProjectImg(SetProjectImgParam pa, Integer userID) {
+
+        String path = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName(), pa.getCompanyID());
+        //TODO  项目图片使用group:img key:projectImg
+        TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
+                new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
+                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .eq(TbProjectConfig::getKey, "projectImg")
+        );
+        if (tbProjectConfig == null) {
+            tbProjectConfig = new TbProjectConfig();
+            tbProjectConfig.setProjectID(pa.getProjectID());
+            tbProjectConfig.setGroup("img");
+            tbProjectConfig.setKey("projectImg");
+            tbProjectConfig.setValue(JSONUtil.toJsonStr(Map.of(pa.getImgType(), path)));
+            tbProjectConfigMapper.insert(tbProjectConfig);
+        } else {
+            String value = tbProjectConfig.getValue();
+            if (StrUtil.isNotEmpty(value)) {
+                Map map = JSONUtil.toBean(value, Map.class);
+                map.put(pa.getImgType(), path);
+                tbProjectConfig.setValue(JSONUtil.toJsonStr(map));
+            } else {
+                tbProjectConfig.setValue(JSONUtil.toJsonStr(Map.of(pa.getImgType(), path)));
+            }
+            tbProjectConfigMapper.updateByPrimaryKey(tbProjectConfig);
+        }
+        return fileService.getFileUrl(path);
+    }
+
+    @Override
+    public String queryProjectImg(QueryProjectImgParam pa) {
+        TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
+                new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
+                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .eq(TbProjectConfig::getKey, "projectImg")
+        );
+        if (tbProjectConfig != null && StrUtil.isNotEmpty(tbProjectConfig.getValue())) {
+            String value = tbProjectConfig.getValue();
+            if (StrUtil.isNotEmpty(value)) {
+                Map map = JSONUtil.toBean(value, Map.class);
+                return fileService.getFileUrl(map.get(pa.getImgType()).toString());
+            }
+        }
+        return null;
     }
 
 }

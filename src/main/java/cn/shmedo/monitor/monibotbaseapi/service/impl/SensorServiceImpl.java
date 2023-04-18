@@ -9,6 +9,10 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
@@ -20,10 +24,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CalType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
@@ -101,19 +101,19 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
         Map<String, List<DeviceWithSensor>> iotMap = getIotMap(() -> result.stream()
                 .flatMap(e -> e.getDataSourceList().stream())
-                .filter(e -> DatasourceType.IOT.getCode() == e.getDataSourceType())
+                .filter(e -> DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType())
                 .map(e -> StrUtil.subBefore(e.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
                 .filter(Objects::nonNull).collect(Collectors.toSet()), request.getKeyword());
 
         Map<String, List<TbSensor>> monitorMap = getMonitorMap(() -> result.stream()
                 .flatMap(e -> e.getDataSourceList().stream())
-                .filter(e -> DatasourceType.MONITOR.getCode() == e.getDataSourceType())
+                .filter(e -> DataSourceType.MONITOR_SENSOR.getCode() == e.getDataSourceType())
                 .map(DataSourceCatalogResponse.DataSource::getTemplateDataSourceToken).collect(Collectors.toSet()));
 
         return result.stream().peek(item -> item.getDataSourceList().forEach(e -> {
                     String token = StrUtil.subBefore(e.getTemplateDataSourceToken(),
                             StrUtil.UNDERLINE, false);
-                    if (DatasourceType.IOT.getCode() == e.getDataSourceType()) {
+                    if (DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType()) {
 
                         List<DeviceWithSensor> childList = new ArrayList<>();
                         iotMap.getOrDefault(token, List.of()).forEach(device -> {
@@ -128,7 +128,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                             childList.add(data);
                         });
                         e.setChildList(childList);
-                    } else if (DatasourceType.MONITOR.getCode() == e.getDataSourceType()) {
+                    } else if (DataSourceType.MONITOR_SENSOR.getCode() == e.getDataSourceType()) {
                         e.setChildList(monitorMap.getOrDefault(token, List.of()));
                     }
                 }))
@@ -185,7 +185,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 dataSource.setDataSourceID(sensor.getDataSourceID());
                 dataSource.setDataSourceType(source.getDataSourceType().getCode());
                 dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
-                dataSource.setDataSourceToken(DatasourceType.IOT.equals(source.getDataSourceType()) ?
+                dataSource.setDataSourceToken(DataSourceType.IOT_SENSOR.equals(source.getDataSourceType()) ?
                         source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
                 dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
                 dataSource.setExValues(source.getExValues());
@@ -213,7 +213,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         //扩展配置
         List<TbMonitorTypeField> typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                 .eq(TbMonitorTypeField::getMonitorType, response.getMonitorType())
-                .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass()));
+                .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode()));
         Dict exConfig = JSONUtil.isTypeJSON(response.getConfigFieldValue()) ?
                 JSONUtil.toBean(response.getConfigFieldValue(), Dict.class) : Dict.create();
         response.setExFields(typeFields.stream().map(e -> {
@@ -224,16 +224,16 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         //参数
         Map<Integer, Map<String, TbParameter>> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
                 .or(wrapper -> wrapper
-                        .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
+                        .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
                         .eq(TbParameter::getSubjectID, response.getID()))
                 .or(wrapper -> {
-                    wrapper.eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                    wrapper.eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                             .eq(TbParameter::getSubjectID, response.getTemplateID());
                 })).stream().collect(Collectors.groupingBy(TbParameter::getSubjectType,
                 Collectors.toMap(TbParameter::getToken, e -> e)));
-        if (paramMap.containsKey(ParamSubjectType.Template.getType())) {
-            Map<String, TbParameter> sensorParamMap = paramMap.getOrDefault(ParamSubjectType.Sensor.getType(), Map.of());
-            response.setParamFields(paramMap.get(ParamSubjectType.Template.getType()).values().stream()
+        if (paramMap.containsKey(ParameterSubjectType.TEMPLATE.getCode())) {
+            Map<String, TbParameter> sensorParamMap = paramMap.getOrDefault(ParameterSubjectType.SENSOR.getCode(), Map.of());
+            response.setParamFields(paramMap.get(ParameterSubjectType.TEMPLATE.getCode()).values().stream()
                     .peek(p -> p.setPaValue(sensorParamMap.getOrDefault(p.getToken(), p).getPaValue())).toList());
         }
         //数据源
@@ -257,7 +257,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
         //删除传感器参数
         parameterMapper.delete(new LambdaQueryWrapper<TbParameter>()
-                .eq(TbParameter::getSubjectType, ParamSubjectType.Sensor.getType())
+                .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
                 .in(TbParameter::getSubjectID, request.getSensorIDList()));
         //删除传感器
         removeBatchByIds(request.getSensorIDList());
@@ -299,7 +299,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         TryingParamResponse result = new TryingParamResponse();
         result.setCalType(request.getMonitorTypeTemplate().getCalType());
         switch (CalType.codeOf(result.getCalType())) {
-            case Formula:
+            case FORMULA:
                 Map<Integer, TbTemplateFormula> formulaMap = templateFormulaMapper
                         .selectList(new LambdaQueryWrapper<TbTemplateFormula>()
                                 .eq(TbTemplateFormula::getTemplateID, request.getTemplateID())
@@ -313,7 +313,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                             return field;
                         }).toList());
                 break;
-            case Script:
+            case SCRIPT:
                 TbTemplateScript tbTemplateScript = templateScriptMapper.selectOne(new LambdaQueryWrapper<TbTemplateScript>()
                         .eq(TbTemplateScript::getTemplateID, request.getTemplateID())
                         .eq(TbTemplateScript::getMonitorType, request.getMonitorType())
@@ -356,7 +356,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 case PARAM -> {
                     List<String> paramTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
                     Map<String, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                                    .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                                     .eq(TbParameter::getSubjectID, request.getTemplateID())
                                     .in(TbParameter::getToken, paramTokens))
                             .stream().collect(Collectors.toMap(TbParameter::getToken, e -> e));
@@ -371,7 +371,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     List<String> exTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
                     Map<String, TbMonitorTypeField> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                             .eq(TbMonitorTypeField::getMonitorType, request.getMonitorType())
-                            .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())
+                            .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode())
                             .in(TbMonitorTypeField::getFieldToken, exTokens)
                             .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
                     ).stream().collect(Collectors.toMap(TbMonitorTypeField::getFieldToken, e -> e));
@@ -394,7 +394,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public Object trying(TryingRequest request) {
         switch (request.getCalType()) {
-            case Formula:
+            case FORMULA:
                 Dict fieldValueMap = Dict.create();
                 return request.getFieldList().stream().map(f -> {
                     Object result = FormulaUtil.calculate(f.getRealFormula(), dataTypeSetMap ->
@@ -407,7 +407,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     fieldValueMap.set(f.getFieldToken(), result);
                     return new TryingResponse(result, f.getFieldToken());
                 }).toList();
-            case Script:
+            case SCRIPT:
                 //TODO 脚本计算未实现
                 break;
             case HTTP:
@@ -420,15 +420,15 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public BaseConfigResponse baseConfig(BaseConfigRequest request) {
         List<TbParameter> parameterList = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                 .eq(TbParameter::getSubjectID, request.getTemplateID()));
         QueryWrapper<Void> wrapper = new QueryWrapper<>();
 //            wrapper.in("tmtf.FieldClass", MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass());
         wrapper.eq("tmt.MonitorType", request.getMonitorType());
         List<BaseConfigResponse> list = monitorTypeMapper.queryMonitorTypeWithField(wrapper).stream().map(e -> {
             BaseConfigResponse item = new BaseConfigResponse();
-            item.setExFields(e.getFieldList().stream().filter(f -> MonitorTypeFieldClass.ExtendedConfigurations
-                    .getFieldClass().equals(f.getFieldClass())).collect(Collectors.toList()));
+            item.setExFields(e.getFieldList().stream().filter(f -> FieldClass.EXTEND_CONFIG
+                    .getCode() == f.getFieldClass()).collect(Collectors.toList()));
             item.setParamFields(parameterList);
             return item;
         }).toList();
