@@ -159,6 +159,7 @@
             tmp.`ID` monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.GpsLocation monitorPointLocation,
+            tmp.InstallLocation installLocation,
             twl.WarnTime warnTime,
             twt.CompareRule compareRule,
             twt.TriggerRule triggerRule
