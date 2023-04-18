@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import lombok.Builder;
+
 /**
     * 监测组别和监测项目关联表
     */
+@Builder(toBuilder = true)
 public class TbMonitorGroupItem {
     /**
     * ID

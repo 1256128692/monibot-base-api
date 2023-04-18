@@ -130,4 +130,23 @@ public class WorkOrderController {
     public Object dispatchWorkOrder(@Valid @RequestBody Object param) {
         return null;
     }
+
+    /**
+     * @api {POST} /QueryWorkOrderStatistics 查询工单状态统计信息
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName QueryWorkOrderStatistics
+     * @apiDescription 查询工单状态统计信息
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 项目ID
+     * @apiSuccess (返回结果) {Int} todoCount 待处理数量
+     * @apiSuccess (返回结果) {Int} processingCount 处理中数量
+     * @apiSuccess (返回结果) {Int} completedCount 已结束数量
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
+     */
+    @PostMapping(value = "/QueryWorkOrderStatistics", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryWorkOrderStatistics(@Valid @RequestBody Object param) {
+        return null;
+    }
 }

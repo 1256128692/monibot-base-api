@@ -308,8 +308,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 result.setFieldList(request.getTypeFields().stream()
                         .filter(e -> formulaMap.containsKey(e.getID())).map(typeField -> {
                             Field field = Field.valueOf(typeField);
-                            field.setFormula(formulaMap.get(typeField.getID()).getDisplayFormula());
-                            field.setRealFormula(formulaMap.get(typeField.getID()).getFormula());
+                            field.setDisplayFormula(formulaMap.get(typeField.getID()).getDisplayFormula());
+                            field.setFormula(formulaMap.get(typeField.getID()).getFormula());
                             return field;
                         }).toList());
                 break;
@@ -327,7 +327,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
 
         Map<FormulaUtil.DataType, Set<FormulaUtil.Source>> sourceMap = result.getFieldList().stream()
-                .map(Field::getRealFormula)
+                .map(Field::getFormula)
                 .flatMap(e -> FormulaUtil.parse(e).entrySet().stream())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> {
                     a.addAll(b);
@@ -397,7 +397,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             case FORMULA:
                 Dict fieldValueMap = Dict.create();
                 return request.getFieldList().stream().map(f -> {
-                    Object result = FormulaUtil.calculate(f.getRealFormula(), dataTypeSetMap ->
+                    Object result = FormulaUtil.calculate(f.getFormula(), dataTypeSetMap ->
                             dataTypeSetMap.forEach((type, sources) ->
                                     sources.forEach(source ->
                                             source.setFieldValue(FormulaUtil.DataType.SELF.equals(type) ?

@@ -1,10 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+
 import java.util.Date;
 
 /**
     * 监测组别和监测组表
     */
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class TbMonitorGroup {
     /**
     * ID

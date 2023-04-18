@@ -69,4 +69,10 @@
       MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+  <select id="queryMonitorItemIDByGroupIDs" resultType="java.lang.Integer">
+    select MonitorItemID from tb_monitor_group_item where MonitorGroupID in
+    <foreach collection="list" item="item" open="(" separator="," close=")">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

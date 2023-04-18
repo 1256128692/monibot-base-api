@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -12,7 +13,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     int deleteByPrimaryKey(Integer ID);
@@ -44,4 +44,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList);
 
     void insertBatch(Collection<TbMonitorItem> collection);
+
+    List<GroupMonitorItem> queryMonitorItemByGroupIDs(List<Integer> groupIDList);
 }

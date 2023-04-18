@@ -175,4 +175,43 @@
       UpdateUserID = #{updateUserID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <update id="updateImg">
+    update tb_monitor_group
+    set
+        ImagePath = #{path},
+        UpdateTime = #{date},
+        UpdateUserID = #{userID}
+        where ID = #{groupID}
+
+  </update>
+  <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web">
+      select *
+      from tb_monitor_group
+      <where>
+          ProjectID = #{projectID}
+          <if test="name != null">
+              and `Name` like concat('%', #{name}, '%')
+          </if>
+          <if test="parented">
+              and ParentID is null
+          </if>
+          <if test="monitorItemID != null">
+              and id in
+                  (select ParentID
+                   from tb_monitor_group
+                   where id in
+                         (select MonitorGroupID from tb_monitor_group_point where MonitorPointID = #{monitorItemID}))
+          </if>
+      </where>
+      order by id desc
+  </select>
+  <select id="queryGroup4WebByParentIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web">
+      select *
+      from tb_monitor_group
+      where ParentID in
+      <foreach collection="parentIDList" item="id" open="(" separator="," close=")">
+          #{id}
+      </foreach>
+  </select>
 </mapper>

@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.AddMonitorGroupParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.UpdateMonitorPointBatchParam;
@@ -232,5 +233,16 @@ public class Param2DBEntityUtil {
                 .exValues(item.getExValues()).enable(item.getEnable()).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
                 .build()).collect(Collectors.toList());
     }
+
+    public static TbMonitorGroup fromAddMonitorGroupParam(AddMonitorGroupParam pa, Integer userID) {
+        Date now = new Date();
+        return TbMonitorGroup.builder()
+                .projectID(pa.getProjectID()).parentID(pa.getParentID()).name(pa.getName()).enable(pa.getEnable())
+                .imagePath(null).exValue(null).displayOrder(null).createUserID(userID).creatTime(now).updateTime(now).updateUserID(userID)
+                .build();
+
+    }
+
+
 
 }

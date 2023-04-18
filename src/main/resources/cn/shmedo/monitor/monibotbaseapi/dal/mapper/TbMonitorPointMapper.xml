@@ -416,4 +416,16 @@
             ID = #{item.ID}
         </foreach>
     </update>
+
+    <select id="queryGroupPointByGroupIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint">
+        select gp.ImageLocation, gp.MonitorPointID, p.Name as monitorPointName, p.MonitorType, p.MonitorItemID
+        ,gp.MonitorGroupID as groupID
+        from tb_monitor_point as p
+                 right join tb_monitor_group_point as gp on p.ID = gp.MonitorPointID
+        where gp.MonitorGroupID in
+        <foreach collection="list" item="groupID" separator="," open="(" close=")">
+            #{groupID}
+        </foreach>
+    </select>
 </mapper>

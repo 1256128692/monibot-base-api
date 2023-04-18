@@ -153,8 +153,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 Map<String, List<ModelField>> iotModelFieldMap;
                 if (ObjectUtil.isNotEmpty(modelTokenList)) {
                     IotService iotService = ThirdHttpService.getInstance(IotService.class, ThirdHttpService.Iot);
-                    var thridParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
-                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thridParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                    var thirdParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
+                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thirdParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
                     if (!resultWrapper.apiSuccess()) {
                         throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
                     } else if (resultWrapper.getData() != null) {
@@ -323,16 +323,40 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (ObjectUtil.isNotEmpty(template)) {
             BeanUtil.copyProperties(template, cacheData, "templateDataSourceList", "templateFormulaList", "templateScriptList");
         }
-        if (ObjectUtil.isNotEmpty(sources)) {
+        if (CollUtil.isNotEmpty(sources)) {
             List<TemplateDataSourceCacheData> templateDataSourceList = BeanUtil.copyToList(sources, TemplateDataSourceCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateDataSourceList())) {
+                List<Integer> sourceIDs = sources.stream().map(TbTemplateDataSource::getID).toList();
+                List<TemplateDataSourceCacheData> otherSourceList = cacheData.getTemplateDataSourceList()
+                        .stream().filter(ds -> !sourceIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherSourceList)) {
+                    templateDataSourceList.addAll(otherSourceList);
+                }
+            }
             cacheData.setTemplateDataSourceList(templateDataSourceList);
         }
         if (CollUtil.isNotEmpty(formulaList)) {
             List<FormulaCacheData> templateFormulaList = BeanUtil.copyToList(formulaList, FormulaCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateFormulaList())) {
+                List<Integer> formulaIDs = formulaList.stream().map(TbTemplateFormula::getID).toList();
+                List<FormulaCacheData> otherFormulaList = cacheData.getTemplateFormulaList()
+                        .stream().filter(ds -> !formulaIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherFormulaList)) {
+                    templateFormulaList.addAll(otherFormulaList);
+                }
+            }
             cacheData.setTemplateFormulaList(templateFormulaList);
         }
         if (CollUtil.isNotEmpty(scriptList)) {
             List<ScriptCacheData> templateScriptList = BeanUtil.copyToList(scriptList, ScriptCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateScriptList())) {
+                List<Integer> scriptIDs = scriptList.stream().map(TbTemplateScript::getID).toList();
+                List<ScriptCacheData> otherScriptList = cacheData.getTemplateScriptList()
+                        .stream().filter(ds -> !scriptIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherScriptList)) {
+                    templateScriptList.addAll(otherScriptList);
+                }
+            }
             cacheData.setTemplateScriptList(templateScriptList);
         }
         redisService.put(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateID.toString(), JSONUtil.toJsonStr(cacheData));

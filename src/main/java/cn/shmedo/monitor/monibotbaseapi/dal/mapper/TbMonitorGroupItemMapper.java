@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 
-public interface TbMonitorGroupItemMapper {
+import java.util.List;
+
+public interface TbMonitorGroupItemMapper extends BasicMapper<TbMonitorGroupItem>{
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorGroupItem record);
@@ -14,4 +16,6 @@ public interface TbMonitorGroupItemMapper {
     int updateByPrimaryKeySelective(TbMonitorGroupItem record);
 
     int updateByPrimaryKey(TbMonitorGroupItem record);
+
+    List<Integer> queryMonitorItemIDByGroupIDs(List<Integer> groupIDList);
 }
