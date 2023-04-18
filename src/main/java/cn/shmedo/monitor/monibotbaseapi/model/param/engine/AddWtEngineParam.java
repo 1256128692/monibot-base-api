@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.Date;
@@ -28,13 +29,15 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
     @NotNull(message = "请选择所属工程项目")
     @Min(value = 1, message = "工程项目ID不能小于1")
     private Integer projectID;
+    @Size(min = 1, max = 30, message = "规则名称仅允许1~30个字符")
     @NotEmpty(message = "请填写规则名称")
     private String engineName;
+    @Size(min = 1, max = 200, message = "规则简介仅运行1~200个字符")
     @NotEmpty(message = "请填写规则简介")
     private String engineDesc;
-    @NotNull(message = "监测项目ID不能为空")
+    @NotNull(message = "请选择所属监测项目")
     private Integer monitorItemID;
-    @NotNull(message = "监测点ID不能为空")
+    @NotNull(message = "请选择监测点")
     private Integer monitorPointID;
 
     public static TbWarnRule build(AddWtEngineParam param) {
@@ -54,8 +57,8 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
     @Override
     public ResultWrapper validate() {
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
-        if(tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) != null){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"规则名称重复");
+        if (tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) != null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则名称重复");
         }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (tbProjectInfoMapper.selectOne(new LambdaQueryWrapper<TbProjectInfo>()

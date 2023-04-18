@@ -10,6 +10,5 @@ import lombok.experimental.Accessors;
 public class WtWarnStatusDetailInfo extends WtWarnStatusInfo {
     private Integer metadataID;
     private String metadataName;
-    private String compareRule;
     private String triggerRule;
 }

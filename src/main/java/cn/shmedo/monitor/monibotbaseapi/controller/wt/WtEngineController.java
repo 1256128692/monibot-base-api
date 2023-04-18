@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-/**
- * TODO test
- */
 @RestController
 @AllArgsConstructor(onConstructor = @__(@Autowired))
 public class WtEngineController {
@@ -55,6 +52,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnID 报警状态ID
      * @apiSuccess (返回结果) {String} currentPageData.dataList.warnName 报警名称
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnLevel 报警等级
+     * @apiSuccess (返回结果) {String} currentPageData.dataList.compareRule 比较区间json
      * @apiSuccess (返回结果) {Object[]} [currentPageData.dataList.action] 动作描述list
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.ID 动作ID
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.action.triggerID 触发报警ID
@@ -81,6 +79,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} engineID 引擎ID
      * @apiSuccess (返回结果) {String} engineName 引擎名称
      * @apiSuccess (返回结果) {String} engineDesc 引擎简介
+     * @apiSuccess (返回结果) {Boolean} enable 启用状态
      * @apiSuccess (返回结果) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {String} projectName 工程名称
      * @apiSuccess (返回结果) {Int} monitorItemID 监测项目ID
@@ -111,7 +110,7 @@ public class WtEngineController {
 //    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
     @PostMapping(value = "/QueryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEngineDetail(@Valid @RequestBody QueryWtEngineDetailParam param) {
-        return tbWarnRuleService.queryWtEngineDetail(param, CurrentSubjectHolder.getCurrentSubjectExtractData());
+        return tbWarnRuleService.queryWtEngineDetail(param);
     }
 
     /**
@@ -133,7 +132,7 @@ public class WtEngineController {
 //    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
     @PostMapping(value = "/AddWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWtEngine(@Valid @RequestBody AddWtEngineParam param) {
-        //TODO finish create while have been charged and goto next step,the last step should be regarded as modify.
+        // finish create while have been charged and goto next step,the last step should be regarded as modify.
         return tbWarnRuleService.addWtEngine(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 

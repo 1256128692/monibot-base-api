@@ -34,6 +34,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {String} currentPageData.typeName 工单类型名称
      * @apiSuccess (返回结果) {Int} currentPageData.organizationID 所属组织ID
      * @apiSuccess (返回结果) {String} currentPageData.organizationName 所属组织名称
+     * @apiSuccess (返回结果) {String} currentPageData.Solution 解决方案
      * @apiSuccess (返回结果) {String} currentPageData.dispatcherName 派单人名称
      * @apiSuccess (返回结果) {DateTime} currentPageData.dispatchTime 派单时间
      * @apiSuccess (返回结果) {String} [currentPageData.disposerName] 处置人名称
@@ -92,6 +93,23 @@ public class WorkOrderController {
      */
     @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWorkOrder(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /UpdateWorkOrderStatus 更新工单状态
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName UpdateWorkOrderStatus
+     * @apiDescription 更新工单状态
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} workOrderID 工单ID
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
+     */
+    @PostMapping(value = "/UpdateWorkOrderStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateWorkOrderStatus(@Valid @RequestBody Object param) {
         return null;
     }
 
