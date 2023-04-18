@@ -102,8 +102,8 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID
      * @apiSuccess (返回结果) {Int} dataList.action.triggerID 触发报警ID
      * @apiSuccess (返回结果) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
-     * @apiSuccess (返回结果) {Int} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
-     * @apiSuccess (返回结果) {Int} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiSuccess (返回结果) {String} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {String} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
      */
