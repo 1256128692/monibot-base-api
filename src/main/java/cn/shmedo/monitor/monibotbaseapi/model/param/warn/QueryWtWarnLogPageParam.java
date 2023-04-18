@@ -40,15 +40,15 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
     public ResultWrapper validate() {
         if (monitorTypeID != null) {
             TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-            if (tbMonitorTypeMapper.selectOne(new LambdaQueryWrapper<TbMonitorType>()
-                    .eq(TbMonitorType::getID, monitorTypeID).select(TbMonitorType::getID)) == null) {
+            if (tbMonitorTypeMapper.selectCount(new LambdaQueryWrapper<TbMonitorType>()
+                    .eq(TbMonitorType::getID, monitorTypeID)) < 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
             }
         }
         if (monitorItemID != null) {
             TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-            if (tbMonitorItemMapper.selectOne(new LambdaQueryWrapper<TbMonitorItem>()
-                    .eq(TbMonitorItem::getID, monitorItemID).select(TbMonitorItem::getID)) == null) {
+            if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
+                    .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
             }
         }

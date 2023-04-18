@@ -1,10 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
-import cn.shmedo.iot.entity.base.CreateType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -83,7 +82,7 @@ public class MonitorTypeCacheData extends AbstractCacheData {
                     field.setFieldToken(tbMonitorTypeField.getFieldToken());
                     field.setFieldName(tbMonitorTypeField.getFieldName());
                     field.setFieldDataType(FieldType.valueOfString(tbMonitorTypeField.getFieldDataType()));
-                    field.setFieldClass(MonitorTypeFieldClass.codeOf(tbMonitorTypeField.getFieldClass()));
+                    field.setFieldClass(FieldClass.codeOf(tbMonitorTypeField.getFieldClass()));
                     field.setParentID(tbMonitorTypeField.getParentID());
                     field.setFieldCalOrder(null);
                     field.setExValues(tbMonitorTypeField.getExValues());
@@ -116,7 +115,7 @@ public class MonitorTypeCacheData extends AbstractCacheData {
         /**
          * 字段类型
          */
-        private MonitorTypeFieldClass fieldClass;
+        private FieldClass fieldClass;
 
         /**
          * 父级ID

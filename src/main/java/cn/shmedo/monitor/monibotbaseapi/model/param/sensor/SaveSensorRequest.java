@@ -8,6 +8,10 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbParameterMapper;
@@ -16,10 +20,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
@@ -107,7 +107,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
          * 数据源类型 1-物联网传感器 2-监测传感器
          */
         @NotNull(message = "数据源类型不能为空")
-        private DatasourceType dataSourceType;
+        private DataSourceType dataSourceType;
 
         /**
          * 模板数据源标识
@@ -132,7 +132,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         private String exValues;
 
         public void setDataSourceType(Integer dataSourceType) {
-            this.dataSourceType = DatasourceType.codeOf(dataSourceType);
+            this.dataSourceType = DataSourceType.codeOf(dataSourceType);
         }
     }
 
@@ -156,7 +156,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         }
         dataSourceList.forEach(e -> {
             Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
-            if (e.getDataSourceType() == DatasourceType.IOT) {
+            if (e.getDataSourceType() == DataSourceType.IOT_SENSOR) {
                 Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
             }
         });
@@ -165,7 +165,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
             Map<Integer, String> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                     .eq(TbMonitorTypeField::getMonitorType, monitorType)
-                    .eq(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())
+                    .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode())
                     .in(TbMonitorTypeField::getID, exFields.stream().map(SensorConfigField::getId).toList())
                     .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
             ).stream().collect(Collectors.toMap(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName));
@@ -185,7 +185,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         if (CollUtil.isNotEmpty(paramFields)) {
             TbParameterMapper parameterMapper = SpringUtil.getBean(TbParameterMapper.class);
             Map<Integer, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                    .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                    .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                     .eq(TbParameter::getSubjectID, templateID)
             ).stream().collect(Collectors.toMap(TbParameter::getID, e -> e));
 
@@ -194,7 +194,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                 TbParameter param = paramMap.get(e.getId());
                 param.setID(null);
                 param.setSubjectID(null);
-                param.setSubjectType(ParamSubjectType.Sensor.getType());
+                param.setSubjectType(ParameterSubjectType.SENSOR.getCode());
                 param.setPaValue(e.getValue());
                 return param;
             }).toList();

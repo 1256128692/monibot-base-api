@@ -5,8 +5,8 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -37,7 +37,7 @@ public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePe
     @Override
     public ResultWrapper<?> validate() {
         if (dataSourceComposeType != null) {
-            Assert.isTrue(DataSourceComposeType.isValid(dataSourceComposeType), "数据来源类型不合法");
+            Assert.notNull(DataSourceComposeType.codeOf(dataSourceComposeType), "数据来源类型不合法");
         } else {
             dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
         }

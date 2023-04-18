@@ -1,12 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitortype;
 
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -35,7 +34,7 @@ public class QueryParamParam implements ParameterValidator, ResourcePermissionPr
     private List< @NotBlank String> subjectTokenList;
     @Override
     public ResultWrapper validate() {
-        if (!ParamSubjectType.isValid(subjectType)){
+        if (ParameterSubjectType.codeOf(subjectType) == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数类型不合法符");
         }
         return null;

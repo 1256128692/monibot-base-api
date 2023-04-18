@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -22,9 +22,9 @@ public class SensorDataSourceCacheData extends AbstractCacheData {
     private String dataSourceID;
 
     /**
-     * 数据源类型 {@link DatasourceType}
+     * 数据源类型 {@link DataSourceType}
      */
-    private DatasourceType dataSourceType;
+    private DataSourceType dataSourceType;
 
     /**
      * 数据源标识 1.物联网uniqueToken@物联网传感器名称  2.监测传感器名称

@@ -12,6 +12,7 @@ import java.util.List;
 @Accessors(chain = true)
 public class WtEngineDetail {
     private Integer engineID;
+    private Boolean enable;
     private String engineName;
     private String engineDesc;
     private Integer projectID;

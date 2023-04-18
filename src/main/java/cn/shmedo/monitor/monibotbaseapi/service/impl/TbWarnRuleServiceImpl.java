@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
@@ -46,6 +47,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final UserService userService;
     private final ITbWarnTriggerService tbWarnTriggerService;
     private final ITbWarnActionService tbWarnActionService;
+    private final FileConfig fileConfig;
 
     //TODO inner warn status sorted
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -94,7 +96,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     //TODO inner warn status sorted
     @SuppressWarnings("unchecked")
     @Override
-    public WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param, final Tuple<String, String> appKeySecret) {
+    public WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param) {
         Integer engineID = param.getEngineID();
         TbWarnRule tbWarnRule = this.baseMapper.selectById(engineID);
         WtEngineDetail build = WtEngineDetail.build(tbWarnRule);
@@ -115,7 +117,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             QueryUserIDNameParameter pa = new QueryUserIDNameParameter();
             pa.setUserIDList(w);
             return pa;
-        }).map(u -> userService.queryUserIDName(u, appKeySecret.getItem1(), appKeySecret.getItem2())).orElse(null);
+        }).map(u -> userService.queryUserIDName(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret())).orElse(null);
         if (wrapper == null) {
             log.info("规则引擎缺少创建/修改用户ID,规则引擎ID: {}", engineID);
         } else {
@@ -185,12 +187,15 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 tuple.setItem2(u.getAction());
                 return tuple;
             }).toList();
-            tbWarnTriggerService.saveOrUpdateBatch(tupleList.stream().map(Tuple::getItem1).toList());
+            Optional.of(tupleList.stream().map(Tuple::getItem1).toList()).filter(u -> !CollectionUtil.isNullOrEmpty(u))
+                    .ifPresent(tbWarnTriggerService::saveOrUpdateBatch);
             List<TbWarnAction> tbWarnActions = tupleList.stream().map(u -> {
                 Integer warnID = u.getItem1().getID();
-                return u.getItem2().stream().peek(w -> w.setTriggerID(warnID)).toList();
+                return Optional.ofNullable(u.getItem2()).map(s -> s.stream().peek(w -> w.setTriggerID(warnID)).toList())
+                        .orElse(new ArrayList<>());
             }).flatMap(Collection::stream).toList();
-            tbWarnActionService.saveOrUpdateBatch(tbWarnActions);
+            Optional.of(tbWarnActions).filter(u -> !CollectionUtil.isNullOrEmpty(u))
+                    .ifPresent(tbWarnActionService::saveOrUpdateBatch);
         }
     }
 

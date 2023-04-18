@@ -2,7 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataSourceComposeType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

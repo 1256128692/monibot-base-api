@@ -5,12 +5,12 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -66,8 +66,8 @@ public class QueryTryingParamRequest implements ParameterValidator, ResourcePerm
         TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
         this.typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                 .eq(TbMonitorTypeField::getMonitorType, monitorType)
-                .in(TbMonitorTypeField::getFieldClass, MonitorTypeFieldClass.BaseProperties.getFieldClass(),
-                        MonitorTypeFieldClass.ExtendedProperties.getFieldClass()));
+                .in(TbMonitorTypeField::getFieldClass, FieldClass.BASIC.getCode(),
+                        FieldClass.EXTEND.getCode()));
         Assert.notEmpty(typeFields, "监测类型不存在");
         return null;
     }

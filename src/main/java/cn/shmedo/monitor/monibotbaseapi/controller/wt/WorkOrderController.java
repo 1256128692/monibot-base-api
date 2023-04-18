@@ -34,6 +34,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {String} currentPageData.typeName 工单类型名称
      * @apiSuccess (返回结果) {Int} currentPageData.organizationID 所属组织ID
      * @apiSuccess (返回结果) {String} currentPageData.organizationName 所属组织名称
+     * @apiSuccess (返回结果) {String} currentPageData.Solution 解决方案
      * @apiSuccess (返回结果) {String} currentPageData.dispatcherName 派单人名称
      * @apiSuccess (返回结果) {DateTime} currentPageData.dispatchTime 派单时间
      * @apiSuccess (返回结果) {String} [currentPageData.disposerName] 处置人名称
@@ -66,6 +67,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} monitorPointLocation 监测点位置
+     * @apiSuccess (返回结果) {String} InstallLocation 安装位置
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} warnLevel 报警等级
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
@@ -96,6 +98,23 @@ public class WorkOrderController {
     }
 
     /**
+     * @api {POST} /UpdateWorkOrderStatus 更新工单状态
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName UpdateWorkOrderStatus
+     * @apiDescription 更新工单状态
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} workOrderID 工单ID
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
+     */
+    @PostMapping(value = "/UpdateWorkOrderStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateWorkOrderStatus(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
      * @api {POST} /DispatchWorkOrder 下派工单
      * @apiVersion 1.0.0
      * @apiGroup 在线监测工单模块
@@ -109,6 +128,25 @@ public class WorkOrderController {
      */
     @PostMapping(value = "/DispatchWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object dispatchWorkOrder(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryWorkOrderStatistics 查询工单状态统计信息
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName QueryWorkOrderStatistics
+     * @apiDescription 查询工单状态统计信息
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 项目ID
+     * @apiSuccess (返回结果) {Int} todoCount 待处理数量
+     * @apiSuccess (返回结果) {Int} processingCount 处理中数量
+     * @apiSuccess (返回结果) {Int} completedCount 已结束数量
+     * @apiSampleRequest off
+     * @apiPermission 系统权限
+     */
+    @PostMapping(value = "/QueryWorkOrderStatistics", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryWorkOrderStatistics(@Valid @RequestBody Object param) {
         return null;
     }
 }

@@ -3,12 +3,14 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -19,9 +21,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DatasourceType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeFieldClass;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ParamSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -135,8 +134,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         MonitorTypeDetail monitorTypeDetail = new MonitorTypeDetail();
         BeanUtil.copyProperties(temp, monitorTypeDetail, false);
         List<TbMonitorTypeField> list = tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true);
-        monitorTypeDetail.setFieldList(list.stream().filter(item -> !item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
-        monitorTypeDetail.setClass3FieldList(list.stream().filter(item -> item.getFieldClass().equals(MonitorTypeFieldClass.ExtendedConfigurations.getFieldClass())).collect(Collectors.toList()));
+        monitorTypeDetail.setFieldList(list.stream().filter(item -> !item.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())).collect(Collectors.toList()));
+        monitorTypeDetail.setClass3FieldList(list.stream().filter(item -> item.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())).collect(Collectors.toList()));
         QueryWrapper<TbMonitorTypeTemplate> templateQueryWrapper = new QueryWrapper<>();
         templateQueryWrapper.eq("monitorType", monitorType);
         List<TbMonitorTypeTemplate> tbMonitorTypeTemplates = tbMonitorTypeTemplateMapper.selectList(templateQueryWrapper);
@@ -149,13 +148,13 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             dataSourceQueryWrapper.in("templateDataSourceID", templateDataSourceIDList);
             List<TbTemplateDataSource> tbTemplateDataSources = tbTemplateDataSourceMapper.selectList(dataSourceQueryWrapper);
             if (ObjectUtil.isNotEmpty(tbTemplateDataSources)) {
-                Set<String> modelTokenList = tbTemplateDataSources.stream().filter(item -> item.getDataSourceType().equals(DatasourceType.IOT.getCode()))
+                Set<String> modelTokenList = tbTemplateDataSources.stream().filter(item -> item.getDataSourceType().equals(DataSourceType.IOT_SENSOR.getCode()))
                         .map(item -> item.getTemplateDataSourceToken().split("_")[0]).collect(Collectors.toSet());
                 Map<String, List<ModelField>> iotModelFieldMap;
                 if (ObjectUtil.isNotEmpty(modelTokenList)) {
                     IotService iotService = ThirdHttpService.getInstance(IotService.class, ThirdHttpService.Iot);
-                    var thridParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
-                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thridParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                    var thirdParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
+                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thirdParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
                     if (!resultWrapper.apiSuccess()) {
                         throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
                     } else if (resultWrapper.getData() != null) {
@@ -324,16 +323,40 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (ObjectUtil.isNotEmpty(template)) {
             BeanUtil.copyProperties(template, cacheData, "templateDataSourceList", "templateFormulaList", "templateScriptList");
         }
-        if (ObjectUtil.isNotEmpty(sources)) {
+        if (CollUtil.isNotEmpty(sources)) {
             List<TemplateDataSourceCacheData> templateDataSourceList = BeanUtil.copyToList(sources, TemplateDataSourceCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateDataSourceList())) {
+                List<Integer> sourceIDs = sources.stream().map(TbTemplateDataSource::getID).toList();
+                List<TemplateDataSourceCacheData> otherSourceList = cacheData.getTemplateDataSourceList()
+                        .stream().filter(ds -> !sourceIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherSourceList)) {
+                    templateDataSourceList.addAll(otherSourceList);
+                }
+            }
             cacheData.setTemplateDataSourceList(templateDataSourceList);
         }
         if (CollUtil.isNotEmpty(formulaList)) {
             List<FormulaCacheData> templateFormulaList = BeanUtil.copyToList(formulaList, FormulaCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateFormulaList())) {
+                List<Integer> formulaIDs = formulaList.stream().map(TbTemplateFormula::getID).toList();
+                List<FormulaCacheData> otherFormulaList = cacheData.getTemplateFormulaList()
+                        .stream().filter(ds -> !formulaIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherFormulaList)) {
+                    templateFormulaList.addAll(otherFormulaList);
+                }
+            }
             cacheData.setTemplateFormulaList(templateFormulaList);
         }
         if (CollUtil.isNotEmpty(scriptList)) {
             List<ScriptCacheData> templateScriptList = BeanUtil.copyToList(scriptList, ScriptCacheData.class);
+            if (CollUtil.isNotEmpty(cacheData.getTemplateScriptList())) {
+                List<Integer> scriptIDs = scriptList.stream().map(TbTemplateScript::getID).toList();
+                List<ScriptCacheData> otherScriptList = cacheData.getTemplateScriptList()
+                        .stream().filter(ds -> !scriptIDs.contains(ds.getID())).toList();
+                if (CollUtil.isNotEmpty(otherScriptList)) {
+                    templateScriptList.addAll(otherScriptList);
+                }
+            }
             cacheData.setTemplateScriptList(templateScriptList);
         }
         redisService.put(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, templateID.toString(), JSONUtil.toJsonStr(cacheData));
@@ -491,8 +514,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                     .forEach((type, list) -> {
                         List<String> sourceTokenList = list.stream()
                                 .map(TbTemplateDataSource::getTemplateDataSourceToken).collect(Collectors.toList());
-                        switch (DatasourceType.codeOf(type)) {
-                            case IOT:
+                        switch (DataSourceType.codeOf(type)) {
+                            case IOT_SENSOR:
                                 Set<Object> iotModelTokens = list.stream()
                                         .map(s -> StrUtil.subBefore(s.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
                                         .map(e -> (Object) e)
@@ -515,7 +538,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                                 modelMap.put(DefaultConstant.MONITOR_TEMPLATE_PARAM_NAME, sourceTokenList);
                                 result.setIot(modelMap);
                                 break;
-                            case MONITOR:
+                            case MONITOR_SENSOR:
                                 List<Integer> monitorTypes = list.stream()
                                         .map(s -> Integer.valueOf(StrUtil.subBefore(s.getTemplateDataSourceToken(),
                                                 StrUtil.UNDERLINE, false)))
@@ -545,12 +568,12 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                         .eq(TbMonitorTypeField::getMonitorType, monitorTypeTemplate.getMonitorType())).stream()
                 .collect(Collectors.groupingBy(TbMonitorTypeField::getFieldClass))
                 .forEach((fc, list) -> {
-                    switch (MonitorTypeFieldClass.codeOf(fc)) {
-                        case BaseProperties:
-                        case ExtendedProperties:
+                    switch (FieldClass.codeOf(fc)) {
+                        case BASIC:
+                        case EXTEND:
                             selfList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
                             break;
-                        case ExtendedConfigurations:
+                        case EXTEND_CONFIG:
                             exList.addAll(list.stream().map(TbMonitorTypeField::getFieldToken).toList());
                             break;
                         default:
@@ -560,7 +583,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         result.setExList(exList);
         result.setSelfList(selfList);
         List<String> paramList = tbParameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                .eq(TbParameter::getSubjectType, ParamSubjectType.Template.getType())
+                .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
                 .in(TbParameter::getSubjectID, request.getTemplateID())).stream().map(TbParameter::getName).collect(Collectors.toList());
         result.setParamList(paramList);
         return result;

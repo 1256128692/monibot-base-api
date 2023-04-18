@@ -24,6 +24,7 @@ public class WtWarnDetailInfo {
     private Integer monitorPointID;
     private String monitorPointName;
     private String monitorPointLocation;
+    private String installLocation;
     private Date warnTime;
     private String compareRule;
     private String triggerRule;
