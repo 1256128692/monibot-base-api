@@ -54,8 +54,6 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎不存在");
         }
         if (!CollectionUtil.isNullOrEmpty(dataList)) {
-            List<Integer> fieldIDList = new ArrayList<>();
-
             // 可空ID -> warnID、actionID,若为空视为新增的 告警状态、动作,所以校验 规则、告警状态、动作 三者间关系时要排除新增的部分
             List<Tuple<Integer, Integer>> updateTriggerRuleIDList = new ArrayList<>();
             List<Tuple<Integer, Integer>> updatActionTriggerIDList = new ArrayList<>();

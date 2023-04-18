@@ -69,7 +69,7 @@
                 ORDER BY twl.WarnTime ASC
             </when>
         </choose>
-        LIMIT (#{param.currentPage} - 1) * #{param.pageSize}, #{param.pageSize}
+        LIMIT ${(param.currentPage - 1) * param.pageSize}, #{param.pageSize}
     </select>
     <select id="queryHistoryRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
