@@ -110,7 +110,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
 
                 for (TbTemplateFormula formula : formulaList) {
                     Field field = Field.valueOf(fieldMap.get(formula.getFieldID()));
-                    field.setRealFormula(formula.getFormula());
+                    field.setFormula(formula.getFormula());
                     this.fieldList.add(field);
                     if (formula.getFieldID().equals(fieldID)) {
                         break;
