@@ -58,22 +58,22 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
     public ResultWrapper validate() {
         this.engineName = engineName.trim();
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
-        if (tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) != null) {
+        if (tbWarnRuleMapper.selectCount(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getName, engineName)) >= 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则名称重复");
         }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectOne(new LambdaQueryWrapper<TbProjectInfo>()
-                .eq(TbProjectInfo::getID, projectID).select(TbProjectInfo::getID)) == null) {
+        if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getID, projectID)) < 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-        if (tbMonitorItemMapper.selectOne(new LambdaQueryWrapper<TbMonitorItem>()
-                .eq(TbMonitorItem::getID, monitorItemID).select(TbMonitorItem::getID)) == null) {
+        if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
+                .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
         }
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
-        if (tbMonitorPointMapper.selectOne(new LambdaQueryWrapper<TbMonitorPoint>()
-                .eq(TbMonitorPoint::getID, monitorPointID).select(TbMonitorPoint::getID)) == null) {
+        if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
+                .eq(TbMonitorPoint::getID, monitorPointID)) < 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
         }
         return null;

@@ -49,8 +49,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     @Override
     public ResultWrapper validate() {
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
-        if (tbWarnRuleMapper.selectOne(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getID, engineID)
-                .select(TbWarnRule::getID)) == null) {
+        if (tbWarnRuleMapper.selectCount(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getID, engineID)) < 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎不存在");
         }
         if (!CollectionUtil.isNullOrEmpty(dataList)) {
