@@ -230,6 +230,7 @@ public class SensorController {
      * @apiParam (请求体) {String} dataSourceList.templateDataSourceToken 模板数据源标识
      * @apiParam (请求体) {String} dataSourceList.sensorName (监测/物联网)传感器名称
      * @apiParam (请求体) {String} dataSourceList.uniqueToken 设备传感器标识 数据源类型为1时必填
+     * @apiParam (请求体) {String} dataSourceList.exValues 数据源拓展信息
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID
      * @apiParam (请求体) {String} exFields.value 扩展配置参数值
@@ -383,7 +384,8 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} data.calType 计算类型 1公式计算 2脚本计算 3外部HTTP计算 -1不计算
      * @apiSuccess (响应结果) {Object[]} data.fieldList 监测类型字段列表
      * @apiSuccess (响应结果) {Int} data.fieldList.id 字段ID
-     * @apiSuccess (响应结果) {String} [data.fieldList.formula] 公式 仅当calType=1时存在
+     * @apiSuccess (响应结果) {String} [data.fieldList.formula] 计算公式 仅当calType=1时存在
+     * @apiSuccess (响应结果) {String} [data.fieldList.displayFormula] 显示公式 仅当calType=1时存在
      * @apiSuccess (响应结果) {String} data.fieldList.monitorType 监测类型
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken 字段标识
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName 字段名称
