@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Range;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class UpdateWorkOrderStatusParam extends DeleteWorkOrderParam {
-    @Range(min = 1, max = 4, message = "工单状态取值范围1~4")
+    @Range(min = 1, max = 6, message = "工单状态取值范围1~6")
     @NotNull(message = "工单状态不能为空")
     private Integer status;
 }
