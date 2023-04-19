@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -61,6 +62,12 @@ public class UpdateMonitorPointParam implements ParameterValidator, ResourcePerm
         tbMonitorPoint =  tbMonitorPointMapper.selectByPrimaryKey(pointID);
         if (tbMonitorPoint == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+        }
+
+        if (tbMonitorPointMapper.selectCount(
+                new QueryWrapper<TbMonitorPoint>().eq("projectID", projectID).eq("Name", name).ne("ID", pointID)
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目下监测点名称已存在");
         }
         return null;
     }

@@ -55,6 +55,13 @@ public class UpdateMonitorPointBatchParam implements ParameterValidator, Resourc
         ) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不存在");
         }
+        if (tbMonitorPointMapper.selectCount(
+                new QueryWrapper<TbMonitorPoint>().eq("projectID", projectID)
+                        .in("Name", updatePointItemList.stream().map(UpdatePointItem::getName).toList())
+                        .notIn("ID", updatePointItemList.stream().map(UpdatePointItem::getPointID).toList())
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目下监测点名称已存在");
+        }
         return null;
     }
 
