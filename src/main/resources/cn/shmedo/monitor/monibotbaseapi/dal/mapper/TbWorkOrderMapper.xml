@@ -41,4 +41,20 @@
         </if>
         ORDER BY two.CreateTime DESC
     </select>
+    <select id="selectWorkOrderStatistics"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
+        SELECT
+            COUNT( CASE WHEN two.`Status` = 1 THEN 1 END ) todoCount,
+            COUNT( CASE WHEN two.`Status` = 5 THEN 1 END ) completedCountprocessingCount,
+            COUNT( CASE WHEN two.`Status` IN ( 2, 3, 4 ) THEN 1 END ) processingCount
+        FROM
+            tb_work_order two
+            LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
+        WHERE
+            two.CompanyID =#{param.companyID}
+        <if test="param.projectID != null">
+            AND twl.ProjectID=#{param.projectID}
+        </if>
+    </select>
 </mapper>

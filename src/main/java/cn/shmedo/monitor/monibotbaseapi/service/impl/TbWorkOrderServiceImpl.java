@@ -4,11 +4,14 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWorkOrderMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWorkOrderService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -35,5 +38,10 @@ public class TbWorkOrderServiceImpl extends ServiceImpl<TbWorkOrderMapper, TbWor
     @Override
     public WtWorkOrderWarnDetail queryWarnDetail(QueryWorkOrderWarnDetailParam param) {
         return this.tbWarnLogMapper.queryWorkOrderWarnDetail(param);
+    }
+
+    @Override
+    public WtWorkOrderStatisticsInfo queryWorkOrderStatistics(QueryWorkOrderStatisticsParam param) {
+       return this.baseMapper.selectWorkOrderStatistics(param);
     }
 }

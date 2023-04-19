@@ -187,7 +187,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             List<TbParameter> templateParams = redisService.getList(RedisKeys.PARAMETER_PREFIX_KEY +
                             ParameterSubjectType.TEMPLATE.getCode(), templateID.toString(), TbParameter.class);
             Map<Integer, SensorConfigField> paramFieldMap = paramFields.stream().collect(Collectors.toMap(SensorConfigField::getId, e -> e));
-            parameterList = templateParams.stream().peek(param -> {
+            parameterList = templateParams.stream().map(param -> {
                 SensorConfigField field = paramFieldMap.get(param.getID());
                 Assert.notNull(field, "参数配置项 [" + param.getID() + "]不存在");
                 Assert.notNull(field.getValue(), "参数配置项 [" + param.getID() + "]值不能为空");
@@ -196,6 +196,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                 item.setSubjectID(null);
                 item.setSubjectType(ParameterSubjectType.SENSOR.getCode());
                 item.setPaValue(paramFieldMap.get(param.getID()).getValue());
+                return item;
             }).collect(Collectors.toList());
         }
         return null;
