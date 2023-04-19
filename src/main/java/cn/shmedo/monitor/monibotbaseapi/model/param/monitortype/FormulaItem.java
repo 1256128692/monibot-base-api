@@ -26,6 +26,7 @@ public class FormulaItem {
     @NotBlank
     @Size(max = 5000)
     private String displayFormula;
-    @NotNull
+
+    // TODO 暂时设置为非必填
     private Integer fieldCalOrder;
 }
