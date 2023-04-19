@@ -25,7 +25,7 @@
             twl.`Name` warnName,
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
-            twl.WarnContent warnContext,
+            twl.WarnContent warnContent,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmi.`ID` monitorItemID,
@@ -47,6 +47,10 @@
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
             LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
         WHERE twl1.latest_time = twl.WarnTime
+        AND twl.ProjectID IN
+        <foreach collection="projectIDList" open="(" close=")" item="item" separator="," index="index">
+            #{item}
+        </foreach>
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
                      OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
@@ -77,7 +81,7 @@
             twl.`Name` warnName,
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
-            twl.WarnContent warnContext,
+            twl.WarnContent warnContent,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmi.`ID` monitorItemID,
@@ -97,7 +101,10 @@
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-        WHERE 1=1
+        WHERE twl.ProjectID IN
+        <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
             OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
@@ -127,6 +134,10 @@
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
         WHERE twl1.latest_time = twl.WarnTime
+        AND twl.ProjectID IN
+        <foreach collection="projectIDList" open="(" close=")" item="item" separator="," index="index">
+            #{item}
+        </foreach>
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
             OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
@@ -155,7 +166,7 @@
             tmi.`ID` monitorItemID,
             tmi.`Name` monitorItemName,
             twl.WarnLevel warnLevel,
-            twl.WarnContent warnContext,
+            twl.WarnContent warnContent,
             tmp.`ID` monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.GpsLocation monitorPointLocation,
@@ -170,5 +181,34 @@
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
         WHERE twl.`ID`=#{warnID}
+    </select>
+    <select id="queryWorkOrderWarnDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam">
+        SELECT
+            tpi.ID projectID,
+            tpi.ProjectName projectName,
+            tmt.MonitorType monitorTypeID,
+            tmt.TypeName monitorTypeName,
+            tmt.TypeAlias monitorTypeAlias,
+            tmi.ID monitorItemID,
+            tmi.`Name` monitorItemName,
+            tmi.Alias monitorItemAlias,
+            tmp.ID monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmp.GpsLocation monitorPointLocation,
+            tmp.InstallLocation installLocation,
+            twl.`Name` warnName,
+            twl.WarnLevel warnLevel,
+            twl.WarnTime warnTime,
+            twl.WarnContent warnContent
+        FROM
+            tb_warn_log twl
+                LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+                LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+                LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+                LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+        WHERE
+            twl.WorkOrderID =#{param.workOrderID}
     </select>
 </mapper>

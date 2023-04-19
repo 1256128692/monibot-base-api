@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWorkOrderMapper">
+    <select id="queryWorkOrderPage"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo">
+        SELECT
+            two.ID workOrderID,
+            two.OrderCode orderCode,
+            two.`Type` typeID,
+            (CASE two.`Type` WHEN 1 THEN '报警处置工单' WHEN 2 THEN '应急预案工单' WHEN 3 THEN '设备运维工单' WHEN 4 THEN '巡查巡检工单' ELSE 'unknown' END) typeName,
+            two.Organization organizationName,
+            two.Solution solution,
+            two.DispatcherName dispatcherName,
+            two.DispatchTime dispatchTime,
+            two.DisposerName disposerName,
+            two.DisposeTime disposeTime,
+            two.`Status` `status`
+        FROM
+            tb_work_order two
+            LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
+        WHERE two.CompanyID=#{param.companyID}
+        <if test="param.status != null">
+            AND two.`Status`=#{param.status}
+        </if>
+        <if test="param.workOrderTypeID != null">
+            AND two.`Type`=#{param.workOrderTypeID}
+        </if>
+        <if test="param.startTime != null">
+            AND two.DispatchTime &gt;= #{param.startTime}
+        </if>
+        <if test="param.endTime != null">
+            AND two.DispatchTime &lt;= #{param.endTime}
+        </if>
+        <if test="param.queryCode != null and param.queryCode != ''">
+            AND (two.OrderCode LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR two.DispatcherName LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR two.DisposerName LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR two.Organization LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%'))
+        </if>
+        ORDER BY two.CreateTime DESC
+    </select>
+</mapper>

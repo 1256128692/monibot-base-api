@@ -47,7 +47,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Int} currentPageData.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警时间
-     * @apiSuccess (返回结果) {String} currentPageData.warnContext 报警内容
+     * @apiSuccess (返回结果) {String} currentPageData.warnContent 报警内容
      * @apiSuccess (返回结果) {Int} currentPageData.workOrderID 关联工单ID,若为空表示该工单暂未
      * @apiSuccess (返回结果) {String} currentPageData.orderCode 关联工单编号
      * @apiSuccess (返回结果) {Int} currentPageData.orderStatus 处置状态 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
@@ -78,7 +78,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {Int} warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
-     * @apiSuccess (返回结果) {String} warnContext 报警内容
+     * @apiSuccess (返回结果) {String} warnContent 报警内容
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} monitorPointLocation 监测点位置

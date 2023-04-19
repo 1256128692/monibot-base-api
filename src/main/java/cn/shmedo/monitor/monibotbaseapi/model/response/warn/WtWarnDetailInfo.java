@@ -20,7 +20,7 @@ public class WtWarnDetailInfo {
     private Integer monitorItemID;
     private String monitorItemName;
     private Integer warnLevel;
-    private String warnContext;
+    private String warnContent;
     private Integer monitorPointID;
     private String monitorPointName;
     private String monitorPointLocation;

@@ -1,8 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -10,4 +14,5 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface TbWorkOrderMapper extends BaseMapper<TbWorkOrder> {
+    IPage<WtWorkOrderInfo> queryWorkOrderPage(IPage<?> page, @Param("param") QueryWorkOrderPageParam param);
 }
