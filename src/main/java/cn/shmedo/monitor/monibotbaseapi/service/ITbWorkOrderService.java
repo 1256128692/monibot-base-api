@@ -2,8 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -16,4 +18,6 @@ public interface ITbWorkOrderService extends IService<TbWorkOrder> {
     PageUtil.Page<WtWorkOrderInfo> queryWorkOrderPage(QueryWorkOrderPageParam param);
 
     WtWorkOrderWarnDetail queryWarnDetail(QueryWorkOrderWarnDetailParam param);
+
+    WtWorkOrderStatisticsInfo queryWorkOrderStatistics(QueryWorkOrderStatisticsParam param);
 }

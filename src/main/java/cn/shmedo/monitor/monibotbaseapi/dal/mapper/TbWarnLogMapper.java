@@ -26,5 +26,5 @@ public interface TbWarnLogMapper extends BaseMapper<TbWarnLog> {
 
     WtWarnDetailInfo queryWarnDetail(Integer warnID);
 
-    WtWorkOrderWarnDetail queryWorkOrderWarnDetail(QueryWorkOrderWarnDetailParam param);
+    WtWorkOrderWarnDetail queryWorkOrderWarnDetail(@Param("param") QueryWorkOrderWarnDetailParam param);
 }

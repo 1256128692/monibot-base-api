@@ -204,10 +204,10 @@
             twl.WarnContent warnContent
         FROM
             tb_warn_log twl
-                LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-                LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-                LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-                LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
         WHERE
             twl.WorkOrderID =#{param.workOrderID}
     </select>
