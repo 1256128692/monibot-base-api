@@ -298,7 +298,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Transactional(rollbackFor = Exception.class)
     public void setFormula(SetFormulaParam pa) {
         List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(pa.getTemplateID(), pa.getMonitorType(), pa.getFormulaList());
-        tbTemplateFormulaMapper.deleteBatchByFieldIDS(pa.getTemplateID(),list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
+        tbTemplateFormulaMapper.deleteBatchByFieldIDS(pa.getTemplateID(), list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
         tbTemplateFormulaMapper.insertBatch(list);
         //修改缓存
         updateTemplateFormulaCache(pa.getTemplateID(), null, null, list, null);
@@ -339,8 +339,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             List<FormulaCacheData> templateFormulaList = BeanUtil.copyToList(formulaList, FormulaCacheData.class);
             if (CollUtil.isNotEmpty(cacheData.getTemplateFormulaList())) {
                 List<Integer> formulaIDs = formulaList.stream().map(TbTemplateFormula::getID).toList();
+                List<Integer> fieldIDs = formulaList.stream().map(TbTemplateFormula::getFieldID).toList();
                 List<FormulaCacheData> otherFormulaList = cacheData.getTemplateFormulaList()
-                        .stream().filter(ds -> !formulaIDs.contains(ds.getID())).toList();
+                        .stream().filter(ds -> !formulaIDs.contains(ds.getID())
+                                && !fieldIDs.contains(ds.getFieldID())).toList();
                 if (CollUtil.isNotEmpty(otherFormulaList)) {
                     templateFormulaList.addAll(otherFormulaList);
                 }
