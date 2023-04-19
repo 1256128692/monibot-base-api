@@ -1,10 +1,16 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.sensor;
 
+import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
-import cn.shmedo.monitor.monibotbaseapi.util.FormulaUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.formula.FormulaData;
+import cn.shmedo.monitor.monibotbaseapi.util.formula.Origin;
 import lombok.Data;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 public class Param {
@@ -48,19 +54,31 @@ public class Param {
      */
     private String type;
 
-    public static Param valueOf(Model.Field field, String origin, FormulaUtil.DataType type) {
+    public static Param valueOf(Map<String, Model> modelMap, FormulaData data) {
+        String modelToken = StrUtil.subBefore(data.getSourceToken(), StrUtil.UNDERLINE, false);
+        Assert.isTrue(modelMap.containsKey(modelToken), "数据源物模型 {} 不存在", modelToken);
+
+        Model model = modelMap.get(modelToken);
+        Map<String, Model.Field> fieldMap = model.getModelFieldList().stream()
+                .collect(Collectors.toMap(Model.Field::getFieldToken, field -> field));
         Param param = new Param();
-        param.setName(field.getFieldName());
-        param.setUnit(field.getFieldUnitID());
-        param.setOrigin(origin);
-        param.setToken(field.getFieldToken());
-        param.setDataType(field.getFieldDataType());
-        param.setExValues(field.getExValues());
-        param.setType(type.name());
+        if (FormulaData.Provide.DATA.equals(data.getProvide())) {
+            Model.Field field = fieldMap.get(data.getFieldToken());
+            Assert.notNull(field, "数据源物模型 {} 不存在字段 {}", modelToken, data.getFieldToken());
+            param.setName(field.getFieldName());
+            param.setUnit(field.getFieldUnitID());
+            param.setToken(field.getFieldToken());
+            param.setDataType(field.getFieldDataType());
+            param.setExValues(field.getExValues());
+        } else {
+            param.setName(model.getModelName() + data.getProvide().getValue());
+        }
         return param;
     }
 
-    public static Param valueOf(TbParameter parameter, String origin, FormulaUtil.DataType type) {
+
+
+    public static Param valueOf(TbParameter parameter, String origin, Origin.Type type) {
         Param param = new Param();
         param.setName(parameter.getName());
         param.setUnit(parameter.getPaUnitID());
@@ -72,7 +90,7 @@ public class Param {
         return param;
     }
 
-    public static Param valueOf(TbMonitorTypeField typeField, String origin, FormulaUtil.DataType type) {
+    public static Param valueOf(TbMonitorTypeField typeField, String origin, Origin.Type type) {
         Param param = new Param();
         param.setName(typeField.getFieldName());
         param.setUnit(typeField.getFieldUnitID());

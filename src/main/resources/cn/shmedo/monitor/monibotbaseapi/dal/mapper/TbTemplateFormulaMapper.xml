@@ -139,8 +139,9 @@
     </insert>
     <delete id="deleteBatchByFieldIDS">
         delete
-        from tb_template_formula where FieldID in
-        <foreach collection="list" item="fid" separator="," open="(" close=")">
+        from tb_template_formula where
+        TemplateID = #{templateID} and FieldID in
+        <foreach collection="fieldIDList" item="fid" separator="," open="(" close=")">
             #{fid}
         </foreach>
     </delete>

@@ -20,7 +20,7 @@ public interface TbTemplateFormulaMapper extends BaseMapper<TbTemplateFormula> {
 
     void insertBatch(List<TbTemplateFormula> list);
 
-    void deleteBatchByFieldIDS(List<Integer> fieldIDList);
+    void deleteBatchByFieldIDS(Integer templateID, List<Integer> fieldIDList);
 
     void deleteByTemplateIDList(List<Integer> templateIDList);
 }

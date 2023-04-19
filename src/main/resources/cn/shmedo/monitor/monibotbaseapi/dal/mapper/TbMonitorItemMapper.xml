@@ -356,6 +356,7 @@
                t.TypeAlias as monitorTypeAlias
         from tb_monitor_item as it
             left join tb_monitor_type as t on t.MonitorType = it.MonitorType
+        where it.ProjectID = #{projectID}
         <if test="monitorItemIDList != null and monitorItemIDList.size > 0">
             and it.id in
             <foreach collection="monitorItemIDList" item="id" separator="," open="(" close=")">

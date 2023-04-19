@@ -8,9 +8,11 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
@@ -50,6 +52,8 @@ public class ConfigMonitorPointSensorsParam implements ParameterValidator, Resou
         if (!tbMonitorPoint.getProjectID().equals(projectID)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "点不属于该项目");
         }
+
+
         TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
         List<TbSensor> tbSensorList = tbSensorMapper.selectList(new QueryWrapper<TbSensor>().in("ID", sensorIDList));
         if (tbSensorList.size()!=sensorIDList.size()){
@@ -64,6 +68,11 @@ public class ConfigMonitorPointSensorsParam implements ParameterValidator, Resou
         }
         if (tbSensorList.stream().anyMatch(item -> item.getMonitorPointID()!=null)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器已经配置过");
+        }
+        TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
+        TbMonitorType tbMonitorType = tbMonitorTypeMapper.queryByType(tbMonitorPoint.getMonitorType());
+        if (!tbMonitorType.getMultiSensor() && sensorIDList.size()>1){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型不支持多传感器");
         }
         return null;
     }
