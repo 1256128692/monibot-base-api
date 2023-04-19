@@ -54,9 +54,9 @@ public class MonitorPointController {
      * @apiDescription 批量新增监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
      * @apiParam (请求体) {Object[]} addPointItemList 新增监测点列表(max = 10)
      * @apiParam (请求体) {String} addPointItemList.name 监测点名称(max = 50)
+     *  @apiParam (请求体) {Int} addPointItemList.monitorItemID 监测项目ID
      * @apiParam (请求体) {Bool} addPointItemList.enable 是否启用
      * @apiParam (请求体) {String} [addPointItemList.gpsLocation] 地图位置
      * @apiParam (请求体) {String} [addPointItemList.imageLocation] 底图位置

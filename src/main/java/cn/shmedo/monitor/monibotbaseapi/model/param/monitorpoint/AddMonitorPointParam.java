@@ -9,10 +9,13 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -76,6 +79,13 @@ public class AddMonitorPointParam implements ParameterValidator, ResourcePermiss
         if (!tbMonitorItem.getMonitorType().equals(monitorType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不属于该监测类型");
 
+        }
+        TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+
+        if (tbMonitorPointMapper.selectCount(
+                new QueryWrapper<TbMonitorPoint>().eq("projectID", projectID).eq("Name", name)
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目下监测点名称已存在");
         }
         // TODO 4个位置的校验
 

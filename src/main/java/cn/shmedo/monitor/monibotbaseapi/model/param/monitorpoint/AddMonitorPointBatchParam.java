@@ -33,8 +33,7 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
     private Integer projectID;
     @NotNull
     private Integer monitorType;
-    @NotNull
-    private Integer monitorItemID;
+
 
     @NotEmpty
     @Valid
@@ -52,15 +51,17 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
         }
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-        TbMonitorItem tbMonitorItem = tbMonitorItemMapper.selectByPrimaryKey(monitorItemID);
-        if (tbMonitorItem == null){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
+        List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectBatchIds(
+                addPointItemList.stream().map(AddPointItem::getMonitorItemID).toList()
+        );
+        if (tbMonitorItems.size() != addPointItemList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不存在");
         }
-        if (!tbMonitorItem.getProjectID().equals(projectID)){
+        if (tbMonitorItems.stream().anyMatch(item -> !item.getProjectID().equals(projectID))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不属于该工程项目");
 
         }
-        if (!tbMonitorItem.getMonitorType().equals(monitorType)){
+        if (tbMonitorItems.stream().anyMatch(item -> !item.getMonitorType().equals(monitorType))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不属于该监测类型");
 
         }

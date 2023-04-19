@@ -18,6 +18,8 @@ public class AddPointItem {
     private String name;
     @NotNull
     private Boolean enable;
+    @NotNull
+    private Integer monitorItemID;
     @Size(max = 100)
     private String gpsLocation;
     @Size(max = 100)

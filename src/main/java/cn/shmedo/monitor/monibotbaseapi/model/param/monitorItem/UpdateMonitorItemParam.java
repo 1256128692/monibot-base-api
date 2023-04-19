@@ -81,6 +81,11 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
         if (StringUtils.isNotBlank(exValue) && JSONUtil.isTypeJSON(exValue)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目额外属性不合法");
         }
+        if (tbMonitorItemMapper.selectCount(
+                new QueryWrapper<TbMonitorItem>().eq("projectID", projectID).eq("alias", alias).ne("id", monitorItemID)
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该项目下监测项目别名已存在");
+        }
         return null;
     }
 
