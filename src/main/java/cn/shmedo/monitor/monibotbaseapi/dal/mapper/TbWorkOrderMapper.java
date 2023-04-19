@@ -12,7 +12,7 @@ import org.apache.ibatis.annotations.Param;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-19 09:53
+ * @date: 2023-04-19 09:53
  */
 @Mapper
 public interface TbWorkOrderMapper extends BaseMapper<TbWorkOrder> {

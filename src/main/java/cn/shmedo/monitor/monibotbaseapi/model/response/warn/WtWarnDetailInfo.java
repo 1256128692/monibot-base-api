@@ -6,7 +6,7 @@ import java.util.Date;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-14 17:13
+ * @date: 2023-04-14 17:13
  */
 @Data
 public class WtWarnDetailInfo {

@@ -7,7 +7,7 @@ import org.hibernate.validator.constraints.Range;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-18 18:04
+ * @date: 2023-04-18 18:04
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

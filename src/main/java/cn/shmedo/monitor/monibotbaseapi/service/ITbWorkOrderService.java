@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-19 09:54
+ * @date: 2023-04-19 09:54
  */
 public interface ITbWorkOrderService extends IService<TbWorkOrder> {
     PageUtil.Page<WtWorkOrderInfo> queryWorkOrderPage(QueryWorkOrderPageParam param);
