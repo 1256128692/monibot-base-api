@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -94,7 +95,7 @@ public class WorkOrderController {
      */
     @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWorkOrder(@Valid @RequestBody Object param) {
-        return null;
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -104,14 +105,15 @@ public class WorkOrderController {
      * @apiName UpdateWorkOrderStatus
      * @apiDescription 更新工单状态
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} workOrderID 工单ID
+     * @apiParam (请求参数) {Int[]} workOrderIDList 工单ID列表
+     * @apiParam (请求参数) {Int} status 工单状态
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */
     @PostMapping(value = "/UpdateWorkOrderStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWorkOrderStatus(@Valid @RequestBody Object param) {
-        return null;
+        return ResultWrapper.successWithNothing();
     }
 
     /**

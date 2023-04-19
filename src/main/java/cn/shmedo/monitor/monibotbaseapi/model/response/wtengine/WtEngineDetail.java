@@ -20,6 +20,9 @@ public class WtEngineDetail {
     private Integer monitorItemID;
     private String monitorItemName;
     private String monitorItemAlias;
+    private Integer monitorTypeID;
+    private String monitorTypeName;
+    private String monitorTypeAlias;
     private Integer monitorPointID;
     private String monitorPointName;
     private Date createTime;
@@ -27,9 +30,9 @@ public class WtEngineDetail {
     private String createUserName;
     private List<WtWarnStatusDetailInfo> dataList;
 
-    public static WtEngineDetail build(TbWarnRule tbWarnRule) {
-        WtEngineDetail res = new WtEngineDetail();
-        BeanUtils.copyProperties(tbWarnRule, res);
-        return res.setEngineID(tbWarnRule.getID()).setEngineName(tbWarnRule.getName()).setEngineDesc(tbWarnRule.getDesc());
-    }
+//    public static WtEngineDetail build(TbWarnRule tbWarnRule) {
+//        WtEngineDetail res = new WtEngineDetail();
+//        BeanUtils.copyProperties(tbWarnRule, res);
+//        return res.setEngineID(tbWarnRule.getID()).setEngineName(tbWarnRule.getName()).setEngineDesc(tbWarnRule.getDesc());
+//    }
 }

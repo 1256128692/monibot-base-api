@@ -49,7 +49,7 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
         res.setUpdateTime(current);
         res.setMonitorItemID(param.getMonitorItemID());
         res.setMonitorPointID(param.getMonitorPointID());
-        res.setProjectID(param.projectID);
+        res.setProjectID(param.getProjectID());
         res.setEnable(false);
         return res;
     }
