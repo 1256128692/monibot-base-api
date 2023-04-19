@@ -194,14 +194,14 @@ public class Param2DBEntityUtil {
         Date now = new Date();
         TbMonitorItem obj = new TbMonitorItem();
         if (pa.getCreateType().equals(CreateType.PREDEFINED.getType())){
-            obj.setCompanyID(-1);
             obj.setProjectID(-1);
             obj.setProjectType(null);
         }else {
-            obj.setCompanyID(pa.getTbProjectInfo().getCompanyID());
             obj.setProjectID(pa.getProjectID());
             obj.setProjectType(pa.getTbProjectInfo().getProjectType().intValue());
         }
+        obj.setCompanyID(pa.getTbProjectInfo().getCompanyID());
+
         obj.setMonitorClass(null);
         obj.setMonitorType(pa.getMonitorType());
         obj.setName(pa.getMonitorItemName());
