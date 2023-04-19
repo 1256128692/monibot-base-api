@@ -44,34 +44,40 @@ public class ConfigMonitorPointSensorsParam implements ParameterValidator, Resou
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null){
+        if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         TbMonitorPoint tbMonitorPoint = tbMonitorPointMapper.selectByPrimaryKey(pointID);
-        if (!tbMonitorPoint.getProjectID().equals(projectID)){
+        if (!tbMonitorPoint.getProjectID().equals(projectID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "点不属于该项目");
         }
 
 
         TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+        if (tbSensorMapper.selectCount(new QueryWrapper<TbSensor>().eq("MonitorPointID", pointID)) > 0
+
+        ) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "点已经设置过传感器");
+
+        }
         List<TbSensor> tbSensorList = tbSensorMapper.selectList(new QueryWrapper<TbSensor>().in("ID", sensorIDList));
-        if (tbSensorList.size()!=sensorIDList.size()){
+        if (tbSensorList.size() != sensorIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器不存在");
 
         }
-        if (tbSensorList.stream().anyMatch(item -> !item.getProjectID().equals(projectID))){
+        if (tbSensorList.stream().anyMatch(item -> !item.getProjectID().equals(projectID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器不属于该项目");
         }
-        if (tbSensorList.stream().anyMatch(item -> !item.getMonitorType().equals(tbMonitorPoint.getMonitorType()))){
+        if (tbSensorList.stream().anyMatch(item -> !item.getMonitorType().equals(tbMonitorPoint.getMonitorType()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器的监测类型与点不相符");
         }
-        if (tbSensorList.stream().anyMatch(item -> item.getMonitorPointID()!=null)){
+        if (tbSensorList.stream().anyMatch(item -> item.getMonitorPointID() != null)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器已经配置过");
         }
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
         TbMonitorType tbMonitorType = tbMonitorTypeMapper.queryByType(tbMonitorPoint.getMonitorType());
-        if (!tbMonitorType.getMultiSensor() && sensorIDList.size()>1){
+        if (!tbMonitorType.getMultiSensor() && sensorIDList.size() > 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型不支持多传感器");
         }
         return null;
