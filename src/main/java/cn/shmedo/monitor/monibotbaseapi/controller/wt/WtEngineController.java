@@ -110,7 +110,7 @@ public class WtEngineController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseRuleEngine
      */
-    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
+    @Permission(permissionName = "mdmbase:DescribeBaseRuleEngine")
     @PostMapping(value = "/QueryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEngineDetail(@Valid @RequestBody QueryWtEngineDetailParam param) {
         return tbWarnRuleService.queryWtEngineDetail(param);
