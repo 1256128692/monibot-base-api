@@ -114,6 +114,12 @@ public class AddTemplateParam implements ParameterValidator, ResourcePermissionP
                     formulaList.get(i).setFieldCalOrder(i);
                 }
             }
+            // TODO 统一的方式处理token
+            tokenList.forEach(item -> {
+                if (!item.getToken().contains("_")){
+                    item.setToken(item.getToken() + "_a");
+                }
+            });
             // TODO 校验公式
         }
         return null;

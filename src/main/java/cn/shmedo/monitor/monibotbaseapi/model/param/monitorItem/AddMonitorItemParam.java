@@ -8,9 +8,11 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -83,6 +85,12 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
         }
         if (StringUtils.isNotBlank(exValue) && JSONUtil.isTypeJSON(exValue)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目额外属性不合法");
+        }
+        TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+        if (tbMonitorItemMapper.selectCount(
+                new QueryWrapper<TbMonitorItem>().eq("projectID", projectID).eq("Name", monitorItemName)
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该项目下监测项目名称已存在");
         }
         return null;
     }
