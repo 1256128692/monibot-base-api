@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
@@ -49,8 +50,9 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {DateTime} [currentPageData.disposeTime] 处置完成时间
      * @apiSuccess (返回结果) {Int} currentPageData.status 工单状态,默认0.全部 0.全部 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListBaseWorkOrder
      */
+    @Permission(permissionName = "mdmbase:ListBaseWorkOrder")
     @PostMapping(value = "/QueryWorkOrderPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWorkOrderPage(@Valid @RequestBody QueryWorkOrderPageParam param) {
         return workOrderService.queryWorkOrderPage(param);
@@ -81,8 +83,9 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
      * @apiSuccess (返回结果) {String} warnContent 报警内容
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
+    @Permission(permissionName = "mdmbase:DescribeBaseWarn")
     @PostMapping(value = "/QueryWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnDetail(@Valid @RequestBody QueryWorkOrderWarnDetailParam param) {
         return workOrderService.queryWarnDetail(param);
@@ -98,8 +101,9 @@ public class WorkOrderController {
      * @apiParam (请求参数) {Int[]} workOrderIDList 工单ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:DeleteBaseWorkOrder
      */
+    @Permission(permissionName = "mdmbase:DeleteBaseWorkOrder")
     @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWorkOrder(@Valid @RequestBody DeleteWorkOrderParam param) {
         workOrderService.remove(new LambdaQueryWrapper<TbWorkOrder>().in(TbWorkOrder::getID, param.getWorkOrderIDList()));
@@ -117,30 +121,14 @@ public class WorkOrderController {
      * @apiParam (请求参数) {Int} status 工单状态
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:UpdateBaseWorkOrder
      */
+    @Permission(permissionName = "mdmbase:UpdateBaseWorkOrder")
     @PostMapping(value = "/UpdateWorkOrderStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWorkOrderStatus(@Valid @RequestBody UpdateWorkOrderStatusParam param) {
         workOrderService.update(new LambdaUpdateWrapper<TbWorkOrder>().in(TbWorkOrder::getID, param.getWorkOrderIDList())
                 .set(TbWorkOrder::getStatus, param.getStatus()));
         return ResultWrapper.successWithNothing();
-    }
-
-    /**
-     * @api {POST} /DispatchWorkOrder 下派工单
-     * @apiVersion 1.0.0
-     * @apiGroup 在线监测工单模块
-     * @apiName DispatchWorkOrder
-     * @apiDescription 下派工单
-     * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int[]} warnLogIDList 警报ID列表
-     * @apiSuccess (返回结果) {String} none 无
-     * @apiSampleRequest off
-     * @apiPermission 系统权限
-     */
-    @PostMapping(value = "/DispatchWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object dispatchWorkOrder(@Valid @RequestBody Object param) {
-        return null;
     }
 
     /**
@@ -155,8 +143,9 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} processingCount 处理中数量
      * @apiSuccess (返回结果) {Int} completedCount 已结束数量
      * @apiSampleRequest off
-     * @apiPermission 系统权限
+     * @apiPermission 系统权限 mdmbase:ListBaseWorkOrder
      */
+    @Permission(permissionName = "mdmbase:ListBaseWorkOrder")
     @PostMapping(value = "/QueryWorkOrderStatistics", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWorkOrderStatistics(@Valid @RequestBody QueryWorkOrderStatisticsParam param) {
         return workOrderService.queryWorkOrderStatistics(param);

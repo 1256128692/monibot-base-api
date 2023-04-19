@@ -54,7 +54,7 @@ public class WtWarnController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
-//    @Permission(permissionName = "mdmbase:ListBaseWarn")
+    @Permission(permissionName = "mdmbase:ListBaseWarn")
     @PostMapping(value = "/QueryWtWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtWarnPage(@Valid @RequestBody QueryWtWarnLogPageParam param) {
         return tbWarnLogService.queryByPage(param);
@@ -88,7 +88,7 @@ public class WtWarnController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseWarn")
+    @Permission(permissionName = "mdmbase:DescribeBaseWarn")
     @PostMapping(value = "/QueryWtWarnInfoDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtWarnInfoDetail(@Valid @RequestBody QueryWtWarnDetailParam param) {
         return tbWarnLogService.queryDetail(param);

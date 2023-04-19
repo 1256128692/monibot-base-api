@@ -60,9 +60,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} currentPageData.dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
      * @apiSuccess (返回结果) {String} currentPageData.dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseWarnRule
+     * @apiPermission 项目权限 mdmbase:ListBaseRuleEngine
      */
-//    @Permission(permissionName = "mdmbase:ListBaseWarnRule")
+    @Permission(permissionName = "mdmbase:ListBaseRuleEngine")
     @PostMapping(value = "/QueryWtEnginePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEnginePage(@Valid @RequestBody QueryWtEnginePageParam param) {
         return tbWarnRuleService.queryWtEnginePage(param);
@@ -110,7 +110,7 @@ public class WtEngineController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseRuleEngine
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
+    @Permission(permissionName = "mdmbase:DescribeBaseRuleEngine")
     @PostMapping(value = "/QueryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtEngineDetail(@Valid @RequestBody QueryWtEngineDetailParam param) {
         return tbWarnRuleService.queryWtEngineDetail(param);
@@ -130,9 +130,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} monitorPointID 监测点ID
      * @apiSuccess (响应结果) Int engineID 引擎ID
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
+     * @apiPermission 项目权限 mdmbase:AddBaseRuleEngine
      */
-//    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
+    @Permission(permissionName = "mdmbase:AddBaseRuleEngine")
     @PostMapping(value = "/AddWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWtEngine(@Valid @RequestBody AddWtEngineParam param) {
         // finish create while have been charged and goto next step,the last step should be regarded as modify.
@@ -166,9 +166,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseWarnRule
+     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
      */
-//    @Permission(permissionName = "mdmbase:UpdateBaseWarnRule")
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/UpdateWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngine(@Valid @RequestBody UpdateWtEngineParam param) {
         tbWarnRuleService.updateWtEngine(param);
@@ -186,9 +186,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
      */
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/UpdateWtEngineEnable", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngineEnable(@Valid @RequestBody BatchUpdateWtEngineEnableParam param) {
         tbWarnRuleService.updateWtEngineEnable(param);
@@ -205,9 +205,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:DeleteBaseRuleEngine
      */
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:DeleteBaseRuleEngine")
     @PostMapping(value = "/DeleteWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWtEngine(@Valid @RequestBody BatchDeleteWtEngineParam param) {
         tbWarnRuleService.deleteWtEngine(param);
@@ -224,8 +224,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} warnIDList 删除的报警状态ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
      */
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/DeleteWtWarnStatus")
     public Object deleteWtWarnStatus(@Valid @RequestBody DeleteWtWarnStatusParam param) {
         tbWarnTriggerService.deleteWarnStatusByIDList(param.getWarnIDList());
@@ -242,8 +243,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} actionIDList 删除的动作ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
      */
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/DeleteWtAction", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWtAction(@Valid @RequestBody DeleteWtActionParam param){
         tbWarnActionService.removeBatchByIds(param.getActionIDList());

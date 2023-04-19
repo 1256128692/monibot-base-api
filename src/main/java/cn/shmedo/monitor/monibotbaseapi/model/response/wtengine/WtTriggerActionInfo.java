@@ -1,8 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.wtengine;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
 import lombok.*;
-import org.springframework.beans.BeanUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,20 +24,20 @@ public class WtTriggerActionInfo extends TbWarnAction {
 
     public WtTriggerActionInfo setAction(TbWarnAction data) {
         TbWarnAction res = new TbWarnAction();
-        BeanUtils.copyProperties(data, res);
+        BeanUtil.copyProperties(data, res);
         this.action.add(res);
         return this;
     }
 
     public static WtWarnStatusInfo build(WtTriggerActionInfo info) {
         WtWarnStatusInfo res = new WtWarnStatusInfo();
-        BeanUtils.copyProperties(info, res);
+        BeanUtil.copyProperties(info, res);
         return res;
     }
 
     public static WtWarnStatusDetailInfo buildDetail(WtTriggerActionInfo info) {
         WtWarnStatusDetailInfo res = new WtWarnStatusDetailInfo();
-        BeanUtils.copyProperties(info, res);
+        BeanUtil.copyProperties(info, res);
         return res.setMetadataID(info.getFieldID());
     }
 }

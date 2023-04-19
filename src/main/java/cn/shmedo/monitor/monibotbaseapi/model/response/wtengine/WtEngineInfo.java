@@ -1,11 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.wtengine;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
-import org.springframework.beans.BeanUtils;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ public class WtEngineInfo {
 
     public static WtEngineInfo build(TbWarnRule tbWarnRule) {
         WtEngineInfo res = new WtEngineInfo();
-        BeanUtils.copyProperties(tbWarnRule, res);
+        BeanUtil.copyProperties(tbWarnRule, res);
         return res.setEngineID(tbWarnRule.getID()).setEngineName(tbWarnRule.getName());
     }
 }
