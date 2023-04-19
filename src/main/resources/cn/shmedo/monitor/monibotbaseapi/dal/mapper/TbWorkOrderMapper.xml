@@ -19,7 +19,7 @@
             tb_work_order two
             LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
         WHERE two.CompanyID=#{param.companyID}
-        <if test="param.status != null">
+        <if test="param.status != null and param.status != 0">
             AND two.`Status`=#{param.status}
         </if>
         <if test="param.workOrderTypeID != null">
