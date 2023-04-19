@@ -46,7 +46,7 @@
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
         SELECT
             COUNT( CASE WHEN two.`Status` = 1 THEN 1 END ) todoCount,
-            COUNT( CASE WHEN two.`Status` = 5 THEN 1 END ) completedCountprocessingCount,
+            COUNT( CASE WHEN two.`Status` = 5 THEN 1 END ) completedCount,
             COUNT( CASE WHEN two.`Status` IN ( 2, 3, 4 ) THEN 1 END ) processingCount
         FROM
             tb_work_order two
