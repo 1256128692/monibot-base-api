@@ -228,7 +228,7 @@ public class Param2DBEntityUtil {
     public static List<TbMonitorPoint> fromAddMonitorPointBatchParam2TbMonitorPoint(AddMonitorPointBatchParam pa, Integer userID) {
         Date now = new Date();
         return pa.getAddPointItemList().stream().map(item -> TbMonitorPoint.builder()
-                .projectID(pa.getProjectID()).monitorType(pa.getMonitorType()).monitorItemID(pa.getMonitorItemID()).name(item.getName())
+                .projectID(pa.getProjectID()).monitorType(pa.getMonitorType()).monitorItemID(item.getMonitorItemID()).name(item.getName())
                 .installLocation(null).gpsLocation(item.getGpsLocation()).imageLocation(item.getImageLocation()).spatialLocation(item.getSpatialLocation())
                 .exValues(item.getExValues()).enable(item.getEnable()).createUserID(userID).createTime(now).updateTime(now).updateUserID(userID)
                 .build()).collect(Collectors.toList());
