@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -28,7 +29,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -168,7 +168,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             List<Tuple<TbWarnTrigger, List<TbWarnAction>>> tupleList = dataList.stream().map(u -> {
                 Tuple<TbWarnTrigger, List<TbWarnAction>> tuple = new Tuple<>();
                 TbWarnTrigger trigger = new TbWarnTrigger();
-                BeanUtils.copyProperties(u, trigger);
+                BeanUtil.copyProperties(u, trigger);
                 trigger.setFieldID(u.getMetadataID());
                 trigger.setID(u.getWarnID());
                 //ensure their relation won't be changed and tbWarnTriggerService would set one column at least.
