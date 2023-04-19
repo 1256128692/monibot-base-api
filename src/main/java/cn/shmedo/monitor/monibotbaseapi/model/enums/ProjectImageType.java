@@ -37,7 +37,7 @@ public enum ProjectImageType {
         }
 
         switch (type){
-            case "Img":
+            case "Image":
                 return true;
             case "OverallView":
                 return true;
