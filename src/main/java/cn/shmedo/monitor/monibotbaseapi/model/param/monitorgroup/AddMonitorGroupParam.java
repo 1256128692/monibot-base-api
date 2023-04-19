@@ -48,11 +48,12 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        Integer count = 0;
         if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
+        TbMonitorGroupMapper tbMonitorGroupMapper = ContextHolder.getBean(TbMonitorGroupMapper.class);
         if (parentID != null) {
-            TbMonitorGroupMapper tbMonitorGroupMapper = ContextHolder.getBean(TbMonitorGroupMapper.class);
             TbMonitorGroup parentGroup = tbMonitorGroupMapper.selectByPrimaryKey(parentID);
             if (parentGroup == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组不存在");
@@ -63,7 +64,20 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
             if (parentGroup.getParentID() != null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组不是一级分组");
             }
+            // 二级类别监测组名称校验
+            count = tbMonitorGroupMapper.selectCountByName(name,true, projectID);
+            if (count > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级分组名称重复,请重新输入");
+            }
+        }else {
+            // 一级类别监测组名称校验
+            count = tbMonitorGroupMapper.selectCountByName(name,false, projectID);
+            if (count > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级分组名称重复,请重新输入");
+            }
         }
+
+
         if (CollectionUtils.isNotEmpty(monitorPointIDList) && CollectionUtils.isEmpty(monitorItemIDList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设置监测点时必须设置监测项");
         }

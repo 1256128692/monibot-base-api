@@ -31,7 +31,7 @@ public class DeleteMonitorGroupParam implements ParameterValidator, ResourcePerm
     private Integer projectID;
     @NotEmpty
     @Valid
-    @Size(min = 10)
+    @Size(min = 1)
     private List< @NotNull Integer> groupIDList;
 
     @Override

@@ -14,7 +14,7 @@ public class WtWarnLogInfo {
     private String warnName;
     private Integer warnLevel;
     private Date warnTime;
-    private String warnContext;
+    private String warnContent;
     private Integer projectID;
     private String projectName;
     private Integer monitorItemID;

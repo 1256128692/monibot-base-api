@@ -26,4 +26,6 @@ public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
     IPage<Group4Web> queryPage(Page<Group4Web> page, Integer projectID, String name, Integer monitorItemID, Boolean parented);
 
     List<Group4Web> queryGroup4WebByParentIDs(List<Integer> parentIDList);
+
+    Integer selectCountByName(String name, boolean flag, Integer projectID);
 }

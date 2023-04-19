@@ -2,6 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.DeleteWorkOrderParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.UpdateWorkOrderStatusParam;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWorkOrderService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WorkOrderController {
+    private final ITbWorkOrderService workOrderService;
+
     /**
      * @api {POST} /QueryWorkOrderPage 查询工单分页
      * @apiVersion 1.0.0
@@ -35,7 +45,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {String} currentPageData.typeName 工单类型名称
      * @apiSuccess (返回结果) {Int} currentPageData.organizationID 所属组织ID
      * @apiSuccess (返回结果) {String} currentPageData.organizationName 所属组织名称
-     * @apiSuccess (返回结果) {String} currentPageData.Solution 解决方案
+     * @apiSuccess (返回结果) {String} currentPageData.solution 解决方案
      * @apiSuccess (返回结果) {String} currentPageData.dispatcherName 派单人名称
      * @apiSuccess (返回结果) {DateTime} currentPageData.dispatchTime 派单时间
      * @apiSuccess (返回结果) {String} [currentPageData.disposerName] 处置人名称
@@ -45,8 +55,8 @@ public class WorkOrderController {
      * @apiPermission 项目权限
      */
     @PostMapping(value = "/QueryWorkOrderPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWorkOrderPage(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWorkOrderPage(@Valid @RequestBody QueryWorkOrderPageParam param) {
+        return workOrderService.queryWorkOrderPage(param);
     }
 
     /**
@@ -68,17 +78,17 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} monitorPointLocation 监测点位置
-     * @apiSuccess (返回结果) {String} InstallLocation 安装位置
+     * @apiSuccess (返回结果) {String} installLocation 安装位置
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} warnLevel 报警等级
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
-     * @apiSuccess (返回结果) {String} warnContext 报警内容
+     * @apiSuccess (返回结果) {String} warnContent 报警内容
      * @apiSampleRequest off
      * @apiPermission 系统权限
      */
     @PostMapping(value = "/QueryWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWarnDetail(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWarnDetail(@Valid @RequestBody QueryWorkOrderWarnDetailParam param) {
+        return workOrderService.queryWarnDetail(param);
     }
 
     /**
@@ -94,7 +104,8 @@ public class WorkOrderController {
      * @apiPermission 系统权限
      */
     @PostMapping(value = "/DeleteWorkOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteWorkOrder(@Valid @RequestBody Object param) {
+    public Object deleteWorkOrder(@Valid @RequestBody DeleteWorkOrderParam param) {
+        workOrderService.remove(new LambdaQueryWrapper<TbWorkOrder>().in(TbWorkOrder::getID, param.getWorkOrderIDList()));
         return ResultWrapper.successWithNothing();
     }
 
@@ -112,7 +123,9 @@ public class WorkOrderController {
      * @apiPermission 系统权限
      */
     @PostMapping(value = "/UpdateWorkOrderStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateWorkOrderStatus(@Valid @RequestBody Object param) {
+    public Object updateWorkOrderStatus(@Valid @RequestBody UpdateWorkOrderStatusParam param) {
+        workOrderService.update(new LambdaUpdateWrapper<TbWorkOrder>().in(TbWorkOrder::getID, param.getWorkOrderIDList())
+                .set(TbWorkOrder::getStatus, param.getStatus()));
         return ResultWrapper.successWithNothing();
     }
 
