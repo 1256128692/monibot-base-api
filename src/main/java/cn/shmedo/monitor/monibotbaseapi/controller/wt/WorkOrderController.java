@@ -3,10 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
-import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.DeleteWorkOrderParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.UpdateWorkOrderStatusParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWorkOrderService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -161,7 +158,7 @@ public class WorkOrderController {
      * @apiPermission 系统权限
      */
     @PostMapping(value = "/QueryWorkOrderStatistics", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWorkOrderStatistics(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWorkOrderStatistics(@Valid @RequestBody QueryWorkOrderStatisticsParam param) {
+        return workOrderService.queryWorkOrderStatistics(param);
     }
 }
