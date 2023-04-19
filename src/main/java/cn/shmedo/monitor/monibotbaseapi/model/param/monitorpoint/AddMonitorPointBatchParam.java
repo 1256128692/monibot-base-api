@@ -9,10 +9,13 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -65,8 +68,16 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不属于该监测类型");
 
         }
+        if (addPointItemList.stream().map(AddPointItem::getName).distinct().count() != addPointItemList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的监测点名称有重复");
+        }
+        TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+        if (tbMonitorPointMapper.selectCount(
+                new QueryWrapper<TbMonitorPoint>().eq("projectID", projectID).in("Name", addPointItemList.stream().map(AddPointItem::getName).toList())
+        )>0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目下监测点名称已存在");
+        }
         // TODO 4个位置的校验
-
 
         if (addPointItemList.stream().anyMatch(item -> StringUtils.isNotBlank(item.getExValues()) && JSONUtil.isTypeJSON(item.getExValues()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有点的额外属性不合法");
