@@ -57,4 +57,32 @@
             #{item}
         </foreach>
     </select>
+    <select id="selectWtEngineDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail"
+            parameterType="java.lang.Integer">
+        SELECT
+            twr.ID engineID,
+            twr.`Enable` `enable`,
+            twr.`Name` engineName,
+            twr.`Desc` engineDesc,
+            tpi.ID projectID,
+            tpi.ProjectName projectName,
+            tmi.ID monitorItemID,
+            tmi.`Name` monitorItemName,
+            tmi.Alias monitorItemAlias,
+            tmt.MonitorType monitorTypeID,
+            tmt.TypeName monitorTypeName,
+            tmt.TypeAlias monitorTypeAlias,
+            tmp.ID monitorPointID,
+            tmp.`Name` monitorPointName,
+            twr.CreateTime createTime,
+            twr.CreateUserID createUserID
+        FROM
+            tb_warn_rule twr
+            LEFT JOIN tb_monitor_item tmi ON twr.MonitorItemID = tmi.ID
+            LEFT JOIN tb_project_info tpi ON twr.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_type tmt ON twr.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twr.MonitorPointID = tmp.ID
+        WHERE twr.ID = #{engineID}
+    </select>
 </mapper>

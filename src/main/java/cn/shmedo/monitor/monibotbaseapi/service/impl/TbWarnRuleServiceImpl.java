@@ -49,7 +49,6 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final ITbWarnActionService tbWarnActionService;
     private final FileConfig fileConfig;
 
-    //TODO inner warn status sorted
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public PageUtil.Page<WtEngineInfo> queryWtEnginePage(QueryWtEnginePageParam param) {
@@ -93,26 +92,15 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
     }
 
-    //TODO inner warn status sorted
     @SuppressWarnings("unchecked")
     @Override
     public WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param) {
         Integer engineID = param.getEngineID();
-        TbWarnRule tbWarnRule = this.baseMapper.selectById(engineID);
-        WtEngineDetail build = WtEngineDetail.build(tbWarnRule);
-        // 防止数据库NOT NULL被修改,还是在这里做了一些空处理
-        Optional.ofNullable(tbWarnRule.getProjectID()).map(tbProjectInfoMapper::selectById).map(TbProjectInfo::getProjectName)
-                .ifPresent(build::setProjectName);
-        Optional.ofNullable(tbWarnRule.getMonitorPointID()).map(tbMonitorPointMapper::selectById).map(TbMonitorPoint::getName)
-                .ifPresent(build::setMonitorPointName);
-        Optional.ofNullable(tbWarnRule.getMonitorItemID()).map(tbMonitorItemMapper::selectById).ifPresent(u -> {
-            build.setMonitorItemName(u.getName());
-            build.setMonitorItemAlias(u.getAlias());
-        });
+        WtEngineDetail build = this.baseMapper.selectWtEngineDetail(engineID);
+        Integer createUserID = build.getCreateUserID();
         List<Integer> userIdList = new ArrayList<>();
         Map<Integer, String> userIdNameMap = null;
-        Optional.ofNullable(tbWarnRule.getCreateUserID()).ifPresent(userIdList::add);
-        Optional.ofNullable(tbWarnRule.getUpdateUserID()).ifPresent(userIdList::add);
+        Optional.ofNullable(createUserID).ifPresent(userIdList::add);
         ResultWrapper<Object> wrapper = Optional.of(userIdList).filter(u -> u.size() > 0).map(w -> {
             QueryUserIDNameParameter pa = new QueryUserIDNameParameter();
             pa.setUserIDList(w);
@@ -130,7 +118,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                         .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
             }
         }
-        Optional.ofNullable(userIdNameMap).flatMap(u -> Optional.ofNullable(tbWarnRule.getCreateUserID()).map(u::get))
+        Optional.ofNullable(userIdNameMap).flatMap(u -> Optional.ofNullable(createUserID).map(u::get))
                 .ifPresent(build::setCreateUserName);
         List<WtTriggerActionInfo> infos = Optional.of(param).map(QueryWtEngineDetailParam::getEngineID).map(u -> {
             List<Integer> list = new ArrayList<>();
@@ -170,7 +158,9 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     @Override
     public void updateWtEngine(UpdateWtEngineParam param) {
         Integer engineID = param.getEngineID();
-        if (Objects.nonNull(param.getEngineName()) || Objects.nonNull(param.getEngineDesc())) {
+        if (Objects.nonNull(param.getEngineName()) || Objects.nonNull(param.getEngineDesc())
+                || Objects.nonNull(param.getProjectID()) || Objects.nonNull(param.getMonitorItemID())
+                || Objects.nonNull(param.getMonitorPointID())) {
             this.updateById(UpdateWtEngineParam.build(param));
         }
         List<WtWarnStatusDetailInfo> dataList = param.getDataList();

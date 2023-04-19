@@ -85,6 +85,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} monitorItemAlias 监测项目别称
+     * @apiSuccess (返回结果) {Int} monitorTypeID 监测类型ID
+     * @apiSuccess (返回结果) {String} monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {String} monitorTypeAlias 监测类型别称
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
@@ -105,7 +108,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
      * @apiSuccess (返回结果) {String} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseWarnRule
+     * @apiPermission 项目权限 mdmbase:DescribeBaseRuleEngine
      */
 //    @Permission(permissionName = "mdmbase:DescribeBaseWarnRule")
     @PostMapping(value = "/QueryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -146,6 +149,9 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} engineID 引擎ID
      * @apiParam (请求参数) {String} [engineName] 引擎名称(30字)
      * @apiParam (请求参数) {String} [engineDesc] 引擎简介(200字)
+     * @apiParam (请求参数) {Int} [projectID] 项目ID
+     * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {Int} [monitorPointID] 监测点位ID
      * @apiParam (请求参数) {Object[]} [dataList] 报警状态列表
      * @apiParam (请求参数) {Int} [dataList.warnID] 报警状态ID,若没有视为新增
      * @apiParam (请求参数) {String} dataList.warnName 报警名称

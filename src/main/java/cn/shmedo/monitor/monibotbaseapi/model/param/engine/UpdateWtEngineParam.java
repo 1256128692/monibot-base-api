@@ -6,13 +6,8 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnActionMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnTriggerMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnTrigger;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -36,6 +31,13 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     private String engineName;
     @Size(min = 1, max = 200, message = "引擎简介必须在1~200字之间")
     private String engineDesc;
+    @Min(value = 1, message = "项目ID不能小于1")
+    private Integer projectID;
+    @Min(value = 1, message = "监测项目ID不能小于1")
+    private Integer monitorItemID;
+    @Min(value = 1, message = "监测点位ID不能小于1")
+    private Integer monitorPointID;
+
     private List<WtWarnStatusDetailInfo> dataList;
 
     public static TbWarnRule build(UpdateWtEngineParam param) {
@@ -43,6 +45,9 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
         res.setID(param.getEngineID());
         res.setName(param.getEngineName());
         res.setDesc(param.getEngineDesc());
+        res.setMonitorItemID(param.getMonitorItemID());
+        res.setMonitorPointID(param.getMonitorPointID());
+        res.setProjectID(param.getProjectID());
         return res;
     }
 
@@ -52,6 +57,27 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
         if (tbWarnRuleMapper.selectCount(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getID, engineID)) < 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎不存在");
+        }
+        if (Objects.nonNull(projectID)) {
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
+                    .eq(TbProjectInfo::getID, projectID)) < 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+            }
+        }
+        if (Objects.nonNull(monitorItemID)) {
+            TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+            if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
+                    .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
+            }
+        }
+        if (Objects.nonNull(monitorPointID)) {
+            TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+            if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
+                    .eq(TbMonitorPoint::getID, monitorPointID)) < 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点位不存在");
+            }
         }
         if (!CollectionUtil.isNullOrEmpty(dataList)) {
             TbWarnTriggerMapper tbWarnTriggerMapper = ContextHolder.getBean(TbWarnTriggerMapper.class);
@@ -110,7 +136,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                                         }
                                     }
                                 } else {
-                                    updatActionTriggerIDList.add(new Tuple<>(actionID, m.getTriggerID()));
+                                    updatActionTriggerIDList.add(new Tuple<>(actionID, u.getWarnID()));
                                 }
                                 Optional.ofNullable(actionType).ifPresent(actionTypeSet::add);
                             }).toList();
