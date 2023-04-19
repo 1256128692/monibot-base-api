@@ -201,7 +201,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {String} [dataList.exValues] 拓展字段
      * @apiSuccess (返回结果) {Int} dataList.displayOrder 排序字段
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 监测传感器列表
-     * @apiSuccess (返回结果) {Int} dataList.sensorList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.id 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.name 传感器名称
      * @apiSuccess (返回结果) {String} dataList.sensorList.alias 传感器别名
      * @apiSuccess (返回结果) {Int} dataList.sensorList.kind 传感器类型

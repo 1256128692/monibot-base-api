@@ -62,7 +62,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     public PageUtil.Page<MonitorPoint4Web> queryMonitorPointPageList(QueryMonitorPointPageListParam pa) {
         Page<MonitorPoint4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
-        IPage<MonitorPoint4Web> pageData = tbMonitorPointMapper.queryPage(page, pa.getProjectID(), pa.getMonitorType(), pa.getMonitorItemName(), pa.getSensorID());
+        IPage<MonitorPoint4Web> pageData = tbMonitorPointMapper.queryPage(page, pa.getProjectID(), pa.getMonitorType(), pa.getMonitorItemName(), pa.getSensorID(), pa.getPointName());
         if (CollectionUtils.isEmpty(pageData.getRecords())){
             return PageUtil.Page.empty();
         }

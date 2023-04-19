@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -30,7 +29,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
 
     List<MonitorPointAndItemInfo> selectListByCondition(List<Integer> projectIDList, Integer monitorType, Integer monitorItemID);
 
-    IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, String monitorItemName, Integer sensorID);
+    IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, String monitorItemName, Integer sensorID, String pointName);
 
     List<IDNameAlias> querySimpleBy(Integer projectID, Integer groupID, List<Integer> monitorItemIDList);
 

@@ -298,7 +298,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Transactional(rollbackFor = Exception.class)
     public void setFormula(SetFormulaParam pa) {
         List<TbTemplateFormula> list = Param2DBEntityUtil.buildTbTemplateFormulaList(pa.getTemplateID(), pa.getMonitorType(), pa.getFormulaList());
-        tbTemplateFormulaMapper.deleteBatchByFieldIDS(list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
+        tbTemplateFormulaMapper.deleteBatchByFieldIDS(pa.getTemplateID(),list.stream().map(TbTemplateFormula::getFieldID).collect(Collectors.toList()));
         tbTemplateFormulaMapper.insertBatch(list);
         //修改缓存
         updateTemplateFormulaCache(pa.getTemplateID(), null, null, list, null);

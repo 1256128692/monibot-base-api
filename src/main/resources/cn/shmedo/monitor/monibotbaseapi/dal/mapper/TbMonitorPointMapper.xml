@@ -336,6 +336,10 @@
         <if test="sensorID != null">
             and s.ID = #{sensorID}
         </if>
+        <if test="pointName != null and pointName != ''">
+            and p.Name like concat('%', #{pointName}, '%')
+        </if>
+        order by p.ID desc
     </select>
     <select id="querySimpleBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias">
         select id, Name
