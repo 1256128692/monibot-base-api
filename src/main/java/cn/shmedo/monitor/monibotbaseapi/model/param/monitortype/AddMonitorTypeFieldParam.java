@@ -50,8 +50,8 @@ public class AddMonitorTypeFieldParam implements ParameterValidator, ResourcePer
         if (tbMonitorType == null){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
         }
-        if (tbMonitorType.getCompanyID().equals(-1)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不是自定义");
+        if (CreateType.PREDEFINED.getType().equals(tbMonitorType.getCreateType())){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "预定义监测类型不允许添加属性");
         }
         if (!tbMonitorType.getCompanyID().equals(companyID)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不属于该公司");
