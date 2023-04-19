@@ -42,33 +42,39 @@ public class SetFormulaParam implements ParameterValidator, ResourcePermissionPr
     public ResultWrapper validate() {
         TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
         TbMonitorTypeTemplate tbMonitorTypeTemplate = tbMonitorTypeTemplateMapper.selectByPrimaryKey(templateID);
-        if (tbMonitorTypeTemplate == null){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不存在");
+        if (tbMonitorTypeTemplate == null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不存在");
         }
-        if (!tbMonitorTypeTemplate.getMonitorType().equals(monitorType)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"模板不属于监测类型");
+        if (!tbMonitorTypeTemplate.getMonitorType().equals(monitorType)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不属于监测类型");
         }
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
         TbMonitorType tbMonitorType = tbMonitorTypeMapper.selectOne(new QueryWrapper<TbMonitorType>().eq("MonitorType", monitorType));
-        if (tbMonitorType == null){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"监测类型不存在");
+        if (tbMonitorType == null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
         }
-        if (!tbMonitorType.getCompanyID().equals(-1) && !tbMonitorType.getCompanyID().equals(companyID)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,"监测类型不属于公司");
+        if (!tbMonitorType.getCompanyID().equals(-1) && !tbMonitorType.getCompanyID().equals(companyID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不属于公司");
         }
-        if (formulaList.stream().map(FormulaItem::getFieldID).distinct().count() != formulaList.size()){
+        if (formulaList.stream().map(FormulaItem::getFieldID).distinct().count() != formulaList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不可重复设置公式");
         }
         TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
         if (tbMonitorTypeFieldMapper.selectCount(new QueryWrapper<TbMonitorTypeField>()
                 .eq("monitorType", monitorType)
-                .in("ID",formulaList.stream().map(FormulaItem::getFieldID).collect(Collectors.toList())))
-                    !=formulaList.size()){
+                .in("ID", formulaList.stream().map(FormulaItem::getFieldID).collect(Collectors.toList())))
+                != formulaList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有属性不属于该监测类型或不存在");
         }
-        if (formulaList.stream().map(FormulaItem::getDisplayFormula).distinct().count()!=formulaList.size()){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "公式顺序不可重复");
+//        if (formulaList.stream().map(FormulaItem::getDisplayFormula).distinct().count()!=formulaList.size()){
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "公式顺序不可重复");
+//        }
+        for (int i = 0; i < formulaList.size(); i++) {
+            if (formulaList.get(i).getFieldCalOrder() == null){
+                formulaList.get(i).setFieldCalOrder(i);
+            }
         }
+
         // TODO 校验公式
         return null;
     }
