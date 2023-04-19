@@ -30,8 +30,10 @@ import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
-import cn.shmedo.monitor.monibotbaseapi.util.FormulaUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.formula.FormulaData;
+import cn.shmedo.monitor.monibotbaseapi.util.formula.FormulaUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.formula.Origin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -62,6 +64,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private TbParameterMapper parameterMapper;
     @Resource
     private TbSensorDataSourceMapper sensorDataSourceMapper;
+    @Resource
     private TbMonitorTypeFieldMapper monitorTypeFieldMapper;
     @Resource
     private TbTemplateScriptMapper templateScriptMapper;
@@ -317,39 +320,28 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 break;
         }
 
-        Map<FormulaUtil.DataType, Set<FormulaUtil.Source>> sourceMap = result.getFieldList().stream()
-                .map(Field::getFormula)
-                .flatMap(e -> FormulaUtil.parse(e).entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (a, b) -> {
+        Map<Origin.Type, Set<FormulaData>> sourceMap = result.getFieldList().stream()
+                .flatMap(e -> FormulaUtil.parse(e.getFormula()).stream())
+                .collect(Collectors.toMap(FormulaData::getType, CollUtil::newHashSet, (a, b) -> {
                     a.addAll(b);
                     return a;
                 }));
 
-        Set<Object> modelTokens = sourceMap.getOrDefault(FormulaUtil.DataType.IOT, Collections.emptySet()).stream()
+        Set<Object> modelTokens = sourceMap.getOrDefault(Origin.Type.IOT, Collections.emptySet()).stream()
                 .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
                 .map(e -> (Object) e)
                 .collect(Collectors.toSet());
-        Map<String, Map<String, Model.Field>> modelMap = iotRedisService.multiGet(RedisKeys.IOT_MODEL_KEY, modelTokens, Model.class)
-                .stream().collect(Collectors.toMap(Model::getModelToken,
-                        e -> e.getModelFieldList().stream().collect(Collectors.toMap(Model.Field::getFieldToken, f -> f))));
+        Map<String, Model> modelMap = iotRedisService.multiGet(RedisKeys.IOT_MODEL_KEY, modelTokens, Model.class)
+                .stream().collect(Collectors.toMap(Model::getModelToken, e -> e));
         List<Param> paramList = sourceMap.entrySet().stream().flatMap(entry -> {
             switch (entry.getKey()) {
                 case IOT -> {
-                    return entry.getValue().stream().map(e -> {
-                        String modelToken = StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false);
-                        Assert.isTrue(modelMap.containsKey(modelToken), "模型{}不存在", modelToken);
-                        Assert.isTrue(modelMap.get(modelToken).containsKey(e.getFieldToken()),
-                                "模型{}不存在字段 {}", modelToken, e.getFieldToken());
-                        return Param.valueOf(modelMap.get(modelToken).get(e.getFieldToken()),
-                                e.getOrigin(), entry.getKey());
-                    });
+                    return entry.getValue().stream().map(e -> Param.valueOf(modelMap, e));
                 }
                 case PARAM -> {
-                    List<String> paramTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
-                    Map<String, TbParameter> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                                    .eq(TbParameter::getSubjectType, ParameterSubjectType.TEMPLATE.getCode())
-                                    .eq(TbParameter::getSubjectID, request.getTemplateID())
-                                    .in(TbParameter::getToken, paramTokens))
+                    Map<String, TbParameter> paramMap = monitorRedisService.getList(
+                                    RedisKeys.PARAMETER_PREFIX_KEY + ParameterSubjectType.TEMPLATE.getCode(),
+                                    request.getTemplateID().toString(), TbParameter.class)
                             .stream().collect(Collectors.toMap(TbParameter::getToken, e -> e));
                     return entry.getValue().stream().map(e -> {
                         Assert.isTrue(paramMap.containsKey(e.getFieldToken()),
@@ -359,7 +351,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     });
                 }
                 case EX -> {
-                    List<String> exTokens = entry.getValue().stream().map(FormulaUtil.Source::getFieldToken).toList();
+                    List<String> exTokens = entry.getValue().stream().map(FormulaData::getFieldToken).toList();
                     Map<String, TbMonitorTypeField> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
                             .eq(TbMonitorTypeField::getMonitorType, request.getMonitorType())
                             .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode())
@@ -388,12 +380,17 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             case FORMULA:
                 Dict fieldValueMap = Dict.create();
                 return request.getFieldList().stream().map(f -> {
-                    Object result = FormulaUtil.calculate(f.getFormula(), dataTypeSetMap ->
-                            dataTypeSetMap.forEach((type, sources) ->
-                                    sources.forEach(source ->
-                                            source.setFieldValue(FormulaUtil.DataType.SELF.equals(type) ?
-                                                    fieldValueMap.get(source.getFieldToken()) :
-                                                    request.getParamMap().get(source.getOrigin())))));
+                    Object result = FormulaUtil.calculate(f.getFormula(), typeListMap -> {
+                        typeListMap.forEach((type, sources) -> {
+                            sources.forEach(source -> {
+                                if (Origin.Type.SELF.equals(type)) {
+                                    fieldValueMap.set(source.getFieldToken(), source.getFieldValue());
+                                } else {
+                                    fieldValueMap.set(source.getFieldToken(), request.getParamMap().get(source.getOrigin()));
+                                }
+                            });
+                        });
+                    });
                     //每计算一个字段，将其结果缓存，供后续公式使用
                     fieldValueMap.set(f.getFieldToken(), result);
                     return new TryingResponse(result, f.getFieldToken());
