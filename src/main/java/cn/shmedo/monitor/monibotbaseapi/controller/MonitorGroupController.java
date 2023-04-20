@@ -21,7 +21,7 @@ public class MonitorGroupController {
      * @apiVersion 1.0.0
      * @apiGroup 监测组模块
      * @apiName AddMonitorGroup
-     * @apiDescription 新建监测组
+     * @apiDescription 新建监测组, 1级组只能加监测项目，二级组只能加监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [parentID] 父监测组ID
      * @apiParam (请求体) {String} name 监测组名称(50)
@@ -88,7 +88,7 @@ public class MonitorGroupController {
      * @apiVersion 1.0.0
      * @apiGroup 监测组模块
      * @apiName DeleteMonitorGroup
-     * @apiDescription 删除监测组
+     * @apiDescription 删除监测组, 会连带删除子监测组
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int[]} groupIDList 监测组ID列表(max = 10)
      * @apiSuccess (返回结果) {String} none 空

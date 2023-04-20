@@ -9,8 +9,10 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -47,7 +49,8 @@ public class UpdateMonitorGroupParam implements ParameterValidator, ResourcePerm
     private List<@NotNull Integer> monitorPointIDList;
 
     @JsonIgnore
-    private    TbMonitorGroup tbMonitorGroup;
+    private TbMonitorGroup tbMonitorGroup;
+
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
@@ -62,6 +65,12 @@ public class UpdateMonitorGroupParam implements ParameterValidator, ResourcePerm
         if (!tbMonitorGroup.getProjectID().equals(projectID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "分组不属于该项目");
         }
+        if (tbMonitorGroup.getParentID() == null && CollectionUtils.isNotEmpty(monitorPointIDList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级组不能设置监测点");
+        }
+        if (tbMonitorGroup.getParentID() != null && CollectionUtils.isNotEmpty(monitorItemIDList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级组不能设置监测项目");
+        }
         if (CollectionUtils.isNotEmpty(monitorItemIDList)) {
             TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
             List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectBatchIds(
@@ -74,15 +83,6 @@ public class UpdateMonitorGroupParam implements ParameterValidator, ResourcePerm
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项不属于该项目");
             }
             if (tbMonitorGroup.getParentID() != null) {
-                TbMonitorGroupItemMapper tbMonitorGroupItemMapper = ContextHolder.getBean(TbMonitorGroupItemMapper.class);
-                List<Integer> monitorItemIDs = tbMonitorGroupItemMapper.queryMonitorItemIDByGroupIDs(List.of(tbMonitorGroup.getParentID()));
-                if (CollectionUtils.isEmpty(monitorItemIDs)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组没有设置监测项");
-                }
-                if (tbMonitorItems.stream().anyMatch(tbMonitorItem -> !monitorItemIDs.contains(tbMonitorItem.getID()))) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项不属于父分组");
-                }
-
                 if (CollectionUtils.isNotEmpty(monitorPointIDList)) {
                     TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
                     List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectBatchIds(
@@ -94,8 +94,12 @@ public class UpdateMonitorGroupParam implements ParameterValidator, ResourcePerm
                     if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !tbMonitorPoint.getProjectID().equals(projectID))) {
                         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不属于该项目");
                     }
-                    if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !monitorItemIDList.contains(tbMonitorPoint.getMonitorItemID())))
-                    {
+                    TbMonitorGroupItemMapper tbMonitorGroupItemMapper = ContextHolder.getBean(TbMonitorGroupItemMapper.class);
+                    List<Integer> parentItemIDList = tbMonitorGroupItemMapper.selectList(
+                            new QueryWrapper<TbMonitorGroupItem>().lambda()
+                                    .eq(TbMonitorGroupItem::getMonitorGroupID, tbMonitorGroup.getParentID())
+                    ).stream().map(TbMonitorGroupItem::getMonitorItemID).toList();
+                    if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !parentItemIDList.contains(tbMonitorPoint.getMonitorItemID()))) {
                         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不属于监测项目");
                     }
                 }
@@ -106,13 +110,14 @@ public class UpdateMonitorGroupParam implements ParameterValidator, ResourcePerm
         return null;
     }
 
-    public  TbMonitorGroup update (Date now,Integer userID){
+    public TbMonitorGroup update(Date now, Integer userID) {
         tbMonitorGroup.setName(name);
         tbMonitorGroup.setUpdateTime(now);
         tbMonitorGroup.setUpdateUserID(userID);
         tbMonitorGroup.setEnable(enable);
         return tbMonitorGroup;
     }
+
     @Override
     public Resource parameter() {
         return null;

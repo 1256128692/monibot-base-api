@@ -54,6 +54,10 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
         }
         TbMonitorGroupMapper tbMonitorGroupMapper = ContextHolder.getBean(TbMonitorGroupMapper.class);
         if (parentID != null) {
+            // 二级组校验
+            if (CollectionUtils.isNotEmpty(monitorItemIDList)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级分组不能设置监测项");
+            }
             TbMonitorGroup parentGroup = tbMonitorGroupMapper.selectByPrimaryKey(parentID);
             if (parentGroup == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组不存在");
@@ -65,21 +69,19 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组不是一级分组");
             }
             // 二级类别监测组名称校验
-            count = tbMonitorGroupMapper.selectCountByName(name,true, projectID);
+            count = tbMonitorGroupMapper.selectCountByName(name, true, projectID);
             if (count > 0) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级分组名称重复,请重新输入");
             }
-        }else {
+        } else {
+            if (CollectionUtils.isNotEmpty(monitorPointIDList)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级分组必须不能设置监测点");
+            }
             // 一级类别监测组名称校验
-            count = tbMonitorGroupMapper.selectCountByName(name,false, projectID);
+            count = tbMonitorGroupMapper.selectCountByName(name, false, projectID);
             if (count > 0) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级分组名称重复,请重新输入");
             }
-        }
-
-
-        if (CollectionUtils.isNotEmpty(monitorPointIDList) && CollectionUtils.isEmpty(monitorItemIDList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设置监测点时必须设置监测项");
         }
         if (CollectionUtils.isNotEmpty(monitorItemIDList)) {
             TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
@@ -93,14 +95,6 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项不属于该项目");
             }
             if (parentID != null) {
-                TbMonitorGroupItemMapper tbMonitorGroupItemMapper = ContextHolder.getBean(TbMonitorGroupItemMapper.class);
-                List<Integer> monitorItemIDs = tbMonitorGroupItemMapper.queryMonitorItemIDByGroupIDs(List.of(parentID));
-                if (CollectionUtils.isEmpty(monitorItemIDs)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "父分组没有设置监测项");
-                }
-                if (tbMonitorItems.stream().anyMatch(tbMonitorItem -> !monitorItemIDs.contains(tbMonitorItem.getID()))) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项不属于父分组");
-                }
 
                 if (CollectionUtils.isNotEmpty(monitorPointIDList)) {
                     TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
@@ -113,13 +107,15 @@ public class AddMonitorGroupParam implements ParameterValidator, ResourcePermiss
                     if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !tbMonitorPoint.getProjectID().equals(projectID))) {
                         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不属于该项目");
                     }
-                    if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !monitorItemIDList.contains(tbMonitorPoint.getMonitorItemID())))
-                    {
-                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不属于监测项目");
+                    TbMonitorGroupItemMapper tbMonitorGroupItemMapper = ContextHolder.getBean(TbMonitorGroupItemMapper.class);
+                    List<Integer> parentItemIDList = tbMonitorGroupItemMapper.selectList(
+                            new QueryWrapper<TbMonitorGroupItem>().lambda()
+                                    .eq(TbMonitorGroupItem::getMonitorGroupID, parentID)
+                    ).stream().map(TbMonitorGroupItem::getMonitorItemID).toList();
+                    if (tbMonitorPoints.stream().anyMatch(tbMonitorPoint -> !parentItemIDList.contains(tbMonitorPoint.getMonitorItemID()))) {
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不属于父组的监测项目");
                     }
                 }
-            } else if (CollectionUtils.isNotEmpty(monitorPointIDList)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级分组不能设置监测点");
             }
         }
         return null;

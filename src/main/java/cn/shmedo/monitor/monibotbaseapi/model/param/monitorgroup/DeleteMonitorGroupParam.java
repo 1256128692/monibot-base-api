@@ -48,13 +48,6 @@ public class DeleteMonitorGroupParam implements ParameterValidator, ResourcePerm
         if (tbMonitorGroups.stream().anyMatch(tbMonitorGroup -> !tbMonitorGroup.getProjectID().equals(projectID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "分组有不属于该项目");
         }
-        if (
-                tbMonitorGroupMapper.selectCount(
-                        new QueryWrapper<TbMonitorGroup>().in("parentID", groupIDList)
-                ) > 0
-        ) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "分组有子分组,不可删除");
-        }
         return null;
     }
 
