@@ -59,6 +59,33 @@ public class WorkOrderController {
     }
 
     /**
+     * @api {POST} /QueryWorkOrderDetail 查询工单详情
+     * @apiVersion 1.0.0
+     * @apiGroup 在线监测工单模块
+     * @apiName QueryWorkOrderDetail
+     * @apiDescription 查询工单详情
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} workOrderID 工单ID
+     * @apiSuccess (返回结果) {Int} workOrderID 工单ID
+     * @apiSuccess (返回结果) {String} orderCode 工单编号
+     * @apiSuccess (返回结果) {Int} typeID 工单类型ID
+     * @apiSuccess (返回结果) {String} typeName 工单类型名称
+     * @apiSuccess (返回结果) {Int} organizationID 所属组织ID
+     * @apiSuccess (返回结果) {String} organizationName 所属组织名称
+     * @apiSuccess (返回结果) {String} solution 解决方案
+     * @apiSuccess (返回结果) {String} dispatcherName 派单人名称
+     * @apiSuccess (返回结果) {DateTime} dispatchTime 派单时间
+     * @apiSuccess (返回结果) {Int} status 工单状态,默认0.全部 0.全部 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseWorkOrder
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseWorkOrder")
+    @PostMapping(value = "/QueryWorkOrderDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryWorkOrderDetail(@Valid @RequestBody Object param){
+        return workOrderService.queryWorkOrderDetail(param);
+    }
+
+    /**
      * @api {POST} /QueryWarnDetail 查询报警详情记录
      * @apiVersion 1.0.0
      * @apiGroup 在线监测工单模块

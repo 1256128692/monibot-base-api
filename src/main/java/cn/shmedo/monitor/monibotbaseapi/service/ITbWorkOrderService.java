@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail;
@@ -20,4 +21,6 @@ public interface ITbWorkOrderService extends IService<TbWorkOrder> {
     WtWorkOrderWarnDetail queryWarnDetail(QueryWorkOrderWarnDetailParam param);
 
     WtWorkOrderStatisticsInfo queryWorkOrderStatistics(QueryWorkOrderStatisticsParam param);
+
+    WtWorkOrderDetailInfo queryWorkOrderDetail(Object param);
 }
