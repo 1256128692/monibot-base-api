@@ -172,6 +172,7 @@
             tmp.GpsLocation monitorPointLocation,
             tmp.InstallLocation installLocation,
             twl.WarnTime warnTime,
+            twt.FieldID metadataID,
             twt.CompareRule compareRule,
             twt.TriggerRule triggerRule,
             two.ID workOrderID,
