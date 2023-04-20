@@ -151,6 +151,11 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
         List<Group4Web>  sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(groupIDList);
         // 处理监测项目和监测点
         handleGroup4Web(pageData.getRecords(), sonGroupList);
+        // 处理额外字段
+        page.getRecords().forEach(item -> {
+            item.setGroupID(item.getID());
+            item.setGroupName(item.getName());
+        });
         return new PageUtil.Page<>( pageData.getTotal(),pageData.getRecords(),  pageData.getSize());
     }
 
@@ -186,6 +191,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
         }
         List<Group4Web>  sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(List.of(group4Web.getID()));
         handleGroup4Web(List.of(group4Web), sonGroupList);
+
+        group4Web.setGroupID(group4Web.getID());
+        group4Web.setGroupName(group4Web.getName());
+
         return group4Web;
     }
 }

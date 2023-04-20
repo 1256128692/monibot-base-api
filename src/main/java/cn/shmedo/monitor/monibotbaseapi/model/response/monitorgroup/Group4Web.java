@@ -13,6 +13,8 @@ import java.util.List;
 @Data
 public class Group4Web extends TbMonitorGroup {
     private String imgURL;
+    private Integer groupID;
+    private String groupName;
     List<GroupMonitorItem> monitorItemList;
     List<GroupPoint> monitorPointList;
     List<Group4Web> childGroupList;
