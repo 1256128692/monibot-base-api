@@ -284,6 +284,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         updateById(request.getSensor());
         if (CollUtil.isNotEmpty(request.getParamList())) {
             parameterMapper.replaceBatch(request.getParamList());
+            monitorRedisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + ParameterSubjectType.SENSOR.getCode(),
+                    parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
+                            .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
+                            .eq(TbParameter::getSubjectID, request.getSensor().getID()))
+                            .stream().collect(Collectors.groupingBy(TbParameter::getSubjectID)));
         }
         return new IdRecord(request.getSensor().getID());
     }

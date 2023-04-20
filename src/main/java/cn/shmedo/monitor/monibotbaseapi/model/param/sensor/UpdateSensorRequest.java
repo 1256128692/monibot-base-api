@@ -131,6 +131,7 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                 TbParameter item = BeanUtil.copyProperties(param, TbParameter.class);
                 item.setID(null);
                 item.setSubjectType(ParameterSubjectType.SENSOR.getCode());
+                item.setSubjectID(sensorID);
                 item.setPaValue(paramFieldMap.get(param.getID()).getValue());
                 return item;
             }).collect(Collectors.toList());
