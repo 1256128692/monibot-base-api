@@ -376,11 +376,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     public Object trying(TryingRequest request) {
+        List<TryingResponse> result = List.of();
         switch (request.getCalType()) {
             case FORMULA:
                 Dict fieldValueMap = Dict.create();
-                return request.getFieldList().stream().map(f -> {
-                    Object result = FormulaUtil.calculate(f.getFormula(), typeListMap -> {
+                result = request.getFieldList().stream().map(f -> {
+                    Object item = FormulaUtil.calculate(f.getFormula(), typeListMap -> {
                         typeListMap.forEach((type, sources) ->
                             sources.forEach(source ->
                                     source.setFieldValue(Origin.Type.SELF.equals(type) ?
@@ -389,8 +390,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                         );
                     });
                     //每计算一个字段，将其结果缓存，供后续公式使用
-                    fieldValueMap.set(f.getFieldToken(), result);
-                    return new TryingResponse(result, f.getFieldToken());
+                    fieldValueMap.set(f.getFieldToken(), item);
+                    return new TryingResponse(item, f.getFieldToken(), f.getID());
                 }).toList();
             case SCRIPT:
                 //TODO 脚本计算未实现
@@ -399,7 +400,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 //TODO HTTP计算未实现
                 break;
         }
-        return List.of();
+        return result.stream().filter(e -> request.getFieldID().equals(e.fieldID())).toList();
     }
 
     @Override

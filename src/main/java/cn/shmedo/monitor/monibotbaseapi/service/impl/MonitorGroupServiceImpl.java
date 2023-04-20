@@ -82,6 +82,11 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteMonitorGroup(List<Integer> groupIDList) {
+        groupIDList.addAll(
+                tbMonitorGroupMapper.selectList(
+                        new QueryWrapper<TbMonitorGroup>().lambda().in(TbMonitorGroup::getParentID, groupIDList)
+                ).stream().map(TbMonitorGroup::getID).toList()
+        );
         tbMonitorGroupMapper.deleteBatchIds(groupIDList);
         tbMonitorGroupItemMapper.delete(
                 new QueryWrapper<TbMonitorGroupItem>().lambda().in(TbMonitorGroupItem::getMonitorGroupID, groupIDList)
