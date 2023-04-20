@@ -57,7 +57,7 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
 
     @Override
     public Resource parameter() {
-        return new Resource(this.companyID.toString(), ResourceType.BASE_PROJECT);
+        return new Resource(this.companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override
