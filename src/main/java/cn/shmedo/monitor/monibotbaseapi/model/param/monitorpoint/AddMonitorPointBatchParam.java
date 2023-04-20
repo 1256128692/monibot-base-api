@@ -40,7 +40,7 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
 
     @NotEmpty
     @Valid
-    @Size(max = 10)
+    @Size(max = 100)
     private List< @NotNull AddPointItem>  addPointItemList;
     @Override
     public ResultWrapper validate() {
