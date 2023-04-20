@@ -46,6 +46,8 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
     private Integer monitorType;
     @NotNull
     private Byte createType;
+    @NotNull
+    private Boolean enable;
     @NotBlank
     @Size(max = 20)
     private String monitorItemName;
