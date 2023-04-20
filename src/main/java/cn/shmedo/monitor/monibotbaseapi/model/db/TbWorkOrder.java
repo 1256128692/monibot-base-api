@@ -10,7 +10,7 @@ import java.util.Date;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-19 09:49
+ * @date: 2023-04-19 09:49
  */
 @Data
 @TableName("tb_work_order")

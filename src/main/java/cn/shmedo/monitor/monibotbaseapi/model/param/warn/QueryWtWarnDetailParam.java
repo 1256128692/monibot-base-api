@@ -12,7 +12,7 @@ import lombok.Data;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-14 16:47
+ * @date: 2023-04-14 16:47
  */
 @Data
 public class QueryWtWarnDetailParam implements ParameterValidator, ResourcePermissionProvider<Resource> {

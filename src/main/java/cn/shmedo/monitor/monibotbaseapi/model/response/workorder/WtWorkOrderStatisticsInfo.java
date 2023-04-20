@@ -5,7 +5,7 @@ import lombok.Data;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-19 14:31
+ * @date: 2023-04-19 14:31
  */
 @Data
 @Builder

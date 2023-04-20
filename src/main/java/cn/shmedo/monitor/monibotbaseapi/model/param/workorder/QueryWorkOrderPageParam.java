@@ -15,7 +15,7 @@ import java.util.Date;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-18 18:03
+ * @date: 2023-04-18 18:03
  */
 @Data
 public class QueryWorkOrderPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {

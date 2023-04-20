@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * @author: youxian.kong@shmedo.cn
- * @date: 2023-04-2023-04-13 17:58
+ * @date: 2023-04-13 17:58
  */
 @Data
 public class DeleteWtActionParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
