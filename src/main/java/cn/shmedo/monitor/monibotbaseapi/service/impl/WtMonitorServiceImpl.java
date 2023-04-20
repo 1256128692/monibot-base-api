@@ -357,8 +357,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Object temperature = currentSensorData.get("temperature");
             if (ObjectUtil.isNotNull(phosphorusTotal)) {
                 // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("dissolvedOxygen"));
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
                 int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
                 int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
                 int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
@@ -368,7 +368,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
             } else if (ObjectUtil.isNotNull(temperature)) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
