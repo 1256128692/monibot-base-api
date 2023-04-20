@@ -156,6 +156,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             item.setGroupID(item.getID());
             item.setGroupName(item.getName());
         });
+        sonGroupList.forEach(item -> {
+            item.setGroupID(item.getID());
+            item.setGroupName(item.getName());
+        });
         return new PageUtil.Page<>( pageData.getTotal(),pageData.getRecords(),  pageData.getSize());
     }
 
