@@ -381,15 +381,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 Dict fieldValueMap = Dict.create();
                 return request.getFieldList().stream().map(f -> {
                     Object result = FormulaUtil.calculate(f.getFormula(), typeListMap -> {
-                        typeListMap.forEach((type, sources) -> {
-                            sources.forEach(source -> {
-                                if (Origin.Type.SELF.equals(type)) {
-                                    fieldValueMap.set(source.getFieldToken(), source.getFieldValue());
-                                } else {
-                                    fieldValueMap.set(source.getFieldToken(), request.getParamMap().get(source.getOrigin()));
-                                }
-                            });
-                        });
+                        typeListMap.forEach((type, sources) ->
+                            sources.forEach(source ->
+                                    source.setFieldValue(Origin.Type.SELF.equals(type) ?
+                                            fieldValueMap.get(source.getFieldToken()) :
+                                            request.getParamMap().get(source.getOrigin())))
+                        );
                     });
                     //每计算一个字段，将其结果缓存，供后续公式使用
                     fieldValueMap.set(f.getFieldToken(), result);
