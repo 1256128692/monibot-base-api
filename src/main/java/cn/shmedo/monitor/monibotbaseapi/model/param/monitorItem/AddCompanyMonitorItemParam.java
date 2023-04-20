@@ -41,6 +41,14 @@ public class AddCompanyMonitorItemParam implements ParameterValidator, ResourceP
         List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(
                 new QueryWrapper<TbMonitorItem>().in("ID", monitorItemIDList)
         );
+        if (tbMonitorItemMapper.selectCount(
+                new QueryWrapper<TbMonitorItem>().lambda()
+                        .eq(TbMonitorItem::getCompanyID, companyID)
+                        .eq(TbMonitorItem::getProjectID,-1)
+                        .in(TbMonitorItem::getName, tbMonitorItemList.stream().map(TbMonitorItem::getName).toArray())
+        ) > 0){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一些监测项目已经设置成企业模板");
+        }
         if (CollectionUtils.isEmpty(tbMonitorItemList) || tbMonitorItemList.size()!= monitorItemIDList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不存在");
 
