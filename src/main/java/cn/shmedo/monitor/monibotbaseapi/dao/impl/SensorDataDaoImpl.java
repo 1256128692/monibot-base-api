@@ -134,6 +134,9 @@ public class SensorDataDaoImpl implements SensorDataDao {
             case DbConstant.DENSITY_HOUR:
                 sql = getHourSensorDataSql(sidOrString, beginString, endString, measurement, selectField, density, monitorType);
                 break;
+            case DbConstant.DENSITY_MINUTE:
+                sql = getMinuteSensorDataSql(sidOrString, beginString, endString, measurement, selectField, density, monitorType);
+                break;
             case DbConstant.DENSITY_DAY:
                 sql = getDaySensorDataSql(sidOrString, beginString, endString, measurement, selectField, density);
                 break;
@@ -141,6 +144,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
+
 
     @Override
     public List<Map<String, Object>> querySensorRainStatisticsData(List<Map<String, Object>> dataMaps, Timestamp begin, Timestamp end, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
@@ -217,6 +221,35 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" order by time desc ");
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
+    }
+
+    private String getMinuteSensorDataSql(String sensorIDOrString, String beginString,
+                                          String endString, String measurement,
+                                          List<String> selectField, String density, Integer monitorType) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder querySql = new StringBuilder();
+
+        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
+            selectField.forEach(item -> {
+                querySql.append("sum(").append(item).append(") as ").append(item).append(",");
+            });
+        } else {
+            selectField.forEach(item -> {
+                querySql.append("last(").append(item).append(") as ").append(item).append(",");
+            });
+        }
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+        sqlBuilder.append(" select ");
+        sqlBuilder.append(selectFieldString);
+        sqlBuilder.append(" from  ").append(measurement);
+        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+        sqlBuilder.append(" and ( ");
+        sqlBuilder.append(sensorIDOrString).append(" ) ");
+        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(").append(density).append(") fill(none) ");
+        sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" tz('Asia/Shanghai') ");
+        return sqlBuilder.toString();
+
     }
 
     private String getHourSensorDataSql(String sensorIDOrString, String beginString,

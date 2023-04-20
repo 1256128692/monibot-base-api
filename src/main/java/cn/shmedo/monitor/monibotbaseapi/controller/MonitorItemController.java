@@ -33,6 +33,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} monitorType 监测类型，预定义时，该项不能为自定义的监测类型
      * @apiParam (请求参数) {String} monitorItemName 监测项目名称(20)
      * @apiParam (请求参数) {Int} createType 创建类型 0:预定义,1:自定义
+     * @apiParam (请求参数) {Boolean} enable 是否开启
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
      * @apiParam (请求参数) {Int[]} fieldIDList 监测类型字段ID列表
@@ -55,6 +56,7 @@ public class MonitorItemController {
      * @apiDescription 修改监测项目
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求参数) {Boolean} enable 是否开启
      * @apiParam (请求参数) {String} alias 别名(max = 20)
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
@@ -108,6 +110,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.id 监测项目ID
+     *  @apiSuccess (返回结果) {Boolean} currentPageData.enable 是否开启
      * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} currentPageData.name 监测项目名称
      * @apiSuccess (返回结果) {String} currentPageData.alias 监测项目别名
@@ -196,6 +199,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} list.itemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.itemName 监测项目名称
      * @apiSuccess (返回结果) {String} list.itemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Boolean} list.enable 是否开启
      * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
      * @apiSuccess (返回结果) {String} list.typeName 监测类型名称
      * @apiSuccess (返回结果) {String} list.typeAlias 监测类型别名

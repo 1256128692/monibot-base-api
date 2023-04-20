@@ -52,6 +52,11 @@ public class TbMonitorItem implements Serializable {
     private String alias;
 
     /**
+     * 是否开启
+     */
+    private Boolean enable;
+
+    /**
      * 创建类型
      */
     private Byte createType;

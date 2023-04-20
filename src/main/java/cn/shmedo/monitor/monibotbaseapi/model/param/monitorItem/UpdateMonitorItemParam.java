@@ -43,6 +43,8 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
     @NotBlank
     @Size(max = 20)
     private String alias;
+    @NotNull
+    private Boolean enable;
     @Size(max = 500)
     private String exValue;
     private Integer displayOrder;
@@ -53,6 +55,7 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
 
     public TbMonitorItem update(Integer userID, Date now){
         tbMonitorItem.setAlias(alias);
+        tbMonitorItem.setEnable(enable);
         tbMonitorItem.setExValue(exValue);
         tbMonitorItem.setDisplayOrder(displayOrder);
         tbMonitorItem.setUpdateUserID(userID);
