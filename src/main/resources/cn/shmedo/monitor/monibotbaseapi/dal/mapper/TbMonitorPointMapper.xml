@@ -409,14 +409,24 @@
                 when ID = #{item.ID} then #{item.exValues}
             </foreach>
         </trim>
-        <trim prefix="displayOrder = case" suffix="end">
+        <trim prefix="displayOrder = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
                 when ID = #{item.ID} then #{item.displayOrder}
             </foreach>
         </trim>
+        <trim prefix="updateUserID = case" suffix="end,">
+            <foreach collection="list" index="index" item="item">
+                when ID = #{item.ID} then #{item.updateUserID}
+            </foreach>
+        </trim>
+        <trim prefix="updateTime = case" suffix="end">
+            <foreach collection="list" index="index" item="item">
+                when ID = #{item.ID} then #{item.updateTime}
+            </foreach>
+        </trim>
         where id in
         <foreach collection="list" item="item" separator="," open="(" close=")">
-            ID = #{item.ID}
+            #{item.ID}
         </foreach>
     </update>
 

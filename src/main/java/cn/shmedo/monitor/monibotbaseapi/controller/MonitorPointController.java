@@ -46,6 +46,7 @@ public class MonitorPointController {
         monitorPointService.addMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /AddMonitorPointBatch 批量新增监测点
      * @apiVersion 1.0.0
@@ -54,9 +55,9 @@ public class MonitorPointController {
      * @apiDescription 批量新增监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {Object[]} addPointItemList 新增监测点列表(max = 10)
+     * @apiParam (请求体) {Object[]} addPointItemList 新增监测点列表(max = 100)
      * @apiParam (请求体) {String} addPointItemList.name 监测点名称(max = 50)
-     *  @apiParam (请求体) {Int} addPointItemList.monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int} addPointItemList.monitorItemID 监测项目ID
      * @apiParam (请求体) {Bool} addPointItemList.enable 是否启用
      * @apiParam (请求体) {String} [addPointItemList.gpsLocation] 地图位置
      * @apiParam (请求体) {String} [addPointItemList.imageLocation] 底图位置
@@ -74,6 +75,7 @@ public class MonitorPointController {
         monitorPointService.addMonitorPointBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
+
     /**
      * @api {POST} /UpdateMonitorPoint 修改监测点
      * @apiVersion 1.0.0
@@ -108,7 +110,7 @@ public class MonitorPointController {
      * @apiName UpdateMonitorPointBatch
      * @apiDescription 批量修改监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {Object[]} updatePointItemList 修改监测点列表(max = 10)
+     * @apiParam (请求体) {Object[]} updatePointItemList 修改监测点列表(max = 100)
      * @apiParam (请求体) {Int} updatePointItemList.pointID 监测点ID
      * @apiParam (请求体) {String} updatePointItemList.name 监测点名称
      * @apiParam (请求体) {Bool} updatePointItemList.enable 是否启用
@@ -231,7 +233,7 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
     @PostMapping(value = "/QueryMonitorPointSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointSimpleList(@Validated @RequestBody QueryMonitorPointSimpleListParam pa){
+    public Object queryMonitorPointSimpleList(@Validated @RequestBody QueryMonitorPointSimpleListParam pa) {
         return monitorPointService.queryMonitorPointSimpleList(pa);
     }
 
@@ -266,10 +268,9 @@ public class MonitorPointController {
      */
     @PostMapping(value = "/QueryMonitorItemPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 
-    public Object queryMonitorItemPointList(@Validated @RequestBody QueryMonitorItemPointListParam pa){
+    public Object queryMonitorItemPointList(@Validated @RequestBody QueryMonitorItemPointListParam pa) {
         return monitorPointService.queryMonitorItemPointList(pa);
     }
-
 
 
     /**

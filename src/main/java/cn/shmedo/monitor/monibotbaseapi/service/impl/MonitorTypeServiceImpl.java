@@ -411,7 +411,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), pa.getMonitorType());
         tbMonitorTypeFieldMapper.insertBatch(list);
         setMonitorTypeCache(
-                tbMonitorTypeMapper.selectByPrimaryKey(pa.getMonitorType()),
+                tbMonitorTypeMapper.queryByType(pa.getMonitorType()),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
         );
     }

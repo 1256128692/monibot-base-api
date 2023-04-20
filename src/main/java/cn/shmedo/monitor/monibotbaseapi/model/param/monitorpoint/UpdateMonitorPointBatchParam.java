@@ -35,7 +35,7 @@ public class UpdateMonitorPointBatchParam implements ParameterValidator, Resourc
     private Integer projectID;
     @NotEmpty
     @Valid
-    @Size(max = 10)
+    @Size(max = 100)
     private List<UpdatePointItem> updatePointItemList;
 
     @JsonIgnore
