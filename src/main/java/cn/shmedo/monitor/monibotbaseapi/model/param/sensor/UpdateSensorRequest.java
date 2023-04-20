@@ -130,7 +130,6 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                 Assert.notNull(field.getValue(), "参数配置项 [" + param.getID() + "]值不能为空");
                 TbParameter item = BeanUtil.copyProperties(param, TbParameter.class);
                 item.setID(null);
-                item.setSubjectID(null);
                 item.setSubjectType(ParameterSubjectType.SENSOR.getCode());
                 item.setPaValue(paramFieldMap.get(param.getID()).getValue());
                 return item;
