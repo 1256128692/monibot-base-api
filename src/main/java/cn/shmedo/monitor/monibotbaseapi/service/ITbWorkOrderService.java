@@ -22,5 +22,5 @@ public interface ITbWorkOrderService extends IService<TbWorkOrder> {
 
     WtWorkOrderStatisticsInfo queryWorkOrderStatistics(QueryWorkOrderStatisticsParam param);
 
-    WtWorkOrderDetailInfo queryWorkOrderDetail(Object param);
+    WtWorkOrderDetailInfo queryWorkOrderDetail(QueryWorkOrderWarnDetailParam param);
 }

@@ -41,7 +41,7 @@
         </if>
         ORDER BY two.CreateTime DESC
     </select>
-    <select id="selectWorkOrderStatistics"
+    <select id="queryWorkOrderStatistics"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
         SELECT
@@ -56,5 +56,22 @@
         <if test="param.projectID != null">
             AND twl.ProjectID=#{param.projectID}
         </if>
+    </select>
+    <select id="queryWorkOrderDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderDetailInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam">
+        SELECT
+            ID workOrderID,
+            OrderCode orderCode,
+            `Type` typeID,
+            ( CASE `Type` WHEN 1 THEN '报警处置工单' WHEN 2 THEN '应急预案工单' WHEN 3 THEN '设备运维工单' WHEN 4 THEN '巡查巡检工单' ELSE 'unknown' END ) typeName,
+            Organization organizationName,
+            Solution solution,
+            DispatcherName dispatcherName,
+            DispatchTime dispatchTime,
+            `Status` `status`
+        FROM
+            tb_work_order
+        WHERE ID=#{param.workOrderID}
     </select>
 </mapper>

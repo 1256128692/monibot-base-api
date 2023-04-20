@@ -173,13 +173,16 @@
             tmp.InstallLocation installLocation,
             twl.WarnTime warnTime,
             twt.CompareRule compareRule,
-            twt.TriggerRule triggerRule
+            twt.TriggerRule triggerRule,
+            two.ID workOrderID,
+            two.OrderCode workOrderCode
         FROM tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
         WHERE twl.`ID`=#{warnID}
     </select>
     <select id="queryWorkOrderWarnDetail"

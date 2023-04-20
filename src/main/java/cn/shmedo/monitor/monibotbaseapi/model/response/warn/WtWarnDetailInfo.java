@@ -28,4 +28,6 @@ public class WtWarnDetailInfo {
     private Date warnTime;
     private String compareRule;
     private String triggerRule;
+    private Integer workOrderID;
+    private String workOrderCode;
 }

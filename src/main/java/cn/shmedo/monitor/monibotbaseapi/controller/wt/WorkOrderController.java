@@ -81,7 +81,7 @@ public class WorkOrderController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseWorkOrder")
     @PostMapping(value = "/QueryWorkOrderDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWorkOrderDetail(@Valid @RequestBody Object param){
+    public Object queryWorkOrderDetail(@Valid @RequestBody QueryWorkOrderWarnDetailParam param){
         return workOrderService.queryWorkOrderDetail(param);
     }
 

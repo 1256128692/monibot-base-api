@@ -85,6 +85,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
      * @apiSuccess (返回结果) {String} compareRule 比较区间json
      * @apiSuccess (返回结果) {String} triggerRule 触发规则json
+     * @apiSuccess (返回结果) {Int} workOrderID 工单ID
+     * @apiSuccess (返回结果) {String} workOrderCode 工单编号
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */
