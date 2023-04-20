@@ -23,7 +23,8 @@ import lombok.NonNull;
 public class QueryMonitorGroupPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer projectID;
-    private String name;
+    private String groupName;
+    private String secondaryGroupName;
     private Integer monitorItemID;
     @NotNull
     @Positive

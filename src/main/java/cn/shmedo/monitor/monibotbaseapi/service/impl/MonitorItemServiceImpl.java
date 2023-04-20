@@ -189,6 +189,25 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         return list;
     }
 
+    @Override
+    public List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa) {
+        QueryWrapper<TbMonitorItem> queryWrapper = new QueryWrapper<>();
+        if (pa.getCreateType() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
+        }
+        if(pa.getCompanyID()!=null){
+            queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
+
+        }
+        if (pa.getProjectID() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
+        }
+        queryWrapper.orderByDesc("ID");
+        return tbMonitorItemMapper.selectList(
+                queryWrapper
+        );
+    }
+
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {
 
         List<Integer> monitorClassIDList = result.getMonitorClassList().stream().map(MonitorClassInfo::getMonitorClass).collect(Collectors.toList());

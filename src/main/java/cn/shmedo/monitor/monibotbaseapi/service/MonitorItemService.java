@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
@@ -23,4 +24,6 @@ public interface MonitorItemService {
     PageUtil.Page<MonitorItem4Web> queryMonitorItemPageList(QueryMonitorItemPageListParam pa);
 
     List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa);
+
+    List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa);
 }

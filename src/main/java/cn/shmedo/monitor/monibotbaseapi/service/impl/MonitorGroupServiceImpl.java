@@ -148,7 +148,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     public PageUtil.Page<Group4Web> queryMonitorGroupPage(QueryMonitorGroupPageParam pa) {
         Page<Group4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        IPage<Group4Web> pageData= tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getName(), pa.getMonitorItemID(), true);
+        IPage<Group4Web> pageData= tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getGroupName(), pa.getSecondaryGroupName(), pa.getMonitorItemID(), true);
         if (CollectionUtils.isEmpty(pageData.getRecords())){
             return PageUtil.Page.empty();
         }
