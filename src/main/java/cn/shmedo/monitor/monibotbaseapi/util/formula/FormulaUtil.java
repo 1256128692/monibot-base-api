@@ -95,7 +95,7 @@ public class FormulaUtil {
 
         //检查参数是否设值
         collection.stream().filter(e -> e.getFieldValue() == null).findFirst().ifPresent(e -> {
-            throw new RuntimeException(StrUtil.format("参数: {} 未设值", e.getOrigin()));
+            throw new IllegalArgumentException(StrUtil.format("参数 {} 未设值", e.getOrigin()));
         });
 
         log.debug("原始公式：{}", formula);

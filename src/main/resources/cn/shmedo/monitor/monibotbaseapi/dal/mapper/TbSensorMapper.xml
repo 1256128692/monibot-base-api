@@ -312,7 +312,7 @@
               </if>
           </trim>
       </where>
-      ORDER BY ts.UpdateTime DESC
+      ORDER BY ts.CreateTime DESC
   </select>
 
   <select id="getNameSerialNumber" resultType="java.lang.Integer">

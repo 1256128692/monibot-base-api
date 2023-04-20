@@ -83,6 +83,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} monitorPointLocation 监测点位置
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
+     * @apiSuccess (返回结果) {Int} metadataID 数据源ID
+     * @apiSuccess (返回结果) {String} metadataToken 数据源token
      * @apiSuccess (返回结果) {String} compareRule 比较区间json
      * @apiSuccess (返回结果) {String} triggerRule 触发规则json
      * @apiSuccess (返回结果) {Int} workOrderID 工单ID
