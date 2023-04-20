@@ -73,6 +73,8 @@ public class Param {
         } else {
             param.setName(model.getModelName() + data.getProvide().getValue());
         }
+        param.setOrigin(data.getOrigin());
+        param.setType(data.getType().name());
         return param;
     }
 

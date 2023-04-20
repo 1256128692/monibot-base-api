@@ -15,6 +15,8 @@ public class DbConstant {
 
     public static final String DENSITY_HOUR = "h";
 
+    public static final String DENSITY_MINUTE = "m";
+
 
     public static final String SENSOR_ID_FIELD_TOKEN = "sensorID";
 
