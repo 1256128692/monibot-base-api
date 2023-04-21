@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -56,6 +57,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
 
     @Override
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
-        return this.baseMapper.queryWarnDetail(param.getWarnID());
+        return FieldShowUtil.dealFieldShow(this.baseMapper.queryWarnDetail(param.getWarnID()));
     }
+
 }

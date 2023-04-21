@@ -161,6 +161,7 @@
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmt.MonitorType monitorTypeID,
+            tmt.MonitorType monitorType,
             tmt.TypeName monitorTypeName,
             tmt.TypeAlias monitorTypeAlias,
             tmi.`ID` monitorItemID,
@@ -174,8 +175,7 @@
             twl.WarnTime warnTime,
             twt.CompareRule compareRule,
             twt.TriggerRule triggerRule,
-            tmtf.ID metadataID,
-            tmtf.FieldToken metadataToken,
+            tmtf.FieldToken fieldToken,
             two.ID workOrderID,
             two.OrderCode workOrderCode
         FROM tb_warn_log twl

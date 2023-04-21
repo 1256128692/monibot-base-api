@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.wtengine;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IFieldName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -12,12 +14,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class WtTriggerActionInfo extends TbWarnAction {
+public class WtTriggerActionInfo extends TbWarnAction implements IFieldName {
     private Integer engineID;
     private String warnName;
     private Integer warnLevel;
     private Integer warnID;     //冗余,保证一定有报警状态ID
-    private Integer fieldID;
+    @JsonIgnore
+    private Integer monitorType;
+    @JsonIgnore
+    private String fieldName;
+    private String fieldToken;
     private String compareRule;
     private String triggerRule;
     private final List<TbWarnAction> action = new ArrayList<>();
@@ -38,6 +44,6 @@ public class WtTriggerActionInfo extends TbWarnAction {
     public static WtWarnStatusDetailInfo buildDetail(WtTriggerActionInfo info) {
         WtWarnStatusDetailInfo res = new WtWarnStatusDetailInfo();
         BeanUtil.copyProperties(info, res);
-        return res.setMetadataID(info.getFieldID());
+        return res;
     }
 }

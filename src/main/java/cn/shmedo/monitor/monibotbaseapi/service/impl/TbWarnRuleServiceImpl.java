@@ -21,6 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -130,11 +131,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                                 WtTriggerActionInfo::getWarnID, info -> info.setAction(info), WtTriggerActionInfo::setAction))
                         .values().stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)).get(engineID))
                 .ifPresent(warnList -> {
-                    List<Integer> fieldList = warnList.stream().map(WtTriggerActionInfo::getFieldID).toList();
-                    Map<Integer, String> fieldIdNameMap = tbMonitorTypeFieldMapper.selectBatchIds(fieldList).stream()
-                            .collect(Collectors.toMap(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName));
                     List<WtWarnStatusDetailInfo> dataList = warnList.stream().map(WtTriggerActionInfo::buildDetail)
-                            .map(u -> u.setMetadataName(fieldIdNameMap.getOrDefault(u.getMetadataID(), "--"))).toList();
+                            .map(FieldShowUtil::dealFieldShow).toList();
                     build.setDataList(dataList);
                 });
         return build;
@@ -169,7 +167,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 Tuple<TbWarnTrigger, List<TbWarnAction>> tuple = new Tuple<>();
                 TbWarnTrigger trigger = new TbWarnTrigger();
                 BeanUtil.copyProperties(u, trigger);
-                trigger.setFieldID(u.getMetadataID());
+                trigger.setFieldToken(u.getFieldToken());
                 trigger.setID(u.getWarnID());
                 //ensure their relation won't be changed and tbWarnTriggerService would set one column at least.
                 trigger.setRuleID(engineID);

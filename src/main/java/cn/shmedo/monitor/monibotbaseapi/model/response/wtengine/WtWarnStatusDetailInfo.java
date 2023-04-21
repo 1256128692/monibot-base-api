@@ -8,7 +8,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
 public class WtWarnStatusDetailInfo extends WtWarnStatusInfo {
-    private Integer metadataID;
+    private String fieldToken;
     private String metadataName;
     private String triggerRule;
 }

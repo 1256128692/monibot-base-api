@@ -97,8 +97,8 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} dataList.warnID 报警状态ID
      * @apiSuccess (返回结果) {String} dataList.warnName 报警名称
      * @apiSuccess (返回结果) {Int} dataList.warnLevel 报警等级
-     * @apiSuccess (返回结果) {Int} dataList.metadataID 源数据ID
-     * @apiSuccess (返回结果) {String} dataList.metadataName 源数据名称
+     * @apiSuccess (返回结果) {Int} dataList.fieldToken 源数据Token
+     * @apiSuccess (返回结果) {String} dataList.fieldName 源数据名称
      * @apiSuccess (返回结果) {String} dataList.compareRule 比较区间json
      * @apiSuccess (返回结果) {String} dataList.triggerRule 触发规则json
      * @apiSuccess (返回结果) {Object[]} [dataList.action] 动作描述list
@@ -156,7 +156,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} [dataList.warnID] 报警状态ID,若没有视为新增
      * @apiParam (请求参数) {String} dataList.warnName 报警名称
      * @apiParam (请求参数) {Int} dataList.warnLevel 报警等级
-     * @apiParam (请求参数) {Int} dataList.metadataID 源数据ID
+     * @apiParam (请求参数) {Int} dataList.fieldToken 源数据IToken
      * @apiParam (请求参数) {String} dataList.compareRule 比较区间json
      * @apiParam (请求参数) {String} dataList.triggerRule 触发规则json
      * @apiParam (请求参数) {Object[]} [dataList.action] 动作描述list

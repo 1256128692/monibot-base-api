@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IFieldToken;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IMonitorType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
@@ -9,12 +12,14 @@ import java.util.Date;
  * @date: 2023-04-14 17:13
  */
 @Data
-public class WtWarnDetailInfo {
+public class WtWarnDetailInfo implements IFieldToken, IMonitorType {
     private Integer warnID;
     private String warnName;
     private Integer projectID;
     private String projectName;
     private Integer monitorTypeID;
+    @JsonIgnore
+    private Integer monitorType;
     private String monitorTypeName;
     private String monitorTypeAlias;
     private Integer monitorItemID;
@@ -26,8 +31,7 @@ public class WtWarnDetailInfo {
     private String monitorPointLocation;
     private String installLocation;
     private Date warnTime;
-    private Integer metadataID;
-    private String metadataToken;
+    private String fieldToken;
     private String compareRule;
     private String triggerRule;
     private Integer workOrderID;

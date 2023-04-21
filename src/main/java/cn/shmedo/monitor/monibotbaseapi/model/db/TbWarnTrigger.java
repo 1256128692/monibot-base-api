@@ -17,8 +17,8 @@ public class TbWarnTrigger {
     private Integer ruleID;
     @TableField("WarnLevel")
     private Integer warnLevel;
-    @TableField("FieldID")
-    private Integer fieldID;
+    @TableField("FieldToken")
+    private String fieldToken;
     @TableField("`Name`")
     private String warnName;
     @TableField("CompareRule")

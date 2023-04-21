@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -73,9 +74,12 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             }
         }
         if (Objects.nonNull(monitorPointID)) {
+            if (Objects.isNull(monitorItemID)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "编辑监测点位时,必须传入相应的监测项目");
+            }
             TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
             if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
-                    .eq(TbMonitorPoint::getID, monitorPointID)) < 1) {
+                    .eq(TbMonitorPoint::getID, monitorPointID).eq(TbMonitorPoint::getMonitorItemID, monitorItemID)) < 1) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点位不存在");
             }
         }
@@ -90,11 +94,12 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             // 可空ID -> warnID、actionID,若为空视为新增的 告警状态、动作,所以校验 规则、告警状态、动作 三者间关系时要排除新增的部分
             List<Tuple<Integer, Integer>> updateTriggerRuleIDList = new ArrayList<>();
             List<Tuple<Integer, Integer>> updatActionTriggerIDList = new ArrayList<>();
-            Set<Integer> fieldSet = new HashSet<>();
+//            Set<Tuple<Integer, String>> fieldSet = new HashSet<>(); TODO 暂时对数据源不做校验
             Set<Integer> actionTypeSet = new HashSet<>();
             Tuple<Integer, String> checkTriggerTuple = new Tuple<>();
             Tuple<Integer, String> checkActionTuple = new Tuple<>();
-            dataList.stream().peek(u -> Optional.ofNullable(u.getMetadataID()).ifPresent(fieldSet::add))
+            dataList.stream()
+//                    .peek(u -> Optional.ofNullable(u.getFieldToken()).filter(FieldShowUtil::notBelongSpecialType).ifPresent()) TODO 暂时对数据源不做校验
                     .peek(u -> {
                         Integer warnID = u.getWarnID();
                         String warnName = u.getWarnName();
@@ -103,7 +108,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
                                 Assert.notEmpty(warnName, "请输入报警名称");
                                 Assert.notNull(u.getWarnLevel(), "请选择报警等级");
                                 Assert.checkBetween(u.getWarnLevel(), 1, 4, "报警等级不合法");
-                                Assert.notNull(u.getMetadataID(), "请选择源数据");
+                                Assert.notNull(u.getFieldToken(), "请选择源数据");
                                 Assert.notEmpty(u.getCompareRule(), "请选择比较区间");
                                 Assert.notEmpty(u.getTriggerRule(), "请完善误判过滤条件");
                             } catch (Throwable e) {
@@ -156,13 +161,14 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
             if (actionTypeSet.stream().anyMatch(u -> u < 1 || u > 4)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有动作类型不合法");
             }
-            if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(fieldSet)) {
-                TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
-                if (fieldSet.size() != tbMonitorTypeFieldMapper.selectCount(
-                        new LambdaQueryWrapper<TbMonitorTypeField>().in(TbMonitorTypeField::getID, fieldSet))) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有数据源不存在");
-                }
-            }
+//            TODO 暂时对数据源不做校验
+//            if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(fieldSet)) {
+//                TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+//                if (fieldSet.size() != tbMonitorTypeFieldMapper.selectCount(
+//                        new LambdaQueryWrapper<TbMonitorTypeField>().in(TbMonitorTypeField::getID, fieldSet))) {
+//                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有数据源不存在");
+//                }
+//            }
             if (cn.hutool.core.collection.CollectionUtil.isNotEmpty(updateTriggerRuleIDList)) {
                 if (updateTriggerRuleIDList.size() != tbWarnTriggerMapper.selectRuleTriggerCount(updateTriggerRuleIDList)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有需修改的告警状态不合法");

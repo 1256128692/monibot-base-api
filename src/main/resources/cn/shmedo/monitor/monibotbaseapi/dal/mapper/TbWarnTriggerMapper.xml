@@ -10,7 +10,9 @@
             twr.RuleID engineID,
             twr.`Name` warnName,
             twr.WarnLevel warnLevel,
-            twr.FieldID fieldID,
+            tmtf.FieldName fieldName,
+            twr.FieldToken fieldToken,
+            twr.MonitorType monitorType,
             twr.CompareRule compareRule,
             twr.TriggerRule triggerRule,
             twa.ID,
@@ -21,6 +23,7 @@
         FROM
             tb_warn_trigger twr
         LEFT JOIN tb_warn_action twa ON twr.ID = twa.triggerID
+        LEFT JOIN tb_monitor_type_field tmtf ON twr.FieldToken = tmtf.FieldToken AND twr.MonitorType = tmtf.MonitorType
         WHERE twr.RuleID IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item}
