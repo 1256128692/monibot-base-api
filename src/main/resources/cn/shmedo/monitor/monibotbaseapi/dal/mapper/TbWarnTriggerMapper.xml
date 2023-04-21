@@ -6,15 +6,15 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo"
             parameterType="list">
         SELECT
-            twr.ID warnID,
-            twr.RuleID engineID,
-            twr.`Name` warnName,
-            twr.WarnLevel warnLevel,
+            twt.ID warnID,
+            twt.RuleID engineID,
+            twt.`Name` warnName,
+            twt.WarnLevel warnLevel,
             tmtf.FieldName fieldName,
-            twr.FieldToken fieldToken,
+            twt.FieldToken fieldToken,
             twr.MonitorType monitorType,
-            twr.CompareRule compareRule,
-            twr.TriggerRule triggerRule,
+            twt.CompareRule compareRule,
+            twt.TriggerRule triggerRule,
             twa.ID,
             twa.triggerID,
             twa.ActionType actionType,
@@ -22,10 +22,11 @@
             twa.`Desc` `desc`,
             twa.`Enable` `enable`
         FROM
-            tb_warn_trigger twr
-        LEFT JOIN tb_warn_action twa ON twr.ID = twa.triggerID
-        LEFT JOIN tb_monitor_type_field tmtf ON twr.FieldToken = tmtf.FieldToken AND twr.MonitorType = tmtf.MonitorType
-        WHERE twr.RuleID IN
+            tb_warn_trigger twt
+        LEFT JOIN tb_warn_action twa ON twt.ID = twa.triggerID
+        LEFT JOIN tb_warn_rule twr ON twr.ID = twt.RuleID
+        LEFT JOIN tb_monitor_type_field tmtf ON twt.FieldToken = tmtf.FieldToken AND twr.MonitorType = tmtf.MonitorType
+        WHERE twt.RuleID IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
