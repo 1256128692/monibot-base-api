@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 
@@ -424,5 +426,29 @@ public class TimeUtil {
             // 倒序
             return MapUtil.sort(groupedMaps, Comparator.reverseOrder());
         }
+    }
+
+
+    /**
+     * 根据开始时间和结束时间去返回list,每个对象是每天的8点到第二天的8点
+     * @param begin
+     * @param end
+     * @return
+     */
+    public static List<Map<String, Timestamp>> getDailyTimestampList(Timestamp begin, Timestamp end) {
+        List<Map<String, Timestamp>> resultList = new ArrayList<>();
+        DateTime current = new DateTime(begin);
+        while (current.before(end)) {
+            Map<String, Timestamp> resultMap = new LinkedHashMap<>();
+            resultMap.put("begin", new Timestamp(DateUtil.offsetHour(DateUtil.beginOfDay(current), 8).getTime()));
+            current = DateUtil.offsetDay(current, 1);
+            resultMap.put("end", new Timestamp(DateUtil.offsetHour(DateUtil.beginOfDay(current), 8).getTime()));
+            resultList.add(resultMap);
+        }
+        Map<String, Timestamp> resultMap = new LinkedHashMap<>();
+        resultMap.put("begin", new Timestamp(DateUtil.offsetHour(DateUtil.beginOfDay(current), 8).getTime()));
+        resultMap.put("end", new Timestamp(DateUtil.offsetHour(DateUtil.endOfDay(end), 8).getTime()));
+        resultList.add(resultMap);
+        return resultList;
     }
 }
