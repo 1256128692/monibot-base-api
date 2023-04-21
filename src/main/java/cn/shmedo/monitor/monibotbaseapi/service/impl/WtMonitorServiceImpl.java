@@ -726,8 +726,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理雨量历史时间段的当前雨量
             handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(pa.getBegin()), 32);
-            List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList, pa.getBegin(), new Timestamp(endTime.getTime()));
+            List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList, pa.getBegin(), pa.getEnd());
             if (!CollectionUtil.isNullOrEmpty(dailyRainData)) {
                 if (dailyRainData.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
                     dailyRainfall = (Double) dailyRainData.get(0).get(DbConstant.DAILY_RAINFALL);

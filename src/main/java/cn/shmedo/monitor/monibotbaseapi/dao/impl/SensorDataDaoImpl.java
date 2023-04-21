@@ -395,7 +395,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
     public List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
                                                                    boolean raw, Integer limitCount, Integer monitorType) {
 
-        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
+        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11_data
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
 
 //        DateTime endTime = DateUtil.date();
@@ -429,13 +429,16 @@ public class SensorDataDaoImpl implements SensorDataDao {
     @Override
     public List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
 
-        String beginString = TimeUtil.formatInfluxTimeString(begin);
-        String endString = TimeUtil.formatInfluxTimeString(end);
+        DateTime startTime = DateUtil.offsetHour(DateUtil.beginOfDay(begin), 8);
+        DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 32);
+
+        String beginString = TimeUtil.formatInfluxTimeString(new Timestamp(startTime.getTime()));
+        String endString = TimeUtil.formatInfluxTimeString(new Timestamp(endTime.getTime()));
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
 
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select sum(v1) as dailyRainfall from tb_5 ");
+        sqlBuilder.append("select sum(v1) as dailyRainfall from tb_5_data ");
         sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
