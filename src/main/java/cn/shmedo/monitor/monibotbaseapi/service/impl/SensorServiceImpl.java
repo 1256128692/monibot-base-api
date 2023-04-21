@@ -326,7 +326,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
 
         Map<Origin.Type, Set<FormulaData>> sourceMap = result.getFieldList().stream()
-                .flatMap(e -> FormulaUtil.parse(e.getFormula()).stream())
+                .flatMap(e -> FormulaUtil.parse(e.getFormula(), null).stream())
                 .collect(Collectors.toMap(FormulaData::getType, CollUtil::newHashSet, (a, b) -> {
                     a.addAll(b);
                     return a;
@@ -386,11 +386,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             case FORMULA:
                 Dict fieldValueMap = Dict.create();
                 result = request.getFieldList().stream().map(f -> {
-                    Object item = FormulaUtil.calculate(f.getFormula(), typeListMap -> {
+                    Double item = FormulaUtil.calculate(f.getFormula(), null, typeListMap -> {
                         typeListMap.forEach((type, sources) ->
                             sources.forEach(source ->
                                     source.setFieldValue(Origin.Type.SELF.equals(type) ?
-                                            fieldValueMap.get(source.getFieldToken()) :
+                                            fieldValueMap.getDouble(source.getFieldToken()) :
                                             request.getParamMap().get(source.getOrigin())))
                         );
                     });

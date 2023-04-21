@@ -51,7 +51,7 @@ public class FormulaData implements Serializable {
     /**
      * 字段值
      */
-    private Object fieldValue;
+    private Double fieldValue;
 
     /**
      * 开始时间
@@ -68,9 +68,12 @@ public class FormulaData implements Serializable {
      *
      * @param fieldValue 字段值
      */
-    public void setFieldValue(Object fieldValue) {
-        if (Provide.DATA.equals(provide)) {
-            this.fieldValue = fieldValue;
+    public void setFieldValue(Double fieldValue) {
+        if (fieldValue != null) {
+            this.fieldValue = Provide.DATA.equals(provide) ?
+                    fieldValue:
+                    Provide.UNIXMILLI.equals(provide) ?
+                            fieldValue : fieldValue / 1000;
         }
     }
 
@@ -80,9 +83,9 @@ public class FormulaData implements Serializable {
      * @param fieldValue 字段值(必须为时间)
      */
     public void setFieldValue(Date fieldValue) {
-        if (!Provide.DATA.equals(provide)) {
-            this.fieldValue = Provide.UNIXMILLI.equals(provide) ?
-                    fieldValue.getTime() : fieldValue.getTime() / 1000;
+        if (fieldValue != null && !Provide.DATA.equals(provide)) {
+            this.fieldValue = (double) (Provide.UNIXMILLI.equals(provide) ?
+                    fieldValue.getTime() : fieldValue.getTime() / 1000);
         }
     }
 

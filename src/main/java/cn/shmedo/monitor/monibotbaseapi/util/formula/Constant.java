@@ -14,5 +14,5 @@ public class Constant {
     public static final String BEGIN_DATE = "beginDate";
     public static final String END_DATE = "endDate";
     public static final String FORMAT = "format";
-
+    public static final String SELF_TIME = "self.time";
 }

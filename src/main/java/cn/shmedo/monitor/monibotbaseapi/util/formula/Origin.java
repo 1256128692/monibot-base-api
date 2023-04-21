@@ -58,7 +58,7 @@ public class Origin implements Serializable {
         }
 
         if (parts.length > 2) {
-            String last = StrUtil.join(StrUtil.COLON, ArrayUtil.sub(parts, 2, parts.length));
+            String last =  ArrayUtil.join(ArrayUtil.sub(parts, 2, parts.length), StrUtil.COLON);
             result.params = StrUtil.split(last, Constant.AND).stream()
                     .map(e -> e.split(Constant.EQUAL))
                     .map(e -> MapUtil.entry(e[0], e[1]))
