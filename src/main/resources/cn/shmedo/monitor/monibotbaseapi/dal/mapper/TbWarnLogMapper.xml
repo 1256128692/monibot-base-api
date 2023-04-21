@@ -57,7 +57,7 @@
                      OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
-            AND twl.monitorTypeID=#{param.monitorTypeID}
+            AND twl.monitorType=#{param.monitorTypeID}
         </if>
         <if test="param.monitorItemID != null">
             AND twl.monitorItemID=#{param.monitorItemID}
@@ -111,7 +111,7 @@
             OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
-            AND twl.monitorTypeID=#{param.monitorTypeID}
+            AND twl.monitorType=#{param.monitorTypeID}
         </if>
         <if test="param.monitorItemID != null">
             AND twl.monitorItemID=#{param.monitorItemID}
@@ -144,7 +144,7 @@
             OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
-            AND twl.monitorTypeID=#{param.monitorTypeID}
+            AND twl.monitorType=#{param.monitorTypeID}
         </if>
         <if test="param.monitorItemID != null">
             AND twl.monitorItemID=#{param.monitorItemID}
@@ -175,7 +175,7 @@
             twl.WarnTime warnTime,
             twt.CompareRule compareRule,
             twt.TriggerRule triggerRule,
-            tmtf.FieldToken fieldToken,
+            twt.FieldToken fieldToken,
             two.ID workOrderID,
             two.OrderCode workOrderCode
         FROM tb_warn_log twl
@@ -184,7 +184,6 @@
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
-            LEFT JOIN tb_monitor_type_field tmtf ON twt.FieldID = tmtf.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
         WHERE twl.`ID`=#{warnID}
     </select>
