@@ -400,7 +400,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 pa.getFieldList()
         );
         setMonitorTypeCache(
-                tbMonitorTypeMapper.selectByPrimaryKey(pa.getMonitorType()),
+                tbMonitorTypeMapper.queryByType(pa.getMonitorType()),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
         );
     }
@@ -449,7 +449,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public void deleteMonitorTypeFieldBatch(Integer monitorType, List<Integer> fieldIDList) {
         tbMonitorTypeFieldMapper.deleteBatchIds(fieldIDList);
         setMonitorTypeCache(
-                tbMonitorTypeMapper.selectByPrimaryKey(monitorType),
+                tbMonitorTypeMapper.queryByType(monitorType),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true)
         );
     }
