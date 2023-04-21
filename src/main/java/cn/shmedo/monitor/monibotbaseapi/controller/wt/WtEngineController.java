@@ -166,6 +166,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} dataList.action.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
      * @apiParam (请求参数) {String} dataList.action.actionTarget 动作目标json,推送的企业通讯录信息
      * @apiParam (请求参数) {String} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiParam (请求参数) {Boolean} dataList.action.enable 是否开启
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
