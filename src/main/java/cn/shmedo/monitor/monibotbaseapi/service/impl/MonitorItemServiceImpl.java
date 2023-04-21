@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -139,6 +140,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             tbMonitorItem.setCreateUserID(userID);
             tbMonitorItem.setUpdateTime(now);
             tbMonitorItem.setUpdateUserID(userID);
+            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
         tbMonitorItemMapper.insertBatch(map.keySet());
         map.forEach((key, value)->{

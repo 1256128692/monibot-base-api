@@ -19,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
@@ -124,6 +125,23 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             );
             Map<Integer, List<TbMonitorItemField>> temp = tbMonitorItemFields.stream().collect(Collectors.groupingBy(TbMonitorItemField::getMonitorItemID));
             Map<TbMonitorItem, List<TbMonitorItemField>> map = new HashMap<>();
+            Date now = new Date();
+            for (TbMonitorItem tbMonitorItem : pa.getMonitorItems()) {
+                map.put(tbMonitorItem, temp.get(tbMonitorItem.getID()));
+                tbMonitorItem.setProjectID(tbProjectInfo.getID());
+                tbMonitorItem.setCreateTime(now);
+                tbMonitorItem.setCreateUserID(userID);
+                tbMonitorItem.setUpdateTime(now);
+                tbMonitorItem.setUpdateUserID(userID);
+                tbMonitorItem.setCreateType(CreateType.CUSTOMIZED.getType());
+            }
+            tbMonitorItemMapper.insertBatch(map.keySet());
+            map.forEach((key, value)->{
+                value.forEach(item ->{
+                    item.setMonitorItemID(key.getID());
+                });
+            });
+            tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
         }
 
         // 新增项目权限
