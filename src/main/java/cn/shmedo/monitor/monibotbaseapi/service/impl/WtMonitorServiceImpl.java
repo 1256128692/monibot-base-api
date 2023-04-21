@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -357,8 +358,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Object temperature = currentSensorData.get("temperature");
             if (ObjectUtil.isNotNull(phosphorusTotal)) {
                 // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("dissolvedOxygen"));
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
                 int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
                 int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
                 int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
@@ -368,7 +369,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
             } else if (ObjectUtil.isNotNull(temperature)) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
-                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("turbidity"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
@@ -720,17 +721,19 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         Double dailyRainfall = 0.0;
         List<Map<String, Object>> resultList = null;
+        List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
             resultList = handleDataOrder(maps, pa.getEnd());
             // 处理雨量历史时间段的当前雨量
             handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(pa.getBegin()), 32);
-            List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList, pa.getBegin(), new Timestamp(endTime.getTime()));
-            if (!CollectionUtil.isNullOrEmpty(dailyRainData)) {
-                if (dailyRainData.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
-                    dailyRainfall = (Double) dailyRainData.get(0).get(DbConstant.DAILY_RAINFALL);
+            dailyRainfallList = handleDailyRainfallList(pa.getBegin(), pa.getEnd(), sensorIDList, dailyRainfall);
+            if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
+                if (dailyRainfallList.size() == 1){
+                    if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
+                        dailyRainfall = (Double) dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL);
+                    }
                 }
             }
         }
@@ -739,7 +742,28 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
+    }
+
+    private List<Map<String, Object>> handleDailyRainfallList(Timestamp begin, Timestamp end,
+                                                              List<Integer> sensorIDList, Double dailyRainfall) {
+
+        DateTime startTime = null;
+        DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 32);
+
+        // 判断如果开始时间与结束时间的差距超过2天,那么就去处理开始时间,开始时间为开始时间的当天8点,返回日降雨量数据列表
+        // 否则就处理开始时间,开始时间为最近一天时间的当天8点,返回日降雨量数据列表(单个)
+        long between = DateUtil.between(DateUtil.beginOfDay(begin), DateUtil.beginOfDay(end), DateUnit.DAY);
+        if (between > 2) {
+            startTime = DateUtil.offsetHour(DateUtil.beginOfDay(begin), 8);
+        } else {
+            startTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 8);
+        }
+
+
+        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
+                new Timestamp(startTime.getTime()), new Timestamp(endTime.getTime()));
+        return dailyRainData;
     }
 
     /**
@@ -1149,7 +1173,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
                     BigDecimal bd2 = new BigDecimal(clock8v1);
                     BigDecimal result = rounded.subtract(bd2);
-                    todayDataList.get(i).put("currentRainfall", result);
+                    BigDecimal finalResult = result.setScale(2, BigDecimal.ROUND_HALF_UP);
+                    todayDataList.get(i).put("currentRainfall", finalResult);
                 }
             }
         }

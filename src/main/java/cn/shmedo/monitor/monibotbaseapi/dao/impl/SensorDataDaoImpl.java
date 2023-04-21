@@ -395,7 +395,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
     public List<Map<String, Object>> querySensorNewDataByCondition(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList,
                                                                    boolean raw, Integer limitCount, Integer monitorType) {
 
-        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11
+        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11_data
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
 
 //        DateTime endTime = DateUtil.date();
@@ -426,27 +426,45 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    /**
+     * @param sensorIDList
+     * @param begin
+     * @param end
+     * @return
+     */
     @Override
     public List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
 
-        String beginString = TimeUtil.formatInfluxTimeString(begin);
-        String endString = TimeUtil.formatInfluxTimeString(end);
-        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                .collect(Collectors.joining(" or "));
-
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select sum(v1) as dailyRainfall from tb_5 ");
-        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
-        String sql = sqlBuilder.toString();
-        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-
+        List<Map<String, Timestamp>> dailyTimestampList = TimeUtil.getDailyTimestampList(begin, end);
         List<String> selectField = new LinkedList<>();
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
         selectField.add(DbConstant.DAILY_RAINFALL);
 
+        if (CollectionUtil.isNullOrEmpty(dailyTimestampList)) {
+            return null;
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (Map<String, Timestamp> map : dailyTimestampList) {
+            Timestamp beginTimestamp = map.get("begin");
+            Timestamp endTimestamp = map.get("end");
+
+            String beginString = TimeUtil.formatInfluxTimeString(beginTimestamp);
+            String endString = TimeUtil.formatInfluxTimeString(endTimestamp);
+            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                    .collect(Collectors.joining(" or "));
+
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("select sum(rainfall) as dailyRainfall from tb_5_data ");
+            sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
+            result.append(sqlBuilder);
+
+        }
+        String sql = result.toString();
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 

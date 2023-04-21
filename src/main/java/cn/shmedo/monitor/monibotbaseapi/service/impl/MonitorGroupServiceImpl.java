@@ -31,10 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -53,6 +50,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     private final FileService fileService;
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorPointMapper tbMonitorPointMapper;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addMonitorGroup(AddMonitorGroupParam pa, Integer userID) {
@@ -99,8 +97,8 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     public void updateMonitorGroup(UpdateMonitorGroupParam pa, Integer userID) {
         Date now = new Date();
-        tbMonitorGroupMapper.updateByPrimaryKey( pa.update(now, userID));
-        if (CollectionUtils.isNotEmpty(pa.getMonitorItemIDList())){
+        tbMonitorGroupMapper.updateByPrimaryKey(pa.update(now, userID));
+        if (CollectionUtils.isNotEmpty(pa.getMonitorItemIDList())) {
             tbMonitorGroupItemMapper.delete(
                     new QueryWrapper<TbMonitorGroupItem>().lambda().eq(TbMonitorGroupItem::getMonitorGroupID, pa.getGroupID())
             );
@@ -112,7 +110,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                     tbMonitorGroupItemList
             );
         }
-        if (CollectionUtils.isNotEmpty(pa.getMonitorPointIDList())){
+        if (CollectionUtils.isNotEmpty(pa.getMonitorPointIDList())) {
             tbMonitorGroupPointMapper.delete(
                     new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID())
             );
@@ -128,13 +126,13 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
 
     @Override
     public String uploadMonitorGroupImage(UploadMonitorGroupImageParam pa, Integer userID) {
-        AddFileUploadRequest pojo = ParamBuilder.buildAddFileUploadRequest(pa.getImageContent(),pa.getImageSuffix(),userID,pa.getFileName(),pa.getCompanyID());
+        AddFileUploadRequest pojo = ParamBuilder.buildAddFileUploadRequest(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName(), pa.getCompanyID());
         ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         String path = null;
         if (!info.apiSuccess()) {
-            throw new CustomBaseException(info.getCode(), ErrorConstant.IMAGE_INSERT_FAIL) ;
+            throw new CustomBaseException(info.getCode(), ErrorConstant.IMAGE_INSERT_FAIL);
         } else {
-            path  = info.getData().getPath();
+            path = info.getData().getPath();
         }
         tbMonitorGroupMapper.updateImg(path, pa.getGroupID(), userID, new Date());
         return fileService.getFileUrl(path);
@@ -148,12 +146,12 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     public PageUtil.Page<Group4Web> queryMonitorGroupPage(QueryMonitorGroupPageParam pa) {
         Page<Group4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        IPage<Group4Web> pageData= tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getName(), pa.getMonitorItemID(), true);
-        if (CollectionUtils.isEmpty(pageData.getRecords())){
+        IPage<Group4Web> pageData = tbMonitorGroupMapper.queryPage(page, pa.getProjectID(), pa.getGroupName(), pa.getSecondaryGroupName(), pa.getMonitorItemID(), true);
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
         List<Integer> groupIDList = pageData.getRecords().stream().map(Group4Web::getID).collect(Collectors.toList());
-        List<Group4Web>  sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(groupIDList);
+        List<Group4Web> sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(groupIDList);
         // 处理监测项目和监测点
         handleGroup4Web(pageData.getRecords(), sonGroupList);
         // 处理额外字段
@@ -165,28 +163,34 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             item.setGroupID(item.getID());
             item.setGroupName(item.getName());
         });
-        return new PageUtil.Page<>( pageData.getTotal(),pageData.getRecords(),  pageData.getSize());
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
+    /**
+     * 处理监测项目和监测点
+     * @param parentGroupList  可以为一级或二级
+     * @param sonGroupList
+     */
     private void handleGroup4Web(List<Group4Web> parentGroupList, List<Group4Web> sonGroupList) {
-        List<Integer> allGroupIDList = new java.util.ArrayList<>(parentGroupList.stream().map(Group4Web::getID).toList());
-        allGroupIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
-        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allGroupIDList);
+        List<Integer> allMonitorItemIDList = new ArrayList<>();
+        allMonitorItemIDList.addAll(parentGroupList.stream().map(Group4Web::getID).toList());
+        allMonitorItemIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
+        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allMonitorItemIDList);
         Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
-
-
-        List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(allGroupIDList);
+        List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(allMonitorItemIDList);
         Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
+
         sonGroupList.forEach(
                 group -> {
-                    group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
                     group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
+                    group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
                 });
         parentGroupList.forEach(
                 group -> {
                     group.setChildGroupList(sonGroupList.stream().filter(sonGroup -> sonGroup.getParentID().equals(group.getID())).collect(Collectors.toList()));
                     group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
                     group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
+
                 }
         );
     }
@@ -195,10 +199,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     public Group4Web queryMonitorGroupDetail(TbMonitorGroup tbMonitorGroup) {
         Group4Web group4Web = new Group4Web();
         BeanUtil.copyProperties(tbMonitorGroup, group4Web);
-        if (StrUtil.isNotBlank(group4Web.getImagePath())){
+        if (StrUtil.isNotBlank(group4Web.getImagePath())) {
             group4Web.setImgURL(fileService.getFileUrl(group4Web.getImagePath()));
         }
-        List<Group4Web>  sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(List.of(group4Web.getID()));
+        List<Group4Web> sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(List.of(group4Web.getID()));
         handleGroup4Web(List.of(group4Web), sonGroupList);
 
         group4Web.setGroupID(group4Web.getID());

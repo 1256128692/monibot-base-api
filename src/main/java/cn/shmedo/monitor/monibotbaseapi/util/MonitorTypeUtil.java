@@ -15,6 +15,7 @@ public class MonitorTypeUtil {
             result.append("raw_");
         }
         result.append(monitorType);
+        result.append("_data");
         if (avg) {
             result.append("_avg");
         }

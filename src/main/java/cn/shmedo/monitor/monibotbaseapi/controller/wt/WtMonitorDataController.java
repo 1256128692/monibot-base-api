@@ -431,6 +431,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {Object[]} dailyRainfallList   日降雨量列表
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */

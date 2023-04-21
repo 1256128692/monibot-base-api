@@ -294,25 +294,34 @@
                LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
       <where>
-          <trim suffixOverrides="AND">
-              <if test="pa.sensorName != null and pa.sensorName != ''">
-                  ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
-                    AND
-              </if>
-              <if test="pa.monitorType != null and pa.monitorType != ''">
-                  tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
-                    AND
-              </if>
-              <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
-                  tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
-                    AND
-              </if>
-              <if test="pa.projectID != null and pa.projectID != ''">
-                  ts.ProjectID = #{pa.projectID} AND
-              </if>
-          </trim>
+        <trim suffixOverrides="AND">
+          <if test="pa.sensorName != null and pa.sensorName != ''">
+            ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
+            AND
+          </if>
+          <if test="pa.sensorID != null">
+            ts.ID = #{pa.sensorID} AND
+          </if>
+          <if test="pa.monitorType != null and pa.monitorType != ''">
+            tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
+            AND
+          </if>
+          <if test="pa.monitorTypeID != null">
+            tmt.ID = #{pa.monitorTypeID} AND
+          </if>
+          <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
+            tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
+            AND
+          </if>
+          <if test="pa.monitorPointID != null">
+            tmp.ID = #{pa.monitorPointID} AND
+          </if>
+          <if test="pa.projectID != null">
+            ts.ProjectID = #{pa.projectID} AND
+          </if>
+        </trim>
       </where>
-      ORDER BY ts.UpdateTime DESC
+      ORDER BY ts.CreateTime DESC
   </select>
 
   <select id="getNameSerialNumber" resultType="java.lang.Integer">
@@ -342,15 +351,24 @@
           ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
             AND
         </if>
-        <if test="pa.monitorType != null and pa.monitorType != ''">
+        <if test="pa.sensorID != null">
+          ts.ID = #{pa.sensorID} AND
+        </if>
+        <if test="pa.monitorType != null">
           tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
             AND
+        </if>
+        <if test="pa.monitorTypeID != null">
+          tmt.ID = #{pa.monitorTypeID} AND
         </if>
         <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
           tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
             AND
         </if>
-        <if test="pa.projectID != null and pa.projectID != ''">
+        <if test="pa.monitorPointID != null">
+          tmp.ID = #{pa.monitorPointID} AND
+        </if>
+        <if test="pa.projectID != null">
           ts.ProjectID = #{pa.projectID} AND
         </if>
       </trim>

@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -139,6 +140,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             tbMonitorItem.setCreateUserID(userID);
             tbMonitorItem.setUpdateTime(now);
             tbMonitorItem.setUpdateUserID(userID);
+            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
         tbMonitorItemMapper.insertBatch(map.keySet());
         map.forEach((key, value)->{
@@ -187,6 +189,25 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             });
         }
         return list;
+    }
+
+    @Override
+    public List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa) {
+        QueryWrapper<TbMonitorItem> queryWrapper = new QueryWrapper<>();
+        if (pa.getCreateType() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
+        }
+        if(pa.getCompanyID()!=null){
+            queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
+
+        }
+        if (pa.getProjectID() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
+        }
+        queryWrapper.orderByDesc("ID");
+        return tbMonitorItemMapper.selectList(
+                queryWrapper
+        );
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {

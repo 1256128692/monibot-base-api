@@ -219,4 +219,28 @@ public class MonitorItemController {
     public Object queryMonitorItemList(@RequestBody @Validated QueryMonitorItemListParam pa) {
         return monitorItemService.queryMonitorItemList(pa);
     }
+
+    /**
+     * @api {POST} /QuerySuperMonitorItemList 查询系统监测项目列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测项目模块
+     * @apiName QuerySuperMonitorItemList
+     * @apiDescription 查询系统监测项目列表
+     * @apiParam (请求参数) {Int} [createType] 创建类型
+     * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
+     * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
+     * @apiSuccess (返回结果) {Object[]} list 监测项目列表
+     * @apiSuccess (返回结果) {Int} list.id 监测项目ID
+     * @apiSuccess (返回结果) {String} list.name 监测项目名称
+     * @apiSuccess (返回结果) {String} list.alias 监测项目别名
+     * @apiSuccess (返回结果) {Boolean} list.enable 是否开启
+     * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
+     * @apiSampleRequest off
+     * @apiPermission xxx mdmbase:xxx
+     */
+    //@Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @PostMapping(value = "/QuerySuperMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySuperMonitorItemList(@RequestBody @Validated QuerySuperMonitorItemListParam pa) {
+        return monitorItemService.querySuperMonitorItemList(pa);
+    }
 }

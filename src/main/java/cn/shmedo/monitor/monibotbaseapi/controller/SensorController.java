@@ -33,6 +33,9 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
      * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
      * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称
+     * @apiParam (请求体) {String} [sensorID] 传感器ID
+     * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
+     * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型 (Code)
@@ -64,6 +67,9 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
      * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
      * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称
+     * @apiParam (请求体) {String} [sensorID] 传感器ID
+     * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
+     * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.totalCount 总条数
      * @apiSuccess (响应结果) {Int} data.totalPage 总页数
