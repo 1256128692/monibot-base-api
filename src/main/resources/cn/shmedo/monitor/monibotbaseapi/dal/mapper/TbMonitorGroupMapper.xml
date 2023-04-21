@@ -201,7 +201,7 @@
         from tb_monitor_group
         <where>
             ProjectID = #{projectID}
-            <if test="groupName != null">
+            <if test=" groupName != null and groupName != ''">
                 and `Name` like concat('%', #{groupName}, '%')
             </if>
             <if test="parented">

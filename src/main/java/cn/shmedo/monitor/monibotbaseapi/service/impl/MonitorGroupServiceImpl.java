@@ -169,24 +169,20 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     }
 
     private void handleGroup4Web(List<Group4Web> parentGroupList, List<Group4Web> sonGroupList) {
-        List<Integer> allGroupIDList = new java.util.ArrayList<>(parentGroupList.stream().map(Group4Web::getID).toList());
-        allGroupIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
-        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allGroupIDList);
+        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(parentGroupList.stream().map(Group4Web::getID).collect(Collectors.toList()));
         Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
 
 
-        List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(allGroupIDList);
+        List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(sonGroupList.stream().map(Group4Web::getID).collect(Collectors.toList()));
         Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
         sonGroupList.forEach(
                 group -> {
-                    group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
                     group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
                 });
         parentGroupList.forEach(
                 group -> {
                     group.setChildGroupList(sonGroupList.stream().filter(sonGroup -> sonGroup.getParentID().equals(group.getID())).collect(Collectors.toList()));
                     group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
-                    group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
                 }
         );
     }
