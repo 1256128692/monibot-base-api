@@ -38,4 +38,9 @@ public class RainMonitorPointHistoryData {
 
 
     private Double dailyRainfall;
+
+    /**
+     * 日降雨量数据
+     */
+    List<Map<String, Object>> dailyRainfallList;
 }

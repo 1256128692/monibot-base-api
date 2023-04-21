@@ -37,6 +37,21 @@ public class SensorListRequest implements ParameterValidator, ResourcePermission
      */
     private String monitorPoint;
 
+    /**
+     * 传感器ID
+     */
+    private Integer sensorID;
+
+    /**
+     * 监测类型ID
+     */
+    private Integer monitorTypeID;
+
+    /**
+     * 监测点ID
+     */
+    private Integer monitorPointID;
+
     @Override
     public ResultWrapper<?> validate() {
         return null;

@@ -426,30 +426,45 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    /**
+     * @param sensorIDList
+     * @param begin
+     * @param end
+     * @return
+     */
     @Override
     public List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
 
-        DateTime startTime = DateUtil.offsetHour(DateUtil.beginOfDay(begin), 8);
-        DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 32);
-
-        String beginString = TimeUtil.formatInfluxTimeString(new Timestamp(startTime.getTime()));
-        String endString = TimeUtil.formatInfluxTimeString(new Timestamp(endTime.getTime()));
-        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                .collect(Collectors.joining(" or "));
-
-        StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("select sum(v1) as dailyRainfall from tb_5_data ");
-        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
-        String sql = sqlBuilder.toString();
-        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-
+        List<Map<String, Timestamp>> dailyTimestampList = TimeUtil.getDailyTimestampList(begin, end);
         List<String> selectField = new LinkedList<>();
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
         selectField.add(DbConstant.DAILY_RAINFALL);
 
+        if (CollectionUtil.isNullOrEmpty(dailyTimestampList)) {
+            return null;
+        }
+
+        StringBuilder result = new StringBuilder();
+        for (Map<String, Timestamp> map : dailyTimestampList) {
+            Timestamp beginTimestamp = map.get("begin");
+            Timestamp endTimestamp = map.get("end");
+
+            String beginString = TimeUtil.formatInfluxTimeString(beginTimestamp);
+            String endString = TimeUtil.formatInfluxTimeString(endTimestamp);
+            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                    .collect(Collectors.joining(" or "));
+
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append("select sum(rainfall) as dailyRainfall from tb_5_data ");
+            sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");
+            result.append(sqlBuilder);
+
+        }
+        String sql = result.toString();
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
