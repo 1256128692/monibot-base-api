@@ -40,6 +40,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
@@ -73,6 +74,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final MdInfoService mdInfoService;
     private final TbProjectConfigMapper tbProjectConfigMapper;
     private final FileService fileService;
+    private final TbMonitorItemMapper tbMonitorItemMapper;
+    private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
     private static final String TOKEN_HEADER = "Authorization";
 
     @Override
@@ -114,6 +117,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (ObjectUtil.isNotEmpty(tagID4DBList)) {
             tbTagRelationMapper.insertBatch(tagID4DBList, tbProjectInfo.getID());
         }
+        // 处理监测项目
+        if (CollectionUtils.isNotEmpty(pa.getMonitorItemIDList()) && CollectionUtils.isNotEmpty(pa.getMonitorItems())) {
+            List<TbMonitorItemField> tbMonitorItemFields = tbMonitorItemFieldMapper.selectList(
+                    new QueryWrapper<TbMonitorItemField>().in("MonitorItemID", pa.getMonitorItemIDList())
+            );
+            Map<Integer, List<TbMonitorItemField>> temp = tbMonitorItemFields.stream().collect(Collectors.groupingBy(TbMonitorItemField::getMonitorItemID));
+            Map<TbMonitorItem, List<TbMonitorItemField>> map = new HashMap<>();
+        }
 
         // 新增项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
@@ -136,7 +147,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         AddFileUploadRequest pojo = ParamBuilder.buildAddFileUploadRequest(imageContent, imageSuffix, userID, fileName, companyID);
         ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
-            throw new CustomBaseException(info.getCode(), ErrorConstant.IMAGE_INSERT_FAIL) ;
+            throw new CustomBaseException(info.getCode(), ErrorConstant.IMAGE_INSERT_FAIL);
         } else {
             return info.getData().getPath();
         }
@@ -420,7 +431,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //TODO  项目图片使用group:img key:projectImg
         TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
                 new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
-                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .lambda().eq(TbProjectConfig::getGroup, "img")
                         .eq(TbProjectConfig::getKey, "projectImg")
         );
         if (tbProjectConfig == null) {
@@ -448,7 +459,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public String queryProjectImg(QueryProjectImgParam pa) {
         TbProjectConfig tbProjectConfig = tbProjectConfigMapper.selectOne(
                 new QueryWrapper<TbProjectConfig>().eq("projectID", pa.getProjectID())
-                        .lambda(). eq(TbProjectConfig::getGroup, "img")
+                        .lambda().eq(TbProjectConfig::getGroup, "img")
                         .eq(TbProjectConfig::getKey, "projectImg")
         );
         if (tbProjectConfig != null && StrUtil.isNotEmpty(tbProjectConfig.getValue())) {

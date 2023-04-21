@@ -9,17 +9,18 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,6 +31,7 @@ import java.util.List;
  * @author: gaoxu
  * @create: 2023-02-22 13:28
  **/
+@Data
 public class AddProjectParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
@@ -68,13 +70,15 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @Valid
     private List<@NotNull TagKeyAndValue> tagList;
     @Valid
-    private List<@NotNull Integer> monitorTypeList;
+    private List<@NotNull Integer> monitorItemIDList;
     private Integer modelID;
     @Valid
     @NotEmpty
     private List<@NotNull PropertyIdAndValue> modelValueList;
     @JsonIgnore
     List<TbProperty> properties;
+    @JsonIgnore
+    List<TbMonitorItem> monitorItems;
 
     @Override
     public ResultWrapper validate() {
@@ -143,6 +147,21 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前公司下标签数量为：" + count + " ,新增会导致超过100");
             }
         }
+        // 校验监测项目
+        if (CollectionUtils.isNotEmpty(monitorItemIDList)) {
+            TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+            monitorItems = tbMonitorItemMapper.selectBatchIds(monitorItemIDList);
+            if (monitorItems.size() != monitorItemIDList.size()) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
+            }
+            if (monitorItems.stream().anyMatch(item -> !((item.getCreateType().equals(CreateType.PREDEFINED.getType()))&&(item.getCompanyID() == null || item.getProjectID() == null)))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目应为预定义或公司定义模板");
+            }
+            if (monitorItems.stream().filter(item -> item.getCompanyID()!=null).anyMatch(item -> !item.getCompanyID().equals(companyID))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不属于该公司模板");
+            }
+
+        }
         return null;
 
 
@@ -159,199 +178,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     }
 
 
-    public Integer getCompanyID() {
-        return companyID;
-    }
 
-    public void setCompanyID(Integer companyID) {
-        this.companyID = companyID;
-    }
-
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getShortName() {
-        return shortName;
-    }
-
-    public void setShortName(String shortName) {
-        this.shortName = shortName;
-    }
-
-    public Byte getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(Byte projectType) {
-        this.projectType = projectType;
-    }
-
-    public String getImageContent() {
-        return imageContent;
-    }
-
-    public void setImageContent(String imageContent) {
-        this.imageContent = imageContent;
-    }
-
-    public String getImageSuffix() {
-        return imageSuffix;
-    }
-
-    public void setImageSuffix(String imageSuffix) {
-        this.imageSuffix = imageSuffix;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public String getDirectManageUnit() {
-        return directManageUnit;
-    }
-
-    public void setDirectManageUnit(String directManageUnit) {
-        this.directManageUnit = directManageUnit;
-    }
-
-    public Byte getPlatformType() {
-        return platformType;
-    }
-
-    public void setPlatformType(Byte platformType) {
-        this.platformType = platformType;
-    }
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getProjectAddress() {
-        return projectAddress;
-    }
-
-    public void setProjectAddress(String projectAddress) {
-        this.projectAddress = projectAddress;
-    }
-
-    public Double getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getProjectDesc() {
-        return projectDesc;
-    }
-
-    public void setProjectDesc(String projectDesc) {
-        this.projectDesc = projectDesc;
-    }
-
-    public List<Integer> getTagIDList() {
-        return tagIDList;
-    }
-
-    public void setTagIDList(List<Integer> tagIDList) {
-        this.tagIDList = tagIDList;
-    }
-
-    public List<TagKeyAndValue> getTagList() {
-        return tagList;
-    }
-
-    public void setTagList(List<TagKeyAndValue> tagList) {
-        this.tagList = tagList;
-    }
-
-    public List<Integer> getMonitorTypeList() {
-        return monitorTypeList;
-    }
-
-    public void setMonitorTypeList(List<Integer> monitorTypeList) {
-        this.monitorTypeList = monitorTypeList;
-    }
-
-    public Integer getModelID() {
-        return modelID;
-    }
-
-    public void setModelID(Integer modelID) {
-        this.modelID = modelID;
-    }
-
-    public List<PropertyIdAndValue> getModelValueList() {
-        return modelValueList;
-    }
-
-    public void setModelValueList(List<PropertyIdAndValue> modelValueList) {
-        this.modelValueList = modelValueList;
-    }
-
-    public void setProperties(List<TbProperty> properties) {
-        this.properties = properties;
-    }
-
-    public List<TbProperty> getProperties() {
-        return properties;
-    }
-
-    @Override
-    public String toString() {
-        return "AddProjectParam{" +
-                "companyID=" + companyID +
-                ", projectName='" + projectName + '\'' +
-                ", shortName='" + shortName + '\'' +
-                ", projectType=" + projectType +
-                ", imageContent='" + imageContent + '\'' +
-                ", imageSuffix='" + imageSuffix + '\'' +
-                ", expiryDate=" + expiryDate +
-                ", directManageUnit='" + directManageUnit + '\'' +
-                ", platformType=" + platformType +
-                ", enable=" + enable +
-                ", location='" + location + '\'' +
-                ", projectAddress='" + projectAddress + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", projectDesc='" + projectDesc + '\'' +
-                ", tagIDList=" + tagIDList +
-                ", tagList=" + tagList +
-                ", monitorTypeList=" + monitorTypeList +
-                ", modelID=" + modelID +
-                ", modelValueList=" + modelValueList +
-                '}';
-    }
 
 
 }
