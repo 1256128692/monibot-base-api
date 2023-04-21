@@ -17,7 +17,8 @@
             twa.triggerID,
             twa.ActionType actionType,
             twa.ActionTarget actionTarget,
-            twa.`Desc` `desc`
+            twa.`Desc` `desc`,
+            twa.`Enable` `enable`
         FROM
             tb_warn_trigger twr
         LEFT JOIN tb_warn_action twa ON twr.ID = twa.triggerID

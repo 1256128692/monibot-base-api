@@ -29,6 +29,8 @@ public class TbWarnAction {
     private String actionTarget;
     @TableField("`Desc`")
     private String desc;
+    @TableField("`Enable`")
+    private Boolean enable;
     @Serial
     private static final long serialVersionUID = 1L;
 }
