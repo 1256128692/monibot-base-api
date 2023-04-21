@@ -31,10 +31,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -166,24 +163,34 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             item.setGroupID(item.getID());
             item.setGroupName(item.getName());
         });
-        return new PageUtil.Page<>(pageData.getTotal(), pageData.getRecords(), pageData.getSize());
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
+    /**
+     * 处理监测项目和监测点
+     * @param parentGroupList  可以为一级或二级
+     * @param sonGroupList
+     */
     private void handleGroup4Web(List<Group4Web> parentGroupList, List<Group4Web> sonGroupList) {
-        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(parentGroupList.stream().map(Group4Web::getID).collect(Collectors.toList()));
+        List<Integer> allMonitorItemIDList = new ArrayList<>();
+        allMonitorItemIDList.addAll(parentGroupList.stream().map(Group4Web::getID).toList());
+        allMonitorItemIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
+        List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allMonitorItemIDList);
         Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
-        if (CollectionUtils.isNotEmpty(sonGroupList)){
-            List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(sonGroupList.stream().map(Group4Web::getID).collect(Collectors.toList()));
-            Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
-            sonGroupList.forEach(
-                    group -> {
-                        group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
-                    });
-        }
+        List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(allMonitorItemIDList);
+        Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
+
+        sonGroupList.forEach(
+                group -> {
+                    group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
+                    group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
+                });
         parentGroupList.forEach(
                 group -> {
                     group.setChildGroupList(sonGroupList.stream().filter(sonGroup -> sonGroup.getParentID().equals(group.getID())).collect(Collectors.toList()));
                     group.setMonitorItemList(monitorItemMap.getOrDefault(group.getID(), Collections.emptyList()));
+                    group.setMonitorPointList(groupPointMap.getOrDefault(group.getID(), Collections.emptyList()));
+
                 }
         );
     }

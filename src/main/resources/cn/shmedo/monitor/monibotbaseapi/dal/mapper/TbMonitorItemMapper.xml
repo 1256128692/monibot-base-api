@@ -365,7 +365,7 @@
                                      MonitorClass, `Name`, `Alias`,
                                      CreateType, ProjectType, ExValue,
                                      DisplayOrder, CreateTime, CreateUserID,
-                                     UpdateTime, UpdateUserID)
+                                     UpdateTime, UpdateUserID,Enable)
         values
         <foreach collection="collection" item="item" separator=",">
             (#{item.companyID,jdbcType=INTEGER}, #{item.projectID,jdbcType=INTEGER},
@@ -375,7 +375,7 @@
              #{item.exValue,jdbcType=VARCHAR},
              #{item.displayOrder,jdbcType=INTEGER}, #{item.createTime,jdbcType=TIMESTAMP},
              #{item.createUserID,jdbcType=INTEGER},
-             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.updateUserID,jdbcType=INTEGER})
+             #{item.updateTime,jdbcType=TIMESTAMP}, #{item.updateUserID,jdbcType=INTEGER}, #{item.enable,jdbcType=TINYINT})
         </foreach>
     </insert>
 
