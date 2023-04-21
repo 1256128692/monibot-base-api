@@ -111,7 +111,7 @@
             OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
-            AND twl.monitorTypeID=#{param.monitorTypeID}
+            AND twl.monitorType=#{param.monitorTypeID}
         </if>
         <if test="param.monitorItemID != null">
             AND twl.monitorItemID=#{param.monitorItemID}
