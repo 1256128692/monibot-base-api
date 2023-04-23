@@ -5,7 +5,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.standard;
  * @date: 2023-04-21 10:29
  */
 public interface IFieldName extends IFieldToken, IMonitorType {
-    void setFieldName(String metadataName);
+    void setFieldName(String fieldName);
 
     String getFieldName();
 }

@@ -27,6 +27,7 @@ public class CompareIntervalDescUtil {
         Map<Integer, String> map = new HashMap<>();
         Map<Integer, Integer> warnIDlimitTypeMap = new HashMap<>();
         Map<Integer, String> warnIDUpperNameMap = new HashMap<>();
+        HashMap<Integer, String> warnIDUnitMap = new HashMap<>();
         List<Tuple<Integer, Double>> tuples101 = new ArrayList<>();
         List<Tuple<Integer, Double>> tuples000 = new ArrayList<>();
         List<Tuple<Integer, Double>> tuples001 = new ArrayList<>();
@@ -34,6 +35,7 @@ public class CompareIntervalDescUtil {
             Integer warnID = u.getWarnID();
             JSONObject compareRule = JSONUtil.parseObj(u.getCompareRule());
             String upperName = Optional.ofNullable(compareRule.getStr("upperName")).map(String::trim).orElse(null);
+            String unit = compareRule.getStr("unit");
             Object limit = compareRule.get("upperLimit");
             warnIDlimitTypeMap.put(warnID, Optional.ofNullable(compareRule.getInt("limitType")).orElse(0)); //是否包含端点
             Double upperLimit = null;
@@ -45,6 +47,7 @@ public class CompareIntervalDescUtil {
             Optional.ofNullable(upperLimit).ifPresent(
                     l -> Optional.ofNullable(CompareInterval.getValue(monitorTypeID, u.getFieldToken(), upperName))
                             .ifPresent(w -> {
+                                warnIDUnitMap.put(warnID, unit);
                                 if (CompareInterval.notSpecialConcat(upperName)) {
                                     warnIDUpperNameMap.put(warnID, upperName);
                                 }
@@ -58,22 +61,22 @@ public class CompareIntervalDescUtil {
                                 }
                             }));
         }).collect(Collectors.toList());
-        dealLowerLimitDesc(tuples101, map, warnIDlimitTypeMap, warnIDUpperNameMap, "(-∞,");
-        dealLowerLimitDesc(tuples000, map, warnIDlimitTypeMap, warnIDUpperNameMap, "[0,");
-        dealUpperLimitDesc(tuples001, map, warnIDlimitTypeMap, warnIDUpperNameMap);
+        dealLowerLimitDesc(tuples101, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "(-∞,");
+        dealLowerLimitDesc(tuples000, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "[0,");
+        dealUpperLimitDesc(tuples001, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap);
         return map;
     }
 
     private static void dealUpperLimitDesc(List<Tuple<Integer, Double>> tupleList, Map<Integer, String> map,
-                                           Map<Integer, Integer> warnIDlimitTypeMap, Map<Integer,
-            String> warnIDUpperNameMap) {
+                                           Map<Integer, Integer> warnIDlimitTypeMap,
+                                           Map<Integer, String> warnIDUpperNameMap, Map<Integer, String> warnIDUnitMap) {
         if (tupleList.size() == 1) {
             Tuple<Integer, Double> tuple = tupleList.get(0);
             Integer tupleItem1 = tuple.getItem1();
             map.put(tupleItem1, (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
                     LEFT_CONTAINS_END_POINT : LEFT_NOT_CONTAINS_END_POINT) +
                     (Optional.ofNullable(warnIDUpperNameMap.get(tupleItem1)).map(u -> u + ": ").orElse("")) +
-                    tuple.getItem2() + ",+∞)");
+                    tuple.getItem2() + warnIDUnitMap.get(tupleItem1) + ",+∞)");
             return;
         }
         Optional.of(tupleList).filter(u -> !CollectionUtil.isNullOrEmpty(u)).ifPresent(u -> {
@@ -83,16 +86,16 @@ public class CompareIntervalDescUtil {
             map.put(tailTupleItem1, (warnIDlimitTypeMap.getOrDefault(tailTupleItem1, 0) == 1 ?
                     LEFT_CONTAINS_END_POINT : LEFT_NOT_CONTAINS_END_POINT) +
                     (Optional.ofNullable(warnIDUpperNameMap.get(tailTupleItem1)).map(w -> w + ": ").orElse("")) +
-                    tailTuple.getItem2() + ",+∞)");
+                    tailTuple.getItem2() + warnIDUnitMap.get(tailTupleItem1) + ",+∞)");
             u.stream().reduce((o1, o2) -> {
                 Integer o1Item1 = o1.getItem1();
                 Integer o2Item1 = o2.getItem1();
                 map.put(o1Item1, (warnIDlimitTypeMap.getOrDefault(o1Item1, 0) == 1 ?
                         LEFT_CONTAINS_END_POINT : LEFT_NOT_CONTAINS_END_POINT) +
                         (Optional.ofNullable(warnIDUpperNameMap.get(o1Item1)).map(w -> w + ": ").orElse("")) +
-                        o1.getItem2() + "," +
+                        o1.getItem2() + warnIDUnitMap.get(o1Item1) + "," +
                         (Optional.ofNullable(warnIDUpperNameMap.get(o2Item1)).map(w -> w + ": ").orElse("")) +
-                        o2.getItem2() + (warnIDlimitTypeMap.getOrDefault(o2Item1, 0) == 1 ?
+                        o2.getItem2() + warnIDUnitMap.get(o2Item1) + (warnIDlimitTypeMap.getOrDefault(o2Item1, 0) == 1 ?
                         RIGHT_NOT_CONTAINS_END_POINT : RIGHT_CONTAINS_END_POINT));
                 return o2;
             });
@@ -101,13 +104,15 @@ public class CompareIntervalDescUtil {
 
     private static void dealLowerLimitDesc(List<Tuple<Integer, Double>> tupleList, Map<Integer, String> resMap,
                                            Map<Integer, Integer> warnIDlimitTypeMap,
-                                           Map<Integer, String> warnIDUpperNameMap, String headDesc) {
+                                           Map<Integer, String> warnIDUpperNameMap, Map<Integer, String> warnIDUnitMap,
+                                           String headDesc) {
         if (tupleList.size() == 1) {
             Tuple<Integer, Double> tuple = tupleList.get(0);
             Integer tupleItem1 = tuple.getItem1();
             resMap.put(tupleItem1, headDesc +
                     (Optional.ofNullable(warnIDUpperNameMap.get(tupleItem1)).map(w -> w + ": ").orElse("")) +
-                    tuple.getItem2() + (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
+                    tuple.getItem2() + warnIDUnitMap.get(tupleItem1) +
+                    (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
                     RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
             return;
         }
@@ -117,7 +122,7 @@ public class CompareIntervalDescUtil {
             Integer headTupleItem1 = headTuple.getItem1();
             resMap.put(headTupleItem1, headDesc +
                     (Optional.ofNullable(warnIDUpperNameMap.get(headTupleItem1)).map(w -> w + ": ").orElse("")) +
-                    headTuple.getItem2() +
+                    headTuple.getItem2() + warnIDUnitMap.get(headTupleItem1) +
                     (warnIDlimitTypeMap.getOrDefault(headTupleItem1, 0) == 1 ?
                             RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
             u.stream().reduce((o1, o2) -> {
@@ -127,10 +132,11 @@ public class CompareIntervalDescUtil {
                         (warnIDlimitTypeMap.getOrDefault(o1Item1, 0) == 1 ?
                                 LEFT_NOT_CONTAINS_END_POINT : LEFT_CONTAINS_END_POINT) +
                                 (Optional.ofNullable(warnIDUpperNameMap.get(o1Item1)).map(w -> w + ": ").orElse("")) +
-                                o1.getItem2() + "," +
+                                o1.getItem2() + warnIDUnitMap.get(o1Item1) + "," +
                                 (Optional.ofNullable(warnIDUpperNameMap.get(o2Item1)).map(w -> w + ": ").orElse("")) +
-                                o2.getItem2() + (warnIDlimitTypeMap.getOrDefault(o2Item1, 0) == 1 ?
-                                RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
+                                o2.getItem2() + warnIDUnitMap.get(o2Item1) +
+                                (warnIDlimitTypeMap.getOrDefault(o2Item1, 0) == 1 ?
+                                        RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
                 return o2;
             });
         });
