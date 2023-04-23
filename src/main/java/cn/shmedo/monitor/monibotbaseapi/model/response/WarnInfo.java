@@ -24,7 +24,8 @@ public class WarnInfo {
     public static WarnInfo toBuliderNewVo(List<TbSensor> sensorList) {
         WarnInfo vo = new WarnInfo();
         if (!CollectionUtils.isEmpty(sensorList)) {
-            Map<Byte, List<TbSensor>> listMap = sensorList.stream().collect(Collectors.groupingBy(TbSensor::getStatus));
+            Map<Byte, List<TbSensor>> listMap = sensorList.stream().filter(sensor -> sensor.getStatus() != null)
+                    .collect(Collectors.groupingBy(TbSensor::getStatus));
             if (MapUtil.isNotEmpty(listMap)){
                 listMap.entrySet().forEach(item -> {
                     if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_0.getKey()))) {
