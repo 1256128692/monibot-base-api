@@ -211,7 +211,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         if (currentSid.equals(sid)) {
                             Double currentRainfall = Double.parseDouble(currentRainMap.get(DbConstant.CURRENT_RAIN_FALL).toString());
                             BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
-                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL,rounded);
+                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, rounded);
                             rainFailMaps.add(mapEntry);
                         }
                     }
@@ -225,9 +225,22 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
             // 流量暂不计算
-        } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
+        } else if (monitorType.equals(MonitorType.LEVEL.getKey()) || monitorType.equals(MonitorType.STRESS.getKey())
+                || monitorType.equals(MonitorType.PRESSURE.getKey())) {
 
-            String key = "levelChange";
+            String key = "";
+            String typeKey = "";
+            if (monitorType.equals(MonitorType.LEVEL.getKey())) {
+                key = "levelChange";
+                typeKey = "distance";
+            } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
+                key = "strainPeriodDisp";
+                typeKey = "strain";
+            } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
+                key = "pressurePeriodDisp";
+                typeKey = "pressure";
+            }
+
             // 处理压力变化值,规则当前的数据减去上一笔的数据
             for (int i = 0; i < maps.size(); i++) {
                 Map<String, Object> map = maps.get(i);
@@ -244,10 +257,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     long prevTime = DateUtil.parse(prevTimeStr).getTime();
                     if (prevTime == twoHoursAgo) {
                         // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
-                        if (prevMap.containsKey("distance")) {
-                            double v1TwoHoursAgo = (double) prevMap.get("distance");
+                        if (prevMap.containsKey(typeKey)) {
+                            double v1TwoHoursAgo = (double) prevMap.get(typeKey);
                             // 计算stressChange并添加到当前Map对象中
-                            double changeValue = (double) map.get("distance") - v1TwoHoursAgo;
+                            double changeValue = (double) map.get(typeKey) - v1TwoHoursAgo;
                             BigDecimal changeBD = new BigDecimal(changeValue);
                             BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
                             map.put(key, rounded);
@@ -730,7 +743,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理日降雨量
             dailyRainfallList = handleDailyRainfallList(pa.getBegin(), pa.getEnd(), sensorIDList, dailyRainfall);
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
-                if (dailyRainfallList.size() == 1){
+                if (dailyRainfallList.size() == 1) {
                     if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
                         dailyRainfall = (Double) dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL);
                     }
@@ -1124,7 +1137,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             DateTime currentTime = DateUtil.parse(data1.get("time").toString());
             Double rainfall = Double.parseDouble(dataList.get(i).get("rainfall").toString());
             BigDecimal rounded = new BigDecimal(rainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
-            dataList.get(i).put("rainfall",rounded);
+            dataList.get(i).put("rainfall", rounded);
             if (DateUtil.compare(currentTime, eightClockDateTime) >= 0) {
                 todayDataList.add(data1);
             } else {
