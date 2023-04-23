@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -111,10 +112,16 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             );
         }
         if (CollectionUtils.isNotEmpty(pa.getMonitorPointIDList())) {
+            List<Integer> allList = tbMonitorGroupPointMapper.queryPointIDByGroupID(pa.getGroupID());
+            // 不需要处理的点
+            List<Integer>  notDealPintIDList= pa.getMonitorPointIDList().stream().filter(allList::contains).collect(Collectors.toList());
             tbMonitorGroupPointMapper.delete(
                     new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID())
+                            .notIn(TbMonitorGroupPoint::getMonitorPointID, notDealPintIDList)
             );
-            List<TbMonitorGroupPoint> tbMonitorGroupPointList = pa.getMonitorPointIDList().stream().map(item -> TbMonitorGroupPoint.builder()
+            List<TbMonitorGroupPoint> tbMonitorGroupPointList = pa.getMonitorPointIDList().stream()
+                    .filter(item -> !allList.contains(item))
+                    .map(item -> TbMonitorGroupPoint.builder()
                     .monitorGroupID(pa.getGroupID())
                     .monitorPointID(item)
                     .build()).collect(Collectors.toList());
