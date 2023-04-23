@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -32,7 +33,7 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
     @PostMapping(value = "/AddMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorGroup(@RequestBody @Validated AddMonitorGroupParam pa) {
         monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -55,7 +56,8 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
+
     @PostMapping(value = "/UpdateMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorGroup(@RequestBody @Validated UpdateMonitorGroupParam pa) {
         monitorGroupService.updateMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -77,7 +79,8 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
+
     @PostMapping(value = "/UploadMonitorGroupImage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object uploadMonitorGroupImage(@RequestBody @Validated UploadMonitorGroupImageParam pa) {
         return monitorGroupService.uploadMonitorGroupImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -95,7 +98,7 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DeleteBaseMonitorGroup")
     @PostMapping(value = "/DeleteMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorGroup(@RequestBody @Validated DeleteMonitorGroupParam pa) {
         monitorGroupService.deleteMonitorGroup(pa.getGroupIDList());
@@ -112,12 +115,13 @@ public class MonitorGroupController {
      * @apiParam (请求体) {Int} groupID 监测组ID
      * @apiParam (请求体) {Object[]} pointLocationList 监测点位置列表(max=20)
      * @apiParam (请求体) {Int} pointLocationList.pointID 监测点ID
-     * @apiParam (请求体) {String} pointLocationList.location 监测点位置
+     * @apiParam (请求体) {String} [pointLocationList.location] 监测点位置
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
+
     @PostMapping(value = "/ConfigMonitorPointImageLocation", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object configMonitorPointImageLocation(@RequestBody @Validated ConfigMonitorPointImageLocationParam pa) {
         monitorGroupService.configMonitorPointImageLocation(pa);
@@ -159,7 +163,7 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
     @PostMapping(value = "/QueryMonitorGroupPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorGroupPage(@RequestBody @Validated QueryMonitorGroupPageParam pa) {
         return monitorGroupService.queryMonitorGroupPage(pa);
@@ -192,7 +196,7 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorGroup
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorGroup")
     @PostMapping(value = "/QueryMonitorGroupDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorGroupDetail(@RequestBody @Validated QueryMonitorGroupDetailParam pa) {
        return monitorGroupService.queryMonitorGroupDetail(pa.getTbMonitorGroup());

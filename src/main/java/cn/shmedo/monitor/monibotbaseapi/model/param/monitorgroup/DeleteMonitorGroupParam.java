@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -53,11 +50,11 @@ public class DeleteMonitorGroupParam implements ParameterValidator, ResourcePerm
 
     @Override
     public Resource parameter() {
-        return null;
+        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionProvider.super.resourcePermissionType();
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 }

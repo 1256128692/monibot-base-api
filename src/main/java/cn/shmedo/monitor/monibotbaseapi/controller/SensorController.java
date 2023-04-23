@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -49,7 +50,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Boolean} data.enable 是否启用, 不启用将不会接收数据
      * @apiPermission mdmbase:ListSensor
      */
-//    @Permission(permissionName = "mdmbase:ListSensor")
+    @Permission(permissionName = "mdmbase:ListBaseSensor")
     @PostMapping(value = "/SensorList", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object sensorList(@RequestBody @Validated SensorListRequest request) {
@@ -88,8 +89,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"id": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false}]}}
      * @apiPermission mdmbase:ListSensor
      */
-    @LogParam(moduleName = "传感器模块", operationName = "查询传感器", operationProperty = OperationProperty.QUERY)
-//    @Permission(permissionName = "mdmbase:ListSensor")
+    @Permission(permissionName = "mdmbase:ListBaseSensor")
     @PostMapping(value = "/SensorPage", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object sensorPage(@RequestBody @Validated SensorPageRequest request) {
@@ -137,7 +137,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": [{"id": 0,"name": "物模型1","dataSourceComposeType": 1,"templateDataSourceID": "777d75e0-f2de-4c0b-a759-d98fe9091d05","monitorType": 1,"calType": 1,"displayOrder": 1,"exValues": "","createType": 0,"companyID": 0,"defaultTemplate": false,"dataSourceList": [{"dataSourceType": 1,"childList": [{"productID": 385,"deviceName": "test2023","deviceToken": "test2023","uniqueToken": "D8DB467AB743476CA4B6F6F909704FBB","sensorList": [{"id": 353,"sensorName": "103_1","iotSensorType": "103","alias": "103_1"}],"id": 15567}],"templateDataSourceToken": "103"},{"dataSourceType": 2,"childList": [{"id": 1,"deviceName": "10086_1","alias": "监测传感器"}],"templateDataSourceToken": "10086"}]}]}
      * @apiPermission mdmbase:ListDataSource
      */
-//    @Permission(permissionName = "mdmbase:ListDataSource")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/DataSourceCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object dataSourceCate(@RequestBody @Validated DataSourceCatalogRequest request) {
@@ -167,7 +167,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": [{"ID": 0,"monitorType": 0,"typeName": "","typeAlias": "","displayOrder": 0,"multiSensor": false,"apiDatasource": false,"createType": 0,"companyID": 0,"exValues": ""}]}
      * @apiPermission mdmbase:ListMonitorType
      */
-//    @Permission(permissionName = "mdmbase:ListMonitorType")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/MonitorTypeCatalog", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object monitorTypeCatalog(@RequestBody @Validated MonitorTypeCatalogRequest request) {
@@ -213,7 +213,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": {"exFields": [{"id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}]}}
      * @apiPermission mdmbase:ListMonitorType
      */
-    //    @Permission(permissionName = "mdmbase:ListMonitorType")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/BaseConfig", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object baseConfig(@RequestBody @Validated BaseConfigRequest request) {
@@ -252,7 +252,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": {"id": 10086}}
      */
     @LogParam(moduleName = "传感器模块", operationName = "新增传感器", operationProperty = OperationProperty.ADD)
-//    @Permission(permissionName = "mdmbase:UpdateSensor")
+    @Permission(permissionName = "mdmbase:UpdateBaseSensor")
     @PostMapping(value = "/AddSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object addSensor(@RequestBody @Validated SaveSensorRequest request) {
@@ -322,7 +322,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": {"exFields": [{"value": "","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"paramFields": [{"value": "","id": 0,"subjectID": 0,"subjectType": 0,"dataType": "","token": "","name": "","paValue": "","paUnitID": 0,"paDesc": ""}],"id": 0,"projectID": 0,"templateID": 0,"dataSourceID": "","dataSourceComposeType": 0,"monitorType": 0,"name": "","alias": "","kind": 0,"displayOrder": 0,"monitorPointID": 0,"configFieldValue": "","exValues": "","status": 0,"warnNoData": false,"monitorBeginTime": "2023-04-03 11:41:06","imagePath": "","createTime": "2023-04-03 11:41:06","createUserID": 0,"updateTime": "2023-04-03 11:41:06","updateUserID": 0}}
      * @apiPermission mdmbase:DescribeSensor
      */
-//    @Permission(permissionName = "mdmbase:DescribeSensor")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/SensorInfo", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object sensorInfo(@RequestBody @Validated SensorInfoRequest request) {
@@ -340,7 +340,7 @@ public class SensorController {
      * @apiPermission mdmbase:DescribeSensor
      */
     @LogParam(moduleName = "传感器管理", operationName = "删除传感器", operationProperty = OperationProperty.DELETE)
-//    @Permission(permissionName = "mdmbase:DeleteSensor")
+    @Permission(permissionName = "mdmbase:DeleteBaseSensor")
     @PostMapping(value = "/DeleteSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object deleteSensor(@RequestBody @Validated DeleteSensorRequest request) {
@@ -371,7 +371,7 @@ public class SensorController {
      * @apiPermission mdmbase:UpdateSensor
      */
     @LogParam(moduleName = "传感器管理", operationName = "更新传感器", operationProperty = OperationProperty.UPDATE)
-//    @Permission(permissionName = "mdmbase:UpdateSensor")
+    @Permission(permissionName = "mdmbase:UpdateBaseSensor")
     @PostMapping(value = "/UpdateSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object updateSensor(@RequestBody @Validated UpdateSensorRequest request) {
@@ -417,7 +417,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
      * @apiPermission mdmbase:DescribeSensor
      */
-//    @Permission(permissionName = "mdmbase:DescribeSensor")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/QueryTryingParam", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object getTryingParam(@RequestBody @Validated QueryTryingParamRequest request) {
@@ -443,7 +443,7 @@ public class SensorController {
      * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
      * @apiPermission mdmbase:DescribeSensor
      */
-//    @Permission(permissionName = "mdmbase:DescribeSensor")
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
     @PostMapping(value = "/Trying", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object trying(@RequestBody @Validated TryingRequest request) {
@@ -486,7 +486,7 @@ public class SensorController {
      * @apiSampleRequest off
      * @apiPermission 项目权限+应用权限
      */
-//    @Permission(permissionName = "mdmbase:ListSensor", allowApplication = true, allowUser = false)
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor", allowApplication = true, allowUser = false)
     @PostMapping(value = "/QuerySensorDataSource", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySensorDataSource(@RequestBody @Validated SourceWithSensorRequest request) {
         return sensorService.querySensorDataSource(request);
@@ -506,7 +506,7 @@ public class SensorController {
      * @apiSampleRequest off
      * @apiPermission 项目权限+应用权限
      */
-//    @Permission(permissionName = "mdmbase:ListSensor", allowApplication = true, allowUser = false)
+    @Permission(permissionName = "mdmbase:UpdateBaseSensor", allowApplication = true, allowUser = false)
     @PostMapping(value = "/UpdateSensorStatusAndMonitorBeginTime", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateSensorStatusAndMonitorBeginTime(@RequestBody @Validated UpdateSensorStatusRequest request) {
         sensorService.updateSensorStatusAndMonitorBeginTime(request);

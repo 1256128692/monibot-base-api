@@ -41,7 +41,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
-//    @Permission(permissionName = "xx")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorItem")
     @PostMapping(value = "/AddMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorItem(@RequestBody @Validated AddMonitorItemParam pa) {
         monitorItemService.addMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -65,7 +65,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:UpdateMonitorItem")
+    @Permission(permissionName = "mdmbase:UpdateMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorItem(@RequestBody @Validated UpdateMonitorItemParam pa) {
         monitorItemService.updateMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -77,14 +77,14 @@ public class MonitorItemController {
      * @apiVersion 1.0.0
      * @apiGroup 监测项目模块
      * @apiName AddCompanyMonitorItem
-     * @apiDescription 保存为公司监测项目模板, 本质是进行复制
+     * @apiDescription 保存为公司监测项目模板
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int[]}  monitorItemIDList 监测项目列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddCompanyMonitorItem
+     * @apiPermission 系统权限 mdmbase:AddCompanyMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:AddCompanyBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:AddCompanyBaseMonitorItem")
     @PostMapping(value = "/AddCompanyMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addCompanyMonitorItem(@RequestBody @Validated AddCompanyMonitorItemParam pa) {
         monitorItemService.addCompanyMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -110,7 +110,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.id 监测项目ID
-     *  @apiSuccess (返回结果) {Boolean} currentPageData.enable 是否开启
+     * @apiSuccess (返回结果) {Boolean} currentPageData.enable 是否开启
      * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} currentPageData.name 监测项目名称
      * @apiSuccess (返回结果) {String} currentPageData.alias 监测项目别名
@@ -128,7 +128,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
     @PostMapping(value = "/QueryMonitorItemPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemPageList(@RequestBody @Validated QueryMonitorItemPageListParam pa) {
         return monitorItemService.queryMonitorItemPageList(pa);
@@ -146,7 +146,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorItem
      */
-//    @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
     @PostMapping(value = "/DeleteMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorItem(@RequestBody @Validated DeleteMonitorItemParam pa) {
         monitorItemService.deleteMonitorItem(pa.getMonitorItemIDList());
@@ -214,7 +214,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
      */
-    //@Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
     @PostMapping(value = "/QueryMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemList(@RequestBody @Validated QueryMonitorItemListParam pa) {
         return monitorItemService.queryMonitorItemList(pa);
@@ -225,7 +225,7 @@ public class MonitorItemController {
      * @apiVersion 1.0.0
      * @apiGroup 监测项目模块
      * @apiName QuerySuperMonitorItemList
-     * @apiDescription 查询系统监测项目列表
+     * @apiDescription 查询系统监测项目列表 系统权限，预定义权限，不允许授予第三方。
      * @apiParam (请求参数) {Int} [createType] 创建类型
      * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
@@ -236,9 +236,9 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Boolean} list.enable 是否开启
      * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
      * @apiSampleRequest off
-     * @apiPermission xxx mdmbase:xxx
+     * @apiPermission 系统权限 mdmbase:ListSuperBaseInfo
      */
-    //@Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:ListSuperBaseInfo")
     @PostMapping(value = "/QuerySuperMonitorItemList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySuperMonitorItemList(@RequestBody @Validated QuerySuperMonitorItemListParam pa) {
         return monitorItemService.querySuperMonitorItemList(pa);

@@ -20,6 +20,5 @@ public class PointIDAndLocation {
     @NotNull
     private Integer pointID;
     @Pattern(regexp = "\\d+(.\\d+)?,\\d+(.\\d+)?", message = "坐标格式错误")
-    @NotBlank
     private String location;
 }
