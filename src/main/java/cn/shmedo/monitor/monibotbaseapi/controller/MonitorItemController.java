@@ -65,7 +65,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
-    @Permission(permissionName = "mdmbase:UpdateMonitorItem")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorItem(@RequestBody @Validated UpdateMonitorItemParam pa) {
         monitorItemService.updateMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -84,7 +84,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddCompanyMonitorItem
      */
-    @Permission(permissionName = "mdmbase:AddCompanyBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:AddCompanyMonitorItem")
     @PostMapping(value = "/AddCompanyMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addCompanyMonitorItem(@RequestBody @Validated AddCompanyMonitorItemParam pa) {
         monitorItemService.addCompanyMonitorItem(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
