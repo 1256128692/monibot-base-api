@@ -76,7 +76,7 @@ public class CompareIntervalDescUtil {
             map.put(tupleItem1, (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
                     LEFT_CONTAINS_END_POINT : LEFT_NOT_CONTAINS_END_POINT) +
                     (Optional.ofNullable(warnIDUpperNameMap.get(tupleItem1)).map(u -> u + ": ").orElse("")) +
-                    tuple.getItem2() + ",+∞)");
+                    tuple.getItem2() + warnIDUnitMap.get(tupleItem1) + ",+∞)");
             return;
         }
         Optional.of(tupleList).filter(u -> !CollectionUtil.isNullOrEmpty(u)).ifPresent(u -> {
@@ -111,7 +111,8 @@ public class CompareIntervalDescUtil {
             Integer tupleItem1 = tuple.getItem1();
             resMap.put(tupleItem1, headDesc +
                     (Optional.ofNullable(warnIDUpperNameMap.get(tupleItem1)).map(w -> w + ": ").orElse("")) +
-                    tuple.getItem2() + (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
+                    tuple.getItem2() + warnIDUnitMap.get(tupleItem1) +
+                    (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
                     RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
             return;
         }
