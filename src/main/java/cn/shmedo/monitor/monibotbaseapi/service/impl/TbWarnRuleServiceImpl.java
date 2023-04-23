@@ -45,7 +45,6 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorPointMapper tbMonitorPointMapper;
-    private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final UserService userService;
     private final ITbWarnTriggerService tbWarnTriggerService;
     private final ITbWarnActionService tbWarnActionService;
