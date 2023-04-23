@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import java.util.Objects;
+
 /**
  * @author: youxian.kong@shmedo.cn
  * @date: 2023-04-21 11:45
@@ -46,6 +48,26 @@ public enum CompareInterval {
     //展示处理 -1->(-∞,value)，如果有其他-1的值小于它->(其他-1值,value); 0->(0,value); 1->(value,+∞)，如果有其他1的值大于它->(value,其他1值)
     private Integer showType;
 
+    public Integer getMonitorType() {
+        return monitorType;
+    }
+
+    public String getFieldToken() {
+        return fieldToken;
+    }
+
+    public String getCompareIntervalName() {
+        return compareIntervalName;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public Integer getShowType() {
+        return showType;
+    }
+
     CompareInterval(Integer monitorType, String fieldToken, String compareIntervalName, String desc, Integer showType) {
         this.monitorType = monitorType;
         this.fieldToken = fieldToken;
@@ -54,10 +76,23 @@ public enum CompareInterval {
         this.showType = showType;
     }
 
-    public static CompareInterval getValue() {
-        for (CompareInterval value : values()) {
-            //if  return
+    public static CompareInterval getValue(Integer monitorType, String fieldToken, String name) {
+        if (Objects.nonNull(monitorType) && Objects.nonNull(fieldToken) && Objects.nonNull(name)) {
+            for (CompareInterval value : values()) {
+                if (value.monitorType.equals(monitorType) && value.fieldToken.equals(fieldToken)
+                        && value.compareIntervalName.equals(name)) {
+                    return value;
+                }
+            }
         }
         return null;
+    }
+
+    public static boolean specialConcat(String compareIntervalName) {
+        return V0b.compareIntervalName.equals(compareIntervalName) || V0c.compareIntervalName.equals(compareIntervalName);
+    }
+
+    public static boolean notSpecialConcat(String compareIntervalName) {
+        return !specialConcat(compareIntervalName);
     }
 }

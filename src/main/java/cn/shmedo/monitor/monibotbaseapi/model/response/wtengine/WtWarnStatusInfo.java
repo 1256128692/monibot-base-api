@@ -15,5 +15,6 @@ public class WtWarnStatusInfo {
     private String warnName;
     private Integer warnLevel;
     private String compareRule;
+    private String compareRuleDesc;
     private List<TbWarnAction> action;
 }
