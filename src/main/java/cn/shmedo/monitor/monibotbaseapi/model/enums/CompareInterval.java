@@ -31,7 +31,7 @@ public enum CompareInterval {
     //水质等级
     V0d(4, "waterQuality", "劣于I类", "", -1),
     V0e(4, "waterQuality", "劣于II类", "", -1),
-    V0f(4, "waterQuality", "劣于III类", "", -1),
+    V0f(4, "waterQuality", "劣于Ⅲ类", "", -1),
     V10(4, "waterQuality", "劣于IV类", "", -1),
     V11(4, "waterQuality", "劣于V类", "", -1),
 
