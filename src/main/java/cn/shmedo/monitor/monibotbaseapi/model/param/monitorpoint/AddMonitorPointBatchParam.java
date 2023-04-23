@@ -1,10 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint;
 
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResultCode;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -24,6 +21,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -54,10 +52,11 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
         }
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+        List<Integer> itemIDList = addPointItemList.stream().map(AddPointItem::getMonitorItemID).distinct().toList();
         List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectBatchIds(
-                addPointItemList.stream().map(AddPointItem::getMonitorItemID).toList()
+                itemIDList
         );
-        if (tbMonitorItems.size() != addPointItemList.size()){
+        if (tbMonitorItems.size() != itemIDList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不存在");
         }
         if (tbMonitorItems.stream().anyMatch(item -> !item.getProjectID().equals(projectID))){
@@ -87,11 +86,11 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
 
     @Override
     public Resource parameter() {
-        return null;
+        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionProvider.super.resourcePermissionType();
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 }
