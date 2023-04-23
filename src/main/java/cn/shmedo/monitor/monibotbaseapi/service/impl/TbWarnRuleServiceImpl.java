@@ -21,6 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.engineField.CompareIntervalDescUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -78,7 +79,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                         .collect(Collectors.toList()));
         Map<Integer, List<WtTriggerActionInfo>> engineIdWarnMap = Optional.of(ruleIds).filter(u -> u.size() > 0)
                 .map(tbWarnTriggerService::queryWarnStatusByEngineIds)
-                .map(w -> w.stream().collect(Collectors.toMap(WtTriggerActionInfo::getWarnID, info -> info.setAction(info))))
+                .map(w -> w.stream().collect(Collectors.toMap(WtTriggerActionInfo::getWarnID, info -> info.setAction(info)
+                        , WtTriggerActionInfo::setAction)))
                 .map(Map::values).map(t -> t.stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)))
                 .orElse(new HashMap<>());
         List<WtEngineInfo> collect = records.stream().map(u -> WtEngineInfo.build(u)
@@ -131,8 +133,9 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                                 WtTriggerActionInfo::getWarnID, info -> info.setAction(info), WtTriggerActionInfo::setAction))
                         .values().stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)).get(engineID))
                 .ifPresent(warnList -> {
+                    Map<Integer, String> map = CompareIntervalDescUtil.getCompareRuleDescMap(build.getMonitorTypeID(), warnList);
                     List<WtWarnStatusDetailInfo> dataList = warnList.stream().map(WtTriggerActionInfo::buildDetail)
-                            .map(FieldShowUtil::dealFieldShow).toList();
+                            .peek(u -> u.setCompareRuleDesc(map.get(u.getWarnID()))).map(FieldShowUtil::dealFieldShow).toList();
                     build.setDataList(dataList);
                 });
         return build;
