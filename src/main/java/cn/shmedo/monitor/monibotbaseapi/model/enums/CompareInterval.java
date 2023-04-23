@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * @author: youxian.kong@shmedo.cn
  * @date: 2023-04-21 11:45
- * @desc: 模板 =
+ * @desc: 比较区间枚举
  */
 public enum CompareInterval {
     //水位-水位
@@ -41,12 +41,15 @@ public enum CompareInterval {
     //流量-流量
     V13(14, "volumeFlow", "警戒流量", "", 1),
     V14(14, "volumeFlow", "最小生态流量", "", -1);
-    private Integer monitorType;
-    private String fieldToken;
-    private String compareIntervalName;
-    private String desc;
-    //展示处理 -1->(-∞,value)，如果有其他-1的值小于它->(其他-1值,value); 0->(0,value); 1->(value,+∞)，如果有其他1的值大于它->(value,其他1值)
-    private Integer showType;
+    private final Integer monitorType;
+    private final String fieldToken;
+    private final String compareIntervalName;
+    private final String desc;
+    // 展示处理
+    // -1 -> (-∞,value)，如果有其他-1的值小于它 -> (其他-1值, value);
+    // 0 -> [0,value),如果有其他0的值小于它 -> (其他0值, value);
+    // 1 -> (value,+∞)，如果有其他1的值大于它 -> (value, 其他1值).
+    private final Integer showType;
 
     public Integer getMonitorType() {
         return monitorType;

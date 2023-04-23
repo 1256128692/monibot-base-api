@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 @TableName("tb_warn_log")
 public class TbWarnLog {
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
     @TableField("ProjectID")
     private Integer projectID;
