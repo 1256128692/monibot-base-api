@@ -26,6 +26,7 @@ public class WtMonitorDataController {
      * @apiName QueryMonitorPointNewDataList
      * @apiDescription 查询公司下所有监测点最新数据列表
      * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} [projectIDList] 工程ID列表
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
@@ -159,9 +160,9 @@ public class WtMonitorDataController {
      * ]
      * }]
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListCompanySensorData
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
-    @Permission(permissionName = "mdmbase:ListCompanySensorData")
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
         return wtMonitorService.queryMonitorPointList(pa);
