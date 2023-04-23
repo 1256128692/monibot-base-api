@@ -40,7 +40,7 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
-    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPoint(@Validated @RequestBody AddMonitorPointParam pa) {
         monitorPointService.addMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -69,7 +69,7 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
-    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPointBatch(@Validated @RequestBody AddMonitorPointBatchParam pa) {
         monitorPointService.addMonitorPointBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -96,7 +96,7 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
-    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPoint(@Validated @RequestBody UpdateMonitorPointParam pa) {
         monitorPointService.updateMonitorPoint(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -124,7 +124,7 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
-    @Permission(permissionName = "mdmbase:UpdateMonitorPoint")
+    @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPointBatch(@Validated @RequestBody UpdateMonitorPointBatchParam pa) {
         monitorPointService.updateMonitorPointBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -141,7 +141,7 @@ public class MonitorPointController {
      * @apiParam (请求体) {Int[]} pointIDList 监测点ID列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:DeleteMonitorPoint
      */
     @Permission(permissionName = "mdmbase:DeleteMonitorPoint")
     @PostMapping(value = "/DeleteMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
