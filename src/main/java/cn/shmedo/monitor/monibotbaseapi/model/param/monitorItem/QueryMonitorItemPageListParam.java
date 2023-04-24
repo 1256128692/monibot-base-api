@@ -42,7 +42,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper validate() {
-        if (projectID!= null){
+        if (projectID!= null && projectID != -1){
             TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
             var tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
             if (tbProjectInfo == null) {

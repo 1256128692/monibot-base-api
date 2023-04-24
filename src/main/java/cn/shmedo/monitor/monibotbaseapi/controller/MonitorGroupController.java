@@ -81,7 +81,7 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
 
-    @PostMapping(value = "/UpdateBaseMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/UploadMonitorGroupImage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object uploadMonitorGroupImage(@RequestBody @Validated UploadMonitorGroupImageParam pa) {
         return monitorGroupService.uploadMonitorGroupImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
