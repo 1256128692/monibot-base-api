@@ -56,12 +56,12 @@ public class FormulaData implements Serializable {
     /**
      * 开始时间
      */
-    private Date beginDate;
+    private long beginDate;
 
     /**
      * 结束时间
      */
-    private Date endDate;
+    private long endDate;
 
     /**
      * 设置字段值
@@ -96,12 +96,12 @@ public class FormulaData implements Serializable {
         /**
          * 毫秒时间戳
          */
-        UNIXMILLI("毫秒时间戳"),
+        UNIXMILLI("数据时间戳 (毫秒)"),
 
         /**
          * 秒时间戳
          */
-        UNIXSECOND("秒时间戳"),
+        UNIXSECOND("数据时间戳 (秒)"),
 
         /**
          * 时间

@@ -5,19 +5,15 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.util.Assert;
-
-import java.util.List;
 
 /**
  * 获取试运行参数 请求体
@@ -49,26 +45,26 @@ public class QueryTryingParamRequest implements ParameterValidator, ResourcePerm
      * 监测类型模板
      */
     @JsonIgnore
-    private TbMonitorTypeTemplate monitorTypeTemplate;
+    private MonitorTypeTemplateCacheData typeTemplateCache;
 
     /**
      * 监测类型字段
      */
     @JsonIgnore
-    private List<TbMonitorTypeField> typeFields;
+    private MonitorTypeCacheData monitorTypeCache;
 
     @Override
     public ResultWrapper<?> validate() {
-        TbMonitorTypeTemplateMapper monitorTypeTemplateMapper = SpringUtil.getBean(TbMonitorTypeTemplateMapper.class);
-        this.monitorTypeTemplate = monitorTypeTemplateMapper.selectById(this.templateID);
-        Assert.notNull(monitorTypeTemplate, "监测类型模板不存在");
+        RedisService redisService = SpringUtil.getBean(RedisService.class);
 
-        TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
-        this.typeFields = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
-                .eq(TbMonitorTypeField::getMonitorType, monitorType)
-                .in(TbMonitorTypeField::getFieldClass, FieldClass.BASIC.getCode(),
-                        FieldClass.EXTEND.getCode()));
-        Assert.notEmpty(typeFields, "监测类型不存在");
+        this.monitorTypeCache = redisService.get(RedisKeys.MONITOR_TYPE_KEY,
+                monitorType.toString(), MonitorTypeCacheData.class);
+        Assert.notNull(monitorTypeCache, "监测类型不存在");
+
+        this.typeTemplateCache = redisService.get(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY,
+                templateID.toString(), MonitorTypeTemplateCacheData.class);
+        Assert.notNull(typeTemplateCache, "监测类型模板不存在");
+
         return null;
     }
 

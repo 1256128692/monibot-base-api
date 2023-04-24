@@ -7,7 +7,6 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
-import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
@@ -28,32 +27,30 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FileService {
 
-    private final FileConfig fileConfig;
-
     private final MdInfoService mdInfoService;
 
     private static final String BASE64_FLAG = ";base64,";
 
+
     /**
      * base64 文件上传
      *
-     * @param base64 带前缀的base64字符串，形如{@code data:image/png;base64,iVBORw0AAA}
-     * @return 文件路径
+     * @param fileContent base64文件内容
+     * @param fileSuffix  文件后缀
+     * @param userID      用户ID
+     * @param fileName    文件名
+     * @param companyID   公司ID
+     * @return 文件key
      */
-    public String base64Upload(String base64) {
-        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-        String fileSuffix = StrUtil.subBetween(base64, StrUtil.SLASH, BASE64_FLAG);
-        String fileContent = StrUtil.subAfter(base64, BASE64_FLAG, false);
-        Assert.notEmpty(fileSuffix, "文件格式获取失败");
-        Assert.notEmpty(fileContent, "文件内容为空");
-
+    public String base64Upload(String fileContent, String fileSuffix,
+                               Integer userID, String fileName, Integer companyID) {
         AddFileUploadRequest pojo = new AddFileUploadRequest();
         pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
-        pojo.setFileName(UUID.randomUUID().toString());
+        pojo.setFileName(StrUtil.isNotBlank(fileName) ? fileName : UUID.randomUUID().toString());
         pojo.setFileContent(fileContent);
         pojo.setFileType(fileSuffix);
-        pojo.setUserID(subject.getSubjectID());
-        pojo.setCompanyID(subject.getCompanyID());
+        pojo.setUserID(userID);
+        pojo.setCompanyID(companyID);
         ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
@@ -61,6 +58,49 @@ public class FileService {
             return info.getData().getPath();
         }
     }
+
+    /**
+     * base64 文件上传<br/>
+     * 通过 {@link CurrentSubjectHolder} 获取必须用户信息，故仅限于请求处理线程中使用
+     *
+     * @param fileContent base64内容
+     * @param fileSuffix  文件后缀
+     * @param fileNane    文件名称
+     * @return 文件key
+     */
+    public String base64Upload(String fileContent, String fileSuffix, String fileNane) {
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        return base64Upload(fileContent, fileSuffix, subject.getSubjectID(), fileNane, subject.getCompanyID());
+    }
+
+    /**
+     * base64 文件上传<br/>
+     * 通过 {@link CurrentSubjectHolder} 获取必须用户信息，故仅限于请求处理线程中使用
+     *
+     * @param fileContent base64文件内容
+     * @param fileSuffix  文件后缀
+     * @return 文件key
+     */
+    public String base64Upload(String fileContent, String fileSuffix) {
+        return base64Upload(fileContent, fileSuffix, null);
+    }
+
+    /**
+     * base64 文件上传<br/>
+     * 通过 {@link CurrentSubjectHolder} 获取必须用户信息，故仅限于请求处理线程中使用
+     *
+     * @param base64 带前缀的base64字符串，形如{@code data:image/png;base64,iVBORw0AAA}
+     * @return 文件key
+     */
+    public String base64Upload(String base64) {
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        String fileSuffix = StrUtil.subBetween(base64, StrUtil.SLASH, BASE64_FLAG);
+        String fileContent = StrUtil.subAfter(base64, BASE64_FLAG, false);
+        Assert.notEmpty(fileSuffix, "文件格式获取失败");
+        Assert.notEmpty(fileContent, "文件内容为空");
+        return base64Upload(fileContent, fileSuffix);
+    }
+
 
     /**
      * 获取文件访问地址

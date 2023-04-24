@@ -9,13 +9,14 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.monitor.enums.CalType;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
@@ -296,51 +297,38 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public TryingParamResponse getTryingParam(QueryTryingParamRequest request) {
         TryingParamResponse result = new TryingParamResponse();
-        result.setCalType(request.getMonitorTypeTemplate().getCalType());
-        switch (CalType.codeOf(result.getCalType())) {
-            case FORMULA:
-                Map<Integer, TbTemplateFormula> formulaMap = templateFormulaMapper
-                        .selectList(new LambdaQueryWrapper<TbTemplateFormula>()
-                                .eq(TbTemplateFormula::getTemplateID, request.getTemplateID())
-                                .eq(TbTemplateFormula::getMonitorType, request.getMonitorType()))
-                        .stream().collect(Collectors.toMap(TbTemplateFormula::getFieldID, e -> e));
-                result.setFieldList(request.getTypeFields().stream()
-                        .filter(e -> formulaMap.containsKey(e.getID())).map(typeField -> {
-                            Field field = Field.valueOf(typeField);
-                            field.setDisplayFormula(formulaMap.get(typeField.getID()).getDisplayFormula());
-                            field.setFormula(formulaMap.get(typeField.getID()).getFormula());
-                            return field;
-                        }).toList());
-                break;
-            case SCRIPT:
-                TbTemplateScript tbTemplateScript = templateScriptMapper.selectOne(new LambdaQueryWrapper<TbTemplateScript>()
-                        .eq(TbTemplateScript::getTemplateID, request.getTemplateID())
-                        .eq(TbTemplateScript::getMonitorType, request.getMonitorType())
-                        .select(TbTemplateScript::getScript));
-                result.setScript(tbTemplateScript.getScript());
-                break;
-            case HTTP: //TODO HTTP计算未实现
-                break;
-            default:
-                break;
-        }
+        result.setCalType(request.getTypeTemplateCache().getCalType().getCode());
 
+        Map<Integer, FormulaCacheData> formulaMap = request.getTypeTemplateCache().getTemplateFormulaList()
+                .stream().collect(Collectors.toMap(FormulaCacheData::getFieldID, e -> e));
+        Map<FieldClass, Map<String, MonitorTypeCacheData.Field>> fieldClassGroup = request.getMonitorTypeCache()
+                .getMonitortypeFieldList().stream()
+                .collect(Collectors.groupingBy(MonitorTypeCacheData.Field::getFieldClass,
+                        Collectors.toMap(MonitorTypeCacheData.Field::getFieldToken, e -> e)));
+        //字段
+        result.setFieldList(fieldClassGroup.entrySet().stream()
+                .filter(e -> !FieldClass.EXTEND_CONFIG.equals(e.getKey()))
+                .flatMap(e -> e.getValue().values().stream())
+                        .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
+                        .filter(Objects::nonNull).toList());
+        //脚本
+        Optional.ofNullable(request.getTypeTemplateCache().getTemplateScriptList())
+                .filter(e -> !e.isEmpty())
+                .ifPresent(scripts -> result.setScript(CollUtil.getFirst(scripts).getScript()));
+        //参数
         Map<Origin.Type, Set<FormulaData>> sourceMap = result.getFieldList().stream()
-                .flatMap(e -> FormulaUtil.parse(e.getFormula(), null).stream())
+                .flatMap(e -> FormulaUtil.parse(e.getFormula()).stream())
                 .collect(Collectors.toMap(FormulaData::getType, CollUtil::newHashSet, (a, b) -> {
                     a.addAll(b);
                     return a;
                 }));
-
-        Set<Object> modelTokens = sourceMap.getOrDefault(Origin.Type.IOT, Collections.emptySet()).stream()
-                .map(e -> StrUtil.subBefore(e.getSourceToken(), StrUtil.UNDERLINE, false))
-                .map(e -> (Object) e)
-                .collect(Collectors.toSet());
-        Map<String, Model> modelMap = iotRedisService.multiGet(RedisKeys.IOT_MODEL_KEY, modelTokens, Model.class)
-                .stream().collect(Collectors.toMap(Model::getModelToken, e -> e));
         List<Param> paramList = sourceMap.entrySet().stream().flatMap(entry -> {
             switch (entry.getKey()) {
                 case IOT -> {
+                    Set<Object> tokens = entry.getValue().stream().map(e -> StrUtil.subBefore(e.getSourceToken(),
+                            StrUtil.UNDERLINE, false)).map(e -> (Object) e).collect(Collectors.toSet());
+                    Map<String, Model> modelMap = iotRedisService.multiGet(RedisKeys.IOT_MODEL_KEY, tokens, Model.class)
+                            .stream().collect(Collectors.toMap(Model::getModelToken, e -> e));
                     return entry.getValue().stream().map(e -> Param.valueOf(modelMap, e));
                 }
                 case PARAM -> {
@@ -356,18 +344,18 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     });
                 }
                 case EX -> {
-                    List<String> exTokens = entry.getValue().stream().map(FormulaData::getFieldToken).toList();
-                    Map<String, TbMonitorTypeField> exMap = monitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
-                            .eq(TbMonitorTypeField::getMonitorType, request.getMonitorType())
-                            .eq(TbMonitorTypeField::getFieldClass, FieldClass.EXTEND_CONFIG.getCode())
-                            .in(TbMonitorTypeField::getFieldToken, exTokens)
-                            .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldName)
-                    ).stream().collect(Collectors.toMap(TbMonitorTypeField::getFieldToken, e -> e));
+                    Map<String, MonitorTypeCacheData.Field> exMap = request.getMonitorTypeCache()
+                            .getMonitortypeFieldList().stream()
+                            .filter(e -> FieldClass.EXTEND_CONFIG.equals(e.getFieldClass()))
+                            .collect(Collectors.toMap(MonitorTypeCacheData.Field::getFieldToken, e -> e));
                     return entry.getValue().stream().map(e -> {
                         Assert.isTrue(exMap.containsKey(e.getFieldToken()),
                                 "扩展字段{}找不到", e.getFieldToken());
                         return Param.valueOf(exMap.get(e.getFieldToken()), e.getOrigin(), entry.getKey());
                     });
+                }
+                case HISTORY -> {
+                    return entry.getValue().stream().map( e-> Param.valueOf(request.getMonitorTypeCache(),e ));
                 }
                 default -> {
                     //TODO SELF、MON、HISTORY 待实现
@@ -382,22 +370,21 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public Object trying(TryingRequest request) {
         List<TryingResponse> result = List.of();
+        Dict fieldValueMap = Dict.create();
         switch (request.getCalType()) {
             case FORMULA:
-                Dict fieldValueMap = Dict.create();
-                result = request.getFieldList().stream().map(f -> {
-                    Double item = FormulaUtil.calculate(f.getFormula(), null, typeListMap -> {
-                        typeListMap.forEach((type, sources) ->
-                            sources.forEach(source ->
-                                    source.setFieldValue(Origin.Type.SELF.equals(type) ?
-                                            fieldValueMap.getDouble(source.getFieldToken()) :
-                                            request.getParamMap().get(source.getOrigin())))
-                        );
-                    });
+                return request.getFieldList().stream().map(f -> {
+                    Double item = FormulaUtil.calculate(f.getFormula(), typeListMap ->
+                            typeListMap.forEach((type, sources) ->
+                                    sources.forEach(source ->
+                                            source.setFieldValue(Origin.Type.SELF.equals(type) ?
+                                                    fieldValueMap.getDouble(source.getFieldToken()) :
+                                                    request.getParamMap().get(source.getOrigin())))
+                            ));
                     //每计算一个字段，将其结果缓存，供后续公式使用
                     fieldValueMap.set(f.getFieldToken(), item);
                     return new TryingResponse(item, f.getFieldToken(), f.getID());
-                }).toList();
+                }).filter(e -> request.getFieldID().equals(e.fieldID())).toList();
             case SCRIPT:
                 //TODO 脚本计算未实现
                 break;
@@ -405,7 +392,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 //TODO HTTP计算未实现
                 break;
         }
-        return result.stream().filter(e -> request.getFieldID().equals(e.fieldID())).toList();
+        return result;
     }
 
     @Override
