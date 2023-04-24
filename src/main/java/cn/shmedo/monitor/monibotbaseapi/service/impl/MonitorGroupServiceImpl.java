@@ -125,9 +125,11 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                     .monitorGroupID(pa.getGroupID())
                     .monitorPointID(item)
                     .build()).collect(Collectors.toList());
-            tbMonitorGroupPointMapper.insertBatchSomeColumn(
-                    tbMonitorGroupPointList
-            );
+                if(CollectionUtils.isNotEmpty(tbMonitorGroupPointList)){
+                    tbMonitorGroupPointMapper.insertBatchSomeColumn(
+                            tbMonitorGroupPointList
+                    );
+                }
         }
     }
 
