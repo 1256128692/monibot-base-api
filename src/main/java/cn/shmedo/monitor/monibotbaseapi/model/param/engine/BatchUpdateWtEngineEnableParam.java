@@ -35,7 +35,7 @@ public class BatchUpdateWtEngineEnableParam extends BatchDeleteWtEngineParam imp
                     }).map(tbWarnTriggerService::queryWarnStatusByEngineIds).filter(u -> u.size() > 0).map(u -> u.get(0))
                     .orElse(WtTriggerActionInfo.builder().warnID(null).build());
             if (Objects.isNull(info.getWarnID())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "请先至少配置一个报警状态");
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该规则未配置完整，不能开启");
             }
         }
         return super.validate();
