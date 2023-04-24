@@ -489,7 +489,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             String value = tbProjectConfig.getValue();
             if (StrUtil.isNotEmpty(value)) {
                 Map map = JSONUtil.toBean(value, Map.class);
-                return fileService.getFileUrl(map.get(pa.getImgType()).toString());
+                Object obj = map.get(pa.getImgType());
+                if (obj!=null){
+                    return fileService.getFileUrl(obj.toString());
+                }
             }
         }
         return null;
