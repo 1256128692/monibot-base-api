@@ -293,8 +293,11 @@
         from tb_monitor_item as it
                  left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         <where>
+            <if test="companyID !=null">
+                it.CompanyID = #{companyID}
+            </if>
             <if test="projectID != null">
-                it.ProjectID = #{projectID}
+                and it.ProjectID = #{projectID}
             </if>
             <if test="createType != null">
                 and it.CreateType = #{createType}

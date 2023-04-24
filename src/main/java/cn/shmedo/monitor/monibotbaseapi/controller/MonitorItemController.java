@@ -96,8 +96,9 @@ public class MonitorItemController {
      * @apiVersion 1.0.0
      * @apiGroup 监测项目模块
      * @apiName QueryMonitorItemPageList
-     * @apiDescription 查询监测项目分页
-     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
+     * @apiDescription 查询监测项目分页,系统权限，预定义权限，不允许授予第三方。
+     * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
+     * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
      * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称, 模糊查询
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {String} [fieldToken] 属性标识, 模糊查询
@@ -126,9 +127,9 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 字段描述
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.unit 单位
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseMonitorItem
+     * @apiPermission 系统权限 mdmbase:ListSuperBaseInfo
      */
-    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @Permission(permissionName = "mdmbase:ListSuperBaseInfo")
     @PostMapping(value = "/QueryMonitorItemPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemPageList(@RequestBody @Validated QueryMonitorItemPageListParam pa) {
         return monitorItemService.queryMonitorItemPageList(pa);

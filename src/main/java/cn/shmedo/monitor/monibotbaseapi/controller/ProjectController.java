@@ -156,10 +156,10 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa) {
-        return projectService.queryProjectList(pa);
+    public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa ){
+        return projectService.queryProjectList(pa, CurrentSubjectHolder.getCurrentSubjectExtractData());
     }
 
 

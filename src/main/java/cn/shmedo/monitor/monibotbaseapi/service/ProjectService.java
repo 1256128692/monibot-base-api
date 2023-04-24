@@ -45,10 +45,11 @@ public interface ProjectService {
 
     /**
      * 查询项目列表
-     * @param pa    参数 {@link QueryProjectListRequest}
-     * @return  {@link PageUtil.Page <ProjectInfo>}
+     *
+     * @param pa     参数 {@link QueryProjectListRequest}
+     * @return {@link PageUtil.Page <ProjectInfo>}
      */
-    PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa);
+    PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa, String accessToken);
 
     ProjectInfo queryProjectInfo(QueryProjectInfoParam pa);
 

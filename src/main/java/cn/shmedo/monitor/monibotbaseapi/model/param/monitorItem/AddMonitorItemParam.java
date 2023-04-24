@@ -87,7 +87,8 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
         }
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
         if (tbMonitorItemMapper.selectCount(
-                new QueryWrapper<TbMonitorItem>().eq("projectID", projectID).eq("Name", monitorItemName)
+                new QueryWrapper<TbMonitorItem>().eq("projectID", createType.equals(CreateType.PREDEFINED.getType()) ? -1 : projectID)
+                        .eq("Name", monitorItemName)
         )>0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该项目下监测项目名称已存在");
         }

@@ -81,7 +81,7 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
 
-    @PostMapping(value = "/UploadMonitorGroupImage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/UpdateBaseMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object uploadMonitorGroupImage(@RequestBody @Validated UploadMonitorGroupImageParam pa) {
         return monitorGroupService.uploadMonitorGroupImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
@@ -98,7 +98,7 @@ public class MonitorGroupController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorGroup
      */
-    @Permission(permissionName = "mdmbase:DeleteBaseMonitorGroup")
+    @Permission(permissionName = "mdmbase:DeleteMonitorGroup")
     @PostMapping(value = "/DeleteMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorGroup(@RequestBody @Validated DeleteMonitorGroupParam pa) {
         monitorGroupService.deleteMonitorGroup(pa.getGroupIDList());

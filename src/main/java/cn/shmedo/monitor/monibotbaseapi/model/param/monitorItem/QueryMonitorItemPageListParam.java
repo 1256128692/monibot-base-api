@@ -21,6 +21,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class QueryMonitorItemPageListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    private Integer companyID;
     private Integer projectID;
     private String monitorItemName;
     private Integer monitorType;
@@ -53,7 +54,8 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     @Override
     public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        CurrentSubject currentSubject = CurrentSubjectHolder.getCurrentSubject();
+        return new Resource(currentSubject.getCompanyID().toString(), ResourceType.COMPANY);
     }
 
     @Override

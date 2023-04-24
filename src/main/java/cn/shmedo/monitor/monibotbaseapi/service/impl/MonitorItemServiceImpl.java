@@ -163,7 +163,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page,pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

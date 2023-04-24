@@ -314,8 +314,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
-        List<Integer> projectIDList = null;
+    public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa, String accessToken) {
+        List<Integer> userProjectIDs = getUserProjectIDs(pa.getCompanyID(), accessToken);
+        if (CollUtil.isEmpty(userProjectIDs)) {
+            return PageUtil.Page.empty();
+        }
+        List<Integer> projectIDList = List.of();
         if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())) {
             projectIDList = tbProjectInfoMapper
                     .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
@@ -323,12 +327,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 return PageUtil.Page.empty();
             }
         }
-
         //FIXME 米度查询所有项目，暂时以固定ID判断
         if (DefaultConstant.MD_ID.equals(pa.getCompanyID())) {
             pa.setCompanyID(null);
         }
-        pa.setProjectIDList(projectIDList);
+
+        userProjectIDs.addAll(projectIDList);
+        pa.setProjectIDList(userProjectIDs);
         Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(page, pa);
 
