@@ -27,7 +27,7 @@ public class FormulaUtil {
      * @param item 具体表达式，如 {@code self:self.time:format=unixMilli}
      * @return 解析结果 {@link FormulaData}
      */
-    private static FormulaData parseItem(@Nonnull String item, Date date) {
+    private static FormulaData parseItem(@Nonnull String item) {
         Origin origin = Origin.parse(item);
         FormulaData result = new FormulaData();
         result.setOrigin(StrUtil.concat(true,
@@ -58,10 +58,10 @@ public class FormulaUtil {
                         .ifPresent(s -> result.setProvide(FormulaData.Provide.valueOf(s.toUpperCase())));
                 Optional.ofNullable(MapUtil.getStr(origin.getParams(), Constant.END_DATE))
                         .filter(StrUtil::isNotBlank)
-                        .ifPresent(s -> result.setEndDate(Constant.SELF_TIME.equals(s) ? date : DateUtil.parseDate(s)));
+                        .ifPresent(s -> result.setEndDate(Constant.SELF_TIME.equals(s) ? -1 : DateUtil.parseDate(s).getTime()));
                 Optional.ofNullable(MapUtil.getStr(origin.getParams(), Constant.BEGIN_DATE))
                         .filter(StrUtil::isNotBlank)
-                        .ifPresent(s -> result.setBeginDate(DateUtil.parseDate(s)));
+                        .ifPresent(s -> result.setBeginDate(DateUtil.parseDate(s).getTime()));
                 break;
             case SELF:
                 Optional.ofNullable(MapUtil.getStr(origin.getParams(), Constant.FORMAT))
@@ -85,9 +85,9 @@ public class FormulaUtil {
      * @param formula 原始公式 形如: {@code ${self:self.time:format=unixMilli}+${self:self.time:format=unixMilli}}
      * @return 解析结果 {@link Collection<FormulaData>}
      */
-    public static Collection<FormulaData> parse(String formula, Date date) {
+    public static Collection<FormulaData> parse(String formula) {
         return Arrays.stream(StrUtil.subBetweenAll(formula, Constant.FORMULA_PREFIX, Constant.FORMULA_SUFFIX))
-                .map(e -> parseItem(e, date)).collect(Collectors.toSet());
+                .map(FormulaUtil::parseItem).collect(Collectors.toSet());
     }
 
     /**
@@ -118,12 +118,11 @@ public class FormulaUtil {
      * 解析并计算公式
      *
      * @param formula  公式
-     * @param date     数据时间
      * @param consumer 参数值提供器
      * @return 计算结果
      */
-    public static Double calculate(String formula, Date date, Consumer<Map<Origin.Type, List<FormulaData>>> consumer) {
-        Collection<FormulaData> data = parse(formula, date);
+    public static Double calculate(String formula, Consumer<Map<Origin.Type, List<FormulaData>>> consumer) {
+        Collection<FormulaData> data = parse(formula);
         Map<Origin.Type, List<FormulaData>> typeMap = data.stream().collect(Collectors.groupingBy(FormulaData::getType));
         consumer.accept(typeMap);
         return calculate(formula, data);

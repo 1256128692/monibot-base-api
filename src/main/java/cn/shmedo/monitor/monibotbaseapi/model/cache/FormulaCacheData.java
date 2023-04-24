@@ -31,4 +31,9 @@ public class FormulaCacheData extends AbstractCacheData {
      * 计算排序字段
      */
     private Integer fieldCalOrder;
+
+    /**
+     * 公式显示表达式
+     */
+    private String displayFormula;
 }

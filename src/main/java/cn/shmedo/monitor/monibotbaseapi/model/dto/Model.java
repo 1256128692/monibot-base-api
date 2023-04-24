@@ -48,7 +48,7 @@ public class Model implements Serializable {
     @Data
     public static class Field implements Serializable {
 
-        private Integer ID;
+        private Integer id;
 
         /**
          * 字段名称

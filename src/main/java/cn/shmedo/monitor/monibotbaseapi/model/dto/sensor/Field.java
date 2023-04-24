@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.sensor;
 
+import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +39,24 @@ public class Field extends TbMonitorTypeField {
         field.setParentID(typeField.getParentID());
         field.setCreateType(typeField.getCreateType());
         field.setExValues(typeField.getExValues());
+        return field;
+    }
+
+    public static Field valueOf(MonitorTypeCacheData.Field e, FormulaCacheData formulaCacheData) {
+        if (formulaCacheData == null) {
+            return null;
+        }
+        Field field = new Field();
+        field.setID(e.getID());
+        field.setFieldToken(e.getFieldToken());
+        field.setFieldName(e.getFieldName());
+        field.setFieldUnitID(e.getFieldUnitID());
+        field.setExValues(e.getExValues());
+        field.setFieldClass(e.getFieldClass().getCode());
+        field.setParentID(e.getParentID());
+        field.setFieldDataType(e.getFieldDataType());
+        field.setFormula(formulaCacheData.getFormula());
+        field.setDisplayFormula(formulaCacheData.getDisplayFormula());
         return field;
     }
 }
