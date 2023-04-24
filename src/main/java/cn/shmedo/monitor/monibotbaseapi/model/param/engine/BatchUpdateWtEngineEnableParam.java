@@ -26,7 +26,7 @@ public class BatchUpdateWtEngineEnableParam extends BatchDeleteWtEngineParam imp
     @Override
     public ResultWrapper validate() {
         List<Integer> engineIDList = getEngineIDList();
-        if (engineIDList.size() == 1) {
+        if (engineIDList.size() == 1 && enable) {
             ITbWarnTriggerService tbWarnTriggerService = ContextHolder.getBean(ITbWarnTriggerService.class);
             WtTriggerActionInfo info = Optional.of(engineIDList).map(w -> w.get(0)).map(u -> {
                         List<Integer> list = new ArrayList<>();
@@ -35,7 +35,7 @@ public class BatchUpdateWtEngineEnableParam extends BatchDeleteWtEngineParam imp
                     }).map(tbWarnTriggerService::queryWarnStatusByEngineIds).filter(u -> u.size() > 0).map(u -> u.get(0))
                     .orElse(WtTriggerActionInfo.builder().warnID(null).build());
             if (Objects.isNull(info.getWarnID())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎未配置报警状态");
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "请先至少配置一个报警状态");
             }
         }
         return super.validate();
