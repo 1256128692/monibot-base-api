@@ -14,6 +14,8 @@ import java.util.Date;
 public class TbWarnRule {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
+    @TableField("RuleType")
+    private Integer ruleType;
     @TableField("ProjectID")
     private Integer projectID;
     @TableField("MonitorType")
