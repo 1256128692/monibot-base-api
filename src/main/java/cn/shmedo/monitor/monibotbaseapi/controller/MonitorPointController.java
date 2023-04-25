@@ -110,6 +110,7 @@ public class MonitorPointController {
      * @apiName UpdateMonitorPointBatch
      * @apiDescription 批量修改监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Boolean} [selectUpdate] 只更新非空的项
      * @apiParam (请求体) {Object[]} updatePointItemList 修改监测点列表(max = 100)
      * @apiParam (请求体) {Int} updatePointItemList.pointID 监测点ID
      * @apiParam (请求体) {String} updatePointItemList.name 监测点名称

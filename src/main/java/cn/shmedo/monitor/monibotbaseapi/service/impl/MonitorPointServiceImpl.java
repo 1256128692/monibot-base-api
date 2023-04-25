@@ -109,7 +109,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
 
     @Override
     public void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID) {
-        tbMonitorPointMapper.updateBatch(pa.updateBatch(userID));
+        tbMonitorPointMapper.updateBatch(pa.updateBatch(userID), pa.getSelectUpdate());
 
     }
 }

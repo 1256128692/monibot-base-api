@@ -75,6 +75,7 @@ public class MonitorGroupController {
      * @apiParam (请求体) {String} fileName 文件名称(100)
      * @apiParam (请求体) {String} imageSuffix 文件后缀
      * @apiParam (请求体) {String} imageContent 文件base64内容
+     * @apiParam (请求体) {Boolean} [cleanLocation] 清理该组的点位置
      * @apiSuccess (返回结果) {String} url 可用图片地址
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup

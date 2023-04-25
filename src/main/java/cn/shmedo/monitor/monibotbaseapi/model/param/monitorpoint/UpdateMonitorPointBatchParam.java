@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 public class UpdateMonitorPointBatchParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer projectID;
+    private Boolean selectUpdate;
     @NotEmpty
     @Valid
     @Size(max = 100)

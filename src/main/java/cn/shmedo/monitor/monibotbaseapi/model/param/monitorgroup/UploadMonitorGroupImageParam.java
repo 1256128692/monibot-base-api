@@ -33,6 +33,7 @@ public class UploadMonitorGroupImageParam implements ParameterValidator, Resourc
     private String imageContent;
     @NotBlank
     private String imageSuffix;
+    private Boolean cleanLocation;
 
     @JsonIgnore
     private Integer companyID;

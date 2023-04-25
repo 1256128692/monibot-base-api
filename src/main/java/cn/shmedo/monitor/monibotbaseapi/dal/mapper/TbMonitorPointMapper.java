@@ -35,7 +35,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
 
     void insertBatch(List<TbMonitorPoint> list);
 
-    void updateBatch(List<TbMonitorPoint> list);
+    void updateBatch(List<TbMonitorPoint> list, Boolean selectUpdate);
 
     List<GroupPoint> queryGroupPointByGroupIDs(List<Integer> allGroupIDList);
 }

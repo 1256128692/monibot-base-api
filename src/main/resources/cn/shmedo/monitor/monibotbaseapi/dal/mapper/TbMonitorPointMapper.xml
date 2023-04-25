@@ -385,33 +385,124 @@
         </trim>
         <trim prefix="gpsLocation = case" suffix="end,">
         <foreach collection="list" index="index" item="item">
-            when ID = #{item.ID} then #{item.gpsLocation}
+            when ID = #{item.ID} then
+
+            <choose>
+                <when test="selectUpdate != null and selectUpdate">
+                    <choose>
+                        <when test="item.gpsLocation == null">
+                            gpsLocation
+                        </when>
+                        <otherwise>
+                            #{item.gpsLocation}
+                        </otherwise>
+                    </choose>
+                </when>
+                <otherwise>
+                    #{item.gpsLocation}
+                </otherwise>
+            </choose>
         </foreach>
         </trim>
         <trim prefix="imageLocation = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
-                when ID = #{item.ID} then #{item.imageLocation}
+                when ID = #{item.ID} then
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.imageLocation == null">
+                                imageLocation
+                            </when>
+                            <otherwise>
+                                #{item.imageLocation}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.imageLocation}
+                    </otherwise>
+                </choose>
             </foreach>
         </trim>
 
         <trim prefix="overallViewLocation = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
-                when ID = #{item.ID} then #{item.overallViewLocation}
+                when ID = #{item.ID} then
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.overallViewLocation == null">
+                                overallViewLocation
+                            </when>
+                            <otherwise>
+                                #{item.overallViewLocation}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.overallViewLocation}
+                    </otherwise>
+                </choose>
             </foreach>
         </trim>
         <trim prefix="spatialLocation = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
-                when ID = #{item.ID} then #{item.spatialLocation}
+                when ID = #{item.ID} then
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.spatialLocation == null">
+                                spatialLocation
+                            </when>
+                            <otherwise>
+                                #{item.spatialLocation}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.spatialLocation}
+                    </otherwise>
+                </choose>
             </foreach>
         </trim>
         <trim prefix="exValues = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
-                when ID = #{item.ID} then #{item.exValues}
+                when ID = #{item.ID} then
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.exValues == null">
+                                exValues
+                            </when>
+                            <otherwise>
+                                #{item.exValues}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.exValues}
+                    </otherwise>
+                </choose>
             </foreach>
         </trim>
         <trim prefix="displayOrder = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
-                when ID = #{item.ID} then #{item.displayOrder}
+                when ID = #{item.ID} then
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.displayOrder == null">
+                                displayOrder
+                            </when>
+                            <otherwise>
+                                #{item.displayOrder}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.displayOrder}
+                    </otherwise>
+                </choose>
             </foreach>
         </trim>
         <trim prefix="updateUserID = case" suffix="end,">

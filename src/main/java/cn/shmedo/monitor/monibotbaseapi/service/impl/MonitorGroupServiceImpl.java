@@ -134,6 +134,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public String uploadMonitorGroupImage(UploadMonitorGroupImageParam pa, Integer userID) {
         AddFileUploadRequest pojo = ParamBuilder.buildAddFileUploadRequest(pa.getImageContent(), pa.getImageSuffix(), userID, pa.getFileName(), pa.getCompanyID());
         ResultWrapper<FilePathResponse> info = mdInfoService.addFileUpload(pojo);
@@ -144,6 +145,11 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             path = info.getData().getPath();
         }
         tbMonitorGroupMapper.updateImg(path, pa.getGroupID(), userID, new Date());
+        if (pa.getCleanLocation()!= null && pa.getCleanLocation()){
+            tbMonitorGroupPointMapper.delete(
+                    new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID())
+            );
+        }
         return fileService.getFileUrl(path);
     }
 
