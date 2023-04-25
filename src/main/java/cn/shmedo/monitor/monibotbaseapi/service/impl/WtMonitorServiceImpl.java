@@ -1035,27 +1035,36 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     .max(Comparator.comparingDouble(data -> (Double) data.get("aAccu")));
             Integer sensorIDByV1 = maxV1Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
-            Double xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
+            Double xDeep = null;
+            if (!StringUtil.isNullOrEmpty(s1) ){
+                xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
+            }
 
             // 找到最大的 v3 和对应的深度
             Optional<Map<String, Object>> maxV3Data = newDataList.stream()
                     .max(Comparator.comparingDouble(data -> (Double) data.get("bAccu")));
             Integer sensorIDByV3 = maxV3Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
-            Double yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
+            Double yDeep = null;
+            if (!StringUtil.isNullOrEmpty(s2) ){
+                yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
+            }
 
             // 找到最大的 v5 和对应的深度
             Optional<Map<String, Object>> maxV5Data = newDataList.stream()
                     .max(Comparator.comparingDouble(data -> (Double) data.get("cOriginal")));
             Integer sensorIDByV5 = maxV5Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
-            Double zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
+            Double zDeep = null;
+            if (!StringUtil.isNullOrEmpty(s3) ){
+                zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
+            }
 
             // 构建新的数据集
             Map<String, Object> newData = new HashMap<>();
-            newData.put("xValue", maxV1Data.map(data -> data.get("aAccu")).orElse(Double.NaN));
-            newData.put("yValue", maxV3Data.map(data -> data.get("bAccu")).orElse(Double.NaN));
-            newData.put("zValue", maxV5Data.map(data -> data.get("cOriginal")).orElse(Double.NaN));
+            newData.put("xValue", maxV1Data.map(data -> data.get("aAccu")).orElse(null));
+            newData.put("yValue", maxV3Data.map(data -> data.get("bAccu")).orElse(null));
+            newData.put("zValue", maxV5Data.map(data -> data.get("cOriginal")).orElse(null));
             newData.put("xDeep", xDeep);
             newData.put("yDeep", yDeep);
             newData.put("zDeep", zDeep);
