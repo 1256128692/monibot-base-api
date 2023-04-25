@@ -17,14 +17,14 @@
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
     </resultMap>
     <sql id="Base_Column_List">
-        ID,ProjectID,MonitorType,MonitorItemID,MonitorPointID,SensorID,`Name`,Enable,`Desc`,CreateTime,CreateUserID,UpdateTime,UpdateUserID
+        ID,RuleType,ProjectID,MonitorType,MonitorItemID,MonitorPointID,SensorID,`Name`,Enable,`Desc`,CreateTime,CreateUserID,UpdateTime,UpdateUserID
     </sql>
 
     <select id="selectWarnRuleByPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
         SELECT <include refid="Base_Column_List"/>
         FROM
             tb_warn_rule
-        WHERE `ProjectID` IN
+        WHERE RuleType == 1 AND `ProjectID` IN
         <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>

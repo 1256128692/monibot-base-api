@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.TbRuleType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
@@ -147,6 +148,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .map(TbMonitorItem::getMonitorType)
                 .orElseThrow(() -> new RuntimeException("请检查tb_monitor_type中id:" + monitorItemID + "的记录是否存在MonitorType"));
         TbWarnRule build = AddWtEngineParam.build(param);
+        build.setRuleType(TbRuleType.WARN_RULE.getKey());
         build.setCreateUserID(userID);
         build.setUpdateUserID(userID);
         build.setMonitorType(monitorType);
