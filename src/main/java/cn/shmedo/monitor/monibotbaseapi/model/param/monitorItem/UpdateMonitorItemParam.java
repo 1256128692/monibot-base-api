@@ -46,7 +46,7 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
     private String exValue;
     private Integer displayOrder;
     @Valid
-    private List< @NotNull Integer > fieldIDList;
+    private List<@NotNull FieldItem> fieldItemList;
     @JsonIgnore
     private TbMonitorItem  tbMonitorItem;
 
@@ -70,11 +70,15 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
         if (!projectID.equals(tbMonitorItem.getProjectID())){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不属于该工程项目");
         }
-        if (ObjectUtil.isNotEmpty(fieldIDList)){
+        if (ObjectUtil.isNotEmpty(fieldItemList)){
             TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+            List<Integer> typeFieldIDList = fieldItemList.stream().map(FieldItem::getMonitorTypeFieldID).distinct().toList();
+            if (typeFieldIDList.size()!=fieldItemList.size()){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性有重复");
+            }
             if (tbMonitorTypeFieldMapper.selectCount(
-                    new QueryWrapper<TbMonitorTypeField>().eq("monitorType", tbMonitorItem.getMonitorType()).in("id", fieldIDList)
-            ) != fieldIDList.size()) {
+                    new QueryWrapper<TbMonitorTypeField>().eq("monitorType", tbMonitorItem.getMonitorType()).in("id", typeFieldIDList)
+            ) != typeFieldIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性有不属于该监测类型的");
             }
         }

@@ -11,4 +11,5 @@ import lombok.Data;
 @Data
 public class TbMonitorTypeFieldWithItemID extends TbMonitorTypeField {
     private Integer itemID;
+    private String alias;
 }

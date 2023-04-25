@@ -271,6 +271,7 @@
   <select id="queryMonitorTypeFieldV1ByMonitorItems"
           resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1">
     select tf.id as fieldID, tf.FieldToken, tf.FieldName, tf.FieldDesc,tf.FieldUnitID,u.EngUnit,itf.MonitorItemID as itemID
+    ,itf.Alias as fieldAlias
       from tb_monitor_type_field as tf
              left join  tb_monitor_item_field as itf on itf.MonitorTypeFieldID = tf.ID
             left join tb_data_unit as u on u.id = tf.FieldUnitID

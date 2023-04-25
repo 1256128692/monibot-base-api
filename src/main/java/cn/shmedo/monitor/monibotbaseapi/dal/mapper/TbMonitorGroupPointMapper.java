@@ -21,4 +21,6 @@ public interface TbMonitorGroupPointMapper extends BasicMapper<TbMonitorGroupPoi
     List<Integer> queryPointIDByGroupID(Integer groupID);
 
     void updateImgLocation(List<PointIDAndLocation> pointLocationList, Integer groupID);
+
+    void updateLocationByGroupID(String location, Integer groupID);
 }

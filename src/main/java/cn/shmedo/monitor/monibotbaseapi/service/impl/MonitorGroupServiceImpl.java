@@ -146,9 +146,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
         }
         tbMonitorGroupMapper.updateImg(path, pa.getGroupID(), userID, new Date());
         if (pa.getCleanLocation()!= null && pa.getCleanLocation()){
-            tbMonitorGroupPointMapper.delete(
-                    new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID())
-            );
+            tbMonitorGroupPointMapper.updateLocationByGroupID(null, pa.getGroupID());
         }
         return fileService.getFileUrl(path);
     }
