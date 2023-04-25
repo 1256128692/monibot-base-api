@@ -107,4 +107,9 @@
             #{item.pointID}
         </foreach>
     </update>
+    <update id="updateLocationByGroupID">
+        update tb_monitor_group_point
+        set ImageLocation = #{location}
+        where MonitorGroupID = #{groupID}
+    </update>
 </mapper>

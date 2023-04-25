@@ -103,7 +103,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         TbMonitorItem tbMonitorItem = Param2DBEntityUtil.fromAddMonitorItemParam2TbMonitorItem(pa, userID);
         tbMonitorItemMapper.insert(tbMonitorItem);
 
-        tbMonitorItemFieldMapper.insertBatch(tbMonitorItem.getID(), pa.getFieldIDList());
+        tbMonitorItemFieldMapper.insertBatch(tbMonitorItem.getID(), pa.getFieldItemList());
     }
 
     @Override
@@ -117,9 +117,9 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     @Transactional(rollbackFor = Exception.class)
     public void updateMonitorItem(UpdateMonitorItemParam pa, Integer userID) {
         tbMonitorItemMapper.updateByPrimaryKey(pa.update(userID, new Date()));
-        if (CollectionUtils.isNotEmpty(pa.getFieldIDList())) {
+        if (CollectionUtils.isNotEmpty(pa.getFieldItemList())) {
             tbMonitorItemFieldMapper.deleteByMonitorItemIDList(List.of(pa.getMonitorItemID()));
-            tbMonitorItemFieldMapper.insertBatch(pa.getMonitorItemID(), pa.getFieldIDList());
+            tbMonitorItemFieldMapper.insertBatch(pa.getMonitorItemID(), pa.getFieldItemList());
         }
     }
 

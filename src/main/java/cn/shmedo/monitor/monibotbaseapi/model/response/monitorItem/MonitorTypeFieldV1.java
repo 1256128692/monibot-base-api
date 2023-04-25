@@ -13,6 +13,7 @@ public class MonitorTypeFieldV1 {
     private Integer fieldID;
     private String fieldToken;
     private String fieldName;
+    private String fieldAlias;
     private String fieldDesc;
     private Integer fieldUnit;
     private String engUnit;

@@ -36,7 +36,9 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Boolean} enable 是否开启
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
-     * @apiParam (请求参数) {Int[]} fieldIDList 监测类型字段ID列表
+     * @apiParam (请求参数) {Int[]} fieldItemList 监测类型字段列表
+     * @apiParam (请求参数) {Int} fieldItemList.monitorTypeFieldID 监测类型字段ID
+     * @apiParam (请求参数) {String} fieldItemList.alias 别名
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
@@ -60,7 +62,9 @@ public class MonitorItemController {
      * @apiParam (请求参数) {String} alias 别名(max = 20)
      * @apiParam (请求参数) {String} [exValue] 拓展字段(500)
      * @apiParam (请求参数) {Int} [displayOrder] 排序字段
-     * @apiParam (请求参数) {Int[]}   [fieldIDList] 监测类型字段ID列表
+     * @apiParam (请求参数) {Int[]} [fieldItemList] 监测类型字段列表
+     * @apiParam (请求参数) {Int} fieldItemList.monitorTypeFieldID 监测类型字段ID
+     * @apiParam (请求参数) {String} fieldItemList.alias 别名
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
@@ -124,6 +128,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.id 字段ID
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.token 字段标识
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.name 字段名称
+     * @apiSuccess (返回结果) {String} currentPageData.fieldList.alias 字段别称
      * @apiSuccess (返回结果) {String} [currentPageData.fieldList.desc] 字段描述
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.unit 单位
      * @apiSampleRequest off
@@ -209,6 +214,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Object[]} list.fieldList 监测项目属性列表
      * @apiSuccess (返回结果) {Int} list.fieldList.fieldID 字段ID
      * @apiSuccess (返回结果) {String} list.fieldList.fieldToken 字段标识
+     * @apiSuccess (返回结果) {String} list.fieldList.fieldAlias 字段别称
      * @apiSuccess (返回结果) {String} list.fieldList.fieldName 字段名称
      * @apiSuccess (返回结果) {String} [list.fieldList.fieldDesc] 字段描述
      * @apiSuccess (返回结果) {String} list.fieldList.engUnit 单位

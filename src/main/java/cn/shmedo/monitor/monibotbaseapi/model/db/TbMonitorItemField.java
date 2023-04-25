@@ -27,5 +27,7 @@ public class TbMonitorItemField implements Serializable {
      */
     private Integer monitorTypeFieldID;
 
+    private String alias;
+
     private static final long serialVersionUID = 1L;
 }

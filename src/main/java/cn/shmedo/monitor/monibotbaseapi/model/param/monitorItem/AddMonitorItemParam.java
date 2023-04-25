@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -53,7 +54,7 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
     private Integer displayOrder;
     @NotEmpty
     @Valid
-    private List<@NotNull Integer> fieldIDList;
+    private List<@NotNull FieldItem> fieldItemList;
 
     @JsonIgnore
     private TbProjectInfo tbProjectInfo;
@@ -77,9 +78,13 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "预定义监测项目，不能使用自定义的监测类型");
         }
         TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper = ContextHolder.getBean(TbMonitorTypeFieldMapper.class);
+        List<Integer> typeFieldIDList = fieldItemList.stream().map(FieldItem::getMonitorTypeFieldID).distinct().toList();
+        if (typeFieldIDList.size()!=fieldItemList.size()){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性有重复");
+        }
         if (tbMonitorTypeFieldMapper.selectCount(
-                new QueryWrapper<TbMonitorTypeField>().eq("monitorType", monitorType).in("id", fieldIDList)
-        ) != fieldIDList.size()) {
+                new QueryWrapper<TbMonitorTypeField>().eq("monitorType", monitorType).in("id", typeFieldIDList)
+        ) != typeFieldIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性有不属于该监测类型的");
         }
         if (StringUtils.isNotBlank(exValue) && JSONUtil.isTypeJSON(exValue)){
