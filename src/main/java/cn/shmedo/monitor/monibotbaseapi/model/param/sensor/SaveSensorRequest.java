@@ -3,7 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
@@ -31,6 +33,7 @@ import lombok.Data;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -162,43 +165,11 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                 Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
             }
         });
-        //校验扩展配置
         RedisService redisService = SpringUtil.getBean(RedisConstant.MONITOR_REDIS_SERVICE, RedisService.class);
-        if (CollUtil.isNotEmpty(exFields)) {
-            MonitorTypeCacheData monitorTypeCacheData = redisService.get(RedisKeys.MONITOR_TYPE_KEY,
-                    monitorType.toString(), MonitorTypeCacheData.class);
-            Map<Integer, String> exMap = monitorTypeCacheData.getMonitortypeFieldList().stream()
-                    .filter(e -> FieldClass.EXTEND_CONFIG.equals(e.getFieldClass()))
-                    .collect(Collectors.toMap(MonitorTypeCacheData.Field::getID, MonitorTypeCacheData.Field::getFieldName));
-            exFields.forEach(ex -> {
-                Assert.isTrue(exMap.containsKey(ex.getId()), "扩展配置项 [" + ex.getId() + "]不存在");
-                ex.setName(exMap.get(ex.getId()));
-            });
-            Map<String, String> exConfig = exFields.stream()
-                    .map(e -> Map.entry(e.getName(), e.getValue()))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            this.configFieldValue = JSONUtil.toJsonStr(exConfig);
-            exFields.clear();
-            exMap.clear();
-        }
-
+        //校验扩展配置
+        this.configFieldValue = validExField(monitorType, exFields, redisService);
         //校验参数
-        if (CollUtil.isNotEmpty(paramFields)) {
-            List<TbParameter> templateParams = redisService.getList(RedisKeys.PARAMETER_PREFIX_KEY +
-                            ParameterSubjectType.TEMPLATE.getCode(), templateID.toString(), TbParameter.class);
-            Map<Integer, SensorConfigField> paramFieldMap = paramFields.stream().collect(Collectors.toMap(SensorConfigField::getId, e -> e));
-            parameterList = templateParams.stream().map(param -> {
-                SensorConfigField field = paramFieldMap.get(param.getID());
-                Assert.notNull(field, "参数配置项 [" + param.getID() + "]不存在");
-                Assert.notNull(field.getValue(), "参数配置项 [" + param.getID() + "]值不能为空");
-                TbParameter item = BeanUtil.copyProperties(param, TbParameter.class);
-                item.setID(null);
-                item.setSubjectID(null);
-                item.setSubjectType(ParameterSubjectType.SENSOR.getCode());
-                item.setPaValue(paramFieldMap.get(param.getID()).getValue());
-                return item;
-            }).collect(Collectors.toList());
-        }
+        this.parameterList = validParamField(templateID, null, paramFields, redisService);
         return null;
     }
 
@@ -211,6 +182,68 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         this.dataSourceComposeType = dataSourceComposeType == null ?
                 DataSourceComposeType.SINGLE_IOT : DataSourceComposeType.codeOf(dataSourceComposeType);
     }
+
+    /**
+     * 校验参数
+     *
+     * @param monitorType  监测类型
+     * @param exFields     扩展配置列表
+     * @param redisService redis服务
+     * @return 参数列表
+     */
+    public static String validExField(Integer monitorType, List<SensorConfigField> exFields, RedisService redisService) {
+
+        MonitorTypeCacheData monitorTypeCacheData = redisService.get(RedisKeys.MONITOR_TYPE_KEY,
+                monitorType.toString(), MonitorTypeCacheData.class);
+        if (CollUtil.isNotEmpty(monitorTypeCacheData.getMonitortypeFieldList())) {
+            Assert.notEmpty(exFields, "扩展配置列表不能为空");
+            Map<Integer, SensorConfigField> exMap = exFields.stream()
+                    .filter(e -> StrUtil.isNotBlank(e.getValue()) && e.getId() != null)
+                    .collect(Collectors.toMap(SensorConfigField::getId, e -> e));
+            Map<String, Object> exConfig = monitorTypeCacheData.getMonitortypeFieldList().stream()
+                    .filter(e -> FieldClass.EXTEND_CONFIG.equals(e.getFieldClass()))
+                    .map(e -> {
+                        JSONObject exVal = JSONUtil.parseObj(e.getExValues());
+                        if (exVal.getBool("required", false)) {
+                            Assert.isTrue(exMap.containsKey(e.getID()), "扩展配置{}不能为空", e.getFieldName());
+                        }
+                        return exMap.containsKey(e.getID()) ? Map.entry(e.getFieldToken(), exMap.get(e.getID()).getValue()) : null;
+                    }).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            return JSONUtil.toJsonStr(exConfig);
+        }
+        return null;
+    }
+
+    /**
+     * 校验参数
+     *
+     * @param templateID   模板ID
+     * @param subjectID    主体ID
+     * @param paramFields  参数配置项
+     * @param redisService redis服务
+     * @return 参数列表
+     */
+    public static List<TbParameter> validParamField(Integer templateID, Integer subjectID, List<SensorConfigField> paramFields, RedisService redisService) {
+        //校验参数
+        if (CollUtil.isNotEmpty(paramFields)) {
+            List<TbParameter> templateParams = redisService.getList(RedisKeys.PARAMETER_PREFIX_KEY +
+                    ParameterSubjectType.TEMPLATE.getCode(), templateID.toString(), TbParameter.class);
+            Map<Integer, SensorConfigField> paramFieldMap = paramFields.stream().collect(Collectors.toMap(SensorConfigField::getId, e -> e));
+            return templateParams.stream().map(param -> {
+                SensorConfigField field = paramFieldMap.get(param.getID());
+                Assert.notNull(field, "参数配置项 [" + param.getID() + "]不存在");
+                Assert.notNull(field.getValue(), "参数配置项 [" + param.getID() + "]值不能为空");
+                TbParameter item = BeanUtil.copyProperties(param, TbParameter.class);
+                item.setID(null);
+                item.setSubjectID(subjectID);
+                item.setSubjectType(ParameterSubjectType.SENSOR.getCode());
+                item.setPaValue(paramFieldMap.get(param.getID()).getValue());
+                return item;
+            }).collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
 }
 
     

@@ -211,7 +211,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 JSONUtil.toBean(response.getConfigFieldValue(), Dict.class) : Dict.create();
         response.setExFields(typeFields.stream().map(e -> {
                     SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
-                    exField.setValue(exConfig.getStr(e.getFieldName()));
+                    exField.setValue(exConfig.getStr(e.getFieldToken()));
                     return exField;
                 }).toList());
         //参数
