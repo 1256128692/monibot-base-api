@@ -257,14 +257,14 @@ public class WtEngineController {
      * @apiName AddWtDeviceWarnRule
      * @apiDescription 新增预警规则
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} ruleType 123 报警规则，视频规则 ， 智能终端规则
-     * @apiParam (请求参数) {Int} monitorType 监测类型
-     * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求参数) {Int} [ruleType] 123 报警规则，视频规则 ， 智能终端规则, 不设置默认为1
+     * @apiParam (请求参数) {Int} monitorType 监测类型，可为-1
+     * @apiParam (请求参数) {Int} monitorItemID 监测项目ID，可为-1
      * @apiParam (请求参数) {String} name 规则名称(100)
      * @apiParam (请求参数) {Boolean} enable 是否启用
      * @apiParam (请求参数) {String} [desc] 描述 1000
      * @apiParam (请求参数) {String} [exValue] 额外属性，json字符串 1000
-     * @apiParam (请求参数) {Int} productID 产品ID（设备型号对应ID）
+     * @apiParam (请求参数) {String} productID 产品ID（设备型号对应ID）,该项为字符串或数字字符串
      * @apiParam (请求参数) {String} deviceCSV 该项为"all"或者设备ID的CSV字符串
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
