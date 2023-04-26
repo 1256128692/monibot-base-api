@@ -15,9 +15,9 @@ public enum CompareInterval {
     V04(2, "distance", "保证水位", "超保证水位", 1),
 
     //雨量-雨量
-    V05(5, "rainfall", "暴雨", "", 1),
-    V06(5, "rainfall", "大暴雨", "", 1),
-    V07(5, "rainfall", "特大暴雨", "", 1),
+    V05(5, "rainfall", "警戒雨量", "", 1),
+//    V06(5, "rainfall", "大暴雨", "", 1),
+//    V07(5, "rainfall", "特大暴雨", "", 1),
 
     //雨量-日降雨量
     V08(5, "dailyRainfall", "暴雨", "", 1),
