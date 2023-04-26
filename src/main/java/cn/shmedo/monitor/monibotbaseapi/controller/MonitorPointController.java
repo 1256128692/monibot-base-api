@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
@@ -40,6 +42,8 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
+    @LogParam(moduleName = "监测组模块", operationName = "监测点模块", operationProperty = OperationProperty.ADD)
+
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPoint(@Validated @RequestBody AddMonitorPointParam pa) {
@@ -69,6 +73,8 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
+    @LogParam(moduleName = "监测组模块", operationName = "批量新增监测点", operationProperty = OperationProperty.ADD)
+
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPointBatch(@Validated @RequestBody AddMonitorPointBatchParam pa) {
@@ -96,6 +102,8 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
+    @LogParam(moduleName = "监测组模块", operationName = "修改监测点", operationProperty = OperationProperty.UPDATE)
+
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPoint(@Validated @RequestBody UpdateMonitorPointParam pa) {
@@ -125,6 +133,8 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
+    @LogParam(moduleName = "监测组模块", operationName = "批量修改监测点", operationProperty = OperationProperty.UPDATE)
+
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPointBatch(@Validated @RequestBody UpdateMonitorPointBatchParam pa) {
@@ -144,6 +154,8 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteMonitorPoint
      */
+    @LogParam(moduleName = "监测组模块", operationName = "删除监测点", operationProperty = OperationProperty.DELETE)
+
     @Permission(permissionName = "mdmbase:DeleteMonitorPoint")
     @PostMapping(value = "/DeleteMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorPoint(@Validated @RequestBody DeleteMonitorPointParam pa) {
@@ -165,6 +177,7 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
+    @LogParam(moduleName = "监测组模块", operationName = "配置监测点传感器", operationProperty = OperationProperty.UPDATE)
 
     @PostMapping(value = "/ConfigMonitorPointSensors", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object configMonitorPointSensors(@Validated @RequestBody ConfigMonitorPointSensorsParam pa) {

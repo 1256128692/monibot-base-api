@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
@@ -43,6 +45,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
+    @LogParam(moduleName = "监测项目模块", operationName = "新增监测项目", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorItem")
     @PostMapping(value = "/AddMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorItem(@RequestBody @Validated AddMonitorItemParam pa) {
@@ -69,6 +72,8 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
+    @LogParam(moduleName = "监测项目模块", operationName = "修改监测项目", operationProperty = OperationProperty.UPDATE)
+
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorItem(@RequestBody @Validated UpdateMonitorItemParam pa) {
@@ -88,6 +93,7 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddCompanyMonitorItem
      */
+    @LogParam(moduleName = "监测项目模块", operationName = "保存为公司监测项目模板", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddCompanyMonitorItem")
     @PostMapping(value = "/AddCompanyMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addCompanyMonitorItem(@RequestBody @Validated AddCompanyMonitorItemParam pa) {
@@ -152,6 +158,8 @@ public class MonitorItemController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorItem
      */
+    @LogParam(moduleName = "监测项目模块", operationName = "删除监测项目", operationProperty = OperationProperty.DELETE)
+
     @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
     @PostMapping(value = "/DeleteMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorItem(@RequestBody @Validated DeleteMonitorItemParam pa) {
