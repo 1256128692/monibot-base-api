@@ -50,7 +50,6 @@ public class QueryWtProjectParam  implements ParameterValidator, ResourcePermiss
     @Override
     public ResultWrapper<?> validate() {
         if (projectType != null) {
-//            Assert.isTrue(projectType > 0 && projectType <= v1KeySet.size());
             Optional.ofNullable(v1).filter(StrUtil::isNotBlank).ifPresent(v ->
                     propertyList.add(new QueryProjectListRequest.Property(v1KeySet.get(projectType - 1), v)));
             Optional.ofNullable(v2).filter(StrUtil::isNotBlank).ifPresent(v ->

@@ -509,12 +509,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
 
         //如存在查询条件 则先查询出符合条件的项目id
-        Optional.ofNullable(pa.getPropertyList()).filter(e -> !e.isEmpty()).ifPresent(e -> {
-            List<Integer> projectIDs = tbProjectInfoMapper.getProjectIDByProperty(e, null);
-            //如 getProjectIDSet 为null，即非用户则不需要做交集
+        if (CollUtil.isNotEmpty(pa.getPropertyList())) {
+            List<Integer> projectIDs = tbProjectInfoMapper.getProjectIDByProperty(pa.getPropertyList(), null);
+            //如 getProjectIDSet 为null，即非用户 则不需要做交集
             pa.setProjectIDSet(pa.getProjectIDSet() == null ?
-                    projectIDs : CollUtil.intersection(projectIDs, pa.getProjectIDSet()));
-        });
+                    projectIDs : CollUtil.intersection(pa.getProjectIDSet(), projectIDs));
+            if (CollUtil.isEmpty(pa.getProjectIDSet())) {
+                return new QueryWtProjectResponse(Collections.emptyList());
+            }
+        }
 
         //查询项目列表
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
