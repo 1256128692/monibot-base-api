@@ -11,9 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor(onConstructor = @__(@Autowired))
@@ -252,6 +250,43 @@ public class WtEngineController {
     @PostMapping(value = "/DeleteWtAction", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWtAction(@Valid @RequestBody DeleteWtActionParam param){
         tbWarnActionService.removeBatchByIds(param.getActionIDList());
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /AddWarnRule 新增预警规则
+     * @apiVersion 1.0.0
+     * @apiGroup 警报规则引擎模块
+     * @apiName AddWarnRule
+     * @apiDescription 新增预警规则
+     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求参数) {Int} ruleType 123 报警规则，视频规则 ， 智能终端规则
+     * @apiParam (请求参数) {Int} monitorType 监测类型
+     * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求参数) {String} name 规则名称(100)
+     * @apiParam (请求参数) {Boolean} enable 是否启用
+     * @apiParam (请求参数) {String} [desc] 描述 1000
+     * @apiParam (请求参数) {String} [exValue] 额外属性，json字符串 1000
+     * @apiParam (请求参数) {Int} productID 产品ID（设备型号对应ID）
+     * @apiParam (请求参数) {String} deviceCSV 该项为"all"或者设备ID的CSV字符串
+     * @apiParam (请求参数) {Object[]} triggerList 触发条件列表
+     * @apiParam (请求参数) {String} triggerList.name 报警名称
+     * @apiParam (请求参数) {Int} triggerList.warnLevel 报警等级/类型，枚举待定....
+     * @apiParam (请求参数) {String} triggerList.fieldToken 数据源token
+     * @apiParam (请求参数) {String} [triggerList.compareRule] 比较规则 Json字符串1000
+     * @apiParam (请求参数) {String} [triggerList.triggerRule] 触发规则 Json字符串1000
+     * @apiParam (请求参数) {Object[]} triggerList.actionList 动作列表
+     * @apiParam (请求参数) {Boolean} triggerList.enable 是否启用
+     * @apiParam (请求参数) {Int} triggerList.actionType 动作类型 1234 通知，事件，短信，钉钉
+     * @apiParam (请求参数) {String} [triggerList.actionValue] 动作目标，Json字符串 500
+     * @apiParam (请求参数) {String} [triggerList.desc] 动作描述， 500
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdwt:UpdateBaseRuleEngine
+     */
+    //@Permission(permissionName = "mdwt:UpdateBaseRuleEngine")
+    @RequestMapping(value = "AddWarnRule", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addWarnRule(@Valid @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();
     }
 }
