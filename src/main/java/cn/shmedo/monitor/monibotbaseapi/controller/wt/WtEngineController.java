@@ -266,17 +266,6 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} [exValue] 额外属性，json字符串 1000
      * @apiParam (请求参数) {Int} productID 产品ID（设备型号对应ID）
      * @apiParam (请求参数) {String} deviceCSV 该项为"all"或者设备ID的CSV字符串
-     * @apiParam (请求参数) {Object[]} [triggerList] 触发条件列表
-     * @apiParam (请求参数) {String} triggerList.name 报警名称
-     * @apiParam (请求参数) {Int} triggerList.warnLevel 报警等级/类型，枚举待定....
-     * @apiParam (请求参数) {String} triggerList.fieldToken 数据源token
-     * @apiParam (请求参数) {String} [triggerList.compareRule] 比较规则 Json字符串1000
-     * @apiParam (请求参数) {String} [triggerList.triggerRule] 触发规则 Json字符串1000
-     * @apiParam (请求参数) {Object[]} triggerList.actionList 动作列表
-     * @apiParam (请求参数) {Boolean} triggerList.enable 是否启用
-     * @apiParam (请求参数) {Int} triggerList.actionType 动作类型 1234 通知，事件，短信，钉钉
-     * @apiParam (请求参数) {String} [triggerList.actionValue] 动作目标，Json字符串 500
-     * @apiParam (请求参数) {String} [triggerList.desc] 动作描述， 500
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdwt:UpdateBaseRuleEngine

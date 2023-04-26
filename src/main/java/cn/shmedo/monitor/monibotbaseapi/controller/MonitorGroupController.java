@@ -36,7 +36,6 @@ public class MonitorGroupController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorGroup
      */
     @LogParam(moduleName = "监测组模块", operationName = "新建监测组", operationProperty = OperationProperty.ADD)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
     @PostMapping(value = "/AddMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorGroup(@RequestBody @Validated AddMonitorGroupParam pa) {
@@ -62,7 +61,6 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
     @LogParam(moduleName = "监测组模块", operationName = "修改监测组", operationProperty = OperationProperty.UPDATE)
-
     @PostMapping(value = "/UpdateMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorGroup(@RequestBody @Validated UpdateMonitorGroupParam pa) {
         monitorGroupService.updateMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -87,7 +85,6 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
     @LogParam(moduleName = "监测组模块", operationName = "上传监测组底图", operationProperty = OperationProperty.UPDATE)
-
     @PostMapping(value = "/UploadMonitorGroupImage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object uploadMonitorGroupImage(@RequestBody @Validated UploadMonitorGroupImageParam pa) {
         return monitorGroupService.uploadMonitorGroupImage(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -106,7 +103,6 @@ public class MonitorGroupController {
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorGroup
      */
     @LogParam(moduleName = "监测组模块", operationName = "删除监测组", operationProperty = OperationProperty.DELETE)
-
     @Permission(permissionName = "mdmbase:DeleteMonitorGroup")
     @PostMapping(value = "/DeleteMonitorGroup", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorGroup(@RequestBody @Validated DeleteMonitorGroupParam pa) {
@@ -131,7 +127,6 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorGroup")
     @LogParam(moduleName = "监测组模块", operationName = "配置监测点底图定位", operationProperty = OperationProperty.UPDATE)
-
     @PostMapping(value = "/ConfigMonitorPointImageLocation", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object configMonitorPointImageLocation(@RequestBody @Validated ConfigMonitorPointImageLocationParam pa) {
         monitorGroupService.configMonitorPointImageLocation(pa);

@@ -73,7 +73,6 @@ public class MonitorItemController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorItem
      */
     @LogParam(moduleName = "监测项目模块", operationName = "修改监测项目", operationProperty = OperationProperty.UPDATE)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorItem")
     @PostMapping(value = "/UpdateMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorItem(@RequestBody @Validated UpdateMonitorItemParam pa) {
@@ -159,7 +158,6 @@ public class MonitorItemController {
      * @apiPermission 项目权限 mdmbase:DeleteBaseMonitorItem
      */
     @LogParam(moduleName = "监测项目模块", operationName = "删除监测项目", operationProperty = OperationProperty.DELETE)
-
     @Permission(permissionName = "mdmbase:DeleteBaseMonitorItem")
     @PostMapping(value = "/DeleteMonitorItem", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorItem(@RequestBody @Validated DeleteMonitorItemParam pa) {

@@ -43,7 +43,6 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @LogParam(moduleName = "监测组模块", operationName = "监测点模块", operationProperty = OperationProperty.ADD)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPoint(@Validated @RequestBody AddMonitorPointParam pa) {
@@ -74,7 +73,6 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @LogParam(moduleName = "监测组模块", operationName = "批量新增监测点", operationProperty = OperationProperty.ADD)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/AddMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addMonitorPointBatch(@Validated @RequestBody AddMonitorPointBatchParam pa) {
@@ -103,7 +101,6 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @LogParam(moduleName = "监测组模块", operationName = "修改监测点", operationProperty = OperationProperty.UPDATE)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPoint(@Validated @RequestBody UpdateMonitorPointParam pa) {
@@ -134,7 +131,6 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
      */
     @LogParam(moduleName = "监测组模块", operationName = "批量修改监测点", operationProperty = OperationProperty.UPDATE)
-
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @PostMapping(value = "/UpdateMonitorPointBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateMonitorPointBatch(@Validated @RequestBody UpdateMonitorPointBatchParam pa) {
@@ -155,7 +151,6 @@ public class MonitorPointController {
      * @apiPermission 项目权限 mdmbase:DeleteMonitorPoint
      */
     @LogParam(moduleName = "监测组模块", operationName = "删除监测点", operationProperty = OperationProperty.DELETE)
-
     @Permission(permissionName = "mdmbase:DeleteMonitorPoint")
     @PostMapping(value = "/DeleteMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorPoint(@Validated @RequestBody DeleteMonitorPointParam pa) {
@@ -178,7 +173,6 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorPoint")
     @LogParam(moduleName = "监测组模块", operationName = "配置监测点传感器", operationProperty = OperationProperty.UPDATE)
-
     @PostMapping(value = "/ConfigMonitorPointSensors", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object configMonitorPointSensors(@Validated @RequestBody ConfigMonitorPointSensorsParam pa) {
         monitorPointService.configMonitorPointSensors(pa.getPointID(), pa.getSensorIDList(), CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -284,6 +278,7 @@ public class MonitorPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
+
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
 
     @PostMapping(value = "/QueryMonitorItemPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
