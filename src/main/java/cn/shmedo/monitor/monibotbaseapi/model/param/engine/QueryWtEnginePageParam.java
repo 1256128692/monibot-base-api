@@ -22,13 +22,13 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     @Min(value = 1, message = "公司ID不能小于1")
     private Integer companyID;
 
+    @Range(min = 1, max = 3, message = "规则类型, 1:报警规则 2:视频规则 3:智能终端规则")
     private Integer ruleType;
     @Min(value = 1,message = "终端设备产品ID不能小于1")
     private Integer productID;
     private String videoTypeName;
     @Min(value = 1, message = "工程项目ID不能小于1")
     private Integer projectID;
-    @Range(min = 1, max = 3, message = "规则类型, 1:报警规则 2:视频规则 3:智能终端规则")
     private String engineName;
     private Boolean enable;
     @Min(value = 1, message = "检测项目ID不能小于1")
