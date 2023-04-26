@@ -322,7 +322,9 @@
         </foreach>
         GROUP BY ProjectID
         ) t
-        WHERE size = #{size}
+        <if test="size != null">
+            WHERE size = #{size}
+        </if>
     </select>
 
     <select id="getProjectList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">

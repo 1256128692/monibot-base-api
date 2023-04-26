@@ -11,7 +11,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -75,6 +74,11 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
         @JsonIgnore
         private List<String> values;
+
+        public Property(String s, String v) {
+            this.name = s;
+            this.setValue(v);
+        }
 
         public void setValue(String value) {
             this.value = value;

@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.List;
@@ -68,4 +69,6 @@ public interface ProjectService {
     String setProjectImg(SetProjectImgParam pa, Integer userID);
 
     String queryProjectImg(QueryProjectImgParam pa);
+
+    QueryWtProjectResponse queryWtProjectSimpleList(QueryWtProjectParam pa);
 }
