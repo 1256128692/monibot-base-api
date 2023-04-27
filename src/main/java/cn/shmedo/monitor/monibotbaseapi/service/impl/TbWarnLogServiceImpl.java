@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -8,11 +7,11 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -25,7 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -59,26 +60,27 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
         } else {
             wtWarnLogInfos = new ArrayList<>();
         }
-        Set<String> deviceTokens = wtWarnLogInfos.stream().map(WtWarnLogInfo::getDeviceToken)
-                .filter(Objects::nonNull).collect(Collectors.toSet());
-        if (!deviceTokens.isEmpty()) {
-            ResultWrapper<List<DeviceBaseInfo>> wrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
-                    .companyID(param.getCompanyID()).deviceTokens(deviceTokens).build());
-            if (wrapper.apiSuccess()) {
-                Map<String, DeviceBaseInfo> tokenProductMap = wrapper.getData().stream()
-                        .collect(Collectors.toMap(DeviceBaseInfo::getDeviceToken, e -> e));
-                wtWarnLogInfos.stream().filter(e -> tokenProductMap.containsKey(e.getDeviceToken())).forEach(e -> {
-                    DeviceBaseInfo deviceBaseInfo = tokenProductMap.get(e.getDeviceToken());
-                    e.setDeviceTypeName(deviceBaseInfo.getProductName());
-                });
-            }
-        }
+        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+        TransferUtil.applyDeviceBaseItem(wtWarnLogInfos,
+                () -> QueryDeviceBaseInfoParam.builder()
+                        .deviceTokens(wtWarnLogInfos.stream().map(WtWarnLogInfo::getDeviceToken).collect(Collectors.toSet()))
+                        .companyID(param.getCompanyID()).build(),
+                WtWarnLogInfo::getDeviceToken,
+                WtWarnLogInfo::setDeviceTypeName);
         return new PageUtil.Page<>(totalCount / pageSize + 1, wtWarnLogInfos, totalCount);
     }
 
     @Override
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
-        return FieldShowUtil.dealFieldShow(this.baseMapper.queryWarnDetail(param.getWarnID()));
+        WtWarnDetailInfo detailInfo = this.baseMapper.queryWarnDetail(param.getWarnID());
+        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+        TransferUtil.applyDeviceBase(List.of(detailInfo),
+                () -> QueryDeviceBaseInfoParam.builder()
+                        .deviceTokens(Set.of(detailInfo.getDeviceToken()))
+                        .companyID(param.getCompanyID()).build(),
+                WtWarnDetailInfo::getDeviceToken,
+                (e, device) -> e.setDeviceTypeName(device.getProductName()));
+        return FieldShowUtil.dealFieldShow(detailInfo);
     }
 
 }

@@ -92,6 +92,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} triggerRule 触发规则json
      * @apiSuccess (返回结果) {Int} workOrderID 工单ID
      * @apiSuccess (返回结果) {String} workOrderCode 工单编号
+     * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */

@@ -180,6 +180,8 @@
         SELECT
             twl.`ID` warnID,
             twl.`Name` warnName,
+            twl.WarnType warnType,
+            twl.DeviceToken deviceToken,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmt.MonitorType monitorTypeID,
