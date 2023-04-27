@@ -46,16 +46,9 @@ public class ConfigMonitorPointSensorsParam implements ParameterValidator, Resou
         if (!tbMonitorPoint.getProjectID().equals(projectID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "点不属于该项目");
         }
-
-
-        TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-        if (tbSensorMapper.selectCount(new QueryWrapper<TbSensor>().eq("MonitorPointID", pointID)) > 0
-
-        ) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "点已经设置过传感器");
-
-        }
         if (CollectionUtils.isNotEmpty(sensorIDList)) {
+            TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+
             List<TbSensor> tbSensorList = tbSensorMapper.selectList(new QueryWrapper<TbSensor>().in("ID", sensorIDList));
             if (tbSensorList.size() != sensorIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器不存在");
@@ -70,12 +63,13 @@ public class ConfigMonitorPointSensorsParam implements ParameterValidator, Resou
             if (tbSensorList.stream().anyMatch(item -> item.getMonitorPointID() != null && !item.getMonitorPointID().equals(pointID))) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器到其他监测点");
             }
+            TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
+            TbMonitorType tbMonitorType = tbMonitorTypeMapper.queryByType(tbMonitorPoint.getMonitorType());
+            if (!tbMonitorType.getMultiSensor() && sensorIDList.size() > 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型不支持多传感器");
+            }
         }
-        TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-        TbMonitorType tbMonitorType = tbMonitorTypeMapper.queryByType(tbMonitorPoint.getMonitorType());
-        if (!tbMonitorType.getMultiSensor() && sensorIDList.size() > 1) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型不支持多传感器");
-        }
+
         return null;
     }
 
