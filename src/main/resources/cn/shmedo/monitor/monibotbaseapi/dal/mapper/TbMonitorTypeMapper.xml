@@ -170,12 +170,12 @@
   </select>
 
 
-  <select id="selectMonitorBaseInfo" parameterType="java.lang.Integer" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo">
+  <select id="selectMonitorBaseInfo" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo">
     select count(ID) PointCount, MonitorType
     from tb_monitor_point
-    where ProjectID in
-    <foreach collection="proIDList" item="item" open="(" close=")" separator=",">
-      #{item}
+    where monitorItemID in
+    <foreach collection="monitorItemIDList" item="monitorItemID" open="(" close=")" separator=",">
+      #{monitorItemID}
     </foreach>
     group by MonitorType
   </select>

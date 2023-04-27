@@ -74,6 +74,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (!StringUtil.isNullOrEmpty(pa.getAreaCode())) {
             wrapper.like(TbProjectInfo::getLocation, pa.getAreaCode());
         }
+        if (!CollectionUtil.isNullOrEmpty(pa.getProjectIDList())) {
+            wrapper.in(TbProjectInfo::getID, pa.getProjectIDList());
+        }
         // 1.项目信息列表
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
@@ -306,7 +309,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                                 TbSensor tbSensor = tbSensors.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
                                 // 将JSON字符串转换为JSON对象
                                 if (tbSensor != null) {
-                                    da.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
+                                    da.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深"));
                                 }
                                 result.add(da);
                             }
@@ -323,7 +326,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         Map<String, Object> currentSensorData = maps.stream().filter(m -> m.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(tbSensor.getID())).findFirst().orElse(null);
                         if (MapUtil.isNotEmpty(currentSensorData)) {
                             if (tbSensor.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
-                                currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.deep"));
+                                currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深"));
                             }
                             snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), currentSensorData));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
@@ -492,13 +495,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         List<Integer> proIDList = proMonitorClassList.stream().map(TbProjectMonitorClass::getProjectID).collect(Collectors.toList());
         List<TbMonitorPoint> tbMonitorPointList = tbMonitorPointMapper.selectMonitorTypeAndProIDByProIDList(proIDList);
-
         // 监测项目列表
         List<MonitorItemBaseInfo> monitorItemList = tbMonitorItemMapper.selectListByCondition(pa.getCompanyID(), proIDList, pa.getQueryType());
+        List<Integer> monitorItemIDList = monitorItemList.stream().map(MonitorItemBaseInfo::getMonitorItemID).collect(Collectors.toList());
 
         MonitorPointTypeStatisticsInfo vo = new MonitorPointTypeStatisticsInfo();
-
-        List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(proIDList);
+        List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(monitorItemIDList);
         monitorTypeBaseInfos.forEach(item -> {
             List<TbProjectType> projectTypeInfos = new LinkedList<>();
             if (!monitorTypeMap.isEmpty()) {
@@ -529,9 +531,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 List<MonitorItemBaseInfo> list = monitorItemList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList());
                 item.setMonitorItemList(list);
             }
-
         });
-        vo.setTypeInfoList(monitorTypeBaseInfos);
+        List<MonitorTypeBaseInfo> filteredList = monitorTypeBaseInfos.stream()
+                .filter(monitorTypeBaseInfo -> monitorTypeBaseInfo.getMonitorItemList() != null
+                        && !monitorTypeBaseInfo.getMonitorItemList().isEmpty())
+                .collect(Collectors.toList());
+        vo.setTypeInfoList(filteredList);
         return vo;
     }
 
@@ -1037,7 +1042,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double xDeep = null;
             if (!StringUtil.isNullOrEmpty(s1) ){
-                xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.deep").toString());
+                xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.埋深").toString());
             }
 
             // 找到最大的 v3 和对应的深度
@@ -1047,7 +1052,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double yDeep = null;
             if (!StringUtil.isNullOrEmpty(s2) ){
-                yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.deep").toString());
+                yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.埋深").toString());
             }
 
             // 找到最大的 v5 和对应的深度
@@ -1057,7 +1062,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double zDeep = null;
             if (!StringUtil.isNullOrEmpty(s3) ){
-                zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.deep").toString());
+                zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.埋深").toString());
             }
 
             // 构建新的数据集
@@ -1094,7 +1099,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     private Map<String, Object> handleTriaxialDisplacementType(Map<String, Object> map, List<TbSensor> tbSensors) {
         TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
         if (sensor != null) {
-            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.deep"));
+            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深"));
         }
         return map;
     }
@@ -1223,7 +1228,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
         if (sensor != null) {
-            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.deep"));
+            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深"));
         }
         return map;
     }
