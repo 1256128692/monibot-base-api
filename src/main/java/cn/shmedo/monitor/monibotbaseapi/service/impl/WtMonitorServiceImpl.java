@@ -18,7 +18,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WaterQuality;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -82,9 +81,21 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
             return Collections.emptyList();
         }
+        // 只查看已经配置过的监测项目
         List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
+        LambdaQueryWrapper<TbProjectMonitorClass> pmcWrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
+                .eq(TbProjectMonitorClass::getMonitorClass, pa.getMonitorClassType())
+                .eq(TbProjectMonitorClass::getEnable,true)
+                .in(TbProjectMonitorClass::getProjectID,projectIDList);
+        List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(pmcWrapper);
+        if (CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
+            return Collections.emptyList();
+        }
+        List<Integer> configProjectIDList = tbProjectMonitorClassList.stream().map(TbProjectMonitorClass::getProjectID).collect(Collectors.toList());
+
         // 2.监测点信息列表
-        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList, pa.getMonitorType(), pa.getMonitorItemID());
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(configProjectIDList, pa.getMonitorType()
+                , pa.getMonitorItemID(), pa.getMonitorClassType());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return Collections.emptyList();
         }
@@ -443,7 +454,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         Integer monitorType = -1;
         // 2.监测点信息列表
-        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null);
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null, null);
         List<MonitorPointAndItemInfo> result = new ArrayList<>();
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
@@ -946,7 +957,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
         // 2.监测点信息列表
-        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList, pa.getMonitorType(), pa.getMonitorItemID());
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList,
+                pa.getMonitorType(), pa.getMonitorItemID(), pa.getMonitorClassType());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return Collections.emptyList();
         }

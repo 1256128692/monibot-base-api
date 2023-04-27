@@ -27,7 +27,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
 
     Integer selectMonitorTypeCount(List<Integer> monitorPointIDs);
 
-    List<MonitorPointAndItemInfo> selectListByCondition(List<Integer> projectIDList, Integer monitorType, Integer monitorItemID);
+    List<MonitorPointAndItemInfo> selectListByCondition(List<Integer> projectIDList, Integer monitorType, Integer monitorItemID, Integer monitorClassType);
 
     IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, String monitorItemName, Integer sensorID, String pointName);
 
