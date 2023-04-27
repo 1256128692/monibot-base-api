@@ -13,22 +13,21 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,22 +113,27 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
         if (CollectionUtils.isNotEmpty(pa.getMonitorPointIDList())) {
             List<Integer> allList = tbMonitorGroupPointMapper.queryPointIDByGroupID(pa.getGroupID());
             // 不需要处理的点
-            List<Integer>  notDealPintIDList= pa.getMonitorPointIDList().stream().filter(allList::contains).collect(Collectors.toList());
+            List<Integer> notDealPintIDList = pa.getMonitorPointIDList().stream().filter(allList::contains).collect(Collectors.toList());
+            LambdaQueryWrapper<TbMonitorGroupPoint> deleteQuery = new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID());
+            if (CollectionUtils.isNotEmpty(notDealPintIDList)
+            ) {
+                deleteQuery.notIn(TbMonitorGroupPoint::getMonitorPointID, notDealPintIDList);
+            }
             tbMonitorGroupPointMapper.delete(
-                    new QueryWrapper<TbMonitorGroupPoint>().lambda().eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID())
-                            .notIn(TbMonitorGroupPoint::getMonitorPointID, notDealPintIDList)
+                    deleteQuery
+
             );
             List<TbMonitorGroupPoint> tbMonitorGroupPointList = pa.getMonitorPointIDList().stream()
                     .filter(item -> !allList.contains(item))
                     .map(item -> TbMonitorGroupPoint.builder()
-                    .monitorGroupID(pa.getGroupID())
-                    .monitorPointID(item)
-                    .build()).collect(Collectors.toList());
-                if(CollectionUtils.isNotEmpty(tbMonitorGroupPointList)){
-                    tbMonitorGroupPointMapper.insertBatchSomeColumn(
-                            tbMonitorGroupPointList
-                    );
-                }
+                            .monitorGroupID(pa.getGroupID())
+                            .monitorPointID(item)
+                            .build()).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(tbMonitorGroupPointList)) {
+                tbMonitorGroupPointMapper.insertBatchSomeColumn(
+                        tbMonitorGroupPointList
+                );
+            }
         }
     }
 
@@ -145,7 +149,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
             path = info.getData().getPath();
         }
         tbMonitorGroupMapper.updateImg(path, pa.getGroupID(), userID, new Date());
-        if (pa.getCleanLocation()!= null && pa.getCleanLocation()){
+        if (pa.getCleanLocation() != null && pa.getCleanLocation()) {
             tbMonitorGroupPointMapper.updateLocationByGroupID(null, pa.getGroupID());
         }
         return fileService.getFileUrl(path);
@@ -181,7 +185,8 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
 
     /**
      * 处理监测项目和监测点
-     * @param parentGroupList  可以为一级或二级
+     *
+     * @param parentGroupList 可以为一级或二级
      * @param sonGroupList
      */
     private void handleGroup4Web(List<Group4Web> parentGroupList, List<Group4Web> sonGroupList) {
