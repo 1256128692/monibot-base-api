@@ -87,7 +87,8 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} engineDesc 引擎简介
      * @apiSuccess (返回结果) {Boolean} enable 启用状态
      * @apiSuccess (返回结果) {String} [videoType] 视频设备型号
-     * @apiSuccess (返回结果) {String} [productID] 产品ID
+     * @apiSuccess (返回结果) {Int} [productID] 产品ID
+     * @apiSuccess (返回结果) {String} [productName] 产品名称
      * @apiSuccess (返回结果) {Int} [projectID] 工程ID
      * @apiSuccess (返回结果) {String} [projectName] 工程名称
      * @apiSuccess (返回结果) {Int} [monitorItemID] 监测项目ID

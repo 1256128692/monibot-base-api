@@ -412,23 +412,23 @@ public class ProjectController {
      * @apiParam (请求体) {String} [v1] 水库规模/河道起点/堤防级别,支持模糊查询
      * @apiParam (请求体) {String} [v2] 所在河流/河道重点/堤防类型,支持模糊查询
      * @apiSuccess (返回结果) {Object[]} waterInfo 水利项目信息
-     * @apiSuccess (返回结果) {Int} reservoirInfo.type 水利项目类型
-     * @apiSuccess (返回结果) {Int} reservoirInfo.typeName 水利项目类型名称
-     * @apiSuccess (返回结果) {Int} reservoirInfo.count 项目数量
-     * @apiSuccess (返回结果) {Object[]} reservoirInfo.dataList 工程项目列表
-     * @apiSuccess (返回结果) {Int} reservoirInfo.dataList.projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectName 工程项目名称
-     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.projectShortName 工程项目简称
-     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.location 工程项目位置
-     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.v1 水库规模/河道起点/堤防级别
-     * @apiSuccess (返回结果) {String} reservoirInfo.dataList.v2 所在河流/河道重点/堤防类型
+     * @apiSuccess (返回结果) {Int} waterInfo.type 水利项目类型
+     * @apiSuccess (返回结果) {Int} waterInfo.typeName 水利项目类型名称
+     * @apiSuccess (返回结果) {Int} waterInfo.count 项目数量
+     * @apiSuccess (返回结果) {Object[]} waterInfo.dataList 工程项目列表
+     * @apiSuccess (返回结果) {Int} waterInfo.dataList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} waterInfo.dataList.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} waterInfo.dataList.projectShortName 工程项目简称
+     * @apiSuccess (返回结果) {String} waterInfo.dataList.location 工程项目位置
+     * @apiSuccess (返回结果) {String} waterInfo.dataList.v1 水库规模/河道起点/堤防级别
+     * @apiSuccess (返回结果) {String} waterInfo.dataList.v2 所在河流/河道重点/堤防类型
      * @apiSampleRequest off
      * @apiPermission 系统权限 + 应用权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
     @RequestMapping(value = "QueryWtProjectSimpleList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryWtProjectSimpleList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryWtProjectSimpleList(@Validated @RequestBody QueryWtProjectParam pa) {
+        return projectService.queryWtProjectSimpleList(pa);
     }
 
 

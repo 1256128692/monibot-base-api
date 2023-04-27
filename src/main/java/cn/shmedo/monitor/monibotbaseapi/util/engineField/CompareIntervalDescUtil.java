@@ -28,11 +28,14 @@ public class CompareIntervalDescUtil {
         Map<Integer, Integer> warnIDlimitTypeMap = new HashMap<>();
         Map<Integer, String> warnIDUpperNameMap = new HashMap<>();
         HashMap<Integer, String> warnIDUnitMap = new HashMap<>();
-        List<Tuple<Integer, Double>> tuples101 = new ArrayList<>();
-        List<Tuple<Integer, Double>> tuples000 = new ArrayList<>();
-        List<Tuple<Integer, Double>> tuples001 = new ArrayList<>();
+        Map<String, TokenNode> tokenTuplesMap = new HashMap<>();
         warnList.stream().filter(u -> Objects.nonNull(u.getCompareRule())).peek(u -> {
             Integer warnID = u.getWarnID();
+            String fieldToken = u.getFieldToken();
+            if (!tokenTuplesMap.containsKey(fieldToken)) {
+                tokenTuplesMap.put(fieldToken, new TokenNode());
+            }
+            TokenNode tokenNode = tokenTuplesMap.get(fieldToken);
             JSONObject compareRule = JSONUtil.parseObj(u.getCompareRule());
             String upperName = Optional.ofNullable(compareRule.getStr("upperName")).map(String::trim).orElse(null);
             String unit = compareRule.getStr("unit");
@@ -45,25 +48,27 @@ public class CompareIntervalDescUtil {
                 upperLimit = ((Number) limit).doubleValue();
             }
             Optional.ofNullable(upperLimit).ifPresent(
-                    l -> Optional.ofNullable(CompareInterval.getValue(monitorTypeID, u.getFieldToken(), upperName))
+                    l -> Optional.ofNullable(CompareInterval.getValue(monitorTypeID, fieldToken, upperName))
                             .ifPresent(w -> {
                                 warnIDUnitMap.put(warnID, unit);
                                 if (CompareInterval.notSpecialConcat(upperName)) {
                                     warnIDUpperNameMap.put(warnID, upperName);
                                 }
                                 switch (w.getShowType()) {
-                                    case -1 -> tuples101.add(new Tuple<>(warnID, l));
-                                    case 0 -> tuples000.add(new Tuple<>(warnID, l));
-                                    case 1 -> tuples001.add(new Tuple<>(warnID, l));
+                                    case -1 -> tokenNode.getTuples101().add(new Tuple<>(warnID, l));
+                                    case 0 -> tokenNode.getTuples000().add(new Tuple<>(warnID, l));
+                                    case 1 -> tokenNode.getTuples001().add(new Tuple<>(warnID, l));
                                     default ->
                                             log.error("CompareInterval参数存在未处理的showType,name:{},\tshowType:{}",
                                                     w.name(), w.getShowType());
                                 }
                             }));
         }).collect(Collectors.toList());
-        dealLowerLimitDesc(tuples101, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "(-∞,");
-        dealLowerLimitDesc(tuples000, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "[0,");
-        dealUpperLimitDesc(tuples001, map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap);
+        tokenTuplesMap.values().stream().peek(u -> {
+            dealLowerLimitDesc(u.getTuples101(), map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "(-∞,");
+            dealLowerLimitDesc(u.getTuples000(), map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap, "[0,");
+            dealUpperLimitDesc(u.getTuples001(), map, warnIDlimitTypeMap, warnIDUpperNameMap, warnIDUnitMap);
+        }).toList();
         return map;
     }
 
@@ -113,7 +118,7 @@ public class CompareIntervalDescUtil {
                     (Optional.ofNullable(warnIDUpperNameMap.get(tupleItem1)).map(w -> w + ": ").orElse("")) +
                     tuple.getItem2() + warnIDUnitMap.get(tupleItem1) +
                     (warnIDlimitTypeMap.getOrDefault(tupleItem1, 0) == 1 ?
-                    RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
+                            RIGHT_CONTAINS_END_POINT : RIGHT_NOT_CONTAINS_END_POINT));
             return;
         }
         Optional.of(tupleList).filter(u -> !CollectionUtil.isNullOrEmpty(u)).ifPresent(u -> {
@@ -140,5 +145,23 @@ public class CompareIntervalDescUtil {
                 return o2;
             });
         });
+    }
+
+    private static class TokenNode {
+        private final List<Tuple<Integer, Double>> tuples101 = new ArrayList<>();
+        private final List<Tuple<Integer, Double>> tuples000 = new ArrayList<>();
+        private final List<Tuple<Integer, Double>> tuples001 = new ArrayList<>();
+
+        public List<Tuple<Integer, Double>> getTuples101() {
+            return tuples101;
+        }
+
+        public List<Tuple<Integer, Double>> getTuples000() {
+            return tuples000;
+        }
+
+        public List<Tuple<Integer, Double>> getTuples001() {
+            return tuples001;
+        }
     }
 }

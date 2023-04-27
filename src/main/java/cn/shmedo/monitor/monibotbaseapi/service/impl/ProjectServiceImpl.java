@@ -5,11 +5,14 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -28,6 +31,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
@@ -495,6 +499,71 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
         return null;
+    }
+
+    @Override
+    public QueryWtProjectResponse queryWtProjectSimpleList(QueryWtProjectParam pa) {
+        //限制查询范围 仅用于限制用户
+        if (CurrentSubjectHolder.getCurrentSubjectExtractData() instanceof String token) {
+            pa.setProjectIDSet(getUserProjectIDs(pa.getCompanyID(), token));
+        }
+
+        //如存在查询条件 则先查询出符合条件的项目id
+        if (CollUtil.isNotEmpty(pa.getPropertyList())) {
+            List<Integer> projectIDs = tbProjectInfoMapper.getProjectIDByProperty(pa.getPropertyList(), null);
+            //如 getProjectIDSet 为null，即非用户 则不需要做交集
+            pa.setProjectIDSet(pa.getProjectIDSet() == null ?
+                    projectIDs : CollUtil.intersection(pa.getProjectIDSet(), projectIDs));
+            if (CollUtil.isEmpty(pa.getProjectIDSet())) {
+                return new QueryWtProjectResponse(Collections.emptyList());
+            }
+        }
+
+        //查询项目列表
+        LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
+                .le(TbProjectInfo::getProjectType, QueryWtProjectParam.v1KeySet.size());
+        Optional.ofNullable(pa.getProjectIDSet()).filter(e -> !e.isEmpty()).ifPresent(e -> wrapper.in(TbProjectInfo::getID, e));
+        Optional.ofNullable(pa.getProjectName()).filter(StrUtil::isNotBlank).ifPresent(item -> wrapper.like(TbProjectInfo::getProjectName, item));
+        Optional.ofNullable(pa.getProjectType()).ifPresent(item -> wrapper.eq(TbProjectInfo::getProjectType, item));
+        List<TbProjectInfo> list = this.list(wrapper);
+        List<Integer> idSet = list.stream().map(TbProjectInfo::getID).toList();
+
+        //属性字典
+        Map<Integer, Map<String, String>> propMap = idSet.isEmpty() ?
+                Collections.emptyMap() :
+                tbProjectPropertyMapper.queryPropertyByProjectID(idSet, CreateType.PREDEFINED.getType().intValue())
+                        .stream().collect(Collectors.groupingBy(PropertyDto::getProjectID,
+                                Collectors.toMap(PropertyDto::getName, e -> StrUtil.nullToEmpty(e.getValue()), (v1, v2) -> v1)));
+        //位置字典
+        Collection<Object> areas = list.stream().filter(e -> StrUtil.isNotEmpty(e.getLocation())).map(e -> {
+                    JSONObject json = JSONUtil.parseObj(e.getLocation());
+                    e.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                    return e.getLocation();
+                }).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = areas.isEmpty() ?
+                Collections.emptyMap() :
+                redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                        .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+
+        //按项目类型分组处理
+        List<QueryWtProjectResponse.WaterInfo> waterInfo = list.stream()
+                .collect(Collectors.groupingBy(e -> e.getProjectType().intValue()))
+                .entrySet().stream().map(entry -> {
+                    List<QueryWtProjectResponse.Detail> dataList = entry.getValue().stream().map(item -> {
+                        Map<String, String> ppMap = propMap.getOrDefault(item.getID(), Map.of());
+                        String v1 = ppMap.get(QueryWtProjectParam.v1KeySet.get(entry.getKey() - 1));
+                        String v2 = ppMap.get(QueryWtProjectParam.v2KeySet.get(entry.getKey() - 1));
+                        String location = areaMap.getOrDefault(item.getLocation(), null);
+                        return new QueryWtProjectResponse.Detail(item.getID(),
+                                item.getProjectName(), item.getShortName(), location, v1, v2);
+                    }).toList();
+                    TbProjectType projectType = ProjectTypeCache.projectTypeMap.get(entry.getKey().byteValue());
+                    return new QueryWtProjectResponse.WaterInfo(entry.getKey(),
+                            projectType.getTypeName(), entry.getValue().size(), dataList);
+                }).toList();
+
+        return new QueryWtProjectResponse(waterInfo);
     }
 
 }
