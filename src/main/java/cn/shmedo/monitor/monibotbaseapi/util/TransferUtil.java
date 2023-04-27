@@ -45,7 +45,7 @@ public class TransferUtil {
     }
 
     /**
-     * 转换设备基础信息
+     * 转换设备基本信息中的产品名称
      *
      * @param records       需要转换的记录
      * @param paramSupplier 查询参数提供器

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
@@ -74,12 +75,14 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
         WtWarnDetailInfo detailInfo = this.baseMapper.queryWarnDetail(param.getWarnID());
         //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
-        TransferUtil.applyDeviceBase(List.of(detailInfo),
-                () -> QueryDeviceBaseInfoParam.builder()
-                        .deviceTokens(Set.of(detailInfo.getDeviceToken()))
-                        .companyID(param.getCompanyID()).build(),
-                WtWarnDetailInfo::getDeviceToken,
-                (e, device) -> e.setDeviceTypeName(device.getProductName()));
+        if (StrUtil.isNotEmpty(detailInfo.getDeviceToken())) {
+            TransferUtil.applyDeviceBase(List.of(detailInfo),
+                    () -> QueryDeviceBaseInfoParam.builder()
+                            .deviceTokens(Set.of(detailInfo.getDeviceToken()))
+                            .companyID(param.getCompanyID()).build(),
+                    WtWarnDetailInfo::getDeviceToken,
+                    (e, device) -> e.setDeviceTypeName(device.getProductName()));
+        }
         return FieldShowUtil.dealFieldShow(detailInfo);
     }
 
