@@ -59,7 +59,11 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     public void configMonitorPointSensors(Integer pointID, List<Integer> sensorIDList, Integer userID) {
         Date now = new Date();
         tbSensorMapper.updatePointByPoint(pointID, null, userID, now);
-        tbSensorMapper.updatePoint(pointID, sensorIDList, userID, now);
+        if (
+                CollectionUtils.isNotEmpty(sensorIDList)
+        ) {
+            tbSensorMapper.updatePoint(pointID, sensorIDList, userID, now);
+        }
     }
 
     @Override
