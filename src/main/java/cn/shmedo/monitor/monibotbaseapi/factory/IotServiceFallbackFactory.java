@@ -5,7 +5,9 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import feign.hystrix.FallbackFactory;
@@ -24,7 +26,6 @@ import java.util.Map;
 @Component
 public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
     @Override
-    @SuppressWarnings("unchecked")
     public IotService create(Throwable cause) {
         log.error("物联网服务调用失败:{}", cause.getMessage());
         log.error(ExceptionUtil.stacktraceToString(cause));
@@ -38,6 +39,11 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
             @Override
             public ResultWrapper<List<DeviceWithSensor>> queryDeviceAndSensorList(QueryDeviceAndSensorRequest request) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<DeviceBaseInfo>> queryDeviceBaseInfo(QueryDeviceBaseInfoParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

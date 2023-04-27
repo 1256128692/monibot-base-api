@@ -3,6 +3,7 @@
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper">
     <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog">
         <id column="ID" property="ID" jdbcType="INTEGER"/>
+        <result column="WarnType" property="warnType" javaType="INTEGER"/>
         <result column="ProjectID" property="projectID" jdbcType="INTEGER"/>
         <result column="MonitorType" property="monitorType" jdbcType="INTEGER"/>
         <result column="MonitorItemID" property="monitorItemID" jdbcType="INTEGER"/>
@@ -14,18 +15,21 @@
         <result column="WarnContent" property="warnContent" jdbcType="VARCHAR"/>
         <result column="WorkOrderID" property="workOrderID" jdbcType="INTEGER"/>
         <result column="triggerID" property="triggerID" jdbcType="INTEGER"/>
+        <result column="DeviceToken" property="deviceToken" jdbcType="VARCHAR"/>
     </resultMap>
     <sql id="Base_Column_List">
-        `ID` ,`ProjectID`,`MonitorType`,`MonitorItemID`,`MonitorPointID`,`SensorID`,`Name`,`WarnTime`,`WarnLevel`,`WarnContent`,`WorkOrderID`,`triggerID`
+        `ID`,`WarnType`,`ProjectID`,`MonitorType`,`MonitorItemID`,`MonitorPointID`,`SensorID`,`Name`,`WarnTime`,`WarnLevel`,`WarnContent`,`WorkOrderID`,`triggerID`,`DeviceToken`
     </sql>
 
     <select id="queryCurrentRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
             twl.`ID` warnID,
+            twl.WarnType warnType,
             twl.`Name` warnName,
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
             twl.WarnContent warnContent,
+            twl.DeviceToken deviceToken,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmi.`ID` monitorItemID,
@@ -54,7 +58,9 @@
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
                      OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
+                     OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
+                     OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
             AND twl.monitorType=#{param.monitorTypeID}
@@ -64,6 +70,9 @@
         </if>
         <if test="param.warnLevel != null">
             AND twl.warnLevel=#{param.warnLevel}
+        </if>
+        <if test="param.warnType != null">
+            AND twl.WarnType=#{param.warnType}
         </if>
         <choose>
             <when test="param.orderType == null or param.orderType == 1">
@@ -78,10 +87,12 @@
     <select id="queryHistoryRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
             twl.`ID` warnID,
+            twl.WarnType warnType,
             twl.`Name` warnName,
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
             twl.WarnContent warnContent,
+            twl.DeviceToken deviceToken,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmi.`ID` monitorItemID,
@@ -108,7 +119,9 @@
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
             OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
+            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
+            OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
+            OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
             AND twl.monitorType=#{param.monitorTypeID}
@@ -118,6 +131,9 @@
         </if>
         <if test="param.warnLevel != null">
             AND twl.warnLevel=#{param.warnLevel}
+        </if>
+        <if test="param.warnType != null">
+            AND twl.WarnType=#{param.warnType}
         </if>
         <choose>
             <when test="param.orderType == null or param.orderType == 1">
@@ -132,6 +148,7 @@
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam">
         SELECT COUNT( * ) FROM tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
         WHERE twl1.latest_time = twl.WarnTime
         AND twl.ProjectID IN
@@ -141,7 +158,9 @@
         <if test="param.queryCode != null and param.queryCode != ''">
             AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
             OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%'))
+            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
+            OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
+            OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
         <if test="param.monitorTypeID != null">
             AND twl.monitorType=#{param.monitorTypeID}
@@ -151,6 +170,9 @@
         </if>
         <if test="param.warnLevel != null">
             AND twl.warnLevel=#{param.warnLevel}
+        </if>
+        <if test="param.warnType != null">
+            AND twl.WarnType=#{param.warnType}
         </if>
     </select>
     <select id="queryWarnDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo"

@@ -14,6 +14,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Optional;
+
 @Data
 public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @Min(value = 1, message = "公司ID不能小于1")
@@ -36,8 +38,11 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
     @NotNull(message = "pageSize不能为空")
     private Integer pageSize;
 
+    @Range(min = 1, max = 3, message = "报警类型不合法,报警类型:1.在线监测报警记录; 2.视频报警记录; 3.智能终端报警记录")
+    private Integer warnType;
+
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         if (monitorTypeID != null) {
             TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
             if (tbMonitorTypeMapper.selectCount(new LambdaQueryWrapper<TbMonitorType>()
@@ -52,6 +57,8 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
             }
         }
+
+        warnType = Optional.ofNullable(warnType).orElse(1);
         return null;
     }
 
