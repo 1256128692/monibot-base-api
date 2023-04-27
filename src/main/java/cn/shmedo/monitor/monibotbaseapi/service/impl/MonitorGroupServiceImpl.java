@@ -223,4 +223,26 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
 
         return group4Web;
     }
+
+    @Override
+    public List<Group4Web> queryMonitorGroupList(QueryMonitorGroupListParam pa) {
+        List<Group4Web> list = tbMonitorGroupMapper.queryList(pa.getProjectID(), pa.getGroupName(), pa.getSecondaryGroupName(), pa.getMonitorItemID(), true);
+        if (CollectionUtils.isEmpty(list)) {
+            return List.of();
+        }
+        List<Integer> groupIDList = list.stream().map(Group4Web::getID).collect(Collectors.toList());
+        List<Group4Web> sonGroupList = tbMonitorGroupMapper.queryGroup4WebByParentIDs(groupIDList);
+        // 处理监测项目和监测点
+        handleGroup4Web(list, sonGroupList);
+        // 处理额外字段
+        list.forEach(item -> {
+            item.setGroupID(item.getID());
+            item.setGroupName(item.getName());
+        });
+        sonGroupList.forEach(item -> {
+            item.setGroupID(item.getID());
+            item.setGroupName(item.getName());
+        });
+        return list;
+    }
 }

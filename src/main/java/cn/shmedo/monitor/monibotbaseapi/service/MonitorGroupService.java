@@ -26,4 +26,6 @@ public interface MonitorGroupService {
     PageUtil.Page<Group4Web> queryMonitorGroupPage(QueryMonitorGroupPageParam pa);
 
     Group4Web queryMonitorGroupDetail(TbMonitorGroup tbMonitorGroup);
+
+    List<Group4Web> queryMonitorGroupList(QueryMonitorGroupListParam pa);
 }

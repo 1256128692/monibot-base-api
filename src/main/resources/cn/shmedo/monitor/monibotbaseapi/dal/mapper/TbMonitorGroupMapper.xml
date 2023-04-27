@@ -241,4 +241,27 @@
             and ParentID is null
         </if>
     </select>
+
+    <select id="queryList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web">
+        select *
+        from tb_monitor_group
+        <where>
+            ProjectID = #{projectID}
+            <if test=" groupName != null and groupName != ''">
+                and `Name` like concat('%', #{groupName}, '%')
+            </if>
+            <if test="parented">
+                and ParentID is null
+            </if>
+            <if test="monitorItemID != null">
+                and id in
+                (select MonitorGroupID from tb_monitor_group_item where MonitorItemID = #{monitorItemID})
+            </if>
+            <if test="secondaryGroupName != null and secondaryGroupName != ''">
+                and id in
+                (select ParentID from tb_monitor_group where ParentID is not null and `Name` like concat('%', #{secondaryGroupName}, '%'))
+            </if>
+        </where>
+        order by id desc
+    </select>
 </mapper>
