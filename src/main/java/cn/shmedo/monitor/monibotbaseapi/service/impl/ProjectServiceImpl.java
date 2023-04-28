@@ -442,7 +442,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         pa.setServiceName(DefaultConstant.MDNET_SERVICE_NAME);
         pa.setPermissionToken(DefaultConstant.LIST_PROJECT);
         pa.setResourceType(ResourceType.BASE_PROJECT.toInt());
-        ResultWrapper<List<String>> info = instance.queryResourceListByPermission(pa, accessToken);
+        ResultWrapper<Set<String>> info = instance.queryResourceListByPermission(pa, accessToken);
         if (!info.apiSuccess()) {
             throw new CustomBaseException(info.getCode(), info.getMsg());
         }

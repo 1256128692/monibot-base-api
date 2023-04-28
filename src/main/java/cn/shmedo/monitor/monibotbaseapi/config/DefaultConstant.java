@@ -23,6 +23,6 @@ public class DefaultConstant {
 
     public static final String MDNET_SERVICE_NAME = "mdmbase";
 
-    public static final String LIST_PROJECT = "ListProject";
+    public static final String LIST_PROJECT = "ListBaseProject";
     public static final String MONITOR_TEMPLATE_PARAM_NAME = "nameList";
 }
