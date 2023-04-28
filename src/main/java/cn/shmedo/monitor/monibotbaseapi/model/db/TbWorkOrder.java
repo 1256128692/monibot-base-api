@@ -25,6 +25,8 @@ public class TbWorkOrder {
     private Integer status;
     @TableField("`Type`")
     private Integer type;
+    @TableField("SourceType")
+    private Integer sourceType;
     @TableField("Organization")
     private String organization;
     @TableField("Solution")

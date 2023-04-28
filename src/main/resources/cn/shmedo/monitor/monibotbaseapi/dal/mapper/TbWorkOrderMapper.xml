@@ -31,13 +31,27 @@
         <if test="param.endTime != null">
             AND two.DispatchTime &lt;= #{param.endTime}
         </if>
+        <if test="param.sourceType != null">
+            AND two.SourceType=#{param.sourceType}
+        </if>
         <if test="param.queryCode != null and param.queryCode != ''">
-            AND (two.OrderCode LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR two.DispatcherName LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR two.DisposerName LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR two.Organization LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%'))
+            <choose>
+                <when test="param.sourceType != 1">
+                    AND (two.OrderCode LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR two.DispatcherName LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR two.DisposerName LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%'))
+                </when>
+                <otherwise>
+                    AND (two.OrderCode LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR two.DispatcherName LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR two.DisposerName LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR two.Organization LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
+                        OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%'))
+                </otherwise>
+            </choose>
         </if>
         ORDER BY two.CreateTime DESC
     </select>
@@ -55,6 +69,9 @@
             two.CompanyID =#{param.companyID}
         <if test="param.projectID != null">
             AND twl.ProjectID=#{param.projectID}
+        </if>
+        <if test="param.sourceType != null">
+            AND two.SourceType=#{param.sourceType}
         </if>
     </select>
     <select id="queryWorkOrderDetail"

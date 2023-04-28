@@ -12,6 +12,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -35,13 +36,17 @@ public class QueryWorkOrderPageParam implements ParameterValidator, ResourcePerm
     @Range(min = 1, message = "当前页码必须大于0")
     @NotNull(message = "currentPage不能为空")
     private Integer currentPage;
+    @Range(min = 1, max = 3)
+    private Integer sourceType;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         Date current = new Date();
         if (endTime != null && endTime.after(current)) {
             endTime = current;
         }
+
+        this.sourceType = Optional.ofNullable(sourceType).orElse(1);
         return null;
     }
 

@@ -26,4 +26,6 @@ public class WtWorkOrderWarnDetail {
     private Integer warnLevel;
     private Date warnTime;
     private String warnContent;
+    private String deviceToken;
+    private String deviceTypeName;
 }

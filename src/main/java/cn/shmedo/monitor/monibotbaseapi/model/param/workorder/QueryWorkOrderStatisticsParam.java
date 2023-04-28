@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -22,6 +23,8 @@ public class QueryWorkOrderStatisticsParam implements ParameterValidator, Resour
     private Integer companyID;
     @Min(value = 1, message = "工程项目ID不能小于1")
     private Integer projectID;
+    @Range(min = 1, max = 3)
+    private Integer sourceType;
 
     @Override
     public ResultWrapper validate() {
