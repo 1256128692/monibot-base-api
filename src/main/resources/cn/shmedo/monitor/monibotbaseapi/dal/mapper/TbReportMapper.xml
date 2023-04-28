@@ -5,18 +5,48 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.report.TbBaseReportInfo">
         SELECT
             tmp.`Name` monitorPointName,
+            tmp.MonitorType monitorType,
             tpi.ProjectName projectName,
+            ts.ID sensorID,
             ts.`Status` "status",
             tmt.TypeName monitorTypeName,
             tmt.MonitorTypeClass monitorTypeClass,
             tmi.`Name` monitorItemName,
-            TRIM( BOTH '"' FROM JSON_EXTRACT( tpi.Location, "$.town" ) ) areaCode
+            TRIM( BOTH '"' FROM JSON_EXTRACT( tpi.Location, "$.town" ) ) areaCode,
+            t1.customColumn,
+            t2.upperName
         FROM
             tb_monitor_point tmp
             LEFT JOIN tb_project_info tpi ON tpi.ID = tmp.ProjectID
             LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmp.MonitorType
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
             LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+            LEFT JOIN (
+                SELECT
+                    tmi1.ID monitorItemID,
+                    GROUP_CONCAT( "{", tmtf.FieldName, (CASE tdu.EngUnit WHEN NULL THEN '' WHEN '' THEN '' ELSE CONCAT("(", tdu.EngUnit, ")") END), ":", tmtf.FieldToken, "}" ) customColumn
+                FROM
+                    tb_monitor_item tmi1
+                    LEFT JOIN tb_monitor_item_field tmif ON tmif.MonitorItemID = tmi1.ID
+                    LEFT JOIN tb_monitor_type_field tmtf ON tmtf.ID = tmif.MonitorTypeFieldID
+                    LEFT JOIN tb_data_unit tdu ON tdu.ID = tmtf.FieldUnitID
+                GROUP BY
+                    tmi1.ID
+            ) t1 ON t1.monitorItemID = tmi.ID
+            LEFT JOIN (
+                SELECT
+                    TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName" ) ) upperName,
+                    tmp2.ID MonitorPointID
+                FROM
+                    tb_warn_log twl
+                    LEFT JOIN tb_monitor_point tmp2 ON twl.MonitorPointID = tmp2.ID
+                    LEFT JOIN tb_sensor ts2 ON ts2.MonitorPointID = tmp2.ID
+                    LEFT JOIN tb_warn_trigger twt ON twt.ID = twl.triggerID
+                    LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
+                WHERE
+                    twl1.latest_time = twl.WarnTime
+                  AND ts2.`Status` IN ( 1, 2, 3, 4 )
+            ) t2 ON t2.MonitorPointID = tmp.ID
         WHERE
             tpi.CompanyID = #{companyID}
             AND tmp.CreateTime BETWEEN #{startTime} AND #{endTime}

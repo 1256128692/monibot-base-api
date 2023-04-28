@@ -21,7 +21,7 @@ public class WtQueryReportInfo {
     private String companyName;
     private Integer total;
     private List<String> monitorTypeClassList;
-    private final List<WtReportProjectInfo> dataList = new ArrayList<>();
+    private List<WtReportProjectInfo> dataList;
     private final List<WtReportProjectInfo> projectDataList = new ArrayList<>();
 
     @JsonProperty("monitorTypeClassSize")
@@ -31,10 +31,6 @@ public class WtQueryReportInfo {
 
     public void addMonitorTypeClass(final String typeClassName) {
         this.monitorTypeClassList.add(typeClassName);
-    }
-
-    public void addData(final WtReportProjectInfo data) {
-        this.dataList.add(data);
     }
 
     public void addProjectData(final WtReportProjectInfo data) {

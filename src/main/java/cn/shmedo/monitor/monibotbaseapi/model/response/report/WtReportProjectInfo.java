@@ -21,7 +21,7 @@ public class WtReportProjectInfo {
     private Integer total;
     private String projectName;
     private List<String> monitorTypeList;
-    private final List<WtReportMonitorTypeCountInfo> monitorTypeCountList = new ArrayList<>();
+    private List<WtReportMonitorTypeCountInfo> monitorTypeCountList;
     private final List<Map<String, Object>> monitorTypeDetailList = new ArrayList<>();
     @JsonIgnore
     private final Map<String, List<WtReportMonitorItemInfo>> detailNameMap = new HashMap<>();
@@ -31,15 +31,7 @@ public class WtReportProjectInfo {
         return this.monitorTypeList.size();
     }
 
-    public void addMonitorTypeList(final String monitorTypeName) {
-        this.monitorTypeList.add(monitorTypeName);
-    }
-
-    public void addMonitorTypeCount(final WtReportMonitorTypeCountInfo data) {
-        this.monitorTypeCountList.add(data);
-    }
-
-    public void addMonitorTypeDetailList(final String monitorTypeName, final WtReportMonitorItemInfo data) {
+    public void addMonitorTypeDetail(final String monitorTypeName, final WtReportMonitorItemInfo data) {
         if (this.detailNameMap.containsKey(monitorTypeName)) {
             this.detailNameMap.get(monitorTypeName).add(data);
         } else {
