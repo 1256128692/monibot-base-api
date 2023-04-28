@@ -230,7 +230,8 @@
             twl.`Name` warnName,
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
-            twl.WarnContent warnContent
+            twl.WarnContent warnContent,
+            twl.DeviceToken deviceToken
         FROM
             tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID

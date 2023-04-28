@@ -6,7 +6,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
-import java.util.List;
+import java.util.Set;
 
 public interface PermissionService {
 
@@ -73,8 +73,8 @@ public interface PermissionService {
      */
     @RequestLine("POST /QueryResourceListByPermission")
     @Headers("Authorization: Bearer {accessToken}")
-    ResultWrapper<List<String>> queryResourceListByPermission(QueryResourceListByPermissionParameter pa,
-                                                              @Param("accessToken") String accessToken);
+    ResultWrapper<Set<String>> queryResourceListByPermission(QueryResourceListByPermissionParameter pa,
+                                                             @Param("accessToken") String accessToken);
 
 
     @RequestLine("POST /DeleteMdmbaseResource")

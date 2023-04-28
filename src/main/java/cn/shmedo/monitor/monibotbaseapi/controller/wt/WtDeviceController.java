@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryProductSimpleParam;
+import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WtDeviceController {
+
+    private final WtDeviceService wtDeviceService;
 
     /**
      * @api {POST} /QueryWtVideoPageList 分页查询视频设备
@@ -151,5 +155,26 @@ public class WtDeviceController {
     @PostMapping(value = "/QueryWtDevicePageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtDevicePageList(@Valid @RequestBody Object param) {
         return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryProductSimpleList 产品简要信息列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName QueryProductSimpleList
+     * @apiDescription 产品简要信息列表
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int[]} [isEnable] 推送是否启用 (对应物联网数据推送开关)
+     * @apiParam (请求参数) {String} [deviceToken] 指定查询的设备token
+     * @apiSuccess (返回结果) {String} productID 产品ID
+     * @apiSuccess (返回结果) {String} productName 产品名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseDevice")
+    @PostMapping(value = "/QueryProductSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deviceTypeList(@Valid @RequestBody QueryProductSimpleParam param) {
+        return wtDeviceService.productSimpleList(param);
     }
 }

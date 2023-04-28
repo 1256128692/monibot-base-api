@@ -34,6 +34,7 @@ public class WorkOrderController {
      * @apiParam (请求参数) {Int} [workOrderTypeID] 工单类型ID,由工作流配置产生
      * @apiParam (请求参数) {DateTime} [startTime] 派单开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 派单结束时间,默认是现在
+     * @apiParam (请求参数) {Int} [sourceType] 工单来源类型 1-在线监测实时报警工单(默认) 2-视频报警工单 3-智能终端报警工单
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
@@ -109,6 +110,8 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} warnLevel 报警等级
      * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
      * @apiSuccess (返回结果) {String} warnContent 报警内容
+     * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
@@ -166,6 +169,7 @@ public class WorkOrderController {
      * @apiDescription 查询工单状态统计信息
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectID] 项目ID
+     * @apiParam (请求参数) {Int} [sourceType] 工单来源类型 1-在线监测实时报警工单 2-视频报警工单 3-智能终端报警工单
      * @apiSuccess (返回结果) {Int} todoCount 待处理数量
      * @apiSuccess (返回结果) {Int} processingCount 处理中数量
      * @apiSuccess (返回结果) {Int} completedCount 已结束数量
