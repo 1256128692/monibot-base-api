@@ -1,8 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.report.WtQueryReportParam;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbReportService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WtReportController {
+    private final ITbReportService tbReportService;
+
     /**
      * @api {POST} /QueryReport 水务局简报
      * @apiVersion 1.0.0
@@ -20,15 +27,16 @@ public class WtReportController {
      * @apiName QueryReport
      * @apiDescription 水务局简报
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} reportType 简报类型 0自定义 1周报 2月报 3季度报 4年报'
+     * @apiParam (请求参数) {Int} reportType 简报类型 0自定义 1周报 2月报 4年报
      * @apiParam (请求参数) {DateTime} startTime 开始时间
      * @apiParam (请求参数) {DateTime} endTime 结束时间
      * @apiParam (请求参数) {Int[]} [projectIDList] 工程概述ID list
      * @apiSuccess (返回结果) {DateTime} startTime 时间范围开始时间
      * @apiSuccess (返回结果) {DateTime} endTime 时间范围结束时间
+     * @apiSuccess (返回结果) {String} period 期数
      * @apiSuccess (返回结果) {String} companyName 编制单位名称
      * @apiSuccess (返回结果) {Int} total 监测点总计
-     * @apiSuccess (返回结果) {Int} monitorItemNameSize 监测类型的类别数量(三类数据监测点)
+     * @apiSuccess (返回结果) {Int} monitorTypeClassSize 监测类型的类别数量(三类数据监测点)
      * @apiSuccess (返回结果) {String[]} monitorTypeClassList 监测类型的类别名称list
      * @apiSuccess (返回结果) {Object[]} dataList 详情数据
      * @apiSuccess (返回结果) {String} dataList.monitorTypeClass 监测类型的类别
@@ -82,7 +90,9 @@ public class WtReportController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
-    public Object queryReport(@Valid @RequestBody Object param) {
-        return null;
+//    @Permission(permissionName = "")
+    @PostMapping(value = "/QueryReport", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryReport(@Valid @RequestBody WtQueryReportParam param) {
+        return tbReportService.queryReport(param);
     }
 }

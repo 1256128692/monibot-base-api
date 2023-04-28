@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper">
+    <select id="queryBaseReportInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.report.TbBaseReportInfo">
+        SELECT
+            tmp.`Name` monitorPointName,
+            tpi.ProjectName projectName,
+            ts.`Status` "status",
+            tmt.TypeName monitorTypeName,
+            tmt.MonitorTypeClass monitorTypeClass,
+            tmi.`Name` monitorItemName,
+            TRIM( BOTH '"' FROM JSON_EXTRACT( tpi.Location, "$.town" ) ) areaCode
+        FROM
+            tb_monitor_point tmp
+            LEFT JOIN tb_project_info tpi ON tpi.ID = tmp.ProjectID
+            LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmp.MonitorType
+            LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
+            LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+        WHERE
+            tpi.CompanyID = #{companyID}
+            AND tmp.CreateTime BETWEEN #{startTime} AND #{endTime}
+    </select>
+</mapper>

@@ -47,6 +47,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} [currentPageData.productID] 产品ID
      * @apiSuccess (返回结果) {String} [currentPageData.productName] 产品名称
      * @apiSuccess (返回结果) {String} [currentPageData.exValue] 应用范围json
+     * @apiSuccess (返回结果) {DateTime} [currentPageData.createTime] 创建时间
      * @apiSuccess (返回结果) {Int} [currentPageData.projectID] 工程ID
      * @apiSuccess (返回结果) {String} [currentPageData.projectName] 工程名称
      * @apiSuccess (返回结果) {Int} [currentPageData.monitorItemID] 监测项目ID

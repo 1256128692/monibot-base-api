@@ -18,7 +18,8 @@ public class FileConfig {
     private String authServiceAddress;
     @Value("${service.infoServiceAddress}")
     private String infoServiceAddress;
-
+    @Value("${service.wtReportServiceAddress}")
+    private String wtReportServiceAddress;
     @Value("${service.mdInfoServiceAddress}")
     private String mdInfoServiceAddress;
 
@@ -101,6 +102,14 @@ public class FileConfig {
 
     public void setMdInfoServiceAddress(String mdInfoServiceAddress) {
         this.mdInfoServiceAddress = mdInfoServiceAddress;
+    }
+
+    public String getWtReportServiceAddress() {
+        return wtReportServiceAddress;
+    }
+
+    public void setWtReportServiceAddress(String wtReportServiceAddress) {
+        this.wtReportServiceAddress = wtReportServiceAddress;
     }
 
     public String getInfluxAddr() {
