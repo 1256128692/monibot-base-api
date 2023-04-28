@@ -383,4 +383,10 @@
     #{id}
   </foreach>
   </update>
+
+  <update id="updatePointByPoint">
+    update tb_sensor
+    set MonitorPointID = #{newPoint}, UpdateTime = #{date}, UpdateUserID = #{userID}
+    where MonitorPointID = #{oldPoint}
+    </update>
 </mapper>

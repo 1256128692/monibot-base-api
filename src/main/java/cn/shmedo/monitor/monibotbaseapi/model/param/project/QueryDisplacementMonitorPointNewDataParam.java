@@ -20,6 +20,9 @@ public class QueryDisplacementMonitorPointNewDataParam implements ParameterValid
 
     private Integer monitorItemID;
 
+    @NotNull(message = "监测类别不能为空")
+    private Integer monitorClassType;
+
     private String areaCode;
 
     @Override

@@ -11,6 +11,7 @@ import java.util.Date;
 @Data
 public class WtWarnLogInfo {
     private Integer warnID;
+    private Integer warnType;
     private String warnName;
     private Integer warnLevel;
     private Date warnTime;
@@ -27,4 +28,6 @@ public class WtWarnLogInfo {
     private Integer workOrderID;
     private String orderCode;
     private Integer orderStatus;
+    private String deviceToken;
+    private String deviceTypeName;
 }

@@ -145,8 +145,45 @@ public class MonitorGroupController {
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiSuccess (返回结果) {Int} totalCount 总页数
-     * @apiSuccess (返回结果) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.groupID 监测组ID
+     * @apiSuccess (返回结果) {String} currentPageData.groupName 监测组名称
+     * @apiSuccess (返回结果) {Boolean} currentPageData.enable 是否启用
+     * @apiSuccess (返回结果) {String} [currentPageData.imagePath] 底图地址
+     * @apiSuccess (返回结果) {String} [currentPageData.exValue] 拓展字段
+     * @apiSuccess (返回结果) {Int} currentPageData.displayOrder 排序字段
+     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorItemList 监测项目列表
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorItemList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} currentPageData.monitorItemList.monitorItemAlias 监测项目别称
+     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点列表
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.imageLocation 底图位置
+     * @apiSuccess (返回结果) {Object[]} currentPageData.childGroupList 子监测组列表
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
+    @PostMapping(value = "/QueryMonitorGroupPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupPage(@RequestBody @Validated QueryMonitorGroupPageParam pa) {
+        return monitorGroupService.queryMonitorGroupPage(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorGroupList 查询监测组列表列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测组模块
+     * @apiName QueryMonitorGroupList
+     * @apiDescription 查询监测组列表列表, 基于QueryMonitorGroupPage
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {String} [groupName] 监测组名称(一级组)
+     * @apiParam (请求体) {String} [secondaryGroupName] 监测组名称(二级组)
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiSuccess (返回结果) {Object[]} data 数据列表
      * @apiSuccess (返回结果) {Int} data.groupID 监测组ID
      * @apiSuccess (返回结果) {String} data.groupName 监测组名称
@@ -169,9 +206,9 @@ public class MonitorGroupController {
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
-    @PostMapping(value = "/QueryMonitorGroupPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorGroupPage(@RequestBody @Validated QueryMonitorGroupPageParam pa) {
-        return monitorGroupService.queryMonitorGroupPage(pa);
+    @PostMapping(value = "/QueryMonitorGroupList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupList(@RequestBody @Validated QueryMonitorGroupListParam pa) {
+        return monitorGroupService.queryMonitorGroupList(pa);
     }
 
     /**
@@ -204,6 +241,6 @@ public class MonitorGroupController {
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorGroup")
     @PostMapping(value = "/QueryMonitorGroupDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorGroupDetail(@RequestBody @Validated QueryMonitorGroupDetailParam pa) {
-       return monitorGroupService.queryMonitorGroupDetail(pa.getTbMonitorGroup());
+        return monitorGroupService.queryMonitorGroupDetail(pa.getTbMonitorGroup());
     }
 }

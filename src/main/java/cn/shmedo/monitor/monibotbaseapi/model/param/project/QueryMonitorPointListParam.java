@@ -31,6 +31,9 @@ public class QueryMonitorPointListParam implements ParameterValidator, ResourceP
 
     private String areaCode;
 
+    @NotNull(message = "监测类别不能为空")
+    private Integer monitorClassType;
+
     @JsonIgnore
     private String accessToken;
 

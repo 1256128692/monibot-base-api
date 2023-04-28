@@ -39,4 +39,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     Integer getNameSerialNumber(@Param("projectID") Integer projectID, @Param("monitorType") Integer monitorType);
 
     void updatePoint(Integer pointID, List<Integer> sensorIDList, Integer userID, Date date);
+
+    void updatePointByPoint(Integer oldPoint, Integer newPoint, Integer userID, Date date);
 }

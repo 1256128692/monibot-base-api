@@ -7,13 +7,16 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
 @TableName("tb_warn_log")
-public class TbWarnLog {
+public class TbWarnLog implements Serializable {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
+    @TableField("WarnType")
+    private Integer warnType;
     @TableField("ProjectID")
     private Integer projectID;
     @TableField("MonitorType")
@@ -36,6 +39,8 @@ public class TbWarnLog {
     private Integer workOrderID;
     @TableField("triggerID")
     private Integer triggerID;
+    @TableField("DeviceToken")
+    private String deviceToken;
     @Serial
     private static final long serialVersionUID = 1L;
 }

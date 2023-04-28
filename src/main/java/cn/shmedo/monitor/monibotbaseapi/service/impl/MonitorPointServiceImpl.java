@@ -19,6 +19,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -53,9 +54,16 @@ public class MonitorPointServiceImpl implements MonitorPointService {
         tbMonitorPointMapper.deleteBatchIds(pointIDList);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void configMonitorPointSensors(Integer pointID, List<Integer> sensorIDList, Integer userID) {
-        tbSensorMapper.updatePoint(pointID, sensorIDList, userID, new Date());
+        Date now = new Date();
+        tbSensorMapper.updatePointByPoint(pointID, null, userID, now);
+        if (
+                CollectionUtils.isNotEmpty(sensorIDList)
+        ) {
+            tbSensorMapper.updatePoint(pointID, sensorIDList, userID, now);
+        }
     }
 
     @Override

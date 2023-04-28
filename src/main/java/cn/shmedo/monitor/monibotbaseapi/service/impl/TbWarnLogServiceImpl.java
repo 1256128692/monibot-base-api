@@ -1,14 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -17,16 +21,21 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog> implements ITbWarnLogService {
     private final TbProjectInfoMapper tbProjectInfoMapper;
+    private final IotService iotService;
 
     @Override
     public PageUtil.Page<WtWarnLogInfo> queryByPage(QueryWtWarnLogPageParam param) {
@@ -52,12 +61,29 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
         } else {
             wtWarnLogInfos = new ArrayList<>();
         }
+        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+        TransferUtil.applyDeviceBaseItem(wtWarnLogInfos,
+                () -> QueryDeviceBaseInfoParam.builder()
+                        .deviceTokens(wtWarnLogInfos.stream().map(WtWarnLogInfo::getDeviceToken).collect(Collectors.toSet()))
+                        .companyID(param.getCompanyID()).build(),
+                WtWarnLogInfo::getDeviceToken,
+                WtWarnLogInfo::setDeviceTypeName);
         return new PageUtil.Page<>(totalCount / pageSize + 1, wtWarnLogInfos, totalCount);
     }
 
     @Override
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
-        return FieldShowUtil.dealFieldShow(this.baseMapper.queryWarnDetail(param.getWarnID()));
+        WtWarnDetailInfo detailInfo = this.baseMapper.queryWarnDetail(param.getWarnID());
+        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+        if (StrUtil.isNotEmpty(detailInfo.getDeviceToken())) {
+            TransferUtil.applyDeviceBase(List.of(detailInfo),
+                    () -> QueryDeviceBaseInfoParam.builder()
+                            .deviceTokens(Set.of(detailInfo.getDeviceToken()))
+                            .companyID(param.getCompanyID()).build(),
+                    WtWarnDetailInfo::getDeviceToken,
+                    (e, device) -> e.setDeviceTypeName(device.getProductName()));
+        }
+        return FieldShowUtil.dealFieldShow(detailInfo);
     }
 
 }

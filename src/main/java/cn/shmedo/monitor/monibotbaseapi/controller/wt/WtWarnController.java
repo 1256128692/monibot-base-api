@@ -24,11 +24,12 @@ public class WtWarnController {
      * @apiDescription 查询报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录
-     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容
+     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容、设备SN、监测点
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
+     * @apiParam (请求参数) {Int} [warnType] 报警类型 1-在线监测报警(默认值) 2-视频报警记录 3-智能终端报警记录
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -51,6 +52,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} currentPageData.workOrderID 关联工单ID,若为空表示该工单暂未
      * @apiSuccess (返回结果) {String} currentPageData.orderCode 关联工单编号
      * @apiSuccess (返回结果) {Int} currentPageData.orderStatus 处置状态 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
+     * @apiSuccess (返回结果) {String} currentPageData.deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} currentPageData.deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
@@ -89,6 +92,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} triggerRule 触发规则json
      * @apiSuccess (返回结果) {Int} workOrderID 工单ID
      * @apiSuccess (返回结果) {String} workOrderCode 工单编号
+     * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */

@@ -166,7 +166,7 @@ public class MonitorPointController {
      * @apiDescription 配置监测点传感器
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} pointID 监测点ID
-     * @apiParam (请求体) {Int[]} sensorIDList 配置传感器列表(max = 100)
+     * @apiParam (请求体) {Int[]} [sensorIDList] 配置传感器列表(max = 100), 该项为空时清空监测点下的传感器
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseMonitorPoint
