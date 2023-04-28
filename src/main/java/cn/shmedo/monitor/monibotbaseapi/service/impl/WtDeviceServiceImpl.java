@@ -30,11 +30,11 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
     @Override
     public Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param) {
-        Collection<String> projectList = PermissionUtil.getHavePermissionProjectList();
+        Collection<Integer> projectList = PermissionUtil.getHavePermissionProjectList(param.getCompanyID());
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(param.getCompanyID())
                 .sendType(SendType.MDMBASE.toInt())
-                .sendAddressList(projectList.stream().toList())
+                .sendAddressList(projectList.stream().map(String::valueOf).toList())
                 .sendEnable(param.getIsEnable())
                 .deviceToken(param.getDeviceToken())
                 .build();

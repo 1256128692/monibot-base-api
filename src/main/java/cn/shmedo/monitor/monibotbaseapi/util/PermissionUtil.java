@@ -34,32 +34,33 @@ public class PermissionUtil {
      *
      * @return 有权限的项目列表
      */
-    public static Collection<String> getHavePermissionProjectList() {
-        return getHavePermissionProjectList(Collections.emptyList());
+    public static Collection<Integer> getHavePermissionProjectList(Integer companyID) {
+        return getHavePermissionProjectList(companyID, null);
     }
 
     /**
      * 获取当前用户有权限的项目列表，仅用于用户在请求线程中调用
      *
-     * @param projectList 需要比较的项目列表，结果将和此集合做交集，为空时将直接返回当前用户有权限的项目列表
+     * @param projectList 需要比较的项目列表，结果将和此集合做交集，为null时将不会做交集
      * @return 有权限的项目列表
      */
-    public static Collection<String> getHavePermissionProjectList(Collection<String> projectList) {
-        Collection<String> resourceList = getResourceList(DefaultConstant.MDNET_SERVICE_NAME,
-                DefaultConstant.LIST_PROJECT, ResourceType.BASE_PROJECT);
-
-        return projectList.isEmpty() ? resourceList : CollectionUtil.intersection(projectList, resourceList);
+    public static Collection<Integer> getHavePermissionProjectList(Integer companyID, Collection<Integer> projectList) {
+        Collection<Integer> resourceList = getResourceList(companyID, DefaultConstant.MDNET_SERVICE_NAME,
+                DefaultConstant.LIST_PROJECT, ResourceType.BASE_PROJECT).stream().map(Integer::parseInt).toList();
+        return projectList == null ? resourceList : CollectionUtil.intersection(projectList, resourceList);
     }
 
     /**
      * 远程调用获当前用户有取资源列表
      *
+     * @param companyID       公司ID
      * @param serviceName     服务名
      * @param permissionToken 权限名
      * @param resourceType    资源类型
      * @return 资源列表
      */
-    public static Collection<String> getResourceList(@Nonnull String serviceName,
+    public static Collection<String> getResourceList(@Nonnull Integer companyID,
+                                                     @Nonnull String serviceName,
                                                      @Nonnull String permissionToken,
                                                      @Nonnull ResourceType resourceType) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
@@ -67,7 +68,7 @@ public class PermissionUtil {
         if (subject != null && extract instanceof String token) {
             PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
             QueryResourceListByPermissionParameter pa = new QueryResourceListByPermissionParameter();
-            pa.setCompanyID(subject.getCompanyID());
+            pa.setCompanyID(companyID);
             pa.setServiceName(serviceName);
             pa.setPermissionToken(permissionToken);
             pa.setResourceType(resourceType.toInt());

@@ -8,8 +8,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
-import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
@@ -318,26 +316,18 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa, String accessToken) {
-        List<Integer> userProjectIDs = getUserProjectIDs(pa.getCompanyID(), accessToken);
-        if (CollUtil.isEmpty(userProjectIDs)) {
-            return PageUtil.Page.empty();
-        }
-        List<Integer> projectIDList = List.of();
-        if (ObjectUtil.isNotEmpty(pa.getPropertyEntity())) {
-            projectIDList = tbProjectInfoMapper
+    public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
+
+        if (CollUtil.isNotEmpty(pa.getPropertyEntity())) {
+            //查询满足过滤条件的项目ID并和有权限的项目ID取交集
+            List<Integer> projectIDList = tbProjectInfoMapper
                     .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
-            if (CollUtil.isEmpty(projectIDList)) {
+            pa.setProjectIDList(CollUtil.intersection(projectIDList, pa.getProjectIDList()));
+            if (pa.getProjectIDList().isEmpty()) {
                 return PageUtil.Page.empty();
             }
         }
-        //FIXME 米度查询所有项目，暂时以固定ID判断
-        if (DefaultConstant.MD_ID.equals(pa.getCompanyID())) {
-            pa.setCompanyID(null);
-        }
 
-        userProjectIDs.addAll(projectIDList);
-        pa.setProjectIDList(userProjectIDs);
         Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(page, pa);
 
@@ -396,13 +386,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public List<ProjectBaseInfo> queryProjectListByProjectName(QueryProjectListParam pa) {
 
-        List<Integer> projectIDs = getUserProjectIDs(pa.getCompanyID(), pa.getAccessToken());
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
-                .in(TbProjectInfo::getID, projectIDs);
-        if (!CollectionUtil.isNotEmpty(projectIDs)) {
-            wrapper.in(TbProjectInfo::getID, projectIDs);
-        }
+                .in(TbProjectInfo::getID, pa.getProjectIDs());
         if (!StringUtil.isNullOrEmpty(pa.getProjectName())) {
             wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
         }
@@ -427,27 +413,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         } else {
             return null;
         }
-    }
-
-    /**
-     * 获取用户在该公司中具有权限的项目
-     *
-     * @return
-     */
-    @Override
-    public List<Integer> getUserProjectIDs(Integer companyID, String accessToken) {
-        PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
-        QueryResourceListByPermissionParameter pa = new QueryResourceListByPermissionParameter();
-        pa.setCompanyID(companyID);
-        pa.setServiceName(DefaultConstant.MDNET_SERVICE_NAME);
-        pa.setPermissionToken(DefaultConstant.LIST_PROJECT);
-        pa.setResourceType(ResourceType.BASE_PROJECT.toInt());
-        ResultWrapper<Set<String>> info = instance.queryResourceListByPermission(pa, accessToken);
-        if (!info.apiSuccess()) {
-            throw new CustomBaseException(info.getCode(), info.getMsg());
-        }
-        List<Integer> pids = info.getData().stream().distinct().map(Integer::parseInt).collect(Collectors.toList());
-        return pids;
     }
 
     @Override
@@ -503,18 +468,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public QueryWtProjectResponse queryWtProjectSimpleList(QueryWtProjectParam pa) {
-        //限制查询范围 仅用于限制用户
-        if (CurrentSubjectHolder.getCurrentSubjectExtractData() instanceof String token) {
-            pa.setProjectIDSet(getUserProjectIDs(pa.getCompanyID(), token));
-        }
 
-        //如存在查询条件 则先查询出符合条件的项目id
+        //有过滤条件先按条件查询对应项目列表，和有权限的项目列表取交集
         if (CollUtil.isNotEmpty(pa.getPropertyList())) {
             List<Integer> projectIDs = tbProjectInfoMapper.getProjectIDByProperty(pa.getPropertyList(), null);
-            //如 getProjectIDSet 为null，即非用户 则不需要做交集
-            pa.setProjectIDSet(pa.getProjectIDSet() == null ?
-                    projectIDs : CollUtil.intersection(pa.getProjectIDSet(), projectIDs));
-            if (CollUtil.isEmpty(pa.getProjectIDSet())) {
+            pa.setProjectList(CollUtil.intersection(projectIDs, pa.getProjectList()));
+            if (pa.getProjectList().isEmpty()) {
                 return new QueryWtProjectResponse(Collections.emptyList());
             }
         }
@@ -522,9 +481,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //查询项目列表
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
-                .le(TbProjectInfo::getProjectType, QueryWtProjectParam.v1KeySet.size());
-        Optional.ofNullable(pa.getProjectIDSet()).filter(e -> !e.isEmpty()).ifPresent(e -> wrapper.in(TbProjectInfo::getID, e));
-        Optional.ofNullable(pa.getProjectName()).filter(StrUtil::isNotBlank).ifPresent(item -> wrapper.like(TbProjectInfo::getProjectName, item));
+                .le(TbProjectInfo::getProjectType, QueryWtProjectParam.v1KeySet.size())
+                .in(TbProjectInfo::getID, pa.getProjectList());
+        Optional.ofNullable(pa.getProjectName()).filter(StrUtil::isNotBlank)
+                .ifPresent(item -> wrapper.like(TbProjectInfo::getProjectName, item));
         Optional.ofNullable(pa.getProjectType()).ifPresent(item -> wrapper.eq(TbProjectInfo::getProjectType, item));
         List<TbProjectInfo> list = this.list(wrapper);
         List<Integer> idSet = list.stream().map(TbProjectInfo::getID).toList();

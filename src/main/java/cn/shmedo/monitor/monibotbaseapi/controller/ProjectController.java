@@ -159,7 +159,7 @@ public class ProjectController {
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa ){
-        return projectService.queryProjectList(pa, CurrentSubjectHolder.getCurrentSubjectExtractData());
+        return projectService.queryProjectList(pa);
     }
 
 

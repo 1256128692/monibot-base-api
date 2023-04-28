@@ -50,21 +50,11 @@ public interface ProjectService {
      * @param pa     参数 {@link QueryProjectListRequest}
      * @return {@link PageUtil.Page <ProjectInfo>}
      */
-    PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa, String accessToken);
+    PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa);
 
     ProjectInfo queryProjectInfo(QueryProjectInfoParam pa);
 
     List<ProjectBaseInfo> queryProjectListByProjectName(QueryProjectListParam pa);
-
-    /**
-     * 获取用户的项目ID
-     * 高频访问方法，使用Spring AOP做特殊缓存
-     *
-     * @param companyID 获取用户在该公司中的项目，如果为null,则获取用户在所有具有权限的公司中的项目
-     * @param accessToken    访问id
-     * @return
-     */
-    List<Integer> getUserProjectIDs(Integer companyID, String accessToken);
 
     String setProjectImg(SetProjectImgParam pa, Integer userID);
 

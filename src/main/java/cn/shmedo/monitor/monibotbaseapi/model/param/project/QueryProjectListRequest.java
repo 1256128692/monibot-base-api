@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     private Date endCreateTime;
 
     @JsonIgnore
-    private List<Integer> projectIDList;
+    private Collection<Integer> projectIDList;
 
     private List<Property> propertyEntity;
 
@@ -113,6 +115,11 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
             }
         }
 
+        // 获取有权限的项目列表
+        this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID);
+        if (projectIDList.isEmpty()) {
+            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+        }
         return null;
     }
 

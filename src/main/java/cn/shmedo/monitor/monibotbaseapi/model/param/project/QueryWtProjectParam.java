@@ -1,11 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.util.StrUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,7 +11,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * 查询水利工程项目简要列表参数
@@ -38,7 +39,7 @@ public class QueryWtProjectParam  implements ParameterValidator, ResourcePermiss
     private String v2;
 
     @JsonIgnore
-    private Collection<Integer> projectIDSet = new HashSet<>();
+    private Collection<Integer> projectList;
 
     @JsonIgnore
     private List<QueryProjectListRequest.Property> propertyList = new ArrayList<>();
@@ -63,6 +64,10 @@ public class QueryWtProjectParam  implements ParameterValidator, ResourcePermiss
                             new QueryProjectListRequest.Property(key, v2)).toList()));
         }
 
+        this.projectList = PermissionUtil.getHavePermissionProjectList(companyID);
+        if (projectList.isEmpty()) {
+            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+        }
         return null;
     }
 
