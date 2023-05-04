@@ -535,4 +535,27 @@
             #{groupID}
         </foreach>
     </select>
+
+
+
+
+    <select id="selectListByIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo">
+        select p.ID     as monitorPointID
+             , p.`Name` as monitorPointName
+             , p.MonitorItemID
+             , p.MonitorType
+             , i.`Name` as monitorItemName
+             , i.Alias as monitorItemAlias
+             , s.ID     as sensorID
+             , s.`Name` as sensorName
+             , s.configFieldValue
+        from tb_monitor_point as p
+                 left join tb_monitor_item as i on i.ID = p.MonitorItemID
+                 left join tb_sensor as s on s.MonitorPointID = p.ID
+        where p.ID in
+        <foreach collection="monitorPointIDList" item="pointID" separator="," open="(" close=")">
+            #{pointID}
+        </foreach>
+    </select>
 </mapper>

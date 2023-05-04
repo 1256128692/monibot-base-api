@@ -7,12 +7,21 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsCode;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointHistoryLiveInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointLiveInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.HistoryLiveInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.QueryVideoBaseInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -55,5 +64,41 @@ public class VideoServiceImpl implements VideoService {
             throw new RuntimeException("ys service error:" + deviceInfoWrapper);
         }
         return QueryVideoBaseInfoResult.valueOf(deviceInfoWrapper.getData());
+    }
+
+
+    @Override
+    public List<VideoMonitorPointLiveInfo> queryVideoMonitorPointLiveInfo(QueryVideoMonitorPointLiveInfoParam pa) {
+
+        List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
+
+        String ysToken = getYsToken();
+        if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
+            liveInfos.forEach( item -> {
+                String baseUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), false, item.getYsChannelNo());
+                String hdUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), true, item.getYsChannelNo());
+                item.setBaseUrl(baseUrl);
+                item.setHdUrl(hdUrl);
+                item.setYsToken(ysToken);
+            });
+
+            return liveInfos;
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    public HistoryLiveInfo queryVideoMonitorPointHistoryLiveInfo(QueryVideoMonitorPointHistoryLiveInfoParam pa) {
+        HistoryLiveInfo vo = new HistoryLiveInfo();
+        List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
+        if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
+            String ysToken = getYsToken();
+            String ezOpenHistoryAddress = YsUtil.getEzOpenHistoryAddress(liveInfos.get(0).getSeqNo(), liveInfos.get(0).getYsChannelNo(), pa.getBeginTime(),
+                    pa.getEndTime());
+            vo.setHistoryLiveAddress(ezOpenHistoryAddress);
+            vo.setYsToken(ysToken);
+        }
+
+        return vo;
     }
 }

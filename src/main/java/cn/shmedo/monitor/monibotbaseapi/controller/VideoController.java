@@ -5,6 +5,8 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointHistoryLiveInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointLiveInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
@@ -27,24 +29,25 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int[]} monitorPointIDList  监测点ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":"1","monitorType":"33"}
-     * @apiSuccess (返回结果) {Int} sensorID  传感器ID
-     * @apiSuccess (返回结果) {String} sensorName  传感器名称
-     * @apiSuccess (返回结果) {Int} monitorPointID   监测点ID
-     * @apiSuccess (返回结果) {String} monitorPointName   监测点名称
-     * @apiSuccess (返回结果) {Int} monitorItemID   监测项目ID
-     * @apiSuccess (返回结果) {String} monitorItemName   监测项目名称
-     * @apiSuccess (返回结果) {String} monitorItemAlias   监测项目别名
-     * @apiSuccess (返回结果) {String} baseUrl  标清直播地址
-     * @apiSuccess (返回结果) {String} hdUrl  高清直播地址
-     * @apiSuccess (返回结果) {String} ysToken 萤石云token
+     * {"projectID":"1","monitorPointIDList":["33"]}
+     * @apiSuccess (响应结果) {Object[]} data  结果列表
+     * @apiSuccess (返回结果) {Int} data.sensorID  传感器ID
+     * @apiSuccess (返回结果) {String} data.sensorName  传感器名称
+     * @apiSuccess (返回结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (返回结果) {String} data.monitorPointName   监测点名称
+     * @apiSuccess (返回结果) {Int} data.monitorItemID   监测项目ID
+     * @apiSuccess (返回结果) {String} data.monitorItemName   监测项目名称
+     * @apiSuccess (返回结果) {String} data.monitorItemAlias   监测项目别名
+     * @apiSuccess (返回结果) {String} data.baseUrl  标清直播地址
+     * @apiSuccess (返回结果) {String} data.hdUrl  高清直播地址
+     * @apiSuccess (返回结果) {String} data.ysToken 萤石云token
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
+     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointLiveInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoMonitorPointLiveInfo(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryVideoMonitorPointLiveInfo(@Validated @RequestBody QueryVideoMonitorPointLiveInfoParam pa) {
+        return videoService.queryVideoMonitorPointLiveInfo(pa);
     }
 
 
@@ -56,11 +59,10 @@ public class VideoController {
      * @apiName QueryVideoMonitorPointHistoryLiveInfo
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
-     * @apiParam (请求体) {Int} monitorType  监测类别
      * @apiParam (请求体) {Date} beginTime  开始时间
      * @apiParam (请求体) {Date} endTime  结束时间
      * @apiParamExample 请求体示例
-     * {"projectID":"1","monitorType":"33"}
+     * {"projectID":"1","monitorPointID":"33","beginTime":"2023-04-12 08:00:00","endTime":"2023-04-13 08:00:00"}
      * @apiSuccess (返回结果) {String} historyLiveAddress  历史回放地址
      * @apiSuccess (返回结果) {String} ysToken  萤石云token
      * @apiSampleRequest off
@@ -68,8 +70,8 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointHistoryLiveInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoMonitorPointHistoryLiveInfo(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryVideoMonitorPointHistoryLiveInfo(@Validated @RequestBody QueryVideoMonitorPointHistoryLiveInfoParam pa) {
+        return videoService.queryVideoMonitorPointHistoryLiveInfo(pa);
     }
 
 
@@ -82,10 +84,9 @@ public class VideoController {
      * @apiName PanControlVideoPoint
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
-     * @apiParam (请求体) {Int} monitorType  监测类别
      * @apiParam (请求体) {Int} direction  方向   1-8:控制摄像头移动 9-10:控制摄像头缩放(9:焦距变大,10:焦距变小)
      * @apiParamExample 请求体示例
-     * {"projectID":"1","monitorPointID":"33","monitorType":"40","direction":"1"}
+     * {"projectID":"1","monitorPointID":"33","direction":"1"}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
