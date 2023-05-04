@@ -1,8 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
@@ -11,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -25,9 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -36,6 +39,7 @@ import java.util.stream.Collectors;
 public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog> implements ITbWarnLogService {
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final IotService iotService;
+    private final RedisService redisService;
 
     @Override
     public PageUtil.Page<WtWarnLogInfo> queryByPage(QueryWtWarnLogPageParam param) {
@@ -74,15 +78,22 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     @Override
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
         WtWarnDetailInfo detailInfo = this.baseMapper.queryWarnDetail(param.getWarnID());
+
+        //从redis中获取regionArea信息填充regionArea(区域名)
+        Optional.ofNullable(detailInfo.getRegionArea()).filter(JSONUtil::isTypeJSON).ifPresent(e -> {
+            Map<String, Object> regionInfo = JSONUtil.toBean(e, Dict.class);
+            List<RegionArea> regionAreas = redisService.multiGet(RedisKeys.REGION_AREA_KEY, regionInfo.values(), RegionArea.class);
+            detailInfo.setRegionArea(regionAreas.stream().map(RegionArea::getName).distinct().collect(Collectors.joining(StrUtil.EMPTY)));
+        });
+
         //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
-        if (StrUtil.isNotEmpty(detailInfo.getDeviceToken())) {
-            TransferUtil.applyDeviceBase(List.of(detailInfo),
-                    () -> QueryDeviceBaseInfoParam.builder()
-                            .deviceTokens(Set.of(detailInfo.getDeviceToken()))
-                            .companyID(param.getCompanyID()).build(),
-                    WtWarnDetailInfo::getDeviceToken,
-                    (e, device) -> e.setDeviceTypeName(device.getProductName()));
-        }
+        Optional.ofNullable(detailInfo.getDeviceToken()).filter(e -> !e.isBlank())
+                .ifPresent(deviceToken -> TransferUtil.applyDeviceBase(List.of(detailInfo),
+                        () -> QueryDeviceBaseInfoParam.builder()
+                                .deviceTokens(Set.of(deviceToken))
+                                .companyID(param.getCompanyID()).build(),
+                        WtWarnDetailInfo::getDeviceToken,
+                        (e, device) -> e.setDeviceTypeName(device.getProductName())));
         return FieldShowUtil.dealFieldShow(detailInfo);
     }
 
