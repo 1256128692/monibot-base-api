@@ -2,11 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
-import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper;
-import cn.shmedo.monitor.monibotbaseapi.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.param.report.WtQueryReportParam;
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service;
 import cn.shmedo.monitor.monibotbaseapi.model.response.report.*;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**

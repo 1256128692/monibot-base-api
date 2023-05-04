@@ -4,12 +4,19 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
+@RestController
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoController {
+    private final VideoService videoService;
 
     /**
      * @api {POST} /QueryVideoMonitorPointLiveInfo 查询视频类型监测点直播地址信息
@@ -32,7 +39,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} hdUrl  高清直播地址
      * @apiSuccess (返回结果) {String} ysToken 萤石云token
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointLiveInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -57,7 +64,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} historyLiveAddress  历史回放地址
      * @apiSuccess (返回结果) {String} ysToken  萤石云token
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointHistoryLiveInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -81,7 +88,7 @@ public class VideoController {
      * {"projectID":"1","monitorPointID":"33","monitorType":"40","direction":"1"}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/PanControlVideoPoint", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -108,7 +115,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Date} data.unloadTime 图片上传时间
      * @apiSuccess (返回结果) {String} data.filePath 图片路径地址
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointPictureInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -116,5 +123,32 @@ public class VideoController {
         return ResultWrapper.successWithNothing();
     }
 
-
+    /**
+     * @api {POST} /QueryVideoBaseInfo 查询视频基本信息
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryVideoBaseInfo
+     * @apiDescription 查询视频基本信息
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {String} videoSn 视频SN
+     * @apiSuccess (返回结果) {String} videoName 视频设备名称
+     * @apiSuccess (返回结果) {String} videoType 视频设备型号
+     * @apiSuccess (返回结果) {Int} status 在线状态：0-不在线，1-在线
+     * @apiSuccess (返回结果) {String} netAddress ip地址
+     * @apiSuccess (返回结果) {String} netType 网络类型
+     * @apiSuccess (返回结果) {String} signal 信号强度
+     * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
+     * @apiSuccess (返回结果) {Int} isEncrypt 是否加密：0-不加密，1-加密
+     * @apiSuccess (返回结果) {Int} riskLevel 设备风险安全等级，0-安全，大于零，有风险，风险越高，值越大
+     * @apiSuccess (返回结果) {Int} offlineNotify 设备下线是否通知：0-不通知 1-通知
+     * @apiSuccess (返回结果) {Int} alarmSoundMode 告警声音模式：0-短叫，1-长叫，2-静音
+     * @apiSuccess (返回结果) {Int} defence 能力的设备布撤防状态：0-睡眠，8-在家，16-外出，普通IPC布撤防状态：0-撤防，1-布防
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryVideoBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryVideoBaseInfo(@Valid @RequestBody QueryVideoBaseInfoParam param) {
+        return videoService.queryVideoBaseInfo(param);
+    }
 }

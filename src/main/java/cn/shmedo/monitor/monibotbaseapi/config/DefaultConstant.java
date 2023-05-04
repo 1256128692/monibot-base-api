@@ -25,4 +25,9 @@ public class DefaultConstant {
 
     public static final String LIST_PROJECT = "ListBaseProject";
     public static final String MONITOR_TEMPLATE_PARAM_NAME = "nameList";
+
+    /**
+     * 萤石TOKEN过期时间
+     */
+    public static final int YS_TOKEN_EXPIRE_DAY = 6;
 }

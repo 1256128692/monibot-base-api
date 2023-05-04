@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.dao;
+package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
 import cn.shmedo.iot.entity.api.base.QueryDensity;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;

@@ -81,35 +81,6 @@ public class WtDeviceController {
     }
 
     /**
-     * @api {POST} /QueryWtVideoInfo 查询视频基本信息需求
-     * @apiVersion 1.0.0
-     * @apiGroup 水利设备列表模块
-     * @apiName QueryWtVideoInfo
-     * @apiDescription 查询视频基本信息需求
-     * @apiParam (请求参数) {Int} ProjectID 工程项目ID
-     * @apiParam (请求参数) {String} videoSn 视频SN
-     * @apiSuccess (返回结果) {String} videoName 视频设备名称
-     * @apiSuccess (返回结果) {String} videoType 视频设备型号
-     * @apiSuccess (返回结果) {Int} status 在线状态：0-不在线，1-在线
-     * @apiSuccess (返回结果) {String} netAddress ip地址
-     * @apiSuccess (返回结果) {String} netType 网络类型
-     * @apiSuccess (返回结果) {String} signal 信号强度
-     * @apiSuccess (返回结果) {DateTime} updateTime 修改时间
-     * @apiSuccess (返回结果) {Int} isEncrypt 是否加密：0-不加密，1-加密
-     * @apiSuccess (返回结果) {Int} riskLevel 设备风险安全等级，0-安全，大于零，有风险，风险越高，值越大
-     * @apiSuccess (返回结果) {Int} offlineNotify 设备下线是否通知：0-不通知 1-通知
-     * @apiSuccess (返回结果) {Int} alarmSoundMode 告警声音模式：0-短叫，1-长叫，2-静音
-     * @apiSuccess (返回结果) {Int} defence 能力的设备布撤防状态：0-睡眠，8-在家，16-外出，普通IPC布撤防状态：0-撤防，1-布防
-     * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
-     */
-    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
-    @PostMapping(value = "/QueryWtVideoInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtVideoInfo(@Valid @RequestBody Object param) {
-        return null;
-    }
-
-    /**
      * @api {POST} /QueryWtDevicePageList 分页查询物联网设备
      * @apiVersion 1.0.0
      * @apiGroup 水利设备列表模块

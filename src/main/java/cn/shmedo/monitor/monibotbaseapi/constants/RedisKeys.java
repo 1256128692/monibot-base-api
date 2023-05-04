@@ -36,6 +36,11 @@ public class RedisKeys {
      * 参数缓存
      */
     public static final String PARAMETER_PREFIX_KEY = "cn.shmedo.iot.monitor.parameter:";
+
+    /**
+     * 萤石云Token
+     */
+    public static final String YS_TOKEN = "cn.shmedo.mdmbse.ysToken";
 }
 
     
