@@ -20,6 +20,7 @@ import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 更新传感器 请求体
@@ -94,9 +95,11 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
         Assert.notNull(sensor, "传感器不存在");
         RedisService redisService = SpringUtil.getBean(RedisConstant.MONITOR_REDIS_SERVICE, RedisService.class);
         //校验扩展配置
-        sensor.setConfigFieldValue(SaveSensorRequest.validExField(sensor.getMonitorType(), exFields, redisService));
+        Optional.ofNullable(exFields).ifPresent(fields ->
+                sensor.setConfigFieldValue(SaveSensorRequest.validExField(sensor.getMonitorType(), exFields, redisService)));
         //校验参数
-        this.paramList = SaveSensorRequest.validParamField(sensor.getTemplateID(), sensorID, paramFields, redisService);
+        Optional.ofNullable(paramFields).ifPresent(fields ->
+                this.paramList = SaveSensorRequest.validParamField(sensor.getTemplateID(), sensorID, paramFields, redisService));
         return null;
     }
 
