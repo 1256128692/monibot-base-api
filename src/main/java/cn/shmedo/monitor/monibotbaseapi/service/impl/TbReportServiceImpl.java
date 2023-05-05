@@ -52,7 +52,8 @@ public class TbReportServiceImpl implements ITbReportService {
                             collection.add(u);
                             return collection;
                         }).map(u -> redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, u, Company.class))
-                        .filter(CollectionUtil::isNotEmpty).map(u -> u.get(0)).map(Company::getShortName).orElse(""))
+                        .filter(CollectionUtil::isNotEmpty).map(u -> u.get(0)).map(Company::getShortName)
+                        .orElse("余姚市水务局"))
                 .startTime(startTime).endTime(endTime);
         List<TbBaseReportInfo> tbBaseReportInfoList = tbReportMapper.queryBaseReportInfo(param.getCompanyID(),
                 startTime, endTime);
