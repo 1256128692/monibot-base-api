@@ -11,6 +11,7 @@ public class TbBaseReportInfo {
     private Integer sensorID;
     private String monitorPointName;
     private String projectName;
+    private String projectTypeName;
     private Integer status;
     private Integer monitorType;
     private String monitorTypeName;

@@ -1,10 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.report;
 
+import cn.hutool.core.util.NumberUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
 
@@ -22,7 +24,7 @@ public class WtReportMonitorTypeCountInfo {
 
     @JsonProperty("rate")
     private Double getRate() {
-        return getNormal() * 100.0 / total;
+        return NumberUtil.div(getNormal() * 100.0, total.doubleValue(), 2);
     }
 
     @JsonProperty("abnormal")
@@ -37,5 +39,9 @@ public class WtReportMonitorTypeCountInfo {
 
     public void addWarnCount(WtReportWarn data) {
         this.warnCountList.add(data);
+    }
+
+    public void addWarnCountList(List<WtReportWarn> data) {
+        this.warnCountList.addAll(data);
     }
 }

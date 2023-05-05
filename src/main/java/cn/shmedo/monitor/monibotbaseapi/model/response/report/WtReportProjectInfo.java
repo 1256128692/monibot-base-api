@@ -17,7 +17,7 @@ import java.util.Map;
 @Data
 @Builder(toBuilder = true)
 public class WtReportProjectInfo {
-    private String monitorTypeClass;
+    private String monitorTypeName;
     private Integer total;
     private String projectName;
     private List<String> monitorTypeList;
@@ -31,12 +31,11 @@ public class WtReportProjectInfo {
         return this.monitorTypeList.size();
     }
 
-    public void addMonitorTypeDetail(final String monitorTypeName, final WtReportMonitorItemInfo data) {
+    public void addMonitorTypeDetail(final String monitorTypeName, final List<WtReportMonitorItemInfo> data) {
         if (this.detailNameMap.containsKey(monitorTypeName)) {
-            this.detailNameMap.get(monitorTypeName).add(data);
+            this.detailNameMap.get(monitorTypeName).addAll(data);
         } else {
-            List<WtReportMonitorItemInfo> list = new ArrayList<>();
-            list.add(data);
+            List<WtReportMonitorItemInfo> list = new ArrayList<>(data);
             this.detailNameMap.put(monitorTypeName, list);
             this.monitorTypeDetailList.add(Map.of("monitorTypeName", monitorTypeName, "monitorItemList", list));
         }

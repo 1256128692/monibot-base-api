@@ -16,14 +16,6 @@ public class WtReportMonitorItemInfo {
     private String monitorItemName;
     private Integer total;
     private Integer noData;
-    private final List<WtReportWarn> warnCountList = new ArrayList<>();
-    private final List<WtReportFormDataInfo> formList = new ArrayList<>();
-
-    public void addWarnCount(WtReportWarn data) {
-        this.warnCountList.add(data);
-    }
-
-    public void addForm(WtReportFormDataInfo data) {
-        this.formList.add(data);
-    }
+    private List<WtReportWarn> warnCountList;
+    private List<WtReportFormDataInfo> formList;
 }

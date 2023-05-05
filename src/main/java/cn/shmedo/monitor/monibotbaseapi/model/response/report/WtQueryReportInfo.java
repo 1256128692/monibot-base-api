@@ -22,18 +22,10 @@ public class WtQueryReportInfo {
     private Integer total;
     private List<String> monitorTypeClassList;
     private List<WtReportProjectInfo> dataList;
-    private final List<WtReportProjectInfo> projectDataList = new ArrayList<>();
+    private List<WtReportProjectInfo> projectDataList;
 
     @JsonProperty("monitorTypeClassSize")
     private Integer getMonitorTypeClassSize() {
         return this.monitorTypeClassList.size();
-    }
-
-    public void addMonitorTypeClass(final String typeClassName) {
-        this.monitorTypeClassList.add(typeClassName);
-    }
-
-    public void addProjectData(final WtReportProjectInfo data) {
-        this.projectDataList.add(data);
     }
 }

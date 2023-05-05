@@ -9,38 +9,39 @@ import java.util.Objects;
  */
 public enum CompareInterval {
     //水位-水位
-    V01(2, "distance", "汛限水位", "超汛限水位", 1),
-    V02(2, "distance", "旱限水位", "低于旱限水位", -1),
-    V03(2, "distance", "警戒水位", "超警戒水位", 1),
-    V04(2, "distance", "保证水位", "超保证水位", 1),
+    DIS0(2, "distance", "汛限水位", "超汛限水位", 1),
+    DIS1(2, "distance", "旱限水位", "低于旱限水位", -1),
+    DIS2(2, "distance", "警戒水位", "超警戒水位", 1),
+    DIS3(2, "distance", "保证水位", "超保证水位", 1),
 
     //雨量-雨量
-    V05(5, "rainfall", "警戒雨量", "", 1),
-//    V06(5, "rainfall", "大暴雨", "", 1),
-//    V07(5, "rainfall", "特大暴雨", "", 1),
+    RAIN(5, "rainfall", "警戒雨量", "超警戒雨量", 1),
 
     //雨量-日降雨量
-    V08(5, "dailyRainfall", "暴雨", "", 1),
-    V09(5, "dailyRainfall", "大暴雨", "", 1),
-    V0a(5, "dailyRainfall", "特大暴雨", "", 1),
+    D_RAIN0(5, "dailyRainfall", "暴雨", "暴雨", 1),
+    D_RAIN1(5, "dailyRainfall", "大暴雨", "大暴雨", 1),
+    D_RAIN2(5, "dailyRainfall", "特大暴雨", "特大暴雨", 1),
 
     //水质-PH
-    V0b(4, "ph", "大于等于", "", 1),
-    V0c(4, "ph", "小于等于", "", -1),
+    PH0(4, "ph", "大于等于", "PH超标", 1),
+    PH1(4, "ph", "小于等于", "PH超标", -1),
 
     //水质等级
-    V0d(4, "waterQuality", "劣于I类", "", -1),
-    V0e(4, "waterQuality", "劣于II类", "", -1),
-    V0f(4, "waterQuality", "劣于Ⅲ类", "", -1),
-    V10(4, "waterQuality", "劣于IV类", "", -1),
-    V11(4, "waterQuality", "劣于V类", "", -1),
+    W_QUALITY0(4, "waterQuality", "劣于I类", "水质等级超标", -1),
+    W_QUALITY1(4, "waterQuality", "劣于II类", "水质等级超标", -1),
+    W_QUALITY2(4, "waterQuality", "劣于Ⅲ类", "水质等级超标", -1),
+    W_QUALITY3(4, "waterQuality", "劣于IV类", "水质等级超标", -1),
+    W_QUALITY4(4, "waterQuality", "劣于V类", "水质等级超标", -1),
 
     //流量-流速
-    V12(14, "velocityFlow", "警戒流速", "", 1),
+    VELOCITY_FLOW(14, "velocityFlow", "警戒流速", "超警戒流速", 1),
 
     //流量-流量
-    V13(14, "volumeFlow", "警戒流量", "", 1),
-    V14(14, "volumeFlow", "最小生态流量", "", -1);
+    VOLUME_FLOW0(14, "volumeFlow", "警戒流量", "超警戒流量", 1),
+    VOLUME_FLOW1(14, "volumeFlow", "最小生态流量", "低于最小生态流量", -1),
+
+    //视频-设备离线
+    VIDEO_OFFLINE(31, "offline", "离线", "设备离线", 1);
     private final Integer monitorType;
     private final String fieldToken;
     private final String compareIntervalName;
@@ -92,7 +93,7 @@ public enum CompareInterval {
     }
 
     public static boolean specialConcat(String compareIntervalName) {
-        return V0b.compareIntervalName.equals(compareIntervalName) || V0c.compareIntervalName.equals(compareIntervalName);
+        return PH0.compareIntervalName.equals(compareIntervalName) || PH1.compareIntervalName.equals(compareIntervalName);
     }
 
     public static boolean notSpecialConcat(String compareIntervalName) {
