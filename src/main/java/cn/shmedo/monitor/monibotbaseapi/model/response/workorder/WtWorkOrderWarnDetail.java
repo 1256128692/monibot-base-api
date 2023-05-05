@@ -28,4 +28,5 @@ public class WtWorkOrderWarnDetail {
     private String warnContent;
     private String deviceToken;
     private String deviceTypeName;
+    private String regionArea;
 }

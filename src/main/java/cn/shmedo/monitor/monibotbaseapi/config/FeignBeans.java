@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
@@ -25,14 +26,13 @@ import org.springframework.stereotype.Component;
 @Component
 @AllArgsConstructor
 public class FeignBeans {
-
     private final FileConfig config;
-
     private final ObjectMapper objectMapper;
     private final UserServiceFallbackFactory userServiceFallbackFactory;
     private final IotServiceFallbackFactory iotServiceFallbackFactory;
     private final MdInfoServiceFallbackFactory mdInfoServiceFallbackFactory;
     private final WtReportServiceFallbackFactory wtReportServiceFallbackFactory;
+    private final YsServiceFallbackFactory ysServiceFallbackFactory;
 
     @Bean
     @Primary
@@ -64,6 +64,13 @@ public class FeignBeans {
                 wtReportServiceFallbackFactory, generalHandler());
     }
 
+    @Bean
+    @Primary
+    public YsService ysService() {
+        return FeignFactory.hystrixClient(YsService.class, config.getYsUrl(),
+                ysServiceFallbackFactory, ysHandler());
+    }
+
 
     /**
      * 通用构造过程，设置序列化器、拦截加入授权头
@@ -77,6 +84,16 @@ public class FeignBeans {
                         .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                         .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
                         .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret()));
+    }
+
+    /**
+     * 通用构造过程，设置序列化器、拦截加入授权头
+     *
+     * @return {@link FeignFactory.Handler<HystrixFeign.Builder>}
+     */
+    private FeignFactory.Handler<HystrixFeign.Builder> ysHandler() {
+        return value -> value.encoder(new JacksonEncoder(objectMapper))
+                .decoder(new JacksonDecoder(objectMapper));
     }
 }
 

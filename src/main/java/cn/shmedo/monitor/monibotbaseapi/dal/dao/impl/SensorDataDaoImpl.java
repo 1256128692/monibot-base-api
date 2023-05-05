@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.dao.impl;
+package cn.shmedo.monitor.monibotbaseapi.dal.dao.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
@@ -9,7 +9,7 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.iot.entity.util.FieldUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;

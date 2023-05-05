@@ -184,6 +184,7 @@
             twl.DeviceToken deviceToken,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
+            tpi.Location regionArea,
             tmt.MonitorType monitorTypeID,
             tmt.MonitorType monitorType,
             tmt.TypeName monitorTypeName,
@@ -201,7 +202,8 @@
             twt.TriggerRule triggerRule,
             twt.FieldToken fieldToken,
             two.ID workOrderID,
-            two.OrderCode workOrderCode
+            two.OrderCode workOrderCode,
+            twr.`Name` ruleName
         FROM tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
@@ -209,6 +211,7 @@
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+            LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE twl.`ID`=#{warnID}
     </select>
     <select id="queryWorkOrderWarnDetail"
@@ -217,6 +220,7 @@
         SELECT
             tpi.ID projectID,
             tpi.ProjectName projectName,
+            tpi.Location regionArea,
             tmt.MonitorType monitorTypeID,
             tmt.TypeName monitorTypeName,
             tmt.TypeAlias monitorTypeAlias,

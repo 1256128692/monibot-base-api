@@ -38,4 +38,6 @@ public class WtWarnDetailInfo implements IFieldToken, IMonitorType {
     private String workOrderCode;
     private String deviceToken;
     private String deviceTypeName;
+    private String regionArea;
+    private String ruleName;
 }
