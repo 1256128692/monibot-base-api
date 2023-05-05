@@ -1,9 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.shmedo.iot.entity.api.*;
+import cn.hutool.core.lang.Assert;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
@@ -21,29 +24,41 @@ import org.hibernate.validator.constraints.Range;
 import java.util.Collection;
 import java.util.Optional;
 
+/**
+ * @author Chengfs on 2023/5/4
+ */
 @Data
-public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @Min(value = 1, message = "公司ID不能小于1")
-    @NotNull(message = "公司ID不能为空")
+public class QueryWtTerminalWarnLogPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+
+    @Min(value = 1)
+    @NotNull
     private Integer companyID;
-    @Range(min = 1, max = 2, message = "查询类型不合法,查询类型:1.实时记录 2.历史记录")
-    @NotNull(message = "查询类型不能为空")
+
+    @Range(min = 1, max = 2)
+    @NotNull
     private Integer queryType;
+
     private String queryCode;
+
     private Integer monitorTypeID;
+
     private Integer monitorItemID;
-    @Range(min = 1, max = 4, message = "报警等级必须在1~4之间")
+
+    @Range(min = 1, max = 4)
     private Integer warnLevel;
-    @Range(min = 1, max = 2, message = "排序规则不合法,排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序")
+
+    @Range(min = 1, max = 2)
     private Integer orderType;
-    @Min(value = 1, message = "当前页不能小于1")
-    @NotNull(message = "currentPage不能为空")
+
+    @Min(value = 1)
+    @NotNull
     private Integer currentPage;
-    @Range(min = 1, max = 100, message = "分页大小必须在1~100")
-    @NotNull(message = "pageSize不能为空")
+
+    @Range(min = 1, max = 100)
+    @NotNull
     private Integer pageSize;
 
-    @Range(min = 1, max = 2, message = "报警类型不合法,报警类型:1.在线监测报警记录; 2.视频报警记录")
+    @Range(min = 3, max = 3)
     private Integer warnType;
 
     @JsonIgnore
@@ -56,32 +71,23 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
             return ResultWrapper.success(PageUtil.Page.empty());
         }
 
-        if (monitorTypeID != null) {
+        Optional.ofNullable(monitorTypeID).ifPresent(monitorType -> {
             TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
-            if (tbMonitorTypeMapper.selectCount(new LambdaQueryWrapper<TbMonitorType>()
-                    .eq(TbMonitorType::getID, monitorTypeID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在");
-            }
-        }
-        if (monitorItemID != null) {
-            TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-            if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
-                    .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
-            }
-        }
+            Assert.isTrue(tbMonitorTypeMapper.selectCount(new LambdaQueryWrapper<TbMonitorType>()
+                    .eq(TbMonitorType::getID, monitorTypeID)) > 0, "监测类型不存在");
+        });
 
-        warnType = Optional.ofNullable(warnType).orElse(1);
+        Optional.ofNullable(monitorItemID).ifPresent(monitorItem -> {
+            TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+            Assert.isTrue(tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
+                    .eq(TbMonitorItem::getID, monitorItemID)) > 0, "监测项目不存在");
+        });
+        warnType = Optional.ofNullable(warnType).orElse(3);
         return null;
     }
 
     @Override
     public Resource parameter() {
         return new Resource(this.companyID.toString(), ResourceType.COMPANY);
-    }
-
-    @Override
-    public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionProvider.super.resourcePermissionType();
     }
 }

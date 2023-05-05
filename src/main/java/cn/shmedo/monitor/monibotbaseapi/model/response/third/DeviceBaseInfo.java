@@ -31,6 +31,11 @@ public class DeviceBaseInfo {
      */
     private ProductType productType;
 
+    /**
+     * 设备唯一标识
+     */
+    private String uniqueToken;
+
     public void setProductType(String productType) {
         this.productType = ProductType.valueOfEngName(productType);
     }

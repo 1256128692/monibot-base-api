@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
@@ -30,4 +31,6 @@ public class WtWarnLogInfo {
     private Integer orderStatus;
     private String deviceToken;
     private String deviceTypeName;
+    @JsonIgnore
+    private String uniqueToken;
 }
