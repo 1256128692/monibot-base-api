@@ -17,7 +17,7 @@ import java.util.List;
 public class WtQueryReportInfo {
     private Date startTime;
     private Date endTime;
-    private String period;
+    private Integer period;
     private String companyName;
     private Integer total;
     private List<String> monitorTypeClassList;

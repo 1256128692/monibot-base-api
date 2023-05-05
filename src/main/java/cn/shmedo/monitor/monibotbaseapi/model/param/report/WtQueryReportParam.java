@@ -37,7 +37,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
     private Date endTime;
     private List<Integer> projectIDList;
     @JsonIgnore
-    private String period;
+    private Integer period;
 
     @Override
     public ResultWrapper validate() {
@@ -55,7 +55,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 Optional.ofNullable(
                                 wtReportService.queryMaxPeriod(request, config.getAuthAppKey(), config.getAuthAppSecret()))
                         .map(ResultWrapper::getData).map(QueryMaxPeriodResponse::getPeriod)
-                        .ifPresent(u -> period = DateUtil.year(endTime) + "年" + (u + 1) + "期");
+                        .ifPresent(u -> period = u + 1);
             }
             case 1 -> {
                 startTime = DateUtil.beginOfWeek(startTime);
@@ -63,7 +63,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfWeek(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前周和未来周无法选择");
                 }
-                period = DateUtil.year(startTime) + "第" + DateUtil.weekOfYear(endTime) + "周";
+                period = DateUtil.weekOfYear(endTime);
             }
             case 2 -> {
                 startTime = DateUtil.beginOfMonth(startTime);
@@ -71,7 +71,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfMonth(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当月和未来月无法选择");
                 }
-                period = DateUtil.year(startTime) + "年" + DateUtil.month(endTime) + "月";
+                period = DateUtil.month(endTime);
             }
             case 3 -> {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "暂不支持季度报");
@@ -83,7 +83,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfYear(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当年和未来年无法选择");
                 }
-                period = DateUtil.year(startTime) + "年";
+                period = DateUtil.year(startTime);
             }
         }
         return null;
