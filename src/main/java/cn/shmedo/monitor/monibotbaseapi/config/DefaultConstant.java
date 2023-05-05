@@ -30,4 +30,9 @@ public class DefaultConstant {
      * 萤石TOKEN过期时间
      */
     public static final int YS_TOKEN_EXPIRE_DAY = 6;
+
+
+    public static final int YS_DEFAULT_SPEED = 1;
+
+    public static final long NORMAL_FILE_EXPIRE_MILLI = 3600 * 1000;
 }

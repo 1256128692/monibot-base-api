@@ -1,8 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointHistoryLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.HistoryLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.QueryVideoBaseInfoResult;
@@ -16,4 +15,8 @@ public interface VideoService {
     List<VideoMonitorPointLiveInfo> queryVideoMonitorPointLiveInfo(QueryVideoMonitorPointLiveInfoParam pa);
 
     HistoryLiveInfo queryVideoMonitorPointHistoryLiveInfo(QueryVideoMonitorPointHistoryLiveInfoParam pa);
+
+    ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa);
+
+    Object queryVideoMonitorPointPictureInfo(QueryVideoMonitorPointPictureInfoParam pa);
 }

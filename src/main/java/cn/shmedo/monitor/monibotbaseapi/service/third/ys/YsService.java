@@ -19,4 +19,22 @@ public interface YsService {
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}")
     YsResultWrapper<YsDeviceInfo> getDeviceInfo(@Param("accessToken") String accessToken,
                                                 @Param("deviceSerial") String deviceSerial);
+
+    @RequestLine("POST /api/lapp/device/ptz/start")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&direction={direction}&speed={speed}")
+    YsResultWrapper startPtz(@Param("accessToken") String accessToken,
+                             @Param("deviceSerial") String deviceSerial,
+                             @Param("channelNo") Integer channelNo,
+                             @Param("direction") Integer direction,
+                             @Param("speed") Integer speed);
+
+
+    @RequestLine("POST /api/lapp/device/ptz/stop")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&direction={direction}")
+    YsResultWrapper stopPtz(@Param("accessToken") String accessToken,
+                            @Param("deviceSerial") String deviceSerial,
+                            @Param("channelNo") Integer channelNo,
+                            @Param("direction") Integer direction);
 }

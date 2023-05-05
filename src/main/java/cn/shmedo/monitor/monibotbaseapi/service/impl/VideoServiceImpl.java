@@ -1,18 +1,21 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsCode;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointHistoryLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.HistoryLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.QueryVideoBaseInfoResult;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -30,6 +33,7 @@ public class VideoServiceImpl implements VideoService {
     private final FileConfig fileConfig;
     private final YsTokenDao ysTokenDao;
 
+    private final TbSensorFileMapper sensorFileMapper;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -100,5 +104,41 @@ public class VideoServiceImpl implements VideoService {
         }
 
         return vo;
+    }
+
+
+    @Override
+    public ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa) {
+
+        List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
+        if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
+
+            String ysToken = getYsToken();
+            YsResultWrapper ysResultWrapper = ysService.startPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection(),
+                    DefaultConstant.YS_DEFAULT_SPEED);
+            ysService.stopPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection());
+            if (!ysResultWrapper.callSuccess()) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, ysResultWrapper.getMsg());
+            }
+        }
+        return ResultWrapper.successWithNothing();
+    }
+
+
+
+    @Override
+    public List<VideoMonitorPointPictureInfo> queryVideoMonitorPointPictureInfo(QueryVideoMonitorPointPictureInfoParam pa) {
+
+        List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
+        if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
+            List<VideoMonitorPointPictureInfo> list = sensorFileMapper.selectListByIDAndTime(liveInfos.get(0).getSensorID(), pa.getBeginTime() , pa.getEndTime());
+            list.forEach(item -> {
+                // TODO:图片绝对地址还未处理
+//                String ossPath = PathUtil.getOssPath(request.getBucketName(), item.getFilePath(), DefaultConstant.NORMAL_FILE_EXPIRE_MILLI);
+//                item.setFilePath(ossPath);
+            });
+            return list;
+        }
+        return Collections.emptyList();
     }
 }

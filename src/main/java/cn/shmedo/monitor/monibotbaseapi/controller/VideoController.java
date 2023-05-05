@@ -5,9 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointHistoryLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoMonitorPointLiveInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -84,7 +82,7 @@ public class VideoController {
      * @apiName PanControlVideoPoint
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
-     * @apiParam (请求体) {Int} direction  方向   1-8:控制摄像头移动 9-10:控制摄像头缩放(9:焦距变大,10:焦距变小)
+     * @apiParam (请求体) {Int} direction  方向   0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
      * @apiParamExample 请求体示例
      * {"projectID":"1","monitorPointID":"33","direction":"1"}
      * @apiSuccess (返回结果) {String} none 空
@@ -93,8 +91,8 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/PanControlVideoPoint", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object panControlVideoPoint(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object panControlVideoPoint(@Validated @RequestBody PanControlVideoPointParam pa) {
+        return videoService.panControlVideoPoint(pa);
     }
 
 
@@ -103,16 +101,16 @@ public class VideoController {
      * @api {POST} /QueryVideoMonitorPointPictureInfo 查询视频类型监测点图像信息
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 云台控制监测点视频设备的摄像头移动,有(上下左右,焦距)等操作
+     * @apiDescription 查询视频类型监测点图像信息,开始时间与结束时间不能超过一周
      * @apiName QueryVideoMonitorPointPictureInfo
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
-     * @apiParam (请求体) {Int} monitorType  监测类别
      * @apiParam (请求体) {Date} beginTime  开始时间
      * @apiParam (请求体) {Date} endTime  结束时间
      * @apiParamExample 请求体示例
-     * {"projectID":"1","monitorPointID":"33","monitorType":"40","beginTime":"1","endTime":"2"}
+     * {"projectID":"1","monitorPointID":"33",,"beginTime":"2023-04-12 08:00:00","endTime":"2023-04-13 08:00:00"}
      * @apiSuccess (返回结果) {Object[]} data
+     * @apiSuccess (返回结果) {Int} data.sensorID 传感器ID
      * @apiSuccess (返回结果) {Date} data.unloadTime 图片上传时间
      * @apiSuccess (返回结果) {String} data.filePath 图片路径地址
      * @apiSampleRequest off
@@ -120,8 +118,8 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/QueryVideoMonitorPointPictureInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoMonitorPointPictureInfo(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryVideoMonitorPointPictureInfo(@Validated @RequestBody QueryVideoMonitorPointPictureInfoParam pa) {
+        return videoService.queryVideoMonitorPointPictureInfo(pa);
     }
 
     /**
