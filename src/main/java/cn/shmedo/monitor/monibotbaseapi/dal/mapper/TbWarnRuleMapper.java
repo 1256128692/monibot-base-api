@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-@Mapper
+
 public interface TbWarnRuleMapper extends BaseMapper<TbWarnRule> {
     IPage<TbWarnRule> selectWarnRuleByPage(IPage<?> page, @Param("param") QueryWtEnginePageParam param, @Param("projectIDList") List<Integer> projectIDList);
 

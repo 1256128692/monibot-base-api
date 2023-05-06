@@ -128,7 +128,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .map(TbMonitorItem::getMonitorType)
                 .orElseThrow(() -> new RuntimeException("请检查tb_monitor_type中id:" + monitorItemID + "的记录是否存在MonitorType"));
         TbWarnRule build = AddWtEngineParam.build(param);
-        build.setRuleType(TbRuleType.WARN_RULE.getKey());
+        build.setRuleType(TbRuleType.WARN_RULE.getKey().byteValue());
         build.setCreateUserID(userID);
         build.setUpdateUserID(userID);
         build.setMonitorType(monitorType);

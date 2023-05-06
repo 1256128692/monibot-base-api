@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryProductSimpleParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtDevicePageListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -87,7 +88,7 @@ public class WtDeviceController {
      * @apiName QueryWtDevicePageList
      * @apiDescription 分页查询物联网设备
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int[]} [projectIDList] 工程项目ID列表
+     * @apiParam (请求参数) {Int[]} [projectIDList] 工程项目ID列表(100)
      * @apiParam (请求参数) {String} [queryCode] 关键词,支持模糊查询设备SN/工程名称/监测点名称
      * @apiParam (请求参数) {Int} [productID] 产品ID(设备型号)
      * @apiParam (请求参数) {Bool} [online] 在线状态 在线:true 离线:false
@@ -97,7 +98,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiParam (请求参数) {Int} currentPage 当前页
-     * @apiParam (请求参数) {Int} pageSize 记录条数
+     * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
@@ -106,26 +107,27 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} currentPageData.productName 产品名称
      * @apiSuccess (返回结果) {Bool} currentPageData.online 在线状态 在线:true 离线:false
-     * @apiSuccess (返回结果) {String} currentPageData.status 设备状态 0.正常 1.异常
-     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} currentPageData.projectName 工程项目名称
-     * @apiSuccess (返回结果) {String} currentPageData.projectShortName 工程项目简称
-     * @apiSuccess (返回结果) {String} currentPageData.location 工程项目行政区划
-     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点信息
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorItemID 监测项目ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorItemName 监测项目名称
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorItemAlias 监测项目别名
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.pointGpsLocation 监测点GPS位置
-     * @apiSuccess (返回结果) {String} currentPageData.[monitorPointList.pointImageLocation] 监测点底图位置
+     * @apiSuccess (返回结果) {Int} currentPageData.status 设备状态 0.正常 1.异常
+     * @apiSuccess (返回结果) {Object[]} currentPageData.projectList 工程项目信息
+     * @apiSuccess (返回结果) {Int} currentPageData.projectList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.projectShortName 工程项目简称
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.location 工程项目行政区划
+     * @apiSuccess (返回结果) {Object[]} currentPageData.projectList.monitorPointList 监测点信息
+     * @apiSuccess (返回结果) {Int} currentPageData.projectList.monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointList.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} currentPageData.projectList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointList.pointGpsLocation 监测点GPS位置
+     * @apiSuccess (返回结果) {String} [currentPageData.projectList.monitorPointList.pointImageLocation] 监测点底图位置
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseDevice
      */
     @Permission(permissionName = "mdmbase:ListBaseDevice")
     @PostMapping(value = "/QueryWtDevicePageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtDevicePageList(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWtDevicePageList(@Valid @RequestBody QueryWtDevicePageListParam pa) {
+        return wtDeviceService.queryWtDevicePageList(pa);
     }
 
 

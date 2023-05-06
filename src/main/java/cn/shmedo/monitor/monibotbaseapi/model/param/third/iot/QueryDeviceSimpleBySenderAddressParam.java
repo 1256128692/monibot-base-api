@@ -19,4 +19,7 @@ public class QueryDeviceSimpleBySenderAddressParam {
     private List<String> sendAddressList;
     private Boolean sendEnable;
     private String deviceToken;
+
+    private Boolean online;
+    private Integer productID;
 }
