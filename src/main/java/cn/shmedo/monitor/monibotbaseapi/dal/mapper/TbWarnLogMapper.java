@@ -19,20 +19,45 @@ import java.util.List;
 
 @Mapper
 public interface TbWarnLogMapper extends BaseMapper<TbWarnLog> {
-    Long queryCurrentRecordCount(@Param("param") QueryWtWarnLogPageParam param);
 
-    List<WtWarnLogInfo> queryCurrentRecords(@Param("param") QueryWtWarnLogPageParam param);
+    /**
+     * 分页查询在线监测报警列表
+     */
+    IPage<WtWarnLogInfo> queryMonitorWarnPage(IPage<WtWarnLogInfo> page, @Param("param") QueryWtWarnLogPageParam param);
 
-    IPage<WtWarnLogInfo> queryHistoryRecords(IPage<WtWarnLogInfo> page, @Param("param") QueryWtWarnLogPageParam param);
+    /**
+     * 分页查询视频/摄像头报警列表
+     */
+    IPage<WtWarnLogInfo> queryCameraWarnPage(IPage<WtWarnLogInfo> page, @Param("param") QueryWtWarnLogPageParam param);
 
-    WtWarnDetailInfo queryWarnDetail(Integer warnID);
+    /**
+     * 查询在线监测报警详情
+     */
+    WtWarnDetailInfo queryMonitorDetail(Integer warnID);
 
+    /**
+     * 查询视频/摄像头报警详情
+     */
+    WtWarnDetailInfo queryCameraDetail(Integer warnID);
+
+    /**
+     * 查询工单报警详情
+     */
     WtWorkOrderWarnDetail queryWorkOrderWarnDetail(@Param("param") QueryWorkOrderWarnDetailParam param);
 
-    List<WtWarnLogInfo> queryTerminalRecords(@Param("param") QueryWtTerminalWarnLogPageParam param, @Param("flag") boolean flag);
+    /**
+     * 查询终端报警列表
+     */
+    List<WtWarnLogInfo> queryTerminalWarnList(@Param("param") QueryWtTerminalWarnLogPageParam param, @Param("flag") boolean flag);
 
-    List<WtTerminalWarnLog> queryTerminalRecordsByUniqueToken(@Param("param") QueryWtTerminalWarnLogPageParam param,
-                                                              @Param("uniqueTokens") Collection<String> uniqueTokens);
+    /**
+     * 查询终端报警详情
+     */
+    List<WtTerminalWarnLog> queryTerminalWarnListByUniqueToken(@Param("param") QueryWtTerminalWarnLogPageParam param,
+                                                               @Param("uniqueTokens") Collection<String> uniqueTokens);
 
+    /**
+     * 查询终端报警详情
+     */
     WtTerminalWarnDetailInfo queryTerminalWarnDetail(Integer warnID);
 }

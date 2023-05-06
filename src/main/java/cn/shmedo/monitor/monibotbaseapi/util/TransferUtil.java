@@ -58,10 +58,10 @@ public class TransferUtil {
      * @param keyFun        分组key提供器
      * @param transferFun   转换函数
      */
-    public static <T> void applyDeviceBaseItem(@Nonnull Collection<T> records,
-                                               @Nonnull Supplier<QueryDeviceBaseInfoParam> paramSupplier,
-                                               @Nonnull Function<? super T, String> keyFun,
-                                               @Nonnull BiConsumer<T, String> transferFun) {
+    public static <T> void applyProductName(@Nonnull Collection<T> records,
+                                            @Nonnull Supplier<QueryDeviceBaseInfoParam> paramSupplier,
+                                            @Nonnull Function<? super T, String> keyFun,
+                                            @Nonnull BiConsumer<T, String> transferFun) {
         applyDeviceBase(records, paramSupplier, keyFun, (e, device) -> {
             transferFun.accept(e, device.getProductName());
         });

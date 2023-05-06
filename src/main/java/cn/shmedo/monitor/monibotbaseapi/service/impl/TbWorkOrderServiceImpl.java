@@ -62,7 +62,7 @@ public class TbWorkOrderServiceImpl extends ServiceImpl<TbWorkOrderMapper, TbWor
         });
 
         Optional.ofNullable(detail.getDeviceToken()).filter(e -> !e.isBlank()).ifPresent(e -> {
-            TransferUtil.applyDeviceBaseItem(List.of(detail),
+            TransferUtil.applyProductName(List.of(detail),
                     () -> QueryDeviceBaseInfoParam.builder()
                             .deviceTokens(Set.of(e)).companyID(param.getCompanyID()).build(),
                     WtWorkOrderWarnDetail::getDeviceToken, WtWorkOrderWarnDetail::setDeviceTypeName);
