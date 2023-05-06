@@ -1,14 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.report;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -84,6 +88,14 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当年和未来年无法选择");
                 }
                 period = DateUtil.year(startTime);
+            }
+        }
+        if (CollectionUtil.isNotEmpty(projectIDList)) {
+            int size = projectIDList.size();
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
+                    .eq(TbProjectInfo::getCompanyID, companyID).in(TbProjectInfo::getID, projectIDList)) != size) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, (size == 1 ? "该" : "有") + "项目不在公司下");
             }
         }
         return null;

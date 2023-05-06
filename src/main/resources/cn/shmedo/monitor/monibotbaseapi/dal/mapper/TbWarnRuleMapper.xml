@@ -24,7 +24,7 @@
         SELECT <include refid="Base_Column_List"/>
         FROM
             tb_warn_rule
-        WHERE RuleType = 1 AND `ProjectID` IN
+        WHERE RuleType =#{param.ruleType} AND `ProjectID` IN
         <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>

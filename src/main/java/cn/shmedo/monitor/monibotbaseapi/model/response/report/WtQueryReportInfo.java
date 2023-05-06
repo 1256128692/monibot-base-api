@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,12 +19,12 @@ public class WtQueryReportInfo {
     private Integer period;
     private String companyName;
     private Integer total;
-    private List<String> monitorTypeClassList;
+    private List<String> monitorClassList;
     private List<WtReportProjectInfo> dataList;
     private List<WtReportProjectInfo> projectDataList;
 
-    @JsonProperty("monitorTypeClassSize")
+    @JsonProperty("monitorClassSize")
     private Integer getMonitorTypeClassSize() {
-        return this.monitorTypeClassList.size();
+        return this.monitorClassList.size();
     }
 }
