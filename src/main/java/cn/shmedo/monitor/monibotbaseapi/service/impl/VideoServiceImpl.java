@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsCode;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
@@ -17,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLi
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.QueryVideoBaseInfoResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -34,6 +37,8 @@ public class VideoServiceImpl implements VideoService {
     private final YsTokenDao ysTokenDao;
 
     private final TbSensorFileMapper sensorFileMapper;
+
+    private final FileService fileService;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -132,11 +137,16 @@ public class VideoServiceImpl implements VideoService {
         List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
             List<VideoMonitorPointPictureInfo> list = sensorFileMapper.selectListByIDAndTime(liveInfos.get(0).getSensorID(), pa.getBeginTime() , pa.getEndTime());
-            list.forEach(item -> {
-                // TODO:图片绝对地址还未处理
-//                String ossPath = PathUtil.getOssPath(request.getBucketName(), item.getFilePath(), DefaultConstant.NORMAL_FILE_EXPIRE_MILLI);
-//                item.setFilePath(ossPath);
-            });
+            List<String> filePathList = list.stream().map(VideoMonitorPointPictureInfo::getFilePath).collect(Collectors.toList());
+            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(filePathList, liveInfos.get(0).getCompanyID());
+            if (!CollectionUtil.isNullOrEmpty(fileUrlList)){
+                list.forEach(item -> {
+                    FileInfoResponse fileInfoResponse = fileUrlList.stream().filter(pojo -> pojo.getFilePath().equals(item.getFilePath())).findFirst().orElse(null);
+                    assert fileInfoResponse != null;
+                    item.setFilePath(fileInfoResponse.getAbsolutePath());
+                });
+            }
+
             return list;
         }
         return Collections.emptyList();

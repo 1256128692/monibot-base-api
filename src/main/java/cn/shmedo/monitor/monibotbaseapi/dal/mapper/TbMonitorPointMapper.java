@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -41,4 +42,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
     List<GroupPoint> queryGroupPointByGroupIDs(List<Integer> allGroupIDList);
 
     List<VideoMonitorPointLiveInfo> selectListByIDList(List<Integer> monitorPointIDList);
+
+    List<WtVideoPageInfo> selectVideoPointListByCondition(List<Integer> projectIDList, Boolean online, String areaCode,
+                                                          Integer monitorItemID, Integer monitorType);
 }

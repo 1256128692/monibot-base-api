@@ -1,27 +1,31 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Dict;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryProductSimpleParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtDevicePageListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtVideoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.Device4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.ProductSimple;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.internal.StringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -46,6 +50,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     private final TbWarnRuleMapper tbWarnRuleMapper;
     private final TbWarnLogMapper tbWarnLogMapper;
     private final TbProjectInfoMapper tbProjectInfoMapper;
+
+    private final TbMonitorPointMapper monitorPointMapper;
 
     @Override
     public Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param) {
@@ -204,5 +210,58 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             return device4Web;
         }).toList();
         return new PageUtil.Page<>(page.totalPage(), collect, page.totalCount());
+    }
+
+
+    @Override
+    public PageUtil.Page<WtVideoPageInfo> queryWtVideoPageList(QueryWtVideoPageParam param) {
+
+        Long totalCount = 0L;
+        Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
+
+        List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
+                param.getOnline(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
+        if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+            return PageUtil.Page.empty();
+        }
+        totalCount = Long.valueOf(wtVideoList.size());
+
+        wtVideoList.forEach(item -> {
+            String exValues = item.getExValues();
+            if (StringUtils.isNotEmpty(exValues)) {
+                Dict dict = JSONUtil.toBean(exValues, Dict.class);
+                if (dict.get("seqNo") != null) {
+                    item.setVideoSN(dict.get("seqNo").toString());
+                }
+                if (dict.get("videoType") != null) {
+                    item.setVideoType(dict.get("videoType").toString());
+                }
+                if (item.getStatus() != null) {
+                    item.setOnline(Boolean.valueOf(item.getStatus()));
+                }
+            }
+        });
+
+        if (!StringUtil.isNullOrEmpty(param.getQueryCode())) {
+            // 设备SN || 工程名称 || 监测点
+            String queryCode = param.getQueryCode();
+            wtVideoList = wtVideoList.stream()
+                    .filter(info -> (info.getVideoSN() != null && !info.getVideoSN().isEmpty() && info.getVideoSN().contains(queryCode))
+                            || (info.getMonitorPointName().contains(queryCode))
+                            || (info.getProjectName().contains(queryCode)))
+                    .collect(Collectors.toList());
+            if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+                return PageUtil.Page.empty();
+            }
+            totalCount = Long.valueOf(wtVideoList.size());
+        }
+
+        // 过滤出规则引擎 所拥有的设备
+        if (param.getRuleID() != null) {
+            // TODO:暂不处理
+        }
+
+        List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(wtVideoList, param.getPageSize());
+        return new PageUtil.Page<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount);
     }
 }

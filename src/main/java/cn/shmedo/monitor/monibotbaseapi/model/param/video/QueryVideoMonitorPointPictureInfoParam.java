@@ -66,15 +66,17 @@ public class QueryVideoMonitorPointPictureInfoParam implements ParameterValidato
             }
 
             liveInfos.forEach(pojo -> {
-                String configFieldValue = pojo.getConfigFieldValue();
-                Dict dict = JSONUtil.toBean(configFieldValue, Dict.class);
-                String protocol = dict.get("protocol").toString();
-                String seqNo = dict.get("seqNo").toString();
-                String ysChannelNo = dict.get("ysChannelNo").toString();
-
-                pojo.setProtocol(protocol);
-                pojo.setSeqNo(seqNo);
-                pojo.setYsChannelNo(ysChannelNo);
+                String exValues = pojo.getExValues();
+                Dict dict = JSONUtil.toBean(exValues, Dict.class);
+                if (dict.get("protocol") != null) {
+                    pojo.setProtocol(dict.get("protocol").toString());
+                }
+                if (dict.get("seqNo") != null) {
+                    pojo.setSeqNo(dict.get("seqNo").toString());
+                }
+                if (dict.get("ysChannelNo") != null) {
+                    pojo.setYsChannelNo(dict.get("ysChannelNo").toString());
+                }
             });
         }
 

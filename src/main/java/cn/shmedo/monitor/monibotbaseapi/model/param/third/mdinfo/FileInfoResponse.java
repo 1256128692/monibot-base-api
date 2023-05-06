@@ -8,6 +8,8 @@ public class FileInfoResponse {
     private String fileDesc;
     private String exValue;
 
+    private String filePath;
+
     private String absolutePath;
     public String getFileName() {
         return fileName;
@@ -55,5 +57,13 @@ public class FileInfoResponse {
 
     public void setAbsolutePath(String absolutePath) {
         this.absolutePath = absolutePath;
+    }
+
+    public String getFilePath() {
+        return filePath;
+    }
+
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 }
