@@ -33,13 +33,13 @@ public class WtReportController {
      * @apiParam (请求参数) {Int[]} [projectIDList] 工程概述ID list
      * @apiSuccess (返回结果) {DateTime} startTime 时间范围开始时间
      * @apiSuccess (返回结果) {DateTime} endTime 时间范围结束时间
-     * @apiSuccess (返回结果) {String} period 期数
+     * @apiSuccess (返回结果) {Integer} period 期数
      * @apiSuccess (返回结果) {String} companyName 编制单位名称
      * @apiSuccess (返回结果) {Int} total 监测点总计
-     * @apiSuccess (返回结果) {Int} monitorTypeClassSize 监测类型的类别数量(三类数据监测点)
-     * @apiSuccess (返回结果) {String[]} monitorTypeClassList 监测类型的类别名称list
+     * @apiSuccess (返回结果) {Int} monitorClassSize 监测类型的类别数量(三类数据监测点)
+     * @apiSuccess (返回结果) {String[]} monitorClassList 监测类型的类别名称list
      * @apiSuccess (返回结果) {Object[]} dataList 详情数据
-     * @apiSuccess (返回结果) {String} dataList.monitorTypeClass 监测类型的类别
+     * @apiSuccess (返回结果) {String} dataList.monitorClass 监测类型的类别
      * @apiSuccess (返回结果) {Int} dataList.total 监测点总计
      * @apiSuccess (返回结果) {Int} dataList.monitorTypeSize 监测类型名称数量
      * @apiSuccess (返回结果) {String[]} dataList.monitorTypeList 监测类型名称list

@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.TbRuleType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -21,10 +22,9 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     @NotNull(message = "公司ID不能为空")
     @Min(value = 1, message = "公司ID不能小于1")
     private Integer companyID;
-
     @Range(min = 1, max = 3, message = "规则类型, 1:报警规则 2:视频规则 3:智能终端规则")
     private Integer ruleType;
-    @Min(value = 1,message = "终端设备产品ID不能小于1")
+    @Min(value = 1, message = "终端设备产品ID不能小于1")
     private Integer productID;
     private String videoTypeName;
     @Min(value = 1, message = "工程项目ID不能小于1")
@@ -44,27 +44,33 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper validate() {
-        //TODO ruleType
-        if (projectID != null) {
-            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-            if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
-                    .eq(TbProjectInfo::getID, projectID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+        ruleType = ruleType == null ? TbRuleType.WARN_RULE.getKey() : ruleType;
+        if (TbRuleType.WARN_RULE.getKey().equals(ruleType)) {
+            if (projectID != null) {
+                TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+                if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
+                        .eq(TbProjectInfo::getID, projectID)) < 1) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+                }
             }
-        }
-        if (monitorItemID != null) {
-            TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-            if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
-                    .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
+            if (monitorItemID != null) {
+                TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+                if (tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
+                        .eq(TbMonitorItem::getID, monitorItemID)) < 1) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
+                }
             }
-        }
-        if (monitorPointID != null) {
-            TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
-            if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
-                    .eq(TbMonitorPoint::getID, monitorPointID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+            if (monitorPointID != null) {
+                TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+                if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
+                        .eq(TbMonitorPoint::getID, monitorPointID)) < 1) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+                }
             }
+        } else if (TbRuleType.VIDEO_RULE.getKey().equals(ruleType)) {
+            //TODO keyword、videoTypeName、enable
+        } else if (TbRuleType.TERMINAL_RULE.getKey().equals(ruleType)) {
+            //TODO keyword、productID、enable
         }
         return null;
     }

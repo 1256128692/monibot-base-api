@@ -1,14 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.report;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -37,7 +41,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
     private Date endTime;
     private List<Integer> projectIDList;
     @JsonIgnore
-    private String period;
+    private Integer period;
 
     @Override
     public ResultWrapper validate() {
@@ -55,7 +59,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 Optional.ofNullable(
                                 wtReportService.queryMaxPeriod(request, config.getAuthAppKey(), config.getAuthAppSecret()))
                         .map(ResultWrapper::getData).map(QueryMaxPeriodResponse::getPeriod)
-                        .ifPresent(u -> period = DateUtil.year(endTime) + "年" + (u + 1) + "期");
+                        .ifPresent(u -> period = u + 1);
             }
             case 1 -> {
                 startTime = DateUtil.beginOfWeek(startTime);
@@ -63,7 +67,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfWeek(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前周和未来周无法选择");
                 }
-                period = DateUtil.year(startTime) + "第" + DateUtil.weekOfYear(endTime) + "周";
+                period = DateUtil.weekOfYear(endTime);
             }
             case 2 -> {
                 startTime = DateUtil.beginOfMonth(startTime);
@@ -71,7 +75,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfMonth(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当月和未来月无法选择");
                 }
-                period = DateUtil.year(startTime) + "年" + DateUtil.month(endTime) + "月";
+                period = DateUtil.month(endTime);
             }
             case 3 -> {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "暂不支持季度报");
@@ -83,7 +87,15 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfYear(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当年和未来年无法选择");
                 }
-                period = DateUtil.year(startTime) + "年";
+                period = DateUtil.year(startTime);
+            }
+        }
+        if (CollectionUtil.isNotEmpty(projectIDList)) {
+            int size = projectIDList.size();
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()
+                    .eq(TbProjectInfo::getCompanyID, companyID).in(TbProjectInfo::getID, projectIDList)) != size) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, (size == 1 ? "该" : "有") + "项目不在公司下");
             }
         }
         return null;

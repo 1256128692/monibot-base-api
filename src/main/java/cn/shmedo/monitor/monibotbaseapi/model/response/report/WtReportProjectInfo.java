@@ -17,7 +17,7 @@ import java.util.Map;
 @Data
 @Builder(toBuilder = true)
 public class WtReportProjectInfo {
-    private String monitorTypeName;
+    private String monitorClass;
     private Integer total;
     private String projectName;
     private List<String> monitorTypeList;

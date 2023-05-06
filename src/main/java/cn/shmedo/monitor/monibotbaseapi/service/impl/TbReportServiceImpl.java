@@ -61,10 +61,10 @@ public class TbReportServiceImpl implements ITbReportService {
         Collection<Object> areaCodeList = tbBaseReportInfoList.stream().map(TbBaseReportInfo::getAreaCode).distinct()
                 .map(u -> (Object) u).toList();
         Map<String, String> areaCodeNameMap = queryAreaData(areaCodeList);
-        Map<String, List<TbBaseReportInfo>> typeClassInfoMap = tbBaseReportInfoList.stream()
+        Map<String, List<TbBaseReportInfo>> monitorClassInfoMap = tbBaseReportInfoList.stream()
                 .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeClass));
-        builder.total(tbBaseReportInfoList.size()).monitorTypeClassList(typeClassInfoMap.keySet().stream().toList())
-                .dataList(dealDataList(typeClassInfoMap, sensorIDResMap, areaCodeNameMap));
+        builder.total(tbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream().toList())
+                .dataList(dealDataList(monitorClassInfoMap, sensorIDResMap, areaCodeNameMap));
         if (CollectionUtil.isNotEmpty(projectIDList)) {
             builder.projectDataList(dealProjectData(projectIDList, startTime, endTime));
         }
@@ -135,13 +135,13 @@ public class TbReportServiceImpl implements ITbReportService {
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    private List<WtReportProjectInfo> dealDataList(final Map<String, List<TbBaseReportInfo>> infoMap,
+    private List<WtReportProjectInfo> dealDataList(final Map<String, List<TbBaseReportInfo>> monitorClassInfoMap,
                                                    final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                    final Map<String, String> areaCodeNameMap) {
         // evaluate the O(n) of this nested loop is equaled to outside base list,
         // if poor performance of this,rewrite here.
         List<WtReportProjectInfo> res = new ArrayList<>();
-        infoMap.entrySet().stream().map(u -> {  //level - typeClass
+        monitorClassInfoMap.entrySet().stream().map(u -> {  //level - typeClass
             List<TbBaseReportInfo> uValue = u.getValue();
             Map<String, List<TbBaseReportInfo>> monitorTypeNameInfoMap = uValue.stream().collect(
                     Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeName));
@@ -222,9 +222,9 @@ public class TbReportServiceImpl implements ITbReportService {
                 }).orElse(new HashMap<>())).orElse(new HashMap<>());
     }
 
-    private WtReportProjectInfo getReportProjectInfo(final String monitorTypeName, final Integer total,
+    private WtReportProjectInfo getReportProjectInfo(final String monitorClass, final Integer total,
                                                      final Map<String, List<TbBaseReportInfo>> monitorTypeNameInfoMap) {
-        return WtReportProjectInfo.builder().monitorTypeName(monitorTypeName).total(total)
+        return WtReportProjectInfo.builder().monitorClass(monitorClass).total(total)
                 .monitorTypeList(monitorTypeNameInfoMap.keySet().stream().toList())
                 .monitorTypeCountList(monitorTypeNameInfoMap.entrySet().stream().map(w -> {
                     List<TbBaseReportInfo> wValue = w.getValue();
