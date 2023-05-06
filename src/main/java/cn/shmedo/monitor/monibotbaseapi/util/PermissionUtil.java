@@ -47,7 +47,7 @@ public class PermissionUtil {
     public static Collection<Integer> getHavePermissionProjectList(Integer companyID, Collection<Integer> projectList) {
         Collection<Integer> resourceList = getResourceList(companyID, DefaultConstant.MDNET_SERVICE_NAME,
                 DefaultConstant.LIST_PROJECT, ResourceType.BASE_PROJECT).stream().map(Integer::parseInt).toList();
-        return projectList.isEmpty() ? resourceList : CollectionUtil.intersection(projectList, resourceList);
+        return projectList == null ? resourceList : CollectionUtil.intersection(projectList, resourceList);
     }
 
     /**
