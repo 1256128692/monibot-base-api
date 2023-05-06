@@ -252,7 +252,9 @@ public class Param2DBEntityUtil {
         obj.setProjectID(pa.getProjectID());
         obj.setMonitorType(pa.getMonitorType());
         obj.setMonitorItemID(pa.getMonitorItemID());
-        if (obj.getRuleType() == 2) {
+        if (obj.getRuleType() == 1) {
+            obj.setMonitorPointID(pa.getPointID());
+        } else if (obj.getRuleType() == 2) {
             obj.setVideoType(pa.getProductID());
             obj.setVideoCSV(pa.getDeviceCSV());
         } else {

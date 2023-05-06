@@ -44,6 +44,9 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
         if (!tbWarnRule.getProjectID().equals(projectID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则不属于项目");
         }
+        if (tbWarnRule.getRuleType() == 1) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不支持的规则类型");
+        }
         if (!sign.equals("+") && !sign.equals("-")) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "符号不合法");
         }

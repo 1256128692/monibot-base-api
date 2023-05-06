@@ -80,7 +80,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             projectIDList =
                     tbProjectInfoMapper.selectList(
                             new QueryWrapper<TbProjectInfo>().lambda()
-                                    .in(TbProjectInfo::getID, projectIDList).likeLeft(TbProjectInfo::getLocation, pa.getAreaCode())
+                                    .in(TbProjectInfo::getID, projectIDList).like(TbProjectInfo::getLocation, pa.getAreaCode())
                     ).stream().map(TbProjectInfo::getID).toList();
         }
         if (CollectionUtils.isEmpty(projectIDList)) {
@@ -103,18 +103,19 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (CollectionUtils.isEmpty(allData)) {
             return PageUtil.Page.empty();
         }
+        List<String> warnDeviceTokenList = tbWarnLogMapper.selectList(
+                new QueryWrapper<TbWarnLog>().lambda()
+                        .ge(TbWarnLog::getWarnTime, DateUtil.offsetDay(new Date(), -2))
+                        .isNotNull(TbWarnLog::getDeviceToken)
+
+        ).stream().map(TbWarnLog::getDeviceToken).distinct().toList();
         if (pa.getStatus() != null) {
             // 过滤 0.正常 1.异常
-            List<String> strings = tbWarnLogMapper.selectList(
-                    new QueryWrapper<TbWarnLog>().lambda()
-                            .ge(TbWarnLog::getWarnTime, DateUtil.offsetDay(new Date(), -2))
-                            .isNotNull(TbWarnLog::getDeviceToken)
 
-            ).stream().map(TbWarnLog::getDeviceToken).distinct().toList();
             if (pa.getStatus() == 0) {
-                allData = allData.stream().filter(e -> !strings.contains(e.getUniqueToken())).toList();
+                allData = allData.stream().filter(e -> !warnDeviceTokenList.contains(e.getDeviceToken())).toList();
             } else {
-                allData = allData.stream().filter(e -> strings.contains(e.getUniqueToken())).toList();
+                allData = allData.stream().filter(e -> warnDeviceTokenList.contains(e.getDeviceToken())).toList();
             }
 
         }
@@ -139,6 +140,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectBatchIds(projectIDList).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             // 支持模糊查询设备SN/工程名称/监测点名称
+            allData.forEach(item -> {
+                item.setProjectIDList(item.getSendAddressList().stream().map(Integer::parseInt).toList());
+            });
             allData = allData.stream().filter(
                     item -> {
                         if (item.getDeviceToken().contains(pa.getQueryCode())) {
@@ -151,7 +155,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             }
                         } else if (
                                 item.getProjectIDList().stream().anyMatch(
-                                        pid -> projectInfoMap.get(pid).getProjectName().contains(pa.getQueryCode())
+                                        pid -> projectInfoMap.containsKey(pid) && projectInfoMap.get(pid).getProjectName().contains(pa.getQueryCode())
                                 )
                         ) {
                             return true;
@@ -160,7 +164,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     }
             ).collect(Collectors.toList());
         }
-        allData.sort(Comparator.comparing(SimpleDeviceV5::getDeviceID).reversed());
+        allData = allData.stream().sorted(Comparator.comparingInt(SimpleDeviceV5::getDeviceID).reversed()).toList();
         PageUtil.Page<SimpleDeviceV5> page = PageUtil.page(allData, pa.getPageSize(), pa.getCurrentPage());
         page.currentPageData().forEach(
                 item -> {
@@ -209,6 +213,11 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             }
             return device4Web;
         }).toList();
+        collect.forEach(
+                item -> item.setStatus(
+                        warnDeviceTokenList.contains(item.getDeviceSN()) ? 1 : 0
+                )
+        );
         return new PageUtil.Page<>(page.totalPage(), collect, page.totalCount());
     }
 
