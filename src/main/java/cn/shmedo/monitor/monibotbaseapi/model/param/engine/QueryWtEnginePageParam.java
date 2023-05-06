@@ -17,6 +17,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Objects;
+
 @Data
 public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
@@ -44,7 +46,7 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper validate() {
-        ruleType = ruleType == null ? TbRuleType.WARN_RULE.getKey() : ruleType;
+        ruleType = Objects.isNull(ruleType) ? TbRuleType.WARN_RULE.getKey() : ruleType;
         if (TbRuleType.WARN_RULE.getKey().equals(ruleType)) {
             if (projectID != null) {
                 TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
@@ -67,10 +69,6 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
                 }
             }
-        } else if (TbRuleType.VIDEO_RULE.getKey().equals(ruleType)) {
-            //TODO keyword、videoTypeName、enable
-        } else if (TbRuleType.TERMINAL_RULE.getKey().equals(ruleType)) {
-            //TODO keyword、productID、enable
         }
         return null;
     }

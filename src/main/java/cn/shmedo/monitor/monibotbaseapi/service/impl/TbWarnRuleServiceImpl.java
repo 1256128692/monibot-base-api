@@ -53,46 +53,26 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public PageUtil.Page<WtEngineInfo> queryWtEnginePage(QueryWtEnginePageParam param) {
-        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
-        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
-        if (CollectionUtil.isNullOrEmpty(projectIDList)) {
-            return PageUtil.Page.empty();
-        }
-        final Map<Integer, String> projectIDNameMap = tbProjectInfos.stream()
-                .collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
-        final Map<Integer, TbMonitorItem> idItemMap = new HashMap<>();
-        final Map<Integer, TbMonitorPoint> idPointMap = new HashMap<>();
-        IPage<TbWarnRule> page = this.baseMapper.selectWarnRuleByPage(
-                new Page<>(param.getCurrentPage(), param.getPageSize()).addOrder(OrderItem.desc("CreateTime")),
-                param, projectIDList);
-        List<TbWarnRule> records = page.getRecords();
-        List<Integer> ruleIds = records.stream().peek(u -> {
-            Optional.ofNullable(u.getMonitorItemID()).ifPresent(s -> idItemMap.put(s, null));
-            Optional.ofNullable(u.getMonitorPointID()).ifPresent(s -> idPointMap.put(s, null));
-        }).map(TbWarnRule::getID).toList();
-        Optional.of(idItemMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
-                this.tbMonitorItemMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
-                        .collect(Collectors.toList()));
-        Optional.of(idPointMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
-                this.tbMonitorPointMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
-                        .collect(Collectors.toList()));
-        Map<Integer, List<WtTriggerActionInfo>> engineIdWarnMap = Optional.of(ruleIds).filter(u -> u.size() > 0)
-                .map(tbWarnTriggerService::queryWarnStatusByEngineIds)
-                .map(w -> w.stream().collect(Collectors.toMap(WtTriggerActionInfo::getWarnID, info -> info.setAction(info)
-                        , WtTriggerActionInfo::setAction)))
-                .map(Map::values).map(t -> t.stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)))
-                .orElse(new HashMap<>());
-        List<WtEngineInfo> collect = records.stream().map(u -> WtEngineInfo.build(u)
-                        .setProjectName(Optional.ofNullable(projectIDNameMap.get(u.getProjectID())).orElse("--"))
-                        .setMonitorItemName(Optional.ofNullable(idItemMap.get(u.getMonitorItemID())).map(TbMonitorItem::getName)
-                                .orElse("--"))
-                        .setMonitorPointName(Optional.ofNullable(idPointMap.get(u.getMonitorPointID())).map(TbMonitorPoint::getName)
-                                .orElse("--"))
-                        .setDataList(Optional.ofNullable(engineIdWarnMap.get(u.getID())).map(w -> w.stream()
-                                .map(WtTriggerActionInfo::build).collect(Collectors.toList())).orElse(new ArrayList<>())))
-                .collect(Collectors.toList());
-        return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
+    public PageUtil.Page<?> queryWtEnginePage(QueryWtEnginePageParam param) {
+        return Optional.ofNullable(TbRuleType.getTbRuleType(param.getRuleType())).map(ruleType -> {
+            switch (ruleType) {
+                case WARN_RULE -> {
+                    return dealWarnQueryPage(param);
+                }
+                case VIDEO_RULE -> {
+                    return dealVideoQueryPage(param);
+                }
+                case TERMINAL_RULE -> {
+                    return dealTerminalQueryPage(param);
+                }
+                default -> {
+                    return PageUtil.Page.empty();
+                }
+            }
+        }).orElseThrow(() -> {
+            log.error("RuleType is null,check the {@code QueryWtEnginePageParam} for setting ruleType please.");
+            return new RuntimeException("RuleType cannot be null");
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -218,5 +198,57 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         List<TbWarnTrigger> triggerIDList = tbWarnTriggerService.list(
                 new LambdaQueryWrapper<TbWarnTrigger>().in(TbWarnTrigger::getRuleID, engineIDList));
         tbWarnTriggerService.deleteWarnStatusByList(triggerIDList);
+    }
+
+    public PageUtil.Page<?> dealWarnQueryPage(QueryWtEnginePageParam param) {
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
+        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
+        if (CollectionUtil.isNullOrEmpty(projectIDList)) {
+            return PageUtil.Page.empty();
+        }
+        final Map<Integer, String> projectIDNameMap = tbProjectInfos.stream()
+                .collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
+        final Map<Integer, TbMonitorItem> idItemMap = new HashMap<>();
+        final Map<Integer, TbMonitorPoint> idPointMap = new HashMap<>();
+        IPage<TbWarnRule> page = this.baseMapper.selectWarnRuleByPage(
+                new Page<>(param.getCurrentPage(), param.getPageSize()).addOrder(OrderItem.desc("CreateTime")),
+                param, projectIDList);
+        List<TbWarnRule> records = page.getRecords();
+        List<Integer> ruleIds = records.stream().peek(u -> {
+            Optional.ofNullable(u.getMonitorItemID()).ifPresent(s -> idItemMap.put(s, null));
+            Optional.ofNullable(u.getMonitorPointID()).ifPresent(s -> idPointMap.put(s, null));
+        }).map(TbWarnRule::getID).toList();
+        Optional.of(idItemMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
+                this.tbMonitorItemMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
+                        .collect(Collectors.toList()));
+        Optional.of(idPointMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
+                this.tbMonitorPointMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
+                        .collect(Collectors.toList()));
+        Map<Integer, List<WtTriggerActionInfo>> engineIdWarnMap = Optional.of(ruleIds).filter(u -> u.size() > 0)
+                .map(tbWarnTriggerService::queryWarnStatusByEngineIds)
+                .map(w -> w.stream().collect(Collectors.toMap(WtTriggerActionInfo::getWarnID, info -> info.setAction(info)
+                        , WtTriggerActionInfo::setAction)))
+                .map(Map::values).map(t -> t.stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)))
+                .orElse(new HashMap<>());
+        List<WtEngineInfo> collect = records.stream().map(u -> WtEngineInfo.build(u)
+                        .setProjectName(Optional.ofNullable(projectIDNameMap.get(u.getProjectID())).orElse("--"))
+                        .setMonitorItemName(Optional.ofNullable(idItemMap.get(u.getMonitorItemID())).map(TbMonitorItem::getName)
+                                .orElse("--"))
+                        .setMonitorPointName(Optional.ofNullable(idPointMap.get(u.getMonitorPointID())).map(TbMonitorPoint::getName)
+                                .orElse("--"))
+                        .setDataList(Optional.ofNullable(engineIdWarnMap.get(u.getID())).map(w -> w.stream()
+                                .map(WtTriggerActionInfo::build).collect(Collectors.toList())).orElse(new ArrayList<>())))
+                .collect(Collectors.toList());
+        return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
+    }
+
+    public PageUtil.Page<?> dealVideoQueryPage(QueryWtEnginePageParam param) {
+        //TODO
+        return null;
+    }
+
+    public PageUtil.Page<?> dealTerminalQueryPage(QueryWtEnginePageParam param) {
+        //TODO
+        return null;
     }
 }
