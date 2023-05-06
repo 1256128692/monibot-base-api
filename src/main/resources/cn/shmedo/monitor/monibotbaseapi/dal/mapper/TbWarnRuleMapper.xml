@@ -1,31 +1,271 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper">
-    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
-        <id column="ID" property="ID" jdbcType="INTEGER"/>
-        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
-        <result column="MonitorType" jdbcType="INTEGER" property="monitorType"/>
-        <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
-        <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
-        <result column="SensorID" jdbcType="INTEGER" property="sensorID"/>
-        <result column="Name" jdbcType="VARCHAR" property="name"/>
-        <result column="Enable" jdbcType="BIT" property="enable"/>
-        <result column="Desc" jdbcType="VARCHAR" property="desc"/>
-        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
-        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
-        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
-        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        ID,RuleType,ProjectID,MonitorType,MonitorItemID,MonitorPointID,SensorID,`Name`,Enable,`Desc`,CreateTime,CreateUserID,UpdateTime,UpdateUserID
-    </sql>
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
+    <!--@mbg.generated-->
+    <!--@Table tb_warn_rule-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="RuleType" jdbcType="TINYINT" property="ruleType" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
+    <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID" />
+    <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID" />
+    <result column="SensorID" jdbcType="INTEGER" property="sensorID" />
+    <result column="ProductID" jdbcType="INTEGER" property="productID" />
+    <result column="DeviceCSV" jdbcType="LONGVARCHAR" property="deviceCSV" />
+    <result column="VideoType" jdbcType="VARCHAR" property="videoType" />
+    <result column="VideoCSV" jdbcType="LONGVARCHAR" property="videoCSV" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Enable" jdbcType="BIT" property="enable" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    <result column="Desc" jdbcType="VARCHAR" property="desc" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, RuleType, ProjectID, MonitorType, MonitorItemID, MonitorPointID, SensorID, ProductID, 
+    DeviceCSV, VideoType, VideoCSV, `Name`, `Enable`, ExValue, `Desc`, CreateTime, CreateUserID, 
+    UpdateTime, UpdateUserID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_warn_rule
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_warn_rule
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_warn_rule (RuleType, ProjectID, MonitorType, 
+      MonitorItemID, MonitorPointID, SensorID, 
+      ProductID, DeviceCSV, VideoType, 
+      VideoCSV, `Name`, `Enable`, 
+      ExValue, `Desc`, CreateTime, 
+      CreateUserID, UpdateTime, UpdateUserID
+      )
+    values (#{ruleType,jdbcType=TINYINT}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, 
+      #{monitorItemID,jdbcType=INTEGER}, #{monitorPointID,jdbcType=INTEGER}, #{sensorID,jdbcType=INTEGER}, 
+      #{productID,jdbcType=INTEGER}, #{deviceCSV,jdbcType=LONGVARCHAR}, #{videoType,jdbcType=VARCHAR}, 
+      #{videoCSV,jdbcType=LONGVARCHAR}, #{name,jdbcType=VARCHAR}, #{enable,jdbcType=BIT}, 
+      #{exValue,jdbcType=VARCHAR}, #{desc,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_warn_rule
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="ruleType != null">
+        RuleType,
+      </if>
+      <if test="projectID != null">
+        ProjectID,
+      </if>
+      <if test="monitorType != null">
+        MonitorType,
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID,
+      </if>
+      <if test="monitorPointID != null">
+        MonitorPointID,
+      </if>
+      <if test="sensorID != null">
+        SensorID,
+      </if>
+      <if test="productID != null">
+        ProductID,
+      </if>
+      <if test="deviceCSV != null">
+        DeviceCSV,
+      </if>
+      <if test="videoType != null">
+        VideoType,
+      </if>
+      <if test="videoCSV != null">
+        VideoCSV,
+      </if>
+      <if test="name != null">
+        `Name`,
+      </if>
+      <if test="enable != null">
+        `Enable`,
+      </if>
+      <if test="exValue != null">
+        ExValue,
+      </if>
+      <if test="desc != null">
+        `Desc`,
+      </if>
+      <if test="createTime != null">
+        CreateTime,
+      </if>
+      <if test="createUserID != null">
+        CreateUserID,
+      </if>
+      <if test="updateTime != null">
+        UpdateTime,
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="ruleType != null">
+        #{ruleType,jdbcType=TINYINT},
+      </if>
+      <if test="projectID != null">
+        #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorPointID != null">
+        #{monitorPointID,jdbcType=INTEGER},
+      </if>
+      <if test="sensorID != null">
+        #{sensorID,jdbcType=INTEGER},
+      </if>
+      <if test="productID != null">
+        #{productID,jdbcType=INTEGER},
+      </if>
+      <if test="deviceCSV != null">
+        #{deviceCSV,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="videoType != null">
+        #{videoType,jdbcType=VARCHAR},
+      </if>
+      <if test="videoCSV != null">
+        #{videoCSV,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enable != null">
+        #{enable,jdbcType=BIT},
+      </if>
+      <if test="exValue != null">
+        #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="desc != null">
+        #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
+    <!--@mbg.generated-->
+    update tb_warn_rule
+    <set>
+      <if test="ruleType != null">
+        RuleType = #{ruleType,jdbcType=TINYINT},
+      </if>
+      <if test="projectID != null">
+        ProjectID = #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorType != null">
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorPointID != null">
+        MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+      </if>
+      <if test="sensorID != null">
+        SensorID = #{sensorID,jdbcType=INTEGER},
+      </if>
+      <if test="productID != null">
+        ProductID = #{productID,jdbcType=INTEGER},
+      </if>
+      <if test="deviceCSV != null">
+        DeviceCSV = #{deviceCSV,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="videoType != null">
+        VideoType = #{videoType,jdbcType=VARCHAR},
+      </if>
+      <if test="videoCSV != null">
+        VideoCSV = #{videoCSV,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="name != null">
+        `Name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="enable != null">
+        `Enable` = #{enable,jdbcType=BIT},
+      </if>
+      <if test="exValue != null">
+        ExValue = #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="desc != null">
+        `Desc` = #{desc,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUserID != null">
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
+    <!--@mbg.generated-->
+    update tb_warn_rule
+    set RuleType = #{ruleType,jdbcType=TINYINT},
+      ProjectID = #{projectID,jdbcType=INTEGER},
+      MonitorType = #{monitorType,jdbcType=INTEGER},
+      MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+      SensorID = #{sensorID,jdbcType=INTEGER},
+      ProductID = #{productID,jdbcType=INTEGER},
+      DeviceCSV = #{deviceCSV,jdbcType=LONGVARCHAR},
+      VideoType = #{videoType,jdbcType=VARCHAR},
+      VideoCSV = #{videoCSV,jdbcType=LONGVARCHAR},
+      `Name` = #{name,jdbcType=VARCHAR},
+      `Enable` = #{enable,jdbcType=BIT},
+      ExValue = #{exValue,jdbcType=VARCHAR},
+      `Desc` = #{desc,jdbcType=VARCHAR},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      CreateUserID = #{createUserID,jdbcType=INTEGER},
+      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
 
     <select id="selectWarnRuleByPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT <include refid="Base_Column_List" />
         FROM
             tb_warn_rule
         WHERE RuleType = 1 AND `ProjectID` IN
-        <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
+        <foreach close=")" collection="projectIDList" index="index" item="item" open="(" separator=",">
             #{item}
         </foreach>
         <if test="param.engineName != null and param.engineName !=''">
@@ -44,7 +284,7 @@
             AND `MonitorPointID`=#{param.monitorPointID}
         </if>
     </select>
-    <select id="selectRuleWarnIDListByRuleIDList" resultType="integer" parameterType="list">
+    <select id="selectRuleWarnIDListByRuleIDList" parameterType="list" resultType="integer">
         SELECT
             twr.ID engineID
         FROM
@@ -53,13 +293,11 @@
         WHERE
             twt.ID IS NOT NULL
             AND twr.ID IN
-        <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
+        <foreach close=")" collection="list" index="index" item="item" open="(" separator=",">
             #{item}
         </foreach>
     </select>
-    <select id="selectWtEngineDetail"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail"
-            parameterType="java.lang.Integer">
+    <select id="selectWtEngineDetail" parameterType="java.lang.Integer" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail">
         SELECT
             twr.ID engineID,
             twr.`Enable` `enable`,

@@ -389,4 +389,35 @@
     set MonitorPointID = #{newPoint}, UpdateTime = #{date}, UpdateUserID = #{userID}
     where MonitorPointID = #{oldPoint}
     </update>
+
+  <select id="querySensorWithMoreBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore">
+      select s.id            as           sensorID,
+             s.Name          as           sensorName,
+             LEFT(ds.DataSourceToken, 32) uniqueToken,
+             p.id           as           monitorPointID,
+             p.Name          as           monitorPointName,
+             p.GpsLocation   as           pointGpsLocation,
+             p.ImageLocation as           pointImageLocation,
+             it.id           as           monitorItemID,
+             it.Name         as           monitorItemName,
+             it.Alias        as           monitorItemAlias,
+             s.ProjectID           as           projectID
+      from tb_sensor as s
+               left join tb_sensor_data_source as ds on ds.DataSourceID = s.DataSourceID
+               left join tb_monitor_point as p on p.id = s.MonitorPointID
+               left join tb_monitor_item as it on it.id = p.MonitorItemID
+      <where>
+          <foreach collection="uniqueTokens" open="(" close=")" item="item" separator="OR">
+              ds.DataSourceToken LIKE CONCAT(#{item}, '%')
+          </foreach>
+        and s.MonitorPointID is not null
+          and s.ProjectID in
+          <foreach collection="projectIDList" item="id" separator="," open="(" close=")">
+              #{id}
+          </foreach>
+          <if test="monitorItemID != null">
+              and it.id = #{monitorItemID}
+          </if>
+      </where>
+  </select>
 </mapper>

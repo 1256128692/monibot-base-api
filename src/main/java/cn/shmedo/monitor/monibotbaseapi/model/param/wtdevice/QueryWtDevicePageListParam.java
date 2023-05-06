@@ -54,8 +54,8 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper validate() {
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (CollectionUtils.isNotEmpty(projectIDList)) {
-            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
             projectInfos = tbProjectInfoMapper.selectList(
                     new QueryWrapper<TbProjectInfo>().lambda()
                             .in(TbProjectInfo::getID, projectIDList)
@@ -63,6 +63,14 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
             );
             if (CollectionUtils.isEmpty(projectInfos) || projectInfos.size() != projectIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有项目不存在或者不属于该公司");
+            }
+        } else {
+            projectInfos = tbProjectInfoMapper.selectList(
+                    new QueryWrapper<TbProjectInfo>().lambda().eq(TbProjectInfo::getCompanyID, companyID)
+            );
+            if (CollectionUtils.isEmpty(projectInfos)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该公司下没有项目");
+
             }
         }
         if (status != null && status != 0 && status != 1) {
@@ -85,6 +93,6 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionProvider.super.resourcePermissionType();
+        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
     }
 }

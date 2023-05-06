@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
  * @create: 2023-05-05 15:23
  **/
 @Data
+@Builder
 public class Device4Web {
     private String deviceSN;
     private String firewallVersion;
@@ -20,7 +22,8 @@ public class Device4Web {
     private List<Porject> projectList;
 
     @Data
-    static class MonitorPoint {
+    @Builder
+    public static class MonitorPoint {
         private Integer monitorPointID;
         private String monitorPointName;
         private String pointGpsLocation;
@@ -31,7 +34,8 @@ public class Device4Web {
     }
 
     @Data
-    static class Porject {
+    @Builder
+    public static class Porject {
         private Integer projectID;
         private String projectName;
         private String projectShortName;
