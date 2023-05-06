@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
@@ -140,7 +139,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} isEncrypt 是否加密：0-不加密，1-加密
      * @apiSuccess (返回结果) {Int} riskLevel 设备风险安全等级，0-安全，大于零，有风险，风险越高，值越大
      * @apiSuccess (返回结果) {Int} offlineNotify 设备下线是否通知：0-不通知 1-通知
-     * @apiSuccess (返回结果) {Int} alarmSoundMode 告警声音模式：0-短叫，1-长叫，2-静音
+     * @apiSuccess (返回结果) {Int} alarmSoundMode 告警声音模式：-1-不支持警告声音 0-短叫，1-长叫，2-静音
      * @apiSuccess (返回结果) {Int} defence 能力的设备布撤防状态：0-睡眠，8-在家，16-外出，普通IPC布撤防状态：0-撤防，1-布防
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
