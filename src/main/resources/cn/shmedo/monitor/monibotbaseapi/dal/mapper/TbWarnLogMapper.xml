@@ -112,7 +112,9 @@
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-        WHERE twl.ProjectID IN
+        LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
+        WHERE twl1.latest_time &gt; twl.WarnTime
+        AND twl.ProjectID IN
         <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
@@ -262,20 +264,19 @@
                two.`Status`    orderStatus
         FROM `tb_warn_log` twl
                  LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
+                 LEFT JOIN (SELECT MAX(WarnTime) latest_time, DeviceToken
+                            FROM tb_warn_log
+                            GROUP BY DeviceToken) twl1
+                           ON twl.DeviceToken = twl1.DeviceToken
         <choose>
             <when test="flag">
-                WHERE
+                WHERE twl1.latest_time &gt; twl.WarnTime
             </when>
             <otherwise>
-                LEFT JOIN (SELECT MAX(WarnTime) latest_time, MonitorPointID
-                    FROM tb_warn_log
-                    GROUP BY MonitorPointID) twl1
-                ON twl.MonitorPointID = twl1.MonitorPointID
                 WHERE twl1.latest_time = twl.WarnTime
-                  AND
             </otherwise>
         </choose>
-        twl.ProjectID IN
+        AND twl.ProjectID IN
         <foreach collection="param.projectIDList" open="(" close=")" item="item" separator="," index="index">
             #{item}
         </foreach>
