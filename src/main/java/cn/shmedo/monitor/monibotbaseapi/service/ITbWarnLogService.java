@@ -16,7 +16,7 @@ public interface ITbWarnLogService extends IService<TbWarnLog> {
 
     WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param);
 
-    PageUtil.Page<WtTerminalWarnLog> queryByPage(QueryWtTerminalWarnLogPageParam param);
+    PageUtil.Page<WtTerminalWarnLog> queryTerminalWarnPage(QueryWtTerminalWarnLogPageParam param);
 
     WtTerminalWarnDetailInfo queryTerminalWarnDetail(QueryWtWarnDetailParam param);
 }

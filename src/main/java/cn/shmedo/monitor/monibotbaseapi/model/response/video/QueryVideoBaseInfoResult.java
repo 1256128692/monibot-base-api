@@ -25,7 +25,7 @@ public class QueryVideoBaseInfoResult {
     public static QueryVideoBaseInfoResult valueOf(YsDeviceInfo deviceInfo) {
         return QueryVideoBaseInfoResult.builder()
                 .videoName(deviceInfo.getDeviceName())
-                .videoType(deviceInfo.getDeviceSerial())
+                .videoType(deviceInfo.getModel())
                 .status(deviceInfo.getStatus())
                 .netAddress(deviceInfo.getNetAddress())
                 .netType(deviceInfo.getNetType())
