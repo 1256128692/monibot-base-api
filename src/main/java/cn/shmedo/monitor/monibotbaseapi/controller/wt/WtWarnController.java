@@ -107,10 +107,10 @@ public class WtWarnController {
     }
 
     /**
-     * @api {POST} /QueryWtTerminalWarnLogPage 查询智能终端报警分页
+     * @api {POST} /QueryWtTerminalWarnPage 查询智能终端报警分页
      * @apiVersion 1.0.0
      * @apiGroup 警报规则引擎模块
-     * @apiName QueryWtTerminalWarnLogPage
+     * @apiName QueryWtTerminalWarnPage
      * @apiDescription 查询智能终端报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录

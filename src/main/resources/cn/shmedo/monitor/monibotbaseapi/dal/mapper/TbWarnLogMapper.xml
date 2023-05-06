@@ -235,13 +235,16 @@
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
             twl.WarnContent warnContent,
-            twl.DeviceToken deviceToken
+            twl.DeviceToken deviceToken,
+            twr.`Name` ruleName
         FROM
             tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE
             twl.WorkOrderID =#{param.workOrderID}
     </select>
