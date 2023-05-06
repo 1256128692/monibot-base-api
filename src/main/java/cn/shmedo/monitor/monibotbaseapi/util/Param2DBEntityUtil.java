@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.engine.AddWtDeviceWarnRuleParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.AddMonitorGroupParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.AddMonitorPointBatchParam;
@@ -244,5 +245,28 @@ public class Param2DBEntityUtil {
     }
 
 
-
+    public static TbWarnRule fromAddWtDeviceWarnRuleParam2TbWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
+        Date now = new Date();
+        TbWarnRule obj = new TbWarnRule();
+        obj.setRuleType(pa.getRuleType());
+        obj.setProjectID(pa.getProjectID());
+        obj.setMonitorType(pa.getMonitorType());
+        obj.setMonitorItemID(pa.getMonitorItemID());
+        if (obj.getRuleType() == 2) {
+            obj.setVideoType(pa.getProductID());
+            obj.setVideoCSV(pa.getDeviceCSV());
+        } else {
+            obj.setProductID(Integer.valueOf(pa.getProductID()));
+            obj.setDeviceCSV(pa.getDeviceCSV());
+        }
+        obj.setName(pa.getName());
+        obj.setEnable(pa.getEnable());
+        obj.setExValue(pa.getExValue());
+        obj.setDesc(pa.getDesc());
+        obj.setCreateTime(now);
+        obj.setUpdateTime(now);
+        obj.setCreateUserID(userID);
+        obj.setUpdateUserID(userID);
+        return obj;
+    }
 }

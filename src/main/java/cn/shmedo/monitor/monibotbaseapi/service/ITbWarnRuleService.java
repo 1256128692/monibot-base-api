@@ -19,4 +19,8 @@ public interface ITbWarnRuleService extends IService<TbWarnRule> {
     void updateWtEngineEnable(BatchUpdateWtEngineEnableParam param);
 
     void deleteWtEngine(BatchDeleteWtEngineParam param);
+
+    void addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID);
+
+    void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID);
 }
