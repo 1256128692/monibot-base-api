@@ -66,36 +66,6 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     private List<Property> propertyEntity;
 
-    @Data
-    public static class Property {
-
-        @NotBlank(message = "属性名称不能为空")
-        private String name;
-
-        private String value;
-
-        @JsonIgnore
-        private List<String> values;
-
-        public Property(String s, String v) {
-            this.name = s;
-            this.setValue(v);
-        }
-
-        public void setValue(String value) {
-            this.value = value;
-            if (JSONUtil.isTypeJSONArray(value)) {
-                this.values = JSONUtil.toList(JSONUtil.parseArray(value), String.class);
-            } else {
-                this.values = List.of(value);
-            }
-        }
-
-        public Property() {
-            this.values = new ArrayList<>();
-        }
-    }
-
     @Override
     public ResultWrapper<?> validate() {
         if (projectType != null) {
@@ -131,5 +101,35 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     @Override
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionProvider.super.resourcePermissionType();
+    }
+
+    @Data
+    public static class Property {
+
+        @NotBlank(message = "属性名称不能为空")
+        private String name;
+
+        private String value;
+
+        @JsonIgnore
+        private List<String> values;
+
+        public Property(String s, String v) {
+            this.name = s;
+            this.setValue(v);
+        }
+
+        public Property() {
+            this.values = new ArrayList<>();
+        }
+
+        public void setValue(String value) {
+            this.value = value;
+            if (JSONUtil.isTypeJSONArray(value)) {
+                this.values = JSONUtil.toList(JSONUtil.parseArray(value), String.class);
+            } else {
+                this.values = List.of(value);
+            }
+        }
     }
 }
