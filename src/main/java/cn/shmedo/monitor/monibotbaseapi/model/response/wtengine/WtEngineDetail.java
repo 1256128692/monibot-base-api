@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class WtEngineDetail {
     private Integer engineID;
+    private Integer ruleType;
     private Boolean enable;
     private String engineName;
     private String engineDesc;

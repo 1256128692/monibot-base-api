@@ -117,6 +117,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     public WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param) {
         Integer engineID = param.getEngineID();
         WtEngineDetail build = this.baseMapper.selectWtEngineDetail(engineID);
+        Integer ruleType = build.getRuleType();
+        boolean needSetCompareRule = Objects.nonNull(ruleType) && WarnType.MONITOR.equals(WarnType.formCode(ruleType));
         Optional.ofNullable(build.getProductID()).map(List::of).filter(CollectionUtil::isNotEmpty)
                 .map(u -> {
                     QueryByProductIDListParam thirdParam = new QueryByProductIDListParam();
@@ -159,7 +161,9 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                                 WtTriggerActionInfo::getWarnID, info -> info.setAction(info), WtTriggerActionInfo::setAction))
                         .values().stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)).get(engineID))
                 .ifPresent(warnList -> {
-                    Map<Integer, String> map = CompareIntervalDescUtil.getCompareRuleDescMap(build.getMonitorTypeID(), warnList);
+                    //reduce unnecessary rule desc setting
+                    Map<Integer, String> map = needSetCompareRule ? CompareIntervalDescUtil
+                            .getCompareRuleDescMap(build.getMonitorTypeID(), warnList) : new HashMap<>();
                     List<WtWarnStatusDetailInfo> dataList = warnList.stream().filter(u -> Objects.nonNull(u) &&
                                     Objects.nonNull(u.getWarnID())).map(WtTriggerActionInfo::buildDetail)
                             .peek(u -> u.setCompareRuleDesc(map.get(u.getWarnID()))).map(FieldShowUtil::dealFieldShow).toList();
