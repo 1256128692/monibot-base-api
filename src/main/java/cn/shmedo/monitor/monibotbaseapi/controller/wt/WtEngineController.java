@@ -36,7 +36,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} [engineName] 规则名称,支持模糊查询
      * @apiParam (请求参数) {String} [queryCode] 关键字,报警规则:模糊搜索规则名称、报警名称、工程项目; 视频规则:
      * @apiParam (请求参数) {Boolean} [enable] 启用状态
-     * @apiParam (请求参数) {Boolean} [orderType] 排序规则 1.按照创建时间降序排序(默认) 2.按照创建时间升序排序
+     * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照创建时间降序排序(默认) 2.按照创建时间升序排序
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求参数) {Int} currentPage 当前页

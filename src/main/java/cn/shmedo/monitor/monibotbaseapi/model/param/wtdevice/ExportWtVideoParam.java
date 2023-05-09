@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -59,6 +60,8 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
     @JsonIgnore
     private List<TbProjectInfo> projectInfos;
 
+    @JsonIgnore
+    private Integer onlineInt;
     @Override
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
@@ -82,6 +85,14 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
             if (CollectionUtils.isEmpty(projectInfos)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该公司下没有项目");
 
+            }
+        }
+
+        if (online != null) {
+            if (online) {
+                onlineInt = 0;
+            }else {
+                onlineInt = 1;
             }
         }
         return null;

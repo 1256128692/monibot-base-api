@@ -591,8 +591,11 @@
         <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
             #{projectID}
         </foreach>
-        <if test="online != null">
-            and s.Status = #{online}
+        <if test="onlineInt != null">
+            and s.Status = #{onlineInt}
+        </if>
+        <if test="status != null">
+            and s.Status = #{status}
         </if>
         <if test="areaCode != null">
             and pi.Location LIKE CONCAT('%', #{areaCode}, '%')

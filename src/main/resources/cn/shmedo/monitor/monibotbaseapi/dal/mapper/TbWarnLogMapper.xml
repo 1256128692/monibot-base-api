@@ -86,8 +86,7 @@
             AND twl.WarnType = 1
             <if test="param.queryCode != null and param.queryCode != ''">
                 AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
-                 OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%')
-                 OR tpi.ProjectName LIKE CONCAT('%', #{param.queryCode}, '%'))
+                 OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%'))
             </if>
             <if test="param.monitorTypeID != null">
                 AND twl.monitorType=#{param.monitorTypeID}
@@ -154,7 +153,6 @@
             AND twl.WarnType = 2
             <if test="param.queryCode != null and param.queryCode != ''">
                 AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
-                OR tpi.ProjectName LIKE CONCAT('%', #{param.queryCode}, '%')
                 OR twl.DeviceToken LIKE CONCAT('%', #{param.queryCode}, '%')
                 OR tmp.`Name` LIKE CONCAT('%', #{param.queryCode}, '%'))
             </if>
@@ -316,10 +314,6 @@
             </otherwise>
         </choose>
         AND twl.WarnType = 3
-        AND twl.ProjectID IN
-        <foreach collection="param.projectIDList" open="(" close=")" item="item" separator="," index="index">
-            #{item}
-        </foreach>
         <if test="param.warnLevel != null">
             AND twl.warnLevel = #{param.warnLevel}
         </if>
@@ -373,6 +367,12 @@
             </if>
             <if test="param.monitorItemID != null">
                 AND tmp.monitorItemID = #{param.monitorItemID}
+            </if>
+            <if test="param.projectIDList != null and !param.projectIDList.empty">
+                AND tpi.ID IN
+                <foreach collection="param.projectIDList" open="(" close=")" item="item" separator=",">
+                    #{item}
+                </foreach>
             </if>
         </where>
     </select>

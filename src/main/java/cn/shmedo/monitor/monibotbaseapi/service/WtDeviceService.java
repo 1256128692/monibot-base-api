@@ -20,4 +20,6 @@ public interface WtDeviceService {
     List<Device4Web> exportWtDevice(ExportWtDeviceParam pa);
 
     List<WtVideoPageInfo> exportWtVideo(ExportWtVideoParam param);
+
+    Object queryWtVideoTypeList(QueryWtVideoTypeParam param);
 }

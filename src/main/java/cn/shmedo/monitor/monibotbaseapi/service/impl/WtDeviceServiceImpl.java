@@ -1,11 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
@@ -13,12 +17,14 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.SensorNewDataInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.Device4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.ProductSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -50,6 +56,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     private final TbProjectInfoMapper tbProjectInfoMapper;
 
     private final TbMonitorPointMapper monitorPointMapper;
+
+    private final RedisService redisService;
 
     @Override
     public Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param) {
@@ -229,7 +237,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnline(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return PageUtil.Page.empty();
         }
@@ -246,9 +254,25 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.setVideoType(dict.get("videoType").toString());
                 }
                 if (item.getStatus() != null) {
-                    item.setOnline(Boolean.valueOf(item.getStatus()));
+                    item.setOnline(!Boolean.parseBoolean(item.getStatus()));
                 }
             }
+            if (StringUtils.isNotEmpty(item.getLocation())) {
+                if (JSONUtil.isTypeJSON(item.getLocation())) {
+                    JSONObject json = JSONUtil.parseObj(item.getLocation());
+                    item.setLocationInfo(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                }
+            }
+        });
+
+        Collection<Object> areas = wtVideoList
+                .stream().map(WtVideoPageInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+
+        wtVideoList.forEach(item -> {
+            item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
         });
 
         if (!StringUtil.isNullOrEmpty(param.getQueryCode())) {
@@ -272,6 +296,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(wtVideoList, param.getPageSize());
         return new PageUtil.Page<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount);
+
     }
 
     @Override
@@ -430,7 +455,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnline(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return List.of();
         }
@@ -446,9 +471,25 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.setVideoType(dict.get("videoType").toString());
                 }
                 if (item.getStatus() != null) {
-                    item.setOnline(Boolean.valueOf(item.getStatus()));
+                    item.setOnline(!Boolean.parseBoolean(item.getStatus()));
                 }
             }
+            if (StringUtils.isNotEmpty(item.getLocation())) {
+                if (JSONUtil.isTypeJSON(item.getLocation())) {
+                    JSONObject json = JSONUtil.parseObj(item.getLocation());
+                    item.setLocationInfo(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                }
+            }
+        });
+
+        Collection<Object> areas = wtVideoList
+                .stream().map(WtVideoPageInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+
+        wtVideoList.forEach(item -> {
+            item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
         });
 
         if (!StringUtil.isNullOrEmpty(param.getQueryCode())) {
@@ -471,4 +512,27 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         return wtVideoList;
     }
+
+    @Override
+    public Object queryWtVideoTypeList(QueryWtVideoTypeParam param) {
+
+        List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
+                null, null, null, null, MonitorType.VIDEO.getKey());
+        if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+            return null;
+        }
+        Set<String> videoTypeList = new HashSet<>();
+        wtVideoList.forEach(item -> {
+            String exValues = item.getExValues();
+            if (StringUtils.isNotEmpty(exValues)) {
+                Dict dict = JSONUtil.toBean(exValues, Dict.class);
+                if (dict.get("videoType") != null) {
+                    videoTypeList.add(dict.get("videoType").toString());
+                }
+            }
+        });
+
+        return videoTypeList;
+    }
+
 }

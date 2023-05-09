@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -63,6 +64,10 @@ public class QueryWtVideoPageParam implements ParameterValidator, ResourcePermis
     @JsonIgnore
     private List<TbProjectInfo> projectInfos;
 
+    @JsonIgnore
+    private Integer onlineInt;
+
+
     @Override
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
@@ -88,6 +93,15 @@ public class QueryWtVideoPageParam implements ParameterValidator, ResourcePermis
 
             }
         }
+
+        if (online != null) {
+            if (online) {
+                onlineInt = 0;
+            }else {
+                onlineInt = 1;
+            }
+        }
+
         return null;
     }
 
