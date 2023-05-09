@@ -46,6 +46,7 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} currentPageData.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} currentPageData.projectShortName 工程项目简称
      * @apiSuccess (返回结果) {String} currentPageData.location 工程项目行政区划
+     * @apiSuccess (返回结果) {String} currentPageData.projectAddress 工程项目地址
      * @apiSuccess (返回结果) {Int} currentPageData.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} currentPageData.monitorItemAlias 监测项目别名
@@ -89,6 +90,7 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} list.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} list.projectShortName 工程项目简称
      * @apiSuccess (返回结果) {String} list.location 工程项目行政区划
+     * @apiSuccess (返回结果) {String} list.projectAddress 工程项目地址
      * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} list.monitorItemAlias 监测项目别名
@@ -157,6 +159,7 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} currentPageData.projectList.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} currentPageData.projectList.projectShortName 工程项目简称
      * @apiSuccess (返回结果) {String} currentPageData.projectList.location 工程项目行政区划
+     * @apiSuccess (返回结果) {String} currentPageData.projectList.projectAddress 工程项目地址
      * @apiSuccess (返回结果) {Object[]} currentPageData.projectList.monitorPointList 监测点信息
      * @apiSuccess (返回结果) {Int} currentPageData.projectList.monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointList.monitorItemName 监测项目名称
@@ -202,6 +205,7 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} list.projectList.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} list.projectList.projectShortName 工程项目简称
      * @apiSuccess (返回结果) {String} list.projectList.location 工程项目行政区划
+     * @apiSuccess (返回结果) {String} list.projectList.projectAddress 工程项目地址
      * @apiSuccess (返回结果) {Object[]} list.projectList.monitorPointList 监测点信息
      * @apiSuccess (返回结果) {Int} list.projectList.monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.projectList.monitorPointList.monitorItemName 监测项目名称
