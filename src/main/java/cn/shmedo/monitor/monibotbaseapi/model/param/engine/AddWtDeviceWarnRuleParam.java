@@ -54,9 +54,6 @@ public class AddWtDeviceWarnRuleParam implements ParameterValidator, ResourcePer
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
-        }
         if (ruleType == null) {
             ruleType = 1;
         }
@@ -79,9 +76,6 @@ public class AddWtDeviceWarnRuleParam implements ParameterValidator, ResourcePer
                 TbMonitorPoint tbMonitorPoint = tbMonitorPointMapper.selectById(pointID);
                 if (tbMonitorPoint == null) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
-                }
-                if (!tbMonitorPoint.getProjectID().equals(projectID)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不属于该项目");
                 }
                 if (!tbMonitorPoint.getMonitorItemID().equals(monitorItemID)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点需要匹配监测项目");

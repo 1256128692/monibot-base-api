@@ -322,7 +322,7 @@ public class WtEngineController {
      * @apiDescription 修改规则关联设备
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} roleID  规则ID
+     * @apiParam (请求参数) {Int} ruleID  规则ID
      * @apiParam (请求参数) {String} sign 符号，支持 + - 两种
      * @apiParam (请求参数) {String} deviceCSV 该项为"all"或者设备ID的CSV字符串
      * @apiSuccess (返回结果) {String} none 无
