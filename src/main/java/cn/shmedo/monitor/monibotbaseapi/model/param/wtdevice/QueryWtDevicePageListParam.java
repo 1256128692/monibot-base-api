@@ -7,8 +7,8 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
@@ -18,6 +18,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,28 +55,19 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper validate() {
-        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (CollectionUtils.isNotEmpty(projectIDList)) {
-            if (projectIDList.stream().distinct().count() != projectIDList.size()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "projectIDList中有重复的项目ID");
-            }
-            projectInfos = tbProjectInfoMapper.selectList(
-                    new QueryWrapper<TbProjectInfo>().lambda()
-                            .in(TbProjectInfo::getID, projectIDList)
-                            .eq(TbProjectInfo::getCompanyID, companyID)
-            );
-            if (CollectionUtils.isEmpty(projectInfos) || projectInfos.size() != projectIDList.size()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有项目不存在或者不属于该公司");
-            }
-        } else {
-            projectInfos = tbProjectInfoMapper.selectList(
-                    new QueryWrapper<TbProjectInfo>().lambda().eq(TbProjectInfo::getCompanyID, companyID)
-            );
-            if (CollectionUtils.isEmpty(projectInfos)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该公司下没有项目");
-
-            }
+        Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
+        if (permissionProjectList.isEmpty()) {
+            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
         }
+        this.projectIDList = permissionProjectList.stream().toList();
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+
+        projectInfos = tbProjectInfoMapper.selectList(
+                new QueryWrapper<TbProjectInfo>().lambda()
+                        .in(TbProjectInfo::getID, projectIDList)
+                        .eq(TbProjectInfo::getCompanyID, companyID)
+        );
+
         if (status != null && status != 0 && status != 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "status只能为0或1");
         }
