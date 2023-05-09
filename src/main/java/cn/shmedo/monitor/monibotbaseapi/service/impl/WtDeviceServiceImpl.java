@@ -133,7 +133,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                 Integer productID = tbWarnRule.getProductID();
-                List<String> SNList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
+                List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
                         e -> {
 
@@ -141,9 +141,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
-                                if (CollectionUtils.isEmpty(SNList)) {
+                                if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return false;
-                                } else if (SNList.contains(e.getDeviceToken())) {
+                                } else if (deviceIDList.contains(e.getDeviceID())) {
                                     return true;
                                 } else {
                                     return false;
@@ -152,9 +152,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
                                 }
-                                if (CollectionUtils.isEmpty(SNList)) {
+                                if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return true;
-                                } else if (SNList.contains(e.getDeviceToken())) {
+                                } else if (deviceIDList.contains(e.getDeviceID())) {
                                     return false;
                                 } else {
                                     return true;
@@ -385,7 +385,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                 Integer productID = tbWarnRule.getProductID();
-                List<String> SNList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
+                List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
                         e -> {
 
@@ -393,9 +393,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
-                                if (CollectionUtils.isEmpty(SNList)) {
+                                if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return false;
-                                } else if (SNList.contains(e.getDeviceToken())) {
+                                } else if (deviceIDList.contains(e.getDeviceID())) {
                                     return true;
                                 } else {
                                     return false;
@@ -404,9 +404,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
                                 }
-                                if (CollectionUtils.isEmpty(SNList)) {
+                                if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return true;
-                                } else if (SNList.contains(e.getDeviceToken())) {
+                                } else if (deviceIDList.contains(e.getDeviceID())) {
                                     return false;
                                 } else {
                                     return true;

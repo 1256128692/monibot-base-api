@@ -331,6 +331,7 @@
             parameterType="java.lang.Integer">
         SELECT
             twr.ID engineID,
+            twr.RuleType ruleType,
             twr.`Enable` `enable`,
             twr.`Name` engineName,
             twr.`Desc` engineDesc,
