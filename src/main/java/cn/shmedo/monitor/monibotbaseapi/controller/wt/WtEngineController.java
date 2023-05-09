@@ -6,6 +6,8 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevel;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnActionService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnRuleService;
@@ -29,7 +31,7 @@ public class WtEngineController {
      * @apiName QueryEnginePage
      * @apiDescription 查询规则引擎分页
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {String} [ruleType] 规则类型, 1:报警规则 2:视频规则 3:智能终端规则
+     * @apiParam (请求参数) {Int} [ruleType] 规则类型, 1:报警规则 2:视频规则 3:智能终端规则
      * @apiParam (请求参数) {Int} [productID] 产品ID
      * @apiParam (请求参数) {String} [videoTypeName] 视频设备型号
      * @apiParam (请求参数) {Int} [projectID] 工程项目ID
@@ -277,14 +279,17 @@ public class WtEngineController {
      * @apiName WarnTypeList
      * @apiDescription 报警类型枚举
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} ruleType 规则类型, 1:报警规则 2:视频规则 3:智能终端规则
      * @apiSuccess (返回结果) {Object[]} dataList 报警类型枚举
-     * @apiSuccess (返回结果) {Int} warnLevel 报警类型枚举值
-     * @apiSuccess (返回结果) {String} warnTypeName 报警类型名称
+     * @apiSuccess (返回结果) {Int} dataList.warnLevel 报警类型枚举值
+     * @apiSuccess (返回结果) {String} dataList.warnTypeName 报警类型名称
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    public Object warnTypeList(@Valid @RequestBody Object param) {
-        return null;
+//    @Permission(permissionName = "")
+    @PostMapping(value = "/WarnTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object warnTypeList(@Valid @RequestBody WarnTypeListParam param) {
+        return WarnLevel.getEnum(WarnType.formCode(param.getRuleType()));
     }
 
     /**

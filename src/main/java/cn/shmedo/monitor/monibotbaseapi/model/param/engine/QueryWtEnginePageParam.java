@@ -10,7 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.TbRuleType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -50,8 +50,8 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     @Override
     public ResultWrapper validate() {
         orderType = Objects.isNull(orderType) ? 1 : orderType;
-        ruleType = Objects.isNull(ruleType) ? TbRuleType.WARN_RULE.getKey() : ruleType;
-        if (TbRuleType.WARN_RULE.getKey().equals(ruleType)) {
+        ruleType = Objects.isNull(ruleType) ? WarnType.MONITOR.getCode() : ruleType;
+        if (WarnType.MONITOR.getCode().equals(ruleType)) {
             if (projectID != null) {
                 TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
                 if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>()

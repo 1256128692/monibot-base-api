@@ -11,7 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.TbRuleType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryByProductIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
@@ -65,7 +65,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     public PageUtil.Page<?> queryWtEnginePage(QueryWtEnginePageParam param) {
         Map<Integer, String> projectIDNameMap = null;
         List<Integer> projectIDList = null;
-        if (TbRuleType.WARN_RULE.getKey().equals(param.getRuleType())) {
+        if (WarnType.MONITOR.getCode().equals(param.getRuleType())) {
             List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
             projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
             if (CollectionUtil.isEmpty(projectIDList)) {
@@ -161,7 +161,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .ifPresent(warnList -> {
                     Map<Integer, String> map = CompareIntervalDescUtil.getCompareRuleDescMap(build.getMonitorTypeID(), warnList);
                     List<WtWarnStatusDetailInfo> dataList = warnList.stream().filter(u -> Objects.nonNull(u) &&
-                                    Objects.nonNull(u.getID())).map(WtTriggerActionInfo::buildDetail)
+                                    Objects.nonNull(u.getWarnID())).map(WtTriggerActionInfo::buildDetail)
                             .peek(u -> u.setCompareRuleDesc(map.get(u.getWarnID()))).map(FieldShowUtil::dealFieldShow).toList();
                     build.setDataList(dataList);
                 });
@@ -175,7 +175,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .map(TbMonitorItem::getMonitorType)
                 .orElseThrow(() -> new RuntimeException("请检查tb_monitor_type中id:" + monitorItemID + "的记录是否存在MonitorType"));
         TbWarnRule build = AddWtEngineParam.build(param);
-        build.setRuleType(TbRuleType.WARN_RULE.getKey().byteValue());
+        build.setRuleType(WarnType.MONITOR.getCode().byteValue());
         build.setCreateUserID(userID);
         build.setUpdateUserID(userID);
         build.setMonitorType(monitorType);
