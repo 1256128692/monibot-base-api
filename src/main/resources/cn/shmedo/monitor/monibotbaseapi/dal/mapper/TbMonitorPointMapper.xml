@@ -600,6 +600,9 @@
         <if test="areaCode != null">
             and pi.Location LIKE CONCAT('%', #{areaCode}, '%')
         </if>
+        <if test="videoType != null">
+            and s.ExValues LIKE CONCAT('%', #{videoType}, '%')
+        </if>
         <if test="monitorItemID != null">
             and p.monitorItemID = #{monitorItemID}
         </if>
