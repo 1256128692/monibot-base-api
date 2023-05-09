@@ -24,5 +24,10 @@ public class WtEngineDetail {
     private Date createTime;
     private Integer createUserID;
     private String createUserName;
+    private String videoType;
+    private Integer productID;
+    private String productName;
+    private String deviceCSV;
+    private String videoCSV;
     private List<WtWarnStatusDetailInfo> dataList;
 }

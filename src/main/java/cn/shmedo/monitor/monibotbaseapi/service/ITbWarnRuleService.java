@@ -8,7 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface ITbWarnRuleService extends IService<TbWarnRule> {
-    PageUtil.Page<WtEngineInfo> queryWtEnginePage(QueryWtEnginePageParam param);
+    PageUtil.Page<?> queryWtEnginePage(QueryWtEnginePageParam param);
 
     WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param);
 

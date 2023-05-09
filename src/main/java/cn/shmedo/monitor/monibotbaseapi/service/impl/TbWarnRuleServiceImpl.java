@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -11,19 +12,18 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.TbRuleType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryByProductIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtTriggerActionInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnActionService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnRuleService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.CompareIntervalDescUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -51,6 +51,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorPointMapper tbMonitorPointMapper;
     private final UserService userService;
+    private final IotService iotService;
     private final ITbWarnTriggerService tbWarnTriggerService;
     private final ITbWarnActionService tbWarnActionService;
     private final FileConfig fileConfig;
@@ -58,45 +59,53 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public PageUtil.Page<WtEngineInfo> queryWtEnginePage(QueryWtEnginePageParam param) {
-        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
-        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
-        if (CollectionUtil.isNullOrEmpty(projectIDList)) {
-            return PageUtil.Page.empty();
+    public PageUtil.Page<?> queryWtEnginePage(QueryWtEnginePageParam param) {
+        Map<Integer, String> projectIDNameMap = null;
+        List<Integer> projectIDList = null;
+        if (TbRuleType.WARN_RULE.getKey().equals(param.getRuleType())) {
+            List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
+            projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
+            if (CollectionUtil.isEmpty(projectIDList)) {
+                return PageUtil.Page.empty();
+            }
+            projectIDNameMap = tbProjectInfos.stream().collect(
+                    Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
         }
-        final Map<Integer, String> projectIDNameMap = tbProjectInfos.stream()
-                .collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
+        Integer orderType = param.getOrderType();
+        final Map<Integer, String> projectIDNameFinalMap = Optional.ofNullable(projectIDNameMap).orElse(new HashMap<>());
         final Map<Integer, TbMonitorItem> idItemMap = new HashMap<>();
         final Map<Integer, TbMonitorPoint> idPointMap = new HashMap<>();
-        IPage<TbWarnRule> page = this.baseMapper.selectWarnRuleByPage(
-                new Page<>(param.getCurrentPage(), param.getPageSize()).addOrder(OrderItem.desc("CreateTime")),
+        IPage<TbWarnRule> page = this.baseMapper.selectWarnRuleByPage(new Page<>(param.getCurrentPage(), param.getPageSize())
+                        .addOrder(orderType == 1 ? OrderItem.desc("CreateTime") : OrderItem.asc("CreateTime")),
                 param, projectIDList);
         List<TbWarnRule> records = page.getRecords();
         List<Integer> ruleIds = records.stream().peek(u -> {
-            Optional.ofNullable(u.getMonitorItemID()).ifPresent(s -> idItemMap.put(s, null));
-            Optional.ofNullable(u.getMonitorPointID()).ifPresent(s -> idPointMap.put(s, null));
+            Optional.ofNullable(u.getMonitorItemID()).filter(w -> w != -1).ifPresent(s -> idItemMap.put(s, null));
+            Optional.ofNullable(u.getMonitorPointID()).filter(w -> w != -1).ifPresent(s -> idPointMap.put(s, null));
         }).map(TbWarnRule::getID).toList();
+        Map<Integer, String> productIDNameMap = queryProductIDNameMap(records);
         Optional.of(idItemMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
-                this.tbMonitorItemMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
-                        .collect(Collectors.toList()));
+                this.tbMonitorItemMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u)).toList());
         Optional.of(idPointMap).filter(ObjectUtil::isNotEmpty).ifPresent(w ->
-                this.tbMonitorPointMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u))
-                        .collect(Collectors.toList()));
+                this.tbMonitorPointMapper.selectBatchIds(w.keySet()).stream().peek(u -> w.put(u.getID(), u)).toList());
         Map<Integer, List<WtTriggerActionInfo>> engineIdWarnMap = Optional.of(ruleIds).filter(u -> u.size() > 0)
                 .map(tbWarnTriggerService::queryWarnStatusByEngineIds)
                 .map(w -> w.stream().collect(Collectors.toMap(WtTriggerActionInfo::getWarnID, info -> info.setAction(info)
                         , WtTriggerActionInfo::setAction)))
                 .map(Map::values).map(t -> t.stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)))
                 .orElse(new HashMap<>());
-        List<WtEngineInfo> collect = records.stream().map(u -> WtEngineInfo.build(u)
-                        .setProjectName(Optional.ofNullable(projectIDNameMap.get(u.getProjectID())).orElse("--"))
-                        .setMonitorItemName(Optional.ofNullable(idItemMap.get(u.getMonitorItemID())).map(TbMonitorItem::getName)
-                                .orElse("--"))
-                        .setMonitorPointName(Optional.ofNullable(idPointMap.get(u.getMonitorPointID())).map(TbMonitorPoint::getName)
-                                .orElse("--"))
-                        .setDataList(Optional.ofNullable(engineIdWarnMap.get(u.getID())).map(w -> w.stream()
-                                .map(WtTriggerActionInfo::build).collect(Collectors.toList())).orElse(new ArrayList<>())))
-                .collect(Collectors.toList());
+        List<WtEngineInfo> collect = records.stream().map(u -> {
+            List<WtWarnStatusInfo> dataList = Optional.ofNullable(engineIdWarnMap.get(u.getID())).map(w -> w.stream()
+                    .filter(s -> ObjectUtil.isNotNull(s.getWarnID())).map(WtTriggerActionInfo::build)
+                    .collect(Collectors.toList())).orElse(new ArrayList<>());
+            return WtEngineInfo.build(u).setProductName(productIDNameMap.get(u.getProductID()))
+                    .setProjectName(projectIDNameFinalMap.get(u.getProjectID())).setDataList(dataList)
+                    .setMonitorItemName(Optional.ofNullable(idItemMap.get(u.getMonitorItemID()))
+                            .map(TbMonitorItem::getName).orElse(null))
+                    .setMonitorPointName(Optional.ofNullable(idPointMap.get(u.getMonitorPointID()))
+                            .map(TbMonitorPoint::getName).orElse(null))
+                    .setWhole(ObjectUtil.isNotEmpty(u.getExValue()) && CollectionUtil.isNotEmpty(dataList));
+        }).collect(Collectors.toList());
         return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
     }
 
@@ -105,41 +114,51 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     public WtEngineDetail queryWtEngineDetail(QueryWtEngineDetailParam param) {
         Integer engineID = param.getEngineID();
         WtEngineDetail build = this.baseMapper.selectWtEngineDetail(engineID);
+        Optional.ofNullable(build.getProductID()).map(List::of).filter(CollectionUtil::isNotEmpty)
+                .map(u -> {
+                    QueryByProductIDListParam thirdParam = new QueryByProductIDListParam();
+                    thirdParam.setProductIDList(u);
+                    return thirdParam;
+                })
+                .map(iotService::queryByProductIDList).map(u -> {
+                    if (!u.apiSuccess()) {
+                        log.error("第三方服务调用失败,未能获取到对应产品名称信息...");
+                    }
+                    return u;
+                }).filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
+                .filter(u -> u.size() > 0).map(u -> u.get(0)).map(ProductBaseInfo::getProductName)
+                .ifPresent(build::setProductName);
         Integer createUserID = build.getCreateUserID();
-        List<Integer> userIdList = new ArrayList<>();
-        Map<Integer, String> userIdNameMap = null;
-        Optional.ofNullable(createUserID).ifPresent(userIdList::add);
-        ResultWrapper<Object> wrapper = Optional.of(userIdList).filter(u -> u.size() > 0).map(w -> {
+        Map<Integer, String> userIDNameMap = null;
+        ResultWrapper<Object> wrapper = Optional.ofNullable(createUserID).map(List::of).map(w -> {
             QueryUserIDNameParameter pa = new QueryUserIDNameParameter();
             pa.setUserIDList(w);
             return pa;
         }).map(u -> userService.queryUserIDName(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret())).orElse(null);
         if (wrapper == null) {
-            log.info("规则引擎缺少创建/修改用户ID,规则引擎ID: {}", engineID);
+            log.error("规则引擎缺少创建/修改用户ID,规则引擎ID: {}", engineID);
         } else {
             Object wrapperData = wrapper.getData();
             if (wrapperData == null) {
-                log.info("第三方服务调用失败,未能获取到用户名称信息...");
+                log.error("第三方服务调用失败,未能获取到用户名称信息...");
             } else {
-                userIdNameMap = ((Collection<Object>) wrapperData).stream()
+                userIDNameMap = ((Collection<Object>) wrapperData).stream()
                         .map(u -> JsonUtil.toObject(JsonUtil.toJson(u), UserIDName.class))
                         .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
             }
         }
-        Optional.ofNullable(userIdNameMap).flatMap(u -> Optional.ofNullable(createUserID).map(u::get))
+        Optional.ofNullable(userIDNameMap).flatMap(u -> Optional.ofNullable(createUserID).map(u::get))
                 .ifPresent(build::setCreateUserName);
-        List<WtTriggerActionInfo> infos = Optional.of(param).map(QueryWtEngineDetailParam::getEngineID).map(u -> {
-            List<Integer> list = new ArrayList<>();
-            list.add(u);
-            return list;
-        }).map(tbWarnTriggerService::queryWarnStatusByEngineIds).orElse(new ArrayList<>());
+        List<WtTriggerActionInfo> infos = Optional.of(param).map(QueryWtEngineDetailParam::getEngineID).map(List::of)
+                .map(tbWarnTriggerService::queryWarnStatusByEngineIds).orElse(new ArrayList<>());
         // nullable for draft
         Optional.ofNullable(infos.stream().collect(Collectors.toMap(
                                 WtTriggerActionInfo::getWarnID, info -> info.setAction(info), WtTriggerActionInfo::setAction))
                         .values().stream().collect(Collectors.groupingBy(WtTriggerActionInfo::getEngineID)).get(engineID))
                 .ifPresent(warnList -> {
                     Map<Integer, String> map = CompareIntervalDescUtil.getCompareRuleDescMap(build.getMonitorTypeID(), warnList);
-                    List<WtWarnStatusDetailInfo> dataList = warnList.stream().map(WtTriggerActionInfo::buildDetail)
+                    List<WtWarnStatusDetailInfo> dataList = warnList.stream().filter(u -> Objects.nonNull(u) &&
+                                    Objects.nonNull(u.getID())).map(WtTriggerActionInfo::buildDetail)
                             .peek(u -> u.setCompareRuleDesc(map.get(u.getWarnID()))).map(FieldShowUtil::dealFieldShow).toList();
                     build.setDataList(dataList);
                 });
@@ -171,7 +190,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             this.updateById(UpdateWtEngineParam.build(param));
         }
         List<WtWarnStatusDetailInfo> dataList = param.getDataList();
-        if (!CollectionUtil.isNullOrEmpty(dataList)) {
+        if (CollectionUtil.isNotEmpty(dataList)) {
             List<Tuple<TbWarnTrigger, List<TbWarnAction>>> tupleList = dataList.stream().map(u -> {
                 Tuple<TbWarnTrigger, List<TbWarnAction>> tuple = new Tuple<>();
                 TbWarnTrigger trigger = new TbWarnTrigger();
@@ -184,15 +203,14 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 tuple.setItem2(u.getAction());
                 return tuple;
             }).toList();
-            Optional.of(tupleList.stream().map(Tuple::getItem1).toList()).filter(u -> !CollectionUtil.isNullOrEmpty(u))
+            Optional.of(tupleList.stream().map(Tuple::getItem1).toList()).filter(CollectionUtil::isNotEmpty)
                     .ifPresent(tbWarnTriggerService::saveOrUpdateBatch);
             List<TbWarnAction> tbWarnActions = tupleList.stream().map(u -> {
                 Integer warnID = u.getItem1().getID();
                 return Optional.ofNullable(u.getItem2()).map(s -> s.stream().peek(w -> w.setTriggerID(warnID)).toList())
                         .orElse(new ArrayList<>());
             }).flatMap(Collection::stream).toList();
-            Optional.of(tbWarnActions).filter(u -> !CollectionUtil.isNullOrEmpty(u))
-                    .ifPresent(tbWarnActionService::saveOrUpdateBatch);
+            Optional.of(tbWarnActions).filter(CollectionUtil::isNotEmpty).ifPresent(tbWarnActionService::saveOrUpdateBatch);
         }
     }
 
@@ -203,7 +221,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             // ignore rule which not has trigger config while user try to enable it.
             engineIDList = this.baseMapper.selectRuleWarnIDListByRuleIDList(engineIDList);
         }
-        if (!CollectionUtil.isNullOrEmpty(engineIDList)) {
+        if (CollectionUtil.isNotEmpty(engineIDList)) {
             this.update(new LambdaUpdateWrapper<TbWarnRule>().in(TbWarnRule::getID, engineIDList)
                     .set(TbWarnRule::getEnable, param.getEnable()));
         }
@@ -215,7 +233,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         List<Integer> engineIDList = param.getEngineIDList();
         List<TbWarnRule> tbWarnRules = this.baseMapper.selectList(
                 new LambdaQueryWrapper<TbWarnRule>().in(TbWarnRule::getID, engineIDList).select(TbWarnRule::getID));
-        if (CollectionUtil.isNullOrEmpty(tbWarnRules)) {
+        if (CollectionUtil.isEmpty(tbWarnRules)) {
             return;
         }
         engineIDList = tbWarnRules.stream().map(TbWarnRule::getID).toList();
@@ -223,6 +241,24 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         List<TbWarnTrigger> triggerIDList = tbWarnTriggerService.list(
                 new LambdaQueryWrapper<TbWarnTrigger>().in(TbWarnTrigger::getRuleID, engineIDList));
         tbWarnTriggerService.deleteWarnStatusByList(triggerIDList);
+    }
+
+    private Map<Integer, String> queryProductIDNameMap(List<TbWarnRule> records) {
+        List<Integer> productIDList = records.stream().map(TbWarnRule::getProductID).filter(Objects::nonNull).toList();
+        if (CollectionUtil.isEmpty(productIDList)) {
+            return new HashMap<>();
+        }
+        ResultWrapper<List<ProductBaseInfo>> wrapper = Optional.of(productIDList).map(u -> {
+                    QueryByProductIDListParam thirdParam = new QueryByProductIDListParam();
+                    thirdParam.setProductIDList(u);
+                    return thirdParam;
+                }).map(iotService::queryByProductIDList)
+                .orElse(ResultWrapper.fail(new RuntimeException("查询产品信息时产生了未知的异常")));   //unable orElse
+        if (!wrapper.apiSuccess()) {
+            log.error("第三方服务调用失败,未能获取到产品型号名称");
+            return new HashMap<>();
+        }
+        return wrapper.getData().stream().collect(Collectors.toMap(ProductBaseInfo::getID, ProductBaseInfo::getProductName));
     }
 
     @Override
