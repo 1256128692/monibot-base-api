@@ -161,7 +161,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .ifPresent(warnList -> {
                     Map<Integer, String> map = CompareIntervalDescUtil.getCompareRuleDescMap(build.getMonitorTypeID(), warnList);
                     List<WtWarnStatusDetailInfo> dataList = warnList.stream().filter(u -> Objects.nonNull(u) &&
-                                    Objects.nonNull(u.getID())).map(WtTriggerActionInfo::buildDetail)
+                                    Objects.nonNull(u.getWarnID())).map(WtTriggerActionInfo::buildDetail)
                             .peek(u -> u.setCompareRuleDesc(map.get(u.getWarnID()))).map(FieldShowUtil::dealFieldShow).toList();
                     build.setDataList(dataList);
                 });
