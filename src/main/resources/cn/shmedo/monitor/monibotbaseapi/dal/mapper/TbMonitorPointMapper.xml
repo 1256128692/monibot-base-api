@@ -582,7 +582,7 @@
         , pi.ID as projectID
         , pi.ProjectName as projectName
         , pi.ShortName as projectShortName
-        , pi.Location
+        , pi.Location, pi.ProjectAddress
         from tb_monitor_point as p
         left join tb_project_info as pi on pi.ID = p.ProjectID
         left join tb_monitor_item as i on i.ID = p.MonitorItemID
