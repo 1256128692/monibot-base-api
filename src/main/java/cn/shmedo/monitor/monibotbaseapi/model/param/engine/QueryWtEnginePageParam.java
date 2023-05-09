@@ -29,6 +29,7 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     @Min(value = 1, message = "终端设备产品ID不能小于1")
     private Integer productID;
     private String videoTypeName;
+    private String queryCode;
     @Min(value = 1, message = "工程项目ID不能小于1")
     private Integer projectID;
     private String engineName;
@@ -43,9 +44,12 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     @Range(min = 1, max = 100, message = "分页大小必须在1~100")
     @NotNull(message = "pageSize不能为空")
     private Integer pageSize;
+    @Range(min = 1, max = 2, message = "排序规则 1.按照创建时间降序排序(默认) 2.按照创建时间升序排序")
+    private Integer orderType;
 
     @Override
     public ResultWrapper validate() {
+        orderType = Objects.isNull(orderType) ? 1 : orderType;
         ruleType = Objects.isNull(ruleType) ? TbRuleType.WARN_RULE.getKey() : ruleType;
         if (TbRuleType.WARN_RULE.getKey().equals(ruleType)) {
             if (projectID != null) {

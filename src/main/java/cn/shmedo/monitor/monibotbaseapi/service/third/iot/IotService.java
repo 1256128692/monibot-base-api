@@ -2,12 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import feign.Headers;
 import feign.Param;
@@ -46,4 +44,7 @@ public interface IotService {
      */
     @RequestLine("POST /QueryDeviceSimpleBySenderAddress")
     ResultWrapper<List<SimpleDeviceV5>> queryDeviceSimpleBySenderAddress(QueryDeviceSimpleBySenderAddressParam param);
+
+    @RequestLine("POST /QueryByProductIDList")
+    ResultWrapper<List<ProductBaseInfo>> queryByProductIDList(QueryByProductIDListParam param);
 }

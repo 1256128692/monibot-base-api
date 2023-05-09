@@ -261,27 +261,56 @@
   </update>
 
     <select id="selectWarnRuleByPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule">
-        SELECT <include refid="Base_Column_List"/>
+        SELECT
+            twr.ID 'ID',
+            twr.RuleType ruleType,
+            twr.ProjectID projectID,
+            twr.MonitorType monitorType,
+            twr.MonitorItemID monitorItemID,
+            twr.MonitorPointID monitorPointID,
+            twr.SensorID sensorID,
+            twr.ProductID productID,
+            twr.DeviceCSV deviceCSV,
+            twr.VideoType videoType,
+            twr.VideoCSV videoCSV,
+            twr.`Name` 'name',
+            twr.`Enable` 'enable',
+            twr.ExValue exValue,
+            twr.`Desc` 'desc',
+            twr.CreateTime createTime,
+            twr.CreateUserID createUserID,
+            twr.UpdateTime updateTime,
+            twr.UpdateUserID updateUserID
         FROM
-            tb_warn_rule
-        WHERE RuleType =#{param.ruleType} AND `ProjectID` IN
-        <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
+            tb_warn_rule twr
+      LEFT JOIN ( SELECT twt.RuleID ruleID, GROUP_CONCAT( twt.`Name` ) warnNames FROM tb_warn_trigger twt GROUP BY twt.RuleID ) t ON t.ruleID = twr.ID
+        WHERE twr.RuleType =#{param.ruleType}
+        <if test="param.ruleType == 1">
+          AND twr.`ProjectID` IN
+          <foreach collection="projectIDList" item="item" index="index" open="(" close=")" separator=",">
+              #{item}
+          </foreach>
+        </if>
         <if test="param.engineName != null and param.engineName !=''">
-            AND `Name` LIKE CONCAT('%',#{param.engineName},'%')
+            AND twr.`Name` LIKE CONCAT('%',#{param.engineName},'%')
         </if>
         <if test="param.projectID != null">
-            AND `ProjectID`=#{param.projectID}
+            AND twr.`ProjectID`=#{param.projectID}
         </if>
         <if test="param.enable != null">
-            AND `Enable`=#{param.enable}
+            AND twr.`Enable`=#{param.enable}
         </if>
         <if test="param.monitorItemID != null">
-            AND `MonitorItemID`=#{param.monitorItemID}
+            AND twr.`MonitorItemID`=#{param.monitorItemID}
         </if>
         <if test="param.monitorPointID != null">
-            AND `MonitorPointID`=#{param.monitorPointID}
+            AND twr.`MonitorPointID`=#{param.monitorPointID}
+        </if>
+        <if test="param.ruleType == 2 and param.queryCode != null and param.queryCode != ''">
+            AND (t.warnNames LIKE CONCAT('%',#{param.queryCode},'%') OR twr.ExValue LIKE CONCAT('%',#{param.queryCode},'%') OR twr.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
+        </if>
+        <if test="param.ruleType == 3 and param.queryCode != null and param.queryCode != ''">
+            AND (t.warnNames LIKE CONCAT('%',#{param.queryCode},'%') OR twr.ExValue LIKE CONCAT('%',#{param.queryCode},'%') OR twr.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
         </if>
     </select>
     <select id="selectRuleWarnIDListByRuleIDList" resultType="integer" parameterType="list">
@@ -316,7 +345,11 @@
             tmp.ID monitorPointID,
             tmp.`Name` monitorPointName,
             twr.CreateTime createTime,
-            twr.CreateUserID createUserID
+            twr.CreateUserID createUserID,
+            twr.VideoType videoType,
+            twr.ProductID productID,
+            twr.DeviceCSV deviceCSV,
+            twr.VideoCSV videoCSV
         FROM
             tb_warn_rule twr
             LEFT JOIN tb_monitor_item tmi ON twr.MonitorItemID = tmi.ID

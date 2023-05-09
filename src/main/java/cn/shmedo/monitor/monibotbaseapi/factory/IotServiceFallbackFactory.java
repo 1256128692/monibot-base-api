@@ -4,12 +4,10 @@ import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import feign.hystrix.FallbackFactory;
@@ -51,6 +49,11 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
             @Override
             public ResultWrapper<List<SimpleDeviceV5>> queryDeviceSimpleBySenderAddress(QueryDeviceSimpleBySenderAddressParam param) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<ProductBaseInfo>> queryByProductIDList(QueryByProductIDListParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

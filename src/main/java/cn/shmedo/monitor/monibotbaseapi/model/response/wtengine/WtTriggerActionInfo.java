@@ -8,6 +8,8 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Data
 @Builder
@@ -29,9 +31,12 @@ public class WtTriggerActionInfo extends TbWarnAction implements IFieldName {
     private final List<TbWarnAction> action = new ArrayList<>();
 
     public WtTriggerActionInfo setAction(TbWarnAction data) {
-        TbWarnAction res = new TbWarnAction();
-        BeanUtil.copyProperties(data, res);
-        this.action.add(res);
+        Optional.ofNullable(data).filter(u -> Objects.nonNull(data.getID())).ifPresent(
+                u -> {
+                    TbWarnAction res = new TbWarnAction();
+                    BeanUtil.copyProperties(u, res);
+                    this.action.add(res);
+                });
         return this;
     }
 

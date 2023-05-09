@@ -28,11 +28,13 @@ public class WtEngineController {
      * @apiDescription 查询规则引擎分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {String} [ruleType] 规则类型, 1:报警规则 2:视频规则 3:智能终端规则
-     * @apiParam (请求参数) {Int} productID 产品ID
-     * @apiParam (请求参数) {String} videoTypeName 视频设备型号
+     * @apiParam (请求参数) {Int} [productID] 产品ID
+     * @apiParam (请求参数) {String} [videoTypeName] 视频设备型号
      * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {String} [engineName] 规则名称,支持模糊查询
+     * @apiParam (请求参数) {String} [queryCode] 关键字,报警规则:模糊搜索规则名称、报警名称、工程项目; 视频规则:
      * @apiParam (请求参数) {Boolean} [enable] 启用状态
+     * @apiParam (请求参数) {Boolean} [orderType] 排序规则 1.按照创建时间降序排序(默认) 2.按照创建时间升序排序
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求参数) {Int} currentPage 当前页
@@ -43,16 +45,17 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.engineID 引擎ID
      * @apiSuccess (返回结果) {String} currentPageData.engineName 引擎名称
      * @apiSuccess (返回结果) {Boolean} currentPageData.enable 启用状态
-     * @apiSuccess (返回结果) {String} [currentPageData.videoTypeName] 视频设备型号名称
-     * @apiSuccess (返回结果) {Int} [currentPageData.productID] 产品ID
+     * @apiSuccess (返回结果) {Boolean} currentPageData.whole 完整状态
+     * @apiSuccess (返回结果) {String} currentPageData.videoTypeName 视频设备型号名称
+     * @apiSuccess (返回结果) {Int} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} [currentPageData.productName] 产品名称
      * @apiSuccess (返回结果) {String} [currentPageData.exValue] 应用范围json
      * @apiSuccess (返回结果) {DateTime} [currentPageData.createTime] 创建时间
-     * @apiSuccess (返回结果) {Int} [currentPageData.projectID] 工程ID
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (返回结果) {String} [currentPageData.projectName] 工程名称
-     * @apiSuccess (返回结果) {Int} [currentPageData.monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} [currentPageData.monitorItemName] 监测项目名称
-     * @apiSuccess (返回结果) {Int} [currentPageData.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} [currentPageData.monitorPointName] 监测点名称
      * @apiSuccess (返回结果) {Object[]} [currentPageData.dataList] 报警状态列表
      * @apiSuccess (返回结果) {Int} currentPageData.dataList.warnID 报警状态ID
