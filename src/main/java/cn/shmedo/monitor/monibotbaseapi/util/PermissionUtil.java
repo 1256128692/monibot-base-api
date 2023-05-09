@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryResourceListByPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ThirdHttpService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
@@ -47,7 +48,7 @@ public class PermissionUtil {
     public static Collection<Integer> getHavePermissionProjectList(Integer companyID, Collection<Integer> projectList) {
         Collection<Integer> resourceList = getResourceList(companyID, DefaultConstant.MDNET_SERVICE_NAME,
                 DefaultConstant.LIST_PROJECT, ResourceType.BASE_PROJECT).stream().map(Integer::parseInt).toList();
-        return projectList.isEmpty() ? resourceList : CollectionUtil.intersection(projectList, resourceList);
+        return CollectionUtils.isEmpty(projectList) ? resourceList : CollectionUtil.intersection(projectList, resourceList);
     }
 
     /**
