@@ -286,6 +286,8 @@ public class WtEngineController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
+//    @Permission(permissionName = "")
+    @PostMapping(value = "/WarnTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object warnTypeList(@Valid @RequestBody WarnTypeListParam param) {
         return WarnLevel.getEnum(WarnType.formCode(param.getRuleType()));
     }
