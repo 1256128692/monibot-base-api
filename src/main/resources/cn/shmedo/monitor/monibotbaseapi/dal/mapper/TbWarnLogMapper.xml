@@ -204,7 +204,7 @@
             twt.TriggerRule triggerRule,
             twt.FieldToken fieldToken,
             two.ID workOrderID,
-            two.OrderCode workOrderCode,
+            two.OrderCode workOrderCode
         FROM `tb_warn_log` twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID

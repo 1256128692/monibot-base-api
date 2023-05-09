@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -75,8 +76,9 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                 //从redis中获取regionArea信息填充regionArea(区域名)
                 Optional.ofNullable(cameraWarn.getRegionArea()).filter(JSONUtil::isTypeJSON).ifPresent(e -> {
                     Map<String, Object> regionInfo = JSONUtil.toBean(e, Dict.class);
-                    List<RegionArea> regionAreas = redisService.multiGet(RedisKeys.REGION_AREA_KEY, regionInfo.values(), RegionArea.class);
-                    cameraWarn.setRegionArea(regionAreas.stream().map(RegionArea::getName).distinct().collect(Collectors.joining(StrUtil.EMPTY)));
+                    RegionArea regionArea = redisService.get(RedisKeys.REGION_AREA_KEY,
+                            (String) CollUtil.getLast(regionInfo.values()), RegionArea.class);
+                    cameraWarn.setRegionArea(regionArea.getName());
                 });
                 //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
                 Optional.ofNullable(cameraWarn.getDeviceToken()).filter(e -> !e.isBlank())
@@ -142,13 +144,14 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                     Set<WtTerminalWarnLog.Project> projects = otherInfo.stream().map(WtTerminalWarnLog::getProjectList).findFirst().orElse(Set.of());
                     //从redis中获取regionArea信息填充regionArea(区域名)
                     Set<Object> areaSet = projects.stream().map(WtTerminalWarnLog.Project::getRegionArea).filter(JSONUtil::isTypeJSON)
-                            .flatMap(e -> JSONUtil.toBean(e, Dict.class).values().stream()).collect(Collectors.toSet());
+                            .map(e -> CollUtil.getLast(JSONUtil.parseObj(e).values())).collect(Collectors.toSet());
                     Map<Object, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areaSet, RegionArea.class)
                             .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
                     projects.forEach(e -> {
                         if (JSONUtil.isTypeJSON(e.getRegionArea())) {
                             Map<String, Object> regionInfo = JSONUtil.toBean(e.getRegionArea(), Dict.class);
-                            e.setRegionArea(regionInfo.values().stream().filter(areaMap::containsKey).map(areaMap::get).distinct().collect(Collectors.joining()));
+                            Object last = CollUtil.getLast(regionInfo.values());
+                            e.setRegionArea(areaMap.getOrDefault(last, null));
                         }
                     });
                     base.setProjectList(projects);
