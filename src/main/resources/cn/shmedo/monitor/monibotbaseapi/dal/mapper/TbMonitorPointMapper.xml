@@ -314,7 +314,7 @@
         <if test="monitorClassType != null">
             and tmi.monitorClass = #{monitorClassType}
         </if>
-        group by tmp.ID
+        group by tmp.ID,tpmc.Density;
     </select>
     <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
         select p.*,
@@ -591,8 +591,11 @@
         <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
             #{projectID}
         </foreach>
-        <if test="online != null">
-            and s.Status = #{online}
+        <if test="onlineInt != null">
+            and s.Status = #{onlineInt}
+        </if>
+        <if test="status != null">
+            and s.Status = #{status}
         </if>
         <if test="areaCode != null">
             and pi.Location LIKE CONCAT('%', #{areaCode}, '%')

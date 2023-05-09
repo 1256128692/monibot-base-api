@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnRuleMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,9 +23,7 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
     @NotNull
     private Integer companyID;
     @NotNull
-    private Integer projectID;
-    @NotNull
-    private Integer roleID;
+    private Integer ruleID;
     private String sign;
     private String deviceCSV;
     @JsonIgnore
@@ -32,17 +31,19 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
 
     @Override
     public ResultWrapper validate() {
-        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
-        }
+
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
-        tbWarnRule = tbWarnRuleMapper.selectById(roleID);
+        tbWarnRule = tbWarnRuleMapper.selectById(ruleID);
         if (tbWarnRule == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则不存在");
         }
-        if (!tbWarnRule.getProjectID().equals(projectID)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则不属于项目");
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(tbWarnRule.getProjectID());
+        if (tbProjectInfo == null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则所属项目不存在");
+        }
+        if (!tbProjectInfo.getCompanyID().equals(companyID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则所属项目不属于该公司");
         }
         if (tbWarnRule.getRuleType() == 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不支持的规则类型");

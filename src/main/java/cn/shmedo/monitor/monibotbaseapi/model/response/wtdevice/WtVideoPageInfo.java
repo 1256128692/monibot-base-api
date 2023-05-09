@@ -30,6 +30,7 @@ public class WtVideoPageInfo {
      * 工程项目行政区划
      */
     private String location;
+    private String locationInfo;
     private Integer monitorItemID;
     private String monitorItemName;
     private String monitorItemAlias;

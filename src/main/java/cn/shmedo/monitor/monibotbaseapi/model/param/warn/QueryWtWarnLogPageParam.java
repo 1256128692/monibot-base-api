@@ -22,6 +22,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -54,13 +55,15 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
     private DateTime endTime;
     @Range(min = 1, max = 6)
     private Integer status;
+    @Min(value = 1)
+    private Integer projectID;
 
     @JsonIgnore
     private Collection<Integer> projectIDList;
 
     @Override
     public ResultWrapper<?> validate() {
-        this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID);
+        this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID, projectID == null ? null: List.of(projectID));
         if (CollUtil.isEmpty(projectIDList)) {
             return ResultWrapper.success(PageUtil.Page.empty());
         }
