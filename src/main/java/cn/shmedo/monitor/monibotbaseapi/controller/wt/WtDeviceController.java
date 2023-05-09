@@ -2,9 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryProductSimpleParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtDevicePageListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtVideoPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -62,6 +60,47 @@ public class WtDeviceController {
     @PostMapping(value = "/QueryWtVideoPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtVideoPageList(@Valid @RequestBody QueryWtVideoPageParam param) {
         return wtDeviceService.queryWtVideoPageList(param);
+    }
+
+    /**
+     * @api {POST} /ExportWtVideo  导出视频设备
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName ExportWtVideo
+     * @apiDescription 导出视频设备
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int[]} [projectIDList] 工程项目ID列表
+     * @apiParam (请求参数) {String} [queryCode] 关键词,支持模糊查询设备SN/工程名称/监测点名称
+     * @apiParam (请求参数) {String} [videoType] 视频设备型号
+     * @apiParam (请求参数) {Bool} [online] 在线状态 在线:true 离线:false
+     * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
+     * @apiParam (请求参数) {String} [areaCode] 行政区划编号
+     * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
+     * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
+     * @apiSuccess (返回结果) {Object[]} list 数据
+     * @apiSuccess (返回结果) {String} list.videoSN 设备SN
+     * @apiSuccess (返回结果) {String} list.videoType 设备型号
+     * @apiSuccess (返回结果) {Bool} list.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} list.status 设备状态 0.正常 1.异常
+     * @apiSuccess (返回结果) {Int} list.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} list.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} list.projectShortName 工程项目简称
+     * @apiSuccess (返回结果) {String} list.location 工程项目行政区划
+     * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} list.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} list.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} list.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} list.pointGpsLocation 监测点GPS位置
+     * @apiSuccess (返回结果) {String} list.[pointImageLocation] 监测点底图位置
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ExportBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:ExportBaseVideo")
+    @PostMapping(value = "/ExportWtVideo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object exportWtVideo(@Valid @RequestBody ExportWtVideoParam param) {
+        return wtDeviceService.exportWtVideo(param);
     }
 
     /**
@@ -131,6 +170,50 @@ public class WtDeviceController {
         return wtDeviceService.queryWtDevicePageList(pa);
     }
 
+    /**
+     * @api {POST} /ExportWtDevice 导出物联网设备
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName ExportWtDevice
+     * @apiDescription 导出物联网设备
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int[]} [projectIDList] 工程项目ID列表(100)
+     * @apiParam (请求参数) {String} [queryCode] 关键词,支持模糊查询设备SN/工程名称/监测点名称
+     * @apiParam (请求参数) {Int} [productID] 产品ID(设备型号)
+     * @apiParam (请求参数) {Bool} [online] 在线状态 在线:true 离线:false
+     * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
+     * @apiParam (请求参数) {String} [areaCode] 行政区划编号
+     * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
+     * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
+     * @apiSuccess (返回结果) {Object[]} list 数据
+     * @apiSuccess (返回结果) {String} list.deviceSN 设备SN
+     * @apiSuccess (返回结果) {String} [list.firewallVersion] 固件版本
+     * @apiSuccess (返回结果) {String} list.productID 产品ID
+     * @apiSuccess (返回结果) {String} list.productName 产品名称
+     * @apiSuccess (返回结果) {Bool} list.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {Int} list.status 设备状态 0.正常 1.异常
+     * @apiSuccess (返回结果) {Object[]} list.projectList 工程项目信息
+     * @apiSuccess (返回结果) {Int} list.projectList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} list.projectList.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} list.projectList.projectShortName 工程项目简称
+     * @apiSuccess (返回结果) {String} list.projectList.location 工程项目行政区划
+     * @apiSuccess (返回结果) {Object[]} list.projectList.monitorPointList 监测点信息
+     * @apiSuccess (返回结果) {Int} list.projectList.monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} list.projectList.monitorPointList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} list.projectList.monitorPointList.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} list.projectList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} list.projectList.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} list.projectList.monitorPointList.pointGpsLocation 监测点GPS位置
+     * @apiSuccess (返回结果) {String} [list.projectList.monitorPointList.pointImageLocation] 监测点底图位置
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ExportBaseDevice
+     */
+    @Permission(permissionName = "mdmbase:ExportBaseDevice")
+    @PostMapping(value = "/ExportWtDevice", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object exportWtDevice(@Valid @RequestBody ExportWtDeviceParam pa) {
+        return wtDeviceService.exportWtDevice(pa);
+    }
 
     /**
      * @api {POST} /QueryProductSimpleList 产品简要信息列表
