@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -51,6 +52,8 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
      */
     private Boolean select;
 
+    @JsonIgnore
+    private Integer onlineInt;
     @Override
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
@@ -64,6 +67,14 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
         if (ruleID != null) {
             if (select == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎ruleID不为空时,参数select不能为空");
+            }
+        }
+
+        if (online != null) {
+            if (online) {
+                onlineInt = 0;
+            }else {
+                onlineInt = 1;
             }
         }
         return null;

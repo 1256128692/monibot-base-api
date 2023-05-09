@@ -117,8 +117,8 @@ public class WtDeviceController {
      */
     @Permission(permissionName = "mdmbase:ListBaseVideo")
     @PostMapping(value = "/QueryWtVideoTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtVideoTypeList(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWtVideoTypeList(@Valid @RequestBody QueryWtVideoTypeParam param) {
+        return wtDeviceService.queryWtVideoTypeList(param);
     }
 
     /**
