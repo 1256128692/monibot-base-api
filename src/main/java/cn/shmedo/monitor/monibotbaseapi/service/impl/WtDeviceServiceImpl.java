@@ -265,7 +265,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey(),
+                param.getVideoType());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return PageUtil.Page.empty();
         }
@@ -511,7 +512,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey());
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey(),
+                param.getVideoType());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return List.of();
         }
@@ -573,7 +575,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     public Object queryWtVideoTypeList(QueryWtVideoTypeParam param) {
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                null, null, null, null, MonitorType.VIDEO.getKey());
+                null, null, null, null, MonitorType.VIDEO.getKey(), null);
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return null;
         }
