@@ -10,7 +10,6 @@ import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
