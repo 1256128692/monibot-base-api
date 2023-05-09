@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class WtEngineInfo {
     private Integer engineID;
+    private Date createTime;
     private String engineName;
     private Boolean enable;
     private Boolean whole;
