@@ -37,14 +37,8 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
         if (tbWarnRule == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则不存在");
         }
-        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(tbWarnRule.getProjectID());
-        if (tbProjectInfo == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则所属项目不存在");
-        }
-        if (!tbProjectInfo.getCompanyID().equals(companyID)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则所属项目不属于该公司");
-        }
+
+
         if (tbWarnRule.getRuleType() == 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不支持的规则类型");
         }

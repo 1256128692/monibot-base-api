@@ -129,11 +129,39 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             return PageUtil.Page.empty();
         }
         if (pa.getRuleID() != null) {
+            boolean flag = pa.getSelect() == null || pa.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                 Integer productID = tbWarnRule.getProductID();
-                List<String> SNList = tbWarnRule.getDeviceCSV().equals("ALL") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
-                allData = allData.stream().filter(e -> e.getProductID().equals(productID) && (SNList == null || SNList.contains(e.getUniqueToken()))).toList();
+                List<String> SNList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
+                allData = allData.stream().filter(
+                        e -> {
+
+                            if (flag) {
+                                if (!e.getProductID().equals(productID)) {
+                                    return false;
+                                }
+                                if (CollectionUtils.isEmpty(SNList)) {
+                                    return false;
+                                } else if (SNList.contains(e.getDeviceToken())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                if (!e.getProductID().equals(productID)) {
+                                    return true;
+                                }
+                                if (CollectionUtils.isEmpty(SNList)) {
+                                    return true;
+                                } else if (SNList.contains(e.getDeviceToken())) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                ).toList();
             }
         }
         if (CollectionUtils.isEmpty(allData)) {
@@ -351,11 +379,39 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             return List.of();
         }
         if (pa.getRuleID() != null) {
+            boolean flag = pa.getSelect() == null || pa.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                 Integer productID = tbWarnRule.getProductID();
-                List<String> SNList = tbWarnRule.getDeviceCSV().equals("ALL") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
-                allData = allData.stream().filter(e -> e.getProductID().equals(productID) && (SNList == null || SNList.contains(e.getUniqueToken()))).toList();
+                List<String> SNList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList();
+                allData = allData.stream().filter(
+                        e -> {
+
+                            if (flag) {
+                                if (!e.getProductID().equals(productID)) {
+                                    return false;
+                                }
+                                if (CollectionUtils.isEmpty(SNList)) {
+                                    return false;
+                                } else if (SNList.contains(e.getDeviceToken())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                if (!e.getProductID().equals(productID)) {
+                                    return true;
+                                }
+                                if (CollectionUtils.isEmpty(SNList)) {
+                                    return true;
+                                } else if (SNList.contains(e.getDeviceToken())) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                ).toList();
             }
         }
         if (CollectionUtils.isEmpty(allData)) {

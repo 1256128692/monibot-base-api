@@ -53,7 +53,6 @@ public class AddWtDeviceWarnRuleParam implements ParameterValidator, ResourcePer
 
     @Override
     public ResultWrapper validate() {
-        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (ruleType == null) {
             ruleType = 1;
         }
