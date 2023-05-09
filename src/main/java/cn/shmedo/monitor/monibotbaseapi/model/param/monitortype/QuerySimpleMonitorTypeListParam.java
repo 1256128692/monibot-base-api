@@ -24,9 +24,11 @@ public class QuerySimpleMonitorTypeListParam implements ParameterValidator, Reso
     private Byte createType;
     private Boolean grouped;
 
+    private Integer projectID;
+
     @Override
     public ResultWrapper validate() {
-        if (createType!=null &&!CreateType.isValid(createType)){
+        if (createType != null && !CreateType.isValid(createType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
         return null;

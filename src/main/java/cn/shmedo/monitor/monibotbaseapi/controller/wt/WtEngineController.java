@@ -305,7 +305,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {String} [exValue] 额外属性，json字符串 1000
      * @apiParam (请求参数) {String} [productID] 产品ID（设备型号对应ID）,该项为字符串或数字字符串
      * @apiParam (请求参数) {String} [deviceCSV] 该项为"all"或者设备ID的CSV字符串
-     * @apiSuccess (返回结果) {String} none 无
+     * @apiSuccess (返回结果) {Int} ruleID 规则ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
@@ -313,8 +313,7 @@ public class WtEngineController {
     @LogParam(moduleName = "警报规则引擎模块", operationName = "新增预警规则", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddWtDeviceWarnRule", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWtDeviceWarnRule(@Valid @RequestBody AddWtDeviceWarnRuleParam pa) {
-        tbWarnRuleService.addWtDeviceWarnRule(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+        return tbWarnRuleService.addWtDeviceWarnRule(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 
     /**

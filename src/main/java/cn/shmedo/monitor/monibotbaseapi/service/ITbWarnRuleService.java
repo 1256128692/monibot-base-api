@@ -20,7 +20,7 @@ public interface ITbWarnRuleService extends IService<TbWarnRule> {
 
     void deleteWtEngine(BatchDeleteWtEngineParam param);
 
-    void addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID);
+    Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID);
 
     void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID);
 }

@@ -3,7 +3,13 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -50,6 +56,8 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
      * 是否选中 true:选中 false:未选中
      */
     private Boolean select;
+    @JsonIgnore
+    private List<TbProjectInfo> projectInfos;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -66,20 +74,34 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎ruleID不为空时,参数select不能为空");
             }
         }
+        if (CollectionUtils.isEmpty(projectIDList)) {
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            projectInfos = tbProjectInfoMapper.selectList(
+                    new QueryWrapper<TbProjectInfo>().lambda().eq(TbProjectInfo::getCompanyID, companyID)
+            );
+            if (CollectionUtils.isEmpty(projectInfos)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该公司下没有项目");
+
+            }
+        }
         return null;
     }
 
     @Override
     public List<Resource> parameter() {
+        if (CollectionUtils.isNotEmpty(projectIDList)) {
 
-        Set<Resource> collect = projectIDList.stream().map(item -> {
-            if (item != null) {
-                return new Resource(item.toString(), ResourceType.BASE_PROJECT);
-            }
-            return null;
-        }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(item -> ResourceType.BASE_PROJECT + item.toString()))));
+            Set<Resource> collect = projectIDList.stream().map(item -> {
+                if (item != null) {
+                    return new Resource(item.toString(), ResourceType.BASE_PROJECT);
+                }
+                return null;
+            }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(item -> ResourceType.BASE_PROJECT + item.toString()))));
 
-        return new ArrayList<>(collect);
+            return new ArrayList<>(collect);
+        } else {
+            return projectInfos.stream().map(item -> new Resource(item.getID().toString(), ResourceType.BASE_PROJECT)).collect(Collectors.toList());
+        }
     }
 
     @Override

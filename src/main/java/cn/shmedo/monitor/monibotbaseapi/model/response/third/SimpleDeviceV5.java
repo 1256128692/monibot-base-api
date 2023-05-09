@@ -25,6 +25,7 @@ public class SimpleDeviceV5 {
     private String firmwareVersion;
     private Boolean onlineStatus;
     private Date lastActiveTime;
+    private Date createTime;
     private List<String> sendAddressList;
 
 

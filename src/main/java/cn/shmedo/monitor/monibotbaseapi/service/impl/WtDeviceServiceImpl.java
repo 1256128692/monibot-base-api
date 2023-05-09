@@ -177,6 +177,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .productID(item.getProductID())
                     .productName(item.getProductName())
                     .online(item.getOnlineStatus())
+                    .lastActiveTime(item.getLastActiveTime())
+                    .createTime(item.getCreateTime())
                     .status(null)
                     .build();
             device4Web.setProjectList(
@@ -379,6 +381,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .productID(item.getProductID())
                     .productName(item.getProductName())
                     .online(item.getOnlineStatus())
+                    .lastActiveTime(item.getLastActiveTime())
+                    .createTime(item.getCreateTime())
                     .status(null)
                     .build();
             device4Web.setProjectList(

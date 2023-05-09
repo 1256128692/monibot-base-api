@@ -594,6 +594,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} [createType]  创建类型
      * @apiParam (请求参数) {Boolean} [grouped]  是否分组， 该项为true时候，结果为以monitorTypeClass为key， list为value的map
+     * @apiParam (请求参数) {Int} [projectID]  项目ID, 该项存在时候,返回工程项目对应的监测项目的监测类型
      * @apiSuccess (返回结果) {Object[]} list  参数列表
      * @apiSuccess (返回结果) {Int} list.id
      * @apiSuccess (返回结果) {Int} list.monitorType  监测类型

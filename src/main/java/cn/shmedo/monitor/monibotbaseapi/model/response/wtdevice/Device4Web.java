@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,6 +20,8 @@ public class Device4Web {
     private String productName;
     private Boolean online;
     private Integer status;
+    private Date lastActiveTime;
+    private Date createTime;
     private List<Porject> projectList;
 
     @Data

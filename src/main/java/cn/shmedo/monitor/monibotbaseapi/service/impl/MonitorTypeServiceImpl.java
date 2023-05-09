@@ -67,6 +67,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbParameterMapper tbParameterMapper;
     private final FileConfig fileConfig;
     private final RedisService redisService;
+    private final TbMonitorItemMapper tbMonitorItemMapper;
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
@@ -486,9 +487,20 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public Object querySimpleMonitorTypeList(QuerySimpleMonitorTypeListParam pa) {
+
         QueryWrapper<TbMonitorType> qu = new QueryWrapper<>();
         qu.eq(pa.getCreateType() != null, "createType", pa.getCreateType());
         qu.orderByDesc("id");
+        if (pa.getProjectID() != null) {
+            List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(
+                    new QueryWrapper<TbMonitorItem>().lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID())
+            );
+            if (CollectionUtils.isEmpty(tbMonitorItems)) {
+                return null;
+            } else {
+                qu.in("monitorType", tbMonitorItems.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toList()));
+            }
+        }
         List<TbMonitorType> list = tbMonitorTypeMapper.selectList(qu);
         if (pa.getGrouped() != null && pa.getGrouped()) {
             if (CollectionUtils.isEmpty(list)) {

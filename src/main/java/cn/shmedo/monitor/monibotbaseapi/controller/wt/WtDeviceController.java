@@ -83,6 +83,8 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} list.videoType 设备型号
      * @apiSuccess (返回结果) {Bool} list.online 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} list.status 设备状态 0.正常 1.异常
+     * @apiSuccess (返回结果) {DateTime} list.lastActiveTime 最后活跃时间
+     * @apiSuccess (返回结果) {DateTime} list.createTime 设备创建时间
      * @apiSuccess (返回结果) {Int} list.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} list.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} list.projectShortName 工程项目简称
@@ -147,6 +149,8 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} currentPageData.productName 产品名称
      * @apiSuccess (返回结果) {Bool} currentPageData.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {DateTime} currentPageData.lastActiveTime 最后活跃时间
+     * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 设备创建时间
      * @apiSuccess (返回结果) {Int} currentPageData.status 设备状态 0.正常 1.异常
      * @apiSuccess (返回结果) {Object[]} currentPageData.projectList 工程项目信息
      * @apiSuccess (返回结果) {Int} currentPageData.projectList.projectID 工程项目ID

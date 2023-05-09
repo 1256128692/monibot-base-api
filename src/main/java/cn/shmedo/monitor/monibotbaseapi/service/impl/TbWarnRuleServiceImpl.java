@@ -262,10 +262,11 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     }
 
     @Override
-    public void addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
+    public Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
         // TODO 处理统计
         TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
         tbWarnRuleMapper.insert(entity);
+        return entity.getID();
     }
 
     @Override

@@ -56,6 +56,9 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (CollectionUtils.isNotEmpty(projectIDList)) {
+            if (projectIDList.stream().distinct().count() != projectIDList.size()) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "projectIDList中有重复的项目ID");
+            }
             projectInfos = tbProjectInfoMapper.selectList(
                     new QueryWrapper<TbProjectInfo>().lambda()
                             .in(TbProjectInfo::getID, projectIDList)
