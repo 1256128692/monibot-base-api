@@ -34,6 +34,7 @@ public class WtWarnController {
      * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间，仅在warnType=2时有效 (默认为7天前)
      * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间，仅在warnType=2时有效（默认为当前时间）
      * @apiParam (请求参数) {Int} [status] 工单状态，仅在warnType=2时有效，1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -125,6 +126,7 @@ public class WtWarnController {
      * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间 (默认为7天前)
      * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间（默认为当前时间）
      * @apiParam (请求参数) {Int} [status] 工单状态 1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
