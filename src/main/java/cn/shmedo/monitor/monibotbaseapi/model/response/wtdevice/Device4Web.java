@@ -43,6 +43,7 @@ public class Device4Web {
         private String projectName;
         private String projectShortName;
         private String location;
+        private String projectAddress;
 
         private List<MonitorPoint> monitorPointList;
     }

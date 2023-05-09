@@ -225,6 +225,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())
                                         .location(tbProjectInfo.getLocation())
+                                        .projectAddress(tbProjectInfo.getProjectAddress())
                                         .build();
                             }
                     ).toList()
@@ -475,6 +476,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())
                                         .location(tbProjectInfo.getLocation())
+                                        .projectAddress(tbProjectInfo.getProjectAddress())
                                         .build();
                             }
                     ).toList()

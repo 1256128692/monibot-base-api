@@ -31,6 +31,7 @@ public class WtVideoPageInfo {
      */
     private String location;
     private String locationInfo;
+    private String projectAddress;
     private Integer monitorItemID;
     private String monitorItemName;
     private String monitorItemAlias;
