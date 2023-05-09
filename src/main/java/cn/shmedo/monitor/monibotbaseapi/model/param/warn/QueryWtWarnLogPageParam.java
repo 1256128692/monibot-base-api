@@ -22,6 +22,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,9 +51,9 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
     @Range(min = 1, max = 2, message = "报警类型不合法,报警类型:1.在线监测报警记录; 2.视频报警记录")
     private Integer warnType;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime beginTime;
+    private Date beginTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime endTime;
+    private Date endTime;
     @Range(min = 1, max = 6)
     private Integer status;
     @Min(value = 1)

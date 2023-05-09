@@ -25,7 +25,7 @@ public class WtWarnController {
      * @apiDescription 查询报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录
-     * @apiParam (请求参数) {String} [queryCode] 检索关键字<br/>1-在线监测报警，模糊范围: 报警名称、工程名称、报警内容<br/>2-视频/摄像头报警，模糊范围: 设备SN、报警名称、工程名称、监测点名称
+     * @apiParam (请求参数) {String} [queryCode] 检索关键字<br/>1-在线监测报警，模糊范围: 报警名称、报警内容<br/>2-视频/摄像头报警，模糊范围: 设备SN、报警名称、监测点名称
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
@@ -118,7 +118,7 @@ public class WtWarnController {
      * @apiDescription 查询智能终端报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录
-     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容、设备SN、监测点
+     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、报警内容、设备SN、监测点
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级

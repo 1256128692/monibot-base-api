@@ -25,6 +25,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,10 +67,10 @@ public class QueryWtTerminalWarnLogPageParam implements ParameterValidator, Reso
     private Integer warnType;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime beginTime;
+    private Date beginTime;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    private DateTime endTime;
+    private Date endTime;
 
     @Range(min = 1, max = 6)
     private Integer status;
