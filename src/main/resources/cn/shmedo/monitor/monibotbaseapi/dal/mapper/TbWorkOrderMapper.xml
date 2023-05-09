@@ -53,7 +53,7 @@
                 </otherwise>
             </choose>
         </if>
-        ORDER BY two.CreateTime DESC
+        ORDER BY two.DispatchTime DESC, two.CreateTime DESC
     </select>
     <select id="queryWorkOrderStatistics"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo"
