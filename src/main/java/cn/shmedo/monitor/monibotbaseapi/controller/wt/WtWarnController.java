@@ -31,9 +31,9 @@ public class WtWarnController {
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
      * @apiParam (请求参数) {Int} [warnType] 报警类型 1-在线监测报警(默认值) 2-视频报警记录
-     * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间，仅在queryType=2时有效 (默认为7天前)
-     * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间，仅在queryType=2时有效（默认为当前时间）
-     * @apiParam (请求参数) {Int} [status] 工单状态，仅在queryType=2时有效，1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
+     * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间，仅在warnType=2时有效 (默认为7天前)
+     * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间，仅在warnType=2时有效（默认为当前时间）
+     * @apiParam (请求参数) {Int} [status] 工单状态，仅在warnType=2时有效，1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -122,6 +122,9 @@ public class WtWarnController {
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
+     * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间 (默认为7天前)
+     * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间（默认为当前时间）
+     * @apiParam (请求参数) {Int} [status] 工单状态 1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
