@@ -6,10 +6,13 @@ import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+
+import java.util.Objects;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -35,6 +38,7 @@ public class WarnTypeListParam implements ParameterValidator, ResourcePermission
 
     @Override
     public ResultWrapper validate() {
+        ruleType = Objects.isNull(ruleType) ? WarnType.MONITOR.getCode() : ruleType;
         return null;
     }
 }
