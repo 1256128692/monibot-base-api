@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class VideoMonitorPointLiveInfo {
 
+    private Integer companyID;
     private Integer sensorID;
     private String sensorName;
 
@@ -19,6 +20,7 @@ public class VideoMonitorPointLiveInfo {
     private String monitorItemName;
     private String monitorItemAlias;
 
+    private String exValues;
 
     /**
      * 监测类型拓展配置值

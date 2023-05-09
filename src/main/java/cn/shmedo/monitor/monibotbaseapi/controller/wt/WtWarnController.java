@@ -25,12 +25,15 @@ public class WtWarnController {
      * @apiDescription 查询报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录
-     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索报警名称、工程名称、报警内容、设备SN、监测点
+     * @apiParam (请求参数) {String} [queryCode] 检索关键字<br/>1-在线监测报警，模糊范围: 报警名称、工程名称、报警内容<br/>2-视频/摄像头报警，模糊范围: 设备SN、报警名称、工程名称、监测点名称
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
-     * @apiParam (请求参数) {Int} [warnType] 报警类型 1-在线监测报警(默认值) 2-视频报警记录 3-智能终端报警记录
+     * @apiParam (请求参数) {Int} [warnType] 报警类型 1-在线监测报警(默认值) 2-视频报警记录
+     * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间，仅在queryType=2时有效 (默认为7天前)
+     * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间，仅在queryType=2时有效（默认为当前时间）
+     * @apiParam (请求参数) {Int} [status] 工单状态，仅在queryType=2时有效，1待接单/2处置中/3已处置/4审核中/5已结束/6已关闭
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -53,8 +56,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} currentPageData.workOrderID 关联工单ID,若为空表示该工单暂未
      * @apiSuccess (返回结果) {String} currentPageData.orderCode 关联工单编号
      * @apiSuccess (返回结果) {Int} currentPageData.orderStatus 处置状态 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭
-     * @apiSuccess (返回结果) {String} currentPageData.deviceToken 设备SN
-     * @apiSuccess (返回结果) {String} currentPageData.deviceTypeName 设备型号（对应物联网产品名称）
+     * @apiSuccess (返回结果) {String} currentPageData.deviceToken 设备SN，仅在queryType=2时有效
+     * @apiSuccess (返回结果) {String} currentPageData.deviceTypeName 设备型号（对应物联网产品名称），仅在queryType=2时有效
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
@@ -95,8 +98,8 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} workOrderCode 工单编号
      * @apiSuccess (返回结果) {String} deviceToken 设备SN
      * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
-     * @apiSuccess (返回结果) {String} regionArea 行政区划
-     * @apiSuccess (返回结果) {String} ruleName 规则名称
+     * @apiSuccess (返回结果) {String} regionArea 行政区划，仅视频/摄像头报警
+     * @apiSuccess (返回结果) {String} ruleName 规则名称，仅视频/摄像头报警
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
      */
@@ -107,10 +110,10 @@ public class WtWarnController {
     }
 
     /**
-     * @api {POST} /QueryWtTerminalWarnLogPage 查询智能终端报警分页
+     * @api {POST} /QueryWtTerminalWarnPage 查询智能终端报警分页
      * @apiVersion 1.0.0
      * @apiGroup 警报规则引擎模块
-     * @apiName QueryWtTerminalWarnLogPage
+     * @apiName QueryWtTerminalWarnPage
      * @apiDescription 查询智能终端报警分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} queryType 查询类型 1.实时记录 2.历史记录
@@ -151,7 +154,7 @@ public class WtWarnController {
     @Permission(permissionName = "mdmbase:ListBaseWarn")
     @PostMapping(value = "/QueryWtTerminalWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtTerminalWarnLogPage(@Valid @RequestBody QueryWtTerminalWarnLogPageParam param) {
-        return tbWarnLogService.queryByPage(param);
+        return tbWarnLogService.queryTerminalWarnPage(param);
     }
 
     /**

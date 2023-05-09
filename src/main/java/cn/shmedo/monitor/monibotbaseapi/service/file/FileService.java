@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.file;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
@@ -7,16 +8,14 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -119,6 +118,31 @@ public class FileService {
                 return info.getData().getAbsolutePath();
             } else {
                 log.error("获取文件 {} 信息失败，{} => {}", ossPath, info.getCode(), info.getMsg());
+            }
+        }
+        return null;
+    }
+
+
+
+    /**
+     * 获取文件访问地址
+     *
+     * @param ossPathList 文件路径
+     * @return 文件访问地址
+     */
+    @SneakyThrows
+    public List<FileInfoResponse> getFileUrlList(List<String> ossPathList, Integer companyID) {
+        if (CollectionUtil.isNotEmpty(ossPathList)){
+            QueryFileListInfoRequest pojo = new QueryFileListInfoRequest();
+            pojo.setCompanyID(companyID);
+            pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);
+            pojo.setFilePathList(ossPathList);
+            ResultWrapper<List<FileInfoResponse>> info = mdInfoService.queryFileListInfo(pojo);
+            if (info.apiSuccess()) {
+                return info.getData();
+            } else {
+                log.error("获取文件 {} 信息失败，{} => {}", ossPathList.stream().toList(), info.getCode(), info.getMsg());
             }
         }
         return null;

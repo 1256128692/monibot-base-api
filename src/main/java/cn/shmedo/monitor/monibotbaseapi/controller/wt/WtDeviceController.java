@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryProductSimpleParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtDevicePageListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.QueryWtVideoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -59,8 +60,8 @@ public class WtDeviceController {
      */
     @Permission(permissionName = "mdmbase:ListBaseVideo")
     @PostMapping(value = "/QueryWtVideoPageList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtVideoPageList(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryWtVideoPageList(@Valid @RequestBody QueryWtVideoPageParam param) {
+        return wtDeviceService.queryWtVideoPageList(param);
     }
 
     /**

@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnActionService;
@@ -181,7 +183,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Boolean} dataList.action.enable 是否开启
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
 
     @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
@@ -202,7 +204,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/UpdateWtEngineEnable", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -240,7 +242,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} warnIDList 删除的报警状态ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/DeleteWtWarnStatus")
@@ -259,7 +261,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} actionIDList 删除的动作ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/DeleteWtAction", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -291,23 +293,50 @@ public class WtEngineController {
      * @apiGroup 警报规则引擎模块
      * @apiName AddWtDeviceWarnRule
      * @apiDescription 新增预警规则
+     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} [ruleType] 123 报警规则，视频规则 ， 智能终端规则, 不设置默认为1
      * @apiParam (请求参数) {Int} monitorType 监测类型，可为-1
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID，可为-1
+     * @apiParam (请求参数) {Int} [pointID] 监测点ID
      * @apiParam (请求参数) {String} name 规则名称(100)
      * @apiParam (请求参数) {Boolean} enable 是否启用
      * @apiParam (请求参数) {String} [desc] 描述 1000
      * @apiParam (请求参数) {String} [exValue] 额外属性，json字符串 1000
-     * @apiParam (请求参数) {String} productID 产品ID（设备型号对应ID）,该项为字符串或数字字符串
+     * @apiParam (请求参数) {String} [productID] 产品ID（设备型号对应ID）,该项为字符串或数字字符串
+     * @apiParam (请求参数) {String} [deviceCSV] 该项为"all"或者设备ID的CSV字符串
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
+     */
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
+    @LogParam(moduleName = "警报规则引擎模块", operationName = "新增预警规则", operationProperty = OperationProperty.ADD)
+    @RequestMapping(value = "AddWtDeviceWarnRule", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addWtDeviceWarnRule(@Valid @RequestBody AddWtDeviceWarnRuleParam pa) {
+        tbWarnRuleService.addWtDeviceWarnRule(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /MutateWarnRuleDevice 修改规则关联设备
+     * @apiVersion 1.0.0
+     * @apiGroup 警报规则引擎模块
+     * @apiName MutateWarnRuleDevice
+     * @apiDescription 修改规则关联设备
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求参数) {Int} roleID  规则ID
+     * @apiParam (请求参数) {String} sign 符号，支持 + - 两种
      * @apiParam (请求参数) {String} deviceCSV 该项为"all"或者设备ID的CSV字符串
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdwt:UpdateBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:UpdateBaseRuleEngine
      */
-    //@Permission(permissionName = "mdwt:UpdateBaseRuleEngine")
-    @RequestMapping(value = "AddWtDeviceWarnRule", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addWtDeviceWarnRule(@Valid @RequestBody Object pa) {
+    @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
+    @LogParam(moduleName = "警报规则引擎模块", operationName = "修改规则关联设备", operationProperty = OperationProperty.UPDATE)
+    @RequestMapping(value = "MutateWarnRuleDevice", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object mutateWarnRuleDevice(@Valid @RequestBody MutateWarnRuleDeviceParam pa) {
+        tbWarnRuleService.mutateWarnRuleDevice(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 }

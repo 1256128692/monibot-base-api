@@ -5,10 +5,10 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
@@ -19,7 +19,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -31,71 +30,71 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog> implements ITbWarnLogService {
-    private final TbProjectInfoMapper tbProjectInfoMapper;
-    private final IotService iotService;
     private final RedisService redisService;
 
     @Override
     public PageUtil.Page<WtWarnLogInfo> queryByPage(QueryWtWarnLogPageParam param) {
         // 实时记录是测点报警状态最新一条报警数据，并不是指当天的；历史记录是除了最新报警状态的报警数据其他触发报警状态的报警数据
-        Integer queryType = param.getQueryType();
-        Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
-        List<WtWarnLogInfo> wtWarnLogInfos;
-        Long totalCount = 0L;
-        if (queryType == 1) {
-            wtWarnLogInfos = this.baseMapper.queryCurrentRecords(param);
-            totalCount = this.baseMapper.queryCurrentRecordCount(param);
-        } else if (queryType == 2) {
-            IPage<WtWarnLogInfo> page = this.baseMapper.queryHistoryRecords(
-                    new Page<>(param.getCurrentPage(), pageSize), param);
-            wtWarnLogInfos = page.getRecords();
-            totalCount = page.getTotal();
-        } else {
-            wtWarnLogInfos = new ArrayList<>();
+        IPage<WtWarnLogInfo> page;
+        switch (WarnType.formCode(param.getWarnType())) {
+            case MONITOR: //在线监测报警
+                page = this.baseMapper.queryMonitorWarnPage(new Page<>(param.getCurrentPage(), param.getPageSize()), param);
+                return new PageUtil.Page<>(page.getPages(), page.getRecords(), page.getTotal());
+            case CAMERA: //视频监控报警
+                page = this.baseMapper.queryCameraWarnPage(new Page<>(param.getCurrentPage(), param.getPageSize()), param);
+                //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+                List<WtWarnLogInfo> data = page.getRecords();
+                TransferUtil.applyProductName(data,
+                        () -> QueryDeviceBaseInfoParam.builder()
+                                .deviceTokens(data.stream().map(WtWarnLogInfo::getDeviceToken).collect(Collectors.toSet()))
+                                .companyID(param.getCompanyID()).build(),
+                        WtWarnLogInfo::getDeviceToken,
+                        WtWarnLogInfo::setDeviceTypeName);
+                return new PageUtil.Page<>(page.getPages(), data, page.getTotal());
         }
-        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
-        TransferUtil.applyDeviceBaseItem(wtWarnLogInfos,
-                () -> QueryDeviceBaseInfoParam.builder()
-                        .deviceTokens(wtWarnLogInfos.stream().map(WtWarnLogInfo::getDeviceToken).collect(Collectors.toSet()))
-                        .companyID(param.getCompanyID()).build(),
-                WtWarnLogInfo::getDeviceToken,
-                WtWarnLogInfo::setDeviceTypeName);
-        return new PageUtil.Page<>(totalCount / pageSize + 1, wtWarnLogInfos, totalCount);
+        return PageUtil.Page.empty();
     }
 
     @Override
     public WtWarnDetailInfo queryDetail(QueryWtWarnDetailParam param) {
-        WtWarnDetailInfo detailInfo = this.baseMapper.queryWarnDetail(param.getWarnID());
-
-        //从redis中获取regionArea信息填充regionArea(区域名)
-        Optional.ofNullable(detailInfo.getRegionArea()).filter(JSONUtil::isTypeJSON).ifPresent(e -> {
-            Map<String, Object> regionInfo = JSONUtil.toBean(e, Dict.class);
-            List<RegionArea> regionAreas = redisService.multiGet(RedisKeys.REGION_AREA_KEY, regionInfo.values(), RegionArea.class);
-            detailInfo.setRegionArea(regionAreas.stream().map(RegionArea::getName).distinct().collect(Collectors.joining(StrUtil.EMPTY)));
-        });
-
-        //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
-        Optional.ofNullable(detailInfo.getDeviceToken()).filter(e -> !e.isBlank())
-                .ifPresent(deviceToken -> TransferUtil.applyDeviceBase(List.of(detailInfo),
-                        () -> QueryDeviceBaseInfoParam.builder()
-                                .deviceTokens(Set.of(deviceToken))
-                                .companyID(param.getCompanyID()).build(),
-                        WtWarnDetailInfo::getDeviceToken,
-                        (e, device) -> e.setDeviceTypeName(device.getProductName())));
-        return FieldShowUtil.dealFieldShow(detailInfo);
+        switch (WarnType.formCode(param.getWarnType())) {
+            case MONITOR:   //在线监测报警
+                return FieldShowUtil.dealFieldShow(this.baseMapper.queryMonitorDetail(param.getWarnID()));
+            case CAMERA:    //视频监控报警
+                WtWarnDetailInfo cameraWarn = this.baseMapper.queryCameraDetail(param.getWarnID());
+                //从redis中获取regionArea信息填充regionArea(区域名)
+                Optional.ofNullable(cameraWarn.getRegionArea()).filter(JSONUtil::isTypeJSON).ifPresent(e -> {
+                    Map<String, Object> regionInfo = JSONUtil.toBean(e, Dict.class);
+                    List<RegionArea> regionAreas = redisService.multiGet(RedisKeys.REGION_AREA_KEY, regionInfo.values(), RegionArea.class);
+                    cameraWarn.setRegionArea(regionAreas.stream().map(RegionArea::getName).distinct().collect(Collectors.joining(StrUtil.EMPTY)));
+                });
+                //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
+                Optional.ofNullable(cameraWarn.getDeviceToken()).filter(e -> !e.isBlank())
+                        .ifPresent(deviceToken -> TransferUtil.applyProductName(List.of(cameraWarn),
+                                () -> QueryDeviceBaseInfoParam.builder()
+                                        .deviceTokens(Set.of(deviceToken))
+                                        .companyID(param.getCompanyID()).build(),
+                                WtWarnDetailInfo::getDeviceToken,
+                                WtWarnDetailInfo::setDeviceTypeName));
+                return FieldShowUtil.dealFieldShow(cameraWarn);
+        }
+        return null;
     }
 
     @Override
-    public PageUtil.Page<WtTerminalWarnLog> queryByPage(QueryWtTerminalWarnLogPageParam param) {
+    public PageUtil.Page<WtTerminalWarnLog> queryTerminalWarnPage(QueryWtTerminalWarnLogPageParam param) {
         //按条件查询所有报警记录，再通过 deviceToken 反查 UniqueToken, 进而反查传感器、项目、监测类型、检测项、监测点
-        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalRecords(param, param.getQueryType() == 1);
+        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param, param.getQueryType() == 1);
         Set<String> deviceTokens = wtWarnLogInfos.stream()
                 .map(WtWarnLogInfo::getDeviceToken).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
         TransferUtil.applyDeviceBase(wtWarnLogInfos,
@@ -108,7 +107,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
         Set<String> uniqueTokenSet = wtWarnLogInfos.stream().map(WtWarnLogInfo::getUniqueToken)
                 .filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
         if (!uniqueTokenSet.isEmpty()) {
-            Map<String, WtTerminalWarnLog> map = baseMapper.queryTerminalRecordsByUniqueToken(param, uniqueTokenSet)
+            Map<String, WtTerminalWarnLog> map = baseMapper.queryTerminalWarnListByUniqueToken(param, uniqueTokenSet)
                     .stream().collect(Collectors.toMap(WtTerminalWarnLog::getUniqueToken, e -> e));
             List<WtTerminalWarnLog> result = wtWarnLogInfos.stream().filter(e -> map.containsKey(e.getUniqueToken())).map(item -> {
                         WtTerminalWarnLog log = new WtTerminalWarnLog();
@@ -139,7 +138,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                                 e.setDeviceTypeName(device.getProductName());
                                 e.setUniqueToken(device.getUniqueToken());
                             });
-                    List<WtTerminalWarnLog> otherInfo = baseMapper.queryTerminalRecordsByUniqueToken(new QueryWtTerminalWarnLogPageParam(), List.of(base.getUniqueToken()));
+                    List<WtTerminalWarnLog> otherInfo = baseMapper.queryTerminalWarnListByUniqueToken(new QueryWtTerminalWarnLogPageParam(), List.of(base.getUniqueToken()));
                     Set<WtTerminalWarnLog.Project> projects = otherInfo.stream().map(WtTerminalWarnLog::getProjectList).findFirst().orElse(Set.of());
                     //从redis中获取regionArea信息填充regionArea(区域名)
                     Set<Object> areaSet = projects.stream().map(WtTerminalWarnLog.Project::getRegionArea).filter(JSONUtil::isTypeJSON)

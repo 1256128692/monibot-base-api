@@ -41,6 +41,12 @@ public class RedisKeys {
      * 萤石云Token
      */
     public static final String YS_TOKEN = "cn.shmedo.mdmbse.ysToken";
+
+    /**
+     * 文件路径缓存
+     * key:value  带过期时间
+     */
+    public static final String FILE_PATH_KEY_TEMPLATE = "cn.shmedo.mdnet.fileCache:";
 }
 
     

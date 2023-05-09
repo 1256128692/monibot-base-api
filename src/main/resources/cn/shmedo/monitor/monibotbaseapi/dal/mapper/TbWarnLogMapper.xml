@@ -17,11 +17,32 @@
         <result column="triggerID" property="triggerID" jdbcType="INTEGER"/>
         <result column="DeviceToken" property="deviceToken" jdbcType="VARCHAR"/>
     </resultMap>
+
+    <resultMap id="terminalWarnLogMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog">
+        <result property="uniqueToken" column="uniqueToken" jdbcType="VARCHAR"/>
+        <collection property="projectList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$Project">
+            <result property="projectID" column="projectID" jdbcType="INTEGER"/>
+            <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
+            <result property="regionArea" column="regionArea" jdbcType="VARCHAR"/>
+            <collection property="monitorPointList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$MonitorPoint">
+                <result property="monitorPointID" column="monitorPointID" jdbcType="INTEGER"/>
+                <result property="monitorPointName" column="monitorPointName" jdbcType="VARCHAR"/>
+                <result property="monitorTypeID" column="monitorTypeID" jdbcType="INTEGER"/>
+                <result property="monitorTypeName" column="monitorTypeName" jdbcType="VARCHAR"/>
+                <result property="monitorTypeAlias" column="monitorTypeAlias" jdbcType="VARCHAR"/>
+                <result property="monitorItemID" column="monitorItemID" jdbcType="INTEGER"/>
+                <result property="monitorItemName" column="monitorItemName" jdbcType="VARCHAR"/>
+                <result property="installLocation" column="installLocation" jdbcType="VARCHAR"/>
+                <result property="monitorPointLocation" column="monitorPointLocation" jdbcType="VARCHAR"/>
+            </collection>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         `ID`,`WarnType`,`ProjectID`,`MonitorType`,`MonitorItemID`,`MonitorPointID`,`SensorID`,`Name`,`WarnTime`,`WarnLevel`,`WarnContent`,`WorkOrderID`,`triggerID`,`DeviceToken`
     </sql>
 
-    <select id="queryCurrentRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
+    <select id="queryMonitorWarnPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
             twl.`ID` warnID,
             twl.WarnType warnType,
@@ -29,7 +50,6 @@
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
             twl.WarnContent warnContent,
-            twl.DeviceToken deviceToken,
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
             tmi.`ID` monitorItemID,
@@ -50,30 +70,35 @@
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
             LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
-        WHERE twl1.latest_time = twl.WarnTime
-        AND twl.ProjectID IN
-        <foreach collection="param.projectIDList" open="(" close=")" item="item" separator="," index="index">
-            #{item}
-        </foreach>
-        <if test="param.queryCode != null and param.queryCode != ''">
-            AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
-                     OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
-        </if>
-        <if test="param.monitorTypeID != null">
-            AND twl.monitorType=#{param.monitorTypeID}
-        </if>
-        <if test="param.monitorItemID != null">
-            AND twl.monitorItemID=#{param.monitorItemID}
-        </if>
-        <if test="param.warnLevel != null">
-            AND twl.warnLevel=#{param.warnLevel}
-        </if>
-        <if test="param.warnType != null">
-            AND twl.WarnType=#{param.warnType}
-        </if>
+        <where>
+            <choose>
+                <when test="param.queryType == null or param.queryType == 2">
+                    twl1.latest_time &gt; twl.WarnTime
+                </when>
+                <otherwise>
+                    twl1.latest_time = twl.WarnTime
+                </otherwise>
+            </choose>
+            AND twl.ProjectID IN
+            <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            AND twl.WarnType = 1
+            <if test="param.queryCode != null and param.queryCode != ''">
+                AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
+                 OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%')
+                 OR tpi.ProjectName LIKE CONCAT('%', #{param.queryCode}, '%'))
+            </if>
+            <if test="param.monitorTypeID != null">
+                AND twl.monitorType=#{param.monitorTypeID}
+            </if>
+            <if test="param.monitorItemID != null">
+                AND twl.monitorItemID=#{param.monitorItemID}
+            </if>
+            <if test="param.warnLevel != null">
+                AND twl.warnLevel=#{param.warnLevel}
+            </if>
+        </where>
         <choose>
             <when test="param.orderType == null or param.orderType == 1">
                 ORDER BY twl.WarnTime DESC
@@ -82,59 +107,70 @@
                 ORDER BY twl.WarnTime ASC
             </when>
         </choose>
-        LIMIT ${(param.currentPage - 1) * param.pageSize}, #{param.pageSize}
     </select>
-    <select id="queryHistoryRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
+
+    <select id="queryCameraWarnPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
-            twl.`ID` warnID,
-            twl.WarnType warnType,
-            twl.`Name` warnName,
-            twl.WarnLevel warnLevel,
-            twl.WarnTime warnTime,
-            twl.WarnContent warnContent,
-            twl.DeviceToken deviceToken,
-            tpi.`ID` projectID,
-            tpi.ProjectName projectName,
-            tmi.`ID` monitorItemID,
-            tmi.`Name` monitorItemName,
-            tmp.`ID` monitorPointID,
-            tmp.`Name` monitorPointName,
-            tmt.MonitorType monitorTypeID,
-            tmt.TypeName monitorTypeName,
-            tmt.TypeAlias monitorTypeAlias,
-            two.`ID` workOrderID,
-            two.OrderCode orderCode,
-            two.`Status` orderStatus
+        twl.`ID` warnID,
+        twl.WarnType warnType,
+        twl.`Name` warnName,
+        twl.WarnLevel warnLevel,
+        twl.WarnTime warnTime,
+        twl.WarnContent warnContent,
+        twl.DeviceToken deviceToken,
+        tpi.`ID` projectID,
+        tpi.ProjectName projectName,
+        tmi.`ID` monitorItemID,
+        tmi.`Name` monitorItemName,
+        tmp.`ID` monitorPointID,
+        tmp.`Name` monitorPointName,
+        tmt.MonitorType monitorTypeID,
+        tmt.TypeName monitorTypeName,
+        tmt.TypeAlias monitorTypeAlias,
+        two.`ID` workOrderID,
+        two.OrderCode orderCode,
+        two.`Status` orderStatus
         FROM
-            tb_warn_log twl
-            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-        WHERE twl.ProjectID IN
-        <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
-            #{item}
-        </foreach>
-        <if test="param.queryCode != null and param.queryCode != ''">
-            AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
-            OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
-            OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
-        </if>
-        <if test="param.monitorTypeID != null">
-            AND twl.monitorType=#{param.monitorTypeID}
-        </if>
-        <if test="param.monitorItemID != null">
-            AND twl.monitorItemID=#{param.monitorItemID}
-        </if>
-        <if test="param.warnLevel != null">
-            AND twl.warnLevel=#{param.warnLevel}
-        </if>
-        <if test="param.warnType != null">
-            AND twl.WarnType=#{param.warnType}
-        </if>
+        tb_warn_log twl
+        LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+        LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+        LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+        LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+        LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+        LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, DeviceToken FROM `tb_warn_log` GROUP BY DeviceToken ) twl1 ON twl.DeviceToken = twl1.DeviceToken
+        <where>
+            <choose>
+                <when test="param.queryType == null or param.queryType == 2">
+                    twl1.latest_time &gt; twl.WarnTime
+                </when>
+                <otherwise>
+                    twl1.latest_time = twl.WarnTime
+                </otherwise>
+            </choose>
+            AND twl.ProjectID IN
+            <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            AND twl.WarnType = 2
+            <if test="param.queryCode != null and param.queryCode != ''">
+                AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
+                OR tpi.ProjectName LIKE CONCAT('%', #{param.queryCode}, '%')
+                OR twl.DeviceToken LIKE CONCAT('%', #{param.queryCode}, '%')
+                OR tmp.`Name` LIKE CONCAT('%', #{param.queryCode}, '%'))
+            </if>
+            <if test="param.monitorItemID != null">
+                AND twl.monitorItemID=#{param.monitorItemID}
+            </if>
+            <if test="param.beginTime != null">
+                AND twl.WarnTime &gt;= #{param.beginTime}
+            </if>
+            <if test="param.endTime != null">
+                AND twl.WarnTime &lt;= #{param.endTime}
+            </if>
+            <if test="param.status != null">
+                AND two.`Status`=#{param.status}
+            </if>
+        </where>
         <choose>
             <when test="param.orderType == null or param.orderType == 1">
                 ORDER BY twl.WarnTime DESC
@@ -144,39 +180,44 @@
             </when>
         </choose>
     </select>
-    <select id="queryCurrentRecordCount" resultType="java.lang.Long"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam">
-        SELECT COUNT( * ) FROM tb_warn_log twl
-            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-            LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
-        WHERE twl1.latest_time = twl.WarnTime
-        AND twl.ProjectID IN
-        <foreach collection="param.projectIDList" open="(" close=")" item="item" separator="," index="index">
-            #{item}
-        </foreach>
-        <if test="param.queryCode != null and param.queryCode != ''">
-            AND (twl.`Name` LIKE CONCAT('%',#{param.queryCode},'%')
-            OR twl.WarnContent LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tpi.ProjectName LIKE CONCAT('%',#{param.queryCode},'%')
-            OR twl.DeviceToken LIKE CONCAT('%',#{param.queryCode},'%')
-            OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
-        </if>
-        <if test="param.monitorTypeID != null">
-            AND twl.monitorType=#{param.monitorTypeID}
-        </if>
-        <if test="param.monitorItemID != null">
-            AND twl.monitorItemID=#{param.monitorItemID}
-        </if>
-        <if test="param.warnLevel != null">
-            AND twl.warnLevel=#{param.warnLevel}
-        </if>
-        <if test="param.warnType != null">
-            AND twl.WarnType=#{param.warnType}
-        </if>
-    </select>
-    <select id="queryWarnDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo"
+
+    <select id="queryMonitorDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo"
             parameterType="java.lang.Integer">
+        SELECT
+            twl.`ID` warnID,
+            twl.`Name` warnName,
+            twl.WarnType warnType,
+            tpi.`ID` projectID,
+            tpi.ProjectName projectName,
+            tmt.MonitorType monitorTypeID,
+            tmt.MonitorType monitorType,
+            tmt.TypeName monitorTypeName,
+            tmt.TypeAlias monitorTypeAlias,
+            tmi.`ID` monitorItemID,
+            tmi.`Name` monitorItemName,
+            twl.WarnLevel warnLevel,
+            twl.WarnContent warnContent,
+            tmp.`ID` monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmp.GpsLocation monitorPointLocation,
+            tmp.InstallLocation installLocation,
+            twl.WarnTime warnTime,
+            twt.CompareRule compareRule,
+            twt.TriggerRule triggerRule,
+            twt.FieldToken fieldToken,
+            two.ID workOrderID,
+            two.OrderCode workOrderCode,
+        FROM `tb_warn_log` twl
+            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+        WHERE twl.`ID`=#{warnID}
+    </select>
+
+    <select id="queryCameraDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo">
         SELECT
             twl.`ID` warnID,
             twl.`Name` warnName,
@@ -205,15 +246,16 @@
             two.OrderCode workOrderCode,
             twr.`Name` ruleName
         FROM tb_warn_log twl
-            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
-            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-            LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
-        WHERE twl.`ID`=#{warnID}
+                 LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+                 LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+                 LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+                 LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+                 LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+                 LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+                 LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
+        WHERE twl.`ID` = #{warnID}
     </select>
+
     <select id="queryWorkOrderWarnDetail"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam">
@@ -235,18 +277,21 @@
             twl.WarnLevel warnLevel,
             twl.WarnTime warnTime,
             twl.WarnContent warnContent,
-            twl.DeviceToken deviceToken
+            twl.DeviceToken deviceToken,
+            twr.`Name` ruleName
         FROM
             tb_warn_log twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
             LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE
             twl.WorkOrderID =#{param.workOrderID}
     </select>
 
-    <select id="queryTerminalRecords" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
+    <select id="queryTerminalWarnList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT twl.`ID`        warnID,
                twl.WarnType    warnType,
                twl.`Name`      warnName,
@@ -259,20 +304,19 @@
                two.`Status`    orderStatus
         FROM `tb_warn_log` twl
                  LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
+                 LEFT JOIN (SELECT MAX(WarnTime) latest_time, DeviceToken
+                            FROM tb_warn_log
+                            GROUP BY DeviceToken) twl1
+                           ON twl.DeviceToken = twl1.DeviceToken
         <choose>
             <when test="flag">
-                WHERE
+                WHERE twl1.latest_time &gt; twl.WarnTime
             </when>
             <otherwise>
-                LEFT JOIN (SELECT MAX(WarnTime) latest_time, MonitorPointID
-                    FROM tb_warn_log
-                    GROUP BY MonitorPointID) twl1
-                ON twl.MonitorPointID = twl1.MonitorPointID
                 WHERE twl1.latest_time = twl.WarnTime
-                  AND
             </otherwise>
         </choose>
-        twl.ProjectID IN
+        AND twl.ProjectID IN
         <foreach collection="param.projectIDList" open="(" close=")" item="item" separator="," index="index">
             #{item}
         </foreach>
@@ -292,26 +336,7 @@
         </choose>
     </select>
 
-    <resultMap id="terminalCurrentRecords" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog">
-        <result property="uniqueToken" column="uniqueToken" jdbcType="VARCHAR"/>
-        <collection property="projectList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$Project">
-            <result property="projectID" column="projectID" jdbcType="INTEGER"/>
-            <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
-            <result property="regionArea" column="regionArea" jdbcType="VARCHAR"/>
-            <collection property="monitorPointList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$MonitorPoint">
-                <result property="monitorPointID" column="monitorPointID" jdbcType="INTEGER"/>
-                <result property="monitorPointName" column="monitorPointName" jdbcType="VARCHAR"/>
-                <result property="monitorTypeID" column="monitorTypeID" jdbcType="INTEGER"/>
-                <result property="monitorTypeName" column="monitorTypeName" jdbcType="VARCHAR"/>
-                <result property="monitorTypeAlias" column="monitorTypeAlias" jdbcType="VARCHAR"/>
-                <result property="monitorItemID" column="monitorItemID" jdbcType="INTEGER"/>
-                <result property="monitorItemName" column="monitorItemName" jdbcType="VARCHAR"/>
-                <result property="installLocation" column="installLocation" jdbcType="VARCHAR"/>
-                <result property="monitorPointLocation" column="monitorPointLocation" jdbcType="VARCHAR"/>
-            </collection>
-        </collection>
-    </resultMap>
-    <select id="queryTerminalRecordsByUniqueToken" resultMap="terminalCurrentRecords">
+    <select id="queryTerminalWarnListByUniqueToken" resultMap="terminalWarnLogMap">
         SELECT
             tpi.`ID` projectID,
             tpi.ProjectName projectName,

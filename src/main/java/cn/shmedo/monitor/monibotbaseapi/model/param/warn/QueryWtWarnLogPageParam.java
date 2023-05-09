@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -12,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -45,6 +48,12 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
 
     @Range(min = 1, max = 2, message = "报警类型不合法,报警类型:1.在线监测报警记录; 2.视频报警记录")
     private Integer warnType;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private DateTime beginTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private DateTime endTime;
+    @Range(min = 1, max = 6)
+    private Integer status;
 
     @JsonIgnore
     private Collection<Integer> projectIDList;
@@ -72,6 +81,9 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
         }
 
         warnType = Optional.ofNullable(warnType).orElse(1);
+        DateTime now = DateTime.now();
+        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
+        endTime = Optional.ofNullable(endTime).orElse(now);
         return null;
     }
 

@@ -3,8 +3,10 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -21,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.CompareIntervalDescUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -28,6 +31,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +55,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final ITbWarnTriggerService tbWarnTriggerService;
     private final ITbWarnActionService tbWarnActionService;
     private final FileConfig fileConfig;
+    private final TbWarnRuleMapper tbWarnRuleMapper;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -238,7 +243,6 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         tbWarnTriggerService.deleteWarnStatusByList(triggerIDList);
     }
 
-
     private Map<Integer, String> queryProductIDNameMap(List<TbWarnRule> records) {
         List<Integer> productIDList = records.stream().map(TbWarnRule::getProductID).filter(Objects::nonNull).toList();
         if (CollectionUtil.isEmpty(productIDList)) {
@@ -255,5 +259,49 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             return new HashMap<>();
         }
         return wrapper.getData().stream().collect(Collectors.toMap(ProductBaseInfo::getID, ProductBaseInfo::getProductName));
+    }
+
+    @Override
+    public void addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
+        // TODO 处理统计
+        TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
+        tbWarnRuleMapper.insert(entity);
+    }
+
+    @Override
+    public void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID) {
+        List<String> strings = Arrays.stream(pa.getDeviceCSV().split(",")).toList();
+        TbWarnRule tbWarnRule = pa.getTbWarnRule();
+        if (tbWarnRule.getRuleType() == 2) {
+            if (pa.getSign().equals("+")) {
+                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                old.addAll(strings);
+                tbWarnRule.setVideoCSV(String.join(",", old));
+            } else {
+                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                old.removeAll(strings);
+                if (CollectionUtils.isEmpty(old)) {
+                    throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "删除后设备为空");
+                }
+                tbWarnRule.setVideoCSV(String.join(",", old));
+
+            }
+        } else {
+            if (pa.getSign().equals("+")) {
+                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                old.addAll(strings);
+                tbWarnRule.setDeviceCSV(String.join(",", old));
+            } else {
+                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                old.removeAll(strings);
+                if (CollectionUtils.isEmpty(old)) {
+                    throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "删除后设备为空");
+                }
+                tbWarnRule.setDeviceCSV(String.join(",", old));
+            }
+        }
+        tbWarnRule.setUpdateTime(new Date());
+        tbWarnRule.setUpdateUserID(userID);
+        tbWarnRuleMapper.updateById(tbWarnRule);
     }
 }

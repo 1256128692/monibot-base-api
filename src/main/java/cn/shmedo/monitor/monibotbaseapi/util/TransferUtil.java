@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
@@ -30,6 +32,10 @@ public class TransferUtil {
                                            @Nonnull Supplier<QueryDeviceBaseInfoParam> pSupplier,
                                            @Nonnull Function<? super T, String> keyFun,
                                            @Nonnull BiConsumer<T, DeviceBaseInfo> transferFun) {
+        QueryDeviceBaseInfoParam param = pSupplier.get();
+        if (ObjUtil.isEmpty(param) || CollUtil.isEmpty(param.getDeviceTokens())) {
+            return;
+        }
         ResultWrapper<List<DeviceBaseInfo>> wrapper = SpringUtil.getBean(IotService.class)
                 .queryDeviceBaseInfo(pSupplier.get());
         if (wrapper.apiSuccess()) {
@@ -52,10 +58,10 @@ public class TransferUtil {
      * @param keyFun        分组key提供器
      * @param transferFun   转换函数
      */
-    public static <T> void applyDeviceBaseItem(@Nonnull Collection<T> records,
-                                               @Nonnull Supplier<QueryDeviceBaseInfoParam> paramSupplier,
-                                               @Nonnull Function<? super T, String> keyFun,
-                                               @Nonnull BiConsumer<T, String> transferFun) {
+    public static <T> void applyProductName(@Nonnull Collection<T> records,
+                                            @Nonnull Supplier<QueryDeviceBaseInfoParam> paramSupplier,
+                                            @Nonnull Function<? super T, String> keyFun,
+                                            @Nonnull BiConsumer<T, String> transferFun) {
         applyDeviceBase(records, paramSupplier, keyFun, (e, device) -> {
             transferFun.accept(e, device.getProductName());
         });

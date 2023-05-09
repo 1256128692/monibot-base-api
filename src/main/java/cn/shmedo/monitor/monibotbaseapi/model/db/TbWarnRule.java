@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.io.Serial;
 import java.util.Date;
 
@@ -79,6 +81,7 @@ public class TbWarnRule {
     /**
      * 规则描述
      */
+    @TableField(value = "`desc`")
     private String desc;
 
     /**
