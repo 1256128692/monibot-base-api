@@ -97,9 +97,9 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {String} list.pointGpsLocation 监测点GPS位置
      * @apiSuccess (返回结果) {String} list.[pointImageLocation] 监测点底图位置
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ExportBaseVideo
+     * @apiPermission 项目权限 mdmbase:ExportBaseDevice
      */
-    @Permission(permissionName = "mdmbase:ExportBaseVideo")
+    @Permission(permissionName = "mdmbase:ExportBaseDevice")
     @PostMapping(value = "/ExportWtVideo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object exportWtVideo(@Valid @RequestBody ExportWtVideoParam param) {
         return wtDeviceService.exportWtVideo(param);

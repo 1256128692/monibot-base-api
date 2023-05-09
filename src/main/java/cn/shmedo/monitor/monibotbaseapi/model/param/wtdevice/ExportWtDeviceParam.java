@@ -78,11 +78,8 @@ public class ExportWtDeviceParam implements ParameterValidator, ResourcePermissi
 
     @Override
     public List<Resource> parameter() {
-        if (CollectionUtils.isNotEmpty(projectIDList)) {
-            return projectIDList.stream().map(id -> new Resource(id.toString(), ResourceType.BASE_PROJECT)).collect(Collectors.toList());
-        } else {
-            return projectInfos.stream().map(projectInfo -> new Resource(projectInfo.getID().toString(), ResourceType.BASE_PROJECT)).collect(Collectors.toList());
-        }
+        return projectInfos.stream().map(projectInfo -> new Resource(projectInfo.getID().toString(), ResourceType.BASE_PROJECT)).collect(Collectors.toList());
+
     }
 
     @Override
