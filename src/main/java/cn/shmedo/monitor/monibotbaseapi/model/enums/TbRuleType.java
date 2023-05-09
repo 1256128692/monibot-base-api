@@ -21,4 +21,13 @@ public enum TbRuleType {
     public String getDesc() {
         return desc;
     }
+
+    public static TbRuleType getTbRuleType(final Integer key) {
+        for (TbRuleType value : values()) {
+            if (value.getKey().equals(key)) {
+                return value;
+            }
+        }
+        return null;
+    }
 }

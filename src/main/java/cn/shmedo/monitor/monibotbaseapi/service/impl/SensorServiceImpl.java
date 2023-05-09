@@ -24,6 +24,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
@@ -89,35 +90,20 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request) {
         List<DataSourceCatalogResponse> result = monitorTypeTemplateMapper.dataSourceCatalog(request);
-
-        Map<String, List<DeviceWithSensor>> iotMap = getIotMap(() -> result.stream()
-                .flatMap(e -> e.getDataSourceList().stream())
-                .filter(e -> DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType())
-                .map(e -> StrUtil.subBefore(e.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
-                .filter(Objects::nonNull).collect(Collectors.toSet()), request.getKeyword());
-
+        Map<String, List<DeviceWithSensor>> iotMap = getIotMap(result, request);
         Map<String, List<TbSensor>> monitorMap = getMonitorMap(() -> result.stream()
                 .flatMap(e -> e.getDataSourceList().stream())
                 .filter(e -> DataSourceType.MONITOR_SENSOR.getCode() == e.getDataSourceType())
                 .map(DataSourceCatalogResponse.DataSource::getTemplateDataSourceToken).collect(Collectors.toSet()));
 
         return result.stream().peek(item -> item.getDataSourceList().forEach(e -> {
-                    String token = StrUtil.subBefore(e.getTemplateDataSourceToken(),
-                            StrUtil.UNDERLINE, false);
+                    String token = StrUtil.subBefore(e.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false);
                     if (DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType()) {
-
-                        List<DeviceWithSensor> childList = new ArrayList<>();
-                        iotMap.getOrDefault(token, List.of()).forEach(device -> {
-                            DeviceWithSensor data = new DeviceWithSensor();
-                            data.setID(device.getID());
-                            data.setDeviceName(device.getDeviceName());
-                            data.setDeviceToken(device.getDeviceToken());
-                            data.setUniqueToken(device.getUniqueToken());
-                            data.setProductID(device.getProductID());
-                            data.setSensorList(device.getSensorList().stream()
-                                    .filter(sensor -> sensor.iotSensorType().equals(token)).toList());
-                            childList.add(data);
-                        });
+                        List<DeviceWithSensor> childList = iotMap.getOrDefault(token, List.of())
+                                .stream().peek(device -> device.setSensorList(device.getSensorList().stream()
+                                        .filter(sensor -> sensor.iotSensorType().equals(token)).toList()))
+                                .filter(device -> !device.getSensorList().isEmpty())
+                                .toList();
                         e.setChildList(childList);
                     } else if (DataSourceType.MONITOR_SENSOR.getCode() == e.getDataSourceType()) {
                         e.setChildList(monitorMap.getOrDefault(token, List.of()));
@@ -435,24 +421,32 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     /**
      * 根据物联网传感器类型获取设备和传感器信息
      *
-     * @param consumer    传感器类型
-     * @param searchToken 搜索设备token
+     * @param catalog 传感器数据源列表
+     * @param request 请求参数
      * @return key:iotSensorType value: {@link DeviceWithSensor}
      */
-    private Map<String, List<DeviceWithSensor>> getIotMap(Supplier<Set<String>> consumer, String searchToken) {
-        Set<String> iotSensorTypes = consumer.get();
+    private Map<String, List<DeviceWithSensor>> getIotMap(List<DataSourceCatalogResponse> catalog,
+                                                          DataSourceCatalogRequest request) {
+        Set<String> iotSensorTypeSet = catalog.stream()
+                .flatMap(e -> e.getDataSourceList().stream())
+                .filter(e -> DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType())
+                .map(e -> StrUtil.subBefore(e.getTemplateDataSourceToken(), StrUtil.UNDERLINE, false))
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+
         Map<String, List<DeviceWithSensor>> iotMap = new HashMap<>();
-        if (!iotSensorTypes.isEmpty()) {
-            QueryDeviceAndSensorRequest request = new QueryDeviceAndSensorRequest();
-            request.setCompanyID(CurrentSubjectHolder.getCurrentSubject().getCompanyID());
-            request.setIotSensorTypeList(iotSensorTypes);
-            if (searchToken != null) {
-                request.setDeviceTokenList(List.of(searchToken));
-            }
-            ResultWrapper<List<DeviceWithSensor>> wrapper = iotService.queryDeviceAndSensorList(request);
+        if (!iotSensorTypeSet.isEmpty()) {
+            QueryDeviceAndSensorRequest param = QueryDeviceAndSensorRequest.builder()
+                    .companyID(CurrentSubjectHolder.getCurrentSubject().getCompanyID())
+                    .iotSensorTypeList(iotSensorTypeSet)
+                    .sendType(SendType.MDMBASE.toInt())
+                    .sendAddressList(List.of(request.getProjectID().toString()))
+                    .build();
+            Optional.ofNullable(request.getKeyword()).filter(e -> !e.isBlank())
+                    .ifPresent(e -> param.setDeviceTokenList(List.of(e)));
+            ResultWrapper<List<DeviceWithSensor>> wrapper = iotService.queryDeviceAndSensorList(param);
             if (wrapper.apiSuccess()) {
                 List<DeviceWithSensor> data = wrapper.getData();
-                iotSensorTypes.forEach(iotSensorType -> {
+                iotSensorTypeSet.forEach(iotSensorType -> {
                     if (data.stream().anyMatch(e -> e.getSensorList().stream()
                             .anyMatch(sensor -> sensor.iotSensorType().equals(iotSensorType)))) {
                         iotMap.put(iotSensorType, data.stream().filter(e -> e.getSensorList().stream()

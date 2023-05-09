@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
@@ -15,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -58,8 +61,17 @@ public class QueryWtTerminalWarnLogPageParam implements ParameterValidator, Reso
     @NotNull
     private Integer pageSize;
 
-    @Range(min = 3, max = 3)
+    @JsonFormat
     private Integer warnType;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private DateTime beginTime;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private DateTime endTime;
+
+    @Range(min = 1, max = 6)
+    private Integer status;
 
     @JsonIgnore
     private Collection<Integer> projectIDList;
@@ -82,6 +94,10 @@ public class QueryWtTerminalWarnLogPageParam implements ParameterValidator, Reso
             Assert.isTrue(tbMonitorItemMapper.selectCount(new LambdaQueryWrapper<TbMonitorItem>()
                     .eq(TbMonitorItem::getID, monitorItemID)) > 0, "监测项目不存在");
         });
+
+        DateTime now = DateTime.now();
+        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
+        endTime = Optional.ofNullable(endTime).orElse(now);
         warnType = Optional.ofNullable(warnType).orElse(3);
         return null;
     }

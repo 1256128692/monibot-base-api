@@ -17,6 +17,11 @@ public class WtEngineInfo {
     private Integer engineID;
     private String engineName;
     private Boolean enable;
+    private Boolean whole;
+    private String videoTypeName;
+    private Integer productID;
+    private String productName;
+    private String exValue;
     private Integer projectID;
     private String projectName;
     private Integer monitorItemID;
@@ -25,9 +30,9 @@ public class WtEngineInfo {
     private String monitorPointName;
     private List<WtWarnStatusInfo> dataList;
 
-    public static WtEngineInfo build(TbWarnRule tbWarnRule) {
+    public static WtEngineInfo build(TbWarnRule rule) {
         WtEngineInfo res = new WtEngineInfo();
-        BeanUtil.copyProperties(tbWarnRule, res);
-        return res.setEngineID(tbWarnRule.getID()).setEngineName(tbWarnRule.getName());
+        BeanUtil.copyProperties(rule, res);
+        return res.setEngineID(rule.getID()).setEngineName(rule.getName()).setVideoTypeName(rule.getVideoType());
     }
 }

@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.device;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -10,6 +13,9 @@ import java.util.List;
  * @author Chengfs on 2023/4/6
  */
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class DeviceWithSensor {
 
     private Integer ID;
@@ -17,7 +23,6 @@ public class DeviceWithSensor {
     private String deviceName;
     private String deviceToken;
     private String uniqueToken;
-
     private List<Sensor> sensorList;
 
     public record Sensor(Integer id, String sensorName, String iotSensorType, String alias) {
