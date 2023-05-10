@@ -30,6 +30,7 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [monitorItemName] 监测项目名称,精准查询不支持模糊
      * @apiParam (请求体) {Int} monitorClassType 监测类别
      * @apiParam (请求体) {String} [areaCode] 行政区划编码
      * @apiParamExample 请求体示例
@@ -538,6 +539,7 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {Int} monitorType 监测类型(内部三轴位移)
      * @apiParam (请求体) {Int} [projectTypeID] 工程类型(水库:1 河道:2 提防:3 流域:4 尾矿库:5 基坑:6)
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [monitorItemName] 监测项目名称,精准查询不支持模糊
      * @apiParam (请求体) {Int} monitorClassType 监测类别
      * @apiParam (请求体) {String} [areaCode] 行政区划编码
      * @apiParamExample 请求体示例
