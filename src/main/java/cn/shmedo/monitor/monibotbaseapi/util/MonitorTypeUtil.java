@@ -34,6 +34,7 @@ public class MonitorTypeUtil {
             vo.setFieldToken("waterQuality");
             vo.setFieldName("水质等级");
             vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
             fieldList.add(vo);
         }
 
@@ -43,6 +44,7 @@ public class MonitorTypeUtil {
             vo.setFieldToken("windPower");
             vo.setFieldName("风力");
             vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
             fieldList.add(vo);
         }
 

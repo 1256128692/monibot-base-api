@@ -430,9 +430,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             fieldSelectInfo.setFieldName(modelField.getFieldName());
             fieldSelectInfo.setFieldOrder(modelField.getDisplayOrder());
             fieldSelectInfo.setFieldType(FieldType.valueOfString(modelField.getFieldDataType()));
-//            fieldSelectInfo.setFieldStatisticsType(modelField.getFieldStatisticsType());
+            fieldSelectInfo.setFieldStatisticsType(modelField.getFieldClass().toString());
 //            fieldSelectInfo.setFieldJsonPath(modelField.getFieldJsonPath());
-            fieldSelectInfo.setFieldStatisticsType(null);
             fieldSelectInfo.setFieldJsonPath(null);
             fieldSelectInfo.setFieldExValue(modelField.getFieldUnitID().toString());
             fieldSelectInfos.add(fieldSelectInfo);
