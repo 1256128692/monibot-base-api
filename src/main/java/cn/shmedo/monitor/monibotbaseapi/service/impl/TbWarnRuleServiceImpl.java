@@ -258,7 +258,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     }
 
     private Map<Integer, String> queryProductIDNameMap(List<TbWarnRule> records) {
-        List<Integer> productIDList = records.stream().map(TbWarnRule::getProductID).filter(Objects::nonNull).toList();
+        List<Integer> productIDList = records.stream().map(TbWarnRule::getProductID).filter(Objects::nonNull).distinct().toList();
         if (CollectionUtil.isEmpty(productIDList)) {
             return new HashMap<>();
         }
@@ -272,7 +272,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             log.error("第三方服务调用失败,未能获取到产品型号名称");
             return new HashMap<>();
         }
-        return wrapper.getData().stream().collect(Collectors.toMap(ProductBaseInfo::getID, ProductBaseInfo::getProductName));
+        return wrapper.getData().stream().collect(Collectors.toMap(ProductBaseInfo::getProductID, ProductBaseInfo::getProductName));
     }
 
     @Override

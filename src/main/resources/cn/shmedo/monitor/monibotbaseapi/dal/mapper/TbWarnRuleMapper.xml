@@ -297,6 +297,9 @@
         <if test="param.projectID != null">
             AND twr.`ProjectID`=#{param.projectID}
         </if>
+        <if test="param.videoTypeName">
+            AND twr.VideoType=#{param.videoTypeName}
+        </if>
         <if test="param.enable != null">
             AND twr.`Enable`=#{param.enable}
         </if>
