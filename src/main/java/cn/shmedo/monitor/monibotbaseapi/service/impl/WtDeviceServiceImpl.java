@@ -271,7 +271,6 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return PageUtil.Page.empty();
         }
-        totalCount = Long.valueOf(wtVideoList.size());
 
         wtVideoList.forEach(item -> {
             String exValues = item.getExValues();
@@ -301,22 +300,28 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                 .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
         areas.clear();
 
-        wtVideoList.forEach(item -> {
-            item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
-        });
+        // 过滤出监测点下存在设备的数据
+        List<WtVideoPageInfo> resultList = wtVideoList.stream()
+                .peek(item -> item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null)))
+                .filter(pojo -> pojo.getVideoSN() != null && !pojo.getVideoSN().equals(""))
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(resultList)) {
+            return PageUtil.Page.empty();
+        }
+        totalCount = Long.valueOf(resultList.size());
 
         if (!StringUtil.isNullOrEmpty(param.getQueryCode())) {
             // 设备SN || 工程名称 || 监测点
             String queryCode = param.getQueryCode();
-            wtVideoList = wtVideoList.stream()
+            resultList = resultList.stream()
                     .filter(info -> (info.getVideoSN() != null && !info.getVideoSN().isEmpty() && info.getVideoSN().contains(queryCode))
                             || (info.getMonitorPointName().contains(queryCode))
                             || (info.getProjectName().contains(queryCode)))
                     .collect(Collectors.toList());
-            if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+            if (CollectionUtil.isNullOrEmpty(resultList)) {
                 return PageUtil.Page.empty();
             }
-            totalCount = Long.valueOf(wtVideoList.size());
+            totalCount = Long.valueOf(resultList.size());
         }
 
         // 过滤出规则引擎 所拥有的设备
@@ -324,7 +329,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             // TODO:暂不处理
         }
 
-        List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(wtVideoList, param.getPageSize());
+        List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(resultList, param.getPageSize());
         return new PageUtil.Page<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount);
 
     }
@@ -548,19 +553,24 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                 .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
         areas.clear();
 
-        wtVideoList.forEach(item -> {
-            item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
-        });
+        // 过滤出监测点下存在设备的数据
+        List<WtVideoPageInfo> resultList = wtVideoList.stream()
+                .peek(item -> item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null)))
+                .filter(pojo -> pojo.getVideoSN() != null && !pojo.getVideoSN().equals(""))
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(resultList)) {
+            return List.of();
+        }
 
         if (!StringUtil.isNullOrEmpty(param.getQueryCode())) {
             // 设备SN || 工程名称 || 监测点
             String queryCode = param.getQueryCode();
-            wtVideoList = wtVideoList.stream()
+            resultList = resultList.stream()
                     .filter(info -> (info.getVideoSN() != null && !info.getVideoSN().isEmpty() && info.getVideoSN().contains(queryCode))
                             || (info.getMonitorPointName().contains(queryCode))
                             || (info.getProjectName().contains(queryCode)))
                     .collect(Collectors.toList());
-            if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+            if (CollectionUtil.isNullOrEmpty(resultList)) {
                 return List.of();
             }
         }
