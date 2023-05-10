@@ -15,7 +15,8 @@
             tmi.`Name` monitorItemName,
             TRIM( BOTH '"' FROM JSON_EXTRACT( tpi.Location, "$.town" ) ) areaCode,
             t1.customColumn,
-            t2.upperName
+            t2.upperName,
+            t3.fieldTokenUpperNames
         FROM
             tb_monitor_point tmp
             LEFT JOIN tb_project_info tpi ON tpi.ID = tmp.ProjectID
@@ -47,8 +48,18 @@
                     LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
                 WHERE
                     twl1.latest_time = twl.WarnTime
-                  AND ts2.`Status` IN ( 1, 2, 3, 4 )
+                    AND ts2.`Status` IN ( 1, 2, 3, 4 )
             ) t2 ON t2.MonitorPointID = tmp.ID
+            LEFT JOIN (
+                SELECT
+                    tmp.ID monitorPointID,
+                    GROUP_CONCAT( "{", twt.FieldToken, ":", TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName" ) ) ,"}" ) fieldTokenUpperNames
+                FROM
+                    tb_monitor_point tmp
+                        LEFT JOIN tb_warn_rule twr ON twr.MonitorPointID = tmp.ID
+                        LEFT JOIN tb_warn_trigger twt ON twt.RuleID = twr.ID
+                GROUP BY tmp.ID
+            ) t3 ON t3.monitorPointID = tmp.ID
         WHERE tpi.CompanyID = #{companyID}
             AND tmi.MonitorClass IN (0,1,4)
             AND tmt.TypeName IS NOT NULL

@@ -7,6 +7,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper;
@@ -169,16 +170,22 @@ public class TbReportServiceImpl implements ITbReportService {
     }
 
     private List<WtReportWarn> dealWarnList(final List<TbBaseReportInfo> infoList) {
-        List<String> warnNameList = infoList.stream().map(k -> {
+        List<String> warnDescList = infoList.stream().map(k -> {
             Integer monitorType = k.getMonitorType();
             String upperName = k.getUpperName();
-            Map<String, String> customFieldColumnMap = getCustomFieldColumnMap(k.getCustomColumn());
-            return customFieldColumnMap.keySet().stream()
+            return getCustomFieldColumnTupleList(k.getCustomColumn()).stream().map(Tuple::getItem1)
                     .map(v -> CompareInterval.getValue(monitorType, v, upperName)).filter(Objects::nonNull)
                     .map(CompareInterval::getDesc).toList();
         }).flatMap(Collection::stream).toList();
-        return CollUtil.countMap(warnNameList).entrySet().stream().map(ss -> WtReportWarn.builder().warnName(ss.getKey())
-                .total(ss.getValue()).build()).toList();
+        List<WtReportWarn> nonWarnList = infoList.stream().map(u -> Optional.ofNullable(u.getFieldTokenUpperNames())
+                .map(this::getCustomFieldColumnTupleList)
+                .map(w -> w.stream().map(s -> CompareInterval.getValue(u.getMonitorType(), s.getItem2(), s.getItem1()))
+                        .filter(Objects::nonNull).map(CompareInterval::getDesc).toList()).orElse(new ArrayList<>())
+        ).flatMap(Collection::stream).distinct().map(u -> WtReportWarn.builder().warnName(u).total(0).build()).toList();
+        List<WtReportWarn> resList = new ArrayList<>(CollUtil.countMap(warnDescList).entrySet().stream().map(u ->
+                WtReportWarn.builder().warnName(u.getKey()).total(u.getValue()).build()).toList());
+        resList.addAll(nonWarnList);
+        return resList;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -186,7 +193,6 @@ public class TbReportServiceImpl implements ITbReportService {
                                                    final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                    final Map<String, String> areaCodeNameMap) {
         return infoList.stream().map(n -> {
-            Map<String, String> customFieldColumnMap = getCustomFieldColumnMap(n.getCustomColumn());
             Map<String, Object> influxData = Optional.ofNullable(n.getSensorID()).map(sensorIDResMap::get)
                     .orElse(new HashMap<>());
             WtReportFormDataInfo formDataInfo = WtReportFormDataInfo.builder().projectName(n.getProjectName())
@@ -196,23 +202,18 @@ public class TbReportServiceImpl implements ITbReportService {
                     .time(Optional.ofNullable(influxData.get(DbConstant.TIME_FIELD))
                             .map(m -> DateUtil.parse(m.toString(), "yyyy-MM-dd HH:mm:ss.SSS"))
                             .orElse(null)).build();
-            customFieldColumnMap.entrySet().stream().peek(s -> formDataInfo.addFieldDataList(
-                    s.getValue(), Optional.ofNullable(influxData.get(s.getKey())).orElse("-"))).toList();
+            getCustomFieldColumnTupleList(n.getCustomColumn()).stream().peek(s -> formDataInfo.addFieldDataList(
+                    s.getItem2(), Optional.ofNullable(influxData.get(s.getItem1())).orElse("-"))).toList();
             return formDataInfo;
         }).toList();
     }
 
-    private Map<String, String> getCustomFieldColumnMap(String customColumn) {
+    private List<Tuple<String, String>> getCustomFieldColumnTupleList(String customColumn) {
         return Optional.ofNullable(customColumn).map(u -> u.replaceAll("[{}]", "").split(","))
                 .map(u -> Arrays.stream(u).map(w -> {
-                    Map<String, String> map = new HashMap<>();
                     String[] split = w.split(":");
-                    map.put(split[1], split[0]);
-                    return map;
-                }).reduce((map, map2) -> {
-                    map.putAll(map2);
-                    return map;
-                }).orElse(new HashMap<>())).orElse(new HashMap<>());
+                    return new Tuple<>(split[1], split[0]);
+                }).toList()).orElse(new ArrayList<>());
     }
 
     private WtReportProjectInfo getReportProjectInfo(final String monitorClass, final Integer total,

@@ -20,5 +20,8 @@ public class TbBaseReportInfo {
     private String areaCode;
     // {columnName:fieldToken}, e.g.{水库库容(m):capacity},{水位(m):distance}
     private String customColumn;
+    // 点位当前报警规则区间的upperName
     private String upperName;
+    // 点位所配置的全部报警规则区间的token和upperName信息(repeated probably),e.g.{fieldToken:upperName}
+    private String fieldTokenUpperNames;
 }
