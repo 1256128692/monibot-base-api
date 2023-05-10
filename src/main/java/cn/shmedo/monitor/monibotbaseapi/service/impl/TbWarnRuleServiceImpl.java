@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.func.Func;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -27,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.CompareIntervalDescUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -35,6 +38,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +48,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.apache.coyote.http11.Constants.a;
 
 @Slf4j
 @Service
@@ -270,8 +277,40 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
 
     @Override
     public Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
-        // TODO 处理统计
         TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
+        if (entity.getProductID() != null) {
+            // iot 设备统计
+            Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(pa.getCompanyID());
+            Map<String, String> idNameMap = tbProjectInfoMapper.selectBatchIds(projectIDLIst).stream().collect(Collectors.toMap(e -> e.getID().toString(), TbProjectInfo::getProjectName));
+            QueryDeviceSimpleBySenderAddressParam request4Third = QueryDeviceSimpleBySenderAddressParam.builder()
+                    .companyID(pa.getCompanyID())
+                    .sendType(SendType.MDMBASE.toInt())
+                    .sendAddressList(projectIDLIst.stream().map(String::valueOf).toList())
+                    .productID(entity.getProductID())
+                    .sendEnable(true)
+                    .build();
+            ResultWrapper<List<SimpleDeviceV5>> result = iotService.queryDeviceSimpleBySenderAddress(request4Third);
+            List<SimpleDeviceV5> allData = result.getData();
+            if (result.apiSuccess() && CollectionUtil.isNotEmpty(allData)) {
+                if (!entity.getDeviceCSV().equals("all")) {
+                    List<Integer> filterList = Arrays.stream(entity.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
+                    allData = allData.stream().filter(u -> filterList.contains(u.getDeviceID())).toList();
+                }
+                Map<String, Long> collect = allData.stream().flatMap(e -> e.getSendAddressList().stream()).collect(Collectors.groupingBy(
+                        Function.identity(), Collectors.counting()
+                ));
+                Map<String, Long> nameCount = collect.entrySet().stream().collect(Collectors.toMap(
+                        e -> idNameMap.get(e.getKey()), Map.Entry::getValue
+                ));
+                if (StringUtils.isBlank(entity.getExValue())) {
+                    entity.setExValue(JSONUtil.toJsonStr(Map.of("proCount", nameCount)));
+                } else {
+                    Map map = JSONUtil.toBean(entity.getExValue(), Map.class);
+                    map.put("proCount", nameCount);
+                    entity.setExValue(JSONUtil.toJsonStr(map));
+                }
+            }
+        }
         tbWarnRuleMapper.insert(entity);
         return entity.getID();
     }
