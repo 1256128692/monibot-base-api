@@ -186,27 +186,20 @@ public class TbReportServiceImpl implements ITbReportService {
                                                    final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                    final Map<String, String> areaCodeNameMap) {
         return infoList.stream().map(n -> {
-                    Map<String, String> customFieldColumnMap = getCustomFieldColumnMap(n.getCustomColumn());
-                    return Optional.ofNullable(n.getSensorID()).map(sensorIDResMap::get).map(m -> {
-                        WtReportFormDataInfo formDataInfo = WtReportFormDataInfo.builder()
-                                .monitorPointName(n.getMonitorPointName())
-                                .monitorTypeName(n.getMonitorTypeName())
-                                .monitorItemName(n.getMonitorItemName())
-                                .projectTypeName(n.getProjectTypeName())
-                                .projectName(n.getProjectName())
-                                .areaName(Optional.ofNullable(n.getAreaCode()).map(areaCodeNameMap::get)
-                                        .orElse("--"))
-                                .time(DateUtil.parse(m.get(DbConstant.TIME_FIELD).toString(),
-                                        "yyyy-MM-dd HH:mm:ss.SSS")).build();
-                        m.entrySet().stream().filter(t -> !(DbConstant.TIME_FIELD.equals(t.getKey()) ||
-                                        DbConstant.SENSOR_ID_FIELD_TOKEN.equals(t.getKey())))
-                                .filter(t -> customFieldColumnMap.containsKey(t.getKey()))
-                                .peek(t -> formDataInfo.addFieldDataList(
-                                        customFieldColumnMap.get(t.getKey()), t.getValue())).toList();
-                        return formDataInfo;
-                    }).orElse(null);
-                }
-        ).filter(Objects::nonNull).toList();
+            Map<String, String> customFieldColumnMap = getCustomFieldColumnMap(n.getCustomColumn());
+            Map<String, Object> influxData = Optional.ofNullable(n.getSensorID()).map(sensorIDResMap::get)
+                    .orElse(new HashMap<>());
+            WtReportFormDataInfo formDataInfo = WtReportFormDataInfo.builder().projectName(n.getProjectName())
+                    .monitorPointName(n.getMonitorPointName()).monitorTypeName(n.getMonitorTypeName())
+                    .monitorItemName(n.getMonitorItemName()).projectTypeName(n.getProjectTypeName())
+                    .areaName(Optional.ofNullable(n.getAreaCode()).map(areaCodeNameMap::get).orElse("-"))
+                    .time(Optional.ofNullable(influxData.get(DbConstant.TIME_FIELD))
+                            .map(m -> DateUtil.parse(m.toString(), "yyyy-MM-dd HH:mm:ss.SSS"))
+                            .orElse(null)).build();
+            customFieldColumnMap.entrySet().stream().peek(s -> formDataInfo.addFieldDataList(
+                    s.getValue(), Optional.ofNullable(influxData.get(s.getKey())).orElse("-"))).toList();
+            return formDataInfo;
+        }).toList();
     }
 
     private Map<String, String> getCustomFieldColumnMap(String customColumn) {
