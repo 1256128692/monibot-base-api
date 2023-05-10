@@ -277,10 +277,10 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     @Override
     public Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
         TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
+        Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(pa.getCompanyID());
+        Map<String, String> idNameMap = tbProjectInfoMapper.selectBatchIds(projectIDLIst).stream().collect(Collectors.toMap(e -> e.getID().toString(), TbProjectInfo::getProjectName));
         if (entity.getProductID() != null) {
             // iot 设备统计
-            Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(pa.getCompanyID());
-            Map<String, String> idNameMap = tbProjectInfoMapper.selectBatchIds(projectIDLIst).stream().collect(Collectors.toMap(e -> e.getID().toString(), TbProjectInfo::getProjectName));
             QueryDeviceSimpleBySenderAddressParam request4Third = QueryDeviceSimpleBySenderAddressParam.builder()
                     .companyID(pa.getCompanyID())
                     .sendType(SendType.MDMBASE.toInt())
@@ -341,6 +341,21 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                             }
                     ).toList();
                 }
+                Map<String, Long> collect = tbSensors.stream().collect(Collectors.groupingBy(
+                        e -> e.getProjectID().toString(), Collectors.counting()
+                ));
+
+                Map<String, Long> nameCount = collect.entrySet().stream().collect(Collectors.toMap(
+                        e -> idNameMap.get(e.getKey()), Map.Entry::getValue
+                ));
+                if (StringUtils.isBlank(entity.getExValue())) {
+                    entity.setExValue(JSONUtil.toJsonStr(Map.of("proCount", nameCount)));
+                } else {
+                    Map map = JSONUtil.toBean(entity.getExValue(), Map.class);
+                    map.put("proCount", nameCount);
+                    entity.setExValue(JSONUtil.toJsonStr(map));
+                }
+
             }
         }
         tbWarnRuleMapper.insert(entity);
