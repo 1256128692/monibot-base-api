@@ -71,6 +71,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
+     * @apiSuccess (响应结果) {Int} data.fieldList.fieldStatisticsType   属性类型 1 - 基础属性  2 - 扩展属性 3 - 扩展配置
      * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
      * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
      * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
@@ -207,6 +208,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {Object[]} fieldList 监测类型属性字段列表
      * @apiSuccess (响应结果) {String} fieldList.fieldToken 字段标志
      * @apiSuccess (响应结果) {String} fieldList.fieldName  字段名称
+     * @apiSuccess (响应结果) {Int} fieldList.fieldStatisticsType   属性类型 1 - 基础属性  2 - 扩展属性 3 - 扩展配置
      * @apiSuccess (响应结果) {String} fieldList.fieldExValue  字段单位ID
      * @apiSuccess (响应结果) {Object[]} dataUnitList 字段单位列表
      * @apiSuccess (响应结果) {String} dataUnitList.engUnit 英文单位
