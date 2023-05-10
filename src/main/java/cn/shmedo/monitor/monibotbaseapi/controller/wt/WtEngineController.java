@@ -74,7 +74,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} currentPageData.dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {Boolean} currentPageData.dataList.action.enable 是否开启
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:ListBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:ListBaseRuleEngine")
     @PostMapping(value = "/QueryWtEnginePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -126,7 +126,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.action.desc 描述,一般是生成报警记录的解决方案说明(200字)
      * @apiSuccess (返回结果) {Boolean} dataList.action.enable 是否开启
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:DescribeBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:DescribeBaseRuleEngine")
     @PostMapping(value = "/QueryWtEngineDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -148,7 +148,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} monitorPointID 监测点ID
      * @apiSuccess (响应结果) Int engineID 引擎ID
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:AddBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:AddBaseRuleEngine")
     @PostMapping(value = "/AddWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -225,7 +225,7 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int[]} engineIDList 引擎ID list
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DeleteBaseRuleEngine
+     * @apiPermission 系统权限 mdmbase:DeleteBaseRuleEngine
      */
     @Permission(permissionName = "mdmbase:DeleteBaseRuleEngine")
     @PostMapping(value = "/DeleteWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -284,9 +284,9 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} dataList.warnLevel 报警类型枚举值
      * @apiSuccess (返回结果) {String} dataList.warnTypeName 报警类型名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 系统权限 mdmbase:DescribeBaseRuleEngine
      */
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:DescribeBaseRuleEngine")
     @PostMapping(value = "/WarnTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object warnTypeList(@Valid @RequestBody WarnTypeListParam param) {
         return WarnLevel.getEnum(WarnType.formCode(param.getRuleType()));

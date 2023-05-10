@@ -88,9 +88,9 @@ public class WtReportController {
      * @apiSuccess (返回结果) {String} projectDataList.monitorTypeCountList.warnCountList.warnName 报警名称
      * @apiSuccess (返回结果) {Int} projectDataList.monitorTypeCountList.warnCountList.total 报警总计
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeWtReport
      */
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:DescribeWtReport")
     @PostMapping(value = "/QueryReport", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryReport(@Valid @RequestBody WtQueryReportParam param) {
         return tbReportService.queryReport(param);
