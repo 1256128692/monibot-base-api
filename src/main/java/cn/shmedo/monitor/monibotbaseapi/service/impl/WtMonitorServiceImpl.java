@@ -95,7 +95,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 2.监测点信息列表
         List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(configProjectIDList, pa.getMonitorType()
-                , pa.getMonitorItemID(), pa.getMonitorClassType());
+                , pa.getMonitorItemID(), pa.getMonitorClassType(), pa.getMonitorItemName());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return Collections.emptyList();
         }
@@ -453,7 +453,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         Integer monitorType = -1;
         // 2.监测点信息列表
-        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null, null, null);
+        List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(Arrays.asList(pa.getProjectID()), null,
+                null, null, null);
         List<MonitorPointAndItemInfo> result = new ArrayList<>();
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
@@ -957,7 +958,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
         // 2.监测点信息列表
         List<MonitorPointAndItemInfo> tbMonitorPoints = tbMonitorPointMapper.selectListByCondition(projectIDList,
-                pa.getMonitorType(), pa.getMonitorItemID(), pa.getMonitorClassType());
+                pa.getMonitorType(), pa.getMonitorItemID(), pa.getMonitorClassType(), pa.getMonitorItemName());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return Collections.emptyList();
         }
