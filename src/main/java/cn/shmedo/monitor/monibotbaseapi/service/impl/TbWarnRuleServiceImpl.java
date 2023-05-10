@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.lang.func.Func;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -20,8 +19,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleB
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnActionService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnRuleService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
@@ -34,6 +33,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.CompareIntervalDescUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
@@ -51,8 +51,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.coyote.http11.Constants.a;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
@@ -66,6 +64,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     private final ITbWarnActionService tbWarnActionService;
     private final FileConfig fileConfig;
     private final TbWarnRuleMapper tbWarnRuleMapper;
+    private final TbSensorMapper tbSensorMapper;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
@@ -308,6 +307,39 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                     Map map = JSONUtil.toBean(entity.getExValue(), Map.class);
                     map.put("proCount", nameCount);
                     entity.setExValue(JSONUtil.toJsonStr(map));
+                }
+            }
+        } else if (entity.getVideoType() != null) {
+            // 视频设备统计
+            List<TbSensor> tbSensors = tbSensorMapper.selectList(
+                    new QueryWrapper<TbSensor>().lambda()
+                            // 视频对应的监测类型为40
+                            .eq(TbSensor::getMonitorType, 40)
+                            .like(TbSensor::getExValues, entity.getVideoType())
+            );
+            if (CollectionUtil.isNotEmpty(tbSensors)) {
+                if (!entity.getVideoCSV().equals("all")) {
+                    List<String> videoSNList = Arrays.stream(entity.getVideoCSV().split(",")).toList();
+                    tbSensors = tbSensors.stream().filter(
+                            e -> {
+                                String exValues = e.getExValues();
+                                if (StringUtils.isBlank(exValues)) {
+                                    return false;
+                                } else {
+                                    Map map = JSONUtil.toBean(exValues, Map.class);
+                                    if (map.containsKey("seqNo")) {
+                                        if (videoSNList.contains(map.get("seqNo").toString())) {
+                                            return true;
+                                        }
+
+                                        return false;
+                                    } else {
+                                        return false;
+                                    }
+
+                                }
+                            }
+                    ).toList();
                 }
             }
         }

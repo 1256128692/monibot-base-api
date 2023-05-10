@@ -221,6 +221,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.getProjectIDList().stream().map(
                             projectID -> {
                                 TbProjectInfo tbProjectInfo = projectInfoMap.get(projectID);
+                                if (tbProjectInfo == null) {
+                                    return null;
+                                }
                                 return Device4Web.Porject.builder().projectID(tbProjectInfo.getID())
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())
@@ -477,6 +480,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.getProjectIDList().stream().map(
                             projectID -> {
                                 TbProjectInfo tbProjectInfo = projectInfoMap.get(projectID);
+                                if (tbProjectInfo == null) {
+                                    return null;
+                                }
                                 return Device4Web.Porject.builder().projectID(tbProjectInfo.getID())
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())
