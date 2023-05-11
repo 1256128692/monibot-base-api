@@ -75,8 +75,8 @@
             tmt.TypeName monitorTypeName,
             t2.upperName
         FROM
-            tb_monitor_point tmp
-            LEFT JOIN tb_project_info tpi ON tpi.ID = tmp.ProjectID
+            tb_project_info tpi
+            LEFT JOIN tb_monitor_point tmp ON tpi.ID = tmp.ProjectID
             LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmp.MonitorType
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
             LEFT JOIN (
@@ -93,12 +93,10 @@
                     twl1.latest_time = twl.WarnTime
                   AND ts2.`Status` IN ( 1, 2, 3, 4 )
             ) t2 ON t2.MonitorPointID = tmp.ID
-        WHERE tmt.TypeName IS NOT NULL
-            AND tmp.CreateTime &lt;= #{endTime}
-            AND tmp.ProjectID IN
+        WHERE tpi.ID IN
             <foreach collection="projectIDList" index="index" item="item" open="(" close=")" separator=",">
                 #{item}
             </foreach>
-
+            AND IF(tmp.ID IS NULL,1=1,tmp.CreateTime &lt;= #{endTime})
     </select>
 </mapper>

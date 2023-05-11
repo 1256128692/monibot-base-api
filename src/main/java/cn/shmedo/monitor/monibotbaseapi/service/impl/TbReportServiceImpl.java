@@ -76,6 +76,10 @@ public class TbReportServiceImpl implements ITbReportService {
         Map<String, List<TbBaseReportInfo>> projectNameInfoMap = tbReportMapper.queryProjectReportInfo(
                 projectIDList, startTime, endTime).stream().collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName));
         return projectNameInfoMap.values().stream().map(u -> {    // level - project
+            if (u.stream().anyMatch(w -> Objects.isNull(w.getMonitorTypeName()))) {
+                return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
+                        .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
+            }
             Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream().collect(Collectors
                     .groupingBy(TbBaseReportInfo::getMonitorTypeName));
             WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
