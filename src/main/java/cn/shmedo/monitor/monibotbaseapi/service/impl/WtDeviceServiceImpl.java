@@ -656,7 +656,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             }
         }
 
-        return wtVideoList;
+        return resultList;
     }
 
     @Override
