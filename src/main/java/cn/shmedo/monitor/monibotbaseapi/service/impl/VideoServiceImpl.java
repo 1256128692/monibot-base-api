@@ -26,6 +26,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -147,7 +148,9 @@ public class VideoServiceImpl implements VideoService {
                 });
             }
 
-            return list;
+            return list.stream()
+                    .sorted(Comparator.comparing(VideoMonitorPointPictureInfo::getUploadTime).reversed())
+                    .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

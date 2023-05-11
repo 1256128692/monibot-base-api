@@ -6,13 +6,14 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorSatusType;
 import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
 public class WarnInfo {
-
     private Integer normalCount;
     private Integer noDataCount;
     private Integer levelOneCount;
@@ -20,37 +21,53 @@ public class WarnInfo {
     private Integer levelThreeCount;
     private Integer levelFourCount;
 
-
     public static WarnInfo toBuliderNewVo(List<TbSensor> sensorList) {
         WarnInfo vo = new WarnInfo();
-        if (!CollectionUtils.isEmpty(sensorList)) {
-            Map<Byte, List<TbSensor>> listMap = sensorList.stream().filter(sensor -> sensor.getStatus() != null)
-                    .collect(Collectors.groupingBy(TbSensor::getStatus));
-            if (MapUtil.isNotEmpty(listMap)){
-                listMap.entrySet().forEach(item -> {
-                    if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_0.getKey()))) {
-                        vo.setNormalCount(item.getValue().size());
-                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_1.getKey()))) {
-                        vo.setLevelOneCount(item.getValue().size());
-                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_2.getKey()))) {
-                        vo.setLevelTwoCount(item.getValue().size());
-                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_3.getKey()))) {
-                        vo.setLevelThreeCount(item.getValue().size());
-                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_4.getKey()))) {
-                        vo.setLevelFourCount(item.getValue().size());
-                    } else if (item.getKey().toString().equals(String.valueOf(SensorSatusType.TYPE_ERROR.getKey()))) {
-                        vo.setNoDataCount(item.getValue().size());
+        vo.setNoDataCount(0);
+        vo.setNormalCount(0);
+        vo.setLevelOneCount(0);
+        vo.setLevelTwoCount(0);
+        vo.setLevelThreeCount(0);
+        vo.setLevelFourCount(0);
+
+        // 进行监测点分组,一个监测点下可能有多个传感器
+        Map<Integer, List<TbSensor>> sensorsByMonitorPoint = sensorList.stream().filter(sensor -> sensor.getMonitorPointID() != null)
+                .collect(Collectors.groupingBy(TbSensor::getMonitorPointID));
+
+        // 遍历每个传感器
+        for (Map.Entry<Integer, List<TbSensor>> entry : sensorsByMonitorPoint.entrySet()) {
+            List<TbSensor> sensorsForMonitorPoint = entry.getValue().stream().filter(sensor -> sensor.getStatus() != null).collect(Collectors.toList());
+
+            // 拿到最差的预警警报
+            if (!CollectionUtils.isEmpty(sensorsForMonitorPoint)) {
+                byte maxStatus = -1;
+                for (TbSensor sensor : sensorsForMonitorPoint) {
+                    if (sensor.getStatus() > maxStatus) {
+                        maxStatus = sensor.getStatus();
                     }
-                });
+                }
+                switch (maxStatus) {
+                    case -1:
+                        vo.setNoDataCount(vo.getNoDataCount() + 1);
+                        break;
+                    case 0:
+                        vo.setNormalCount(vo.getNormalCount() + 1);
+                        break;
+                    case 1:
+                        vo.setLevelOneCount(vo.getLevelOneCount() + 1);
+                        break;
+                    case 2:
+                        vo.setLevelTwoCount(vo.getLevelTwoCount() + 1);
+                        break;
+                    case 3:
+                        vo.setLevelThreeCount(vo.getLevelThreeCount() + 1);
+                        break;
+                    case 4:
+                        vo.setLevelFourCount(vo.getLevelFourCount() + 1);
+                        break;
+                }
             }
         }
-        vo.setNoDataCount(vo.getNoDataCount() == null ? 0 : vo.getNoDataCount());
-        vo.setNormalCount(vo.getNormalCount() == null ? 0 : vo.getNormalCount());
-        vo.setLevelOneCount(vo.getLevelOneCount() == null ? 0 : vo.getLevelOneCount());
-        vo.setLevelTwoCount(vo.getLevelTwoCount() == null ? 0 : vo.getLevelTwoCount());
-        vo.setLevelThreeCount(vo.getLevelThreeCount() == null ? 0 : vo.getLevelThreeCount());
-        vo.setLevelFourCount(vo.getLevelFourCount() == null ? 0 : vo.getLevelFourCount());
-
         return vo;
     }
 }

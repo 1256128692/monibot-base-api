@@ -484,7 +484,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
-        // TODO WarnInfo待处理,统计方式:处理统计成为单个监测点下最差情况
         List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID());
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(pa.getCompanyID());
 
