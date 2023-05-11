@@ -329,9 +329,46 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         // 过滤出规则引擎 所拥有的设备
         if (param.getRuleID() != null) {
-            // TODO:暂不处理
+            boolean flag = param.getSelect() == null || param.getSelect();
+            TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(param.getRuleID());
+            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType()) && StringUtils.isNotBlank(tbWarnRule.getVideoCSV())) {
+                String videoType = tbWarnRule.getVideoType();
+                List<String> videoSNList = tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
+                resultList = resultList.stream().filter(
+                        e -> {
+
+                            if (flag) {
+                                if (!e.getVideoType().equals(videoType)) {
+                                    return false;
+                                }
+                                if (CollectionUtils.isEmpty(videoSNList)) {
+                                    return false;
+                                } else if (videoSNList.contains(e.getVideoSN())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                if (!e.getVideoType().equals(videoType)) {
+                                    return true;
+                                }
+                                if (CollectionUtils.isEmpty(videoSNList)) {
+                                    return true;
+                                } else if (videoSNList.contains(e.getVideoSN())) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                ).toList();
+            }
+        }
+        if (CollectionUtils.isEmpty(resultList)) {
+            return PageUtil.Page.empty();
         }
 
+        totalCount = Long.valueOf(resultList.size());
         List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(resultList, param.getPageSize());
         return new PageUtil.Page<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount);
 
@@ -583,7 +620,40 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         // 过滤出规则引擎 所拥有的设备
         if (param.getRuleID() != null) {
-            // TODO:暂不处理
+            boolean flag = param.getSelect() == null || param.getSelect();
+            TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(param.getRuleID());
+            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType()) && StringUtils.isNotBlank(tbWarnRule.getVideoCSV())) {
+                String videoType = tbWarnRule.getVideoType();
+                List<String> videoSNList = tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
+                resultList = resultList.stream().filter(
+                        e -> {
+
+                            if (flag) {
+                                if (!e.getVideoType().equals(videoType)) {
+                                    return false;
+                                }
+                                if (CollectionUtils.isEmpty(videoSNList)) {
+                                    return false;
+                                } else if (videoSNList.contains(e.getVideoSN())) {
+                                    return true;
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                if (!e.getVideoType().equals(videoType)) {
+                                    return true;
+                                }
+                                if (CollectionUtils.isEmpty(videoSNList)) {
+                                    return true;
+                                } else if (videoSNList.contains(e.getVideoSN())) {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            }
+                        }
+                ).toList();
+            }
         }
 
         return wtVideoList;
