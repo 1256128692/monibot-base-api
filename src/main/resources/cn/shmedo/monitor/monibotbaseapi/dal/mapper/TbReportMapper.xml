@@ -94,7 +94,7 @@
                   AND ts2.`Status` IN ( 1, 2, 3, 4 )
             ) t2 ON t2.MonitorPointID = tmp.ID
         WHERE tmt.TypeName IS NOT NULL
-            AND tmp.CreateTime BETWEEN #{startTime} AND #{endTime}
+            AND tmp.CreateTime &lt;= #{endTime}
             AND tmp.ProjectID IN
             <foreach collection="projectIDList" index="index" item="item" open="(" close=")" separator=",">
                 #{item}
