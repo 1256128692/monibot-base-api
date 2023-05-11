@@ -36,6 +36,10 @@ public class QueryVideoMonitorPointHistoryLiveInfoParam  implements ParameterVal
 
     @Override
     public ResultWrapper<?> validate() {
+        if (endTime != null && endTime.before(beginTime)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "结束时间必须大于开始时间");
+        }
+
         TbProjectMonitorClassMapper projectMonitorClassMapper = ContextHolder.getBean(TbProjectMonitorClassMapper.class);
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
