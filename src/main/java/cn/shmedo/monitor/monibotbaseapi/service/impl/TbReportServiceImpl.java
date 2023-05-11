@@ -77,19 +77,21 @@ public class TbReportServiceImpl implements ITbReportService {
     private List<WtReportProjectInfo> dealProjectData(List<Integer> projectIDList,
                                                       final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                       Date startTime, Date endTime) {
-        Map<String, List<TbBaseReportInfo>> projectNameInfoMap = tbReportMapper.queryProjectReportInfo(
-                projectIDList, startTime, endTime).stream().collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName));
+        Map<String, List<TbBaseReportInfo>> projectNameInfoMap = Optional.of(tbReportMapper.queryProjectReportInfo(
+                projectIDList, startTime, endTime)).map(u -> reduceSensorToPoint(u,sensorIDResMap))
+                .map(Collection::stream).map(u -> u.collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName)))
+                .orElse(new HashMap<>());
         return projectNameInfoMap.values().stream().map(u -> {    // level - project
             if (u.stream().anyMatch(w -> Objects.isNull(w.getMonitorTypeName()))) {
                 return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
                         .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
             }
-            Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream().collect(Collectors
-                    .groupingBy(TbBaseReportInfo::getMonitorTypeName));
+            Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream()
+                    .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeName));
             WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
                     .projectName(u.get(0).getProjectName()).monitorTypeList(monitorTypeMap.keySet().stream().toList());
             List<WtReportMonitorTypeCountInfo> monitorTypeCountList = monitorTypeMap.entrySet().stream().map(w -> { //level - monitorType
-                List<TbBaseReportInfo> wValue = reduceSensorToPoint(w.getValue(), sensorIDResMap);
+                List<TbBaseReportInfo> wValue = w.getValue();
                 WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder().monitorTypeName(w.getKey())
                         .noData((int) wValue.stream().filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
                 List<WtReportWarn> wtReportWarns = dealWarnList(wValue);
