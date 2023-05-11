@@ -141,6 +141,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
+                                if (tbWarnRule.getDeviceCSV().equals("all")) {
+                                    return true;
+                                }
                                 if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return false;
                                 } else if (deviceIDList.contains(e.getDeviceID())) {
@@ -151,6 +154,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
+                                }
+                                if (tbWarnRule.getDeviceCSV().equals("all")) {
+                                    return false;
                                 }
                                 if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return true;
@@ -341,6 +347,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getVideoType().equals(videoType)) {
                                     return false;
                                 }
+                                if (tbWarnRule.getVideoCSV().equals("all")) {
+                                    return true;
+                                }
                                 if (CollectionUtils.isEmpty(videoSNList)) {
                                     return false;
                                 } else if (videoSNList.contains(e.getVideoSN())) {
@@ -351,6 +360,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getVideoType().equals(videoType)) {
                                     return true;
+                                }
+                                if (tbWarnRule.getVideoCSV().equals("all")) {
+                                    return false;
                                 }
                                 if (CollectionUtils.isEmpty(videoSNList)) {
                                     return true;
@@ -438,6 +450,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
+                                if (tbWarnRule.getDeviceCSV().equals("all")) {
+                                    return true;
+                                }
                                 if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return false;
                                 } else if (deviceIDList.contains(e.getDeviceID())) {
@@ -448,6 +463,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
+                                }
+                                if (tbWarnRule.getDeviceCSV().equals("all")) {
+                                    return false;
                                 }
                                 if (CollectionUtils.isEmpty(deviceIDList)) {
                                     return true;
@@ -632,6 +650,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getVideoType().equals(videoType)) {
                                     return false;
                                 }
+                                if (tbWarnRule.getVideoCSV().equals("all")) {
+                                    return true;
+                                }
                                 if (CollectionUtils.isEmpty(videoSNList)) {
                                     return false;
                                 } else if (videoSNList.contains(e.getVideoSN())) {
@@ -642,6 +663,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getVideoType().equals(videoType)) {
                                     return true;
+                                }
+                                if (tbWarnRule.getVideoCSV().equals("all")) {
+                                    return false;
                                 }
                                 if (CollectionUtils.isEmpty(videoSNList)) {
                                     return true;
