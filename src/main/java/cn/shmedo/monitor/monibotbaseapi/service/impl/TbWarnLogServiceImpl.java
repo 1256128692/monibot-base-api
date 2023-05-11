@@ -96,7 +96,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     @Override
     public PageUtil.Page<WtTerminalWarnLog> queryTerminalWarnPage(QueryWtTerminalWarnLogPageParam param) {
         //按条件查询所有报警记录，再通过 deviceToken 反查 UniqueToken, 进而反查传感器、项目、监测类型、检测项、监测点
-        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param, param.getQueryType() == 1);
+        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param);
         Set<String> deviceTokens = wtWarnLogInfos.stream()
                 .map(WtWarnLogInfo::getDeviceToken).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
         TransferUtil.applyDeviceBase(wtWarnLogInfos,
