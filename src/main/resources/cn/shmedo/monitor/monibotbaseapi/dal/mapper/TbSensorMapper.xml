@@ -272,7 +272,7 @@
   </update>
 
   <select id="selectStatisticsCountByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-      select ID, Status, MonitorType
+      select ID, Status, MonitorType, MonitorPointID
       from tb_sensor
       where MonitorPointID in (select ID
                                from tb_monitor_point
