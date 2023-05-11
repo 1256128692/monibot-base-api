@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 public class TbBaseReportInfo {
     private Integer sensorID;
+    private Integer monitorPointID;
     private String monitorPointName;
     private String projectName;
     private String projectTypeName;

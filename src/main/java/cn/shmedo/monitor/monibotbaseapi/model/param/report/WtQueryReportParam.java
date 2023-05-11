@@ -51,13 +51,12 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (DateUtil.betweenYear(startTime, endTime, false) >= 1) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "时间范围最大限制一年");
                 }
-                FileConfig config = ContextHolder.getBean(FileConfig.class);
                 WtReportService wtReportService = ContextHolder.getBean(WtReportService.class);
                 QueryMaxPeriodRequest request = new QueryMaxPeriodRequest();
                 request.setYear(DateUtil.year(endTime));
                 request.setCompanyID(companyID);
                 Optional.ofNullable(
-                                wtReportService.queryMaxPeriod(request, config.getAuthAppKey(), config.getAuthAppSecret()))
+                                wtReportService.queryMaxPeriod(request))
                         .map(ResultWrapper::getData).map(QueryMaxPeriodResponse::getPeriod)
                         .ifPresent(u -> period = u + 1);
             }

@@ -19,6 +19,6 @@ public class WtReportServiceFallbackFactory implements FallbackFactory<WtReportS
     public WtReportService create(Throwable cause) {
         log.error("信息化服务调用失败:{}", cause.getMessage());
         log.error(ExceptionUtil.stacktraceToString(cause));
-        return (pa, appKey, appSecret) -> ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+        return pa -> ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
     }
 }

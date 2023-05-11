@@ -19,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.report.WtQueryReportParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.report.WtQueryReportInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorWarnUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,18 +62,21 @@ public class TbReportServiceImpl implements ITbReportService {
         Map<Integer, Map<String, Object>> sensorIDResMap = querySensorNewData(tbBaseReportInfoList);
         Collection<Object> areaCodeList = tbBaseReportInfoList.stream().map(TbBaseReportInfo::getAreaCode).distinct()
                 .map(u -> (Object) u).toList();
+        List<TbBaseReportInfo> reduceTbBaseReportInfoList = reduceSensorToPoint(tbBaseReportInfoList, sensorIDResMap);
         Map<String, String> areaCodeNameMap = queryAreaData(areaCodeList);
-        Map<String, List<TbBaseReportInfo>> monitorClassInfoMap = tbBaseReportInfoList.stream()
+        Map<String, List<TbBaseReportInfo>> monitorClassInfoMap = reduceTbBaseReportInfoList.stream()
                 .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeClass));
-        builder.total(tbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream().toList())
+        builder.total(reduceTbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream().toList())
                 .dataList(dealDataList(monitorClassInfoMap, sensorIDResMap, areaCodeNameMap));
         if (CollectionUtil.isNotEmpty(projectIDList)) {
-            builder.projectDataList(dealProjectData(projectIDList, startTime, endTime));
+            builder.projectDataList(dealProjectData(projectIDList, sensorIDResMap, startTime, endTime));
         }
         return builder.build();
     }
 
-    private List<WtReportProjectInfo> dealProjectData(List<Integer> projectIDList, Date startTime, Date endTime) {
+    private List<WtReportProjectInfo> dealProjectData(List<Integer> projectIDList,
+                                                      final Map<Integer, Map<String, Object>> sensorIDResMap,
+                                                      Date startTime, Date endTime) {
         Map<String, List<TbBaseReportInfo>> projectNameInfoMap = tbReportMapper.queryProjectReportInfo(
                 projectIDList, startTime, endTime).stream().collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName));
         return projectNameInfoMap.values().stream().map(u -> {    // level - project
@@ -85,7 +89,7 @@ public class TbReportServiceImpl implements ITbReportService {
             WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
                     .projectName(u.get(0).getProjectName()).monitorTypeList(monitorTypeMap.keySet().stream().toList());
             List<WtReportMonitorTypeCountInfo> monitorTypeCountList = monitorTypeMap.entrySet().stream().map(w -> { //level - monitorType
-                List<TbBaseReportInfo> wValue = w.getValue();
+                List<TbBaseReportInfo> wValue = reduceSensorToPoint(w.getValue(), sensorIDResMap);
                 WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder().monitorTypeName(w.getKey())
                         .noData((int) wValue.stream().filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
                 List<WtReportWarn> wtReportWarns = dealWarnList(wValue);
@@ -143,7 +147,7 @@ public class TbReportServiceImpl implements ITbReportService {
     private List<WtReportProjectInfo> dealDataList(final Map<String, List<TbBaseReportInfo>> monitorClassInfoMap,
                                                    final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                    final Map<String, String> areaCodeNameMap) {
-        // evaluate the O(n) of this nested loop is equaled to outside base list,
+        // evaluate the O(n) of this nested loop wouldn't exceed too more to outside base list,
         // if poor performance of this,rewrite here.
         List<WtReportProjectInfo> res = new ArrayList<>();
         monitorClassInfoMap.entrySet().stream().map(u -> {  //level - typeClass
@@ -203,9 +207,7 @@ public class TbReportServiceImpl implements ITbReportService {
                     .monitorPointName(n.getMonitorPointName()).monitorTypeName(n.getMonitorTypeName())
                     .monitorItemName(n.getMonitorItemName()).projectTypeName(n.getProjectTypeName())
                     .areaName(Optional.ofNullable(n.getAreaCode()).map(areaCodeNameMap::get).orElse("-"))
-                    .time(Optional.ofNullable(influxData.get(DbConstant.TIME_FIELD))
-                            .map(m -> DateUtil.parse(m.toString(), "yyyy-MM-dd HH:mm:ss.SSS"))
-                            .orElse(null)).build();
+                    .time(getInfluxDataTime(influxData)).build();
             getCustomFieldColumnTupleList(n.getCustomColumn()).stream().peek(s -> formDataInfo.addFieldDataList(
                     s.getItem2(), Optional.ofNullable(influxData.get(s.getItem1())).orElse("-"))).toList();
             return formDataInfo;
@@ -243,5 +245,49 @@ public class TbReportServiceImpl implements ITbReportService {
     private WtReportWarn dealWarnCount(Map<Integer, List<TbBaseReportInfo>> statusInfoMap, SensorStatusDesc desc) {
         return WtReportWarn.builder().total(Optional.ofNullable(statusInfoMap.get(desc.getStatus())).map(List::size)
                 .orElse(0)).warnLevel(desc.getWarnLevel()).warnName(desc.getDesc()).build();
+    }
+
+    private Date getInfluxDataTime(Map<String, Object> influxData) {
+        return Optional.ofNullable(influxData).map(u -> u.get(DbConstant.TIME_FIELD))
+                .map(m -> DateUtil.parse(m.toString(), "yyyy-MM-dd HH:mm:ss.SSS")).orElse(null);
+    }
+
+    /**
+     * 一个监测点会绑定多个传感器，这个时候要把多个传感器的数据全部聚合成对应监测点的数据
+     * 选取条件排序 存在报警、上行数据时间最新、报警等级最低
+     * <p>
+     * example:
+     * A监测点存在a1,a2,a3,a4四个传感器：
+     * 其中a1在 2023/05/11 11:10:15.000 上行了二级报警；
+     * a2在 2023/05/11 11:10:15.000 上行了三级报警；
+     * a3在 2023/05/11 11:10:00.000 上行了一级报警；
+     * a4在 2023/05/11 11:15:00.000 上行了正常
+     * 那么此时a1传感器的报警数据将被当成A监测点的报警数据被统计，因为它存在报警、上行时间最新、报警等级最低
+     * </p>
+     */
+    private List<TbBaseReportInfo> reduceSensorToPoint(final List<TbBaseReportInfo> list,
+                                                       final Map<Integer, Map<String, Object>> sensorIDResMap) {
+        return list.stream().collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorPointID)).values().stream()
+                .map(u -> u.stream().reduce((info1, info2) -> {
+                    // if only one sensor is warning,return the warning one; or return the latest one
+                    Integer info1Status = info1.getStatus();
+                    Integer info2Status = info2.getStatus();
+                    boolean info1IsWarn = SensorWarnUtils.sensorIsWarn(info1Status);
+                    if (info1IsWarn ^ SensorWarnUtils.sensorIsWarn(info2Status)) {
+                        return info1IsWarn ? info1 : info2;
+                    }
+                    Date info1Time = getInfluxDataTime(sensorIDResMap.get(info1.getSensorID()));
+                    Date info2Time = getInfluxDataTime(sensorIDResMap.get(info2.getSensorID()));
+                    boolean info1TimeIsNull = Objects.isNull(info1Time);
+                    boolean info2TimeIsNull = Objects.isNull(info2Time);
+                    if (info1TimeIsNull ^ info2TimeIsNull) {
+                        return info1TimeIsNull ? info2 : info1;
+                    }
+                    // if they waring at the same time, return the lower level one
+                    if (info1TimeIsNull || DateUtil.isSameTime(info1Time, info2Time)) {
+                        return info1Status <= info2Status ? info1 : info2;
+                    }
+                    return info1Time.after(info2Time) ? info1 : info2;
+                }).orElse(null)).filter(Objects::nonNull).toList();
     }
 }

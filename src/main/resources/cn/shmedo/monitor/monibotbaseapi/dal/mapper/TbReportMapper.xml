@@ -4,6 +4,7 @@
     <select id="queryBaseReportInfo"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.report.TbBaseReportInfo">
         SELECT
+            tmp.ID monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.MonitorType monitorType,
             tpi.ProjectName projectName,
@@ -69,6 +70,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.report.TbBaseReportInfo">
         SELECT
             tpi.ProjectName projectName,
+            tmp.ID monitorPointID,
             tmp.MonitorType monitorType,
             ts.ID sensorID,
             IF(ts.`Status` IS NULL,-1,ts.`Status`) "status",

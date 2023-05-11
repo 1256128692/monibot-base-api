@@ -49,7 +49,6 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {Int} currentPageData.engineID 引擎ID
      * @apiSuccess (返回结果) {String} currentPageData.engineName 引擎名称
      * @apiSuccess (返回结果) {Boolean} currentPageData.enable 启用状态
-     * @apiSuccess (返回结果) {Boolean} currentPageData.whole 完整状态
      * @apiSuccess (返回结果) {String} currentPageData.videoTypeName 视频设备型号名称
      * @apiSuccess (返回结果) {Int} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} [currentPageData.productName] 产品名称

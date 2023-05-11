@@ -14,6 +14,5 @@ import feign.RequestLine;
 public interface WtReportService {
     @RequestLine("POST /QueryMaxPeriod")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<QueryMaxPeriodResponse> queryMaxPeriod(QueryMaxPeriodRequest pa, @Param("appKey") String appKey,
-                                                         @Param("appSecret") String appSecret);
+    ResultWrapper<QueryMaxPeriodResponse> queryMaxPeriod(QueryMaxPeriodRequest pa);
 }

@@ -130,15 +130,13 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                     QueryByProductIDListParam thirdParam = new QueryByProductIDListParam();
                     thirdParam.setProductIDList(u);
                     return thirdParam;
-                })
-                .map(iotService::queryByProductIDList).map(u -> {
+                }).map(iotService::queryByProductIDList).map(u -> {
                     if (!u.apiSuccess()) {
                         log.error("第三方服务调用失败,未能获取到对应产品名称信息...");
                     }
                     return u;
-                }).filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
-                .filter(u -> u.size() > 0).map(u -> u.get(0)).map(ProductBaseInfo::getProductName)
-                .ifPresent(build::setProductName);
+                }).filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).filter(u -> u.size() > 0)
+                .map(u -> u.get(0)).map(ProductBaseInfo::getProductName).ifPresent(build::setProductName);
         Integer createUserID = build.getCreateUserID();
         Map<Integer, String> userIDNameMap = null;
         ResultWrapper<Object> wrapper = Optional.ofNullable(createUserID).map(List::of).map(w -> {
