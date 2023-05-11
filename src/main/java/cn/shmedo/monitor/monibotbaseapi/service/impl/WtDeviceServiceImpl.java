@@ -586,7 +586,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             // TODO:暂不处理
         }
 
-        return wtVideoList;
+        return resultList;
     }
 
     @Override
