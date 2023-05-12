@@ -324,6 +324,7 @@
         LEFT JOIN tb_warn_trigger twt ON twr.ID = twt.RuleID
         WHERE
             twt.ID IS NOT NULL
+            AND IF(twr.RuleType = 1, twr.MonitorPointID IS NOT NULL, twr.ExValue IS NOT NULL AND twr.ExValue != '')
             AND twr.ID IN
         <foreach collection="list" item="item" index="index" open="(" close=")" separator=",">
             #{item}

@@ -20,7 +20,10 @@
             twa.ActionType actionType,
             twa.ActionTarget actionTarget,
             twa.`Desc` `desc`,
-            twa.`Enable` `enable`
+            twa.`Enable` `enable`,
+            twr.RuleType ruleType,
+            twr.MonitorPointID monitorPointID,
+            twr.ExValue exValue
         FROM
             tb_warn_trigger twt
         LEFT JOIN tb_warn_action twa ON twt.ID = twa.triggerID

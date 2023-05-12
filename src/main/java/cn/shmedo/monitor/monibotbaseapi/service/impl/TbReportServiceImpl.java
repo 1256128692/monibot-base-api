@@ -10,9 +10,11 @@ import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.Company;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareInterval;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.param.report.WtQueryReportParam;
@@ -20,6 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.report.WtQueryReportInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorWarnUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,7 @@ import java.util.stream.Collectors;
 public class TbReportServiceImpl implements ITbReportService {
     private final RedisService redisService;
     private final TbReportMapper tbReportMapper;
+    private final TbProjectInfoMapper tbProjectInfoMapper;
     private final SensorDataDao sensorDataDao;
 
     @Override
@@ -75,7 +79,7 @@ public class TbReportServiceImpl implements ITbReportService {
     private List<WtReportProjectInfo> dealProjectData(List<Integer> projectIDList,
                                                       final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                       Date startTime, Date endTime) {
-        return Optional.of(tbReportMapper.queryProjectReportInfo(
+        List<WtReportProjectInfo> infoList = new ArrayList<>(Optional.of(tbReportMapper.queryProjectReportInfo(
                         projectIDList, startTime, endTime))
                 .map(Collection::stream).map(u -> u.collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName)))
                 .orElse(new HashMap<>()).values().stream().map(u -> {    // level - project
@@ -83,7 +87,6 @@ public class TbReportServiceImpl implements ITbReportService {
                         return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
                                 .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
                     }
-                    //TODO fix me cannot get not point in time interval
                     List<TbBaseReportInfo> reduceU = Optional.of(u).map(w -> reduceSensorToPoint(w, sensorIDResMap))
                             .orElse(new ArrayList<>());
                     Map<String, List<TbBaseReportInfo>> monitorTypeMap = reduceU.stream().collect(Collectors.groupingBy(
@@ -99,7 +102,14 @@ public class TbReportServiceImpl implements ITbReportService {
                         build.addWarnCountList(dealWarnList(wValue));
                         return build;
                     }).toList()).build();
-                }).toList();
+                }).toList());
+        List<WtReportProjectInfo> addtionList = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
+                .in(TbProjectInfo::getID, projectIDList)).stream().map(TbProjectInfo::getProjectName)
+                .filter(u -> infoList.stream().noneMatch(v -> u.equalsIgnoreCase(v.getProjectName())))
+                .map(u -> WtReportProjectInfo.builder().total(0).projectName(u).monitorClass(null)
+                        .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build()).toList();
+        infoList.addAll(addtionList);
+        return infoList;
     }
 
     private Map<String, String> queryAreaData(final Collection<Object> areaCodeList) {

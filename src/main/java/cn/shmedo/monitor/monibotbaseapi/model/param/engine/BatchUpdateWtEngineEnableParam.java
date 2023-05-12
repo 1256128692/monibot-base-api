@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.engine;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -28,13 +29,13 @@ public class BatchUpdateWtEngineEnableParam extends BatchDeleteWtEngineParam imp
         List<Integer> engineIDList = getEngineIDList();
         if (engineIDList.size() == 1 && enable) {
             ITbWarnTriggerService tbWarnTriggerService = ContextHolder.getBean(ITbWarnTriggerService.class);
-            WtTriggerActionInfo info = Optional.of(engineIDList).map(w -> w.get(0)).map(u -> {
-                        List<Integer> list = new ArrayList<>();
-                        list.add(u);
-                        return list;
-                    }).map(tbWarnTriggerService::queryWarnStatusByEngineIds).filter(u -> u.size() > 0).map(u -> u.get(0))
+            WtTriggerActionInfo info = Optional.of(engineIDList).map(w -> w.get(0)).map(List::of)
+                    .map(tbWarnTriggerService::queryWarnStatusByEngineIds).filter(u -> u.size() > 0).map(u -> u.get(0))
                     .orElse(WtTriggerActionInfo.builder().warnID(null).build());
-            if (Objects.isNull(info.getWarnID())) {
+            Integer ruleType = info.getRuleType();
+            // rule exist warn_status(or be called rule trigger) and: warn rule -> exist pointID; other rule -> devices
+            if (Objects.isNull(info.getWarnID()) || (Objects.isNull(ruleType) ? 1 : ruleType) == 1
+                    ? Objects.isNull(info.getMonitorPointID()) : ObjectUtil.isEmpty(info.getExValue())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该规则未配置完整，不能开启");
             }
         }

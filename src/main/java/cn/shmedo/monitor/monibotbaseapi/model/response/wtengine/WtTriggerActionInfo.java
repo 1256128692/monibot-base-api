@@ -21,13 +21,19 @@ public class WtTriggerActionInfo extends TbWarnAction implements IFieldName {
     private String warnName;
     private Integer warnLevel;
     private Integer warnID;     //冗余,保证一定有报警状态ID
+    private String fieldToken;
+    private String compareRule;
+    private String triggerRule;
     @JsonIgnore
     private Integer monitorType;
     @JsonIgnore
     private String fieldName;
-    private String fieldToken;
-    private String compareRule;
-    private String triggerRule;
+    @JsonIgnore
+    private Integer ruleType;
+    @JsonIgnore
+    private Integer monitorPointID;
+    @JsonIgnore
+    private String exValue;
     private final List<TbWarnAction> action = new ArrayList<>();
 
     public WtTriggerActionInfo setAction(TbWarnAction data) {
