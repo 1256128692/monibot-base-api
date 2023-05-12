@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryMaxPeriodResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
+import cn.shmedo.monitor.monibotbaseapi.util.DatePickerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
@@ -62,11 +63,11 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
             }
             case 1 -> {
                 startTime = DateUtil.beginOfWeek(startTime);
-                endTime = DateUtil.endOfWeek(endTime);
                 if (startTime.after(DateUtil.beginOfWeek(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前周和未来周无法选择");
                 }
-                period = DateUtil.weekOfYear(endTime);
+                period = DatePickerUtil.getDatePickerWeekOfYear(endTime);
+                endTime = DateUtil.endOfWeek(endTime);
             }
             case 2 -> {
                 startTime = DateUtil.beginOfMonth(startTime);
