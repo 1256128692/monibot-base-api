@@ -14,6 +14,7 @@ import java.util.List;
 @Data
 @Builder
 public class Device4Web {
+    private Integer deviceID;
     private String deviceSN;
     private String firewallVersion;
     private Integer productID;
