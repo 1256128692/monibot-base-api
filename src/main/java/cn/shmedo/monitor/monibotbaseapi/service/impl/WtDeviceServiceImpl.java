@@ -175,9 +175,23 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         }
         Collection<String> uniqueTokens = allData.stream().map(SimpleDeviceV5::getUniqueToken).collect(Collectors.toSet());
 
-        List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, pa.getMonitorItemID());
+        List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
         Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectBatchIds(projectIDList).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        if (pa.getMonitorItemID() != null) {
+            allData = allData.stream().filter(
+                    item -> {
+                        if (map.containsKey(item.getUniqueToken())) {
+                            if (map.get(item.getUniqueToken()).stream().anyMatch(
+                                    item2 -> item2.getMonitorItemID().equals(pa.getMonitorItemID())
+                            )) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+            ).toList();
+        }
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             // 支持模糊查询设备SN/工程名称/监测点名称
             allData.forEach(item -> {
@@ -484,9 +498,23 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         }
         Collection<String> uniqueTokens = allData.stream().map(SimpleDeviceV5::getUniqueToken).collect(Collectors.toSet());
 
-        List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, pa.getMonitorItemID());
+        List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
         Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectBatchIds(projectIDList).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        if (pa.getMonitorItemID() != null) {
+            allData = allData.stream().filter(
+                    item -> {
+                        if (map.containsKey(item.getUniqueToken())) {
+                            if (map.get(item.getUniqueToken()).stream().anyMatch(
+                                    item2 -> item2.getMonitorItemID().equals(pa.getMonitorItemID())
+                            )) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+            ).toList();
+        }
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             // 支持模糊查询设备SN/工程名称/监测点名称
             allData.forEach(item -> {

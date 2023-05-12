@@ -6,13 +6,12 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -53,6 +52,13 @@ public class AddWtDeviceWarnRuleParam implements ParameterValidator, ResourcePer
 
     @Override
     public ResultWrapper validate() {
+        // 重复名称校验
+        TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
+        if (tbWarnRuleMapper.selectCount(
+                new QueryWrapper<TbWarnRule>().lambda().eq(TbWarnRule::getName, name)
+        ) > 0) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称重复");
+        }
         if (ruleType == null) {
             ruleType = 1;
         }
