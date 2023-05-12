@@ -74,7 +74,7 @@ public class WtQueryReportParam implements ParameterValidator, ResourcePermissio
                 if (startTime.after(DateUtil.beginOfMonth(current))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当月和未来月无法选择");
                 }
-                period = DateUtil.month(endTime);
+                period = DateUtil.month(endTime) + 1;
             }
             case 3 -> {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "暂不支持季度报");
