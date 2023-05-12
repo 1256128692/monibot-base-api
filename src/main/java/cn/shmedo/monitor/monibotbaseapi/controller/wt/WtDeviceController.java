@@ -146,6 +146,7 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.deviceID 设备ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceSN 设备SN
      * @apiSuccess (返回结果) {String} [currentPageData.firewallVersion] 固件版本
      * @apiSuccess (返回结果) {String} currentPageData.productID 产品ID
@@ -195,6 +196,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiSuccess (返回结果) {Object[]} list 数据
      * @apiSuccess (返回结果) {String} list.deviceSN 设备SN
+     * @apiSuccess (返回结果) {Int} list.deviceID 设备ID
      * @apiSuccess (返回结果) {String} [list.firewallVersion] 固件版本
      * @apiSuccess (返回结果) {String} list.productID 产品ID
      * @apiSuccess (返回结果) {String} list.productName 产品名称

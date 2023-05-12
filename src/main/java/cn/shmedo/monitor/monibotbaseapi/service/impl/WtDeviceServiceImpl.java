@@ -131,7 +131,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (pa.getRuleID() != null) {
             boolean flag = pa.getSelect() == null || pa.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
-            if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+            if (tbWarnRule != null && tbWarnRule.getProductID() != null) {
                 Integer productID = tbWarnRule.getProductID();
                 List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
@@ -139,6 +139,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
                             if (flag) {
                                 if (!e.getProductID().equals(productID)) {
+                                    return false;
+                                }
+                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                                     return false;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
@@ -153,6 +156,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 }
                             } else {
                                 if (!e.getProductID().equals(productID)) {
+                                    return true;
+                                }
+                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
                                     return true;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
@@ -236,6 +242,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .lastActiveTime(item.getLastActiveTime())
                     .createTime(item.getCreateTime())
                     .status(null)
+                    .deviceID(item.getDeviceID())
                     .build();
             device4Web.setProjectList(
                     item.getProjectIDList().stream().map(
@@ -454,7 +461,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (pa.getRuleID() != null) {
             boolean flag = pa.getSelect() == null || pa.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
-            if (tbWarnRule != null && tbWarnRule.getProductID() != null && StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+            if (tbWarnRule != null && tbWarnRule.getProductID() != null) {
                 Integer productID = tbWarnRule.getProductID();
                 List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
@@ -463,6 +470,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             if (flag) {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
+                                }
+                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+                                    return true;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
                                     return true;
@@ -477,6 +487,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
+                                }
+                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+                                    return false;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
                                     return false;
@@ -558,6 +571,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .lastActiveTime(item.getLastActiveTime())
                     .createTime(item.getCreateTime())
                     .status(null)
+                    .deviceID(item.getDeviceID())
                     .build();
             device4Web.setProjectList(
                     item.getProjectIDList().stream().map(
