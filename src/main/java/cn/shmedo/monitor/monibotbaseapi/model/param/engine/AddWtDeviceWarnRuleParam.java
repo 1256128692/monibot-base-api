@@ -84,18 +84,21 @@ public class AddWtDeviceWarnRuleParam implements ParameterValidator, ResourcePer
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "需要输入monitorType和monitorItemID和pointID");
             }
         } else {
-            if (StringUtils.isNotBlank(productID) && StringUtils.isNotBlank(deviceCSV)) {
-                if (!deviceCSV.equals("all")) {
-                    try {
-                        List<String> strings = Arrays.stream(deviceCSV.split(",")).toList();
-                        if (ruleType == 3 && strings.stream().anyMatch(s -> !NumberUtil.isInteger(s))) {
-                            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV不是合法的数字");
-                        }
+            if (StringUtils.isNotBlank(productID)) {
+                if (StringUtils.isNotBlank(deviceCSV)) {
+                    if (!deviceCSV.equals("all")) {
+                        try {
+                            List<String> strings = Arrays.stream(deviceCSV.split(",")).toList();
+                            if (ruleType == 3 && strings.stream().anyMatch(s -> !NumberUtil.isInteger(s))) {
+                                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV不是合法的数字");
+                            }
 
-                    } catch (Exception e) {
-                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV格式不正确");
+                        } catch (Exception e) {
+                            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV格式不正确");
+                        }
                     }
                 }
+
             } else {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "需要输入productID和deviceCSV");
             }

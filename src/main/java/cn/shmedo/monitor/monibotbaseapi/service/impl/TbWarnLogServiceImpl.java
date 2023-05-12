@@ -96,7 +96,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     @Override
     public PageUtil.Page<WtTerminalWarnLog> queryTerminalWarnPage(QueryWtTerminalWarnLogPageParam param) {
         //按条件查询所有报警记录，再通过 deviceToken 反查 UniqueToken, 进而反查传感器、项目、监测类型、检测项、监测点
-        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param, param.getQueryType() == 1);
+        List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param);
         Set<String> deviceTokens = wtWarnLogInfos.stream()
                 .map(WtWarnLogInfo::getDeviceToken).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
         TransferUtil.applyDeviceBase(wtWarnLogInfos,
@@ -118,9 +118,10 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                         return log;
                     })
                     .filter(e -> StrUtil.isEmpty(param.getQueryCode())
-                            || (StrUtil.equalsAny(param.getQueryCode(), e.getDeviceToken(), e.getWarnName(), e.getWarnContent())
-                            || e.getProjectList().stream().anyMatch(p -> param.getQueryCode().equals(p.getProjectName()))
-                            || e.getProjectList().stream().flatMap(p -> p.getMonitorPointList().stream()).anyMatch(m -> param.getQueryCode().equals(m.getMonitorPointName())))
+                            || (StrUtil.contains(e.getDeviceToken(), param.getQueryCode()))
+                            || (StrUtil.contains(e.getWarnName(), param.getQueryCode()))
+                            || (StrUtil.contains(e.getWarnContent(), param.getQueryCode()))
+                            || e.getProjectList().stream().flatMap(p -> p.getMonitorPointList().stream()).anyMatch(m -> m.getMonitorPointName().contains(param.getQueryCode()))
                     ).toList();
             return PageUtil.page(result, param.getPageSize(), param.getCurrentPage());
         }

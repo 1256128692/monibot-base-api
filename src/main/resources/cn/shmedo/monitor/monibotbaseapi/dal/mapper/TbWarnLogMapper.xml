@@ -305,35 +305,37 @@
                  LEFT JOIN (SELECT MAX(WarnTime) latest_time, DeviceToken
                             FROM tb_warn_log  WHERE WarnType = 3 GROUP BY DeviceToken) twl1
                            ON twl.DeviceToken = twl1.DeviceToken
-        <choose>
-            <when test="flag">
-                WHERE twl1.latest_time &gt; twl.WarnTime
-            </when>
-            <otherwise>
-                WHERE twl1.latest_time = twl.WarnTime
-            </otherwise>
-        </choose>
-        AND twl.WarnType = 3
-        <if test="param.warnLevel != null">
-            AND twl.warnLevel = #{param.warnLevel}
-        </if>
-        <if test="param.beginTime != null">
-            AND twl.WarnTime &gt;= #{param.beginTime}
-        </if>
-        <if test="param.endTime != null">
-            AND twl.WarnTime &lt;= #{param.endTime}
-        </if>
-        <if test="param.status != null">
-            AND two.`Status`=#{param.status}
-        </if>
-        <choose>
-            <when test="param.orderType == null or param.orderType == 1">
-                ORDER BY twl.WarnTime DESC
-            </when>
-            <when test="param.orderType == 2">
-                ORDER BY twl.WarnTime ASC
-            </when>
-        </choose>
+        <where>
+            <choose>
+                <when test="param.queryType == null or param.queryType == 2">
+                    twl1.latest_time &gt; twl.WarnTime
+                </when>
+                <otherwise>
+                    twl1.latest_time = twl.WarnTime
+                </otherwise>
+            </choose>
+            AND twl.WarnType = 3
+            <if test="param.warnLevel != null">
+                AND twl.warnLevel = #{param.warnLevel}
+            </if>
+            <if test="param.beginTime != null">
+                AND twl.WarnTime &gt;= #{param.beginTime}
+            </if>
+            <if test="param.endTime != null">
+                AND twl.WarnTime &lt;= #{param.endTime}
+            </if>
+            <if test="param.status != null">
+                AND two.`Status`=#{param.status}
+            </if>
+            <choose>
+                <when test="param.orderType == null or param.orderType == 1">
+                    ORDER BY twl.WarnTime DESC
+                </when>
+                <when test="param.orderType == 2">
+                    ORDER BY twl.WarnTime ASC
+                </when>
+            </choose>
+        </where>
     </select>
 
     <select id="queryTerminalWarnListByUniqueToken" resultMap="terminalWarnLogMap">

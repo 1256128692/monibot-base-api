@@ -48,7 +48,7 @@ public interface TbWarnLogMapper extends BaseMapper<TbWarnLog> {
     /**
      * 查询终端报警列表
      */
-    List<WtWarnLogInfo> queryTerminalWarnList(@Param("param") QueryWtTerminalWarnLogPageParam param, @Param("flag") boolean flag);
+    List<WtWarnLogInfo> queryTerminalWarnList(@Param("param") QueryWtTerminalWarnLogPageParam param);
 
     /**
      * 查询终端报警详情
