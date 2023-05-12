@@ -55,19 +55,17 @@ public class TbReportServiceImpl implements ITbReportService {
                             return collection;
                         }).map(u -> redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, u, Company.class))
                         .filter(CollectionUtil::isNotEmpty).map(u -> u.get(0)).map(Company::getShortName)
-                        .orElse("余姚市水务局"))
-                .startTime(startTime).endTime(endTime);
+                        .orElse("余姚市水务局")).startTime(startTime).endTime(endTime);
         List<TbBaseReportInfo> tbBaseReportInfoList = tbReportMapper.queryBaseReportInfo(param.getCompanyID(),
                 startTime, endTime);
         Map<Integer, Map<String, Object>> sensorIDResMap = querySensorNewData(tbBaseReportInfoList);
         Collection<Object> areaCodeList = tbBaseReportInfoList.stream().map(TbBaseReportInfo::getAreaCode).distinct()
                 .map(u -> (Object) u).toList();
         List<TbBaseReportInfo> reduceTbBaseReportInfoList = reduceSensorToPoint(tbBaseReportInfoList, sensorIDResMap);
-        Map<String, String> areaCodeNameMap = queryAreaData(areaCodeList);
         Map<String, List<TbBaseReportInfo>> monitorClassInfoMap = reduceTbBaseReportInfoList.stream()
                 .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeClass));
         builder.total(reduceTbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream().toList())
-                .dataList(dealDataList(monitorClassInfoMap, sensorIDResMap, areaCodeNameMap));
+                .dataList(dealDataList(monitorClassInfoMap, sensorIDResMap, queryAreaData(areaCodeList)));
         if (CollectionUtil.isNotEmpty(projectIDList)) {
             builder.projectDataList(dealProjectData(projectIDList, sensorIDResMap, startTime, endTime));
         }
@@ -77,29 +75,27 @@ public class TbReportServiceImpl implements ITbReportService {
     private List<WtReportProjectInfo> dealProjectData(List<Integer> projectIDList,
                                                       final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                       Date startTime, Date endTime) {
-        Map<String, List<TbBaseReportInfo>> projectNameInfoMap = Optional.of(tbReportMapper.queryProjectReportInfo(
-                projectIDList, startTime, endTime)).map(u -> reduceSensorToPoint(u,sensorIDResMap))
+        return Optional.of(tbReportMapper.queryProjectReportInfo(
+                        projectIDList, startTime, endTime)).map(u -> reduceSensorToPoint(u, sensorIDResMap))
                 .map(Collection::stream).map(u -> u.collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName)))
-                .orElse(new HashMap<>());
-        return projectNameInfoMap.values().stream().map(u -> {    // level - project
-            if (u.stream().anyMatch(w -> Objects.isNull(w.getMonitorTypeName()))) {
-                return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
-                        .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
-            }
-            Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream()
-                    .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeName));
-            WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
-                    .projectName(u.get(0).getProjectName()).monitorTypeList(monitorTypeMap.keySet().stream().toList());
-            List<WtReportMonitorTypeCountInfo> monitorTypeCountList = monitorTypeMap.entrySet().stream().map(w -> { //level - monitorType
-                List<TbBaseReportInfo> wValue = w.getValue();
-                WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder().monitorTypeName(w.getKey())
-                        .noData((int) wValue.stream().filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
-                List<WtReportWarn> wtReportWarns = dealWarnList(wValue);
-                build.addWarnCountList(wtReportWarns);
-                return build;
-            }).toList();
-            return builder.monitorTypeCountList(monitorTypeCountList).build();
-        }).toList();
+                .orElse(new HashMap<>()).values().stream().map(u -> {    // level - project
+                    if (u.stream().anyMatch(w -> Objects.isNull(w.getMonitorTypeName()))) {
+                        return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
+                                .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
+                    }
+                    Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream().collect(Collectors.groupingBy(
+                            TbBaseReportInfo::getMonitorTypeName));
+                    WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
+                            .projectName(u.get(0).getProjectName()).monitorTypeList(monitorTypeMap.keySet().stream().toList());
+                    return builder.monitorTypeCountList(monitorTypeMap.entrySet().stream().map(w -> { //level - monitorType
+                        List<TbBaseReportInfo> wValue = w.getValue();
+                        WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder()
+                                .monitorTypeName(w.getKey()).noData((int) wValue.stream()
+                                        .filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
+                        build.addWarnCountList(dealWarnList(wValue));
+                        return build;
+                    }).toList()).build();
+                }).toList();
     }
 
     private Map<String, String> queryAreaData(final Collection<Object> areaCodeList) {
