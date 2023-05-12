@@ -277,7 +277,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
         Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(pa.getCompanyID());
         Map<String, String> idNameMap = tbProjectInfoMapper.selectBatchIds(projectIDLIst).stream().collect(Collectors.toMap(e -> e.getID().toString(), TbProjectInfo::getProjectName));
-        if (entity.getProductID() != null) {
+        if (entity.getProductID() != null && StringUtils.isNotBlank(entity.getDeviceCSV())) {
             // iot 设备统计
             QueryDeviceSimpleBySenderAddressParam request4Third = QueryDeviceSimpleBySenderAddressParam.builder()
                     .companyID(pa.getCompanyID())
@@ -307,7 +307,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                     entity.setExValue(JSONUtil.toJsonStr(map));
                 }
             }
-        } else if (entity.getVideoType() != null) {
+        } else if (entity.getVideoType() != null && StringUtils.isNotBlank(entity.getVideoCSV())) {
             // 视频设备统计
             List<TbSensor> tbSensors = tbSensorMapper.selectList(
                     new QueryWrapper<TbSensor>().lambda()
