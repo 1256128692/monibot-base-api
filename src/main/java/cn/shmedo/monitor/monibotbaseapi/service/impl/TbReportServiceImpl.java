@@ -76,17 +76,21 @@ public class TbReportServiceImpl implements ITbReportService {
                                                       final Map<Integer, Map<String, Object>> sensorIDResMap,
                                                       Date startTime, Date endTime) {
         return Optional.of(tbReportMapper.queryProjectReportInfo(
-                        projectIDList, startTime, endTime)).map(u -> reduceSensorToPoint(u, sensorIDResMap))
+                        projectIDList, startTime, endTime))
                 .map(Collection::stream).map(u -> u.collect(Collectors.groupingBy(TbBaseReportInfo::getProjectName)))
                 .orElse(new HashMap<>()).values().stream().map(u -> {    // level - project
                     if (u.stream().anyMatch(w -> Objects.isNull(w.getMonitorTypeName()))) {
                         return WtReportProjectInfo.builder().total(0).projectName(u.get(0).getProjectName())
                                 .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build();
                     }
-                    Map<String, List<TbBaseReportInfo>> monitorTypeMap = u.stream().collect(Collectors.groupingBy(
+                    //TODO fix me cannot get not point in time interval
+                    List<TbBaseReportInfo> reduceU = Optional.of(u).map(w -> reduceSensorToPoint(w, sensorIDResMap))
+                            .orElse(new ArrayList<>());
+                    Map<String, List<TbBaseReportInfo>> monitorTypeMap = reduceU.stream().collect(Collectors.groupingBy(
                             TbBaseReportInfo::getMonitorTypeName));
-                    WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder().total(u.size())
-                            .projectName(u.get(0).getProjectName()).monitorTypeList(monitorTypeMap.keySet().stream().toList());
+                    WtReportProjectInfo.WtReportProjectInfoBuilder builder = WtReportProjectInfo.builder()
+                            .total(reduceU.size()).projectName(reduceU.get(0).getProjectName())
+                            .monitorTypeList(monitorTypeMap.keySet().stream().toList());
                     return builder.monitorTypeCountList(monitorTypeMap.entrySet().stream().map(w -> { //level - monitorType
                         List<TbBaseReportInfo> wValue = w.getValue();
                         WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder()

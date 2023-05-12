@@ -113,7 +113,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                             .map(TbMonitorItem::getName).orElse(null))
                     .setMonitorPointName(Optional.ofNullable(idPointMap.get(u.getMonitorPointID()))
                             .map(TbMonitorPoint::getName).orElse(null))
-                    .setWhole(ObjectUtil.isNotEmpty(u.getExValue()) && CollectionUtil.isNotEmpty(dataList));
+                    .setWhole((u.getRuleType().intValue() == 1 ? Objects.nonNull(u.getMonitorPointID()) :
+                            ObjectUtil.isNotEmpty(u.getExValue())) && CollectionUtil.isNotEmpty(dataList));
         }).collect(Collectors.toList());
         return new PageUtil.Page<>(page.getPages(), collect, page.getTotal());
     }
