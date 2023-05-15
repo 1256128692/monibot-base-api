@@ -382,11 +382,11 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         } else {
             if (tbWarnRule.getRuleType() == 2) {
                 if (pa.getSign().equals("+")) {
-                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
                     old.addAll(strings);
                     tbWarnRule.setVideoCSV(String.join(",", old));
                 } else {
-                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
                     old.removeAll(strings);
                     if (CollectionUtils.isEmpty(old)) {
                         tbWarnRule.setVideoCSV(null);
@@ -398,11 +398,11 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 }
             } else {
                 if (pa.getSign().equals("+")) {
-                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
                     old.addAll(strings);
                     tbWarnRule.setDeviceCSV(String.join(",", old));
                 } else {
-                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
                     old.removeAll(strings);
                     if (CollectionUtils.isEmpty(old)) {
                         tbWarnRule.setDeviceCSV(null);

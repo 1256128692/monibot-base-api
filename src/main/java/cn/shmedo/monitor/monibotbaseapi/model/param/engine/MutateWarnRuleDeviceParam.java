@@ -49,12 +49,16 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "符号不合法");
         }
         if (!deviceCSV.equals("all")) {
+            if ("all".equals(tbWarnRule.getDeviceCSV()) || "all".equals(tbWarnRule.getVideoCSV())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则已经是全选");
+            }
             try {
                 deviceCSV.split(",");
             } catch (Exception e) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV不合法");
             }
         }
+
         return null;
     }
 
