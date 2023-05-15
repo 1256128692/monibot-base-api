@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -24,7 +25,9 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
     private Integer companyID;
     @NotNull
     private Integer ruleID;
+    @NotBlank
     private String sign;
+    @NotBlank
     private String deviceCSV;
     @JsonIgnore
     private TbWarnRule tbWarnRule;
@@ -45,8 +48,12 @@ public class MutateWarnRuleDeviceParam implements ParameterValidator, ResourcePe
         if (!sign.equals("+") && !sign.equals("-")) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "符号不合法");
         }
-        if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV()) && tbWarnRule.getDeviceCSV().equals("all") || StringUtils.isNotBlank(tbWarnRule.getVideoCSV()) && tbWarnRule.getVideoCSV().equals("all")) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "规则已经包含所有设备");
+        if (!deviceCSV.equals("all")) {
+            try {
+                deviceCSV.split(",");
+            } catch (Exception e) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "deviceCSV不合法");
+            }
         }
         return null;
     }

@@ -4,10 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
-import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -365,32 +363,54 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     public void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID) {
         List<String> strings = Arrays.stream(pa.getDeviceCSV().split(",")).toList();
         TbWarnRule tbWarnRule = pa.getTbWarnRule();
-        if (tbWarnRule.getRuleType() == 2) {
+        if (pa.getDeviceCSV().equals("all")) {
             if (pa.getSign().equals("+")) {
-                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
-                old.addAll(strings);
-                tbWarnRule.setVideoCSV(String.join(",", old));
-            } else {
-                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
-                old.removeAll(strings);
-                if (CollectionUtils.isEmpty(old)) {
-                    throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "删除后设备为空");
+                if (tbWarnRule.getRuleType() == 2) {
+                    tbWarnRule.setVideoCSV("all");
+                } else {
+                    tbWarnRule.setDeviceCSV("all");
                 }
-                tbWarnRule.setVideoCSV(String.join(",", old));
 
-            }
-        } else {
-            if (pa.getSign().equals("+")) {
-                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
-                old.addAll(strings);
-                tbWarnRule.setDeviceCSV(String.join(",", old));
             } else {
-                List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
-                old.removeAll(strings);
-                if (CollectionUtils.isEmpty(old)) {
-                    throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "删除后设备为空");
+                if (tbWarnRule.getRuleType() == 2) {
+                    tbWarnRule.setVideoCSV(null);
+                } else {
+                    tbWarnRule.setDeviceCSV(null);
                 }
-                tbWarnRule.setDeviceCSV(String.join(",", old));
+            }
+
+        } else {
+            if (tbWarnRule.getRuleType() == 2) {
+                if (pa.getSign().equals("+")) {
+                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    old.addAll(strings);
+                    tbWarnRule.setVideoCSV(String.join(",", old));
+                } else {
+                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    old.removeAll(strings);
+                    if (CollectionUtils.isEmpty(old)) {
+                        tbWarnRule.setVideoCSV(null);
+                    } else {
+                        tbWarnRule.setVideoCSV(String.join(",", old));
+                    }
+
+
+                }
+            } else {
+                if (pa.getSign().equals("+")) {
+                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    old.addAll(strings);
+                    tbWarnRule.setDeviceCSV(String.join(",", old));
+                } else {
+                    List<String> old = new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    old.removeAll(strings);
+                    if (CollectionUtils.isEmpty(old)) {
+                        tbWarnRule.setDeviceCSV(null);
+                    } else {
+                        tbWarnRule.setDeviceCSV(String.join(",", old));
+                    }
+
+                }
             }
         }
         tbWarnRule.setUpdateTime(new Date());
