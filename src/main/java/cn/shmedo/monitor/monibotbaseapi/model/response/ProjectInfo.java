@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
-import cn.shmedo.monitor.monibotbaseapi.model.Company;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbTag;

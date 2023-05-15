@@ -1,6 +1,5 @@
-package cn.shmedo.monitor.monibotbaseapi.model;
+package cn.shmedo.monitor.monibotbaseapi.model.dto;
 
-import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

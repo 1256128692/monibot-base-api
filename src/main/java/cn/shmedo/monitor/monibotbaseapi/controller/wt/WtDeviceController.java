@@ -31,6 +31,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
      * @apiParam (请求参数) {String} [areaCode] 行政区划编号
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiParam (请求参数) {Int} currentPage 当前页
@@ -77,6 +78,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
      * @apiParam (请求参数) {String} [areaCode] 行政区划编号
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiSuccess (返回结果) {Object[]} list 数据
@@ -139,6 +141,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
      * @apiParam (请求参数) {String} [areaCode] 行政区划编号
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiParam (请求参数) {Int} currentPage 当前页
@@ -192,6 +195,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} [status] 设备状态 0.正常 1.异常
      * @apiParam (请求参数) {String} [areaCode] 行政区划编号
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
      * @apiSuccess (返回结果) {Object[]} list 数据

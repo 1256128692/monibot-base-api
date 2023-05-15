@@ -49,6 +49,7 @@ public class ExportWtVideoParam implements ParameterValidator, ResourcePermissio
     private String areaCode;
 
     private Integer monitorItemID;
+    private String monitorItemName;
 
     private Integer ruleID;
 

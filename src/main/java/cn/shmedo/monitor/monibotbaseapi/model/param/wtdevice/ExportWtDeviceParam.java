@@ -39,6 +39,7 @@ public class ExportWtDeviceParam implements ParameterValidator, ResourcePermissi
     private Integer status;
     private String areaCode;
     private Integer monitorItemID;
+    private String monitorItemName;
     private Integer ruleID;
     private Boolean select;
 
