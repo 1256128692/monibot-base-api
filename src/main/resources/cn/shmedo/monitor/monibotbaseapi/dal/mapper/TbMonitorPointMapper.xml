@@ -609,6 +609,11 @@
         <if test="monitorItemID != null">
             and p.monitorItemID = #{monitorItemID}
         </if>
+        <if test="monitorItemName != null and monitorItemName != ''">
+            and (
+            i.Name LIKE CONCAT('%', #{monitorItemName}, '%') or i.Alias LIKE CONCAT('%', #{monitorItemName}, '%')
+            )
+        </if>
         and i.MonitorType = #{monitorType}
     </select>
 </mapper>

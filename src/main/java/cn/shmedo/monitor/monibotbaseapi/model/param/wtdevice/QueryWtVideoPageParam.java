@@ -46,6 +46,7 @@ public class QueryWtVideoPageParam implements ParameterValidator, ResourcePermis
     private String areaCode;
 
     private Integer monitorItemID;
+    private String monitorItemName;
 
     private Integer ruleID;
 

@@ -198,6 +198,30 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     }
             ).toList();
         }
+        if (CollectionUtils.isEmpty(allData)) {
+            return PageUtil.Page.empty();
+        }
+        if (StringUtils.isNotBlank(pa.getMonitorItemName())) {
+            allData = allData.stream().filter(
+                    item -> {
+                        if (map.containsKey(item.getUniqueToken())) {
+                            if (map.get(item.getUniqueToken()).stream().anyMatch(
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName())
+                                            && item2.getMonitorItemName().contains(pa.getMonitorItemName())
+                                            || StringUtils.isNotBlank(item2.getMonitorItemAlias())
+                                            && item2.getMonitorItemAlias().contains(pa.getMonitorItemName())
+                            )) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+            ).toList();
+        }
+        if (CollectionUtils.isEmpty(allData)) {
+            return PageUtil.Page.empty();
+        }
+
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             // 支持模糊查询设备SN/工程名称/监测点名称
             allData.forEach(item -> {
@@ -296,7 +320,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey(),
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), param.getMonitorItemName(), MonitorType.VIDEO.getKey(),
                 param.getVideoType());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return PageUtil.Page.empty();
@@ -528,6 +552,29 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     }
             ).toList();
         }
+        if (CollectionUtils.isEmpty(allData)) {
+            return List.of();
+        }
+        if (StringUtils.isNotBlank(pa.getMonitorItemName())) {
+            allData = allData.stream().filter(
+                    item -> {
+                        if (map.containsKey(item.getUniqueToken())) {
+                            if (map.get(item.getUniqueToken()).stream().anyMatch(
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName())
+                                            && item2.getMonitorItemName().contains(pa.getMonitorItemName())
+                                            || StringUtils.isNotBlank(item2.getMonitorItemAlias())
+                                            && item2.getMonitorItemAlias().contains(pa.getMonitorItemName())
+                            )) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+            ).toList();
+        }
+        if (CollectionUtils.isEmpty(allData)) {
+            return List.of();
+        }
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             // 支持模糊查询设备SN/工程名称/监测点名称
             allData.forEach(item -> {
@@ -622,7 +669,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), MonitorType.VIDEO.getKey(),
+                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), param.getMonitorItemName(), MonitorType.VIDEO.getKey(),
                 param.getVideoType());
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return List.of();
@@ -729,7 +776,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     public Object queryWtVideoTypeList(QueryWtVideoTypeParam param) {
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                null, null, null, null, MonitorType.VIDEO.getKey(), null);
+                null, null, null, null, null, MonitorType.VIDEO.getKey(), null);
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return null;
         }

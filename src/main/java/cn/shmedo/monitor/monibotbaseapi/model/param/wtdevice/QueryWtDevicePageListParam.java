@@ -40,6 +40,7 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
     private Integer status;
     private String areaCode;
     private Integer monitorItemID;
+    private String monitorItemName;
     private Integer ruleID;
     private Boolean select;
     @Positive
