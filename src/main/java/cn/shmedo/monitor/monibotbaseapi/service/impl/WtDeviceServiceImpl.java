@@ -133,7 +133,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null) {
                 Integer productID = tbWarnRule.getProductID();
-                List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
+                List<Integer> deviceIDList = StringUtils.isBlank(tbWarnRule.getDeviceCSV()) || tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
                         e -> {
 
@@ -141,7 +141,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
-                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+                                if (StringUtils.isBlank(tbWarnRule.getDeviceCSV())) {
                                     return false;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
@@ -158,7 +158,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
                                 }
-                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
+                                if (StringUtils.isBlank(tbWarnRule.getDeviceCSV())) {
                                     return true;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
@@ -189,7 +189,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item -> {
                         if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> item2.getMonitorItemID().equals(pa.getMonitorItemID())
+                                    item2 -> item2.getMonitorItemID() != null && item2.getMonitorItemID().equals(pa.getMonitorItemID())
                             )) {
                                 return true;
                             }
@@ -463,7 +463,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
             if (tbWarnRule != null && tbWarnRule.getProductID() != null) {
                 Integer productID = tbWarnRule.getProductID();
-                List<Integer> deviceIDList = tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
+                List<Integer> deviceIDList = StringUtils.isBlank(tbWarnRule.getDeviceCSV()) || tbWarnRule.getDeviceCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).map(Integer::valueOf).toList();
                 allData = allData.stream().filter(
                         e -> {
 
@@ -519,7 +519,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item -> {
                         if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> item2.getMonitorItemID().equals(pa.getMonitorItemID())
+                                    item2 -> item2.getMonitorItemID() != null && item2.getMonitorItemID().equals(pa.getMonitorItemID())
                             )) {
                                 return true;
                             }
