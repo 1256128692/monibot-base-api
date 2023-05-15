@@ -16,7 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.Company;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
@@ -138,8 +138,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 tbMonitorItem.setCreateType(CreateType.CUSTOMIZED.getType());
             }
             tbMonitorItemMapper.insertBatch(map.keySet());
-            map.forEach((key, value)->{
-                value.forEach(item ->{
+            map.forEach((key, value) -> {
+                value.forEach(item -> {
                     item.setMonitorItemID(key.getID());
                 });
             });
@@ -154,8 +154,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, tbProjectInfo.getID().toString(), tbProjectInfo.getProjectName()));
         }
         if (!CollectionUtil.isEmpty(resourceItemV3s)) {
-            ResultWrapper<Object> info = instance.addMdmbaseResource(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new AddResourcesParameter(pa.getCompanyID(), resourceItemV3s));
+            ResultWrapper<Object> info = null;
+            if (DefaultConstant.MDWT_PROJECT_TYPE_LIST.contains(pa.getProjectType())) {
+                info = instance.addMdmbaseResource(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new AddResourcesParameter(pa.getCompanyID(), resourceItemV3s));
+            } else {
+                info = instance.addMdwtResource(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new AddResourcesParameter(pa.getCompanyID(), resourceItemV3s));
+            }
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
@@ -183,11 +189,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void transferProject(TransferProjectParam param, CurrentSubject currentSubject) {
-        transferProject(currentSubject.getSubjectID(), param.getProjectID(), param.getCompanyID(), param.getRowCompanyID());
+        transferProject(currentSubject.getSubjectID(), param.getProjectID(),
+                param.getCompanyID(), param.getRowCompanyID(), param.getProjectType());
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void transferProject(Integer userID, Integer projectID, Integer newCompanyID, Integer oldCompanyID) {
+    public void transferProject(Integer userID, Integer projectID, Integer newCompanyID, Integer oldCompanyID, Integer projectType) {
         tbProjectInfoMapper.updateCompanyID(projectID, newCompanyID, userID, new Date());
         tbTagRelationMapper.deleteByProjectID(projectID);
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
@@ -195,9 +202,17 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         // 转移成功后,并且修改项目资源的公司ID
         resourceItemV2s.add(new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, projectID.toString()));
         if (!CollectionUtil.isEmpty(resourceItemV2s)) {
-            ResultWrapper<Object> info = instance.transferMdmbaseResource(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new TransferResourceParameter(oldCompanyID,
-                            newCompanyID, resourceItemV2s));
+            ResultWrapper<Object> info = null;
+            if (DefaultConstant.MDWT_PROJECT_TYPE_LIST.contains(projectType)) {
+                info = instance.transferMdwtResource(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new TransferResourceParameter(oldCompanyID,
+                                newCompanyID, resourceItemV2s));
+            } else {
+                info = instance.transferMdmbaseResource(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new TransferResourceParameter(oldCompanyID,
+                                newCompanyID, resourceItemV2s));
+            }
+
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
@@ -226,26 +241,38 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     /**
      * 批量删除
-     * TODO:删除关联信息以及水利平台相关关联信息
      *
-     * @param idListParam
+     * @param param
      * @return
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteProjectList(ProjectIDListParam idListParam) {
-        tbProjectInfoMapper.deleteProjectInfoList(idListParam.getDataIDList());
-        tbTagRelationMapper.deleteProjectTagList(idListParam.getDataIDList());
-        tbProjectPropertyMapper.deleteProjectPropertyList(idListParam.getDataIDList());
-        // 删除项目权限
+    public void deleteProjectList(ProjectIDListParam param) {
+        tbProjectInfoMapper.deleteProjectInfoList(param.getDataIDList());
+        tbTagRelationMapper.deleteProjectTagList(param.getDataIDList());
+        tbProjectPropertyMapper.deleteProjectPropertyList(param.getDataIDList());
+        //TODO:删除关联信息以及水利平台相关关联信息
+
+        // 删除项目权限,区分水利项目与其他业务项目
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
-        List<ResourceItemV2> resourceItemV2s = null;
-        if (!CollectionUtil.isEmpty(idListParam.getDataIDList())) {
-            resourceItemV2s = idListParam.getDataIDList().stream().map(item -> new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, item.toString())).toList();
+        List<Integer> wtProjectIDs = param.getProjectInfoList().stream().filter(pi -> DefaultConstant.MDWT_PROJECT_TYPE_LIST
+                .contains(pi.getProjectType().intValue())).map(TbProjectInfo::getID).toList();
+        List<Integer> otherProjectIDs = param.getProjectInfoList().stream().filter(pi -> !DefaultConstant.MDWT_PROJECT_TYPE_LIST
+                .contains(pi.getProjectType().intValue())).map(TbProjectInfo::getID).toList();
+        if (!CollectionUtil.isEmpty(wtProjectIDs)) {
+            List<ResourceItemV2> resourceItemV2s = wtProjectIDs.stream().map(item ->
+                    new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, item.toString())).toList();
+            ResultWrapper<Object> info = instance.deleteMdwtResource(fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret(), new DeleteResourcesParameter(param.getCompanyID(), resourceItemV2s));
+            if (!info.apiSuccess()) {
+                throw new CustomBaseException(info.getCode(), info.getMsg());
+            }
         }
-        if (!CollectionUtil.isEmpty(resourceItemV2s)) {
+        if (!CollectionUtil.isEmpty(otherProjectIDs)) {
+            List<ResourceItemV2> resourceItemV2s = otherProjectIDs.stream().map(item ->
+                    new ResourceItemV2(DefaultConstant.AUTH_RESOURSE, item.toString())).toList();
             ResultWrapper<Object> info = instance.deleteMdmbaseResource(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new DeleteResourcesParameter(idListParam.getCompanyID(), resourceItemV2s));
+                    fileConfig.getAuthAppSecret(), new DeleteResourcesParameter(param.getCompanyID(), resourceItemV2s));
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
@@ -280,7 +307,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             propertyService.updateProperty(pa.getProjectID(), pa.getPropertyList(), pa.getProperties());
         }
         if (pa.getNewCompanyID() != null) {
-            transferProject(userID, pa.getProjectID(), pa.getNewCompanyID(), projectInfo.getCompanyID());
+            transferProject(userID, pa.getProjectID(), pa.getNewCompanyID(),
+                    projectInfo.getCompanyID(), projectInfo.getProjectType().intValue());
         }
         if (ObjectUtil.isAllNotEmpty(pa.getFileName(), pa.getImageContent(), pa.getImageSuffix())) {
             updateProjectImage(pa.getImageContent(), pa.getImageSuffix(), pa.getFileName(), userID,
@@ -295,8 +323,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, projectInfo.getID().toString(), projectInfo.getProjectName()));
         }
         if (!CollectionUtil.isEmpty(resourceItemV3s)) {
-            ResultWrapper<Object> info = instance.updateMdmbaseResourceDesc(fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret(), new UpdateResourceDescParameter(resourceItemV3s));
+            ResultWrapper<Object> info = null;
+            if (DefaultConstant.MDWT_PROJECT_TYPE_LIST.contains(projectInfo.getProjectType())) {
+                info = instance.updateMdwtResourceDesc(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new UpdateResourceDescParameter(resourceItemV3s));
+            } else {
+                info = instance.updateMdmbaseResourceDesc(fileConfig.getAuthAppKey(),
+                        fileConfig.getAuthAppSecret(), new UpdateResourceDescParameter(resourceItemV3s));
+            }
+
             if (!info.apiSuccess()) {
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
@@ -497,10 +532,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                                 Collectors.toMap(PropertyDto::getName, e -> StrUtil.nullToEmpty(e.getValue()), (v1, v2) -> v1)));
         //位置字典
         Collection<Object> areas = list.stream().filter(e -> StrUtil.isNotEmpty(e.getLocation())).map(e -> {
-                    JSONObject json = JSONUtil.parseObj(e.getLocation());
-                    e.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
-                    return e.getLocation();
-                }).filter(Objects::nonNull).collect(Collectors.toSet());
+            JSONObject json = JSONUtil.parseObj(e.getLocation());
+            e.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+            return e.getLocation();
+        }).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, String> areaMap = areas.isEmpty() ?
                 Collections.emptyMap() :
                 redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
