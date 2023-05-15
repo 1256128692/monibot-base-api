@@ -27,7 +27,7 @@ import java.util.Objects;
  */
 @Slf4j
 @Data
-public class SetProjectConfigParam implements IConfigParam, IConfigGroup, ParameterValidator, ResourcePermissionProvider<Resource> {
+public class SetProjectConfigParam implements IConfigParam, IConfigID, ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "项目ID不能为空")
     @Min(value = 1, message = "项目ID不能小于1")
     private Integer projectID;
@@ -37,8 +37,8 @@ public class SetProjectConfigParam implements IConfigParam, IConfigGroup, Parame
     private String group;
     @NotEmpty(message = "要配置的value不能为空")
     private String value;
-    @NotNull(message = "暂时只允许配置分组的额外配置,因此monitorGroupID不能为null")
     private Integer monitorGroupID;
+    private Integer monitorPointID;
     @JsonIgnore
     private TbProjectInfo tbProjectInfo;
     @JsonIgnore
@@ -46,7 +46,6 @@ public class SetProjectConfigParam implements IConfigParam, IConfigGroup, Parame
     @JsonIgnore
     private ProjectGroupType projectGroupType;
 
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     @Override
     public ResultWrapper validate() {
         projectGroupType = ProjectGroupType.getProjectGroupType(this);
@@ -67,6 +66,7 @@ public class SetProjectConfigParam implements IConfigParam, IConfigGroup, Parame
             tbMonitorGroup = tbMonitorGroups.get(0);
             switch (projectGroupType) {
                 case MONITOR_GROUP -> key = key + "::" + monitorGroupID;
+                case MONITOR_POINT -> key = key + "::" + monitorPointID;
                 default -> log.info("未设置对应的分级枚举，将不会拼接key");
             }
         }

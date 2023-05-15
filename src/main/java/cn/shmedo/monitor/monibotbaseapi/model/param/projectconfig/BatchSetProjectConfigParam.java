@@ -6,8 +6,10 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectGroupType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -19,6 +21,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +39,8 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
     private TbProjectInfo tbProjectInfo;
     @JsonIgnore
     private Map<Integer, TbMonitorGroup> tbMonitorGroupMap;
+    @JsonIgnore
+    private Map<Integer, TbMonitorPoint> tbMonitorPointMap;
 
     @SuppressWarnings({"SwitchStatementWithTooFewBranches", "ResultOfMethodCallIgnored"})
     @Override
@@ -58,20 +63,29 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
                 .collect(Collectors.groupingBy(ProjectGroupType::getProjectGroupType));
         projectGroupTypeListMap.entrySet().stream().peek(u -> {
             switch (u.getKey()) {
-                // 目前只有一个monitorGroup可进行配置，如果有其他，需要在这里、SetProjectConfigParam和IConfigGroup进行处理
+                // 需要在这里、SetProjectConfigParam和IConfigID进行处理
                 case MONITOR_GROUP -> {
                     TbMonitorGroupMapper groupMapper = ContextHolder.getBean(TbMonitorGroupMapper.class);
                     tbMonitorGroupMap = groupMapper.selectList(new LambdaQueryWrapper<TbMonitorGroup>()
                             .in(TbMonitorGroup::getID, u.getValue().stream().map(SetProjectConfigParam::getMonitorGroupID)
                                     .toList())).stream().collect(Collectors.toMap(TbMonitorGroup::getID, w -> w));
                 }
+                case MONITOR_POINT -> {
+                    TbMonitorPointMapper pointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+                    tbMonitorPointMap = pointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
+                            .in(TbMonitorPoint::getID, u.getValue().stream().map(SetProjectConfigParam::getMonitorPointID)
+                                    .toList())).stream().collect(Collectors.toMap(TbMonitorPoint::getID, w -> w));
+                }
                 default ->
                         throw new RuntimeException("switch in {@code BatchSetProjectConfigParam} lack enums,@see ProjectGroupType");
             }
         }).toList();
-        // 同一个项目每一级仅能对同一个项目配置一次
-        // 被配置对象的size之和(目前这里只有一个tbMonitorGroupMap)等于setProjectConfigParamList.size()
-        if (dataList.size() != tbMonitorGroupMap.keySet().size()) {
+        // 同一个项目同一级仅能对同一个项目配置一次
+        // e.g.
+        // 表定义(group,key,value) -> dataList中数据项(monitorGroup,stConfig::123,value),
+        // {@code dataList}里只能出现一次(monitorGroup,stConfig::123,value),
+        // 所有的value变更都要在这个(monitorGroup,stConfig::123,value)的value里
+        if (dataList.size() != getSubSum()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "被配置对象不存在或重复");
         }
         return null;
@@ -85,5 +99,13 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
     @Override
     public Resource parameter() {
         return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    /**
+     * 批量配置时，可能会有多级配置被一起配置了，所以校验时需要校验被配置对象size等于dataList.size()
+     */
+    private Integer getSubSum() {
+        return (Objects.isNull(tbMonitorGroupMap) ? 0 : tbMonitorGroupMap.keySet().size())
+                + (Objects.isNull(tbMonitorPointMap) ? 0 : tbMonitorPointMap.keySet().size());
     }
 }

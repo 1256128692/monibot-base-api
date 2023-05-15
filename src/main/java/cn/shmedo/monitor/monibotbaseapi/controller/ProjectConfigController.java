@@ -3,9 +3,11 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,14 +28,15 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {String} group 分组
      * @apiParam (请求参数) {String} key 对应的key,最终入库的key将和对应级别的ID拼接成这样 key::ID
      * @apiParam (请求参数) {String} value 值
-     * @apiParam (请求参数) {Int} monitorGroupID 监测点分组ID,暂时只允许配置分组的额外配置,因此monitorGroupID不能为null
+     * @apiParam (请求参数) {Int} monitorGroupID 监测点分组ID
+     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
     @PostMapping(value = "/SetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
-    public Object setProjectConfig(SetProjectConfigParam param) {
+    public Object setProjectConfig(@Valid @RequestBody SetProjectConfigParam param) {
         return null;
     }
 
@@ -56,7 +59,7 @@ public class ProjectConfigController {
      */
     @PostMapping(value = "/BatchSetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
-    public Object batchSetProjectConfig(BatchSetProjectConfigParam param) {
+    public Object batchSetProjectConfig(@Valid @RequestBody BatchSetProjectConfigParam param) {
         return null;
     }
 
@@ -80,7 +83,7 @@ public class ProjectConfigController {
      */
     @PostMapping(value = "/ListProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
-    public Object listProjectConfig(ListProjectConfigParam param) {
+    public Object listProjectConfig(@Valid @RequestBody ListProjectConfigParam param) {
         return null;
     }
 }

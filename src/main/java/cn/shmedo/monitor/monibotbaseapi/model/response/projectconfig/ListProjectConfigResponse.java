@@ -1,6 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.IConfigGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.IConfigID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.IConfigParam;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +11,10 @@ import lombok.Data;
  */
 @Data
 @Builder(toBuilder = true)
-public class ListProjectConfigResponse implements IConfigParam, IConfigGroup {
+public class ListProjectConfigResponse implements IConfigParam, IConfigID {
     private Integer projectID;
     private Integer monitorGroupID;
+    private Integer monitorPointID;
     private String group;
     private String key;
     private String value;
