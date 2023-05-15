@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.config;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 
 public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
@@ -35,4 +37,5 @@ public class DefaultConstant {
     public static final int YS_DEFAULT_SPEED = 1;
 
     public static final long NORMAL_FILE_EXPIRE_MILLI = 3600 * 1000;
+    public static final List<Integer> MDWT_PROJECT_TYPE_LIST = Arrays.asList(1, 2, 3, 4);
 }

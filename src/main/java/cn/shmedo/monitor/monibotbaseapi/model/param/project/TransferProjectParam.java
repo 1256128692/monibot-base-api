@@ -25,6 +25,8 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
 
     @JsonIgnore
     private Integer rowCompanyID;
+    @JsonIgnore
+    private Integer projectType;
 
     @Override
     public ResultWrapper validate() {
@@ -37,6 +39,7 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目标公司与当前公司一样");
         }
         this.rowCompanyID = tbProjectInfo.getCompanyID();
+        this.projectType = Integer.valueOf(tbProjectInfo.getProjectType());
         return null;
     }
 
@@ -75,6 +78,14 @@ public class TransferProjectParam implements ParameterValidator, ResourcePermiss
 
     public void setProjectID(Integer projectID) {
         this.projectID = projectID;
+    }
+
+    public Integer getProjectType() {
+        return projectType;
+    }
+
+    public void setProjectType(Integer projectType) {
+        this.projectType = projectType;
     }
 
     @Override

@@ -101,4 +101,29 @@ public interface PermissionService {
     ResultWrapper<Object> transferMdmbaseResource(@Param("appKey")String authAppKey,
                                                   @Param("appSecret")String authAppSecret,
                                                   TransferResourceParameter transferResourceParameter);
+
+    @RequestLine("POST /DeleteMdwtResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> deleteMdwtResource(@Param("appKey") String authAppKey,
+                                                @Param("appSecret") String authAppSecret,
+                                                DeleteResourcesParameter deleteResourcesParameter);
+
+
+    @RequestLine("POST /AddMdwtResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> addMdwtResource(@Param("appKey") String authAppKey,
+                                             @Param("appSecret") String authAppSecret,
+                                             AddResourcesParameter addResourcesParameter);
+
+    @RequestLine("POST /UpdateMdwtResourceDesc")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> updateMdwtResourceDesc(@Param("appKey") String authAppKey,
+                                                    @Param("appSecret") String authAppSecret,
+                                                    UpdateResourceDescParameter updateResourceDescParameter);
+
+    @RequestLine("POST /TransferMdwtResource")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Object> transferMdwtResource(@Param("appKey")String authAppKey,
+                                                  @Param("appSecret")String authAppSecret,
+                                                  TransferResourceParameter transferResourceParameter);
 }

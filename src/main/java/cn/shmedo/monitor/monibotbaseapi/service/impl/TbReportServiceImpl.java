@@ -13,7 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
-import cn.shmedo.monitor.monibotbaseapi.model.Company;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareInterval;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
