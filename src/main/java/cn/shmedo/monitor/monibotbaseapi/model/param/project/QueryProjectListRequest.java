@@ -88,7 +88,8 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
         // 获取有权限的项目列表
         this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID);
         if (projectIDList.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            return ResultWrapper.successWithNothing();
+//            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
         }
         return null;
     }

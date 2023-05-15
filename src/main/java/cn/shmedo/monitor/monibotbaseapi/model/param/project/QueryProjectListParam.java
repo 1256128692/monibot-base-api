@@ -35,7 +35,8 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
         Optional.ofNullable(platformType).ifPresent(val -> Assert.isTrue(PlatformType.validate(val), "platformType is invalid"));
         this.projectIDs = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
         if (projectIDs.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            return ResultWrapper.successWithNothing();
+//            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
         }
         return null;
     }
