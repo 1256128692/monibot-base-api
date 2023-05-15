@@ -52,7 +52,8 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {String} dataList.group 分组
      * @apiParam (请求参数) {String} dataList.key 对应的key
      * @apiParam (请求参数) {String} dataList.value 值
-     * @apiParam (请求参数) {Int} dataList.monitorGroupID 监测点分组ID,暂时只允许配置分组的额外配置,因此monitorGroupID不能为null
+     * @apiParam (请求参数) {Int} dataList.monitorGroupID 监测点分组ID
+     * @apiParam (请求参数) {Int} dataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -75,6 +76,7 @@ public class ProjectConfigController {
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.projectID 项目ID
      * @apiSuccess (返回结果) {Int} [dataList.monitorGroupID] 监测点分组ID
+     * @apiSuccess (返回结果) {Int} [dataList.monitorPointID] 监测点ID
      * @apiSuccess (返回结果) {String} dataList.group 分组
      * @apiSuccess (返回结果) {String} dataList.key key
      * @apiSuccess (返回结果) {String} dataList.value value
