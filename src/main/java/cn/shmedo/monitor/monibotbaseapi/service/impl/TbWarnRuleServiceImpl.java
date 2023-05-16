@@ -415,6 +415,6 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         }
         tbWarnRule.setUpdateTime(new Date());
         tbWarnRule.setUpdateUserID(userID);
-        tbWarnRuleMapper.updateById(tbWarnRule);
+        tbWarnRuleMapper.updateIGNORED(tbWarnRule);
     }
 }
