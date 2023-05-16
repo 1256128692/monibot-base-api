@@ -130,12 +130,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             Date now = new Date();
             for (TbMonitorItem tbMonitorItem : pa.getMonitorItems()) {
                 map.put(tbMonitorItem, temp.get(tbMonitorItem.getID()));
+                tbMonitorItem.setCompanyID(pa.getCompanyID());
                 tbMonitorItem.setProjectID(tbProjectInfo.getID());
                 tbMonitorItem.setCreateTime(now);
                 tbMonitorItem.setCreateUserID(userID);
                 tbMonitorItem.setUpdateTime(now);
                 tbMonitorItem.setUpdateUserID(userID);
-                tbMonitorItem.setCreateType(CreateType.CUSTOMIZED.getType());
+                tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
             }
             tbMonitorItemMapper.insertBatch(map.keySet());
             map.forEach((key, value) -> {
