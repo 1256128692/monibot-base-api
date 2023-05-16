@@ -17,4 +17,11 @@ public interface TbWarnRuleMapper extends BaseMapper<TbWarnRule> {
     List<Integer> selectRuleWarnIDListByRuleIDList(List<Integer> engineIDList);
 
     WtEngineDetail selectWtEngineDetail(Integer engineID);
+
+    /**
+     * 不忽略null的字段
+     *
+     * @param tbWarnRule
+     */
+    void updateIGNORED(TbWarnRule tbWarnRule);
 }

@@ -382,14 +382,17 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (param.getRuleID() != null) {
             boolean flag = param.getSelect() == null || param.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(param.getRuleID());
-            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType()) && StringUtils.isNotBlank(tbWarnRule.getVideoCSV())) {
+            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType())) {
                 String videoType = tbWarnRule.getVideoType();
-                List<String> videoSNList = tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
+                List<String> videoSNList = StringUtils.isBlank(tbWarnRule.getVideoCSV()) || tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
                 resultList = resultList.stream().filter(
                         e -> {
 
                             if (flag) {
                                 if (!e.getVideoType().equals(videoType)) {
+                                    return false;
+                                }
+                                if (StringUtils.isBlank(tbWarnRule.getVideoCSV())) {
                                     return false;
                                 }
                                 if (tbWarnRule.getVideoCSV().equals("all")) {
@@ -404,6 +407,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 }
                             } else {
                                 if (!e.getVideoType().equals(videoType)) {
+                                    return true;
+                                }
+                                if (StringUtils.isBlank(tbWarnRule.getVideoCSV())) {
                                     return true;
                                 }
                                 if (tbWarnRule.getVideoCSV().equals("all")) {
@@ -495,8 +501,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return false;
                                 }
-                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
-                                    return true;
+                                if (StringUtils.isBlank(tbWarnRule.getDeviceCSV())) {
+                                    return false;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
                                     return true;
@@ -512,8 +518,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                                 if (!e.getProductID().equals(productID)) {
                                     return true;
                                 }
-                                if (StringUtils.isNotBlank(tbWarnRule.getDeviceCSV())) {
-                                    return false;
+                                if (StringUtils.isBlank(tbWarnRule.getDeviceCSV())) {
+                                    return true;
                                 }
                                 if (tbWarnRule.getDeviceCSV().equals("all")) {
                                     return false;
@@ -729,14 +735,17 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (param.getRuleID() != null) {
             boolean flag = param.getSelect() == null || param.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(param.getRuleID());
-            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType()) && StringUtils.isNotBlank(tbWarnRule.getVideoCSV())) {
+            if (tbWarnRule != null && StringUtils.isNotBlank(tbWarnRule.getVideoType())) {
                 String videoType = tbWarnRule.getVideoType();
-                List<String> videoSNList = tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
+                List<String> videoSNList = StringUtils.isBlank(tbWarnRule.getVideoCSV()) || tbWarnRule.getVideoCSV().equals("all") ? null : Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList();
                 resultList = resultList.stream().filter(
                         e -> {
 
                             if (flag) {
                                 if (!e.getVideoType().equals(videoType)) {
+                                    return false;
+                                }
+                                if (StringUtils.isBlank(tbWarnRule.getVideoCSV())) {
                                     return false;
                                 }
                                 if (tbWarnRule.getVideoCSV().equals("all")) {
@@ -752,6 +761,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             } else {
                                 if (!e.getVideoType().equals(videoType)) {
                                     return true;
+                                }
+                                if (StringUtils.isBlank(tbWarnRule.getVideoCSV())) {
+                                    return false;
                                 }
                                 if (tbWarnRule.getVideoCSV().equals("all")) {
                                     return false;

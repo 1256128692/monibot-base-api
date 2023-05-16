@@ -363,4 +363,27 @@
             LEFT JOIN tb_monitor_point tmp ON twr.MonitorPointID = tmp.ID
         WHERE twr.ID = #{engineID}
     </select>
+
+  <update id="updateIGNORED">
+    update tb_warn_rule set
+        RuleType = #{ruleType,jdbcType=INTEGER},
+        ProjectID = #{projectID,jdbcType=INTEGER},
+        MonitorType = #{monitorType,jdbcType=INTEGER},
+        MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+        MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+        SensorID = #{sensorID,jdbcType=INTEGER},
+        ProductID = #{productID,jdbcType=INTEGER},
+        DeviceCSV = #{deviceCSV,jdbcType=LONGVARCHAR},
+        VideoType = #{videoType,jdbcType=VARCHAR},
+        VideoCSV = #{videoCSV,jdbcType=LONGVARCHAR},
+        `Name` = #{name,jdbcType=VARCHAR},
+        `Enable` = #{enable,jdbcType=BIT},
+        ExValue = #{exValue,jdbcType=VARCHAR},
+        `Desc` = #{desc,jdbcType=VARCHAR},
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
 </mapper>
