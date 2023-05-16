@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 import cn.hutool.core.lang.Assert;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.iot.entity.base.SubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,10 +34,12 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     @Override
     public ResultWrapper<?> validate() {
         Optional.ofNullable(platformType).ifPresent(val -> Assert.isTrue(PlatformType.validate(val), "platformType is invalid"));
-        this.projectIDs = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
-        if (projectIDs.isEmpty()) {
-            return ResultWrapper.successWithNothing();
-//            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+        //只限制用户查询范围
+        if (SubjectType.USER.equals(CurrentSubjectHolder.getCurrentSubject().getSubjectType())) {
+            this.projectIDs = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
+            if (projectIDs.isEmpty()) {
+                return ResultWrapper.successWithNothing();
+            }
         }
         return null;
     }
