@@ -35,7 +35,6 @@ public class StResourceController {
      * @apiSuccess (返回结果) {Object} newData 最新浸润线数据
      * @apiSuccess (返回结果) {String} newData.distance 库水位,坝前水位监测项目监测点数据或多个坝前水位监测项目监测点数据均值
      * @apiSuccess (返回结果) {Object[]} newData.dataList 监测点数据
-     * @apiSuccess (返回结果) {} [newData.dataList.] 监
      * @apiSuccess (返回结果) {Int} newData.dataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} newData.dataList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {DateTime} newData.dataList.time 数据上行时间
