@@ -585,6 +585,160 @@ public class WtMonitorDataController {
         return wtMonitorService.queryDisplacementMonitorPointNewDataList(pa);
     }
 
+
+
+    /**
+     * @api {POST} /QueryMonitorPointHistoryAvgDataList 查询监测点历史平均数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 查询监测点历史平均数据列表
+     * @apiName QueryMonitorPointHistoryAvgDataList
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime[]} dateList 开始时间 时间列表,月密度仅传月初即可,例如:[2022-10-01 00:00:00,2022-11-01 00:00:00,2022-12-01 00:00:00],年密度传年初,例如:[2019-01-01 00:00:00]
+     * @apiParam (请求体) {Int} density 密度,(0:全部 1:日平均 2:月平均 3:年平均)
+     * @apiSuccess (返回结果) {Object[]} data 传感器数据信息列表
+     * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
+     * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
+     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} data.dataList.T     时刻数据列表
+     * @apiSuccess (响应结果) {Object[]} data.fieldList      监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldToken 属性字段标志
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldName  属性字段名称
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryMonitorPointHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointHistoryAvgDataList(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryMonitorPointHistoryAvgDataPage 分页查询监测点历史平均数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 查询监测点历史平均数据列表
+     * @apiName QueryMonitorPointHistoryAvgDataPage
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime[]} dateList 开始时间 时间列表,月密度仅传月初即可,例如:[2022-10-01 00:00:00,2022-11-01 00:00:00,2022-12-01 00:00:00],年密度传年初,例如:[2019-01-01 00:00:00]
+     * @apiParam (请求体) {Int} density 密度,(0:全部 1:日平均 2:月平均 3:年平均)
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 数据总量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 传感器数据信息列表
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
+     * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T     时刻数据列表
+     * @apiSuccess (响应结果) {Object[]} currentPageData.fieldList      监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldToken 属性字段标志
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldName  属性字段名称
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryMonitorPointHistoryAvgDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointHistoryAvgDataPage(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryRainPointHistorySumDataList 查询雨量类型监测点历史累加数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 查询雨量类型监测点历史累加数据列表
+     * @apiName QueryRainPointHistorySumDataList
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime[]} dateList 开始时间 时间列表,月密度仅传月初即可,例如:[2022-10-01 00:00:00,2022-11-01 00:00:00,2022-12-01 00:00:00],年密度传年初,例如:[2019-01-01 00:00:00]
+     * @apiParam (请求体) {Int} density 密度,(0:全部 1:日累加 2:月累加 3:年累加 4:一小时累加 5:三小时累加 6:六小时累加 7:十二小时累加)
+     * @apiSuccess (返回结果) {Object[]} data 传感器数据信息列表
+     * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
+     * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
+     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} data.dataList.T     时刻数据列表
+     * @apiSuccess (响应结果) {Object[]} data.fieldList      监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldToken 属性字段标志
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldName  属性字段名称
+     * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.dataUnitList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryRainPointHistorySumDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryRainPointHistorySumDataList(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+
+    /**
+     * @api {POST} /QueryRainPointHistorySumDataPage 分页查询雨量类型监测点历史累加数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 查询监测点历史平均数据列表
+     * @apiName QueryRainPointHistorySumDataPage
+     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime[]} dateList 开始时间 时间列表,月密度仅传月初即可,例如:[2022-10-01 00:00:00,2022-11-01 00:00:00,2022-12-01 00:00:00],年密度传年初,例如:[2019-01-01 00:00:00]
+     * @apiParam (请求体) {Int} density 密度,(0:全部 1:日累加 2:月累加 3:年累加 4:一小时累加 5:三小时累加 6:六小时累加 7:十二小时累加)
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 数据总量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 传感器数据信息列表
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
+     * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T     时刻数据列表
+     * @apiSuccess (响应结果) {Object[]} currentPageData.fieldList      监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldToken 属性字段标志
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldName  属性字段名称
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldExValue  字段单位ID
+     * @apiSuccess (响应结果) {Object[]} currentPageData.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} currentPageData.dataUnitList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryRainPointHistorySumDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryRainPointHistorySumDataPage(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
 }
 
 
