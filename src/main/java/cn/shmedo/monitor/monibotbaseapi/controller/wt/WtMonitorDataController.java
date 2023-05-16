@@ -622,7 +622,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据监测点查询传感器历史平均数据列表
      * @apiName QueryMonitorPointHistoryAvgDataList
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -656,7 +656,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据监测点分页查询传感器历史平均数据列表
      * @apiName QueryMonitorPointHistoryAvgDataPage
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -695,7 +695,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据传感器查询传感器历史平均数据列表,传感器所属监测点必须属于同一个监测项目
      * @apiName QuerySensorHistoryAvgDataList
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} sensorIDList 传感器ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -729,7 +729,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据传感器分页查询传感器历史平均数据列表
      * @apiName QuerySensorHistoryAvgDataPage
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} sensorIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -767,7 +767,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 查询雨量类型监测点历史累加数据列表
      * @apiName QueryRainPointHistorySumDataList
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -802,7 +802,7 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 查询监测点历史平均数据列表
      * @apiName QueryRainPointHistorySumDataPage
-     * @apiParam (请求体) {Int} projectID  项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
