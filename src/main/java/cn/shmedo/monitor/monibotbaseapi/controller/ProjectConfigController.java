@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.*;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbProjectConfigService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProjectConfigController {
+    private final ITbProjectConfigService tbProjectConfigService;
+
     /**
-     * @api {POST} /SetProjectConfig 设置额外配置
+     * @api {POST} /SetProjectConfig 设置自定义配置
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName SetProjectConfig
@@ -37,11 +41,12 @@ public class ProjectConfigController {
     @PostMapping(value = "/SetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
     public Object setProjectConfig(@Valid @RequestBody SetProjectConfigParam param) {
-        return null;
+        tbProjectConfigService.setProjectConfig(param);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /BatchSetProjectConfig 批量额外配置
+     * @api {POST} /BatchSetProjectConfig 批量自定义配置
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName BatchSetProjectConfig
@@ -61,22 +66,23 @@ public class ProjectConfigController {
     @PostMapping(value = "/BatchSetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
     public Object batchSetProjectConfig(@Valid @RequestBody BatchSetProjectConfigParam param) {
-        return null;
+        tbProjectConfigService.batchSetProjectConfig(param);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /ListProjectConfig 查询额外配置
+     * @api {POST} /ListProjectConfig 查询自定义配置
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName ListProjectConfig
      * @apiDescription 查询额外配置
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {String} [group] 分组,如果要查看全部可填空或”all“
-     * @apiParam (请求参数) {String} [key] key前缀,跟设置额外配置时入参key相同,如果要查看全部可填空或”all“
+     * @apiParam (请求参数) {String} group 分组
+     * @apiParam (请求参数) {String} [key] key前缀,跟设置额外配置时入参key相同,如果要查看全部可填空或填”all“
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.configID 配置ID
      * @apiSuccess (返回结果) {Int} dataList.projectID 项目ID
-     * @apiSuccess (返回结果) {Int} [dataList.monitorGroupID] 监测点分组ID
-     * @apiSuccess (返回结果) {Int} [dataList.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Int} dataList.ID 配置对象ID
      * @apiSuccess (返回结果) {String} dataList.group 分组
      * @apiSuccess (返回结果) {String} dataList.key key
      * @apiSuccess (返回结果) {String} dataList.value value
@@ -86,6 +92,6 @@ public class ProjectConfigController {
     @PostMapping(value = "/ListProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    @Permission(permissionName = "")
     public Object listProjectConfig(@Valid @RequestBody ListProjectConfigParam param) {
-        return null;
+        return tbProjectConfigService.listProjectConfig(param);
     }
 }

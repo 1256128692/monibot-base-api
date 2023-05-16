@@ -6,10 +6,13 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectGroupType;
+import cn.shmedo.monitor.monibotbaseapi.util.projectConfig.ProjectConfigKeyUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
@@ -31,6 +34,9 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     @NotNull(message = "项目ID不能为空")
     @Min(value = 1, message = "项目ID不能小于1")
     private Integer projectID;
+    @NotNull(message = "配置ID不能为空")
+    @Min(value = 1, message = "配置ID不能小于1")
+    private Integer configID;
     @NotEmpty(message = "要配置的key不能为空")
     private String key;
     @NotEmpty(message = "要配置的group不能为空")
@@ -43,6 +49,8 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     private TbProjectInfo tbProjectInfo;
     @JsonIgnore
     private TbMonitorGroup tbMonitorGroup;
+    @JsonIgnore
+    private TbMonitorPoint tbMonitorPoint;
     @JsonIgnore
     private ProjectGroupType projectGroupType;
 
@@ -61,14 +69,22 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
             List<TbMonitorGroup> tbMonitorGroups = groupMapper.selectList(new LambdaQueryWrapper<TbMonitorGroup>()
                     .eq(TbMonitorGroup::getID, monitorGroupID));
             if (CollectionUtil.isEmpty(tbMonitorGroups)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要配置的分组不存在");
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要额外配置的监测点分组不存在");
             }
             tbMonitorGroup = tbMonitorGroups.get(0);
-            switch (projectGroupType) {
-                case MONITOR_GROUP -> key = key + "::" + monitorGroupID;
-                case MONITOR_POINT -> key = key + "::" + monitorPointID;
-                default -> log.info("未设置对应的分级枚举，将不会拼接key");
+        } else if (Objects.nonNull(monitorPointID)) {
+            TbMonitorPointMapper pointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+            List<TbMonitorPoint> tbMonitorPoints = pointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
+                    .eq(TbMonitorPoint::getID, monitorPointID));
+            if (CollectionUtil.isEmpty(tbMonitorPoints)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要额外配置的监测点不存在");
             }
+            tbMonitorPoint = tbMonitorPoints.get(0);
+        }
+        switch (projectGroupType) {
+            case MONITOR_GROUP -> ProjectConfigKeyUtils.setKey(this, monitorGroupID);
+            case MONITOR_POINT -> ProjectConfigKeyUtils.setKey(this, monitorPointID);
+            default -> log.info("未设置对应的分级枚举，将不会拼接key");
         }
         return null;
     }
