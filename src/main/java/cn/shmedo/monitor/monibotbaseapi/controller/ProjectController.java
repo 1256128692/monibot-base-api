@@ -375,7 +375,7 @@ public class ProjectController {
 
     /**
      * @api {post} /QueryProjectList 查询工程项目列表
-     * @apiDescription 查询工程项目列表
+     * @apiDescription 查询工程项目列表（应用调用时不限制查询范围）
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectList
