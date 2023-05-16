@@ -34,7 +34,6 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     @NotNull(message = "项目ID不能为空")
     @Min(value = 1, message = "项目ID不能小于1")
     private Integer projectID;
-    @NotNull(message = "配置ID不能为空")
     @Min(value = 1, message = "配置ID不能小于1")
     private Integer configID;
     @NotEmpty(message = "要配置的key不能为空")

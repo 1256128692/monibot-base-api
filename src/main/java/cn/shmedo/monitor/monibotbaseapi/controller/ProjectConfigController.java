@@ -29,11 +29,12 @@ public class ProjectConfigController {
      * @apiName SetProjectConfig
      * @apiDescription 设置额外配置
      * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求参数) {Int} [configID] 配置ID,为空时认为是新增配置
      * @apiParam (请求参数) {String} group 分组
      * @apiParam (请求参数) {String} key 对应的key,最终入库的key将和对应级别的ID拼接成这样 key::ID
      * @apiParam (请求参数) {String} value 值
-     * @apiParam (请求参数) {Int} monitorGroupID 监测点分组ID
-     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
+     * @apiParam (请求参数) {Int} [monitorGroupID] 监测点分组ID
+     * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -54,11 +55,12 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Object[]} dataList 对象
      * @apiParam (请求参数) {Int} dataList.projectID 项目ID
+     * @apiParam (请求参数) {Int} [dataList.configID] 配置ID,为空时认为是新增配置
      * @apiParam (请求参数) {String} dataList.group 分组
      * @apiParam (请求参数) {String} dataList.key 对应的key
      * @apiParam (请求参数) {String} dataList.value 值
-     * @apiParam (请求参数) {Int} dataList.monitorGroupID 监测点分组ID
-     * @apiParam (请求参数) {Int} dataList.monitorPointID 监测点ID
+     * @apiParam (请求参数) {Int} [dataList.monitorGroupID] 监测点分组ID
+     * @apiParam (请求参数) {Int} [dataList.monitorPointID] 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限
