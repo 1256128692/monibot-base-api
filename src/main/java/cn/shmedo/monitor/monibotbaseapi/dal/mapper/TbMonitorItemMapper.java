@@ -46,4 +46,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     void insertBatch(Collection<TbMonitorItem> collection);
 
     List<GroupMonitorItem> queryMonitorItemByGroupIDs(List<Integer> groupIDList);
+
+    List<TbMonitorItem> selectListByMonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
+
 }

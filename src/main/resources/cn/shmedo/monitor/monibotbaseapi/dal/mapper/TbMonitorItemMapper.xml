@@ -391,4 +391,22 @@
             #{id}
         </foreach>
     </select>
+
+
+
+    <select id="selectListByMonitorPointIDsAndProjectIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
+        select ID, ProjectID, `Name`, `Alias`
+        from tb_monitor_item
+        where ID in (select monitorItemID
+                     from tb_monitor_point where ID in
+        <foreach close=")" collection="monitorPointIDList" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
+        ) and ProjectID in
+        <foreach close=")" collection="projectIDList" item="projectID" open="(" separator=",">
+            #{projectID}
+        </foreach>
+    </select>
+
+
 </mapper>
