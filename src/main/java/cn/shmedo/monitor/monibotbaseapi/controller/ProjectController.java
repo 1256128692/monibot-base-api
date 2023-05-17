@@ -406,7 +406,7 @@ public class ProjectController {
      * @api {POST} /QueryProjectBaseInfoList 查询公司下的工程基本信息以及监测项目信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
-     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表
+     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表,最终只展示有传感器的监测点,已经对应的工程
      * @apiName QueryProjectBaseInfoList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String} monitorItemName 监测项目名称
@@ -426,15 +426,15 @@ public class ProjectController {
      * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.projectID 工程ID
      * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.sensorID 传感器ID
-     * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.sensorName 传感器名称
-     * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.sensorAlias 传感器别名
+     * @apiSuccess (响应结果) {String} data.monitorPointList.sensorList.sensorName 传感器名称
+     * @apiSuccess (响应结果) {String} data.monitorPointList.sensorList.sensorAlias 传感器别名
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/QueryProjectBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectBaseInfoList(@Validated @RequestBody QueryProjectBaseInfoListParam pa) {
-        return null;
+        return projectService.queryProjectBaseInfoList(pa);
     }
 
 

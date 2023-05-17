@@ -616,4 +616,24 @@
         </if>
         and i.MonitorType = #{monitorType}
     </select>
+
+
+
+    <select id="selectListByProjectIDsAndMonitorItemName"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor">
+        select p.ID     as monitorPointID
+        , p.`Name` as monitorPointName
+        , p.MonitorItemID
+        , i.`Name` as monitorItemName
+        , i.Alias as monitorItemAlias
+        , p.ProjectID
+        from tb_monitor_point as p
+        left join tb_monitor_item as i on i.ID = p.MonitorItemID
+        where p.ProjectID in
+        <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
+            #{projectID}
+        </foreach>
+        and i.Alias = #{monitorItemName}
+    </select>
+
 </mapper>

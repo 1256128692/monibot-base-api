@@ -413,4 +413,18 @@
         from tb_project_info
         where CompanyID = #{companyID,jdbcType=INTEGER}
     </select>
+
+
+
+    <select id="selectListByCompanyIDAndMonitorItemName" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse">
+        select pi.ID as projectID,
+               pi.CompanyID,
+               pi.ProjectName,
+               pi.ShortName as projectShortName,
+               pi.ProjectType
+        from tb_project_info pi
+                 left join tb_monitor_item mi on mi.projectID = pi.ID
+        where mi.CompanyID = #{companyID,jdbcType=INTEGER}
+          and mi.Alias = #{monitorItemName}
+    </select>
 </mapper>

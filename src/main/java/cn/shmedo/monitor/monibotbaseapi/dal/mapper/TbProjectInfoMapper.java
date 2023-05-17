@@ -3,11 +3,13 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -39,9 +41,13 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int countByNameExcludeID(String projectName, Integer projectID);
 
-    int countByProjectIDList(List<Integer> idList,Integer companyID);
+    int countByProjectIDList(List<Integer> idList, Integer companyID);
+
     List<Integer> countComany(List idList);
+
     int deleteProjectInfoList(List idList);
 
     List<TbProjectInfo> selectProjectInfoByCompanyID(Integer companyID);
+
+    List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName);
 }

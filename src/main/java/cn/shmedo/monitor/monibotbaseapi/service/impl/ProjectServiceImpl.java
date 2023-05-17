@@ -29,7 +29,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathRespons
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
@@ -563,4 +566,29 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         return new QueryWtProjectResponse(waterInfo);
     }
 
+
+    @Override
+    public List<QueryProjectBaseInfoResponse> queryProjectBaseInfoList(QueryProjectBaseInfoListParam pa) {
+
+        List<QueryProjectBaseInfoResponse> projectInfoResponseList = new LinkedList();
+        List<MonitorPointWithSensor> monitorPointWithSensorList = new LinkedList();
+
+        if (CollectionUtil.isNotEmpty(pa.getMonitorPointWithSensorList())) {
+            pa.getMonitorPointWithSensorList().forEach(item -> {
+                List<SensorBaseInfoResponse> filerSensorList = pa.getSensorBaseInfoResponseList().stream().filter(s -> s.getMonitorPointID().equals(item.getMonitorPointID())).collect(Collectors.toList());
+                item.setSensorList(filerSensorList);
+                if (CollectionUtil.isNotEmpty(filerSensorList)) {
+                    monitorPointWithSensorList.add(item);
+                }
+            });
+        }
+        pa.getProjectInfoResponseList().forEach(item -> {
+            List<MonitorPointWithSensor> filerMonitorList = monitorPointWithSensorList.stream().filter(m -> m.getProjectID().equals(item.getProjectID())).collect(Collectors.toList());
+            item.setMonitorPointList(filerMonitorList);
+            if (CollectionUtil.isNotEmpty(filerMonitorList)) {
+                projectInfoResponseList.add(item);
+            }
+        });
+        return projectInfoResponseList;
+    }
 }
