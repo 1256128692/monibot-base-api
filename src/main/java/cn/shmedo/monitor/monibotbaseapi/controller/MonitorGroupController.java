@@ -243,4 +243,25 @@ public class MonitorGroupController {
     public Object queryMonitorGroupDetail(@RequestBody @Validated QueryMonitorGroupDetailParam pa) {
         return monitorGroupService.queryMonitorGroupDetail(pa.getTbMonitorGroup());
     }
+
+    /**
+     * @api {POST} /QueryMonitorGroupItemNameList 根据监测项目名称获取监测组
+     * @apiVersion 1.0.0
+     * @apiGroup 监测组模块
+     * @apiName QueryMonitorGroupItemNameList
+     * @apiDescription 返回所有组内含该(模糊匹配名称)监测项目的监测组
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {String} monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {Object[]} data 数据列表
+     * @apiSuccess (返回结果) {Int} data.groupID 监测组ID
+     * @apiSuccess (返回结果) {String} data.groupName 监测组名称
+     * @apiSuccess (返回结果) {Boolean} data.enable 是否启用
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
+    @PostMapping(value = "/QueryMonitorGroupItemNameList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupItemNameList(@RequestBody @Validated QueryMonitorGroupItemNameListParam pa) {
+        return monitorGroupService.queryMonitorGroupItemNameList(pa);
+    }
 }

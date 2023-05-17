@@ -1,7 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.QueryMonitorGroupItemNameListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -30,4 +32,6 @@ public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
     Integer selectCountByName(String name, boolean flag, Integer projectID);
 
     List<Group4Web> queryList(Integer projectID, String groupName, String secondaryGroupName, Integer monitorItemID, Boolean parented);
+
+    List<SimpleMonitorInfo> queryMonitorGroupItemNameList(QueryMonitorGroupItemNameListParam pa);
 }

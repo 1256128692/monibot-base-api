@@ -264,4 +264,18 @@
         </where>
         order by id desc
     </select>
+    <select id="queryMonitorGroupItemNameList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.QueryMonitorGroupItemNameListParam">
+        SELECT
+            tmg.ID groupID,
+            tmg.`Name` groupName,
+            tmg.`Enable` enable
+        FROM
+            tb_monitor_group tmg
+                LEFT JOIN tb_monitor_group_item tmgi ON tmg.ID = tmgi.MonitorGroupID
+                LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmgi.MonitorItemID
+        WHERE tmi.`Name` LIKE CONCAT('%',#{monitorItemName},'%')
+        AND tmg.ProjectID=#{projectID}
+    </select>
 </mapper>
