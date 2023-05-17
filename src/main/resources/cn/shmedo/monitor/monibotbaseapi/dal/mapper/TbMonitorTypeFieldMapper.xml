@@ -1,282 +1,319 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
-    <!--@mbg.generated-->
-    <!--@Table tb_monitor_type_field-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
-    <result column="FieldToken" jdbcType="VARCHAR" property="fieldToken" />
-    <result column="FieldName" jdbcType="VARCHAR" property="fieldName" />
-    <result column="FieldDataType" jdbcType="VARCHAR" property="fieldDataType" />
-    <result column="FieldClass" jdbcType="INTEGER" property="fieldClass" />
-    <result column="FieldDesc" jdbcType="VARCHAR" property="fieldDesc" />
-    <result column="FieldUnitID" jdbcType="INTEGER" property="fieldUnitID" />
-    <result column="ParentID" jdbcType="INTEGER" property="parentID" />
-    <result column="CreateType" jdbcType="INTEGER" property="createType" />
-    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
-    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, MonitorType, FieldToken, FieldName, FieldDataType, FieldClass, FieldDesc, FieldUnitID, 
-    ParentID, CreateType, ExValues, DisplayOrder
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from tb_monitor_type_field
-    where ID = #{ID,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    <!--@mbg.generated-->
-    delete from tb_monitor_type_field
-    where ID = #{ID,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_monitor_type_field (MonitorType, FieldToken, FieldName, 
-      FieldDataType, FieldClass, FieldDesc, 
-      FieldUnitID, ParentID, CreateType, 
-      ExValues, DisplayOrder)
-    values (#{monitorType,jdbcType=INTEGER}, #{fieldToken,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR}, 
-      #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldDesc,jdbcType=VARCHAR}, 
-      #{fieldUnitID,jdbcType=INTEGER}, #{parentID,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER}, 
-      #{exValues,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER})
-  </insert>
-  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_monitor_type_field
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="monitorType != null">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+        <!--@mbg.generated-->
+        <!--@Table tb_monitor_type_field-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="MonitorType" jdbcType="INTEGER" property="monitorType"/>
+        <result column="FieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+        <result column="FieldName" jdbcType="VARCHAR" property="fieldName"/>
+        <result column="FieldDataType" jdbcType="VARCHAR" property="fieldDataType"/>
+        <result column="FieldClass" jdbcType="INTEGER" property="fieldClass"/>
+        <result column="FieldDesc" jdbcType="VARCHAR" property="fieldDesc"/>
+        <result column="FieldUnitID" jdbcType="INTEGER" property="fieldUnitID"/>
+        <result column="ParentID" jdbcType="INTEGER" property="parentID"/>
+        <result column="CreateType" jdbcType="INTEGER" property="createType"/>
+        <result column="ExValues" jdbcType="VARCHAR" property="exValues"/>
+        <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
         MonitorType,
-      </if>
-      <if test="fieldToken != null">
         FieldToken,
-      </if>
-      <if test="fieldName != null">
         FieldName,
-      </if>
-      <if test="fieldDataType != null">
         FieldDataType,
-      </if>
-      <if test="fieldClass != null">
         FieldClass,
-      </if>
-      <if test="fieldDesc != null">
         FieldDesc,
-      </if>
-      <if test="fieldUnitID != null">
         FieldUnitID,
-      </if>
-      <if test="parentID != null">
         ParentID,
-      </if>
-      <if test="createType != null">
         CreateType,
-      </if>
-      <if test="exValues != null">
         ExValues,
-      </if>
-      <if test="displayOrder != null">
-        DisplayOrder,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="monitorType != null">
-        #{monitorType,jdbcType=INTEGER},
-      </if>
-      <if test="fieldToken != null">
-        #{fieldToken,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldName != null">
-        #{fieldName,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldDataType != null">
-        #{fieldDataType,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldClass != null">
-        #{fieldClass,jdbcType=INTEGER},
-      </if>
-      <if test="fieldDesc != null">
-        #{fieldDesc,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldUnitID != null">
-        #{fieldUnitID,jdbcType=INTEGER},
-      </if>
-      <if test="parentID != null">
-        #{parentID,jdbcType=INTEGER},
-      </if>
-      <if test="createType != null">
-        #{createType,jdbcType=INTEGER},
-      </if>
-      <if test="exValues != null">
-        #{exValues,jdbcType=VARCHAR},
-      </if>
-      <if test="displayOrder != null">
-        #{displayOrder,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
-    <!--@mbg.generated-->
-    update tb_monitor_type_field
-    <set>
-      <if test="monitorType != null">
-        MonitorType = #{monitorType,jdbcType=INTEGER},
-      </if>
-      <if test="fieldToken != null">
-        FieldToken = #{fieldToken,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldName != null">
-        FieldName = #{fieldName,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldDataType != null">
-        FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldClass != null">
-        FieldClass = #{fieldClass,jdbcType=INTEGER},
-      </if>
-      <if test="fieldDesc != null">
-        FieldDesc = #{fieldDesc,jdbcType=VARCHAR},
-      </if>
-      <if test="fieldUnitID != null">
-        FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
-      </if>
-      <if test="parentID != null">
-        ParentID = #{parentID,jdbcType=INTEGER},
-      </if>
-      <if test="createType != null">
-        CreateType = #{createType,jdbcType=INTEGER},
-      </if>
-      <if test="exValues != null">
-        ExValues = #{exValues,jdbcType=VARCHAR},
-      </if>
-      <if test="displayOrder != null">
-        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-      </if>
-    </set>
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
-    <!--@mbg.generated-->
-    update tb_monitor_type_field
-    set MonitorType = #{monitorType,jdbcType=INTEGER},
-      FieldToken = #{fieldToken,jdbcType=VARCHAR},
-      FieldName = #{fieldName,jdbcType=VARCHAR},
-      FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
-      FieldClass = #{fieldClass,jdbcType=INTEGER},
-      FieldDesc = #{fieldDesc,jdbcType=VARCHAR},
-      FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
-      ParentID = #{parentID,jdbcType=INTEGER},
-      CreateType = #{createType,jdbcType=INTEGER},
-      ExValues = #{exValues,jdbcType=VARCHAR},
-      DisplayOrder = #{displayOrder,jdbcType=INTEGER}
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <select id="queryByMonitorTypes" resultMap="BaseResultMap">
-      select *
-      from tb_monitor_type_field where MonitorType in
-      <foreach close=")" collection="monitorTypes" item="type" open="(" separator=",">
-          #{type}
-      </foreach>
-      <if test="allFiled == null || allFiled == false">
-          and FieldClass != 3
-      </if>
-  </select>
-  <select id="queryMonitorTypeByFuzzyNameAndFuzzyToken" resultType="java.lang.Integer">
-    select distinct  MonitorType
-      from tb_monitor_type_field
+        DisplayOrder
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_monitor_type_field
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete
+        from tb_monitor_type_field
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_monitor_type_field (MonitorType, FieldToken, FieldName,
+                                           FieldDataType, FieldClass, FieldDesc,
+                                           FieldUnitID, ParentID, CreateType,
+                                           ExValues, DisplayOrder)
+        values (#{monitorType,jdbcType=INTEGER}, #{fieldToken,jdbcType=VARCHAR}, #{fieldName,jdbcType=VARCHAR},
+                #{fieldDataType,jdbcType=VARCHAR}, #{fieldClass,jdbcType=INTEGER}, #{fieldDesc,jdbcType=VARCHAR},
+                #{fieldUnitID,jdbcType=INTEGER}, #{parentID,jdbcType=INTEGER}, #{createType,jdbcType=INTEGER},
+                #{exValues,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_monitor_type_field
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="monitorType != null">
+                MonitorType,
+            </if>
+            <if test="fieldToken != null">
+                FieldToken,
+            </if>
+            <if test="fieldName != null">
+                FieldName,
+            </if>
+            <if test="fieldDataType != null">
+                FieldDataType,
+            </if>
+            <if test="fieldClass != null">
+                FieldClass,
+            </if>
+            <if test="fieldDesc != null">
+                FieldDesc,
+            </if>
+            <if test="fieldUnitID != null">
+                FieldUnitID,
+            </if>
+            <if test="parentID != null">
+                ParentID,
+            </if>
+            <if test="createType != null">
+                CreateType,
+            </if>
+            <if test="exValues != null">
+                ExValues,
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="monitorType != null">
+                #{monitorType,jdbcType=INTEGER},
+            </if>
+            <if test="fieldToken != null">
+                #{fieldToken,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldName != null">
+                #{fieldName,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldDataType != null">
+                #{fieldDataType,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldClass != null">
+                #{fieldClass,jdbcType=INTEGER},
+            </if>
+            <if test="fieldDesc != null">
+                #{fieldDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldUnitID != null">
+                #{fieldUnitID,jdbcType=INTEGER},
+            </if>
+            <if test="parentID != null">
+                #{parentID,jdbcType=INTEGER},
+            </if>
+            <if test="createType != null">
+                #{createType,jdbcType=INTEGER},
+            </if>
+            <if test="exValues != null">
+                #{exValues,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                #{displayOrder,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+        <!--@mbg.generated-->
+        update tb_monitor_type_field
+        <set>
+            <if test="monitorType != null">
+                MonitorType = #{monitorType,jdbcType=INTEGER},
+            </if>
+            <if test="fieldToken != null">
+                FieldToken = #{fieldToken,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldName != null">
+                FieldName = #{fieldName,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldDataType != null">
+                FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldClass != null">
+                FieldClass = #{fieldClass,jdbcType=INTEGER},
+            </if>
+            <if test="fieldDesc != null">
+                FieldDesc = #{fieldDesc,jdbcType=VARCHAR},
+            </if>
+            <if test="fieldUnitID != null">
+                FieldUnitID = #{fieldUnitID,jdbcType=INTEGER},
+            </if>
+            <if test="parentID != null">
+                ParentID = #{parentID,jdbcType=INTEGER},
+            </if>
+            <if test="createType != null">
+                CreateType = #{createType,jdbcType=INTEGER},
+            </if>
+            <if test="exValues != null">
+                ExValues = #{exValues,jdbcType=VARCHAR},
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+        <!--@mbg.generated-->
+        update tb_monitor_type_field
+        set MonitorType   = #{monitorType,jdbcType=INTEGER},
+            FieldToken    = #{fieldToken,jdbcType=VARCHAR},
+            FieldName     = #{fieldName,jdbcType=VARCHAR},
+            FieldDataType = #{fieldDataType,jdbcType=VARCHAR},
+            FieldClass    = #{fieldClass,jdbcType=INTEGER},
+            FieldDesc     = #{fieldDesc,jdbcType=VARCHAR},
+            FieldUnitID   = #{fieldUnitID,jdbcType=INTEGER},
+            ParentID      = #{parentID,jdbcType=INTEGER},
+            CreateType    = #{createType,jdbcType=INTEGER},
+            ExValues      = #{exValues,jdbcType=VARCHAR},
+            DisplayOrder  = #{displayOrder,jdbcType=INTEGER}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <select id="queryByMonitorTypes" resultMap="BaseResultMap">
+        select *
+        from tb_monitor_type_field where MonitorType in
+        <foreach close=")" collection="monitorTypes" item="type" open="(" separator=",">
+            #{type}
+        </foreach>
+        <if test="allFiled == null || allFiled == false">
+            and FieldClass != 3
+        </if>
+    </select>
+    <select id="queryMonitorTypeByFuzzyNameAndFuzzyToken" resultType="java.lang.Integer">
+        select distinct MonitorType
+        from tb_monitor_type_field
         <where>
-          <if test="fuzzyFieldName != null and fuzzyFieldName !=''">
-            FieldName like concat('%',#{fuzzyFieldName},'%')
-          </if>
-          <if test="fuzzyFieldToken != null and fuzzyFieldToken !=''">
-            and FieldToken like concat('%',#{fuzzyFieldToken},'%')
-          </if>
+            <if test="fuzzyFieldName != null and fuzzyFieldName != ''">
+                FieldName like concat('%', #{fuzzyFieldName}, '%')
+            </if>
+            <if test="fuzzyFieldToken != null and fuzzyFieldToken != ''">
+                and FieldToken like concat('%', #{fuzzyFieldToken}, '%')
+            </if>
         </where>
-  </select>
-  <insert id="insertBatch" keyColumn="ID" keyProperty="ID"  useGeneratedKeys="true">
-    insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
-    FieldDataType, FieldClass,FieldDesc, FieldUnitID,
-    ParentID, DisplayOrder, CreateType,
-    ExValues)
-    values <foreach collection="list" item="item" separator=",">
-    (#{item.monitorType,jdbcType=INTEGER}, #{item.fieldName,jdbcType=VARCHAR}, #{item.fieldToken,jdbcType=VARCHAR},
-    #{item.fieldDataType,jdbcType=VARCHAR}, #{item.fieldClass,jdbcType=INTEGER},#{item.fieldDesc,jdbcType=INTEGER}, #{item.fieldUnitID,jdbcType=INTEGER},
-    #{item.parentID,jdbcType=INTEGER}, #{item.displayOrder,jdbcType=INTEGER}, #{item.createType,jdbcType=INTEGER},
-    #{item.exValues,jdbcType=VARCHAR})
-  </foreach>
-  </insert>
+    </select>
+    <insert id="insertBatch" keyColumn="ID" keyProperty="ID" useGeneratedKeys="true">
+        insert into tb_monitor_type_field (MonitorType, FieldName, FieldToken,
+                                           FieldDataType, FieldClass, FieldDesc, FieldUnitID,
+                                           ParentID, DisplayOrder, CreateType,
+                                           ExValues)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.monitorType,jdbcType=INTEGER}, #{item.fieldName,jdbcType=VARCHAR},
+             #{item.fieldToken,jdbcType=VARCHAR},
+             #{item.fieldDataType,jdbcType=VARCHAR}, #{item.fieldClass,jdbcType=INTEGER},
+             #{item.fieldDesc,jdbcType=INTEGER}, #{item.fieldUnitID,jdbcType=INTEGER},
+             #{item.parentID,jdbcType=INTEGER}, #{item.displayOrder,jdbcType=INTEGER},
+             #{item.createType,jdbcType=INTEGER},
+             #{item.exValues,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
 
-  <select id="queryMonitorTypeFieldWithFormula" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
-      select field.*, formula.Formula, formula.DisplayFormula
-      from tb_monitor_type_field as field
-               left join (select * from tb_template_formula where TemplateID = #{templateID}) as formula
-                         on formula.FieldID = field.ID
-      where field.MonitorType = #{monitorType}
-        and FieldClass != 3
-  </select>
+    <select id="queryMonitorTypeFieldWithFormula"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula">
+        select field.*, formula.Formula, formula.DisplayFormula
+        from tb_monitor_type_field as field
+                 left join (select * from tb_template_formula where TemplateID = #{templateID}) as formula
+                           on formula.FieldID = field.ID
+        where field.MonitorType = #{monitorType}
+          and FieldClass != 3
+    </select>
 
-  <update id="updateBatch">
-    update tb_monitor_type_field set
-    <trim prefix="fieldName = case" suffix="end,">
-      <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.fieldName}
-      </foreach>
-    </trim>
-    <trim prefix="fieldDataType = case" suffix="end,">
-      <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.fieldDataType}
-      </foreach>
-    </trim>
-    <trim prefix="fieldUnitID = case" suffix="end,">
-      <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.fieldUnitID}
-      </foreach>
-    </trim>
-    <trim prefix="FieldDesc = case" suffix="end,">
-      <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.fieldDesc}
-      </foreach>
-    </trim>
-    <trim prefix="ExValues = case" suffix="end">
-      <foreach collection="fieldList" index="index" item="item">
-        when ID = #{item.ID} then #{item.exValues}
-      </foreach>
-    </trim>
-    where ID in
-    <foreach close=")" collection="fieldList" item="item" open="(" separator=",">
-      #{item.ID}
-    </foreach>
+    <update id="updateBatch">
+        update tb_monitor_type_field set
+        <trim prefix="fieldName = case" suffix="end,">
+            <foreach collection="fieldList" index="index" item="item">
+                when ID = #{item.ID} then #{item.fieldName}
+            </foreach>
+        </trim>
+        <trim prefix="fieldDataType = case" suffix="end,">
+            <foreach collection="fieldList" index="index" item="item">
+                when ID = #{item.ID} then #{item.fieldDataType}
+            </foreach>
+        </trim>
+        <trim prefix="fieldUnitID = case" suffix="end,">
+            <foreach collection="fieldList" index="index" item="item">
+                when ID = #{item.ID} then #{item.fieldUnitID}
+            </foreach>
+        </trim>
+        <trim prefix="FieldDesc = case" suffix="end,">
+            <foreach collection="fieldList" index="index" item="item">
+                when ID = #{item.ID} then #{item.fieldDesc}
+            </foreach>
+        </trim>
+        <trim prefix="ExValues = case" suffix="end">
+            <foreach collection="fieldList" index="index" item="item">
+                when ID = #{item.ID} then #{item.exValues}
+            </foreach>
+        </trim>
+        where ID in
+        <foreach close=")" collection="fieldList" item="item" open="(" separator=",">
+            #{item.ID}
+        </foreach>
+    </update>
+    <delete id="deleteByMonitorTypeList">
+        delete
+        from tb_monitor_type_field where MonitorType in
+        <foreach close=")" collection="list" item="type" open="(" separator=",">
+            #{type}
+        </foreach>
+    </delete>
 
-  </update>
-  <delete id="deleteByMonitorTypeList">
-    delete from tb_monitor_type_field where MonitorType in <foreach close=")" collection="list" item="type" open="(" separator=",">
-      #{type}
-  </foreach>
-  </delete>
+    <select id="queryByMonitorItemIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID">
+        select tf.*, itf.MonitorItemID as itemID, itf.Alias
+        from tb_monitor_type_field as tf
+                 left join tb_monitor_item_field as itf on itf.MonitorTypeFieldID = tf.ID
+        where itf.MonitorItemID in
+        <foreach collection="list" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
 
-  <select id="queryByMonitorItemIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID">
-      select tf.*, itf.MonitorItemID as itemID, itf.Alias
-      from tb_monitor_type_field as tf
-               left join tb_monitor_item_field as itf on itf.MonitorTypeFieldID = tf.ID
-      where itf.MonitorItemID in
-      <foreach collection="list" item="id" separator="," close=")" open="(">
-          #{id}
-      </foreach>
-  </select>
+    <select id="queryMonitorTypeFieldV1ByMonitorItems"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1">
+        select tf.id             as fieldID
+             , tf.FieldToken
+             , tf.FieldName
+             , tf.FieldDesc
+             , tf.FieldUnitID
+             , u.EngUnit
+             , itf.MonitorItemID as itemID
+             , itf.Alias         as fieldAlias
+        from tb_monitor_type_field as tf
+                 left join tb_monitor_item_field as itf on itf.MonitorTypeFieldID = tf.ID
+                 left join tb_data_unit as u on u.id = tf.FieldUnitID
+        where itf.MonitorItemID in
+        <foreach collection="list" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
 
-  <select id="queryMonitorTypeFieldV1ByMonitorItems"
-          resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1">
-    select tf.id as fieldID, tf.FieldToken, tf.FieldName, tf.FieldDesc,tf.FieldUnitID,u.EngUnit,itf.MonitorItemID as itemID
-    ,itf.Alias as fieldAlias
-      from tb_monitor_type_field as tf
-             left join  tb_monitor_item_field as itf on itf.MonitorTypeFieldID = tf.ID
-            left join tb_data_unit as u on u.id = tf.FieldUnitID
-    where itf.MonitorItemID in <foreach collection="list" item="id" separator="," close=")" open="(">
-      #{id}
-  </foreach>
-  </select>
+
+    <select id="selectListByMonitorID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField">
+        select *
+        from tb_monitor_type_field mtf
+                 left join tb_monitor_item_field mif on mtf.ID = mif.MonitorTypeFieldID
+        where mif.MonitorItemID = (select MonitorItemID from tb_monitor_point where ID = #{monitorPointID})
+    </select>
 </mapper>

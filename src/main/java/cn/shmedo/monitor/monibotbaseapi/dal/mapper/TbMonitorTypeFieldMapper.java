@@ -37,4 +37,6 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
     List<TbMonitorTypeFieldWithItemID> queryByMonitorItemIDs(List<Integer> monitorItemIDList);
 
     List<MonitorTypeFieldV1> queryMonitorTypeFieldV1ByMonitorItems(List<Integer> monitorItemIDList);
+
+    List<TbMonitorTypeField> selectListByMonitorID(Integer monitorPointID);
 }

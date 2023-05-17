@@ -21,6 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WaterQuality;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
@@ -963,6 +964,29 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         return buildTDProjectAndMonitorAndSensorInfo(tbProjectInfos, tbMonitorPoints, pa.getMonitorType());
     }
+
+
+
+    @Override
+    public MonitorItemFieldResponse queryMonitorItemFieldList(QueryMonitorItemFieldListParam pa) {
+        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
+        Integer monitorPointID = pa.getMonitorPointIDList().get(0);
+
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+
+        List<TbDataUnit> tbDataUnitList = new LinkedList<>();
+        if (!CollectionUtil.isNullOrEmpty(monitorTypeFields)) {
+            List<Integer> dataUnitIDList = monitorTypeFields.stream().map(TbMonitorTypeField::getFieldUnitID).collect(Collectors.toList());
+            dataUnitsMap.entrySet().forEach(entry -> {
+                if (dataUnitIDList.contains(entry.getKey())) {
+                    tbDataUnitList.add(entry.getValue());
+                }
+            });
+        }
+        return new MonitorItemFieldResponse(monitorTypeFields, tbDataUnitList);
+    }
+
+
 
     private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
 

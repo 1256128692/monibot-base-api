@@ -593,15 +593,16 @@ public class WtMonitorDataController {
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据监测项目查询监测子类型列表信息
      * @apiName QueryMonitorItemFieldList
-     * @apiParam (请求体) {Int} projectID  项目ID
-     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiSuccess (返回结果) {Object} data 信息
      * @apiSuccess (响应结果) {Object[]} data.fieldList      监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken 属性字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName  属性字段名称
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldExValue  字段单位ID
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldStatisticsType 字段类型(1:基础类型字段, 2:拓展类型字段)
+     * @apiSuccess (响应结果) {Int} data.fieldList.fieldUnitID  字段单位ID
+     * @apiSuccess (响应结果) {Int} data.fieldList.fieldClass 字段类型(1:基础类型字段, 2:拓展类型字段)
      * @apiSuccess (响应结果) {Object[]} data.dataUnitList 字段单位列表
+     * @apiSuccess (响应结果) {String} data.dataUnitList.id 字段单位ID
      * @apiSuccess (响应结果) {String} data.dataUnitList.engUnit 英文单位
      * @apiSuccess (响应结果) {String} data.dataUnitList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} data.dataUnitList.unitClass  单位类型
@@ -611,8 +612,8 @@ public class WtMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorItemFieldList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorItemFieldList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorItemFieldList(@Validated @RequestBody QueryMonitorItemFieldListParam pa) {
+        return wtMonitorService.queryMonitorItemFieldList(pa);
     }
 
 
