@@ -29,5 +29,5 @@ public interface MonitorItemService {
 
     List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa);
 
-    CompanyMonitorItemNameInfo queryMonitorItemNameList(QueryTagListParam pa);
+    List<CompanyMonitorItemNameInfo> queryMonitorItemNameList(QueryTagListParam pa);
 }

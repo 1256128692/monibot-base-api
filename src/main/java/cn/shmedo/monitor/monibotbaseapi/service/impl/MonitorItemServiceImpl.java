@@ -25,7 +25,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @EnableTransactionManagement
@@ -141,8 +143,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
         tbMonitorItemMapper.insertBatch(map.keySet());
-        map.forEach((key, value)->{
-            value.forEach(item ->{
+        map.forEach((key, value) -> {
+            value.forEach(item -> {
                 item.setMonitorItemID(key.getID());
             });
         });
@@ -156,12 +158,12 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         List<Integer> idList = null;
         if (StringUtils.isNotBlank(pa.getFieldName()) || StringUtils.isNotBlank(pa.getFieldToken())) {
             idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(pa.getFieldName(), pa.getFieldToken());
-            if (CollectionUtils.isEmpty(idList)){
+            if (CollectionUtils.isEmpty(idList)) {
                 return PageUtil.Page.empty();
 
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page,pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
@@ -176,8 +178,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     @Override
     public List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa) {
-        List<MonitorItemV1> list= tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType());
-        if (CollectionUtils.isNotEmpty(list)){
+        List<MonitorItemV1> list = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType());
+        if (CollectionUtils.isNotEmpty(list)) {
             List<Integer> monitorItemIDList = list.stream().map(MonitorItemV1::getItemID).collect(Collectors.toList());
             List<MonitorTypeFieldV1> temp = tbMonitorTypeFieldMapper.queryMonitorTypeFieldV1ByMonitorItems(monitorItemIDList);
             Map<Integer, List<MonitorTypeFieldV1>> fieldMap = temp.stream().collect(Collectors.groupingBy(MonitorTypeFieldV1::getItemID));
@@ -195,7 +197,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         if (pa.getCreateType() != null) {
             queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
         }
-        if(pa.getCompanyID()!=null){
+        if (pa.getCompanyID() != null) {
             queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
 
         }
@@ -209,8 +211,19 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     }
 
     @Override
-    public CompanyMonitorItemNameInfo queryMonitorItemNameList(QueryTagListParam pa) {
-        return null;
+    public List<CompanyMonitorItemNameInfo> queryMonitorItemNameList(QueryTagListParam pa) {
+        Map<String, List<MonitorItemNameFullInfo>> monitorClassMap = tbMonitorItemMapper.queryMonitorItemNameFullInfo(
+                pa.getCompanyID()).stream().collect(Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorClassName));
+        return monitorClassMap.entrySet().stream().map(u -> {
+            Map<Integer, List<MonitorItemNameFullInfo>> monitorTypemap = u.getValue().stream().collect(
+                    Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorTypeID));
+            return CompanyMonitorItemNameInfo.builder().MonitorClassName(u.getKey()).dataList(monitorTypemap.entrySet()
+                    .stream().map(w -> MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
+                            .monitorTypeName(w.getValue().stream().findFirst()
+                                    .map(MonitorItemNameFullInfo::getMonitorItemName).orElse(null))
+                            .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
+                                    .distinct().toList()).build()).toList()).build();
+        }).toList();
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {
