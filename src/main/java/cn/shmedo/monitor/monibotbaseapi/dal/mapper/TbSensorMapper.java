@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -45,4 +46,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     void updatePointByPoint(Integer oldPoint, Integer newPoint, Integer userID, Date date);
 
     List<SensorWithMore> querySensorWithMoreBy(Collection<String> uniqueTokens, Integer companyID, List<Integer> projectIDList, Integer monitorItemID);
+
+    List<SensorBaseInfoResponse> selectListBymonitorPointIDList(List<Integer> monitorPointIDList);
 }

@@ -406,7 +406,7 @@ public class ProjectController {
      * @api {POST} /QueryProjectBaseInfoList 查询公司下的工程基本信息以及监测项目信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
-     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表
+     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表,最终只展示有传感器的监测点,已经对应的工程
      * @apiName QueryProjectBaseInfoList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String} monitorItemName 监测项目名称
@@ -415,27 +415,26 @@ public class ProjectController {
      * @apiSuccess (响应结果) {Int} data.projectType     工程类型
      * @apiSuccess (响应结果) {String} data.projectName      工程名称
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
-     * @apiSuccess (响应结果) {Object[]} data.monitorItemList  监测项目列表
-     * @apiSuccess (响应结果) {Int} data.monitorItemList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {String} data.monitorItemList.monitorItemName 监测项目名称
-     * @apiSuccess (响应结果) {String} data.monitorItemList.monitorItemAlias 监测项目别名
      * @apiSuccess (响应结果) {Object[]} data.monitorPointList 监测点列表
      * @apiSuccess (响应结果) {Int} data.monitorPointList.projectID 工程ID
      * @apiSuccess (响应结果) {Int} data.monitorPointList.monitorItemID 项目ID
+     * @apiSuccess (响应结果) {String} data.monitorPointList.monitorItemName 监测项目名称
+     * @apiSuccess (响应结果) {String} data.monitorPointList.monitorItemAlias 监测项目别名
      * @apiSuccess (响应结果) {Int} data.monitorPointList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointList.monitorPointName  监测点名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorList 传感器列表
-     * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.sensorID 传感器ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.sensorName 传感器名称
-     * @apiSuccess (响应结果) {Int} data.sensorList.sensorAlias 传感器别名
+     * @apiSuccess (响应结果) {Object[]} data.monitorPointList.sensorList 传感器列表
+     * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.monitorPointID  监测点ID
+     * @apiSuccess (响应结果) {Int} data.monitorPointList.sensorList.sensorID 传感器ID
+     * @apiSuccess (响应结果) {String} data.monitorPointList.sensorList.sensorName 传感器名称
+     * @apiSuccess (响应结果) {String} data.monitorPointList.sensorList.sensorAlias 传感器别名
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/QueryProjectBaseInfoList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectBaseInfoList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryProjectBaseInfoList(@Validated @RequestBody QueryProjectBaseInfoListParam pa) {
+        return projectService.queryProjectBaseInfoList(pa);
     }
 
 

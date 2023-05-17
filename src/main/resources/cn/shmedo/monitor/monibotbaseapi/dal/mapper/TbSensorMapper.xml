@@ -420,4 +420,18 @@
           </if>
       </where>
   </select>
+
+
+
+  <select id="selectListBymonitorPointIDList" parameterType="java.lang.Integer" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse">
+      select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
+      from tb_sensor
+      where MonitorPointID in
+      <foreach collection="monitorPointIDList" open="(" close=")" item="item" separator="OR">
+      #{item}
+      </foreach>
+  </select>
+
+
+
 </mapper>
