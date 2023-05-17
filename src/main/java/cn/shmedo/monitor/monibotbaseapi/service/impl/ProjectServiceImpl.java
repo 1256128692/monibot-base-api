@@ -424,7 +424,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getCompanyID, pa.getCompanyID());
-        Optional.ofNullable(pa.getProjectIDs()).filter(e -> !e.isEmpty())
+        Optional.ofNullable(pa.getProjectIDList()).filter(e -> !e.isEmpty())
                 .ifPresent(ids -> wrapper.in(TbProjectInfo::getID, ids));
         if (!StringUtil.isNullOrEmpty(pa.getProjectName())) {
             wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());

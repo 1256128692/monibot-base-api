@@ -6,13 +6,11 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.base.SubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Collection;
 import java.util.Optional;
-import java.util.Set;
 
 @Data
 public class QueryProjectListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -26,18 +24,15 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
 
     private Byte platformType;
 
-    private Set<Integer> projectIDList;
-
-    @JsonIgnore
-    private Collection<Integer> projectIDs;
+    private Collection<Integer> projectIDList;
 
     @Override
     public ResultWrapper<?> validate() {
         Optional.ofNullable(platformType).ifPresent(val -> Assert.isTrue(PlatformType.validate(val), "platformType is invalid"));
         //只限制用户查询范围
         if (SubjectType.USER.equals(CurrentSubjectHolder.getCurrentSubject().getSubjectType())) {
-            this.projectIDs = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
-            if (projectIDs.isEmpty()) {
+            this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
+            if (projectIDList.isEmpty()) {
                 return ResultWrapper.successWithNothing();
             }
         }
