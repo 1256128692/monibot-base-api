@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.QueryRealDataParam;
+import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import java.util.Objects;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ThematicDataAnalysisController {
+    private final IThematicDataAnalysisService thematicDataAnalysisService;
+
     /**
      * @api {POST} /QueryStGroupRealData 浸润线专题
      * @apiVersion 1.0.0
@@ -64,7 +67,7 @@ public class ThematicDataAnalysisController {
         if (Objects.nonNull(density) && density == 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度枚举错误,密度 1.日平均;2.月平均;3.年平均");
         }
-        return null;
+        return thematicDataAnalysisService.queryStGroupRealData(param);
     }
 
     /**
@@ -89,7 +92,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {String} newData.dataList.monitorChildTypeDesc 数据轴描述
      * @apiSuccess (返回结果) {Double} newData.dataList.totalValue 累计位移
      * @apiSuccess (返回结果) {Double} newData.dataList.segmentValue 阶段位移
-     * @apiSuccess (返回结果) {Object} newData.dataList.config 传感器自定义配置,其中至少有传感器深度(m)的配置
+     * @apiSuccess (返回结果) {String} newData.dataList.config 传感器自定义配置,其中至少有传感器深度(m)的配置
      * @apiSuccess (返回结果) {Object[]} historyData 历史内部变形数据
      * @apiSuccess (返回结果) {DateTime} historyData.time 数据上行时间
      * @apiSuccess (返回结果) {Object[]} historyData.dataList 内部变形数据
@@ -98,13 +101,13 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {String} historyData.dataList.monitorChildTypeDesc 数据轴描述
      * @apiSuccess (返回结果) {Double} historyData.dataList.totalValue 累计位移
      * @apiSuccess (返回结果) {Double} historyData.dataList.segmentValue 阶段位移
-     * @apiSuccess (返回结果) {Object} historyData.dataList.config 传感器自定义配置,其中至少有传感器深度(m)的配置
+     * @apiSuccess (返回结果) {String} historyData.dataList.config 传感器自定义配置,其中至少有传感器深度(m)的配置
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
 //    @Permission(permissionName = "")
     @PostMapping(value = "/QueryDmAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDmAnalysisData(@Valid @RequestBody QueryRealDataParam param) {
-        return null;
+        return thematicDataAnalysisService.queryDmAnalysisData(param);
     }
 }
