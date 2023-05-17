@@ -1,11 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.lang.Assert;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,10 +23,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Data
 @AllArgsConstructor
@@ -68,28 +71,31 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     @Override
     public ResultWrapper<?> validate() {
-        if (projectType != null) {
-            if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不存在");
-            }
-        }
+        Optional.ofNullable(projectType).ifPresent(type -> {
+            Assert.isTrue(ProjectTypeCache.projectTypeMap.containsKey(type), "项目类型不存在");
+        });
+
         if (beginCreateTime != null && endCreateTime != null) {
-            if (beginCreateTime.getTime() > endCreateTime.getTime()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能大于结束时间");
-            }
+            Assert.isTrue(beginCreateTime.getTime() >= endCreateTime.getTime(), "开始时间不能大于结束时间");
         }
 
-        if (CollUtil.isNotEmpty(platformTypeList)) {
-            if (platformTypeList.stream().anyMatch(platformType -> !PlatformType.validate(platformType))) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不存在");
-            }
-        }
+        Optional.ofNullable(platformTypeList).filter(e -> !e.isEmpty()).ifPresent(e -> {
+            Assert.isTrue(e.stream().allMatch(PlatformType::validate), "平台类型不存在");
+        });
 
         // 获取有权限的项目列表
         this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID);
+        if (CollUtil.isNotEmpty(projectIDList)) {
+            //查询满足过滤条件且有权限的项目ID
+            Optional.ofNullable(propertyEntity).filter(e -> !e.isEmpty())
+                    .ifPresent(props -> {
+                        TbProjectInfoMapper projectInfoMapper = SpringUtil.getBean(TbProjectInfoMapper.class);
+                        this.projectIDList = projectInfoMapper.getProjectIDByProperty(props, projectIDList);
+                    });
+        }
+
         if (projectIDList.isEmpty()) {
             return ResultWrapper.successWithNothing();
-//            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
         }
         return null;
     }
