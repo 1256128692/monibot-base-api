@@ -427,8 +427,8 @@
       select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
       from tb_sensor
       where MonitorPointID in
-      <foreach collection="monitorPointIDList" open="(" close=")" item="item" separator="OR">
-      #{item}
+      <foreach collection="monitorPointIDList" item="id" separator="," open="(" close=")">
+        #{id}
       </foreach>
   </select>
 
