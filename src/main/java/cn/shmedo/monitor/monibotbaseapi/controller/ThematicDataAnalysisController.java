@@ -31,7 +31,7 @@ public class ThematicDataAnalysisController {
      * @apiName QueryStGroupRealData
      * @apiDescription 浸润线专题
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorGroupID 检测组ID
+     * @apiParam (请求参数) {Int} monitorGroupID 监测组ID
      * @apiParam (请求参数) {Int} [density] 密度 1.日平均; 2.月平均; 3.年平均
      * @apiParam (请求参数) {DateTime} [startTime] 查询时段开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 查询时段结束时间
@@ -77,7 +77,7 @@ public class ThematicDataAnalysisController {
      * @apiName QueryDmAnalysisData
      * @apiDescription 内部变形专题
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorPointID 检测点ID
+     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
      * @apiParam (请求参数) {Int} [monitorChildType] 数据轴,默认是1.轴A 1.轴A;2.轴B
      * @apiParam (请求参数) {Int} [density] 密度 0.全部;1.日平均; 2.月平均; 3.年平均
      * @apiParam (请求参数) {DateTime} [startTime] 查询时段开始时间

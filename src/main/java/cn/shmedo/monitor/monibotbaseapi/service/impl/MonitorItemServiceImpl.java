@@ -6,11 +6,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.tag.QueryTagListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -208,6 +206,11 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         return tbMonitorItemMapper.selectList(
                 queryWrapper
         );
+    }
+
+    @Override
+    public CompanyMonitorItemNameInfo queryMonitorItemNameList(QueryTagListParam pa) {
+        return null;
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {
