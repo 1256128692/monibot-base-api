@@ -398,11 +398,11 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 }
             } else {
                 if (pa.getSign().equals("+")) {
-                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
                     old.addAll(strings);
                     tbWarnRule.setDeviceCSV(String.join(",", old));
                 } else {
-                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
                     old.removeAll(strings);
                     if (CollectionUtils.isEmpty(old)) {
                         tbWarnRule.setDeviceCSV(null);
