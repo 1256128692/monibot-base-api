@@ -356,48 +356,39 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
-
-        if (CollUtil.isNotEmpty(pa.getPropertyEntity())) {
-            //查询满足过滤条件的项目ID并和有权限的项目ID取交集
-            List<Integer> projectIDList = tbProjectInfoMapper
-                    .getProjectIDByProperty(pa.getPropertyEntity(), pa.getPropertyEntity().size());
-            pa.setProjectIDList(CollUtil.intersection(projectIDList, pa.getProjectIDList()));
-            if (pa.getProjectIDList().isEmpty()) {
-                return PageUtil.Page.empty();
-            }
-        }
-
-        Page<ProjectInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(page, pa);
-
-        List<Integer> ids = pageData.getRecords().stream().map(TbProjectInfo::getID).toList();
-        if (!ids.isEmpty()) {
-            Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids)
-                    .stream().collect(Collectors.groupingBy(TagDto::getProjectID));
-
+        IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(new Page<>(pa.getCurrentPage(), pa.getPageSize()), pa);
+        if (!pageData.getRecords().isEmpty()) {
+            List<Integer> ids = pageData.getRecords().stream().map(TbProjectInfo::getID).toList();
+            //标签
+            Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids).stream()
+                    .collect(Collectors.groupingBy(TagDto::getProjectID));
+            //属性
             Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
                     .queryPropertyByProjectID(ids, 0).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
-
-            Collection<Object> areas = pageData.getRecords()
-                    .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull).collect(Collectors.toSet());
-            Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+            //行政区划
+            Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, pageData.getRecords()
+                            .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull)
+                            .collect(Collectors.toSet()), RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
-            areas.clear();
-            Collection<Object> companyData = pageData.getRecords()
-                    .stream().map(s -> s.getCompanyID().toString()).filter(Objects::nonNull).collect(Collectors.toSet());
-            List<Company> companies = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class);
-            System.out.println(companies);
-            Map<Integer, Company> companyMap = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, companyData, Company.class)
-                    .stream().collect(Collectors.toMap(e -> e.getId(), e -> e));
-            companyData.clear();
+            //公司信息
+            Map<Integer, Company> companyMap = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, pageData.getRecords()
+                            .stream().map(s -> s.getCompanyID().toString()).collect(Collectors.toSet()), Company.class)
+                    .stream().collect(Collectors.toMap(Company::getId, e -> e));
+            //图片 TODO 任意文件不存在会返回null，故无法批量获取
+//            Map<String, String> imgMap = fileService.getFileUrlList(pageData.getRecords().stream().map(ProjectInfo::getImagePath)
+//                            .filter(StrUtil::isNotEmpty).collect(Collectors.toList()), pa.getCompanyID())
+//                    .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
 
             pageData.getRecords().forEach(item -> {
-                item.setTagInfo(tagGroup.getOrDefault(item.getID(), Collections.emptyList()));
-                item.setPropertyList(propMap.getOrDefault(item.getID(), Collections.emptyList()));
-                item.setCompany(companyMap.getOrDefault(item.getCompanyID(), null));
+                item.setTagInfo(tagGroup.getOrDefault(item.getID(), List.of()));
+                item.setPropertyList(propMap.getOrDefault(item.getID(), List.of()));
+                item.setCompany(companyMap.get(item.getCompanyID()));
                 item.setLocationInfo(areaMap.getOrDefault(item.getLocationInfo(), null));
-                handlerImagePathToRealPath(item);
+                Optional.ofNullable(item.getImagePath()).filter(e -> !e.isEmpty()).ifPresent(path -> {
+                    item.setImagePath(fileService.getFileUrl(item.getImagePath()));
+                });
+//                item.setImagePath(imgMap.getOrDefault(item.getImagePath(), null));
             });
         }
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());

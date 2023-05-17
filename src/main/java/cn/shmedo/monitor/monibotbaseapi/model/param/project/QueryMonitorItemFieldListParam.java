@@ -3,6 +3,10 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
@@ -22,7 +26,17 @@ public class QueryMonitorItemFieldListParam implements ParameterValidator, Resou
 
     @Override
     public ResultWrapper<?> validate() {
-        // TODO:加校验
+        // 校验监测点的监测项目名称,如果监测项目名称有1个以上,则这是跨监测项目,返回相应错误
+        TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+        List<TbMonitorItem> monitorItemList = tbMonitorItemMapper.selectListByMonitorPointIDsAndProjectIDs(monitorPointIDList, projectIDList);
+        if (CollectionUtil.isNullOrEmpty(monitorItemList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表没有对应的监测项目");
+        } else {
+            long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
+            if (count > 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表所属不同监测项目");
+            }
+        }
         return null;
     }
 
