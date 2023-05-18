@@ -14,6 +14,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.lang.Nullable;
 
+import java.util.function.Consumer;
+
 /**
  * Feign客户端工厂<br>
  *
@@ -31,10 +33,10 @@ public class FeignFactory {
      * @return 远程服务实例
      */
     public static <T> T hystrixClient(Class<T> tClass, String url, FallbackFactory<T> fallbackFactory,
-                                      @Nullable Handler<HystrixFeign.Builder> handler) {
+                                      @Nullable Consumer<HystrixFeign.Builder> handler) {
         HystrixFeign.Builder builder = HystrixFeign.builder();
         if (handler != null) {
-            handler.handle(builder);
+            handler.accept(builder);
         }
         return builder.target(tClass, url, fallbackFactory);
     }
@@ -67,10 +69,10 @@ public class FeignFactory {
      * @param handler 服务构造器 {@link Feign.Builder}
      * @return 远程服务实例
      */
-    public static <T> T client(Class<T> tClass, String url, @Nullable Handler<Feign.Builder> handler) {
+    public static <T> T client(Class<T> tClass, String url, @Nullable Consumer<Feign.Builder> handler) {
         Feign.Builder builder = Feign.builder();
         if (handler != null) {
-            handler.handle(builder);
+            handler.accept(builder);
         }
         return builder.target(tClass, url);
     }
@@ -96,13 +98,6 @@ public class FeignFactory {
                         .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
     }
 
-    /**
-     * 函数式接口，用于处理 {@link HystrixFeign.Builder}
-     */
-    @FunctionalInterface
-    public interface Handler<T> {
-        void handle(T value);
-    }
 }
 
     

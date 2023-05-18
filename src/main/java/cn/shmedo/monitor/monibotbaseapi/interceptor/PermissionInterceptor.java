@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.interceptor;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.*;
@@ -115,11 +114,13 @@ public class PermissionInterceptor {
 
             return userService.applicationHasPermission(pa, appKeySecret.getItem1(), appKeySecret.getItem2());
         }
-        return ResultWrapper.success(Boolean.FALSE);
+        return ResultWrapper.withCode(ResultCode.ACCESS_TYPE_NOT_ALLOWED);
     }
 
     /**
-     * 校验用户是否有相应权限
+     * 校验用户是否有相应权限<br/>
+     * 无参数时，会直接返回无权限，因此无参接口不适用于 {@link PermissionScope#REQUIRE}<br/>
+     * 多参数时，将只校验第一个实现 {@link ResourcePermissionProvider} 的参数
      *
      * @param args              接口参数
      * @param permission        权限
@@ -128,11 +129,8 @@ public class PermissionInterceptor {
      */
     private ResultWrapper<Boolean> validateUserPermission(Object[] args, Permission permission,
                                                           String token, Tuple<String, String> servicePermission) {
-        //FIXME: 无参数时，会直接返回无权限；
-        // 多参数时，将只校验第一个实现 ResourcePermissionProvider 的参数
-
-        if (ArrayUtil.isNotEmpty(args)) {
-            for (Object arg : args) {
+        if (permission.allowUser()) {
+            for (Object arg : args == null || args.length == 0 ? new Object[0] : args) {
                 if (arg instanceof ResourcePermissionProvider<?> provider) {
                     switch (provider.resourcePermissionType()) {
                         case SINGLE_RESOURCE_SINGLE_PERMISSION -> {
@@ -160,6 +158,8 @@ public class PermissionInterceptor {
                     break;
                 }
             }
+        } else {
+            return ResultWrapper.withCode(ResultCode.ACCESS_TYPE_NOT_ALLOWED);
         }
         return ResultWrapper.success(Boolean.FALSE);
     }
