@@ -266,7 +266,7 @@ public class MonitorItemController {
      * @apiDescription 查询公司下全部已配置监测类别、监测类型和监测项目名称
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {Object[]} list 监测项目信息列表
-     * @apiSuccess (返回结果) {String} list.MonitorClassName 监测类别名称
+     * @apiSuccess (返回结果) {String} list.monitorClassName 监测类别名称
      * @apiSuccess (返回结果) {Object[]} list.dataList 数据
      * @apiSuccess (返回结果) {Int} list.dataList.monitorTypeID 监测类型ID
      * @apiSuccess (返回结果) {String} list.dataList.monitorTypeName 监测类型名称
