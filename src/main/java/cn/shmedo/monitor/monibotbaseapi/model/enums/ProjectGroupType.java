@@ -1,11 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.IConfigID;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -15,6 +18,7 @@ import java.util.Objects;
  * @see IConfigID
  */
 public enum ProjectGroupType {
+    PROJECT("project", "工程"),
     MONITOR_GROUP("monitorGroup", "监测点分组"),
     MONITOR_POINT("monitorPoint", "监测点");
 
@@ -27,7 +31,7 @@ public enum ProjectGroupType {
     }
 
     public static ProjectGroupType getProjectGroupType(IConfigID data) {
-        String dCode = Arrays.stream(IConfigID.class.getMethods())
+        List<String> list = Arrays.stream(IConfigID.class.getMethods())
                 .filter(u -> u.getName().startsWith("get") && u.getName().endsWith("ID")).map(u -> {
                     try {
                         u.setAccessible(true);
@@ -36,8 +40,10 @@ public enum ProjectGroupType {
                         throw new RuntimeException("invoke failure,data: " + data.toString(null), e);
                     }
                 }).filter(u -> Objects.nonNull(u.getItem2())).map(Tuple::getItem1).map(Method::getName)
-                .map(u -> u.substring(3, u.length() - 2))   // "get" + code + "ID"
-                .findFirst().orElseThrow(() -> new IllegalArgumentException("param need set an 'ID' at least"));
+                .map(u -> u.substring(3, u.length() - 2)).distinct().toList();
+        Assert.isTrue(CollectionUtil.isEmpty(list), () -> new IllegalArgumentException("Param need set an 'ID' at least"));
+        String dCode = list.size() == 1 ? list.get(0) : list.stream().filter(u -> !u.equalsIgnoreCase(PROJECT.code))
+                .findFirst().orElseThrow(() -> new IllegalArgumentException("Unreachable Exception"));
         return Arrays.stream(values()).filter(u -> u.code.equalsIgnoreCase(dCode)).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException(dCode + "not exists in enum."));
     }

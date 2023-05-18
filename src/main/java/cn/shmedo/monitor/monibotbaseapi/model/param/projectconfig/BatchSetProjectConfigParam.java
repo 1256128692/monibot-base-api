@@ -40,6 +40,8 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
     @NotEmpty(message = "要配置的参数不能为空")
     private List<SetProjectConfigParam> dataList;
     @JsonIgnore
+    private Boolean containsProjectConfig;
+    @JsonIgnore
     private TbProjectInfo tbProjectInfo;
     /**
      * @see #getSubSum()
@@ -79,15 +81,16 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
                     tbMonitorGroupMap = groupMapper.selectList(new LambdaQueryWrapper<TbMonitorGroup>()
                             .in(TbMonitorGroup::getID, u.getValue().stream().map(SetProjectConfigParam::getMonitorGroupID)
                                     .toList())).stream().collect(Collectors.toMap(TbMonitorGroup::getID, w -> w));
-                    u.getValue().stream().peek(w -> ProjectConfigKeyUtils.setKey(w, w.getMonitorGroupID())).toList();
+                    u.getValue().stream().peek(w -> ProjectConfigKeyUtils.setKey(w, w.getMonitorGroupID(), false)).toList();
                 }
                 case MONITOR_POINT -> {
                     TbMonitorPointMapper pointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
                     tbMonitorPointMap = pointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
                             .in(TbMonitorPoint::getID, u.getValue().stream().map(SetProjectConfigParam::getMonitorPointID)
                                     .toList())).stream().collect(Collectors.toMap(TbMonitorPoint::getID, w -> w));
-                    u.getValue().stream().peek(w -> ProjectConfigKeyUtils.setKey(w, w.getMonitorPointID())).toList();
+                    u.getValue().stream().peek(w -> ProjectConfigKeyUtils.setKey(w, w.getMonitorPointID(), false)).toList();
                 }
+                case PROJECT -> containsProjectConfig = true;
                 default ->
                         throw new IllegalArgumentException("switch in {@code BatchSetProjectConfigParam} lack enums,@see ProjectGroupType");
             }
@@ -116,7 +119,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
      * 批量配置时，可能会有多级同时配置，所以校验时需要校验被配置对象size(即所有存有被配置对象map的keySet.size()之和)等于dataList.size()
      */
     private Integer getSubSum() {
-        return (Objects.isNull(tbMonitorGroupMap) ? 0 : tbMonitorGroupMap.keySet().size())
+        return (Objects.isNull(tbMonitorGroupMap) ? 0 : tbMonitorGroupMap.keySet().size()) + (containsProjectConfig ? 1 : 0)
                 + (Objects.isNull(tbMonitorPointMap) ? 0 : tbMonitorPointMap.keySet().size());
     }
 

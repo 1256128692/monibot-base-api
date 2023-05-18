@@ -18,13 +18,15 @@ public class ProjectConfigKeyUtils {
      * @param item     含key对象
      * @param targetID 被配置对象ID
      */
-    public static void setKey(@NotNull IProjectConfigKey item, final Integer targetID) {
-        Optional.of(item).filter(u -> ObjectUtil.isNotEmpty(u.getKey()) && !u.getKey().contains("::"))
-                .ifPresent(u -> u.setKey(u.getKey() + "::" + targetID));
+    public static void setKey(@NotNull IProjectConfigKey item, final Integer targetID, final boolean isProject) {
+        if (!isProject) {   //TODO test
+            Optional.of(item).filter(u -> ObjectUtil.isNotEmpty(u.getKey()) && !u.getKey().contains("::"))
+                    .ifPresent(u -> u.setKey(u.getKey() + "::" + targetID));
+        }
     }
 
-    public static Tuple<String, Integer> getKey(final String key) {
+    public static Tuple<String, Integer> getKey(final String key, final Integer projectID) {
         return Objects.nonNull(key) && key.contains("::") ?
-                new Tuple<>(key.split("::")[0], Integer.parseInt(key.split("::")[1])) : new Tuple<>(key, null);
+                new Tuple<>(key.split("::")[0], Integer.parseInt(key.split("::")[1])) : new Tuple<>(key, projectID);
     }
 }

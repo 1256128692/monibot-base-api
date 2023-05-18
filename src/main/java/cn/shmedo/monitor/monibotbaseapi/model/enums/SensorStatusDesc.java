@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 /**
  * @author: youxian.kong@shmedo.cn
  * @date: 2023-04-28 13:36
@@ -34,12 +37,8 @@ public enum SensorStatusDesc {
         this.desc = desc;
     }
 
-    //    private interface SensorStatus {
-    //        Integer NO_DATA = -1;
-    //        Integer NORMAL = 0;
-    //        Integer WARM_LEVEL1 = 1;
-    //        Integer WARM_LEVEL2 = 2;
-    //        Integer WARM_LEVEL3 = 3;
-    //        Integer WARM_LEVEL4 = 4;
-    //    }
+    public static SensorStatusDesc getByWarnLevel(Integer warnLevel) {
+        return Optional.ofNullable(warnLevel).map(u -> Arrays.stream(values()).filter(w -> u.equals(w.warnLevel))
+                .findFirst().orElse(NO_DATA)).orElse(NO_DATA);
+    }
 }
