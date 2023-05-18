@@ -81,8 +81,9 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
             tbMonitorPoint = tbMonitorPoints.get(0);
         }
         switch (projectGroupType) {
-            case MONITOR_GROUP -> ProjectConfigKeyUtils.setKey(this, monitorGroupID);
-            case MONITOR_POINT -> ProjectConfigKeyUtils.setKey(this, monitorPointID);
+            case PROJECT -> ProjectConfigKeyUtils.setKey(this, projectID, true);
+            case MONITOR_GROUP -> ProjectConfigKeyUtils.setKey(this, monitorGroupID, false);
+            case MONITOR_POINT -> ProjectConfigKeyUtils.setKey(this, monitorPointID, false);
             default -> log.info("未设置对应的分级枚举，将不会拼接key");
         }
         return null;

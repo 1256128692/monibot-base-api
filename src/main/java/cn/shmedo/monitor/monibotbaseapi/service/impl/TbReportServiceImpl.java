@@ -99,12 +99,21 @@ public class TbReportServiceImpl implements ITbReportService {
                         WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder()
                                 .monitorTypeName(w.getKey()).noData((int) wValue.stream()
                                         .filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
-                        build.addWarnCountList(dealWarnList(wValue));
+                        List<WtReportWarn> warnList = dealWarnList(wValue);
+                        Map<Integer, Integer> levelCountMap = CollUtil.countMap(warnList.stream()
+                                .map(WtReportWarn::getWarnLevel).toList());
+                        List<WtReportWarn> addtionWarnList = Arrays.stream(SensorStatusDesc.values())
+                                .filter(s -> !(s.equals(SensorStatusDesc.NO_DATA) || s.equals(SensorStatusDesc.NORMAL)))
+                                .map(SensorStatusDesc::getWarnLevel).filter(s -> !levelCountMap.containsKey(s))
+                                .map(s -> WtReportWarn.builder().total(0).warnLevel(s).warnName(
+                                        SensorStatusDesc.getByWarnLevel(s).getDesc()).build()).toList();
+                        build.addWarnCountList(warnList);
+                        build.addWarnCountList(addtionWarnList);
                         return build;
                     }).toList()).build();
                 }).toList());
         List<WtReportProjectInfo> addtionList = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
-                .in(TbProjectInfo::getID, projectIDList)).stream().map(TbProjectInfo::getProjectName)
+                        .in(TbProjectInfo::getID, projectIDList)).stream().map(TbProjectInfo::getProjectName)
                 .filter(u -> infoList.stream().noneMatch(v -> u.equalsIgnoreCase(v.getProjectName())))
                 .map(u -> WtReportProjectInfo.builder().total(0).projectName(u).monitorClass(null)
                         .monitorTypeList(new ArrayList<>()).monitorTypeCountList(new ArrayList<>()).build()).toList();

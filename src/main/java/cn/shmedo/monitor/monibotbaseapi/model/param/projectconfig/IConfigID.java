@@ -12,6 +12,10 @@ import java.util.Map;
  * 比如假设本接口里有多个getA1ID(),getA2ID(),...方法，那么这些方法中仅有一个是有值的，其他值均为null
  */
 public interface IConfigID {
+    Integer getProjectID();
+
+    void setProjectID(final Integer projectID);
+
     Integer getMonitorGroupID();
 
     void setMonitorGroupID(final Integer monitorGroupID);

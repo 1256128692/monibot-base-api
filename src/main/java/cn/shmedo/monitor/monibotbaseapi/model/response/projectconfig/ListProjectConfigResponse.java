@@ -22,7 +22,7 @@ public class ListProjectConfigResponse implements IConfigParam {
     private String value;
 
     public static ListProjectConfigResponse build(TbProjectConfig config) {
-        Tuple<String, Integer> tuple = ProjectConfigKeyUtils.getKey(config.getKey());
+        Tuple<String, Integer> tuple = ProjectConfigKeyUtils.getKey(config.getKey(), config.getProjectID());
         return ListProjectConfigResponse.builder().configID(config.getID()).ID(tuple.getItem2()).key(tuple.getItem1())
                 .projectID(config.getProjectID()).group(config.getGroup()).value(config.getValue()).build();
     }
