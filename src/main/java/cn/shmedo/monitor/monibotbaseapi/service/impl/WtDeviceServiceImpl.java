@@ -339,11 +339,15 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
             return PageUtil.PageWithMap.empty();
         }
-        long normalBefore = wtVideoList.stream().filter(e -> e.getStatus() == 0).count();
-        long warnBefore = wtVideoList.size() - normalBefore;
+        long normalBefore = wtVideoList.stream().filter(e -> e.getStatus() != null && e.getStatus() == 0).count();
+        long warnBefore = wtVideoList.stream().filter(e -> e.getStatus() != null && e.getStatus() == 1).count();
         PageUtil.PageWithMap<WtVideoPageInfo> empty = PageUtil.PageWithMap.emptyWithMap(Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
-
-
+        if (param.getStatus() != null) {
+            wtVideoList = wtVideoList.stream().filter(e -> e.getStatus() != null && e.getStatus().equals(param.getStatus())).toList();
+        }
+        if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
+            return empty;
+        }
         wtVideoList.forEach(item -> {
             String exValues = item.getExValues();
             if (StringUtils.isNotEmpty(exValues)) {
