@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -52,12 +53,14 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
         res.setMonitorItemID(param.getMonitorItemID());
         res.setMonitorPointID(param.getMonitorPointID());
         res.setProjectID(param.getProjectID());
-        if (tbWarnRule.getRuleType().intValue() == 2) {
-            res.setVideoType(productID);
-            res.setVideoCSV(deviceCSV);
-        } else if (tbWarnRule.getRuleType().intValue() == 3) {
-            res.setProductID(Integer.valueOf(productID));
-            res.setDeviceCSV(deviceCSV);
+        if (StringUtils.isNotBlank(productID) && StringUtils.isNotBlank(deviceCSV)) {
+            if (tbWarnRule.getRuleType().intValue() == 2) {
+                res.setVideoType(productID);
+                res.setVideoCSV(deviceCSV);
+            } else if (tbWarnRule.getRuleType().intValue() == 3) {
+                res.setProductID(Integer.valueOf(productID));
+                res.setDeviceCSV(deviceCSV);
+            }
         }
         return res;
     }
