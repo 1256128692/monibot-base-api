@@ -192,7 +192,7 @@ public class WtEngineController {
     @Permission(permissionName = "mdmbase:UpdateBaseRuleEngine")
     @PostMapping(value = "/UpdateWtEngine", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWtEngine(@Valid @RequestBody UpdateWtEngineParam param) {
-        tbWarnRuleService.updateWtEngine(param);
+        tbWarnRuleService.updateWtEngine(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 

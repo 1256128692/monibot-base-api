@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -14,7 +13,7 @@ public interface ITbWarnRuleService extends IService<TbWarnRule> {
 
     Integer addWtEngine(AddWtEngineParam param, Integer userID);
 
-    void updateWtEngine(UpdateWtEngineParam param);
+    void updateWtEngine(UpdateWtEngineParam param, Integer userID);
 
     void updateWtEngineEnable(BatchUpdateWtEngineEnableParam param);
 
