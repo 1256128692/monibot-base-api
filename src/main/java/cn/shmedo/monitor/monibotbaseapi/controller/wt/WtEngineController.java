@@ -166,6 +166,8 @@ public class WtEngineController {
      * @apiParam (请求参数) {Int} engineID 引擎ID
      * @apiParam (请求参数) {String} [engineName] 引擎名称(30字)
      * @apiParam (请求参数) {String} [engineDesc] 引擎简介(200字)
+     * @apiParam (请求参数) {String} [productID] 设备型号
+     * @apiParam (请求参数) {String} [DeviceCSV]
      * @apiParam (请求参数) {Int} [projectID] 项目ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [monitorPointID] 监测点位ID

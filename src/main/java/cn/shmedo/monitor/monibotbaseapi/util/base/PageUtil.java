@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.exception.InvalidParameterExceptio
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Created by Liudongdong on 18/1/19.
@@ -14,11 +15,12 @@ public class PageUtil {
 
     /**
      * 逻辑分页
-     * @param data  数据
-     * @param pageSize  页大小
-     * @param currentPage   当前页
-     * @return  分页结果
-     * @param <T>   数据类型
+     *
+     * @param data        数据
+     * @param pageSize    页大小
+     * @param currentPage 当前页
+     * @param <T>         数据类型
+     * @return 分页结果
      */
     public static <T> Page<T> page(Collection<T> data, long pageSize, long currentPage) {
         if (currentPage < 1) {
@@ -52,6 +54,17 @@ public class PageUtil {
 
         public static <E> Page<E> empty() {
             return new Page<>(0, Collections.emptyList(), 0);
+        }
+    }
+
+    public record PageWithMap<T>(long totalPage, Collection<T> currentPageData, long totalCount,
+                                 Map<String, Object> map) {
+        public static <E> PageWithMap<E> empty() {
+            return new PageWithMap<>(0, Collections.emptyList(), 0, null);
+        }
+
+        public static <E> PageWithMap<E> emptyWithMap(Map<String, Object> map) {
+            return new PageWithMap<>(0, Collections.emptyList(), 0, map);
         }
     }
 }

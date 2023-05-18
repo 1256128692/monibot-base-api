@@ -14,9 +14,9 @@ public interface WtDeviceService {
 
     Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param);
 
-    PageUtil.Page<Device4Web> queryWtDevicePageList(QueryWtDevicePageListParam pa);
+    PageUtil.PageWithMap<Device4Web> queryWtDevicePageList(QueryWtDevicePageListParam pa);
 
-    PageUtil.Page<WtVideoPageInfo> queryWtVideoPageList(QueryWtVideoPageParam param);
+    PageUtil.PageWithMap<WtVideoPageInfo> queryWtVideoPageList(QueryWtVideoPageParam param);
 
     List<Device4Web> exportWtDevice(ExportWtDeviceParam pa);
 
