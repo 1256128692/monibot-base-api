@@ -23,4 +23,6 @@ public interface ITbWarnRuleService extends IService<TbWarnRule> {
     Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID);
 
     void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID);
+
+    void statRuleRelatDevice(Integer ruleID, Integer CompanyID);
 }

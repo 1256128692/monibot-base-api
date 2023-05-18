@@ -33,6 +33,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -222,6 +223,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
             }).flatMap(Collection::stream).toList();
             Optional.of(tbWarnActions).filter(CollectionUtil::isNotEmpty).ifPresent(tbWarnActionService::saveOrUpdateBatch);
         }
+
+        statRuleRelatDevice(param.getEngineID(), param.getCompanyID());
     }
 
     @Override
@@ -274,12 +277,89 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
     @Override
     public Integer addWtDeviceWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
         TbWarnRule entity = Param2DBEntityUtil.fromAddWtDeviceWarnRuleParam2TbWarnRule(pa, userID);
-        Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(pa.getCompanyID());
+        tbWarnRuleMapper.insert(entity);
+        statRuleRelatDevice(entity.getID(), pa.getCompanyID());
+        return entity.getID();
+    }
+
+    @Override
+    public void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID) {
+        List<String> strings = Arrays.stream(pa.getDeviceCSV().split(",")).toList();
+        TbWarnRule tbWarnRule = pa.getTbWarnRule();
+        if (pa.getDeviceCSV().equals("all")) {
+            if (pa.getSign().equals("+")) {
+                if (tbWarnRule.getRuleType() == 2) {
+                    tbWarnRule.setVideoCSV("all");
+                } else {
+                    tbWarnRule.setDeviceCSV("all");
+                }
+
+            } else {
+                if (tbWarnRule.getRuleType() == 2) {
+                    tbWarnRule.setVideoCSV(null);
+                } else {
+                    tbWarnRule.setDeviceCSV(null);
+                }
+            }
+
+        } else {
+            if (tbWarnRule.getRuleType() == 2) {
+                if (pa.getSign().equals("+")) {
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    old.addAll(strings);
+                    tbWarnRule.setVideoCSV(String.join(",", old));
+                } else {
+                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
+                    old.removeAll(strings);
+                    if (CollectionUtils.isEmpty(old)) {
+                        tbWarnRule.setVideoCSV(null);
+                    } else {
+                        tbWarnRule.setVideoCSV(String.join(",", old));
+                    }
+
+
+                }
+            } else {
+                if (pa.getSign().equals("+")) {
+                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    old.addAll(strings);
+                    tbWarnRule.setDeviceCSV(String.join(",", old));
+                } else {
+                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
+                    old.removeAll(strings);
+                    if (CollectionUtils.isEmpty(old)) {
+                        tbWarnRule.setDeviceCSV(null);
+                    } else {
+                        tbWarnRule.setDeviceCSV(String.join(",", old));
+                    }
+
+                }
+            }
+        }
+        tbWarnRule.setUpdateTime(new Date());
+        tbWarnRule.setUpdateUserID(userID);
+        tbWarnRuleMapper.updateIGNORED(tbWarnRule);
+        statRuleRelatDevice(pa.getRuleID(), pa.getCompanyID());
+    }
+
+    /**
+     * 统计规则的设备的应用范围
+     *
+     * @param ruleID
+     * @param CompanyID
+     */
+    @Override
+    public void statRuleRelatDevice(Integer ruleID, Integer CompanyID) {
+        Collection<Integer> projectIDLIst = PermissionUtil.getHavePermissionProjectList(CompanyID);
         Map<String, String> idNameMap = tbProjectInfoMapper.selectBatchIds(projectIDLIst).stream().collect(Collectors.toMap(e -> e.getID().toString(), TbProjectInfo::getProjectName));
+        TbWarnRule entity = tbWarnRuleMapper.selectById(ruleID);
+        if (entity == null) {
+            return;
+        }
         if (entity.getProductID() != null && StringUtils.isNotBlank(entity.getDeviceCSV())) {
             // iot 设备统计
             QueryDeviceSimpleBySenderAddressParam request4Third = QueryDeviceSimpleBySenderAddressParam.builder()
-                    .companyID(pa.getCompanyID())
+                    .companyID(CompanyID)
                     .sendType(SendType.MDMBASE.toInt())
                     .sendAddressList(projectIDLIst.stream().map(String::valueOf).toList())
                     .productID(entity.getProductID())
@@ -354,67 +434,15 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 }
 
             }
-        }
-        tbWarnRuleMapper.insert(entity);
-        return entity.getID();
-    }
-
-    @Override
-    public void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID) {
-        List<String> strings = Arrays.stream(pa.getDeviceCSV().split(",")).toList();
-        TbWarnRule tbWarnRule = pa.getTbWarnRule();
-        if (pa.getDeviceCSV().equals("all")) {
-            if (pa.getSign().equals("+")) {
-                if (tbWarnRule.getRuleType() == 2) {
-                    tbWarnRule.setVideoCSV("all");
-                } else {
-                    tbWarnRule.setDeviceCSV("all");
-                }
-
-            } else {
-                if (tbWarnRule.getRuleType() == 2) {
-                    tbWarnRule.setVideoCSV(null);
-                } else {
-                    tbWarnRule.setDeviceCSV(null);
-                }
-            }
-
         } else {
-            if (tbWarnRule.getRuleType() == 2) {
-                if (pa.getSign().equals("+")) {
-                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
-                    old.addAll(strings);
-                    tbWarnRule.setVideoCSV(String.join(",", old));
-                } else {
-                    List<String> old = tbWarnRule.getVideoCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getVideoCSV().split(",")).toList());
-                    old.removeAll(strings);
-                    if (CollectionUtils.isEmpty(old)) {
-                        tbWarnRule.setVideoCSV(null);
-                    } else {
-                        tbWarnRule.setVideoCSV(String.join(",", old));
-                    }
-
-
-                }
-            } else {
-                if (pa.getSign().equals("+")) {
-                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
-                    old.addAll(strings);
-                    tbWarnRule.setDeviceCSV(String.join(",", old));
-                } else {
-                    List<String> old = tbWarnRule.getDeviceCSV() == null ? new ArrayList<>() : new ArrayList<>(Arrays.stream(tbWarnRule.getDeviceCSV().split(",")).toList());
-                    old.removeAll(strings);
-                    if (CollectionUtils.isEmpty(old)) {
-                        tbWarnRule.setDeviceCSV(null);
-                    } else {
-                        tbWarnRule.setDeviceCSV(String.join(",", old));
-                    }
-
-                }
-            }
+            Map map = JSONUtil.toBean(entity.getExValue(), Map.class);
+            map.put("proCount", null);
+            entity.setExValue(JSONUtil.toJsonStr(map));
         }
-        tbWarnRule.setUpdateTime(new Date());
-        tbWarnRule.setUpdateUserID(userID);
-        tbWarnRuleMapper.updateIGNORED(tbWarnRule);
+        tbWarnRuleMapper.update(null,
+                new UpdateWrapper<TbWarnRule>().lambda()
+                        .eq(TbWarnRule::getID, entity.getID())
+                        .set(TbWarnRule::getEnable, entity.getEnable())
+        );
     }
 }
