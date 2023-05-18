@@ -233,7 +233,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             return true;
                         } else if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> item2.getMonitorPointName().contains(pa.getQueryCode())
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
                             )) {
                                 return true;
                             }
@@ -592,7 +592,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             return true;
                         } else if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> item2.getMonitorPointName().contains(pa.getQueryCode())
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
                             )) {
                                 return true;
                             }
