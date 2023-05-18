@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 
@@ -32,10 +33,7 @@ public class QueryRealDataParam implements ParameterValidator, ResourcePermissio
 
     @Override
     public ResultWrapper validate() {
-        boolean denIsNull = Objects.isNull(density);
-        boolean stIsNull = Objects.isNull(startTime);
-        boolean etIsNull = Objects.isNull(endTime);
-        if (!((denIsNull && stIsNull && etIsNull) || !(denIsNull || stIsNull || etIsNull))) {
+        if (!isAllNullOrNotNull(density, startTime, endTime)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度、开始时间、结束时间必须全部存在或全部不存在");
         }
         monitorChildType = Objects.isNull(monitorChildType) ? 1 : monitorChildType;
@@ -50,5 +48,9 @@ public class QueryRealDataParam implements ParameterValidator, ResourcePermissio
     @Override
     public Resource parameter() {
         return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    private boolean isAllNullOrNotNull(Object... obj) {
+        return Arrays.stream(obj).map(Objects::isNull).distinct().toList().size() == 1;
     }
 }

@@ -128,6 +128,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
         BatchSetProjectConfigParam res = new BatchSetProjectConfigParam();
         res.setProjectID(param.getProjectID());
         res.setDataList(List.of(param));
+        res.setBuild(res.build());
         Optional.ofNullable(param.getTbMonitorGroup()).map(u -> Map.of(u.getID(), u)).ifPresent(res::setTbMonitorGroupMap);
         Optional.ofNullable(param.getTbMonitorPoint()).map(u -> Map.of(u.getID(), u)).ifPresent(res::setTbMonitorPointMap);
         return res;
