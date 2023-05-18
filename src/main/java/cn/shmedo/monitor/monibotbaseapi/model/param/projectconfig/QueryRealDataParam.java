@@ -28,7 +28,7 @@ public class QueryRealDataParam implements ParameterValidator, ResourcePermissio
     private Integer density;
     private Date startTime;
     private Date endTime;
-    @Range(min = 1, max = 2, message = "数据轴枚举错误,数据轴 1.轴A;2.轴B")
+    @Range(min = 1, max = 3, message = "数据轴枚举错误,数据轴 1.A轴;2.B轴;3.C轴")
     private Integer monitorChildType;
 
     @Override
