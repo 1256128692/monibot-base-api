@@ -34,7 +34,7 @@ public class QueryWtEnginePageParam implements ParameterValidator, ResourcePermi
     private Integer projectID;
     private String engineName;
     private Boolean enable;
-    @Min(value = 1, message = "检测项目ID不能小于1")
+    @Min(value = 1, message = "监测项目ID不能小于1")
     private Integer monitorItemID;
     @Min(value = 1, message = "监测点位ID不能小于1")
     private Integer monitorPointID;

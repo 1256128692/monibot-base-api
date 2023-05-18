@@ -34,7 +34,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     void updatePathByID(String path, Integer projectID);
 
     List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
-                                         @Param("size") Integer size);
+                                         @Param("projectIDList") Collection<Integer> projectIDList);
 
     IPage<ProjectInfo> getProjectList(IPage<ProjectInfo> page,
                                       @Param("pa") QueryProjectListRequest pa);

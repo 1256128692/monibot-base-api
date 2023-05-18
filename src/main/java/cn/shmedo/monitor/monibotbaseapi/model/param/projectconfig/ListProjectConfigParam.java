@@ -30,12 +30,13 @@ public class ListProjectConfigParam implements ParameterValidator, ResourcePermi
         LambdaQueryWrapper<TbProjectConfig> wrapper = new LambdaQueryWrapper<TbProjectConfig>()
                 .eq(TbProjectConfig::getProjectID, projectID);
         Optional.ofNullable(group).filter(ObjectUtil::isNotEmpty).ifPresent(u -> wrapper.eq(TbProjectConfig::getGroup, u));
-        Optional.ofNullable(key).filter(ObjectUtil::isNotEmpty).ifPresent(u -> wrapper.likeLeft(TbProjectConfig::getKey, u));
+        Optional.ofNullable(key).filter(ObjectUtil::isNotEmpty).ifPresent(u -> wrapper.likeRight(TbProjectConfig::getKey, u));
         return wrapper;
     }
 
     @Override
     public ResultWrapper validate() {
+        group = "all".equalsIgnoreCase(group) ? null : group;
         key = ObjectUtil.isEmpty(key) || "all".equalsIgnoreCase(key) ? null : key;
         return null;
     }

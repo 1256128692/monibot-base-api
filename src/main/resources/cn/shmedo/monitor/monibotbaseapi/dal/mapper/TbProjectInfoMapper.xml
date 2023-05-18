@@ -310,8 +310,7 @@
         FROM tb_project_property tpp
                  LEFT JOIN tb_property tp ON tp.ID = tpp.PropertyID
         WHERE tp.CreateType = 0
-          AND
-        <foreach collection="list" item="item" separator="OR" open="(" close=")">
+        <foreach collection="list" item="item" separator="OR" open="AND (" close=")">
                 tp.`Name` = #{item.name}
             <if test="item.values != null and item.values.size() != 0">
                 AND
@@ -320,11 +319,14 @@
                 </foreach>
             </if>
         </foreach>
+        <if test="projectIDList != null and projectIDList.size() != 0">
+            <foreach collection="projectIDList" item="item" separator="OR" open="AND (" close=")">
+                `ProjectID` = #{item}
+            </foreach>
+        </if>
         GROUP BY ProjectID
         ) t
-        <if test="size != null">
-            WHERE size = #{size}
-        </if>
+        WHERE size = ${list.size}
     </select>
 
     <select id="getProjectList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">
