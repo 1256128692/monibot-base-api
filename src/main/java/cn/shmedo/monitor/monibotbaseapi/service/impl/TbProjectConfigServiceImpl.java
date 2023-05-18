@@ -27,7 +27,7 @@ public class TbProjectConfigServiceImpl extends ServiceImpl<TbProjectConfigMappe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchSetProjectConfig(BatchSetProjectConfigParam param) {
-        this.saveOrUpdateBatch(param.build());
+//        this.saveOrUpdateBatch(param.getBuild());
     }
 
     @Override

@@ -51,7 +51,7 @@ public class ProjectConfigController {
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName BatchSetProjectConfig
-     * @apiDescription 批量额外配置,当配置是项目配置时,被配置的项目仅为一个
+     * @apiDescription 批量额外配置,仅能同时对单一项目进行配置;同一个被配置对象在一次接口调用中仅能被配置一次
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Object[]} dataList 配置对象
      * @apiParam (请求参数) {Int} dataList.projectID 项目ID

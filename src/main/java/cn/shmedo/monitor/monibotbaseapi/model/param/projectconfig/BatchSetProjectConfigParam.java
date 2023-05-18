@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
@@ -40,9 +41,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
     @NotEmpty(message = "要配置的参数不能为空")
     private List<SetProjectConfigParam> dataList;
     @JsonIgnore
-    private Boolean containsProjectConfig;
-    @JsonIgnore
-    private TbProjectInfo tbProjectInfo;
+    private Integer projectConfigSize = 0;
     /**
      * @see #getSubSum()
      */
@@ -53,24 +52,20 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
      */
     @JsonIgnore
     private Map<Integer, TbMonitorPoint> tbMonitorPointMap;
+    @JsonIgnore
+    private List<TbProjectConfig> build;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public ResultWrapper validate() {
         //如果只有一个，按单个校验处理
         if (dataList.size() == 1) {
-            SetProjectConfigParam param = dataList.get(0);
-            ResultWrapper validate = param.validate();
-            this.tbProjectInfo = param.getTbProjectInfo();
-            return validate;
+            return dataList.get(0).validate();
         }
-        TbProjectInfoMapper mapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        List<TbProjectInfo> infos = mapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
-                .eq(TbProjectInfo::getID, projectID));
-        if (CollectionUtil.isEmpty(infos)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有项目不存在");
+        if (!ContextHolder.getBean(TbProjectInfoMapper.class).exists(new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getID, projectID))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
-        tbProjectInfo = infos.get(0);
         Map<ProjectGroupType, List<SetProjectConfigParam>> projectGroupTypeListMap = dataList.stream()
                 .peek(u -> u.setProjectID(projectID)).collect(Collectors.groupingBy(ProjectGroupType::getProjectGroupType));
         projectGroupTypeListMap.entrySet().stream().peek(u -> {
@@ -90,7 +85,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
                                     .toList())).stream().collect(Collectors.toMap(TbMonitorPoint::getID, w -> w));
                     u.getValue().stream().peek(w -> ProjectConfigKeyUtils.setKey(w, w.getMonitorPointID(), false)).toList();
                 }
-                case PROJECT -> containsProjectConfig = true;
+                case PROJECT -> projectConfigSize += u.getValue().size();
                 default ->
                         throw new IllegalArgumentException("switch in {@code BatchSetProjectConfigParam} lack enums,@see ProjectGroupType");
             }
@@ -102,7 +97,13 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
         if (dataList.size() != getSubSum()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "被配置对象不存在或重复");
         }
-        return null;
+        build = build();
+        List<TbProjectConfig> addList = build.stream().filter(u -> Objects.isNull(u.getID())).toList();
+        return CollectionUtil.isNotEmpty(addList) && ContextHolder.getBean(TbProjectConfigMapper.class).selectCount(
+                new LambdaQueryWrapper<TbProjectConfig>().or(r -> addList.stream().peek(u -> r.or(s -> s.eq(
+                        TbProjectConfig::getGroup, u.getGroup()).eq(TbProjectConfig::getProjectID, projectID).eq(
+                        TbProjectConfig::getKey, u.getKey()))).toList())) == 0 ? null : ResultWrapper.withCode(
+                ResultCode.INVALID_PARAMETER, "有新增的配置项已被配置");
     }
 
     @Override
@@ -119,7 +120,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
      * 批量配置时，可能会有多级同时配置，所以校验时需要校验被配置对象size(即所有存有被配置对象map的keySet.size()之和)等于dataList.size()
      */
     private Integer getSubSum() {
-        return (Objects.isNull(tbMonitorGroupMap) ? 0 : tbMonitorGroupMap.keySet().size()) + (containsProjectConfig ? 1 : 0)
+        return projectConfigSize + (Objects.isNull(tbMonitorGroupMap) ? 0 : tbMonitorGroupMap.keySet().size())
                 + (Objects.isNull(tbMonitorPointMap) ? 0 : tbMonitorPointMap.keySet().size());
     }
 
@@ -132,7 +133,7 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
         return res;
     }
 
-    public List<TbProjectConfig> build() {
+    private List<TbProjectConfig> build() {
         return dataList.stream().map(u -> {
             TbProjectConfig config = new TbProjectConfig();
             BeanUtils.copyProperties(u, config);

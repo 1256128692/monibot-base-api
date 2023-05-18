@@ -41,7 +41,7 @@ public enum ProjectGroupType {
                     }
                 }).filter(u -> Objects.nonNull(u.getItem2())).map(Tuple::getItem1).map(Method::getName)
                 .map(u -> u.substring(3, u.length() - 2)).distinct().toList();
-        Assert.isTrue(CollectionUtil.isEmpty(list), () -> new IllegalArgumentException("Param need set an 'ID' at least"));
+        Assert.isTrue(CollectionUtil.isNotEmpty(list), () -> new IllegalArgumentException("Param need set an 'ID' at least"));
         String dCode = list.size() == 1 ? list.get(0) : list.stream().filter(u -> !u.equalsIgnoreCase(PROJECT.code))
                 .findFirst().orElseThrow(() -> new IllegalArgumentException("Unreachable Exception"));
         return Arrays.stream(values()).filter(u -> u.code.equalsIgnoreCase(dCode)).findFirst()

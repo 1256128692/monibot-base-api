@@ -7,9 +7,11 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectGroupType;
 import cn.shmedo.monitor.monibotbaseapi.util.projectConfig.ProjectConfigKeyUtils;
@@ -45,8 +47,6 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     private Integer monitorGroupID;
     private Integer monitorPointID;
     @JsonIgnore
-    private TbProjectInfo tbProjectInfo;
-    @JsonIgnore
     private TbMonitorGroup tbMonitorGroup;
     @JsonIgnore
     private TbMonitorPoint tbMonitorPoint;
@@ -56,13 +56,10 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     @Override
     public ResultWrapper validate() {
         projectGroupType = ProjectGroupType.getProjectGroupType(this);
-        TbProjectInfoMapper projectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        List<TbProjectInfo> infos = projectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
-                .eq(TbProjectInfo::getID, projectID));
-        if (CollectionUtil.isEmpty(infos)) {
+        if (!ContextHolder.getBean(TbProjectInfoMapper.class).exists(new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getID, projectID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
-        tbProjectInfo = infos.get(0);
         if (Objects.nonNull(monitorGroupID)) {
             TbMonitorGroupMapper groupMapper = ContextHolder.getBean(TbMonitorGroupMapper.class);
             List<TbMonitorGroup> tbMonitorGroups = groupMapper.selectList(new LambdaQueryWrapper<TbMonitorGroup>()
@@ -85,6 +82,11 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
             case MONITOR_GROUP -> ProjectConfigKeyUtils.setKey(this, monitorGroupID, false);
             case MONITOR_POINT -> ProjectConfigKeyUtils.setKey(this, monitorPointID, false);
             default -> log.info("未设置对应的分级枚举，将不会拼接key");
+        }
+        if (Objects.isNull(configID) && ContextHolder.getBean(TbProjectConfigMapper.class)
+                .exists(new LambdaQueryWrapper<TbProjectConfig>().eq(TbProjectConfig::getProjectID, projectID)
+                        .eq(TbProjectConfig::getGroup, group).eq(TbProjectConfig::getKey, key))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增配置已存在");
         }
         return null;
     }
