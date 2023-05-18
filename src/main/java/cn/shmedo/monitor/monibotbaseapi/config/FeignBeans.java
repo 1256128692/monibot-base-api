@@ -8,7 +8,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import feign.hystrix.HystrixFeign;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import lombok.AllArgsConstructor;
@@ -47,53 +46,29 @@ public class FeignBeans {
     @Bean
     @Primary
     public IotService iotService() {
-        return FeignFactory.hystrixClient(IotService.class, config.getIotServiceAddress(),
-                iotServiceFallbackFactory, generalHandler());
+        return FeignFactory.hystrixClient(IotService.class,
+                config.getIotServiceAddress(), iotServiceFallbackFactory);
     }
 
     @Bean
     public MdInfoService mdInfoService() {
-        return FeignFactory.hystrixClient(MdInfoService.class, config.getMdInfoServiceAddress(),
-                mdInfoServiceFallbackFactory, generalHandler());
+        return FeignFactory.hystrixClient(MdInfoService.class,
+                config.getMdInfoServiceAddress(), mdInfoServiceFallbackFactory);
     }
 
     @Bean
     @Primary
     public WtReportService wtReportService() {
-        return FeignFactory.hystrixClient(WtReportService.class, config.getWtReportServiceAddress(),
-                wtReportServiceFallbackFactory, generalHandler());
+        return FeignFactory.hystrixClient(WtReportService.class,
+                config.getWtReportServiceAddress(), wtReportServiceFallbackFactory);
     }
 
     @Bean
     @Primary
     public YsService ysService() {
         return FeignFactory.hystrixClient(YsService.class, config.getYsUrl(),
-                ysServiceFallbackFactory, ysHandler());
-    }
-
-
-    /**
-     * 通用构造过程，设置序列化器、拦截加入授权头
-     *
-     * @return {@link FeignFactory.Handler<HystrixFeign.Builder>}
-     */
-    private FeignFactory.Handler<HystrixFeign.Builder> generalHandler() {
-        return value -> value.encoder(new JacksonEncoder(objectMapper))
-                .decoder(new JacksonDecoder(objectMapper))
-                .requestInterceptor(template -> template
-                        .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                        .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
-                        .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret()));
-    }
-
-    /**
-     * 通用构造过程，设置序列化器、拦截加入授权头
-     *
-     * @return {@link FeignFactory.Handler<HystrixFeign.Builder>}
-     */
-    private FeignFactory.Handler<HystrixFeign.Builder> ysHandler() {
-        return value -> value.encoder(new JacksonEncoder(objectMapper))
-                .decoder(new JacksonDecoder(objectMapper));
+                ysServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
+                        .decoder(new JacksonDecoder(objectMapper)));
     }
 }
 
