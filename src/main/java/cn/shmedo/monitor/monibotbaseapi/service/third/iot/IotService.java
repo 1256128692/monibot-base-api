@@ -3,10 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -47,4 +44,18 @@ public interface IotService {
 
     @RequestLine("POST /QueryByProductIDList")
     ResultWrapper<List<ProductBaseInfo>> queryByProductIDList(QueryByProductIDListParam param);
+
+    /**
+     * 查询设备最新状态
+     * @return {@link ResultWrapper<DeviceStateResponse>}
+     */
+    @RequestLine("POST /QueryDeviceNewState")
+    ResultWrapper<DeviceStateResponse> queryDeviceState(QueryDeviceStateParam param);
+
+    /**
+     * 查询设备最新扩展状态
+     * @return {@link ResultWrapper<DeviceStateResponse>}
+     */
+    @RequestLine("POST /QueryDeviceExpandNewState")
+    ResultWrapper<DeviceStateResponse> queryDeviceExpandState(QueryDeviceStateParam param);
 }

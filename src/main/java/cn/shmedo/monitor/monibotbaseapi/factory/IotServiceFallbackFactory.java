@@ -5,10 +5,7 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.ProductBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +51,16 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
             @Override
             public ResultWrapper<List<ProductBaseInfo>> queryByProductIDList(QueryByProductIDListParam param) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<DeviceStateResponse> queryDeviceState(QueryDeviceStateParam param) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<DeviceStateResponse> queryDeviceExpandState(QueryDeviceStateParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

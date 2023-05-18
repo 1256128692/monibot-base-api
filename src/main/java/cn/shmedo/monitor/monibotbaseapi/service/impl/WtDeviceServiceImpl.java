@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
@@ -13,13 +15,16 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceState;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStateParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.SensorNewDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceStateResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.Device4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.DeviceDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.ProductSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
@@ -804,6 +809,29 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         });
 
         return videoTypeList;
+    }
+
+    @Override
+    public DeviceDetail deviceDetail(QueryDeviceDetailParam param) {
+        DeviceDetail result = BeanUtil.copyProperties(param.getDevice(), DeviceDetail.class);
+        result.setState(new DeviceState());
+
+        //构建参数查询设备状态和扩展状态
+        QueryDeviceStateParam stateParam = QueryDeviceStateParam.builder()
+                .deviceID(param.getDevice().getDeviceID()).build();
+        ResultWrapper<DeviceStateResponse> stateWrapper = iotService.queryDeviceState(stateParam);
+        if (stateWrapper.apiSuccess() && stateWrapper.getData() != null) {
+            BeanUtil.copyProperties(stateWrapper.getData(), result.getState(), CopyOptions.create().ignoreNullValue());
+        }
+
+        ResultWrapper<DeviceStateResponse> expandWrapper = iotService.queryDeviceExpandState(stateParam);
+        if (expandWrapper.apiSuccess() && expandWrapper.getData() != null) {
+            BeanUtil.copyProperties(expandWrapper.getData(), result.getState(), CopyOptions.create().ignoreNullValue());
+        }
+
+        //TODO 设备状态（正常/异常）设备有报警即异常，否则正常；临时默认为在线状态
+        result.getState().setStatus(Boolean.TRUE.equals(result.getOnlineStatus()) ? 0 : 1);
+        return result;
     }
 
 }
