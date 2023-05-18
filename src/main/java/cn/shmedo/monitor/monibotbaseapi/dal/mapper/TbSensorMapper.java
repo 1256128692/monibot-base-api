@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
+import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
@@ -48,4 +49,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorWithMore> querySensorWithMoreBy(Collection<String> uniqueTokens, Integer companyID, List<Integer> projectIDList, Integer monitorItemID);
 
     List<SensorBaseInfoResponse> selectListBymonitorPointIDList(List<Integer> monitorPointIDList);
+
+    List<Tuple<Integer, Integer>> queryAllTypeAndID();
 }
