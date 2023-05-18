@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
@@ -13,13 +15,16 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceState;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStateParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.SensorNewDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceStateResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.Device4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.DeviceDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.ProductSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
@@ -78,7 +83,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     }
 
     @Override
-    public PageUtil.Page<Device4Web> queryWtDevicePageList(QueryWtDevicePageListParam pa) {
+    public PageUtil.PageWithMap<Device4Web> queryWtDevicePageList(QueryWtDevicePageListParam pa) {
+        PageUtil.PageWithMap<Device4Web> empty = PageUtil.PageWithMap.empty();
         List<Integer> projectIDList = CollectionUtils.isEmpty(pa.getProjectIDList())
                 ? pa.getProjectInfos().stream().map(TbProjectInfo::getID).toList()
                 : pa.getProjectIDList();
@@ -90,7 +96,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     ).stream().map(TbProjectInfo::getID).toList();
         }
         if (CollectionUtils.isEmpty(projectIDList)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(pa.getCompanyID())
@@ -107,27 +113,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         }
         List<SimpleDeviceV5> allData = result.getData();
         if (CollectionUtils.isEmpty(allData)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
-        List<String> warnDeviceTokenList = tbWarnLogMapper.selectList(
-                new QueryWrapper<TbWarnLog>().lambda()
-                        .ge(TbWarnLog::getWarnTime, DateUtil.offsetDay(new Date(), -2))
-                        .isNotNull(TbWarnLog::getDeviceToken)
 
-        ).stream().map(TbWarnLog::getDeviceToken).distinct().toList();
-        if (pa.getStatus() != null) {
-            // 过滤 0.正常 1.异常
-
-            if (pa.getStatus() == 0) {
-                allData = allData.stream().filter(e -> !warnDeviceTokenList.contains(e.getDeviceToken())).toList();
-            } else {
-                allData = allData.stream().filter(e -> warnDeviceTokenList.contains(e.getDeviceToken())).toList();
-            }
-
-        }
-        if (CollectionUtils.isEmpty(allData)) {
-            return PageUtil.Page.empty();
-        }
         if (pa.getRuleID() != null) {
             boolean flag = pa.getSelect() == null || pa.getSelect();
             TbWarnRule tbWarnRule = tbWarnRuleMapper.selectById(pa.getRuleID());
@@ -177,7 +165,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             }
         }
         if (CollectionUtils.isEmpty(allData)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
         Collection<String> uniqueTokens = allData.stream().map(SimpleDeviceV5::getUniqueToken).collect(Collectors.toSet());
 
@@ -199,7 +187,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             ).toList();
         }
         if (CollectionUtils.isEmpty(allData)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
         if (StringUtils.isNotBlank(pa.getMonitorItemName())) {
             allData = allData.stream().filter(
@@ -219,7 +207,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             ).toList();
         }
         if (CollectionUtils.isEmpty(allData)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
 
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
@@ -247,6 +235,30 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                         return false;
                     }
             ).collect(Collectors.toList());
+        }
+        if (CollectionUtils.isEmpty(allData)) {
+            return empty;
+        }
+        List<String> warnDeviceTokenList = tbWarnLogMapper.selectList(
+                new QueryWrapper<TbWarnLog>().lambda()
+                        .ge(TbWarnLog::getWarnTime, DateUtil.offsetDay(new Date(), -2))
+                        .isNotNull(TbWarnLog::getDeviceToken)
+
+        ).stream().map(TbWarnLog::getDeviceToken).distinct().toList();
+        long warnBefore = allData.stream().filter(e -> warnDeviceTokenList.contains(e.getDeviceToken())).count();
+        long normalBefore = allData.size() - warnBefore;
+        if (pa.getStatus() != null) {
+            // 过滤 0.正常 1.异常
+
+            if (pa.getStatus() == 0) {
+                allData = allData.stream().filter(e -> !warnDeviceTokenList.contains(e.getDeviceToken())).toList();
+            } else {
+                allData = allData.stream().filter(e -> warnDeviceTokenList.contains(e.getDeviceToken())).toList();
+            }
+
+        }
+        if (CollectionUtils.isEmpty(allData)) {
+            return new PageUtil.PageWithMap<>(0, Collections.emptyList(), 0, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
         }
         allData = allData.stream().sorted(Comparator.comparingInt(SimpleDeviceV5::getDeviceID).reversed()).toList();
         PageUtil.Page<SimpleDeviceV5> page = PageUtil.page(allData, pa.getPageSize(), pa.getCurrentPage());
@@ -309,22 +321,28 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                         warnDeviceTokenList.contains(item.getDeviceSN()) ? 1 : 0
                 )
         );
-        return new PageUtil.Page<>(page.totalPage(), collect, page.totalCount());
+        return new PageUtil.PageWithMap<>(page.totalPage(), collect, page.totalCount(), Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
     }
 
 
     @Override
-    public PageUtil.Page<WtVideoPageInfo> queryWtVideoPageList(QueryWtVideoPageParam param) {
+    public PageUtil.PageWithMap<WtVideoPageInfo> queryWtVideoPageList(QueryWtVideoPageParam param) {
+
 
         Long totalCount = 0L;
         Integer pageSize = param.getPageSize() == 0 ? 1 : param.getPageSize();
 
         List<WtVideoPageInfo> wtVideoList = monitorPointMapper.selectVideoPointListByCondition(param.getProjectIDList(),
-                param.getOnlineInt(), param.getStatus(), param.getAreaCode(), param.getMonitorItemID(), param.getMonitorItemName(), MonitorType.VIDEO.getKey(),
+                param.getOnlineInt(), null, param.getAreaCode(), param.getMonitorItemID(), param.getMonitorItemName(), MonitorType.VIDEO.getKey(),
                 param.getVideoType());
+
         if (CollectionUtil.isNullOrEmpty(wtVideoList)) {
-            return PageUtil.Page.empty();
+            return PageUtil.PageWithMap.empty();
         }
+        long normalBefore = wtVideoList.stream().filter(e -> e.getStatus() == 0).count();
+        long warnBefore = wtVideoList.size() - normalBefore;
+        PageUtil.PageWithMap<WtVideoPageInfo> empty = PageUtil.PageWithMap.emptyWithMap(Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
+
 
         wtVideoList.forEach(item -> {
             String exValues = item.getExValues();
@@ -337,7 +355,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.setVideoType(dict.get("videoType").toString());
                 }
                 if (item.getStatus() != null) {
-                    item.setOnline(!Boolean.parseBoolean(item.getStatus()));
+                    item.setOnline(item.getStatus() == 0);
                 }
             }
             if (StringUtils.isNotEmpty(item.getLocation())) {
@@ -360,7 +378,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                 .filter(pojo -> pojo.getVideoSN() != null && !pojo.getVideoSN().equals(""))
                 .collect(Collectors.toList());
         if (CollectionUtil.isNullOrEmpty(resultList)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
         totalCount = Long.valueOf(resultList.size());
 
@@ -373,7 +391,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             || (info.getProjectName().contains(queryCode)))
                     .collect(Collectors.toList());
             if (CollectionUtil.isNullOrEmpty(resultList)) {
-                return PageUtil.Page.empty();
+                return empty;
             }
             totalCount = Long.valueOf(resultList.size());
         }
@@ -428,12 +446,12 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             }
         }
         if (CollectionUtils.isEmpty(resultList)) {
-            return PageUtil.Page.empty();
+            return empty;
         }
 
         totalCount = Long.valueOf(resultList.size());
         List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(resultList, param.getPageSize());
-        return new PageUtil.Page<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount);
+        return new PageUtil.PageWithMap<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
 
     }
 
@@ -692,7 +710,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item.setVideoType(dict.get("videoType").toString());
                 }
                 if (item.getStatus() != null) {
-                    item.setOnline(!Boolean.parseBoolean(item.getStatus()));
+                    item.setOnline(item.getStatus() == 0);
                 }
             }
             if (StringUtils.isNotEmpty(item.getLocation())) {
@@ -804,6 +822,29 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         });
 
         return videoTypeList;
+    }
+
+    @Override
+    public DeviceDetail deviceDetail(QueryDeviceDetailParam param) {
+        DeviceDetail result = BeanUtil.copyProperties(param.getDevice(), DeviceDetail.class);
+        result.setState(new DeviceState());
+
+        //构建参数查询设备状态和扩展状态
+        QueryDeviceStateParam stateParam = QueryDeviceStateParam.builder()
+                .deviceID(param.getDevice().getDeviceID()).build();
+        ResultWrapper<DeviceStateResponse> stateWrapper = iotService.queryDeviceState(stateParam);
+        if (stateWrapper.apiSuccess() && stateWrapper.getData() != null) {
+            BeanUtil.copyProperties(stateWrapper.getData(), result.getState(), CopyOptions.create().ignoreNullValue());
+        }
+
+        ResultWrapper<DeviceStateResponse> expandWrapper = iotService.queryDeviceExpandState(stateParam);
+        if (expandWrapper.apiSuccess() && expandWrapper.getData() != null) {
+            BeanUtil.copyProperties(expandWrapper.getData(), result.getState(), CopyOptions.create().ignoreNullValue());
+        }
+
+        //TODO 设备状态（正常/异常）设备有报警即异常，否则正常；临时默认为在线状态
+        result.getState().setStatus(Boolean.TRUE.equals(result.getOnlineStatus()) ? 0 : 1);
+        return result;
     }
 
 }

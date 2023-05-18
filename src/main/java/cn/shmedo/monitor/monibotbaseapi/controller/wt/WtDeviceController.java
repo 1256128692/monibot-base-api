@@ -38,6 +38,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map  其他的数据，包含normalBefore 和warnBefore
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {String} currentPageData.videoSN 设备SN
      * @apiSuccess (返回结果) {String} currentPageData.videoType 设备型号
@@ -148,6 +149,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map  其他的数据，包含normalBefore 和warnBefore
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.deviceID 设备ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceSN 设备SN
@@ -247,5 +249,56 @@ public class WtDeviceController {
     @PostMapping(value = "/QueryProductSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deviceTypeList(@Valid @RequestBody QueryProductSimpleParam param) {
         return wtDeviceService.productSimpleList(param);
+    }
+
+    /**
+     * @api {POST} /QueryDeviceDetail 查询设备详情
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName QueryProductSimpleList
+     * @apiDescription 产品简要信息列表
+     * @apiParam (请求参数) {Int} projectID 公司ID
+     * @apiParam (请求参数) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {Int} deviceID 设备ID
+     * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} deviceName 设备名称
+     * @apiSuccess (返回结果) {String} productName 产品名称（设备型号）
+     * @apiSuccess (返回结果) {String} firmwareVersion 固件版本
+     * @apiSuccess (返回结果) {Bool} onlineStatus 在线状态
+     * @apiSuccess (返回结果) {DateTime} lastActiveTime 最后活跃时间
+     * @apiSuccess (返回结果) {DateTime} createTime 创建时间
+     * @apiSuccess (返回结果) {Object} state 设备状态
+     * @apiSuccess (返回结果) {Int} state.status 设备状态 0.正常 1.异常
+     * @apiSuccess (返回结果) {Double} [state.extPowerVolt] 外接电源电压
+     * @apiSuccess (返回结果) {Double} [state.innerPowerVolt] 内部电源电压
+     * @apiSuccess (返回结果) {Double} [state.temp] 温度
+     * @apiSuccess (返回结果) {Double} [state.humidity] 湿度
+     * @apiSuccess (返回结果) {Double} [state.tempOut] 设备外部环境温度
+     * @apiSuccess (返回结果) {Double} [state.humidityOut] 设备外部环境湿度
+     * @apiSuccess (返回结果) {Double} [state.fourGSignal] 4G信号强度
+     * @apiSuccess (返回结果) {Double} [state.bdSignal] 北斗功率等级
+     * @apiSuccess (返回结果) {Double} [state.swVersion] 固件版本
+     * @apiSuccess (返回结果) {Double} [state.location] 位置
+     * @apiSuccess (返回结果) {String} [state.sensorErrno] 传感器错误码
+     * @apiSuccess (返回结果) {Double} [state.solarVolt] 太阳能板电压
+     * @apiSuccess (返回结果) {Double} [state.batteryVolt] 蓄电池电压
+     * @apiSuccess (返回结果) {Double} [state.supplyPower] 充电功率
+     * @apiSuccess (返回结果) {Double} [state.consumePower] 消耗功率
+     * @apiSuccess (返回结果) {Double} [state.workCurrent] 设备工作电流
+     * @apiSuccess (返回结果) {Double} [state.voltPercent] 剩余电量百分比
+     * @apiSuccess (返回结果) {Double} [state.uptime] 设备启动后工作时间，单位秒
+     * @apiSuccess (返回结果) {Double} [state.iccid] 湿度设备物联网卡iccid，多个逗号分隔
+     * @apiSuccess (返回结果) {Double} [state.imei] 通信模块身份识别码
+     * @apiSuccess (返回结果) {Double} [state.onlinePercent] 设备平台在线时间百分比
+     * @apiSuccess (返回结果) {Double} [state.rebootCode] 设备重启代码
+     * @apiSuccess (返回结果) {Double} [state.loraUpSignal] LORA上行信号强度，单位dbm
+     * @apiSuccess (返回结果) {Double} [state.loraDownSignal] LORA下行信号强度，单位dbm
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseDevice
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseDevice")
+    @PostMapping(value = "/QueryDeviceDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deviceInfo(@Valid @RequestBody QueryDeviceDetailParam param) {
+        return wtDeviceService.deviceDetail(param);
     }
 }

@@ -22,7 +22,7 @@ public class WtVideoPageInfo {
     /**
      * 设备状态 0.正常 1.异常
      */
-    private String status;
+    private Integer status;
     private Integer projectID;
     private String projectName;
     private String projectShortName;

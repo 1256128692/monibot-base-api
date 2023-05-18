@@ -197,7 +197,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         if (Objects.nonNull(param.getEngineName()) || Objects.nonNull(param.getEngineDesc())
                 || Objects.nonNull(param.getProjectID()) || Objects.nonNull(param.getMonitorItemID())
                 || Objects.nonNull(param.getMonitorPointID())) {
-            this.updateById(UpdateWtEngineParam.build(param));
+            this.updateById(param.build(param));
         }
         List<WtWarnStatusDetailInfo> dataList = param.getDataList();
         if (CollectionUtil.isNotEmpty(dataList)) {
