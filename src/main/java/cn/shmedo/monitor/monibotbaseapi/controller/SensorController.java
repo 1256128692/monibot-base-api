@@ -10,9 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: monibot-base-api
@@ -511,5 +509,21 @@ public class SensorController {
     public Object updateSensorStatusAndMonitorBeginTime(@RequestBody @Validated UpdateSensorStatusRequest request) {
         sensorService.updateSensorStatusAndMonitorBeginTime(request);
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {GET} /QueryAllSensorID  查询全部的传感器ID
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QueryAllSensorID
+     * @apiDescription 查询全部的传感器ID
+     * @apiSuccess (返回结果) {Object} map key为Type, value为传感器列表
+     * @apiSampleRequest off
+     * @apiPermission 项目权限+应用权限
+     */
+    //@Permission(permissionName = "mdmbase:xxx", allowApplication = true, allowUser = false)
+    @RequestMapping(value = "/QueryAllSensorID", method = RequestMethod.GET, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateSensorStatusAndMonitorBeginTime() {
+        return sensorService.queryAllSensorID();
     }
 }

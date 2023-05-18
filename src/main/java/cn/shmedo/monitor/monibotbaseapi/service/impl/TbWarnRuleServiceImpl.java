@@ -193,12 +193,12 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void updateWtEngine(UpdateWtEngineParam param) {
+    public void updateWtEngine(UpdateWtEngineParam param, Integer userID) {
         Integer engineID = param.getEngineID();
         if (Objects.nonNull(param.getEngineName()) || Objects.nonNull(param.getEngineDesc())
                 || Objects.nonNull(param.getProjectID()) || Objects.nonNull(param.getMonitorItemID())
                 || Objects.nonNull(param.getMonitorPointID())) {
-            this.updateById(param.build(param));
+            this.baseMapper.updateIGNORED(param.build(userID));
         }
         List<WtWarnStatusDetailInfo> dataList = param.getDataList();
         if (CollectionUtil.isNotEmpty(dataList)) {

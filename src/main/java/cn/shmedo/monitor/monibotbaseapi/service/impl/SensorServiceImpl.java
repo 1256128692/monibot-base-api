@@ -12,6 +12,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
+import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -416,6 +417,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Optional.ofNullable(request.getSensorStatus()).ifPresent(e -> sensor.setStatus(e.byteValue()));
         Optional.ofNullable(request.getMonitorBeginTime()).ifPresent(sensor::setMonitorBeginTime);
         this.updateById(sensor);
+    }
+
+    @Override
+    public Map<Integer, List<Integer>> queryAllSensorID() {
+        List<Tuple<Integer, Integer>> temp = this.baseMapper.queryAllTypeAndID();
+        return temp.stream().collect(Collectors.groupingBy(Tuple::getItem1, Collectors.mapping(Tuple::getItem2, Collectors.toList())));
     }
 
     /**

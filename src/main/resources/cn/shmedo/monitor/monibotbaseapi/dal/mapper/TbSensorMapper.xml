@@ -432,6 +432,9 @@
       </foreach>
   </select>
 
+  <select id="queryAllTypeAndID" resultType="cn.shmedo.iot.entity.base.Tuple">
+    select MonitorType as item1, id as item2
+      from tb_sensor
 
-
+    </select>
 </mapper>

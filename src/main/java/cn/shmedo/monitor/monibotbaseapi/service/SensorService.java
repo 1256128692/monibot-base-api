@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SensorService extends IService<TbSensor> {
 
@@ -113,4 +114,6 @@ public interface SensorService extends IService<TbSensor> {
      * @param request {@link UpdateSensorStatusRequest}
      */
     void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request);
+
+    Map<Integer, List<Integer>> queryAllSensorID();
 }

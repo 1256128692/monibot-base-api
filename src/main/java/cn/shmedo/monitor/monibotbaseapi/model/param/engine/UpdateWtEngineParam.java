@@ -45,24 +45,34 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     private String deviceCSV;
     private List<WtWarnStatusDetailInfo> dataList;
 
-    public TbWarnRule build(UpdateWtEngineParam param) {
-        TbWarnRule res = new TbWarnRule();
-        res.setID(param.getEngineID());
-        res.setName(param.getEngineName());
-        res.setDesc(param.getEngineDesc());
-        res.setMonitorItemID(param.getMonitorItemID());
-        res.setMonitorPointID(param.getMonitorPointID());
-        res.setProjectID(param.getProjectID());
-        if (StringUtils.isNotBlank(productID) && StringUtils.isNotBlank(deviceCSV)) {
+    public TbWarnRule build(Integer userID) {
+
+        tbWarnRule.setName(engineName);
+        tbWarnRule.setDesc(engineDesc);
+        tbWarnRule.setMonitorItemID(monitorItemID);
+        tbWarnRule.setMonitorPointID(monitorPointID);
+        tbWarnRule.setProjectID(projectID);
+        if (StringUtils.isNotBlank(productID)) {
             if (tbWarnRule.getRuleType().intValue() == 2) {
-                res.setVideoType(productID);
-                res.setVideoCSV(deviceCSV);
+                tbWarnRule.setVideoType(productID);
+                if (StringUtils.isNotBlank(deviceCSV)) {
+                    tbWarnRule.setVideoCSV(deviceCSV);
+                } else {
+                    tbWarnRule.setVideoCSV(null);
+                }
             } else if (tbWarnRule.getRuleType().intValue() == 3) {
-                res.setProductID(Integer.valueOf(productID));
-                res.setDeviceCSV(deviceCSV);
+                tbWarnRule.setProductID(Integer.valueOf(productID));
+                if (StringUtils.isNotBlank(deviceCSV)) {
+                    tbWarnRule.setDeviceCSV(deviceCSV);
+                } else {
+                    tbWarnRule.setDeviceCSV(null);
+                }
+
             }
         }
-        return res;
+        tbWarnRule.setUpdateUserID(userID);
+        tbWarnRule.setUpdateTime(new Date());
+        return tbWarnRule;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
