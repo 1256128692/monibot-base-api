@@ -19,7 +19,7 @@ public class ProjectConfigKeyUtils {
      * @param targetID 被配置对象ID
      */
     public static void setKey(@NotNull IProjectConfigKey item, final Integer targetID, final boolean isProject) {
-        if (!isProject) {   //TODO test
+        if (!isProject) {
             Optional.of(item).filter(u -> ObjectUtil.isNotEmpty(u.getKey()) && !u.getKey().contains("::"))
                     .ifPresent(u -> u.setKey(u.getKey() + "::" + targetID));
         }

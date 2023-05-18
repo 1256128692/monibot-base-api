@@ -31,7 +31,7 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} [configID] 配置ID,为空时认为是新增配置
      * @apiParam (请求参数) {String} group 分组
-     * @apiParam (请求参数) {String} key 对应的key,最终入库的key将和对应级别的ID拼接成这样 key::ID
+     * @apiParam (请求参数) {String} key key,配置是工程项目级别直接录入原key,否则key将和对应级别的ID拼接成这样 key::ID
      * @apiParam (请求参数) {String} value 值
      * @apiParam (请求参数) {Int} [monitorGroupID] 监测点分组ID
      * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
@@ -51,7 +51,7 @@ public class ProjectConfigController {
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName BatchSetProjectConfig
-     * @apiDescription 批量额外配置,当配置是项目配置时,被配置的项目仅为一个
+     * @apiDescription 批量额外配置,仅能同时对单一项目进行配置;同一个被配置对象在一次接口调用中仅能被配置一次
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Object[]} dataList 配置对象
      * @apiParam (请求参数) {Int} dataList.projectID 项目ID
