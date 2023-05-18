@@ -2,7 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.util.base;
 
 
 import cn.hutool.core.collection.CollUtil;
-import cn.shmedo.monitor.monibotbaseapi.model.exception.InvalidParameterException;
+import cn.shmedo.iot.entity.exception.InvalidParameterException;
 
 import java.util.Collection;
 import java.util.Collections;

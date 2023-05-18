@@ -40,21 +40,19 @@ public class RedisBeanFactory implements BeanFactoryAware, InstantiationAwareBea
 
             // 向ioc容器中注入StringRedisTemplate
             String templateName = name + RedisConstant.TEMPLATE_SUFFIX;
-            final var templateDefinition = BeanDefinitionBuilder
+            listableBeanFactory.registerBeanDefinition(templateName,  BeanDefinitionBuilder
                     .rootBeanDefinition(StringRedisTemplate.class)
-                    .getBeanDefinition();
-            templateDefinition.setPrimary(dataSource.isPrimary());
-            listableBeanFactory.registerBeanDefinition(templateName, templateDefinition);
+                    .setPrimary(dataSource.isPrimary())
+                    .getBeanDefinition());
             listableBeanFactory.registerSingleton(templateName, stringRedisTemplate);
 
             // 向ioc容器中注入RedisService
             String serviceName = name + RedisConstant.SERVICE_SUFFIX;
             RedisService redisService = new RedisService(stringRedisTemplate);
-            final var serviceDefinition = BeanDefinitionBuilder
+            listableBeanFactory.registerBeanDefinition(serviceName, BeanDefinitionBuilder
                     .rootBeanDefinition(RedisService.class)
-                    .getBeanDefinition();
-            serviceDefinition.setPrimary(dataSource.isPrimary());
-            listableBeanFactory.registerBeanDefinition(serviceName, serviceDefinition);
+                    .setPrimary(dataSource.isPrimary())
+                    .getBeanDefinition());
             listableBeanFactory.registerSingleton(serviceName, redisService);
         });
     }
