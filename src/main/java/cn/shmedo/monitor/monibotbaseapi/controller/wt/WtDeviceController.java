@@ -38,6 +38,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map  其他的数据，包含normalBefore 和warnBefore
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {String} currentPageData.videoSN 设备SN
      * @apiSuccess (返回结果) {String} currentPageData.videoType 设备型号
@@ -148,6 +149,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiSuccess (返回结果) {Int} totalCount 总条数
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map  其他的数据，包含normalBefore 和warnBefore
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.deviceID 设备ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceSN 设备SN

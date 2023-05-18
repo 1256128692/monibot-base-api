@@ -10,8 +10,8 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtWarnStatusDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 @Data
 public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @JsonIgnore
+    public TbWarnRule tbWarnRule;
     @NotNull(message = "公司ID不能为空")
     @Min(value = 1, message = "公司ID不能小于1")
     private Integer companyID;
@@ -38,10 +40,11 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     private Integer monitorItemID;
     @Min(value = 1, message = "监测点位ID不能小于1")
     private Integer monitorPointID;
-
+    private String productID;
+    private String deviceCSV;
     private List<WtWarnStatusDetailInfo> dataList;
 
-    public static TbWarnRule build(UpdateWtEngineParam param) {
+    public TbWarnRule build(UpdateWtEngineParam param) {
         TbWarnRule res = new TbWarnRule();
         res.setID(param.getEngineID());
         res.setName(param.getEngineName());
@@ -49,6 +52,13 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
         res.setMonitorItemID(param.getMonitorItemID());
         res.setMonitorPointID(param.getMonitorPointID());
         res.setProjectID(param.getProjectID());
+        if (tbWarnRule.getRuleType().intValue() == 2) {
+            res.setVideoType(productID);
+            res.setVideoCSV(deviceCSV);
+        } else if (tbWarnRule.getRuleType().intValue() == 3) {
+            res.setProductID(Integer.valueOf(productID));
+            res.setDeviceCSV(deviceCSV);
+        }
         return res;
     }
 
@@ -56,7 +66,8 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     @Override
     public ResultWrapper validate() {
         TbWarnRuleMapper tbWarnRuleMapper = ContextHolder.getBean(TbWarnRuleMapper.class);
-        if (tbWarnRuleMapper.selectCount(new LambdaQueryWrapper<TbWarnRule>().eq(TbWarnRule::getID, engineID)) < 1) {
+        tbWarnRule = tbWarnRuleMapper.selectById(engineID);
+        if (tbWarnRule == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "引擎不存在");
         }
         if (Objects.nonNull(projectID)) {
