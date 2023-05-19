@@ -80,7 +80,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
     public List<Map<String, Object>> querySensorDayStatisticsData(List<Integer> sensorIDList, Timestamp begin,
                                                                   Timestamp end, List<FieldSelectInfo> fieldSelectInfoList,
                                                                   boolean raw, Integer monitorType) {
-        List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
         String endString = TimeUtil.formatInfluxTimeString(end);

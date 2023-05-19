@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
@@ -429,6 +430,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     public List<FieldSelectInfo> getFieldSelectInfoListFromModleTypeFieldList(List<TbMonitorTypeField> list) {
         List<FieldSelectInfo> fieldSelectInfos = new ArrayList<>();
         list.forEach(modelField -> {
+            if (modelField.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())) {
+                return;
+            }
             FieldSelectInfo fieldSelectInfo = new FieldSelectInfo();
             fieldSelectInfo.setFieldToken(modelField.getFieldToken());
             fieldSelectInfo.setFieldName(modelField.getFieldName());

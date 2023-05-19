@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -35,6 +36,9 @@ public class SensorDataServiceImpl implements SensorDataService {
                 new QueryWrapper<TbMonitorTypeField>().lambda().eq(TbMonitorTypeField::getMonitorType, pa.getMonitorType())
         );
         List<FieldSelectInfo> fieldSelectInfoList = wtMonitorService.getFieldSelectInfoListFromModleTypeFieldList(temp);
+        if (CollectionUtil.isEmpty(fieldSelectInfoList)) {
+            return;
+        }
         List<Map<String, Object>> list = sensorDataDao.querySensorDayStatisticsData(pa.getSensorIDList(),
                 new Timestamp(pa.getBegin().getTime()),
                 new Timestamp(pa.getEnd().getTime()),
