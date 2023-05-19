@@ -10,6 +10,8 @@ import cn.shmedo.iot.entity.util.FieldUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
@@ -32,6 +34,11 @@ import java.util.stream.Collectors;
 
 @Component
 public class SensorDataDaoImpl implements SensorDataDao {
+
+    /**
+     * 查询密度:(全部,小时)下的限制数量
+     */
+    private static final int LimitCount = 10000;
     private InfluxDB influxDB;
     private FileConfig fileConfig;
 
@@ -218,6 +225,8 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" limit ");
+        sqlBuilder.append(LimitCount);
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }
@@ -246,6 +255,8 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(").append(density).append(") fill(none) ");
         sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" limit ");
+        sqlBuilder.append(LimitCount);
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
 
@@ -275,6 +286,8 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(").append(density).append(") fill(none) ");
         sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" limit ");
+        sqlBuilder.append(LimitCount);
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }
@@ -302,56 +315,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return sqlBuilder.toString();
     }
 
-    private String getWeekSensorDataSql(String sensorIDOrString, String beginString,
-                                        String endString, String measurement,
-                                        List<String> selectField) {
-        StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
-        sqlBuilder.append(" select ");
-        sqlBuilder.append(selectFieldString);
-        sqlBuilder.append(" from  ").append(measurement);
-        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sensorIDOrString).append(" ) ");
-        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1w)  fill(none)  ");
-        sqlBuilder.append(" order by time asc ");
-        sqlBuilder.append(" tz('Asia/Shanghai') ");
-        return sqlBuilder.toString();
-    }
-
-    private String getMonthSensorDataSql(String sensorIDOrString, String beginString,
-                                         String endString, String measurement,
-                                         List<String> selectField) {
-        StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
-        sqlBuilder.append(" select ");
-        sqlBuilder.append(selectFieldString);
-        sqlBuilder.append(" from  ").append(measurement);
-        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sensorIDOrString).append(" ) ");
-        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(30d)  fill(none)  ");
-        sqlBuilder.append(" order by time asc ");
-        sqlBuilder.append(" tz('Asia/Shanghai') ");
-        return sqlBuilder.toString();
-    }
-
-    private String getYearSensorDataSql(String sensorIDOrString, String beginString,
-                                        String endString, String measurement,
-                                        List<String> selectField) {
-        StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
-        sqlBuilder.append(" select ");
-        sqlBuilder.append(selectFieldString);
-        sqlBuilder.append(" from  ").append(measurement);
-        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sensorIDOrString).append(" ) ");
-        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(365d)  fill(none)  ");
-        sqlBuilder.append(" order by time asc ");
-        sqlBuilder.append(" tz('Asia/Shanghai') ");
-        return sqlBuilder.toString();
-    }
 
     @Override
     public void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw, List<FieldSelectInfo> fieldSelectInfoList) {
@@ -465,84 +428,58 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    @Override
+    public List<Map<String, Object>> querySensorHistoryAvgData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
+                                                               Timestamp begin, Timestamp end, Integer density, Integer monitorType) {
 
-    private List<Map<String, Object>> queryResult2map(QueryResult queryResult) {
-        return queryResult2map(queryResult, null);
-    }
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, true);
+        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String endString = TimeUtil.formatInfluxTimeString(end);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
 
-    /**
-     * 需要保证每一条数据的map的顺序和字段顺序一致
-     *
-     * @param queryResult
-     * @param fieldSelectInfoList
-     * @return
-     */
-    private List<Map<String, Object>> queryResult2map(QueryResult queryResult, List<FieldSelectInfo> fieldSelectInfoList) {
-        InfluxColComparator influxColComparator;
-        if (ObjectUtil.isEmpty(fieldSelectInfoList)) {
-            influxColComparator = null;
-        } else {
-            Map<String, Integer> map = fieldSelectInfoList.stream().collect(Collectors.toMap(fi -> fi.getFieldType().getColumnPrefix() + fi.getFieldTypeOrder().toString(), FieldSelectInfo::getFieldOrder));
-            influxColComparator = new InfluxColComparator(map);
-        }
-        List<QueryResult.Result> results = queryResult.getResults();
-        List<Map<String, Object>> maps = new ArrayList<>(results.size());
-
-        results.forEach(result -> {
-            List<QueryResult.Series> series = result.getSeries();
-            if (!CollectionUtil.isNullOrEmpty(series)) {
-                series.forEach(item -> {
-                    List<String> columns = item.getColumns();
-                    List<List<Object>> values = item.getValues();
-                    values.forEach(list -> {
-                        Map<String, Object> temp = ObjectUtil.isNull(influxColComparator) ? new HashMap<>() : new TreeMap<>(influxColComparator);
-                        for (int i = 0; i < columns.size(); i++) {
-                            if (columns.get(i).equals(DbConstant.TIME_FIELD)) {
-                                temp.put(columns.get(i), parseInfluxTime(list.get(i)));
-                            } else {
-                                temp.put(columns.get(i), list.get(i));
-                            }
-
-                        }
-                        maps.add(temp);
-                    });
-
-                });
-            }
-
+        List<String> selectField = new LinkedList<>();
+        monitorTypeFields.forEach(item -> {
+            selectField.add(item.getFieldToken());
         });
-        return maps;
-    }
 
-    private String parseInfluxTime(Object time) {
-        if (time instanceof Double) {
-            Double timeDouble = (Double) time;
-            long milli = timeDouble.longValue();
-            Timestamp timestamp = new Timestamp(milli);
-            return TimeUtil.getMilliDefaultFormatter().format(timestamp);
-        } else {
-            throw new RuntimeException("unknown time value");
-        }
-    }
-
-    private static class InfluxColComparator implements Comparator<String> {
-        Map<String, Integer> map;
-
-        public InfluxColComparator(Map<String, Integer> map) {
-            this.map = map;
+        String sql = null;
+        if (density.equals(AvgDensityType.ALL.getValue())) {
+            // 查询全部数据
+            sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
+        }else {
+            // 查询每日的平均数据
+            sql = getAvgSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
         }
 
-        @Override
-        public int compare(String o1, String o2) {
-            if (map.containsKey(o1) && map.containsKey(o2)) {
-                return map.get(o1) - map.get(o2);
-            } else if (!map.containsKey(o1) && map.containsKey(o2)) {
-                return -1;
-            } else if (map.containsKey(o1) && !map.containsKey(o2)) {
-                return 1;
-            } else {
-                return o1.compareTo(o2);
-            }
-        }
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+
     }
+
+
+
+    private String getAvgSensorDataSql(String sensorIDOrString, String beginString,
+                                       String endString, String measurement,
+                                       List<String> selectField) {
+        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder querySql = new StringBuilder();
+        selectField.forEach(item -> {
+            querySql.append("mean(").append(item).append(") as ").append(item).append(",");
+        });
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+        sqlBuilder.append(" select ");
+        sqlBuilder.append(selectFieldString);
+        sqlBuilder.append(" from  ").append(measurement);
+        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+        sqlBuilder.append(" and ( ");
+        sqlBuilder.append(sensorIDOrString).append(" ) ");
+        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1d)  fill(none)  ");
+        sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" tz('Asia/Shanghai') ");
+        return sqlBuilder.toString();
+    }
+
+
+
 }

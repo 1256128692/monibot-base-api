@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 
 import java.util.List;
 
@@ -34,4 +35,6 @@ public interface WtMonitorService {
     List<TriaxialDisplacementSensorNewDataInfo> queryDisplacementMonitorPointNewDataList(QueryDisplacementMonitorPointNewDataParam pa);
 
     MonitorItemFieldResponse queryMonitorItemFieldList(QueryMonitorItemFieldListParam pa);
+
+    List<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataList(QueryMonitorPointHistoryAvgDataParam pa);
 }

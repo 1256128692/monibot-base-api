@@ -639,15 +639,17 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointHistoryAvgDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHistoryAvgDataList(@Validated @RequestBody QueryMonitorPointHistoryAvgDataParam pa) {
+        return wtMonitorService.queryMonitorPointHistoryAvgDataList(pa);
     }
 
 
@@ -677,8 +679,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
@@ -712,8 +716,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
@@ -750,8 +756,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
@@ -784,8 +792,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
@@ -823,8 +833,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */

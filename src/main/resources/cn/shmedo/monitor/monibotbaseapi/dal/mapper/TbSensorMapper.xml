@@ -1,440 +1,499 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
-    <!--@mbg.generated-->
-    <!--@Table tb_sensor-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
-    <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
-    <result column="DataSourceID" jdbcType="VARCHAR" property="dataSourceID" />
-    <result column="DataSourceComposeType" jdbcType="INTEGER" property="dataSourceComposeType" />
-    <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
-    <result column="Name" jdbcType="VARCHAR" property="name" />
-    <result column="Alias" jdbcType="VARCHAR" property="alias" />
-    <result column="Kind" jdbcType="TINYINT" property="kind" />
-    <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder" />
-    <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID" />
-    <result column="ConfigFieldValue" jdbcType="VARCHAR" property="configFieldValue" />
-    <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
-    <result column="Status" jdbcType="TINYINT" property="status" />
-    <result column="WarnNoData" jdbcType="BIT" property="warnNoData" />
-    <result column="MonitorBeginTime" jdbcType="TIMESTAMP" property="monitorBeginTime" />
-    <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
-    <result column="Enable" jdbcType="BIT" property="enable" />
-    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, ProjectID, TemplateID, DataSourceID, DataSourceComposeType, MonitorType, `Name`,
-    `Alias`, Kind, DisplayOrder, MonitorPointID, ConfigFieldValue, ExValues, `Status`,
-    WarnNoData, MonitorBeginTime, ImagePath, `Enable`, CreateTime, CreateUserID, UpdateTime, UpdateUserID
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from tb_sensor
-    where ID = #{ID,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    <!--@mbg.generated-->
-    delete from tb_sensor
-    where ID = #{ID,jdbcType=INTEGER}
-  </delete>
-
-  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_sensor
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="projectID != null">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
+        <!--@mbg.generated-->
+        <!--@Table tb_sensor-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="TemplateID" jdbcType="INTEGER" property="templateID"/>
+        <result column="DataSourceID" jdbcType="VARCHAR" property="dataSourceID"/>
+        <result column="DataSourceComposeType" jdbcType="INTEGER" property="dataSourceComposeType"/>
+        <result column="MonitorType" jdbcType="INTEGER" property="monitorType"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Alias" jdbcType="VARCHAR" property="alias"/>
+        <result column="Kind" jdbcType="TINYINT" property="kind"/>
+        <result column="DisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+        <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+        <result column="ConfigFieldValue" jdbcType="VARCHAR" property="configFieldValue"/>
+        <result column="ExValues" jdbcType="VARCHAR" property="exValues"/>
+        <result column="Status" jdbcType="TINYINT" property="status"/>
+        <result column="WarnNoData" jdbcType="BIT" property="warnNoData"/>
+        <result column="MonitorBeginTime" jdbcType="TIMESTAMP" property="monitorBeginTime"/>
+        <result column="ImagePath" jdbcType="VARCHAR" property="imagePath"/>
+        <result column="Enable" jdbcType="BIT" property="enable"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
+        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
         ProjectID,
-      </if>
-      <if test="templateID != null">
         TemplateID,
-      </if>
-      <if test="dataSourceID != null">
         DataSourceID,
-      </if>
-      <if test="dataSourceComposeType != null">
         DataSourceComposeType,
-      </if>
-      <if test="monitorType != null">
         MonitorType,
-      </if>
-      <if test="name != null">
         `Name`,
-      </if>
-      <if test="alias != null">
         `Alias`,
-      </if>
-      <if test="kind != null">
         Kind,
-      </if>
-      <if test="displayOrder != null">
         DisplayOrder,
-      </if>
-      <if test="monitorPointID != null">
         MonitorPointID,
-      </if>
-      <if test="configFieldValue != null">
         ConfigFieldValue,
-      </if>
-      <if test="exValues != null">
         ExValues,
-      </if>
-      <if test="status != null">
         `Status`,
-      </if>
-      <if test="warnNoData != null">
         WarnNoData,
-      </if>
-      <if test="monitorBeginTime != null">
         MonitorBeginTime,
-      </if>
-      <if test="imagePath != null">
         ImagePath,
-      </if>
-      <if test="createTime != null">
+        `Enable`,
         CreateTime,
-      </if>
-      <if test="createUserID != null">
         CreateUserID,
-      </if>
-      <if test="updateTime != null">
         UpdateTime,
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="projectID != null">
-        #{projectID,jdbcType=INTEGER},
-      </if>
-      <if test="templateID != null">
-        #{templateID,jdbcType=INTEGER},
-      </if>
-      <if test="dataSourceID != null">
-        #{dataSourceID,jdbcType=VARCHAR},
-      </if>
-      <if test="dataSourceComposeType != null">
-        #{dataSourceComposeType,jdbcType=INTEGER},
-      </if>
-      <if test="monitorType != null">
-        #{monitorType,jdbcType=INTEGER},
-      </if>
-      <if test="name != null">
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="alias != null">
-        #{alias,jdbcType=VARCHAR},
-      </if>
-      <if test="kind != null">
-        #{kind,jdbcType=TINYINT},
-      </if>
-      <if test="displayOrder != null">
-        #{displayOrder,jdbcType=INTEGER},
-      </if>
-      <if test="monitorPointID != null">
-        #{monitorPointID,jdbcType=INTEGER},
-      </if>
-      <if test="configFieldValue != null">
-        #{configFieldValue,jdbcType=VARCHAR},
-      </if>
-      <if test="exValues != null">
-        #{exValues,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        #{status,jdbcType=TINYINT},
-      </if>
-      <if test="warnNoData != null">
-        #{warnNoData,jdbcType=BIT},
-      </if>
-      <if test="monitorBeginTime != null">
-        #{monitorBeginTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="imagePath != null">
-        #{imagePath,jdbcType=VARCHAR},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null">
-        #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        #{updateUserID,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
-    <!--@mbg.generated-->
-    update tb_sensor
-    <set>
-      <if test="projectID != null">
-        ProjectID = #{projectID,jdbcType=INTEGER},
-      </if>
-      <if test="templateID != null">
-        TemplateID = #{templateID,jdbcType=INTEGER},
-      </if>
-      <if test="dataSourceID != null">
-        DataSourceID = #{dataSourceID,jdbcType=VARCHAR},
-      </if>
-      <if test="dataSourceComposeType != null">
-        DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
-      </if>
-      <if test="monitorType != null">
-        MonitorType = #{monitorType,jdbcType=INTEGER},
-      </if>
-      <if test="name != null">
-        `Name` = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="alias != null">
-        `Alias` = #{alias,jdbcType=VARCHAR},
-      </if>
-      <if test="kind != null">
-        Kind = #{kind,jdbcType=TINYINT},
-      </if>
-      <if test="displayOrder != null">
-        DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-      </if>
-      <if test="monitorPointID != null">
-        MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
-      </if>
-      <if test="configFieldValue != null">
-        ConfigFieldValue = #{configFieldValue,jdbcType=VARCHAR},
-      </if>
-      <if test="exValues != null">
-        ExValues = #{exValues,jdbcType=VARCHAR},
-      </if>
-      <if test="status != null">
-        `Status` = #{status,jdbcType=TINYINT},
-      </if>
-      <if test="warnNoData != null">
-        WarnNoData = #{warnNoData,jdbcType=BIT},
-      </if>
-      <if test="monitorBeginTime != null">
-        MonitorBeginTime = #{monitorBeginTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="imagePath != null">
-        ImagePath = #{imagePath,jdbcType=VARCHAR},
-      </if>
-      <if test="enable != null ">
-        `Enable` = #{enable,jdbcType=BIT},
-      </if>
-      <if test="createTime != null">
-        CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="createUserID != null">
-        CreateUserID = #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      </if>
-    </set>
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
-    <!--@mbg.generated-->
-    update tb_sensor
-    set ProjectID = #{projectID,jdbcType=INTEGER},
-      TemplateID = #{templateID,jdbcType=INTEGER},
-      DataSourceID = #{dataSourceID,jdbcType=VARCHAR},
-      DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
-      MonitorType = #{monitorType,jdbcType=INTEGER},
-      `Name` = #{name,jdbcType=VARCHAR},
-      `Alias` = #{alias,jdbcType=VARCHAR},
-      Kind = #{kind,jdbcType=TINYINT},
-      DisplayOrder = #{displayOrder,jdbcType=INTEGER},
-      MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
-      ConfigFieldValue = #{configFieldValue,jdbcType=VARCHAR},
-      ExValues = #{exValues,jdbcType=VARCHAR},
-      `Status` = #{status,jdbcType=TINYINT},
-      WarnNoData = #{warnNoData,jdbcType=BIT},
-      MonitorBeginTime = #{monitorBeginTime,jdbcType=TIMESTAMP},
-      ImagePath = #{imagePath,jdbcType=VARCHAR},
-      `Enable` = #{enable,jdbcType=BIT},
-      CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      CreateUserID = #{createUserID,jdbcType=INTEGER},
-      UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      UpdateUserID = #{updateUserID,jdbcType=INTEGER}
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
+        UpdateUserID
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_sensor
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete
+        from tb_sensor
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
 
-  <select id="selectStatisticsCountByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-      select ID, Status, MonitorType, MonitorPointID
-      from tb_sensor
-      where MonitorPointID in (select ID
-                               from tb_monitor_point
-                               where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID}))
-  </select>
-
-  <select id="selectSensorPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
-      SELECT ts.ID,
-             ts.MonitorType    AS `monitorType`,
-             ts.`Name`         AS `name`,
-             ts.Alias          AS `alias`,
-             ts.DisplayOrder   AS `displayOrder`,
-             ts.monitorPointID AS `monitorPointID`,
-             ts.exValues       AS `exValues`,
-             ts.Enable         AS `enable`,
-             tmp.`Name`        AS `monitorPointName`,
-             tmt.TypeName      AS `monitorTypeName`
-      FROM `tb_sensor` ts
-               LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
-               LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
-      <where>
-        <trim suffixOverrides="AND">
-          <if test="pa.sensorName != null and pa.sensorName != ''">
-            ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
-            AND
-          </if>
-          <if test="pa.sensorID != null">
-            ts.ID = #{pa.sensorID} AND
-          </if>
-          <if test="pa.monitorType != null and pa.monitorType != ''">
-            tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
-            AND
-          </if>
-          <if test="pa.monitorTypeID != null">
-            tmt.ID = #{pa.monitorTypeID} AND
-          </if>
-          <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
-            tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
-            AND
-          </if>
-          <if test="pa.monitorPointID != null">
-            tmp.ID = #{pa.monitorPointID} AND
-          </if>
-          <if test="pa.projectID != null">
-            ts.ProjectID = #{pa.projectID} AND
-          </if>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_sensor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                ProjectID,
+            </if>
+            <if test="templateID != null">
+                TemplateID,
+            </if>
+            <if test="dataSourceID != null">
+                DataSourceID,
+            </if>
+            <if test="dataSourceComposeType != null">
+                DataSourceComposeType,
+            </if>
+            <if test="monitorType != null">
+                MonitorType,
+            </if>
+            <if test="name != null">
+                `Name`,
+            </if>
+            <if test="alias != null">
+                `Alias`,
+            </if>
+            <if test="kind != null">
+                Kind,
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder,
+            </if>
+            <if test="monitorPointID != null">
+                MonitorPointID,
+            </if>
+            <if test="configFieldValue != null">
+                ConfigFieldValue,
+            </if>
+            <if test="exValues != null">
+                ExValues,
+            </if>
+            <if test="status != null">
+                `Status`,
+            </if>
+            <if test="warnNoData != null">
+                WarnNoData,
+            </if>
+            <if test="monitorBeginTime != null">
+                MonitorBeginTime,
+            </if>
+            <if test="imagePath != null">
+                ImagePath,
+            </if>
+            <if test="createTime != null">
+                CreateTime,
+            </if>
+            <if test="createUserID != null">
+                CreateUserID,
+            </if>
+            <if test="updateTime != null">
+                UpdateTime,
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID,
+            </if>
         </trim>
-      </where>
-      ORDER BY ts.CreateTime DESC
-  </select>
-
-  <select id="getNameSerialNumber" resultType="java.lang.Integer">
-    SELECT IFNULL(MAX(CONVERT(SUBSTRING_INDEX(`Name`, '_', - 1), UNSIGNED)), 0) + 1
-    FROM `tb_sensor`
-    WHERE MonitorType = #{monitorType}
-      AND ProjectID = #{projectID}
-  </select>
-
-  <select id="selectSensorList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
-    SELECT ts.ID,
-           ts.MonitorType    AS `monitorType`,
-           ts.`Name`         AS `name`,
-           ts.Alias          AS `alias`,
-           ts.DisplayOrder   AS `displayOrder`,
-           ts.monitorPointID AS `monitorPointID`,
-           ts.exValues       AS `exValues`,
-           ts.Enable         AS `enable`,
-           tmp.`Name`        AS `monitorPointName`,
-           tmt.TypeName      AS `monitorTypeName`
-    FROM `tb_sensor` ts
-           LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
-           LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
-    <where>
-      <trim suffixOverrides="AND">
-        <if test="pa.sensorName != null and pa.sensorName != ''">
-          ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
-            AND
-        </if>
-        <if test="pa.sensorID != null">
-          ts.ID = #{pa.sensorID} AND
-        </if>
-        <if test="pa.monitorType != null">
-          tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
-            AND
-        </if>
-        <if test="pa.monitorTypeID != null">
-          tmt.ID = #{pa.monitorTypeID} AND
-        </if>
-        <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
-          tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
-            AND
-        </if>
-        <if test="pa.monitorPointID != null">
-          tmp.ID = #{pa.monitorPointID} AND
-        </if>
-        <if test="pa.projectID != null">
-          ts.ProjectID = #{pa.projectID} AND
-        </if>
-      </trim>
-    </where>
-    ORDER BY ts.UpdateTime DESC
-  </select>
-
-  <update id="updatePoint">
-    update tb_sensor
-    set MonitorPointID = #{pointID}, UpdateTime = #{date}, UpdateUserID = #{userID}
-      where ID in <foreach collection="sensorIDList" item="id" separator="," open="(" close=")">
-    #{id}
-  </foreach>
-  </update>
-
-  <update id="updatePointByPoint">
-    update tb_sensor
-    set MonitorPointID = #{newPoint}, UpdateTime = #{date}, UpdateUserID = #{userID}
-    where MonitorPointID = #{oldPoint}
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="templateID != null">
+                #{templateID,jdbcType=INTEGER},
+            </if>
+            <if test="dataSourceID != null">
+                #{dataSourceID,jdbcType=VARCHAR},
+            </if>
+            <if test="dataSourceComposeType != null">
+                #{dataSourceComposeType,jdbcType=INTEGER},
+            </if>
+            <if test="monitorType != null">
+                #{monitorType,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="alias != null">
+                #{alias,jdbcType=VARCHAR},
+            </if>
+            <if test="kind != null">
+                #{kind,jdbcType=TINYINT},
+            </if>
+            <if test="displayOrder != null">
+                #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="monitorPointID != null">
+                #{monitorPointID,jdbcType=INTEGER},
+            </if>
+            <if test="configFieldValue != null">
+                #{configFieldValue,jdbcType=VARCHAR},
+            </if>
+            <if test="exValues != null">
+                #{exValues,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=TINYINT},
+            </if>
+            <if test="warnNoData != null">
+                #{warnNoData,jdbcType=BIT},
+            </if>
+            <if test="monitorBeginTime != null">
+                #{monitorBeginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="imagePath != null">
+                #{imagePath,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserID != null">
+                #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                #{updateUserID,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
+        <!--@mbg.generated-->
+        update tb_sensor
+        <set>
+            <if test="projectID != null">
+                ProjectID = #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="templateID != null">
+                TemplateID = #{templateID,jdbcType=INTEGER},
+            </if>
+            <if test="dataSourceID != null">
+                DataSourceID = #{dataSourceID,jdbcType=VARCHAR},
+            </if>
+            <if test="dataSourceComposeType != null">
+                DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+            </if>
+            <if test="monitorType != null">
+                MonitorType = #{monitorType,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                `Name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="alias != null">
+                `Alias` = #{alias,jdbcType=VARCHAR},
+            </if>
+            <if test="kind != null">
+                Kind = #{kind,jdbcType=TINYINT},
+            </if>
+            <if test="displayOrder != null">
+                DisplayOrder = #{displayOrder,jdbcType=INTEGER},
+            </if>
+            <if test="monitorPointID != null">
+                MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
+            </if>
+            <if test="configFieldValue != null">
+                ConfigFieldValue = #{configFieldValue,jdbcType=VARCHAR},
+            </if>
+            <if test="exValues != null">
+                ExValues = #{exValues,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                `Status` = #{status,jdbcType=TINYINT},
+            </if>
+            <if test="warnNoData != null">
+                WarnNoData = #{warnNoData,jdbcType=BIT},
+            </if>
+            <if test="monitorBeginTime != null">
+                MonitorBeginTime = #{monitorBeginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="imagePath != null">
+                ImagePath = #{imagePath,jdbcType=VARCHAR},
+            </if>
+            <if test="enable != null">
+                `Enable` = #{enable,jdbcType=BIT},
+            </if>
+            <if test="createTime != null">
+                CreateTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="createUserID != null">
+                CreateUserID = #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor">
+        <!--@mbg.generated-->
+        update tb_sensor
+        set ProjectID             = #{projectID,jdbcType=INTEGER},
+            TemplateID            = #{templateID,jdbcType=INTEGER},
+            DataSourceID          = #{dataSourceID,jdbcType=VARCHAR},
+            DataSourceComposeType = #{dataSourceComposeType,jdbcType=INTEGER},
+            MonitorType           = #{monitorType,jdbcType=INTEGER},
+            `Name`                = #{name,jdbcType=VARCHAR},
+            `Alias`               = #{alias,jdbcType=VARCHAR},
+            Kind                  = #{kind,jdbcType=TINYINT},
+            DisplayOrder          = #{displayOrder,jdbcType=INTEGER},
+            MonitorPointID        = #{monitorPointID,jdbcType=INTEGER},
+            ConfigFieldValue      = #{configFieldValue,jdbcType=VARCHAR},
+            ExValues              = #{exValues,jdbcType=VARCHAR},
+            `Status`              = #{status,jdbcType=TINYINT},
+            WarnNoData            = #{warnNoData,jdbcType=BIT},
+            MonitorBeginTime      = #{monitorBeginTime,jdbcType=TIMESTAMP},
+            ImagePath             = #{imagePath,jdbcType=VARCHAR},
+            `Enable`              = #{enable,jdbcType=BIT},
+            CreateTime            = #{createTime,jdbcType=TIMESTAMP},
+            CreateUserID          = #{createUserID,jdbcType=INTEGER},
+            UpdateTime            = #{updateTime,jdbcType=TIMESTAMP},
+            UpdateUserID          = #{updateUserID,jdbcType=INTEGER}
+        where ID = #{ID,jdbcType=INTEGER}
     </update>
 
-  <select id="querySensorWithMoreBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore">
-      select s.id            as           sensorID,
-             s.Name          as           sensorName,
-             LEFT(ds.DataSourceToken, 32) uniqueToken,
-             p.id           as           monitorPointID,
-             p.Name          as           monitorPointName,
-             p.GpsLocation   as           pointGpsLocation,
-             p.ImageLocation as           pointImageLocation,
-             it.id           as           monitorItemID,
-             it.Name         as           monitorItemName,
-             it.Alias        as           monitorItemAlias,
-             s.ProjectID           as           projectID
-      from tb_sensor as s
-               left join tb_sensor_data_source as ds on ds.DataSourceID = s.DataSourceID
-               left join tb_monitor_point as p on p.id = s.MonitorPointID
-               left join tb_monitor_item as it on it.id = p.MonitorItemID
-      <where>
-          <foreach collection="uniqueTokens" open="(" close=")" item="item" separator="OR">
-              ds.DataSourceToken LIKE CONCAT(#{item}, '%')
-          </foreach>
-        and s.MonitorPointID is not null
-          and s.ProjectID in
-          <foreach collection="projectIDList" item="id" separator="," open="(" close=")">
-              #{id}
-          </foreach>
-          <if test="monitorItemID != null">
-              and it.id = #{monitorItemID}
-          </if>
-      </where>
-  </select>
+    <select id="selectStatisticsCountByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select ID, Status, MonitorType, MonitorPointID
+        from tb_sensor
+        where MonitorPointID in (select ID
+                                 from tb_monitor_point
+                                 where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID}))
+    </select>
+
+    <select id="selectSensorPage"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
+        SELECT ts.ID,
+               ts.MonitorType    AS `monitorType`,
+               ts.`Name`         AS `name`,
+               ts.Alias          AS `alias`,
+               ts.DisplayOrder   AS `displayOrder`,
+               ts.monitorPointID AS `monitorPointID`,
+               ts.exValues       AS `exValues`,
+               ts.Enable         AS `enable`,
+               tmp.`Name`        AS `monitorPointName`,
+               tmt.TypeName      AS `monitorTypeName`
+        FROM `tb_sensor` ts
+                 LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
+                 LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="pa.sensorName != null and pa.sensorName != ''">
+                    ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
+                      AND
+                </if>
+                <if test="pa.sensorID != null">
+                    ts.ID = #{pa.sensorID}
+                      AND
+                </if>
+                <if test="pa.monitorType != null and pa.monitorType != ''">
+                    tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
+                      AND
+                </if>
+                <if test="pa.monitorTypeID != null">
+                    tmt.ID = #{pa.monitorTypeID}
+                      AND
+                </if>
+                <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
+                    tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
+                      AND
+                </if>
+                <if test="pa.monitorPointID != null">
+                    tmp.ID = #{pa.monitorPointID}
+                      AND
+                </if>
+                <if test="pa.projectID != null">
+                    ts.ProjectID = #{pa.projectID} AND
+                </if>
+            </trim>
+        </where>
+        ORDER BY ts.CreateTime DESC
+    </select>
+
+    <select id="getNameSerialNumber" resultType="java.lang.Integer">
+        SELECT IFNULL(MAX(CONVERT(SUBSTRING_INDEX(`Name`, '_', - 1), UNSIGNED)), 0) + 1
+        FROM `tb_sensor`
+        WHERE MonitorType = #{monitorType}
+          AND ProjectID = #{projectID}
+    </select>
+
+    <select id="selectSensorList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse">
+        SELECT ts.ID,
+               ts.MonitorType    AS `monitorType`,
+               ts.`Name`         AS `name`,
+               ts.Alias          AS `alias`,
+               ts.DisplayOrder   AS `displayOrder`,
+               ts.monitorPointID AS `monitorPointID`,
+               ts.exValues       AS `exValues`,
+               ts.Enable         AS `enable`,
+               tmp.`Name`        AS `monitorPointName`,
+               tmt.TypeName      AS `monitorTypeName`
+        FROM `tb_sensor` ts
+                 LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
+                 LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="pa.sensorName != null and pa.sensorName != ''">
+                    ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
+                      AND
+                </if>
+                <if test="pa.sensorID != null">
+                    ts.ID = #{pa.sensorID}
+                      AND
+                </if>
+                <if test="pa.monitorType != null">
+                    tmt.TypeName LIKE CONCAT('%', #{pa.monitorType}, '%')
+                      AND
+                </if>
+                <if test="pa.monitorTypeID != null">
+                    tmt.ID = #{pa.monitorTypeID}
+                      AND
+                </if>
+                <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
+                    tmp.`Name` LIKE CONCAT('%', #{pa.monitorPoint}, '%')
+                      AND
+                </if>
+                <if test="pa.monitorPointID != null">
+                    tmp.ID = #{pa.monitorPointID}
+                      AND
+                </if>
+                <if test="pa.projectID != null">
+                    ts.ProjectID = #{pa.projectID} AND
+                </if>
+            </trim>
+        </where>
+        ORDER BY ts.UpdateTime DESC
+    </select>
+
+    <update id="updatePoint">
+        update tb_sensor
+        set MonitorPointID = #{pointID},
+            UpdateTime     = #{date},
+            UpdateUserID   = #{userID}
+        where ID in
+        <foreach collection="sensorIDList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="updatePointByPoint">
+        update tb_sensor
+        set MonitorPointID = #{newPoint},
+            UpdateTime     = #{date},
+            UpdateUserID   = #{userID}
+        where MonitorPointID = #{oldPoint}
+    </update>
+
+    <select id="querySensorWithMoreBy" resultType="cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore">
+        select s.id            as           sensorID,
+               s.Name          as           sensorName,
+               LEFT(ds.DataSourceToken, 32) uniqueToken,
+               p.id            as           monitorPointID,
+               p.Name          as           monitorPointName,
+               p.GpsLocation   as           pointGpsLocation,
+               p.ImageLocation as           pointImageLocation,
+               it.id           as           monitorItemID,
+               it.Name         as           monitorItemName,
+               it.Alias        as           monitorItemAlias,
+               s.ProjectID     as           projectID
+        from tb_sensor as s
+                 left join tb_sensor_data_source as ds on ds.DataSourceID = s.DataSourceID
+                 left join tb_monitor_point as p on p.id = s.MonitorPointID
+                 left join tb_monitor_item as it on it.id = p.MonitorItemID
+        <where>
+            <foreach collection="uniqueTokens" open="(" close=")" item="item" separator="OR">
+                ds.DataSourceToken LIKE CONCAT(#{item}, '%')
+            </foreach>
+            and s.MonitorPointID is not null
+            and s.ProjectID in
+            <foreach collection="projectIDList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+            <if test="monitorItemID != null">
+                and it.id = #{monitorItemID}
+            </if>
+        </where>
+    </select>
 
 
+    <select id="selectListBymonitorPointIDList" parameterType="java.lang.Integer"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse">
+        select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
+        from tb_sensor
+        where MonitorPointID in
+        <foreach collection="monitorPointIDList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </select>
 
-  <select id="selectListBymonitorPointIDList" parameterType="java.lang.Integer" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse">
-      select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
-      from tb_sensor
-      where MonitorPointID in
-      <foreach collection="monitorPointIDList" item="id" separator="," open="(" close=")">
-        #{id}
-      </foreach>
-  </select>
+    <select id="queryAllTypeAndID" resultType="cn.shmedo.iot.entity.base.Tuple">
+        select MonitorType as item1, id as item2
+        from tb_sensor
+    </select>
 
-  <select id="queryAllTypeAndID" resultType="cn.shmedo.iot.entity.base.Tuple">
-    select MonitorType as item1, id as item2
-      from tb_sensor
-
+    <select id="selectListBymonitorPointIDsAndProjectIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse">
+        select s.ID         as sensorID,
+               s.`Name`     as sensorName,
+               s.Alias      as sensorAlias,
+               s.monitorPointID,
+               s.projectID,
+               s.monitorType,
+               m.Name       as monitorPointName,
+               s.configFieldValue,
+               s.exvalues,
+               pi.projectName,
+               pi.ShortName as projectShortName
+        from tb_sensor s
+                 left join tb_monitor_point m on s.monitorPointID = m.ID
+                 left join tb_project_info pi on s.projectID = pi.ID
+        where s.MonitorPointID in
+        <foreach collection="monitorPointIDList" item="monitorPointID" separator="," open="(" close=")">
+            #{monitorPointID}
+        </foreach>
+        and s.ProjectID in
+        <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
+            #{projectID}
+        </foreach>
     </select>
 </mapper>

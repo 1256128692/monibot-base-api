@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
 import cn.shmedo.iot.entity.api.base.QueryDensity;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -103,8 +104,18 @@ public interface SensorDataDao {
 
     List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp endTime);
 
-//    List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b);
+    /**
+     * 查询历史时间段的历史平均数据
+     *
+     * @param sensorIDList 传感器ID列表
+     * @param monitorTypeFields 字段列表
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @param density 密度
+     * @return
+     */
+    List<Map<String, Object>> querySensorHistoryAvgData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
+                                                        Timestamp begin, Timestamp end, Integer density, Integer monitorType);
 
-//    List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b, Boolean fieldSort);
 
 }

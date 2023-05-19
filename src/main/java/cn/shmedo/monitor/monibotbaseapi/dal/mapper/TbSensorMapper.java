@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -51,4 +52,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorBaseInfoResponse> selectListBymonitorPointIDList(List<Integer> monitorPointIDList);
 
     List<Tuple<Integer, Integer>> queryAllTypeAndID();
+
+    List<SensorHistoryAvgDataResponse> selectListBymonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
 }
