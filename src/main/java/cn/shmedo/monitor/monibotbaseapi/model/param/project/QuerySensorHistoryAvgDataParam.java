@@ -12,20 +12,19 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.validator.constraints.Range;
 
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class QueryMonitorPointHistoryAvgDataPageParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class QuerySensorHistoryAvgDataParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
     @NotEmpty(message = "工程ID列表不能为空")
     private List<Integer> projectIDList;
 
-    @NotEmpty(message = "监测点ID列表不能为空")
-    private List<Integer> monitorPointIDList;
+    @NotEmpty(message = "传感器ID列表不能为空")
+    private List<Integer> sensorIDList;
 
     @NotNull(message = "开始时间不能为空")
     private Timestamp begin;
@@ -36,25 +35,18 @@ public class QueryMonitorPointHistoryAvgDataPageParam implements ParameterValida
     @NotNull(message = "密度不能为空")
     private Integer density;
 
-    @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")
-    @NotNull(message = "pageSize不能为空")
-    private Integer pageSize;
-
-    @Range(min = 1, message = "当前页码必须大于0")
-    @NotNull(message = "currentPage不能为空")
-    private Integer currentPage;
 
     @Override
     public ResultWrapper<?> validate() {
         // 校验监测点的监测项目名称,如果监测项目名称有1个以上,则这是跨监测项目,返回相应错误
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-        List<TbMonitorItem> monitorItemList = tbMonitorItemMapper.selectListByMonitorPointIDsAndProjectIDs(monitorPointIDList, projectIDList);
+        List<TbMonitorItem> monitorItemList = tbMonitorItemMapper.selectListBySensorIDsAndProjectIDs(sensorIDList, projectIDList);
         if (CollectionUtil.isNullOrEmpty(monitorItemList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表没有对应的监测项目");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表没有对应的监测项目");
         } else {
             long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
             if (count > 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表所属不同监测项目");
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表所属不同监测项目");
             }
         }
 
@@ -91,6 +83,5 @@ public class QueryMonitorPointHistoryAvgDataPageParam implements ParameterValida
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
     }
-
 
 }

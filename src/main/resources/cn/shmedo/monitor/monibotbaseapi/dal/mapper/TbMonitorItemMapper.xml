@@ -408,6 +408,26 @@
         </foreach>
     </select>
 
+
+
+
+    <select id="selectListBySensorIDsAndProjectIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem">
+        select ID, ProjectID, `Name`, `Alias`
+        from tb_monitor_item
+        where ID in (select monitorItemID
+                     from tb_monitor_point where ID in (
+        select monitorPointID
+        from tb_sensor where ID in
+        <foreach close=")" collection="sensorIDList" item="sensorID" open="(" separator=",">
+            #{sensorID}
+        </foreach>
+        ))
+          and ProjectID in
+        <foreach close=")" collection="projectIDList" item="projectID" open="(" separator=",">
+            #{projectID}
+        </foreach>
+    </select>
+
     <select id="queryMonitorItemNameFullInfo"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemNameFullInfo"
             parameterType="java.lang.Integer">

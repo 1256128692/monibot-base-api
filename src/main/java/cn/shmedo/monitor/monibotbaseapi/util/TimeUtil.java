@@ -9,10 +9,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
@@ -451,4 +448,20 @@ public class TimeUtil {
         resultList.add(resultMap);
         return resultList;
     }
+
+
+    /**
+     * 判断开始时间和结束时间是否为今日
+     * @param begin
+     * @param end
+     * @return
+     */
+    public static boolean validateTimestamps(Timestamp begin, Timestamp end) {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate beginDate = begin.toLocalDateTime().toLocalDate();
+        LocalDate endDate = end.toLocalDateTime().toLocalDate();
+
+        return !beginDate.isEqual(currentDate) && !endDate.isEqual(currentDate);
+    }
+
 }

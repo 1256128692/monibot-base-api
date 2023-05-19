@@ -23,7 +23,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
@@ -993,7 +992,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     @Override
     public List<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataList(QueryMonitorPointHistoryAvgDataParam pa) {
 
-        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBymonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
             return Collections.emptyList();
         }
@@ -1020,7 +1019,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Long totalCount = 0L;
         Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
 
-        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBymonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
             return PageUtil.PageWithMap.empty();
         }
@@ -1047,6 +1046,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
         return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
 
+    }
+
+    @Override
+    public List<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataList(QuerySensorHistoryAvgDataParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBySensorIDsAndProjectIDs(pa.getSensorIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 正序
+        return  responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
     }
 
 

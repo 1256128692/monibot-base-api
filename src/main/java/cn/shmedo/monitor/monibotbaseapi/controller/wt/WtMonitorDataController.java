@@ -725,8 +725,8 @@ public class WtMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySensorHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object querySensorHistoryAvgDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object querySensorHistoryAvgDataList(@Validated @RequestBody QuerySensorHistoryAvgDataParam pa) {
+        return wtMonitorService.querySensorHistoryAvgDataList(pa);
     }
 
 

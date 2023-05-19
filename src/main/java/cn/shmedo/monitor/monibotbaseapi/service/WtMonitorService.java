@@ -41,4 +41,6 @@ public interface WtMonitorService {
     List<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataList(QueryMonitorPointHistoryAvgDataParam pa);
 
     PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataPage(QueryMonitorPointHistoryAvgDataPageParam pa);
+
+    List<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataList(QuerySensorHistoryAvgDataParam pa);
 }

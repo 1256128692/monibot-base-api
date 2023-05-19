@@ -471,7 +471,7 @@
         from tb_sensor
     </select>
 
-    <select id="selectListBymonitorPointIDsAndProjectIDs"
+    <select id="selectListByMonitorPointIDsAndProjectIDs"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse">
         select s.ID         as sensorID,
                s.`Name`     as sensorName,
@@ -496,4 +496,34 @@
             #{projectID}
         </foreach>
     </select>
+
+
+
+
+    <select id="selectListBySensorIDsAndProjectIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse">
+        select s.ID         as sensorID,
+        s.`Name`     as sensorName,
+        s.Alias      as sensorAlias,
+        s.monitorPointID,
+        s.projectID,
+        s.monitorType,
+        m.Name       as monitorPointName,
+        s.configFieldValue,
+        s.exvalues,
+        pi.projectName,
+        pi.ShortName as projectShortName
+        from tb_sensor s
+        left join tb_monitor_point m on s.monitorPointID = m.ID
+        left join tb_project_info pi on s.projectID = pi.ID
+        where s.ID in
+        <foreach collection="sensorIDList" item="sensorID" separator="," open="(" close=")">
+            #{sensorID}
+        </foreach>
+        and s.ProjectID in
+        <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
+            #{projectID}
+        </foreach>
+    </select>
+
 </mapper>

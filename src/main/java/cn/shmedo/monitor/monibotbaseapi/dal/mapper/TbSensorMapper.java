@@ -53,5 +53,7 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     List<Tuple<Integer, Integer>> queryAllTypeAndID();
 
-    List<SensorHistoryAvgDataResponse> selectListBymonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
+    List<SensorHistoryAvgDataResponse> selectListByMonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
+
+    List<SensorHistoryAvgDataResponse> selectListBySensorIDsAndProjectIDs(List<Integer> sensorIDList, List<Integer> projectIDList);
 }

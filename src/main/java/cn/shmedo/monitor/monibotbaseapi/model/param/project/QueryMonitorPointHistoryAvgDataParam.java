@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
+import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -53,6 +54,14 @@ public class QueryMonitorPointHistoryAvgDataParam implements ParameterValidator,
         boolean validDensity = AvgDensityType.isValidDensity(density);
         if (!validDensity) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测密度参数错误");
+        }
+
+        if (begin.after(end)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
+        }
+
+        if (!TimeUtil.validateTimestamps(begin, end)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询时间不能为当日,只能查询昨日以及之前的数据统计");
         }
         return null;
     }
