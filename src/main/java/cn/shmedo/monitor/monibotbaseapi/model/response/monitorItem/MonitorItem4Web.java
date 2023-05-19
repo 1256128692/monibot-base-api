@@ -1,9 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -13,6 +12,7 @@ import java.util.List;
  * @create: 2023-04-11 10:26
  **/
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MonitorItem4Web extends TbMonitorItem {
     private String typeName;
     private String typeAlias;

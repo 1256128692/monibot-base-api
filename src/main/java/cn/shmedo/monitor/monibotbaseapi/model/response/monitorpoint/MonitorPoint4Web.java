@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @create: 2023-04-12 17:20
  **/
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MonitorPoint4Web extends TbMonitorPoint {
     private String monitorTypeName;
     private String monitorTypeAlias;

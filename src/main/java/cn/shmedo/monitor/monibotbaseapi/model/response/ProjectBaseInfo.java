@@ -5,10 +5,10 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import lombok.Data;
-
-import java.util.Map;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class ProjectBaseInfo extends TbProjectInfo{
 
     private String projectTypeName;
