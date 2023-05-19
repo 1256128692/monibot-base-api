@@ -633,6 +633,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectName 工程名称
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
@@ -673,6 +674,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectName 工程名称
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
@@ -711,6 +713,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
@@ -751,6 +754,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
@@ -787,6 +791,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(5:雨量)
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
@@ -828,6 +833,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(5:雨量)
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名

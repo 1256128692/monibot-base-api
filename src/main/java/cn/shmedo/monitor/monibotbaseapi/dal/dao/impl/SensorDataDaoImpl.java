@@ -432,7 +432,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
     public List<Map<String, Object>> querySensorHistoryAvgData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
                                                                Timestamp begin, Timestamp end, Integer density, Integer monitorType) {
 
-        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, true);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
         String endString = TimeUtil.formatInfluxTimeString(end);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
@@ -446,9 +445,11 @@ public class SensorDataDaoImpl implements SensorDataDao {
         String sql = null;
         if (density.equals(AvgDensityType.ALL.getValue())) {
             // 查询全部数据
+            String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, false);
             sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
         }else {
             // 查询每日的平均数据
+            String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, true);
             sql = getAvgSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
         }
 
