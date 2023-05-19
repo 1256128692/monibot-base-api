@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -24,23 +23,23 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1016,13 +1015,47 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     }
 
 
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataPage(QueryMonitorPointHistoryAvgDataPageParam pa) {
+        Long totalCount = 0L;
+        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBymonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+        totalCount = (long) responses.size();
+
+        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+
+    }
+
+
     private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
 
         List<TriaxialDisplacementSensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
-        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());
