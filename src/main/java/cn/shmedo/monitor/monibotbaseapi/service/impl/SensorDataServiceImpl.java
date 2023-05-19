@@ -38,8 +38,8 @@ public class SensorDataServiceImpl implements SensorDataService {
         List<Map<String, Object>> list = sensorDataDao.querySensorDayStatisticsData(pa.getSensorIDList(),
                 new Timestamp(pa.getBegin().getTime()),
                 new Timestamp(pa.getEnd().getTime()),
-                fieldSelectInfoList, pa.getRaw());
+                fieldSelectInfoList, pa.getRaw(), pa.getMonitorType());
 
-        sensorDataDao.insertSensorData(list, true, pa.getRaw(), fieldSelectInfoList);
+        sensorDataDao.insertSensorData(list, true, pa.getRaw(), fieldSelectInfoList, pa.getMonitorType());
     }
 }

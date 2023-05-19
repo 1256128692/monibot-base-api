@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -80,14 +79,19 @@ public class SensorDataDaoImpl implements SensorDataDao {
     @Override
     public List<Map<String, Object>> querySensorDayStatisticsData(List<Integer> sensorIDList, Timestamp begin,
                                                                   Timestamp end, List<FieldSelectInfo> fieldSelectInfoList,
-                                                                  boolean raw) {
+                                                                  boolean raw, Integer monitorType) {
         List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-        String measurement = FieldUtil.getMeasurement(fieldTypeCount, raw, false);
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
         String endString = TimeUtil.formatInfluxTimeString(end);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
-        List<String> selectField = FieldUtil.getSelectField(fieldSelectInfoList, true);
+        List<String> selectField = new LinkedList<>();
+        List<String> resultField = new LinkedList<>();
+        fieldSelectInfoList.forEach(item -> {
+            selectField.add(String.format(" mean(%s) as %s", item.getFieldToken(), item.getFieldToken()));
+            resultField.add(item.getFieldToken());
+        });
 
         StringBuilder sqlBuilder = new StringBuilder();
         String selectFieldString = String.join(",", selectField);
@@ -102,7 +106,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         String sql = sqlBuilder.toString();
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, null);
+        return InfluxSensorDataUtil.parseResult(queryResult, resultField);
     }
 
     @Override
@@ -317,16 +321,16 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
 
     @Override
-    public void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw, List<FieldSelectInfo> fieldSelectInfoList) {
+    public void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
         List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-        String measurement = FieldUtil.getMeasurement(fieldTypeCount, raw, avg);
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, avg);
 
         BatchPoints batchPoints = BatchPoints.database(fileConfig.getIotInfluxDatabase()).build();
         for (Map<String, Object> item : sensorDataList) {
             Point.Builder builder = Point.measurement(measurement);
 
             Map<String, Object> collect = fieldSelectInfoList.stream().collect(Collectors.toMap(
-                    fieldSelectInfo -> fieldSelectInfo.getFieldType().getColumnPrefix() + fieldSelectInfo.getFieldTypeOrder().toString(),
+                    FieldSelectInfo::getFieldToken,
                     fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
             builder.fields(collect);
 
