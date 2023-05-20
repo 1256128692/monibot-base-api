@@ -799,15 +799,15 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
      * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Double} data.sensorData.rainfall  累加雨量
      * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistorySumDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainPointHistorySumDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryRainPointHistorySumDataList(@Validated @RequestBody QueryRainPointHistorySumDataParam pa) {
+        return wtMonitorService.queryRainPointHistorySumDataList(pa);
     }
 
 
@@ -841,7 +841,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
      * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.rainfall  累加雨量
      * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData

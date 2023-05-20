@@ -119,4 +119,19 @@ public interface SensorDataDao {
                                                         Timestamp begin, Timestamp end, Integer density, Integer monitorType);
 
 
+
+    /**
+     * 查询历史时间段的历史累加数据(雨量专属)
+     *
+     * @param sensorIDList 传感器ID列表
+     * @param monitorTypeFields 字段列表
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @param density 密度
+     * @return
+     */
+    List<Map<String, Object>> queryRainSensorHistorySumData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
+                                                            Timestamp begin, Timestamp end, Integer density, Integer monitorType);
+
+
 }

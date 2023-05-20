@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -450,7 +451,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             // 查询全部数据
             String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, false);
             sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
-        }else {
+        } else {
             // 查询每日的平均数据
             String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, true);
             sql = getAvgSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
@@ -461,6 +462,37 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
     }
 
+    @Override
+    public List<Map<String, Object>> queryRainSensorHistorySumData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields, Timestamp begin, Timestamp end, Integer density, Integer monitorType) {
+        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String endString = TimeUtil.formatInfluxTimeString(end);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        List<String> selectField = new LinkedList<>();
+        monitorTypeFields.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, false);
+        String sql = null;
+        if (density.equals(AvgDensityType.ALL.getValue())) {
+            // 查询全部数据
+            sql = getAllSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
+        } else if (density.equals(RainDensityType.DAILY.getValue()) || density.equals(RainDensityType.MONTHLY.getValue())
+                || density.equals(RainDensityType.YEARLY.getValue())) {
+            // 查询每日的日平均数据
+            selectField.clear();
+            selectField.add("dailyRainfall");
+            sql = getAvgSensorDataSql(sidOrString, beginString, endString, measurement, selectField);
+        } else if (density.equals(RainDensityType.ONE_HOURS.getValue()) || density.equals(RainDensityType.THREE_HOURS.getValue())
+                || density.equals(RainDensityType.SIX_HOURS.getValue()) || density.equals(RainDensityType.TWELVE_HOURS.getValue())) {
+            // 查询每小时的累加数据
+            sql = getRainSensorSumDataSql(sidOrString, beginString, endString, measurement, selectField, density);
+        }
+
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
 
 
     private String getAvgSensorDataSql(String sensorIDOrString, String beginString,
@@ -479,6 +511,41 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" and ( ");
         sqlBuilder.append(sensorIDOrString).append(" ) ");
         sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1d)  fill(none)  ");
+        sqlBuilder.append(" order by time desc ");
+        sqlBuilder.append(" tz('Asia/Shanghai') ");
+        return sqlBuilder.toString();
+    }
+
+
+    private String getRainSensorSumDataSql(String sensorIDOrString, String beginString,
+                                           String endString, String measurement,
+                                           List<String> selectField, Integer density) {
+        String time = "";
+        if (density.equals(RainDensityType.ONE_HOURS.getValue())) {
+            time = RainDensityType.ONE_HOURS.getStr();
+        } else if (density.equals(RainDensityType.THREE_HOURS.getValue())) {
+            time = RainDensityType.THREE_HOURS.getStr();
+        } else if (density.equals(RainDensityType.SIX_HOURS.getValue())) {
+            time = RainDensityType.SIX_HOURS.getStr();
+        } else if (density.equals(RainDensityType.TWELVE_HOURS.getValue())) {
+            time = RainDensityType.TWELVE_HOURS.getStr();
+        }
+
+        StringBuilder sqlBuilder = new StringBuilder();
+        StringBuilder querySql = new StringBuilder();
+        selectField.forEach(item -> {
+            querySql.append("sum(").append(item).append(") as ").append(item).append(",");
+        });
+        String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
+        sqlBuilder.append(" select ");
+        sqlBuilder.append(selectFieldString);
+        sqlBuilder.append(" from  ").append(measurement);
+        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+        sqlBuilder.append(" and ( ");
+        sqlBuilder.append(sensorIDOrString).append(" ) ");
+        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(");
+        sqlBuilder.append(time);
+        sqlBuilder.append(")  fill(none)  ");
         sqlBuilder.append(" order by time desc ");
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();

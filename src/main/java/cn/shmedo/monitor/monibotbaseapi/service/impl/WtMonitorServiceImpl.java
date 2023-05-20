@@ -1109,6 +1109,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
     }
 
+    @Override
+    public List<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataList(QueryRainPointHistorySumDataParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 正序
+        return  responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
+    }
+
 
     private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
 
