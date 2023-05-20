@@ -848,8 +848,8 @@ public class WtMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistorySumDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainPointHistorySumDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryRainPointHistorySumDataPage(@Validated @RequestBody QueryRainPointHistorySumDataPageParam pa) {
+        return wtMonitorService.queryRainPointHistorySumDataPage(pa);
     }
 
 }

@@ -1123,7 +1123,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
         List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
 
-        // 处理传感器数据月平均值,年平均值
+        // 处理传感器数据月累加值,年累加值
         List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
 
@@ -1131,6 +1131,40 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return  responseList.stream()
                 .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
                 .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataPage(QueryRainPointHistorySumDataPageParam pa) {
+        Long totalCount = 0L;
+        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月累加值,年累加值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+        totalCount = (long) responses.size();
+
+        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
     }
 
 
