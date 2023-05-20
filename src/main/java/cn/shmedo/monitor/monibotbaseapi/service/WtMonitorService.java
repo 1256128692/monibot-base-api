@@ -6,7 +6,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.List;

@@ -990,6 +990,19 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 }
             });
         }
+
+        List<Integer> monitorTypeList = monitorTypeFields.stream().map(TbMonitorTypeField::getMonitorType).collect(Collectors.toList());
+        if (monitorTypeList.contains(MonitorType.WT_RAINFALL.getKey())) {
+            TbMonitorTypeField vo = new TbMonitorTypeField();
+            vo.setFieldToken("rainfall");
+            vo.setFieldUnitID(1);
+            vo.setFieldClass(2);
+            vo.setMonitorType(MonitorType.WT_RAINFALL.getKey());
+            vo.setFieldName("降雨量");
+            vo.setFieldDataType("Double");
+            monitorTypeFields.add(vo);
+        }
+
         return new MonitorItemFieldResponse(monitorTypeFields, tbDataUnitList);
     }
 
