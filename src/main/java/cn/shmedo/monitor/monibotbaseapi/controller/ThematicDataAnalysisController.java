@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
@@ -113,5 +114,26 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/QueryDmAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDmAnalysisData(@Valid @RequestBody QueryDmDataParam param) {
         return thematicDataAnalysisService.queryDmAnalysisData(param);
+    }
+
+    /**
+     * @api {POST} /QueryThematicMonitorPoint 查询专题分析监测点位
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryThematicMonitorPoint
+     * @apiDescription 查询专题分析监测点位
+     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Object[]} data 数据
+     * @apiSuccess (返回结果) {Int} data.thematicType 主题类型枚举1.水雨情; 2.浸润线; 3.内部变形
+     * @apiSuccess (返回结果) {Object[]} data.thematicType.dataList 监测点位数据
+     * @apiSuccess (返回结果) {Int} data.thematicType.dataList.monitorPointID 监测点位ID
+     * @apiSuccess (返回结果) {String} data.thematicType.dataList.monitorPointName 监测点位名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限
+     */
+    //    @Permission(permissionName = "")
+    @PostMapping(value = "/QueryThematicMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryThematicMonitorPoint(@Valid @RequestBody QueryMonitorItemPointListParam param) {
+        return null;
     }
 }
