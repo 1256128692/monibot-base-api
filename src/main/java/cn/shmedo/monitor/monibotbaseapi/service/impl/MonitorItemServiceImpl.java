@@ -220,7 +220,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             return CompanyMonitorItemNameInfo.builder().MonitorClassName(u.getKey()).dataList(monitorTypemap.entrySet()
                     .stream().map(w -> MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
                             .monitorTypeName(w.getValue().stream().findFirst()
-                                    .map(MonitorItemNameFullInfo::getMonitorItemName).orElse(null))
+                                    .map(MonitorItemNameFullInfo::getMonitorTypeName).orElse(null))
                             .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
                                     .distinct().toList()).build()).toList()).build();
         }).toList();
