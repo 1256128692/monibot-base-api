@@ -24,7 +24,6 @@ import org.influxdb.dto.Point;
 import org.influxdb.dto.Query;
 import org.influxdb.dto.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
@@ -42,7 +41,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
     private InfluxDB influxDB;
     private FileConfig fileConfig;
 
-    public SensorDataDaoImpl(@Autowired @Qualifier("iotDb") InfluxDB influxDB, FileConfig fileConfig) {
+    public SensorDataDaoImpl(@Autowired InfluxDB influxDB, FileConfig fileConfig) {
         this.influxDB = influxDB;
         this.fileConfig = fileConfig;
     }
@@ -325,7 +324,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, avg);
 
-        BatchPoints batchPoints = BatchPoints.database(fileConfig.getIotInfluxDatabase()).build();
+        BatchPoints batchPoints = BatchPoints.database(fileConfig.getInfluxDatabase()).build();
         for (Map<String, Object> item : sensorDataList) {
             Point.Builder builder = Point.measurement(measurement);
 
