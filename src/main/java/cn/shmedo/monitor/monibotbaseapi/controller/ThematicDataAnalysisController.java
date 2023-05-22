@@ -1,10 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.QueryRealDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +33,8 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Int} monitorGroupID 监测组ID
      * @apiParam (请求参数) {Int} [density] 密度 1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求参数) {String} group 监测点自定义配置信息group
+     * @apiParam (请求参数) {String} key 监测点自定义配置信息key
      * @apiParam (请求参数) {DateTime} [startTime] 查询时段开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 查询时段结束时间
      * @apiSuccess (返回结果) {Int} monitorPointGroupID 监测组ID
@@ -61,7 +63,7 @@ public class ThematicDataAnalysisController {
      */
 //    @Permission(permissionName = "")
     @PostMapping(value = "/QueryStGroupRealData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryStGroupRealData(@Valid @RequestBody QueryRealDataParam param) {
+    public Object queryStGroupRealData(@Valid @RequestBody QueryStDataParam param) {
         // StData without 'all' density
         Integer density = param.getDensity();
         if (Objects.nonNull(density) && density == 0) {
@@ -80,6 +82,8 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求参数) {Int} monitorPointID 监测点ID
      * @apiParam (请求参数) {Int} [monitorChildType] 数据轴,默认是1.A轴 1.A轴;2.B轴;3.C轴
      * @apiParam (请求参数) {Int} [density] 密度 0.全部;1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求参数) {String} group 传感器自定义配置信息group
+     * @apiParam (请求参数) {String} key 传感器自定义配置信息key
      * @apiParam (请求参数) {DateTime} [startTime] 查询时段开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 查询时段结束时间
      * @apiSuccess (返回结果) {Int} monitorPointGroupID 监测组ID
@@ -107,7 +111,7 @@ public class ThematicDataAnalysisController {
      */
 //    @Permission(permissionName = "")
     @PostMapping(value = "/QueryDmAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDmAnalysisData(@Valid @RequestBody QueryRealDataParam param) {
+    public Object queryDmAnalysisData(@Valid @RequestBody QueryDmDataParam param) {
         return thematicDataAnalysisService.queryDmAnalysisData(param);
     }
 }

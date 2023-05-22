@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -17,22 +18,14 @@ public class DmThematicAnalysisInfo {
     private Integer monitorPointID;
     private String monitorPointName;
     private Map<String, Object> newData;
-    private Map<String, Object> historyData;
+    private List<Map<String, Object>>  historyData = new ArrayList<>();
 
     public void setNewData(@NotNull final Date time, @NotNull final List<DmAnalysisData> dataList) {
         this.newData = Map.of("time", time, "dataList", dataList);
     }
 
-    public void setHistoryData(@NotNull final Date time, @NotNull final List<DmAnalysisData> dataList) {
-        this.historyData = Map.of("time", time, "dataList", dataList);
-    }
-
     private void setNewData(final Map<String, Object> newData) {
         this.newData = newData;
-    }
-
-    private void setHistoryData(final Map<String, Object> historyData) {
-        this.historyData = historyData;
     }
 
     @Builder(toBuilder = true)

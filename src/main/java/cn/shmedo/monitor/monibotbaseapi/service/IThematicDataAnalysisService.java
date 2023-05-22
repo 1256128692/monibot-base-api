@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.projectconfig.QueryRealDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
 
@@ -9,7 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StTh
  * @date: 2023-05-17 15:59
  */
 public interface IThematicDataAnalysisService {
-    StThematicAnalysisInfo queryStGroupRealData(QueryRealDataParam param);
+    StThematicAnalysisInfo queryStGroupRealData(QueryStDataParam param);
 
-    DmThematicAnalysisInfo queryDmAnalysisData(QueryRealDataParam param);
+    DmThematicAnalysisInfo queryDmAnalysisData(QueryDmDataParam param);
 }
