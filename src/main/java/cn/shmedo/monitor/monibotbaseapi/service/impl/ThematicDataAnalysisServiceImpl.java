@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QuerySt
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +65,11 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         return res;
     }
 
+    @Override
+    public ThematicMonitorPointInfo queryThematicMonitorPointByProjectID(Integer projectID) {
+        return null;
+    }
+
     private void dealDmNewData(final DmThematicAnalysisInfo res, final QueryDmDataParam param,
                                final Integer monitorType, final Map<Integer, ConfigBaseResponse> configMap,
                                final List<FieldSelectInfo> fieldSelectInfoList) {
@@ -111,6 +117,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             res.setHistoryData(new ArrayList<>());
         }
     }
+
+
 
     /**
      * @param groupFunc acquire the {@code time} which is grouping key according metadata time

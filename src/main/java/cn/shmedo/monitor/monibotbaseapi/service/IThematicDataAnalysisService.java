@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDm
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -13,4 +14,6 @@ public interface IThematicDataAnalysisService {
     StThematicAnalysisInfo queryStGroupRealData(QueryStDataParam param);
 
     DmThematicAnalysisInfo queryDmAnalysisData(QueryDmDataParam param);
+
+    ThematicMonitorPointInfo queryThematicMonitorPointByProjectID(Integer projectID);
 }
