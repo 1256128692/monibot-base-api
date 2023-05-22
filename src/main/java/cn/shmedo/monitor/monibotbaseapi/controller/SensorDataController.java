@@ -34,9 +34,9 @@ public class SensorDataController {
      * @apiParam (请求体) {Bool} raw true:原始数据,false:修正数据
      * @apiSuccess (响应结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 设备权限+应用权限:iot:ManagerSensorData
+     * @apiPermission 项目权限+应用权限:iot:ManagerMDMBaseSensorData
      */
-    //@Permission(permissionName = "mdmbase:ManagerSensorData", allowApplication = true)
+    @Permission(permissionName = "mdmbase:ManagerMDMBaseSensorData", allowApplication = true)
     @RequestMapping(value = "/StatisticsSensorData", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object statisticsSensorData(@Valid @RequestBody StatisticsSensorDataParam pa) {
