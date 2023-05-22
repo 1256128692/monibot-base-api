@@ -633,21 +633,24 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectName 工程名称
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointHistoryAvgDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHistoryAvgDataList(@Validated @RequestBody QueryMonitorPointHistoryAvgDataParam pa) {
+        return wtMonitorService.queryMonitorPointHistoryAvgDataList(pa);
     }
 
 
@@ -671,21 +674,24 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectName 工程名称
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryMonitorPointHistoryAvgDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointHistoryAvgDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHistoryAvgDataPage(@Validated @RequestBody QueryMonitorPointHistoryAvgDataPageParam pa) {
+        return wtMonitorService.queryMonitorPointHistoryAvgDataPage(pa);
     }
 
 
@@ -707,20 +713,23 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySensorHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object querySensorHistoryAvgDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object querySensorHistoryAvgDataList(@Validated @RequestBody QuerySensorHistoryAvgDataParam pa) {
+        return wtMonitorService.querySensorHistoryAvgDataList(pa);
     }
 
 
@@ -745,20 +754,23 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(2:水位 3:流速 5:雨量)
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySensorHistoryAvgDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object querySensorHistoryAvgDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object querySensorHistoryAvgDataPage(@Validated @RequestBody QuerySensorHistoryAvgDataPageParam pa) {
+        return wtMonitorService.querySensorHistoryAvgDataPage(pa);
     }
 
 
@@ -779,20 +791,23 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorPointType   监测类型(5:雨量)
      * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} data.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} data.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.rainfall  累加雨量
+     * @apiSuccess (响应结果) {Date} data.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistorySumDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainPointHistorySumDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryRainPointHistorySumDataList(@Validated @RequestBody QueryRainPointHistorySumDataParam pa) {
+        return wtMonitorService.queryRainPointHistorySumDataList(pa);
     }
 
 
@@ -818,20 +833,23 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.projectShortName 工程短称
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID   监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointType   监测类型(5:雨量)
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID      传感器ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName   传感器名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorAlias   传感器别名
      * @apiSuccess (响应结果) {String} currentPageData.configFieldValue   传感器配置
      * @apiSuccess (响应结果) {String} currentPageData.exValues   传感器额外补充信息
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList   数据列表
-     * @apiSuccess (响应结果) {Object[]} currentPageData.dataList.T  时刻数据列表
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} currentPageData.sensorData.rainfall  累加雨量
+     * @apiSuccess (响应结果) {Date} currentPageData.time   时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensorData
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryRainPointHistorySumDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainPointHistorySumDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryRainPointHistorySumDataPage(@Validated @RequestBody QueryRainPointHistorySumDataPageParam pa) {
+        return wtMonitorService.queryRainPointHistorySumDataPage(pa);
     }
 
 }

@@ -5,6 +5,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.List;
 
@@ -34,4 +36,16 @@ public interface WtMonitorService {
     List<TriaxialDisplacementSensorNewDataInfo> queryDisplacementMonitorPointNewDataList(QueryDisplacementMonitorPointNewDataParam pa);
 
     MonitorItemFieldResponse queryMonitorItemFieldList(QueryMonitorItemFieldListParam pa);
+
+    List<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataList(QueryMonitorPointHistoryAvgDataParam pa);
+
+    PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataPage(QueryMonitorPointHistoryAvgDataPageParam pa);
+
+    List<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataList(QuerySensorHistoryAvgDataParam pa);
+
+    PageUtil.PageWithMap<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataPage(QuerySensorHistoryAvgDataPageParam pa);
+
+    List<SensorHistoryAvgDataResponse>  queryRainPointHistorySumDataList(QueryRainPointHistorySumDataParam pa);
+
+    PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataPage(QueryRainPointHistorySumDataPageParam pa);
 }

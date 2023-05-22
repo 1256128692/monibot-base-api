@@ -3,11 +3,13 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 
 /**
     * 监测组和监测点关联表
     */
 @Builder(toBuilder = true)
+@EqualsAndHashCode
 public class TbMonitorGroupPoint {
     /**
     * ID

@@ -41,7 +41,7 @@ public class StatisticsSensorDataParam implements ParameterValidator, ResourcePe
         if (sensorList.size() < sensorIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器不存在");
         }
-        Set<Integer> collect = sensorList.stream().map(TbSensor::getMonitorPointID).collect(Collectors.toSet());
+        Set<Integer> collect = sensorList.stream().map(TbSensor::getMonitorType).collect(Collectors.toSet());
         if (collect.size() > 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器类型不一致");
         }

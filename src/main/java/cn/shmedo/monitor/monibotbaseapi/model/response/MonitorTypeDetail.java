@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @create: 2023-03-29 09:52
  **/
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class MonitorTypeDetail extends TbMonitorType {
     private List<TbMonitorTypeField> fieldList;
     private List<TbMonitorTypeField> class3FieldList;

@@ -36,7 +36,7 @@ public class SensorDataController {
      * @apiSampleRequest off
      * @apiPermission 设备权限+应用权限:iot:ManagerSensorData
      */
-    @Permission(permissionName = "mdmbase:ManagerSensorData", allowApplication = true)
+    //@Permission(permissionName = "mdmbase:ManagerSensorData", allowApplication = true)
     @RequestMapping(value = "/StatisticsSensorData", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object statisticsSensorData(@Valid @RequestBody StatisticsSensorDataParam pa) {

@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
  * @create: 2023-04-18 13:51
  **/
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class Group4Web extends TbMonitorGroup {
     private String imgURL;
     private Integer groupID;

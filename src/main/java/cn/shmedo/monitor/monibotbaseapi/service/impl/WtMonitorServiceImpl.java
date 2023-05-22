@@ -9,6 +9,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
@@ -22,11 +23,14 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.WaterQuality;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -426,6 +430,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     public List<FieldSelectInfo> getFieldSelectInfoListFromModleTypeFieldList(List<TbMonitorTypeField> list) {
         List<FieldSelectInfo> fieldSelectInfos = new ArrayList<>();
         list.forEach(modelField -> {
+            if (modelField.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())) {
+                return;
+            }
             FieldSelectInfo fieldSelectInfo = new FieldSelectInfo();
             fieldSelectInfo.setFieldToken(modelField.getFieldToken());
             fieldSelectInfo.setFieldName(modelField.getFieldName());
@@ -983,9 +990,195 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 }
             });
         }
+
+        List<Integer> monitorTypeList = monitorTypeFields.stream().map(TbMonitorTypeField::getMonitorType).collect(Collectors.toList());
+        if (monitorTypeList.contains(MonitorType.WT_RAINFALL.getKey())) {
+            TbMonitorTypeField vo = new TbMonitorTypeField();
+            vo.setFieldToken("rainfall");
+            vo.setFieldUnitID(1);
+            vo.setFieldClass(2);
+            vo.setMonitorType(MonitorType.WT_RAINFALL.getKey());
+            vo.setFieldName("降雨量");
+            vo.setFieldDataType("Double");
+            monitorTypeFields.add(vo);
+        }
+
         return new MonitorItemFieldResponse(monitorTypeFields, tbDataUnitList);
     }
 
+    @Override
+    public List<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataList(QueryMonitorPointHistoryAvgDataParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 正序
+        return  responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataPage(QueryMonitorPointHistoryAvgDataPageParam pa) {
+        Long totalCount = 0L;
+        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+        totalCount = (long) responses.size();
+
+        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+
+    }
+
+    @Override
+    public List<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataList(QuerySensorHistoryAvgDataParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBySensorIDsAndProjectIDs(pa.getSensorIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 正序
+        return  responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataPage(QuerySensorHistoryAvgDataPageParam pa) {
+        Long totalCount = 0L;
+        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBySensorIDsAndProjectIDs(pa.getSensorIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月平均值,年平均值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+        totalCount = (long) responses.size();
+
+        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+    }
+
+    @Override
+    public List<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataList(QueryRainPointHistorySumDataParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月累加值,年累加值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 正序
+        return  responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataPage(QueryRainPointHistorySumDataPageParam pa) {
+        Long totalCount = 0L;
+        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        List<Integer> sensorIDList = sensorHistoryAvgDataResponseList.stream().map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+        Integer monitorPointID = sensorHistoryAvgDataResponseList.get(0).getMonitorPointID();
+        Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
+        List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+        List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
+
+        // 处理传感器数据月累加值,年累加值
+        List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                monitorTypeFields, sensorHistoryAvgDataResponseList);
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = responseList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+        totalCount = (long) responses.size();
+
+        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+    }
 
 
     private List<TriaxialDisplacementSensorNewDataInfo> buildTDProjectAndMonitorAndSensorInfo(List<TbProjectInfo> tbProjectInfos, List<MonitorPointAndItemInfo> tbMonitorPoints, Integer monitorType) {
@@ -994,7 +1187,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
-        Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());

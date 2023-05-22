@@ -442,7 +442,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         tbWarnRuleMapper.update(null,
                 new UpdateWrapper<TbWarnRule>().lambda()
                         .eq(TbWarnRule::getID, entity.getID())
-                        .set(TbWarnRule::getEnable, entity.getEnable())
+                        .set(TbWarnRule::getExValue, entity.getExValue())
         );
     }
 }

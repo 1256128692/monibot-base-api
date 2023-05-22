@@ -47,11 +47,11 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
 
     public TbWarnRule build(Integer userID) {
 
-        tbWarnRule.setName(engineName);
-        tbWarnRule.setDesc(engineDesc);
-        tbWarnRule.setMonitorItemID(monitorItemID);
-        tbWarnRule.setMonitorPointID(monitorPointID);
-        tbWarnRule.setProjectID(projectID);
+        Optional.ofNullable(engineName).ifPresent(tbWarnRule::setName);
+        Optional.ofNullable(engineDesc).ifPresent(tbWarnRule::setDesc);
+        Optional.ofNullable(monitorItemID).ifPresent(tbWarnRule::setMonitorItemID);
+        Optional.ofNullable(monitorPointID).ifPresent(tbWarnRule::setMonitorPointID);
+        Optional.ofNullable(projectID).ifPresent(tbWarnRule::setProjectID);
         if (StringUtils.isNotBlank(productID)) {
             if (tbWarnRule.getRuleType().intValue() == 2) {
                 tbWarnRule.setVideoType(productID);

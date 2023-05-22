@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
-import cn.shmedo.iot.entity.api.base.QueryDensity;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -57,11 +57,12 @@ public interface SensorDataDao {
      * @param end                 结束时间(<)
      * @param fieldSelectInfoList 字段列表
      * @param raw                 是否原始数据
+     * @param monitorType
      * @return 传感器天的统计数据
      */
     List<Map<String, Object>> querySensorDayStatisticsData(List<Integer> sensorIDList, Timestamp begin, Timestamp end,
                                                            List<FieldSelectInfo> fieldSelectInfoList,
-                                                           boolean raw);
+                                                           boolean raw, Integer monitorType);
 
     /**
      * 获取特定时间范围内的传感器最新数据
@@ -84,9 +85,10 @@ public interface SensorDataDao {
      * @param avg                 是否是AVG数据
      * @param raw                 是否时原始数据
      * @param fieldSelectInfoList 字段列表
+     * @param monitorType
      */
     void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw,
-                          List<FieldSelectInfo> fieldSelectInfoList);
+                          List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType);
 
     /**
      * 删除传感器在时间点上的数据
@@ -103,8 +105,33 @@ public interface SensorDataDao {
 
     List<Map<String, Object>> querySensorDailyRainData(List<Integer> sensorIDList, Timestamp begin, Timestamp endTime);
 
-//    List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b);
+    /**
+     * 查询历史时间段的历史平均数据
+     *
+     * @param sensorIDList 传感器ID列表
+     * @param monitorTypeFields 字段列表
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @param density 密度
+     * @return
+     */
+    List<Map<String, Object>> querySensorHistoryAvgData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
+                                                        Timestamp begin, Timestamp end, Integer density, Integer monitorType);
 
-//    List<Map<String, Object>> querySensorOriginData(List<Integer> sensorIDList, List<FieldSelectInfo> fieldSelectInfoList, Timestamp begin, Timestamp end, QueryDensity density, boolean b, Boolean fieldSort);
+
+
+    /**
+     * 查询历史时间段的历史累加数据(雨量专属)
+     *
+     * @param sensorIDList 传感器ID列表
+     * @param monitorTypeFields 字段列表
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @param density 密度
+     * @return
+     */
+    List<Map<String, Object>> queryRainSensorHistorySumData(List<Integer> sensorIDList, List<TbMonitorTypeField> monitorTypeFields,
+                                                            Timestamp begin, Timestamp end, Integer density, Integer monitorType);
+
 
 }

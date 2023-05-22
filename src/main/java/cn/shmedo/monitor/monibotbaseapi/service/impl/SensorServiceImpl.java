@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
@@ -453,12 +454,19 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             ResultWrapper<List<DeviceWithSensor>> wrapper = iotService.queryDeviceAndSensorList(param);
             if (wrapper.apiSuccess()) {
                 List<DeviceWithSensor> data = wrapper.getData();
-                iotSensorTypeSet.forEach(iotSensorType -> {
-                    if (data.stream().anyMatch(e -> e.getSensorList().stream()
-                            .anyMatch(sensor -> sensor.iotSensorType().equals(iotSensorType)))) {
-                        iotMap.put(iotSensorType, data.stream().filter(e -> e.getSensorList().stream()
-                                .anyMatch(sensor -> sensor.iotSensorType().equals(iotSensorType))).collect(Collectors.toList()));
-                    }
+                data.forEach(item -> {
+                   item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
+                           .forEach((iotSensorType, list) -> {
+                       DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
+                       temp.setSensorList(list);
+                       if (iotMap.containsKey(iotSensorType)) {
+                           List<DeviceWithSensor> val = iotMap.get(iotSensorType);
+                           val.add(temp);
+                           iotMap.put(iotSensorType, val);
+                       } else {
+                           iotMap.put(iotSensorType, CollUtil.newArrayList(temp));
+                       }
+                   });
                 });
             }
         }
