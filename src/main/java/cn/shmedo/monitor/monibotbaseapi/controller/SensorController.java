@@ -519,9 +519,9 @@ public class SensorController {
      * @apiDescription 查询全部的传感器ID
      * @apiSuccess (返回结果) {Object} map key为Type, value为传感器列表
      * @apiSampleRequest off
-     * @apiPermission 项目权限+应用权限
+     * @apiPermission 项目权限+应用权限mdmbase:ManagerMDMBaseSensorData
      */
-    //@Permission(permissionName = "mdmbase:xxx", allowApplication = true, allowUser = false)
+    @Permission(permissionName = "mdmbase:ManagerMDMBaseSensorData", allowApplication = true)
     @RequestMapping(value = "/QueryAllSensorID", method = RequestMethod.GET, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateSensorStatusAndMonitorBeginTime() {
         return sensorService.queryAllSensorID();
