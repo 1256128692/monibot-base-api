@@ -635,5 +635,27 @@
         </foreach>
         and i.Alias = #{monitorItemName}
     </select>
-
+    <select id="selectPointWithItemBaseInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo">
+        SELECT
+            tmp.`ID` ID,
+            tmp.`ProjectID` projectID,
+            tmp.`MonitorType` monitorType,
+            tmp.`Name` name,
+            tmi.ID monitorItemID,
+            tmi.`Name` monitorItemName,
+            tmi.Alias monitorItemAlias
+        FROM
+            tb_monitor_point tmp
+            LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+        WHERE tmi.ID IS NOT NULL
+        AND tmp.ProjectID IN
+        <foreach collection="projectIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+        AND tmp.MonitorType IN
+        <foreach collection="monitorTypeList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

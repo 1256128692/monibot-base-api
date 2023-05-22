@@ -1,20 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ThematicPlainMonitorItemEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointPlainInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +38,7 @@ import java.util.stream.Collectors;
 public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisService {
     private final SensorDataDao sensorDataDao;
     private final TbProjectInfoMapper tbProjectInfoMapper;
+    private final TbMonitorPointMapper tbMonitorPointMapper;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
 
     @Override
@@ -65,9 +68,36 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         return res;
     }
 
+    /**
+     * @see ThematicMonitorPointPlainInfo
+     */
     @Override
-    public ThematicMonitorPointInfo queryThematicMonitorPointByProjectID(Integer projectID) {
-        return null;
+    public List<ThematicMonitorPointInfo> queryThematicMonitorPointByProjectID(Integer projectID) {
+        return tbMonitorPointMapper.selectPointWithItemBaseInfo(
+                        List.of(projectID), ThematicPlainMonitorItemEnum.getThematicMonitorTypeIDs()).stream()
+                .collect(Collectors.groupingBy(
+                        MonitorPointWithItemBaseInfo::getMonitorType)).entrySet().stream().map(u -> {
+                    Integer monitorType = u.getKey();
+                    return u.getValue().stream().map(w -> {
+                        if (ThematicPlainMonitorItemEnum.DISTANCE.getMonitorType().equals(monitorType)) {
+                            ThematicPlainMonitorItemEnum pointEnum = (w.getMonitorItemName().contains("浸润线")
+                                    || w.getMonitorItemAlias().contains("浸润线")) ? ThematicPlainMonitorItemEnum.WETTING_LINE
+                                    : ThematicPlainMonitorItemEnum.DISTANCE;
+                            return ThematicMonitorPointPlainInfo.builder().thematicType(pointEnum.getThematicType())
+                                    .monitorItemEnum(pointEnum).monitorPointID(w.getID())
+                                    .monitorPointName(w.getName()).build();
+                        }
+                        ThematicPlainMonitorItemEnum pointEnum = ThematicPlainMonitorItemEnum.getByMonitorType(monitorType);
+                        return ThematicMonitorPointPlainInfo.builder().thematicType(pointEnum.getThematicType()).monitorItemEnum(
+                                pointEnum).monitorPointID(w.getID()).monitorPointName(w.getName()).build();
+                    }).toList();
+                }).flatMap(Collection::stream).toList().stream()
+                .collect(Collectors.groupingBy(ThematicMonitorPointPlainInfo::getThematicType)).entrySet().stream()
+                .map(u -> ThematicMonitorPointInfo.builder().thematicType(u.getKey()).thematicDataList(u.getValue().stream()
+                        .collect(Collectors.groupingBy(ThematicMonitorPointPlainInfo::getMonitorItemEnum)).entrySet()
+                        .stream().map(w -> Map.of("monitorItemDesc", w.getKey().getDesc(), "dataList", w.getValue()
+                                .stream().map(s -> Map.of("monitorPointID", s.getMonitorPointID(), "monitorPointName",
+                                        s.getMonitorPointName())).toList())).toList()).build()).toList();
     }
 
     private void dealDmNewData(final DmThematicAnalysisInfo res, final QueryDmDataParam param,
@@ -118,8 +148,6 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         }
     }
 
-
-
     /**
      * @param groupFunc acquire the {@code time} which is grouping key according metadata time
      * @return [{"time":${DateTime},"dataList":[{${DmAnalysisData}}]}]
@@ -131,13 +159,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         //TODO map for,
 
 
-
-       return metadataList.stream().collect(Collectors.groupingBy(u -> groupFunc.apply((Date) u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> {
-           List<Map<String, Object>> value = u.getValue();
-
+        return metadataList.stream().collect(Collectors.groupingBy(u -> groupFunc.apply((Date) u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> {
+            List<Map<String, Object>> value = u.getValue();
 
 
-           return Map.of("time",u.getKey(),"dataList", List.of(1)  );
+            return Map.of("time", u.getKey(), "dataList", List.of(1));
         }).toList();
     }
+
 }

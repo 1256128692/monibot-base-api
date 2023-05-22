@@ -5,15 +5,17 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
+public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbMonitorPoint record);
@@ -49,4 +51,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint>{
                                                           Integer monitorItemID, String monitorItemName, Integer monitorType, String videoType);
 
     List<MonitorPointWithSensor> selectListByProjectIDsAndMonitorItemName(List<Integer> projectIDList, String monitorItemName);
+
+    List<MonitorPointWithItemBaseInfo> selectPointWithItemBaseInfo(@Param("projectIDList") List<Integer> projectIDList,
+                                                                   @Param("monitorTypeList") List<Integer> monitorTypeList);
 }

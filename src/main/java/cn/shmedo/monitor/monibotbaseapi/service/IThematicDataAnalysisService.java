@@ -6,6 +6,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmTh
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
 
+import java.util.List;
+
 /**
  * @author: youxian.kong@shmedo.cn
  * @date: 2023-05-17 15:59
@@ -15,5 +17,5 @@ public interface IThematicDataAnalysisService {
 
     DmThematicAnalysisInfo queryDmAnalysisData(QueryDmDataParam param);
 
-    ThematicMonitorPointInfo queryThematicMonitorPointByProjectID(Integer projectID);
+    List<ThematicMonitorPointInfo> queryThematicMonitorPointByProjectID(Integer projectID);
 }

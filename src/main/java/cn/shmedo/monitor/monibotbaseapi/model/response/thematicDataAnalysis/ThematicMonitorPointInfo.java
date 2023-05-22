@@ -14,5 +14,5 @@ import java.util.Map;
 @Builder(toBuilder = true)
 public class ThematicMonitorPointInfo {
     private Integer thematicType;
-    private List<Map<String, Object>> dataList;
+    private List<Map<String, Object>> thematicDataList;
 }

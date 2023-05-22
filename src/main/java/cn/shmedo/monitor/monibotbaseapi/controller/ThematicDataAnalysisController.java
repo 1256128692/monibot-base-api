@@ -125,9 +125,11 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {Object[]} data 数据
      * @apiSuccess (返回结果) {Int} data.thematicType 主题类型枚举1.水雨情; 2.浸润线; 3.内部变形
-     * @apiSuccess (返回结果) {Object[]} data.dataList 监测点位数据
-     * @apiSuccess (返回结果) {Int} data.dataList.monitorPointID 监测点位ID
-     * @apiSuccess (返回结果) {String} data.dataList.monitorPointName 监测点位名称
+     * @apiSuccess (返回结果) {Object[]} data.thematicDataList 主题类型数据
+     * @apiSuccess (返回结果) {String} data.thematicDataList.monitorItemDesc 监测项目描述
+     * @apiSuccess (返回结果) {Object[]} data.thematicDataList.dataList 监测点位数据
+     * @apiSuccess (返回结果) {Int} data.thematicDataList.dataList.monitorPointID 监测点位ID
+     * @apiSuccess (返回结果) {String} data.thematicDataList.dataList.monitorPointName 监测点位名称
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
