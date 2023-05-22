@@ -15,35 +15,20 @@ public class FileConfig {
     private String authAppKey;
     @Value("${service.authAppSecret}")
     private String authAppSecret;
-
     @Value("${service.authServiceAddress}")
     private String authServiceAddress;
-    @Value("${service.infoServiceAddress}")
-    private String infoServiceAddress;
     @Value("${service.wtReportServiceAddress}")
     private String wtReportServiceAddress;
     @Value("${service.mdInfoServiceAddress}")
     private String mdInfoServiceAddress;
-
     @Value("${service.influxAddr}")
     private String influxAddr;
-
     @Value("${service.influxDatabase}")
     private String influxDatabase;
-
     @Value("${service.influxUsername}")
     private String influxUsername;
-
     @Value("${service.influxPassword}")
     private String influxPassword;
-    @Value("${service.iotInfluxAddr}")
-    private String iotInfluxAddr;
-    @Value("${service.iotInfluxDatabase}")
-    private String iotInfluxDatabase;
-    @Value("${service.iotInfluxUsername}")
-    private String iotInfluxUsername;
-    @Value("${service.iotInfluxPassword}")
-    private String iotInfluxPassword;
     @Value("${service.ysUrl}")
     private String ysUrl;
     @Value("${service.ysAppKey}")

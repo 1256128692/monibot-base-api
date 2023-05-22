@@ -21,7 +21,7 @@ public class InfluxDbBean {
     }
 
     @Primary
-    @Bean("influxDBConnection")
+    @Bean
     public InfluxDB getInfluxDB() {
         InfluxDBConnection influxDBConnection = new InfluxDBConnection(fileConfig.getInfluxUsername()
                 , fileConfig.getInfluxPassword(), fileConfig.getInfluxAddr()
@@ -31,16 +31,4 @@ public class InfluxDbBean {
         influxDB.enableBatch();
         return influxDB;
     }
-
-    @Bean("iotDb")
-    public InfluxDB getIotInfluxDB() {
-        InfluxDBConnection influxDBConnection = new InfluxDBConnection(fileConfig.getIotInfluxUsername()
-                , fileConfig.getIotInfluxPassword(), fileConfig.getIotInfluxAddr()
-                , fileConfig.getIotInfluxDatabase(), IOT_DB_RETENTION);// 保留策略模式为默认
-        InfluxDB influxDB = influxDBConnection.influxDbBuild();
-        influxDB.setDatabase(fileConfig.getIotInfluxDatabase());
-        influxDB.enableBatch();
-        return influxDB;
-    }
-
 }
