@@ -50,7 +50,7 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
             if (!tbMonitorPoint.getProjectID().equals(projectID)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点的项目ID与条件项目ID不符");
             }
-            if (!tbMonitorPoint.getMonitorType().equals(MonitorType.RAINFALL.getKey())) {
+            if (!tbMonitorPoint.getMonitorType().equals(MonitorType.WT_RAINFALL.getKey())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点类型不为雨量类型");
             }
         }

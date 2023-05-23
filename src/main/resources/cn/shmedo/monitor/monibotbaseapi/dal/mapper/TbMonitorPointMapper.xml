@@ -311,7 +311,7 @@
         <if test="monitorItemID != null">
             and tmp.MonitorItemID = #{monitorItemID}
         </if>
-        <if test="monitorItemName != null">
+        <if test="monitorItemName != null and monitorItemName != ''">
             and tmi.Name = #{monitorItemName}
         </if>
         <if test="monitorClassType != null">

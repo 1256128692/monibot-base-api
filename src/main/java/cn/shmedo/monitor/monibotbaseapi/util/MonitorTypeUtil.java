@@ -48,15 +48,22 @@ public class MonitorTypeUtil {
             fieldList.add(vo);
         }
 
+        // TODO:注释掉
         // 当前降雨量
-        if (monitorType.equals(MonitorType.RAINFALL.getKey())){
-            FieldSelectInfo vo = new FieldSelectInfo();
-            vo.setFieldToken("currentRainfall");
-            vo.setFieldName("当前降雨量");
-            vo.setFieldOrder(0);
-            // 雨量单位ID:1
-            vo.setFieldExValue("1");
-            fieldList.add(vo);
+        if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())){
+//            FieldSelectInfo vo = new FieldSelectInfo();
+//            vo.setFieldToken("currentRainfall");
+//            vo.setFieldName("当前降雨量");
+//            vo.setFieldOrder(0);
+//            // 雨量单位ID:1
+//            vo.setFieldExValue("1");
+//            fieldList.add(vo);
+            FieldSelectInfo currentRainfallInfo = fieldList.stream().filter(vo -> vo.getFieldToken().equals("currentRainfall")).findFirst().orElse(null);
+            assert currentRainfallInfo != null;
+            currentRainfallInfo.setFieldStatisticsType("2");
+            FieldSelectInfo dailyRainfallInfo = fieldList.stream().filter(vo -> vo.getFieldToken().equals("dailyRainfall")).findFirst().orElse(null);
+            assert dailyRainfallInfo != null;
+            dailyRainfallInfo.setFieldStatisticsType("2");
         }
 
         // 物液位
