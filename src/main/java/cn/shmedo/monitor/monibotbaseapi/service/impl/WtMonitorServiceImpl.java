@@ -1214,7 +1214,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
             Integer monitorPointID = rainList.get(0).getMonitorPointID();
             List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
-            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+            List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(waterLevelSensorIDList, monitorTypeFields,
                     pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WT_RAINFALL.getKey());
             List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                     monitorTypeFields, rainList);
