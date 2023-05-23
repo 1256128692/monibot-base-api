@@ -49,5 +49,9 @@ public interface WtMonitorService {
 
     PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataPage(QueryRainPointHistorySumDataPageParam pa);
 
+    List<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataList(QueryWaterRainSensorHistoryAvgDataPageParam pa);
+
     PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataPage(QueryWaterRainSensorHistoryAvgDataPageParam pa);
+
+
 }

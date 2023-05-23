@@ -853,13 +853,50 @@ public class WtMonitorDataController {
     }
 
 
+    /**
+     * @api {POST} /QueryWaterRainSensorHistoryAvgDataList 根据监测点查询水雨晴传感器历史平均数据列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 根据监测点分页查询水雨晴传感器历史平均数据列表
+     * @apiName QueryWaterRainSensorHistoryAvgDataList
+     * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {Int} density 密度,(0:全部 1:日 2:月 3:年)
+     * @apiSuccess (响应结果) {Object[]} data  传感器数据信息列表
+     * @apiSuccess (响应结果) {Int} data.projectID   工程ID
+     * @apiSuccess (响应结果) {String} data.projectName 工程名称
+     * @apiSuccess (响应结果) {String} data.projectShortName 工程短称
+     * @apiSuccess (响应结果) {Int} data.monitorPointID   监测点ID
+     * @apiSuccess (响应结果) {String} data.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} data.monitorType   监测类型(2:水位 3:流速 31:雨量)
+     * @apiSuccess (响应结果) {Int} data.sensorID      传感器ID
+     * @apiSuccess (响应结果) {String} data.sensorName   传感器名称
+     * @apiSuccess (响应结果) {String} data.sensorAlias   传感器别名
+     * @apiSuccess (响应结果) {String} data.configFieldValue   传感器配置
+     * @apiSuccess (响应结果) {String} data.exValues   传感器额外补充信息
+     * @apiSuccess (响应结果) {Object} data.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorData.T   数据key(根据不同的监测类型,返回不同的监测key)
+     * @apiSuccess (响应结果) {Date} data.time   时间
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @RequestMapping(value = "/QueryWaterRainSensorHistoryAvgDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryWaterRainSensorHistoryAvgDataList(@Validated @RequestBody QueryWaterRainSensorHistoryAvgDataPageParam pa) {
+        return wtMonitorService.queryWaterRainSensorHistoryAvgDataList(pa);
+    }
+
+
 
     /**
      * @api {POST} /QueryWaterRainSensorHistoryAvgDataPage 根据监测点分页查询水雨晴传感器历史平均数据列表
      * @apiVersion 1.0.0
      * @apiGroup 水利监测点数据模块
      * @apiDescription 根据监测点分页查询水雨晴传感器历史平均数据列表
-     * @apiName QuerySensorHistoryAvgDataPage
+     * @apiName QueryWaterRainSensorHistoryAvgDataPage
      * @apiParam (请求体) {Int[]} projectIDList  项目ID列表
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间

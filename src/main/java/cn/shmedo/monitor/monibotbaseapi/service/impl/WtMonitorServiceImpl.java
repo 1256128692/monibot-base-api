@@ -1165,6 +1165,71 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
     }
 
+    @Override
+    public List<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataList(QueryWaterRainSensorHistoryAvgDataPageParam pa) {
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return Collections.emptyList();
+        }
+
+        Map<Integer, List<SensorHistoryAvgDataResponse>> listMap = sensorHistoryAvgDataResponseList.stream().collect(Collectors.groupingBy(SensorHistoryAvgDataResponse::getMonitorType));
+
+        List<SensorHistoryAvgDataResponse> resultList = new LinkedList<SensorHistoryAvgDataResponse>();
+        List<SensorHistoryAvgDataResponse> waterLevelList = listMap.get(MonitorType.WATER_LEVEL.getKey());
+        List<SensorHistoryAvgDataResponse> flowVelocityList = listMap.get(MonitorType.FLOW_VELOCITY.getKey());
+        List<SensorHistoryAvgDataResponse> rainList = listMap.get(MonitorType.WT_RAINFALL.getKey());
+
+        // 水位类型
+        if (!CollectionUtil.isNullOrEmpty(waterLevelList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.WATER_LEVEL.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = waterLevelList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WATER_LEVEL.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, waterLevelList);
+            resultList.addAll(responseList);
+        }
+        // 流速类型
+        if (!CollectionUtil.isNullOrEmpty(flowVelocityList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.FLOW_VELOCITY.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = flowVelocityList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.FLOW_VELOCITY.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, flowVelocityList);
+            resultList.addAll(responseList);
+        }
+        // 雨量类型
+        if (!CollectionUtil.isNullOrEmpty(rainList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.WT_RAINFALL.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = rainList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WT_RAINFALL.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, rainList);
+            resultList.addAll(responseList);
+        }
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = resultList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return Collections.emptyList();
+        }
+
+        return responses;
+    }
+
 
     @Override
     public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataPage(QueryWaterRainSensorHistoryAvgDataPageParam pa) {
