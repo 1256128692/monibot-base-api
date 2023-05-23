@@ -12,8 +12,8 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class MonitorGroupBaseInfo {
-   private Integer monitorGroupID;
-           private String monitorGroupName;
-   private Boolean monitorGroupEnable;
-           private List<MonitorPointBaseInfo> monitorPointDataList;
+    private Integer monitorGroupID;
+    private String monitorGroupName;
+    private Boolean monitorGroupEnable;
+    private List<MonitorPointBaseInfo> monitorPointDataList;
 }

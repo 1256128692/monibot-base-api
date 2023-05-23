@@ -14,5 +14,6 @@ import java.util.List;
 public class MonitorPointBaseInfo {
     private Integer monitorPointID;
     private String monitorPointName;
+    private Boolean monitorPointEnable;
     private List<SensorBaseInfo> sensorDataList;
 }

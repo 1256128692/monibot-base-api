@@ -128,6 +128,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Object[]} data.thematicDataList 主题类型数据
      * @apiSuccess (返回结果) {String} data.thematicDataList.monitorItemDesc 监测项目描述
      * @apiSuccess (返回结果) {Object[]} data.thematicDataList.dataList 监测点位数据
+     * @apiSuccess (返回结果) {Int} data.thematicDataList.dataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} data.thematicDataList.dataList.monitorPointID 监测点位ID
      * @apiSuccess (返回结果) {String} data.thematicDataList.dataList.monitorPointName 监测点位名称
      * @apiSampleRequest off

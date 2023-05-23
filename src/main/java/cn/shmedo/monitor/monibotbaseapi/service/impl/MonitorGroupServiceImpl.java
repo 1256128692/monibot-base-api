@@ -256,6 +256,28 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
 
     @Override
     public List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(Integer projectID) {
-        return null;
+        return tbMonitorGroupMapper.queryProjectGroupInfoList(projectID).stream().collect(Collectors.groupingBy(
+                ProjectGroupPlainInfo::getMonitorGroupParentID)).values().stream().map(p1 -> p1.stream().findFirst()
+                .map(p2 -> MonitorGroupParentBaseInfo.builder().monitorGroupParentID(p2.getMonitorGroupParentID())
+                        .monitorGroupParentName(p2.getMonitorGroupParentName()).monitorGroupParentEnable(
+                                p2.getMonitorGroupParentEnable()).monitorGroupDataList(p1.stream().collect(
+                                        Collectors.groupingBy(ProjectGroupPlainInfo::getMonitorGroupID)).values()
+                                .stream().map(p3 -> p3.stream().findFirst().map(p4 -> MonitorGroupBaseInfo.builder()
+                                        .monitorGroupID(p4.getMonitorGroupID()).monitorGroupName(p4.getMonitorGroupName())
+                                        .monitorGroupEnable(p4.getMonitorGroupEnable()).monitorPointDataList(p3.stream()
+                                                .collect(Collectors.groupingBy(ProjectGroupPlainInfo::getMonitorPointID))
+                                                .values().stream().map(p5 -> p5.stream().findFirst().map(p6 ->
+                                                        MonitorPointBaseInfo.builder().monitorPointID(p6.getMonitorPointID())
+                                                                .monitorPointName(p6.getMonitorPointName())
+                                                                .monitorPointEnable(p6.getMonitorPointEnable())
+                                                                .sensorDataList(p5.stream()
+                                                                        .filter(w -> Objects.nonNull(w.getSensorID()))
+                                                                        .map(p7 -> SensorBaseInfo.builder().sensorID(
+                                                                                p7.getSensorID()).sensorName(
+                                                                                p7.getSensorName()).sensorAlias(
+                                                                                p7.getSensorAlias()).build()).toList())
+                                                                .build()).orElse(null)).filter(Objects::nonNull)
+                                                .toList()).build()).orElse(null)).filter(Objects::nonNull).toList())
+                        .build()).orElse(null)).filter(Objects::nonNull).toList();
     }
 }

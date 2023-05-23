@@ -18,4 +18,5 @@ public class ThematicMonitorPointPlainInfo {
     private ThematicPlainMonitorItemEnum monitorItemEnum;
     private Integer monitorPointID;
     private String monitorPointName;
+    private Integer monitorType;
 }

@@ -84,12 +84,13 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                     || w.getMonitorItemAlias().contains("浸润线")) ? ThematicPlainMonitorItemEnum.WETTING_LINE
                                     : ThematicPlainMonitorItemEnum.DISTANCE;
                             return ThematicMonitorPointPlainInfo.builder().thematicType(pointEnum.getThematicType())
-                                    .monitorItemEnum(pointEnum).monitorPointID(w.getID())
-                                    .monitorPointName(w.getName()).build();
+                                    .monitorItemEnum(pointEnum).monitorPointID(w.getID()).monitorPointName(w.getName())
+                                    .monitorType(w.getMonitorType()).build();
                         }
                         ThematicPlainMonitorItemEnum pointEnum = ThematicPlainMonitorItemEnum.getByMonitorType(monitorType);
                         return ThematicMonitorPointPlainInfo.builder().thematicType(pointEnum.getThematicType()).monitorItemEnum(
-                                pointEnum).monitorPointID(w.getID()).monitorPointName(w.getName()).build();
+                                pointEnum).monitorPointID(w.getID()).monitorPointName(w.getName())
+                                .monitorType(w.getMonitorType()).build();
                     }).toList();
                 }).flatMap(Collection::stream).toList().stream()
                 .collect(Collectors.groupingBy(ThematicMonitorPointPlainInfo::getThematicType)).entrySet().stream()
@@ -97,7 +98,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         .collect(Collectors.groupingBy(ThematicMonitorPointPlainInfo::getMonitorItemEnum)).entrySet()
                         .stream().map(w -> Map.of("monitorItemDesc", w.getKey().getDesc(), "dataList", w.getValue()
                                 .stream().map(s -> Map.of("monitorPointID", s.getMonitorPointID(), "monitorPointName",
-                                        s.getMonitorPointName())).toList())).toList()).build()).toList();
+                                        s.getMonitorPointName(), "monitorType", s.getMonitorType())).toList()))
+                        .toList()).build()).toList();
     }
 
     private void dealDmNewData(final DmThematicAnalysisInfo res, final QueryDmDataParam param,
@@ -159,14 +161,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         //TODO map keySet for,sort to time list
 
 
-
         return metadataList.stream().collect(Collectors.groupingBy(u -> groupFunc.apply((Date) u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> {
             List<Map<String, Object>> value = u.getValue();
 
 
             Double sum = value.stream().map(w -> w.get(fieldToken).toString()).map(Double::parseDouble).reduce(Double::sum)
                     .orElse(0d);
-
 
 
             return Map.of("time", u.getKey(), "dataList", List.of(1));
