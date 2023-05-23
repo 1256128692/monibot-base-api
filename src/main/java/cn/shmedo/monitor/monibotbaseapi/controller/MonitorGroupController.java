@@ -287,6 +287,8 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorPointDataList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Boolean} data.monitorGroupDataList.monitorPointDataList.monitorPointEnable 监测点是否启用
      * @apiSuccess (返回结果) {Boolean} data.monitorGroupDataList.monitorPointDataList.multiSensor 监测点允许关联多传感器标识
+     * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorPointDataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Object[]} data.monitorGroupDataList.monitorPointDataList.sensorDataList 传感器信息
      * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorPointDataList.sensorDataList.sensorID 传感器ID
      * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorPointDataList.sensorDataList.sensorName 传感器名称
