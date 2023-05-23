@@ -1166,7 +1166,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     }
 
     @Override
-    public List<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataList(QueryWaterRainSensorHistoryAvgDataPageParam pa) {
+    public List<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataList(QueryWaterRainSensorHistoryAvgDataParam pa) {
         List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
             return Collections.emptyList();
