@@ -240,7 +240,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
 
-        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
+        if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
             selectField.forEach(item -> {
                 querySql.append("sum(").append(item).append(") as ").append(item).append(",");
             });
@@ -271,7 +271,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
 
-        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
+        if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
             selectField.forEach(item -> {
                 querySql.append("sum(").append(item).append(") as ").append(item).append(",");
             });

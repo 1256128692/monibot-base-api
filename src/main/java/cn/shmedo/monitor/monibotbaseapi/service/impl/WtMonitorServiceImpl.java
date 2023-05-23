@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -40,6 +39,10 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -170,7 +173,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         List<Map<String, Object>> maps;
         List<FieldSelectInfo> fieldList;
-        List<Map<String, Object>> rainFailMaps = new LinkedList<>();
         // 根据传感器ID列表和传感器类型,查传感器最新数据
         if (!CollectionUtil.isNullOrEmpty(sensorIDList)) {
             fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
@@ -179,7 +181,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理需要计算的监测子类型返回token
             fieldList = MonitorTypeUtil.handlefieldList(monitorType, fieldList);
 
-            handleSpecialSensorDataList(monitorType, rainFailMaps, fieldList, maps);
+            handleSpecialSensorDataList(monitorType, maps);
         } else {
             fieldList = null;
             maps = null;
@@ -188,60 +190,51 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 最终将传感器数据封装结果集
         List<FieldSelectInfo> finalFieldList = fieldList;
 
-        // 处理最终返回结果集,如果是雨量则单独处理
-        if (!CollectionUtil.isNullOrEmpty(rainFailMaps)) {
-            return handleFinalResultInfo(sensorNewDataInfoList, rainFailMaps, tbSensors, finalFieldList, dataUnitsMap);
-        } else {
-            return handleFinalResultInfo(sensorNewDataInfoList, maps, tbSensors, finalFieldList, dataUnitsMap);
-        }
-
+        return handleFinalResultInfo(sensorNewDataInfoList, maps, tbSensors, finalFieldList, dataUnitsMap);
     }
 
     /**
      * @param monitorType  监测类型
-     * @param fieldList    字段列表(v1,v2,xxx)
      * @param maps         传感器数据列表
-     * @param rainFailMaps 雨量的传感器数据列表
      */
-    private void handleSpecialSensorDataList(Integer monitorType, List<Map<String, Object>> rainFailMaps,
-                                             List<FieldSelectInfo> fieldList,
+    private void handleSpecialSensorDataList(Integer monitorType,
                                              List<Map<String, Object>> maps) {
         if (CollectionUtil.isNullOrEmpty(maps)) {
             return;
         }
-        // 雨量单独处理
+        // 雨量单独处理 TODO:雨量预计删除
         if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
-            // 当前时间
-            DateTime nowDate = DateUtil.date();
-            // 当天早上8点
-            DateTime nowDateEightclock = DateUtil.offsetHour(DateUtil.beginOfDay(nowDate), 8);
-
-            // 如果当前时间小于当天的早上8点,那么就统计昨天的早上8点到凌晨现在的时间
-            if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
-                DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
-                nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
-            }
-            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
-            if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-                for (Map<String, Object> mapEntry : maps) {
-                    for (Map<String, Object> currentRainMap : currentRainMaps) {
-                        String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-                        String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-                        if (currentSid.equals(sid)) {
-                            Double currentRainfall = Double.parseDouble(currentRainMap.get(DbConstant.CURRENT_RAIN_FALL).toString());
-                            BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
-                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, rounded);
-                            rainFailMaps.add(mapEntry);
-                        }
-                    }
-                }
-            }
-            if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-                for (Map<String, Object> mapEntry : maps) {
-                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0.0);
-                    rainFailMaps.add(mapEntry);
-                }
-            }
+//            // 当前时间
+//            DateTime nowDate = DateUtil.date();
+//            // 当天早上8点
+//            DateTime nowDateEightclock = DateUtil.offsetHour(DateUtil.beginOfDay(nowDate), 8);
+//
+//            // 如果当前时间小于当天的早上8点,那么就统计昨天的早上8点到凌晨现在的时间
+//            if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
+//                DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
+//                nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
+//            }
+//            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
+//            if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
+//                for (Map<String, Object> mapEntry : maps) {
+//                    for (Map<String, Object> currentRainMap : currentRainMaps) {
+//                        String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
+//                        String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
+//                        if (currentSid.equals(sid)) {
+//                            Double currentRainfall = Double.parseDouble(currentRainMap.get(DbConstant.CURRENT_RAIN_FALL).toString());
+//                            BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
+//                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, rounded);
+//                            rainFailMaps.add(mapEntry);
+//                        }
+//                    }
+//                }
+//            }
+//            if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
+//                for (Map<String, Object> mapEntry : maps) {
+//                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0.0);
+//                    rainFailMaps.add(mapEntry);
+//                }
+//            }
         } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
             // 流量暂不计算
         } else if (monitorType.equals(MonitorType.LEVEL.getKey()) || monitorType.equals(MonitorType.STRESS.getKey())
@@ -610,7 +603,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         // 处理需要计算的监测子类型返回token
         MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps);
 
         // 处理时间排序
 //        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
@@ -669,7 +662,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 resultMaps.add(stringObjectMap);
             });
         }
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps);
 
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
@@ -762,9 +755,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理雨量历史时间段的降雨量
             resultList = handleDataOrder(maps, pa.getEnd());
             // 处理雨量历史时间段的当前雨量
-            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
+//            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            dailyRainfallList = handleDailyRainfallList(pa.getBegin(), pa.getEnd(), sensorIDList, dailyRainfall);
+            dailyRainfallList = handleDailyRainfallList(maps);
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
                 if (dailyRainfallList.size() == 1) {
                     if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
@@ -781,25 +774,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
-    private List<Map<String, Object>> handleDailyRainfallList(Timestamp begin, Timestamp end,
-                                                              List<Integer> sensorIDList, Double dailyRainfall) {
+    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps) {
 
-        DateTime startTime = null;
-        DateTime endTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 32);
+        // 操作按日期分组
+        Map<LocalDate, List<Map<String, Object>>> groupedMaps = maps.stream()
+                .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate()));
 
-        // 判断如果开始时间与结束时间的差距超过2天,那么就去处理开始时间,开始时间为开始时间的当天8点,返回日降雨量数据列表
-        // 否则就处理开始时间,开始时间为最近一天时间的当天8点,返回日降雨量数据列表(单个)
-        long between = DateUtil.between(DateUtil.beginOfDay(begin), DateUtil.beginOfDay(end), DateUnit.DAY);
-        if (between > 2) {
-            startTime = DateUtil.offsetHour(DateUtil.beginOfDay(begin), 8);
-        } else {
-            startTime = DateUtil.offsetHour(DateUtil.beginOfDay(end), 8);
+        // 遍历每一天的数据，生成新的newMaps列表
+        List<Map<String, Object>> newMaps = new ArrayList<>();
+        for (Map.Entry<LocalDate, List<Map<String, Object>>> entry : groupedMaps.entrySet()) {
+            LocalDate date = entry.getKey();
+            List<Map<String, Object>> dailyMaps = entry.getValue();
+
+            double dailyRainfall = (double) dailyMaps.get(0).get("dailyRainfall");
+
+            Map<String, Object> newMap = new HashMap<>();
+            newMap.put("time", LocalDateTime.of(date, LocalTime.MIN).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            newMap.put("sensorID", dailyMaps.get(0).get("sensorID"));
+            newMap.put("dailyRainfall", dailyRainfall);
+            newMaps.add(newMap);
         }
 
-
-        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
-                new Timestamp(startTime.getTime()), new Timestamp(endTime.getTime()));
-        return dailyRainData;
+//        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
+//                new Timestamp(startTime.getTime()), new Timestamp(endTime.getTime()));
+        return newMaps;
     }
 
     /**
@@ -877,7 +875,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), map);
             resultMaps.add(stringObjectMap);
         });
-        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps, fieldList, maps);
+        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps);
 
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getMonitorType(), fieldList, dataUnitsMap);
@@ -937,7 +935,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         // 处理需要计算的监测子类型返回token
         MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, fieldList, maps);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), maps);
 
         // 处理时间排序
         Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
