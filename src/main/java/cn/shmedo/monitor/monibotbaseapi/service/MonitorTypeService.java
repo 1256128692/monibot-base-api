@@ -51,4 +51,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     Object querySimpleMonitorTypeList(QuerySimpleMonitorTypeListParam pa);
 
     QueryFormulaParamsResult queryFormulaParams(QueryFormulaParamsRequest request);
+
+    void refreshMonitorTypeCache(RefreshMonitorTypeCacheParam pa);
 }

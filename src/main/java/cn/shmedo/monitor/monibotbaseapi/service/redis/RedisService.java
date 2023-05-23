@@ -5,15 +5,15 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import cn.hutool.json.JSONUtil;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
-import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.data.redis.core.*;
 import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -239,9 +239,7 @@ public class RedisService {
      * @param values k-v存储
      */
     public <K, V> void multiSet(Map<K, V> values) {
-        Map<String, String> data = values.entrySet().stream()
-                .map(entry -> Map.entry(serialize(entry.getKey()), serialize(entry.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        Map<String, String> data = serializeMap(values);
         template.opsForValue().multiSet(data);
         data.clear();
     }
@@ -266,10 +264,7 @@ public class RedisService {
      * @return {@code true} 成功
      */
     public <K, V> boolean multiSetIfAbsent(Map<K, V> map) {
-        Map<String, String> data = map.entrySet().stream()
-                .map(entry -> Map.entry(serialize(entry.getKey()), serialize(entry.getValue())))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return Boolean.TRUE.equals(template.opsForValue().multiSetIfAbsent(data));
+        return Boolean.TRUE.equals(template.opsForValue().multiSetIfAbsent(serializeMap(map)));
     }
 
     /**
@@ -569,9 +564,7 @@ public class RedisService {
      */
     public <K, V> void putAll(String key, Map<K, V> dataMap) {
         if (CollUtil.isNotEmpty(dataMap)) {
-            Map<String, String> stringMap = dataMap.entrySet().stream()
-                    .map(entry -> Map.entry(serialize(entry.getKey()), serialize(entry.getValue())))
-                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            Map<String, String> stringMap = serializeMap(dataMap);
             template.opsForHash().putAll(key, stringMap);
             stringMap.clear();
         }
@@ -1177,6 +1170,24 @@ public class RedisService {
     }
 
     /**
+     * 执行事务，通过 {@link StringRedisTemplate#executePipelined(SessionCallback)} 实现，已进行了必要的前置操作
+     *
+     * @param consumer 操作
+     */
+    public List<Object> transaction(Consumer<RedisOperations<String, String>> consumer) {
+        return template.executePipelined(new SessionCallback<Void>() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public Void execute(@NotNull RedisOperations operations) {
+                operations.multi();
+                consumer.accept(operations);
+                operations.exec();
+                return null;
+            }
+        });
+    }
+
+    /**
      * 将对象序列化为json串，不会处理 {@link CharSequence}、{@link Number}、{@link Boolean}
      *
      * @param o 对象
@@ -1188,6 +1199,18 @@ public class RedisService {
             return o.toString();
         }
         return JSONUtil.toJsonStr(o);
+    }
+
+    /**
+     * 将map中的key和value序列化为json串
+     * @param dataMap   map
+     * @return  {@link Map<String, String>}
+     */
+    public static <K, V> Map<String, String> serializeMap(Map<K, V> dataMap) {
+        Assert.notNull(dataMap, "序列化对象不能为null");
+        return dataMap.entrySet().stream()
+                .map(entry -> Map.entry(serialize(entry.getKey()), serialize(entry.getValue())))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**

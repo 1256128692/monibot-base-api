@@ -7,7 +7,6 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.BaseConfigRequest;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -610,5 +609,24 @@ public class MonitorTypeController {
     @PostMapping(value = "/QuerySimpleMonitorTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySimpleMonitorTypeList(@RequestBody @Validated QuerySimpleMonitorTypeListParam pa) {
         return monitorTypeService.querySimpleMonitorTypeList(pa);
+    }
+
+    /**
+     * @api {POST} /RefreshMonitorTypeCache  刷新监测类型缓存
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName RefreshMonitorTypeCache
+     * @apiDescription 刷新监测类型缓存，包括参数、监测类型、模板（公式、脚本）
+     * @apiParam (请求参数) {Int} companyID  公司ID
+     * @apiParam (请求参数) {Bool} [isClear]  是否在刷新前清除对应缓存,默认为true
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+    @PostMapping(value = "/RefreshMonitorTypeCache", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object refreshMonitorTypeCache(@RequestBody @Validated RefreshMonitorTypeCacheParam pa) {
+        monitorTypeService.refreshMonitorTypeCache(pa);
+        return ResultWrapper.successWithNothing();
     }
 }

@@ -38,6 +38,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
@@ -59,7 +60,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbMonitorType> implements MonitorTypeService {
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
-    private final TbMonitorTypeMapper tbMonitorTypeMapper;
     private final TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper;
     private final TbTemplateDataSourceMapper tbTemplateDataSourceMapper;
     private final TbTemplateScriptMapper tbTemplateScriptMapper;
@@ -81,7 +81,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = tbMonitorTypeMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getFuzzyTypeName(), typeList);
+        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getFuzzyTypeName(), typeList);
         if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
@@ -107,7 +107,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         } else {
             QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
             wrapper.orderByDesc("monitorType").last("limit 1");
-            TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+            TbMonitorType temp = baseMapper.selectOne(wrapper);
             if (temp == null || temp.getMonitorType() <= 20000) {
                 type = 20001;
             } else {
@@ -116,7 +116,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         }
 
         TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddCustomizedMonitorTypeParam2tbMonitorType(pa, userID, type);
-        tbMonitorTypeMapper.insert(tbMonitorType);
+        baseMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
         setMonitorTypeCache(tbMonitorType, list);
@@ -131,7 +131,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public MonitorTypeDetail queryMonitorTypeDetail(Integer monitorType, Integer companyID) {
         QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
         wrapper.eq("monitorType", monitorType);
-        TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+        TbMonitorType temp = baseMapper.selectOne(wrapper);
         MonitorTypeDetail monitorTypeDetail = new MonitorTypeDetail();
         BeanUtil.copyProperties(temp, monitorTypeDetail, false);
         List<TbMonitorTypeField> list = tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true);
@@ -383,7 +383,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Transactional(rollbackFor = Exception.class)
     public void updateCustomizedMonitorType(UpdateCustomizedMonitorTypeParam pa) {
         TbMonitorType tbMonitorTypeNew = pa.update();
-        tbMonitorTypeMapper.updateByPrimaryKey(
+        baseMapper.updateByPrimaryKey(
                 tbMonitorTypeNew
         );
 
@@ -401,7 +401,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 pa.getFieldList()
         );
         setMonitorTypeCache(
-                tbMonitorTypeMapper.queryByType(pa.getMonitorType()),
+                baseMapper.queryByType(pa.getMonitorType()),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
         );
     }
@@ -412,7 +412,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), pa.getMonitorType());
         tbMonitorTypeFieldMapper.insertBatch(list);
         setMonitorTypeCache(
-                tbMonitorTypeMapper.queryByType(pa.getMonitorType()),
+                baseMapper.queryByType(pa.getMonitorType()),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(pa.getMonitorType()), true)
         );
     }
@@ -437,7 +437,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             deleteTemplateBatch(typeTemplates.stream().map(TbMonitorTypeTemplate::getID).collect(Collectors.toList()));
         }
         tbMonitorTypeFieldMapper.deleteByMonitorTypeList(monitorTypeList);
-        tbMonitorTypeMapper.deleteByMonitorTypeList(monitorTypeList);
+        baseMapper.deleteByMonitorTypeList(monitorTypeList);
         deleteMonitorTypeCache(monitorTypeList);
     }
 
@@ -450,7 +450,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public void deleteMonitorTypeFieldBatch(Integer monitorType, List<Integer> fieldIDList) {
         tbMonitorTypeFieldMapper.deleteBatchIds(fieldIDList);
         setMonitorTypeCache(
-                tbMonitorTypeMapper.queryByType(monitorType),
+                baseMapper.queryByType(monitorType),
                 tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true)
         );
     }
@@ -466,7 +466,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             QueryWrapper<TbMonitorType> wrapper = new QueryWrapper<>();
             wrapper.between("monitorType", 1, 20000);
             wrapper.orderByDesc("monitorType").last("limit 1");
-            TbMonitorType temp = tbMonitorTypeMapper.selectOne(wrapper);
+            TbMonitorType temp = baseMapper.selectOne(wrapper);
             if (temp == null) {
                 type = 1;
             } else {
@@ -478,7 +478,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             }
         }
         TbMonitorType tbMonitorType = Param2DBEntityUtil.fromAddPredefinedMonitorTypeParam2tbMonitorType(pa, usrID, type);
-        tbMonitorTypeMapper.insert(tbMonitorType);
+        baseMapper.insert(tbMonitorType);
         List<TbMonitorTypeField> list = Param2DBEntityUtil.buildTbMonitorTypeFieldList(pa.getFieldList(), type);
         tbMonitorTypeFieldMapper.insertBatch(list);
 
@@ -501,7 +501,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 qu.in("monitorType", tbMonitorItems.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toList()));
             }
         }
-        List<TbMonitorType> list = tbMonitorTypeMapper.selectList(qu);
+        List<TbMonitorType> list = baseMapper.selectList(qu);
         if (pa.getGrouped() != null && pa.getGrouped()) {
             if (CollectionUtils.isEmpty(list)) {
                 return Map.of();
@@ -601,5 +601,73 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 .in(TbParameter::getSubjectID, request.getTemplateID())).stream().map(TbParameter::getName).collect(Collectors.toList());
         result.setParamList(paramList);
         return result;
+    }
+
+    @Override
+    public void refreshMonitorTypeCache(RefreshMonitorTypeCacheParam pa) {
+        //参数缓存
+        Map<Integer, List<TbParameter>> paramMap = tbParameterMapper.selectList(new LambdaQueryWrapper<>())
+                .stream().collect(Collectors.groupingBy(TbParameter::getSubjectType));
+        redisService.transaction(operations -> {
+            Optional.ofNullable(pa.getIsClear()).filter(e -> e).ifPresent(e -> {
+                Set<String> keys = operations.keys(RedisKeys.PARAMETER_PREFIX_KEY + "*");
+                if (keys != null && keys.size() > 0) {
+                    operations.delete(keys);
+                }
+            });
+            Optional.of(paramMap).ifPresent(map -> map.forEach((k, v) ->
+                operations.opsForHash().putAll(RedisKeys.PARAMETER_PREFIX_KEY + k,
+                        RedisService.serializeMap(v.stream().collect(Collectors.groupingBy(TbParameter::getSubjectID))))
+            ));
+        });
+        paramMap.clear();
+
+        //监测类型缓存
+        Map<Integer, Object> monitorTypeMap = baseMapper.queryMonitorTypeWithField(Wrappers.emptyWrapper())
+                .stream().map(e -> MonitorTypeCacheData.valueof(e, e.getFieldList()))
+                .collect(Collectors.toMap(MonitorTypeCacheData::getMonitorType, e -> e));
+        redisService.transaction(operations -> {
+            Optional.ofNullable(pa.getIsClear()).filter(b -> b)
+                    .ifPresent(b -> operations.delete(RedisKeys.MONITOR_TYPE_KEY));
+            Optional.of(monitorTypeMap).filter(m -> !m.isEmpty())
+                    .ifPresent(m -> operations.opsForHash().putAll(RedisKeys.MONITOR_TYPE_KEY, RedisService.serializeMap(m)));
+        });
+        monitorTypeMap.clear();
+
+        //监测类型模板缓存
+        List<TbMonitorTypeTemplate> typeTemplates = tbMonitorTypeTemplateMapper.selectList(Wrappers.emptyWrapper());
+        Map<String, List<TbTemplateDataSource>> datasourceMap = tbTemplateDataSourceMapper
+                .selectList(Wrappers.lambdaQuery(TbTemplateDataSource.class)
+                        .in(TbTemplateDataSource::getTemplateDataSourceID,
+                                typeTemplates.stream().map(TbMonitorTypeTemplate::getTemplateDataSourceID).collect(Collectors.toSet())))
+                .stream().collect(Collectors.groupingBy(TbTemplateDataSource::getTemplateDataSourceID));
+
+        Map<Integer, List<TbTemplateFormula>> formulaMap = tbTemplateFormulaMapper
+                .selectList(Wrappers.lambdaQuery(TbTemplateFormula.class)
+                        .in(TbTemplateFormula::getTemplateID,
+                                typeTemplates.stream().map(TbMonitorTypeTemplate::getID).collect(Collectors.toSet())))
+                .stream().collect(Collectors.groupingBy(TbTemplateFormula::getTemplateID));
+
+        Map<Integer, List<TbTemplateScript>> scriptMap = tbTemplateScriptMapper
+                .selectList(Wrappers.lambdaQuery(TbTemplateScript.class)
+                        .in(TbTemplateScript::getTemplateID,
+                                typeTemplates.stream().map(TbMonitorTypeTemplate::getID).collect(Collectors.toSet())))
+                .stream().collect(Collectors.groupingBy(TbTemplateScript::getTemplateID));
+
+        Map<Integer, MonitorTypeTemplateCacheData> templateCacheDataMap = typeTemplates.stream()
+                .filter(template -> datasourceMap.containsKey(template.getTemplateDataSourceID()))
+                .map(template -> MonitorTypeTemplateCacheData.valueOf(template,
+                        datasourceMap.getOrDefault(template.getTemplateDataSourceID(), null),
+                        formulaMap.getOrDefault(template.getID(), List.of()),
+                        scriptMap.getOrDefault(template.getID(), List.of())))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toMap(MonitorTypeTemplateCacheData::getID, e -> e));
+        redisService.transaction(operations -> {
+           Optional.ofNullable(pa.getIsClear()).filter(b -> b)
+                   .ifPresent(b -> operations.delete(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY));
+              Optional.of(templateCacheDataMap).filter(m -> !m.isEmpty())
+                        .ifPresent(m -> operations.opsForHash().putAll(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, RedisService.serializeMap(m)));
+        });
+        templateCacheDataMap.clear();
     }
 }
