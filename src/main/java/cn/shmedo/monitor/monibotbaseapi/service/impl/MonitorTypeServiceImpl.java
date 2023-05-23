@@ -490,6 +490,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
         QueryWrapper<TbMonitorType> qu = new QueryWrapper<>();
         qu.eq(pa.getCreateType() != null, "createType", pa.getCreateType());
+        qu.in("companyID", List.of(-1, pa.getCompanyID()));
         qu.orderByDesc("id");
         if (pa.getProjectID() != null) {
             List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(
