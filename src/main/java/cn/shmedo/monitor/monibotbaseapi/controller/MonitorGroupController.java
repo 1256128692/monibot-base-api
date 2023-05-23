@@ -273,6 +273,7 @@ public class MonitorGroupController {
      * @apiName QueryProjectGroupInfoList
      * @apiDescription 根据工程ID获取工程下监测组别、监测组、监测点、监测点所属传感器信息
      * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {String} monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {Object[]} data 监测组信息
      * @apiSuccess (返回结果) {Int} data.monitorGroupParentID 监测组别ID
      * @apiSuccess (返回结果) {String} data.monitorGroupParentName 监测组名称
@@ -295,7 +296,7 @@ public class MonitorGroupController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
     @PostMapping(value = "/QueryProjectGroupInfoList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryProjectGroupInfoList(@RequestBody @Validated QueryMonitorItemPointListParam pa) {
-        return monitorGroupService.queryProjectGroupInfoList(pa.getProjectID());
+    public Object queryProjectGroupInfoList(@RequestBody @Validated QueryProjectGroupInfoParam pa) {
+        return monitorGroupService.queryProjectGroupInfoList(pa);
     }
 }

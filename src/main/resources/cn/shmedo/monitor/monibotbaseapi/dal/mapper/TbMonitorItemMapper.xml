@@ -430,7 +430,7 @@
 
     <select id="queryMonitorItemNameFullInfo"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemNameFullInfo"
-            parameterType="java.lang.Integer">
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
         SELECT
             (CASE tmi.MonitorClass WHEN 0 THEN '环境监测' WHEN 1 THEN '安全监测' WHEN 2 THEN '工情监测' WHEN 3 THEN '防洪调度指挥监测' WHEN 4 THEN '视频监测' ELSE '其它' END ) monitorClassName,
             tmt.MonitorType monitorTypeID,
@@ -442,10 +442,12 @@
             LEFT JOIN tb_project_info tpi ON tpi.ID = tpmc.ProjectID
             LEFT JOIN tb_monitor_item tmi ON tmi.ProjectID = tpi.ID AND tmi.MonitorClass = tpmc.MonitorClass
             LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmi.MonitorType
-        WHERE
-            tmi.MonitorClass IS NOT NULL
+        WHERE tmi.MonitorClass IS NOT NULL
           AND tmt.MonitorType IS NOT NULL
           AND tmi.ID IS NOT NULL
-          AND tpi.CompanyID = #{companyID}
+          AND tpi.CompanyID = #{param.companyID}
+          <if test="param.projectID != null">
+              AND tpi.ID = #{param.projectID}
+          </if>
     </select>
 </mapper>

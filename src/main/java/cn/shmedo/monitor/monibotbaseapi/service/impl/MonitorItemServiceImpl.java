@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.tag.QueryTagListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
@@ -209,16 +210,16 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     }
 
     @Override
-    public List<CompanyMonitorItemNameInfo> queryMonitorItemNameList(QueryTagListParam pa) {
+    public List<CompanyMonitorItemNameInfo> queryMonitorItemNameList(QueryWorkOrderStatisticsParam pa) {
         Map<String, List<MonitorItemNameFullInfo>> monitorClassMap = tbMonitorItemMapper.queryMonitorItemNameFullInfo(
-                pa.getCompanyID()).stream().collect(Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorClassName));
+                pa).stream().collect(Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorClassName));
         return monitorClassMap.entrySet().stream().map(u -> {
             Map<Integer, List<MonitorItemNameFullInfo>> monitorTypemap = u.getValue().stream().collect(
                     Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorTypeID));
             return CompanyMonitorItemNameInfo.builder().MonitorClassName(u.getKey()).dataList(monitorTypemap.entrySet()
                     .stream().map(w -> {
                         MonitorItemNameFullInfo info = w.getValue().stream().findFirst()
-                                .orElseThrow(() -> new RuntimeException(""));   //Unreachable RuntimeException
+                                .orElseThrow(() -> new RuntimeException("Unreachable RuntimeException"));
                         return MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
                                 .multiSensor(info.getMultiSensor()).monitorTypeName(info.getMonitorTypeName())
                                 .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)

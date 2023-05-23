@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemNameFullInfo;
@@ -10,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemW
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.Date;
@@ -50,7 +52,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     List<TbMonitorItem> selectListByMonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
 
-    List<MonitorItemNameFullInfo> queryMonitorItemNameFullInfo(Integer companyID);
+    List<MonitorItemNameFullInfo> queryMonitorItemNameFullInfo(@Param("param") QueryWorkOrderStatisticsParam param);
 
     List<TbMonitorItem> selectListBySensorIDsAndProjectIDs(List<Integer> sensorIDList, List<Integer> projectIDList);
 }

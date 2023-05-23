@@ -255,8 +255,8 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     }
 
     @Override
-    public List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(Integer projectID) {
-        return tbMonitorGroupMapper.queryProjectGroupInfoList(projectID).stream().collect(Collectors.groupingBy(
+    public List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(QueryProjectGroupInfoParam param) {
+        return tbMonitorGroupMapper.queryProjectGroupInfoList(param).stream().collect(Collectors.groupingBy(
                 ProjectGroupPlainInfo::getMonitorGroupParentID)).values().stream().map(p1 -> p1.stream().findFirst()
                 .map(p2 -> MonitorGroupParentBaseInfo.builder().monitorGroupParentID(p2.getMonitorGroupParentID())
                         .monitorGroupParentName(p2.getMonitorGroupParentName()).monitorGroupParentEnable(
@@ -270,8 +270,9 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                                                         MonitorPointBaseInfo.builder().monitorPointID(p6.getMonitorPointID())
                                                                 .monitorPointName(p6.getMonitorPointName())
                                                                 .monitorPointEnable(p6.getMonitorPointEnable())
-                                                                .multiSensor(p6.getMultiSensor())
-                                                                .sensorDataList(p5.stream()
+                                                                .monitorType(p6.getMonitorType())
+                                                                .monitorItemID(p6.getMonitorItemID())
+                                                                .multiSensor(p6.getMultiSensor()).sensorDataList(p5.stream()
                                                                         .filter(w -> Objects.nonNull(w.getSensorID()))
                                                                         .map(p7 -> SensorBaseInfo.builder().sensorID(
                                                                                 p7.getSensorID()).sensorName(

@@ -280,11 +280,13 @@
     </select>
     <select id="queryProjectGroupInfoList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.ProjectGroupPlainInfo"
-            parameterType="java.lang.Integer">
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.QueryProjectGroupInfoParam">
         SELECT
             tmp.ID monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.`Enable` monitorPointEnable,
+            tmp.MonitorType monitorType,
+            tmp.MonitorItemID monitorItemID,
             tmt.MultiSensor multiSensor,
             tmg1.ID monitorGroupID,
             tmg1.`Name` monitorGroupName,
@@ -297,11 +299,16 @@
             ts.Alias sensorAlias
         FROM
             tb_monitor_point tmp
+            LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
             LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmp.MonitorType
             LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorPointID = tmp.ID
             LEFT JOIN tb_monitor_group tmg1 ON tmg1.ID = tmgp.MonitorGroupID
             LEFT JOIN tb_monitor_group tmg2 ON tmg1.ParentID = tmg2.ID
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
-        WHERE tmg1.ID IS NOT NULL AND tmg2.ID IS NOT NULL AND tmp.ProjectID =#{projectID}
+        WHERE tmg1.ID IS NOT NULL
+          AND tmg2.ID IS NOT NULL
+          AND tmi.ID IS NOT NULL
+          AND tmp.ProjectID =#{param.projectID}
+          AND tmi.`Name` =#{param.monitorItemName}
     </select>
 </mapper>

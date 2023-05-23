@@ -33,5 +33,5 @@ public interface MonitorGroupService {
 
     List<SimpleMonitorInfo> queryMonitorGroupItemNameList(QueryMonitorGroupItemNameListParam pa);
 
-    List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(Integer projectID);
+    List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(QueryProjectGroupInfoParam param);
 }

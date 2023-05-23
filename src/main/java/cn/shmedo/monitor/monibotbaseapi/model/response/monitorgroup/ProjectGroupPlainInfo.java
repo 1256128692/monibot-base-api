@@ -10,6 +10,8 @@ import lombok.Data;
 public class ProjectGroupPlainInfo {
     private Integer monitorPointID;
     private String monitorPointName;
+    private Integer monitorType;
+    private Integer monitorItemID;
     private Boolean monitorPointEnable;
     private Boolean multiSensor;
     private Integer monitorGroupID;
