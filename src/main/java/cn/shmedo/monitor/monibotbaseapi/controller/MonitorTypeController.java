@@ -621,9 +621,9 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Bool} [isClear]  是否在刷新前清除对应缓存,默认为true
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
+     * @apiPermission 系统权限 mdmbase:RefreshMonitorTypeCache
      */
-    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+    @Permission(permissionName = "mdmbase:RefreshMonitorTypeCache")
     @PostMapping(value = "/RefreshMonitorTypeCache", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object refreshMonitorTypeCache(@RequestBody @Validated RefreshMonitorTypeCacheParam pa) {
         monitorTypeService.refreshMonitorTypeCache(pa);
