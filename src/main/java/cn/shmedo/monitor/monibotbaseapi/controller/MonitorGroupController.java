@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -263,5 +264,36 @@ public class MonitorGroupController {
     @PostMapping(value = "/QueryMonitorGroupItemNameList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorGroupItemNameList(@RequestBody @Validated QueryMonitorGroupItemNameListParam pa) {
         return monitorGroupService.queryMonitorGroupItemNameList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryProjectGroupInfoList 根据工程ID获取对应监测组信息
+     * @apiVersion 1.0.0
+     * @apiGroup 监测组模块
+     * @apiName QueryProjectGroupInfoList
+     * @apiDescription 根据工程ID获取工程下监测组别、监测组、监测点、监测点所属传感器信息
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiSuccess (返回结果) {Object[]} data 监测组信息
+     * @apiSuccess (返回结果) {Int} data.monitorGroupParentID 监测组别ID
+     * @apiSuccess (返回结果) {String} data.monitorGroupParentName 监测组名称
+     * @apiSuccess (返回结果) {Boolean} data.monitorGroupParentEnable 监测组别是否启用
+     * @apiSuccess (返回结果) {Object[]} data.monitorGroupDataList 监测组数据列表
+     * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorGroupID 监测组ID
+     * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorGroupName 监测组名称
+     * @apiSuccess (返回结果) {Boolean} data.monitorGroupDataList.monitorGroupEnable 监测组是否启用
+     * @apiSuccess (返回结果) {Object[]} data.monitorGroupDataList.monitorPointDataList 监测点信息
+     * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorPointDataList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorPointDataList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Object[]} data.monitorGroupDataList.monitorPointDataList.sensorDataList 传感器信息
+     * @apiSuccess (返回结果) {Int} data.monitorGroupDataList.monitorPointDataList.sensorDataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorPointDataList.sensorDataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} data.monitorGroupDataList.monitorPointDataList.sensorDataList.sensorAlias 传感器别称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
+    @PostMapping(value = "/QueryProjectGroupInfoList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryProjectGroupInfoList(@RequestBody @Validated QueryMonitorItemPointListParam pa) {
+        return monitorGroupService.queryProjectGroupInfoList(pa.getProjectID());
     }
 }

@@ -156,11 +156,17 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                                        final String fieldToken, final Function<Date, Date> groupFunc) {
         // Date time = DateUtil.parse(map.get("time").toString(), "yyyy-MM-dd HH:mm:ss.SSS");
         //TODO grouping by date
-        //TODO map for,
+        //TODO map keySet for,sort to time list
+
 
 
         return metadataList.stream().collect(Collectors.groupingBy(u -> groupFunc.apply((Date) u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> {
             List<Map<String, Object>> value = u.getValue();
+
+
+            Double sum = value.stream().map(w -> w.get(fieldToken).toString()).map(Double::parseDouble).reduce(Double::sum)
+                    .orElse(0d);
+
 
 
             return Map.of("time", u.getKey(), "dataList", List.of(1));

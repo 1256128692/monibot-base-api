@@ -12,10 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupMonitorItem;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
@@ -255,5 +252,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
     @Override
     public List<SimpleMonitorInfo> queryMonitorGroupItemNameList(QueryMonitorGroupItemNameListParam pa) {
         return tbMonitorGroupMapper.queryMonitorGroupItemNameList(pa);
+    }
+
+    @Override
+    public List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(Integer projectID) {
+        return null;
     }
 }
