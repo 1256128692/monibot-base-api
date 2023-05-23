@@ -270,6 +270,7 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                                                         MonitorPointBaseInfo.builder().monitorPointID(p6.getMonitorPointID())
                                                                 .monitorPointName(p6.getMonitorPointName())
                                                                 .monitorPointEnable(p6.getMonitorPointEnable())
+                                                                .multiSensor(p6.getMultiSensor())
                                                                 .sensorDataList(p5.stream()
                                                                         .filter(w -> Objects.nonNull(w.getSensorID()))
                                                                         .map(p7 -> SensorBaseInfo.builder().sensorID(

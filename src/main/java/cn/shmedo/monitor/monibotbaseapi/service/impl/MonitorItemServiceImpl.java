@@ -25,9 +25,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @EnableTransactionManagement
@@ -218,11 +216,14 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             Map<Integer, List<MonitorItemNameFullInfo>> monitorTypemap = u.getValue().stream().collect(
                     Collectors.groupingBy(MonitorItemNameFullInfo::getMonitorTypeID));
             return CompanyMonitorItemNameInfo.builder().MonitorClassName(u.getKey()).dataList(monitorTypemap.entrySet()
-                    .stream().map(w -> MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
-                            .monitorTypeName(w.getValue().stream().findFirst()
-                                    .map(MonitorItemNameFullInfo::getMonitorTypeName).orElse(null))
-                            .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
-                                    .distinct().toList()).build()).toList()).build();
+                    .stream().map(w -> {
+                        MonitorItemNameFullInfo info = w.getValue().stream().findFirst()
+                                .orElseThrow(() -> new RuntimeException(""));   //Unreachable RuntimeException
+                        return MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
+                                .multiSensor(info.getMultiSensor()).monitorTypeName(info.getMonitorTypeName())
+                                .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
+                                        .distinct().toList()).build();
+                    }).toList()).build();
         }).toList();
     }
 

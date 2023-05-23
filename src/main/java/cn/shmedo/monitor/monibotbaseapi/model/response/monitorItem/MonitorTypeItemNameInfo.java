@@ -12,7 +12,8 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class MonitorTypeItemNameInfo {
-  private  Integer  monitorTypeID;
-           private String monitorTypeName;
+    private Integer monitorTypeID;
+    private String monitorTypeName;
+    private Boolean multiSensor;
     private List<String> monitorItemNameList;
 }

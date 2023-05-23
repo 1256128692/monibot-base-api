@@ -270,6 +270,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {Object[]} list.dataList 数据
      * @apiSuccess (返回结果) {Int} list.dataList.monitorTypeID 监测类型ID
      * @apiSuccess (返回结果) {String} list.dataList.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {Boolean} list.dataList.multiSensor 监测点允许关联多传感器标识
      * @apiSuccess (返回结果) {String[]} list.dataList.monitorItemNameList 监测项目名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorItem

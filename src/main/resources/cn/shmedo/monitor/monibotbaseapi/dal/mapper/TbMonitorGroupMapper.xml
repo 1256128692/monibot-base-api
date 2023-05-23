@@ -285,6 +285,7 @@
             tmp.ID monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.`Enable` monitorPointEnable,
+            tmt.MultiSensor multiSensor,
             tmg1.ID monitorGroupID,
             tmg1.`Name` monitorGroupName,
             tmg1.`Enable` monitorGroupEnable,
@@ -296,6 +297,7 @@
             ts.Alias sensorAlias
         FROM
             tb_monitor_point tmp
+            LEFT JOIN tb_monitor_type tmt ON tmt.MonitorType = tmp.MonitorType
             LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorPointID = tmp.ID
             LEFT JOIN tb_monitor_group tmg1 ON tmg1.ID = tmgp.MonitorGroupID
             LEFT JOIN tb_monitor_group tmg2 ON tmg1.ParentID = tmg2.ID

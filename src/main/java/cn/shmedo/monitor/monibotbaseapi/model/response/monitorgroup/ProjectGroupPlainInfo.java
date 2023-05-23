@@ -11,6 +11,7 @@ public class ProjectGroupPlainInfo {
     private Integer monitorPointID;
     private String monitorPointName;
     private Boolean monitorPointEnable;
+    private Boolean multiSensor;
     private Integer monitorGroupID;
     private String monitorGroupName;
     private Boolean monitorGroupEnable;

@@ -15,5 +15,6 @@ public class MonitorPointBaseInfo {
     private Integer monitorPointID;
     private String monitorPointName;
     private Boolean monitorPointEnable;
+    private Boolean multiSensor;
     private List<SensorBaseInfo> sensorDataList;
 }
