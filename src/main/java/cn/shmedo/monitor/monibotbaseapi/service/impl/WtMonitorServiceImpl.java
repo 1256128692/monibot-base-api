@@ -93,8 +93,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
         LambdaQueryWrapper<TbProjectMonitorClass> pmcWrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
                 .eq(TbProjectMonitorClass::getMonitorClass, pa.getMonitorClassType())
-                .eq(TbProjectMonitorClass::getEnable,true)
-                .in(TbProjectMonitorClass::getProjectID,projectIDList);
+                .eq(TbProjectMonitorClass::getEnable, true)
+                .in(TbProjectMonitorClass::getProjectID, projectIDList);
         List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(pmcWrapper);
         if (CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
             return Collections.emptyList();
@@ -194,8 +194,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     }
 
     /**
-     * @param monitorType  监测类型
-     * @param maps         传感器数据列表
+     * @param monitorType 监测类型
+     * @param maps        传感器数据列表
      */
     private void handleSpecialSensorDataList(Integer monitorType,
                                              List<Map<String, Object>> maps) {
@@ -971,7 +971,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     }
 
 
-
     @Override
     public MonitorItemFieldResponse queryMonitorItemFieldList(QueryMonitorItemFieldListParam pa) {
         Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
@@ -1023,7 +1022,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
 
         // 正序
-        return  responseList.stream()
+        return responseList.stream()
                 .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
                 .collect(Collectors.toList());
     }
@@ -1031,8 +1030,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
     @Override
     public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryMonitorPointHistoryAvgDataPage(QueryMonitorPointHistoryAvgDataPageParam pa) {
-        Long totalCount = 0L;
-        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
 
         List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
@@ -1056,11 +1053,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (CollectionUtil.isNullOrEmpty(responses)) {
             return PageUtil.PageWithMap.empty();
         }
-        totalCount = (long) responses.size();
-
-        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
-        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
-
+        PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
     }
 
     @Override
@@ -1082,15 +1076,13 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
 
         // 正序
-        return  responseList.stream()
+        return responseList.stream()
                 .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
                 .collect(Collectors.toList());
     }
 
     @Override
     public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> querySensorHistoryAvgDataPage(QuerySensorHistoryAvgDataPageParam pa) {
-        Long totalCount = 0L;
-        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
 
         List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListBySensorIDsAndProjectIDs(pa.getSensorIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
@@ -1114,10 +1106,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (CollectionUtil.isNullOrEmpty(responses)) {
             return PageUtil.PageWithMap.empty();
         }
-        totalCount = (long) responses.size();
-
-        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
-        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+        PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
     }
 
     @Override
@@ -1139,7 +1129,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
 
         // 正序
-        return  responseList.stream()
+        return responseList.stream()
                 .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime))
                 .collect(Collectors.toList());
     }
@@ -1147,8 +1137,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
     @Override
     public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryRainPointHistorySumDataPage(QueryRainPointHistorySumDataPageParam pa) {
-        Long totalCount = 0L;
-        Integer pageSize = pa.getPageSize() == 0 ? 1 : pa.getPageSize();
 
         List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
         if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
@@ -1172,10 +1160,77 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         if (CollectionUtil.isNullOrEmpty(responses)) {
             return PageUtil.PageWithMap.empty();
         }
-        totalCount = (long) responses.size();
 
-        List<List<SensorHistoryAvgDataResponse>> lists = CollectionUtil.seperatorList(responses, pa.getPageSize());
-        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(totalCount / pageSize + 1, lists.get(pa.getCurrentPage() - 1), totalCount, null);
+        PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
+    }
+
+
+    @Override
+    public PageUtil.PageWithMap<SensorHistoryAvgDataResponse> queryWaterRainSensorHistoryAvgDataPage(QueryWaterRainSensorHistoryAvgDataPageParam pa) {
+
+        List<SensorHistoryAvgDataResponse> sensorHistoryAvgDataResponseList = tbSensorMapper.selectListByMonitorPointIDsAndProjectIDs(pa.getMonitorPointIDList(), pa.getProjectIDList());
+        if (CollectionUtil.isNullOrEmpty(sensorHistoryAvgDataResponseList)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        Map<Integer, List<SensorHistoryAvgDataResponse>> listMap = sensorHistoryAvgDataResponseList.stream().collect(Collectors.groupingBy(SensorHistoryAvgDataResponse::getMonitorType));
+
+        List<SensorHistoryAvgDataResponse> resultList = new LinkedList<SensorHistoryAvgDataResponse>();
+        List<SensorHistoryAvgDataResponse> waterLevelList = listMap.get(MonitorType.WATER_LEVEL.getKey());
+        List<SensorHistoryAvgDataResponse> flowVelocityList = listMap.get(MonitorType.FLOW_VELOCITY.getKey());
+        List<SensorHistoryAvgDataResponse> rainList = listMap.get(MonitorType.WT_RAINFALL.getKey());
+
+        // 水位类型
+        if (!CollectionUtil.isNullOrEmpty(waterLevelList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.WATER_LEVEL.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = waterLevelList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WATER_LEVEL.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, waterLevelList);
+            resultList.addAll(responseList);
+        }
+        // 流速类型
+        if (!CollectionUtil.isNullOrEmpty(flowVelocityList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.FLOW_VELOCITY.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = flowVelocityList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.FLOW_VELOCITY.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, flowVelocityList);
+            resultList.addAll(responseList);
+        }
+        // 雨量类型
+        if (!CollectionUtil.isNullOrEmpty(rainList)) {
+            List<Integer> waterLevelSensorIDList = sensorHistoryAvgDataResponseList.stream()
+                    .filter(pojo -> pojo.getMonitorType().equals(MonitorType.WT_RAINFALL.getKey()))
+                    .map(SensorHistoryAvgDataResponse::getSensorID).collect(Collectors.toList());
+            Integer monitorPointID = rainList.get(0).getMonitorPointID();
+            List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
+            List<Map<String, Object>> dataList = sensorDataDao.querySensorHistoryAvgData(waterLevelSensorIDList, monitorTypeFields,
+                    pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WT_RAINFALL.getKey());
+            List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
+                    monitorTypeFields, rainList);
+            resultList.addAll(responseList);
+        }
+
+        // 时间倒序
+        List<SensorHistoryAvgDataResponse> responses = resultList.stream()
+                .sorted(Comparator.comparing(SensorHistoryAvgDataResponse::getTime).reversed())
+                .collect(Collectors.toList());
+        if (CollectionUtil.isNullOrEmpty(responses)) {
+            return PageUtil.PageWithMap.empty();
+        }
+
+        PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
     }
 
 
@@ -1266,7 +1321,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Integer sensorIDByV1 = maxV1Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s1 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV1)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double xDeep = null;
-            if (!StringUtil.isNullOrEmpty(s1) ){
+            if (!StringUtil.isNullOrEmpty(s1)) {
                 xDeep = Double.parseDouble(JSONUtil.parseObj(s1).getByPath("$.埋深").toString());
             }
 
@@ -1276,7 +1331,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Integer sensorIDByV3 = maxV3Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s2 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV3)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double yDeep = null;
-            if (!StringUtil.isNullOrEmpty(s2) ){
+            if (!StringUtil.isNullOrEmpty(s2)) {
                 yDeep = Double.parseDouble(JSONUtil.parseObj(s2).getByPath("$.埋深").toString());
             }
 
@@ -1286,7 +1341,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Integer sensorIDByV5 = maxV5Data.map(data -> (Integer) data.get("sensorID")).orElse(0);
             String s3 = pojo.getSensorList().stream().filter(s -> s.getID().equals(sensorIDByV5)).map(TbSensor::getConfigFieldValue).findFirst().orElse(null);
             Double zDeep = null;
-            if (!StringUtil.isNullOrEmpty(s3) ){
+            if (!StringUtil.isNullOrEmpty(s3)) {
                 zDeep = Double.parseDouble(JSONUtil.parseObj(s3).getByPath("$.埋深").toString());
             }
 
