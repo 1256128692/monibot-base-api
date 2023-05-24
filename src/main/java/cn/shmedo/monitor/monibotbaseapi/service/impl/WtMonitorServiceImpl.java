@@ -485,7 +485,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
-        List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID());
+        List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID(), pa.getQueryType());
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(pa.getCompanyID());
 
         // 当前公司下没有工程,则没有监测类型,返回空
@@ -535,7 +535,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
             if (!CollectionUtil.isNullOrEmpty(sensorList)) {
                 // 传感器警报信息
-                item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream().filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType())).collect(Collectors.toList())));
+                item.setWarnInfo(WarnInfo.toBuliderNewVo(sensorList.stream()
+                        .filter(pojo -> pojo.getMonitorType().equals(item.getMonitorType()))
+                        .collect(Collectors.toList())));
             }
             if (!CollectionUtil.isNullOrEmpty(monitorItemList)) {
                 // 监测项目信息列表
@@ -675,9 +677,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     public MonitorPointAllInfo queryMonitorPointBaseInfoList(QueryMonitorPointBaseInfoListParam pa) {
 
         MonitorPointAllInfo vo = new MonitorPointAllInfo();
-        LambdaQueryWrapper<TbMonitorPoint> wrapper = new LambdaQueryWrapper<TbMonitorPoint>()
-                .eq(TbMonitorPoint::getProjectID, pa.getProjectID());
-        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(wrapper);
+        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectListByProjectIDAndMonitorClass(pa.getProjectID(), pa.getMonitorClass());
         if (CollectionUtil.isNullOrEmpty(tbMonitorPoints)) {
             return null;
         }

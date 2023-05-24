@@ -292,12 +292,14 @@
         where ID = #{ID,jdbcType=INTEGER}
     </update>
 
-    <select id="selectStatisticsCountByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <select id="selectStatisticsCountByCompanyID" resultMap="BaseResultMap">
         select ID, Status, MonitorType, MonitorPointID
         from tb_sensor
         where MonitorPointID in (select ID
                                  from tb_monitor_point
-                                 where ProjectID in (select ID from tb_project_info where CompanyID = #{companyID}))
+                                 where MonitorItemID in
+            (select ID from tb_monitor_item where CompanyID = #{companyID} and MonitorClass = #{queryType})
+        )
     </select>
 
     <select id="selectSensorPage"
@@ -498,24 +500,22 @@
     </select>
 
 
-
-
     <select id="selectListBySensorIDsAndProjectIDs"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse">
         select s.ID         as sensorID,
-        s.`Name`     as sensorName,
-        s.Alias      as sensorAlias,
-        s.monitorPointID,
-        s.projectID,
-        s.monitorType,
-        m.Name       as monitorPointName,
-        s.configFieldValue,
-        s.exvalues,
-        pi.projectName,
-        pi.ShortName as projectShortName
+               s.`Name`     as sensorName,
+               s.Alias      as sensorAlias,
+               s.monitorPointID,
+               s.projectID,
+               s.monitorType,
+               m.Name       as monitorPointName,
+               s.configFieldValue,
+               s.exvalues,
+               pi.projectName,
+               pi.ShortName as projectShortName
         from tb_sensor s
-        left join tb_monitor_point m on s.monitorPointID = m.ID
-        left join tb_project_info pi on s.projectID = pi.ID
+                 left join tb_monitor_point m on s.monitorPointID = m.ID
+                 left join tb_project_info pi on s.projectID = pi.ID
         where s.ID in
         <foreach collection="sensorIDList" item="sensorID" separator="," open="(" close=")">
             #{sensorID}
@@ -525,5 +525,4 @@
             #{projectID}
         </foreach>
     </select>
-
 </mapper>

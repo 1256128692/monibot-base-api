@@ -48,7 +48,6 @@ public class MonitorTypeUtil {
             fieldList.add(vo);
         }
 
-        // TODO:注释掉
         // 当前降雨量
         if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())){
 //            FieldSelectInfo vo = new FieldSelectInfo();
@@ -58,12 +57,6 @@ public class MonitorTypeUtil {
 //            // 雨量单位ID:1
 //            vo.setFieldExValue("1");
 //            fieldList.add(vo);
-            FieldSelectInfo currentRainfallInfo = fieldList.stream().filter(vo -> vo.getFieldToken().equals("currentRainfall")).findFirst().orElse(null);
-            assert currentRainfallInfo != null;
-            currentRainfallInfo.setFieldStatisticsType("2");
-            FieldSelectInfo dailyRainfallInfo = fieldList.stream().filter(vo -> vo.getFieldToken().equals("dailyRainfall")).findFirst().orElse(null);
-            assert dailyRainfallInfo != null;
-            dailyRainfallInfo.setFieldStatisticsType("2");
         }
 
         // 物液位

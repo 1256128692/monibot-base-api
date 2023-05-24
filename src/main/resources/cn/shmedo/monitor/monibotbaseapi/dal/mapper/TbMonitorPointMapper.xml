@@ -317,7 +317,7 @@
         <if test="monitorClassType != null">
             and tmi.monitorClass = #{monitorClassType}
         </if>
-        group by tmp.ID,tpmc.Density, tmi.Name;
+        group by tmp.ID, tpmc.Density, tmi.Name;
     </select>
     <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
         select p.*,
@@ -390,25 +390,25 @@
             </foreach>
         </trim>
         <trim prefix="gpsLocation = case" suffix="end,">
-        <foreach collection="list" index="index" item="item">
-            when ID = #{item.ID} then
+            <foreach collection="list" index="index" item="item">
+                when ID = #{item.ID} then
 
-            <choose>
-                <when test="selectUpdate != null and selectUpdate">
-                    <choose>
-                        <when test="item.gpsLocation == null">
-                            gpsLocation
-                        </when>
-                        <otherwise>
-                            #{item.gpsLocation}
-                        </otherwise>
-                    </choose>
-                </when>
-                <otherwise>
-                    #{item.gpsLocation}
-                </otherwise>
-            </choose>
-        </foreach>
+                <choose>
+                    <when test="selectUpdate != null and selectUpdate">
+                        <choose>
+                            <when test="item.gpsLocation == null">
+                                gpsLocation
+                            </when>
+                            <otherwise>
+                                #{item.gpsLocation}
+                            </otherwise>
+                        </choose>
+                    </when>
+                    <otherwise>
+                        #{item.gpsLocation}
+                    </otherwise>
+                </choose>
+            </foreach>
         </trim>
         <trim prefix="imageLocation = case" suffix="end,">
             <foreach collection="list" index="index" item="item">
@@ -529,8 +529,12 @@
 
     <select id="queryGroupPointByGroupIDs"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint">
-        select gp.ImageLocation, gp.MonitorPointID, p.Name as monitorPointName, p.MonitorType, p.MonitorItemID
-        ,gp.MonitorGroupID as groupID
+        select gp.ImageLocation
+             , gp.MonitorPointID
+             , p.Name            as monitorPointName
+             , p.MonitorType
+             , p.MonitorItemID
+             , gp.MonitorGroupID as groupID
         from tb_monitor_point as p
                  right join tb_monitor_group_point as gp on p.ID = gp.MonitorPointID
         where gp.MonitorGroupID in
@@ -540,8 +544,6 @@
     </select>
 
 
-
-
     <select id="selectListByIDList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo">
         select p.ID     as monitorPointID
@@ -549,7 +551,7 @@
              , p.MonitorItemID
              , p.MonitorType
              , i.`Name` as monitorItemName
-             , i.Alias as monitorItemAlias
+             , i.Alias  as monitorItemAlias
              , s.ID     as sensorID
              , s.`Name` as sensorName
              , s.configFieldValue
@@ -566,30 +568,29 @@
     </select>
 
 
-
-
     <select id="selectVideoPointListByCondition"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo">
-        select p.ID     as monitorPointID
-        , p.`Name` as monitorPointName
-        , p.GpsLocation as pointGpsLocation
-        , p.ImageLocation as pointImageLocation
-        , p.MonitorItemID
-        , p.MonitorType
-        , i.`Name` as monitorItemName
-        , i.Alias as monitorItemAlias
-        , s.ID     as sensorID
-        , s.`Name` as sensorName
-        , s.exValues
-        , s.Status
-        , pi.ID as projectID
-        , pi.ProjectName as projectName
-        , pi.ShortName as projectShortName
-        , pi.Location, pi.ProjectAddress
+        select p.ID            as monitorPointID
+             , p.`Name`        as monitorPointName
+             , p.GpsLocation   as pointGpsLocation
+             , p.ImageLocation as pointImageLocation
+             , p.MonitorItemID
+             , p.MonitorType
+             , i.`Name`        as monitorItemName
+             , i.Alias         as monitorItemAlias
+             , s.ID            as sensorID
+             , s.`Name`        as sensorName
+             , s.exValues
+             , s.Status
+             , pi.ID           as projectID
+             , pi.ProjectName  as projectName
+             , pi.ShortName    as projectShortName
+             , pi.Location
+             , pi.ProjectAddress
         from tb_monitor_point as p
-        left join tb_project_info as pi on pi.ID = p.ProjectID
-        left join tb_monitor_item as i on i.ID = p.MonitorItemID
-        left join tb_sensor as s on s.MonitorPointID = p.ID
+                 left join tb_project_info as pi on pi.ID = p.ProjectID
+                 left join tb_monitor_item as i on i.ID = p.MonitorItemID
+                 left join tb_sensor as s on s.MonitorPointID = p.ID
         where p.ProjectID in
         <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
             #{projectID}
@@ -611,45 +612,45 @@
         </if>
         <if test="monitorItemName != null and monitorItemName != ''">
             and (
-            i.Name LIKE CONCAT('%', #{monitorItemName}, '%') or i.Alias LIKE CONCAT('%', #{monitorItemName}, '%')
-            )
+                        i.Name LIKE CONCAT('%', #{monitorItemName}, '%') or
+                        i.Alias LIKE CONCAT('%', #{monitorItemName}, '%')
+                )
         </if>
         and i.MonitorType = #{monitorType}
     </select>
 
 
-
     <select id="selectListByProjectIDsAndMonitorItemName"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor">
         select p.ID     as monitorPointID
-        , p.`Name` as monitorPointName
-        , p.MonitorItemID
-        , i.`Name` as monitorItemName
-        , i.Alias as monitorItemAlias
-        , p.ProjectID
+             , p.`Name` as monitorPointName
+             , p.MonitorItemID
+             , i.`Name` as monitorItemName
+             , i.Alias  as monitorItemAlias
+             , p.ProjectID
         from tb_monitor_point as p
-        left join tb_monitor_item as i on i.ID = p.MonitorItemID
+                 left join tb_monitor_item as i on i.ID = p.MonitorItemID
         where p.ProjectID in
         <foreach collection="projectIDList" item="projectID" separator="," open="(" close=")">
             #{projectID}
         </foreach>
         and i.Alias = #{monitorItemName}
     </select>
+
+
     <select id="selectPointWithItemBaseInfo"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo">
-        SELECT
-            tmp.`ID` ID,
-            tmp.`ProjectID` projectID,
-            tmp.`MonitorType` monitorType,
-            tmp.`Name` name,
-            tmi.ID monitorItemID,
-            tmi.`Name` monitorItemName,
-            tmi.Alias monitorItemAlias
-        FROM
-            tb_monitor_point tmp
-            LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+        SELECT tmp.`ID`          ID,
+               tmp.`ProjectID`   projectID,
+               tmp.`MonitorType` monitorType,
+               tmp.`Name`        name,
+               tmi.ID            monitorItemID,
+               tmi.`Name`        monitorItemName,
+               tmi.Alias         monitorItemAlias
+        FROM tb_monitor_point tmp
+                 LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
         WHERE tmi.ID IS NOT NULL
-        AND tmp.ProjectID IN
+          AND tmp.ProjectID IN
         <foreach collection="projectIDList" item="item" separator="," index="index" open="(" close=")">
             #{item}
         </foreach>
@@ -657,5 +658,16 @@
         <foreach collection="monitorTypeList" item="item" separator="," index="index" open="(" close=")">
             #{item}
         </foreach>
+    </select>
+
+
+    <select id="selectListByProjectIDAndMonitorClass"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint">
+        SELECT *
+        FROM tb_monitor_point tmp
+                 LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
+        WHERE 1= 1
+          AND tmi.ProjectID = #{projectID}
+          AND tmi.MonitorClass = #{monitorClass}
     </select>
 </mapper>
