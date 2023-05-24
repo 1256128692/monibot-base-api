@@ -1,8 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -85,9 +83,9 @@ public class QueryWtWarnLogPageParam implements ParameterValidator, ResourcePerm
         }
 
         warnType = Optional.ofNullable(warnType).orElse(1);
-        DateTime now = DateTime.now();
-        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
-        endTime = Optional.ofNullable(endTime).orElse(now);
+//        DateTime now = DateTime.now();
+//        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
+//        endTime = Optional.ofNullable(endTime).orElse(now);
         return null;
     }
 

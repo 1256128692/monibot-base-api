@@ -154,7 +154,8 @@
             <if test="param.queryCode != null and param.queryCode != ''">
                 AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
                 OR twl.DeviceToken LIKE CONCAT('%', #{param.queryCode}, '%')
-                OR tmp.`Name` LIKE CONCAT('%', #{param.queryCode}, '%'))
+                OR tmp.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
+                OR tpi.ProjectName LIKE CONCAT('%', #{param.queryCode}, '%'))
             </if>
             <if test="param.monitorItemID != null">
                 AND twl.monitorItemID=#{param.monitorItemID}

@@ -120,8 +120,8 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                     .filter(e -> StrUtil.isEmpty(param.getQueryCode())
                             || (StrUtil.contains(e.getDeviceToken(), param.getQueryCode()))
                             || (StrUtil.contains(e.getWarnName(), param.getQueryCode()))
-                            || (StrUtil.contains(e.getWarnContent(), param.getQueryCode()))
                             || e.getProjectList().stream().flatMap(p -> p.getMonitorPointList().stream()).anyMatch(m -> m.getMonitorPointName().contains(param.getQueryCode()))
+                            || e.getProjectList().stream().anyMatch(i -> i.getProjectName().contains(param.getQueryCode()))
                     ).toList();
             return PageUtil.page(result, param.getPageSize(), param.getCurrentPage());
         }

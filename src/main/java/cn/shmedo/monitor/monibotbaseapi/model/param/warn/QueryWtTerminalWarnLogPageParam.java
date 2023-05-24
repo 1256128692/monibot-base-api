@@ -1,8 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
@@ -100,9 +98,9 @@ public class QueryWtTerminalWarnLogPageParam implements ParameterValidator, Reso
                     .eq(TbMonitorItem::getID, monitorItemID)) > 0, "监测项目不存在");
         });
 
-        DateTime now = DateTime.now();
-        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
-        endTime = Optional.ofNullable(endTime).orElse(now);
+//        DateTime now = DateTime.now();
+//        beginTime = Optional.ofNullable(beginTime).orElse(DateUtil.offsetDay(now, -7));
+//        endTime = Optional.ofNullable(endTime).orElse(now);
         warnType = Optional.ofNullable(warnType).orElse(3);
         return null;
     }
