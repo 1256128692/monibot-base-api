@@ -14,10 +14,11 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
@@ -50,8 +51,10 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
-import lombok.AllArgsConstructor;
+import jakarta.annotation.Resource;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,7 +69,7 @@ import java.util.stream.Collectors;
  **/
 @EnableTransactionManagement
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService {
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbTagMapper tbTagMapper;
@@ -75,14 +78,18 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbPropertyMapper tbPropertyMapper;
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final FileConfig fileConfig;
-    private final RedisService redisService;
     private final PropertyService propertyService;
     private final MdInfoService mdInfoService;
     private final TbProjectConfigMapper tbProjectConfigMapper;
     private final FileService fileService;
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
-    private static final String TOKEN_HEADER = "Authorization";
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
+    private RedisService monitorRedisService;
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.IOT_REDIS_SERVICE)
+    private RedisService iotRedisService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -367,12 +374,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .queryPropertyByProjectID(ids, 0).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
             //行政区划
-            Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, pageData.getRecords()
+            Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, pageData.getRecords()
                             .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull)
                             .collect(Collectors.toSet()), RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
             //公司信息
-            Map<Integer, Company> companyMap = redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, pageData.getRecords()
+            Map<Integer, Company> companyMap = iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, pageData.getRecords()
                             .stream().map(s -> s.getCompanyID().toString()).collect(Collectors.toSet()), Company.class)
                     .stream().collect(Collectors.toMap(Company::getId, e -> e));
             //图片 TODO 任意文件不存在会返回null，故无法批量获取
@@ -405,7 +412,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
         result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
         if (StrUtil.isNotEmpty(result.getLocationInfo())) {
-            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
+            RegionArea area = monitorRedisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
             result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
         }
 
@@ -534,7 +541,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }).filter(Objects::nonNull).collect(Collectors.toSet());
         Map<String, String> areaMap = areas.isEmpty() ?
                 Collections.emptyMap() :
-                redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                         .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
 
         //按项目类型分组处理

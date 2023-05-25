@@ -9,25 +9,26 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbReportMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareInterval;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.param.report.WtQueryReportParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.report.WtQueryReportInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.report.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorWarnUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import cn.shmedo.monitor.monibotbaseapi.model.response.report.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -41,10 +42,18 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbReportServiceImpl implements ITbReportService {
-    private final RedisService redisService;
+
     private final TbReportMapper tbReportMapper;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final SensorDataDao sensorDataDao;
+
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.IOT_REDIS_SERVICE)
+    private final RedisService iotRedisService;
+
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
+    private final RedisService monitorRedisService;
     private final Map<String, Integer> dataListOrderMap = Map.of("环境监测", 1, "安全监测", 2, "视频监测", 3);
 
     @Override
@@ -58,7 +67,7 @@ public class TbReportServiceImpl implements ITbReportService {
                             Collection<Object> collection = new ArrayList<>();
                             collection.add(u);
                             return collection;
-                        }).map(u -> redisService.multiGet(RedisKeys.COMPANY_INFO_KEY, u, Company.class))
+                        }).map(u -> iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, u, Company.class))
                         .filter(CollectionUtil::isNotEmpty).map(u -> u.get(0)).map(Company::getShortName)
                         .orElse("余姚市水务局")).startTime(startTime).endTime(endTime);
         List<TbBaseReportInfo> tbBaseReportInfoList = tbReportMapper.queryBaseReportInfo(param.getCompanyID(),
@@ -125,7 +134,7 @@ public class TbReportServiceImpl implements ITbReportService {
 
     private Map<String, String> queryAreaData(final Collection<Object> areaCodeList) {
         return Optional.of(areaCodeList).filter(CollectionUtil::isNotEmpty)
-                .map(u -> redisService.multiGet(RedisKeys.REGION_AREA_KEY, u).stream()
+                .map(u -> monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, u).stream()
                         .map(w -> {
                             JSONObject jsonObject = JSONUtil.parseObj(w);
                             return Optional.ofNullable(jsonObject.getStr("areaCode")).map(s -> {

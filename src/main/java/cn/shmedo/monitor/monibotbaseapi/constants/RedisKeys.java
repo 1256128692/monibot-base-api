@@ -13,12 +13,14 @@ public class RedisKeys {
     public static final String REGION_AREA_KEY = "cn.shmedo.monitor.regionArea";
 
     /**
-     * 公司信息缓存
+     * 公司信息缓存<br/>
+     * 缓存位于iot-redis，请使用iotRedisTemplate、iotRedisService
      */
-    public static final String COMPANY_INFO_KEY = "cn.shmedo.mdauth.companyInfo";
+    public static final String IOT_COMPANY_INFO_KEY = "cn.shmedo.mdauth.companyInfo";
 
     /**
-     * 物模型缓存
+     * 物模型缓存<br/>
+     * 缓存位于iot-redis，请使用iotRedisTemplate、iotRedisService
      */
     public static final String IOT_MODEL_KEY = "cn.shmedo.iot.model";
 
