@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
@@ -79,6 +81,15 @@ public class QueryVideoMonitorPointHistoryLiveInfoParam  implements ParameterVal
                     pojo.setYsChannelNo(dict.get("ysChannelNo").toString());
                 }
             });
+        }
+
+        if (beginTime.after(endTime)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
+        }
+
+        long between = DateUtil.between(beginTime, endTime, DateUnit.DAY);
+        if (between > 7) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "最多查询一周范围内的时间");
         }
 
         return null;

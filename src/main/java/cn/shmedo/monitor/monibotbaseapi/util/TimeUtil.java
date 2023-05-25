@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
@@ -462,6 +463,34 @@ public class TimeUtil {
         LocalDate endDate = end.toLocalDateTime().toLocalDate();
 
         return !beginDate.isEqual(currentDate) && !endDate.isEqual(currentDate);
+    }
+
+
+    /**
+     * 当density为1的时候,校验begin和end是否为当天
+     * 当density为2的时候,校验begin和end是否为当月
+     * 当density为3的时候,校验begin和end是否为当年
+     * @param begin
+     * @param end
+     * @return 如果符合条件,则返回true
+     */
+    public static boolean validateTime(Timestamp begin, Timestamp end, int density) {
+        LocalDate beginDate = begin.toLocalDateTime().toLocalDate();
+        LocalDate endDate = end.toLocalDateTime().toLocalDate();
+
+        switch (density) {
+            case 1: // 当天
+                return beginDate.isEqual(LocalDate.now()) || endDate.isEqual(LocalDate.now());
+            case 2: // 当月
+                LocalDate now = LocalDate.now();
+                LocalDate firstDayOfMonth = now.withDayOfMonth(1);
+                return  ( beginDate.isAfter(firstDayOfMonth)) || ( endDate.isAfter(firstDayOfMonth));
+            case 3: // 当年
+                LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
+                return (beginDate.isAfter(firstDayOfYear)) || (endDate.isAfter(firstDayOfYear));
+            default:
+                return false;
+        }
     }
 
 }

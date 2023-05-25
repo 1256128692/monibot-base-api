@@ -45,7 +45,8 @@ public class QueryWaterRainSensorHistoryAvgDataParam implements ParameterValidat
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表没有对应的监测项目");
         } else {
             long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
-            if (count != 3) {
+            long monitorTypeCount = monitorItemList.stream().map(TbMonitorItem::getMonitorType).distinct().count();
+            if (count != 3 && monitorTypeCount != 3) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表所属不同监测项目");
             }
         }
@@ -59,9 +60,13 @@ public class QueryWaterRainSensorHistoryAvgDataParam implements ParameterValidat
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
         }
 
-        if (!TimeUtil.validateTimestamps(begin, end)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询时间不能为当日,只能查询昨日以及之前的数据统计");
+        // 密度不为全部时,需要加入时间校验
+        if (density != AvgDensityType.ALL.getValue()) {
+            if (TimeUtil.validateTime(begin, end, density)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度为(日,月,年)时,开始或者结束时间分别不得为(当日,当月,当年)");
+            }
         }
+
         return null;
     }
 

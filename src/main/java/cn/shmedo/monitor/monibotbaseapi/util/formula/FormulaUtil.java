@@ -2,9 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.util.formula;
 
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
 import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.mariuszgromada.math.mxparser.Expression;
@@ -101,7 +102,7 @@ public class FormulaUtil {
         final String originFormula = formula;
         //检查参数是否设值
         collection.stream().filter(e -> e.getFieldValue() == null).findFirst().ifPresent(e -> {
-            throw new IllegalArgumentException(StrUtil.format("参数 {} 未设值", e.getOrigin()));
+            throw new IllegalArgumentException(StrUtil.format("缺少必要参数"));
         });
 
         for (FormulaData data : collection) {
@@ -109,9 +110,11 @@ public class FormulaUtil {
         }
         //调用mathParser进行计算
         Expression e = new Expression(formula);
-        double result = e.calculate();
-        Assert.isFalse(Double.isNaN(result), "公式错误: {} => {} = {}", originFormula, formula, result);
-        return result;
+        if (e.checkSyntax() || e.checkLexSyntax()) {
+            return e.calculate();
+        }
+        log.warn("公式错误: {} => {}", originFormula, e.getExpressionString());
+        throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "公式错误, 请检查公式配置");
     }
 
     /**

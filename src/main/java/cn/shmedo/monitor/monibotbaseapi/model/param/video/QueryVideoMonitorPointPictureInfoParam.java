@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLi
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Arrays;
@@ -26,12 +27,15 @@ import java.util.List;
 @Data
 public class QueryVideoMonitorPointPictureInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-
+    @NotNull(message = "监测工程不能为空")
     private Integer projectID;
+    @NotNull(message = "监测点不能为空")
     private Integer monitorPointID;
 
+    @NotNull(message = "开始时间不能为空")
     private Date beginTime;
 
+    @NotNull(message = "结束时间不能为空")
     private Date endTime;
 
     @JsonIgnore

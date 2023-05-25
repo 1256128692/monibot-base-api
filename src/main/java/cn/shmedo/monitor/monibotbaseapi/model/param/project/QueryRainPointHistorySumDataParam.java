@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -59,8 +60,11 @@ public class QueryRainPointHistorySumDataParam  implements ParameterValidator, R
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
         }
 
-        if (!TimeUtil.validateTimestamps(begin, end)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询时间不能为当日,只能查询昨日以及之前的数据统计");
+        // 密度不为全部时,需要加入时间校验
+        if (density != AvgDensityType.ALL.getValue()) {
+            if (TimeUtil.validateTime(begin, end, density)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度为(日,月,年)时,开始或者结束时间分别不得为(当日,当月,当年)");
+            }
         }
         return null;
     }

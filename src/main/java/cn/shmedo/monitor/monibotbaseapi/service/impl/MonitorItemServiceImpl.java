@@ -1,14 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemFieldMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.tag.QueryTagListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorClassInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeAndChildMonitorItemInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -204,6 +212,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
         }
         queryWrapper.orderByDesc("ID");
+        Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper.lambda()
+                .and(wrapper -> wrapper.like(TbMonitorItem::getAlias, e).or().like(TbMonitorItem::getName, e)));
         return tbMonitorItemMapper.selectList(
                 queryWrapper
         );
