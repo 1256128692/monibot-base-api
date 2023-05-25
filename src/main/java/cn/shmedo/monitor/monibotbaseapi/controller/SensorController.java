@@ -63,6 +63,7 @@ public class SensorController {
      * @apiParam (请求体) {Int} pageSize 分页大小 (1-100)
      * @apiParam (请求体) {Int} currentPage 当前页码 (大于0)
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {String} [keyword] 聚合模糊检索 (传感器名称, 关联监测点名称)
      * @apiParam (请求体) {String} [sensorName] 传感器名称 模糊查询
      * @apiParam (请求体) {String} [monitorType] 监测类型名称 模糊查询
      * @apiParam (请求体) {String} [monitorPoint] 关联监测点名称

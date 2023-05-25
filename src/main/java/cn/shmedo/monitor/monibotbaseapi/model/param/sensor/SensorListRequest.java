@@ -23,6 +23,11 @@ public class SensorListRequest implements ParameterValidator, ResourcePermission
     private Integer projectID;
 
     /**
+     * 聚合模糊查询关键字
+     */
+    private String keyword;
+
+    /**
      * 传感器名称 模糊查询
      */
     private String sensorName;

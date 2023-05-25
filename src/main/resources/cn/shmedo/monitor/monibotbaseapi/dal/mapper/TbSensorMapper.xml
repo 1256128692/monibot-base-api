@@ -319,6 +319,9 @@
                  LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
         <where>
             <trim suffixOverrides="AND">
+                <if test="pa.keyword != null and pa.keyword != ''">
+                    (ts.`Alias` LIKE CONCAT('%', #{pa.keyword}, '%') OR tmp.`Name` LIKE CONCAT('%', #{pa.keyword}, '%')) AND
+                </if>
                 <if test="pa.sensorName != null and pa.sensorName != ''">
                     ts.`Alias` LIKE CONCAT('%', #{pa.sensorName}, '%')
                       AND
