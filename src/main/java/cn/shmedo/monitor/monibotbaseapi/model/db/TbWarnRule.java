@@ -12,6 +12,7 @@ public class TbWarnRule {
      * 主键
      */
     private Integer ID;
+    private Integer companyID;
 
     /**
      * 规则类型, 1:报警规则 2:视频规则 3:智能终端规则
@@ -110,6 +111,14 @@ public class TbWarnRule {
 
     public void setID(Integer ID) {
         this.ID = ID;
+    }
+
+    public Integer getCompanyID() {
+        return companyID;
+    }
+
+    public void setCompanyID(Integer companyID) {
+        this.companyID = companyID;
     }
 
     public Byte getRuleType() {

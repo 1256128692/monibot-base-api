@@ -248,6 +248,7 @@ public class Param2DBEntityUtil {
     public static TbWarnRule fromAddWtDeviceWarnRuleParam2TbWarnRule(AddWtDeviceWarnRuleParam pa, Integer userID) {
         Date now = new Date();
         TbWarnRule obj = new TbWarnRule();
+        obj.setCompanyID(pa.getCompanyID());
         obj.setRuleType(pa.getRuleType());
         obj.setProjectID(pa.getProjectID());
         obj.setMonitorType(pa.getMonitorType());

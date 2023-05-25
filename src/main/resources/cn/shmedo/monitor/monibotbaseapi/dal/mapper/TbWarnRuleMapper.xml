@@ -5,6 +5,7 @@
     <!--@mbg.generated-->
     <!--@Table tb_warn_rule-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
     <result column="RuleType" jdbcType="TINYINT" property="ruleType" />
     <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
     <result column="MonitorType" jdbcType="INTEGER" property="monitorType" />
@@ -26,7 +27,7 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, RuleType, ProjectID, MonitorType, MonitorItemID, MonitorPointID, SensorID, ProductID,
+    ID, CompanyID, RuleType, ProjectID, MonitorType, MonitorItemID, MonitorPointID, SensorID, ProductID,
     DeviceCSV, VideoType, VideoCSV, `Name`, `Enable`, ExValue, `Desc`, CreateTime, CreateUserID,
     UpdateTime, UpdateUserID
   </sql>
@@ -44,14 +45,14 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_warn_rule (RuleType, ProjectID, MonitorType,
+    insert into tb_warn_rule (RuleType, CompanyID, ProjectID, MonitorType,
       MonitorItemID, MonitorPointID, SensorID,
       ProductID, DeviceCSV, VideoType,
       VideoCSV, `Name`, `Enable`,
       ExValue, `Desc`, CreateTime,
       CreateUserID, UpdateTime, UpdateUserID
       )
-    values (#{ruleType,jdbcType=TINYINT}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER},
+    values (#{ruleType,jdbcType=TINYINT}, #{companyID,jdbcType=INTEGER}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER},
       #{monitorItemID,jdbcType=INTEGER}, #{monitorPointID,jdbcType=INTEGER}, #{sensorID,jdbcType=INTEGER},
       #{productID,jdbcType=INTEGER}, #{deviceCSV,jdbcType=LONGVARCHAR}, #{videoType,jdbcType=VARCHAR},
       #{videoCSV,jdbcType=LONGVARCHAR}, #{name,jdbcType=VARCHAR}, #{enable,jdbcType=BIT},
@@ -65,6 +66,9 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="ruleType != null">
         RuleType,
+      </if>
+      <if test="companyID != null">
+        CompanyID,
       </if>
       <if test="projectID != null">
         ProjectID,
@@ -121,6 +125,9 @@
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="ruleType != null">
         #{ruleType,jdbcType=TINYINT},
+      </if>
+      <if test="companyID != null">
+         #{companyID,jdbcType=INTEGER},
       </if>
       <if test="projectID != null">
         #{projectID,jdbcType=INTEGER},
@@ -182,6 +189,9 @@
       <if test="ruleType != null">
         RuleType = #{ruleType,jdbcType=TINYINT},
       </if>
+      <if test="companyID != null">
+          CompanyID = #{companyID,jdbcType=INTEGER},
+      </if>
       <if test="projectID != null">
         ProjectID = #{projectID,jdbcType=INTEGER},
       </if>
@@ -240,6 +250,7 @@
     <!--@mbg.generated-->
     update tb_warn_rule
     set RuleType = #{ruleType,jdbcType=TINYINT},
+      CompanyID = #{companyID,jdbcType=INTEGER},
       ProjectID = #{projectID,jdbcType=INTEGER},
       MonitorType = #{monitorType,jdbcType=INTEGER},
       MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
@@ -264,6 +275,7 @@
         SELECT
             twr.ID 'ID',
             twr.RuleType ruleType,
+            twr.CompanyID companyID,
             twr.ProjectID projectID,
             twr.MonitorType monitorType,
             twr.MonitorItemID monitorItemID,
@@ -283,7 +295,7 @@
             twr.UpdateUserID updateUserID
         FROM
             tb_warn_rule twr
-      LEFT JOIN ( SELECT twt.RuleID ruleID, GROUP_CONCAT( twt.`Name` ) warnNames FROM tb_warn_trigger twt GROUP BY twt.RuleID ) t ON t.ruleID = twr.ID
+            LEFT JOIN ( SELECT twt.RuleID ruleID, GROUP_CONCAT( twt.`Name` ) warnNames FROM tb_warn_trigger twt GROUP BY twt.RuleID ) t ON t.ruleID = twr.ID
         WHERE twr.RuleType =#{param.ruleType}
         <if test="param.ruleType == 1">
           AND twr.`ProjectID` IN
@@ -308,6 +320,9 @@
         </if>
         <if test="param.monitorPointID != null">
             AND twr.`MonitorPointID`=#{param.monitorPointID}
+        </if>
+        <if test="param.companyID != null">
+            AND twr.CompanyID=#{param.companyID}
         </if>
         <if test="param.ruleType == 2 and param.queryCode != null and param.queryCode != ''">
             AND (t.warnNames LIKE CONCAT('%',#{param.queryCode},'%') OR twr.ExValue LIKE CONCAT('%',#{param.queryCode},'%') OR twr.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
@@ -368,6 +383,7 @@
     update tb_warn_rule set
         RuleType = #{ruleType,jdbcType=INTEGER},
         ProjectID = #{projectID,jdbcType=INTEGER},
+        CompanyID = #{companyID,jdbcType=INTEGER},
         MonitorType = #{monitorType,jdbcType=INTEGER},
         MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
         MonitorPointID = #{monitorPointID,jdbcType=INTEGER},

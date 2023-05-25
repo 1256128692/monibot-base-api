@@ -43,6 +43,7 @@ public class AddWtEngineParam implements ParameterValidator, ResourcePermissionP
     public static TbWarnRule build(AddWtEngineParam param) {
         Date current = new Date();
         TbWarnRule res = new TbWarnRule();
+        res.setCompanyID(param.getCompanyID());
         res.setName(param.getEngineName());
         res.setDesc(param.getEngineDesc());
         res.setCreateTime(current);
