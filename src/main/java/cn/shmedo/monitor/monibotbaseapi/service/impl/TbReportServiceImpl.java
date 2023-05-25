@@ -45,6 +45,7 @@ public class TbReportServiceImpl implements ITbReportService {
     private final TbReportMapper tbReportMapper;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final SensorDataDao sensorDataDao;
+    private final Map<String, Integer> dataListOrderMap = Map.of("环境监测", 1, "安全监测", 2, "视频监测", 3);
 
     @Override
     public WtQueryReportInfo queryReport(WtQueryReportParam param) {
@@ -68,7 +69,8 @@ public class TbReportServiceImpl implements ITbReportService {
         List<TbBaseReportInfo> reduceTbBaseReportInfoList = reduceSensorToPoint(tbBaseReportInfoList, sensorIDResMap);
         Map<String, List<TbBaseReportInfo>> monitorClassInfoMap = reduceTbBaseReportInfoList.stream()
                 .collect(Collectors.groupingBy(TbBaseReportInfo::getMonitorTypeClass));
-        builder.total(reduceTbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream().toList())
+        builder.total(reduceTbBaseReportInfoList.size()).monitorClassList(monitorClassInfoMap.keySet().stream()
+                        .sorted((o1, o2) -> dataListOrderMap.get(o1) - dataListOrderMap.get(o2)).toList())
                 .dataList(dealDataList(monitorClassInfoMap, sensorIDResMap, queryAreaData(areaCodeList)));
         if (CollectionUtil.isNotEmpty(projectIDList)) {
             builder.projectDataList(dealProjectData(projectIDList, sensorIDResMap, startTime, endTime));
@@ -195,7 +197,8 @@ public class TbReportServiceImpl implements ITbReportService {
             }).toList();
             return info;
         }).map(res::add).toList();
-        return res;
+        return res.stream().sorted((o1, o2) -> dataListOrderMap.get(o1.getMonitorClass())
+                - dataListOrderMap.get(o2.getMonitorClass())).toList();
     }
 
     private List<WtReportWarn> dealWarnList(final List<TbBaseReportInfo> infoList) {
