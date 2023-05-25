@@ -7,7 +7,6 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.tag.QueryTagListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import lombok.AllArgsConstructor;
@@ -244,6 +243,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [createType] 创建类型
      * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
+     * @apiParam (请求参数) {String} [keyword] 模糊检索关键字，支持: 监测项目名称、监测项目别名
      * @apiSuccess (返回结果) {Object[]} list 监测项目列表
      * @apiSuccess (返回结果) {Int} list.id 监测项目ID
      * @apiSuccess (返回结果) {String} list.name 监测项目名称
