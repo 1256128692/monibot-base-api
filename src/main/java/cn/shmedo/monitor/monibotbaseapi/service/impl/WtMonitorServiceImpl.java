@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
@@ -216,6 +217,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 //                key = "levelChange";
 //                typeKey = "distance";
 //            }
+
+
             if (monitorType.equals(MonitorType.STRESS.getKey())) {
                 key = "strainPeriodDisp";
                 typeKey = "strain";
@@ -228,44 +231,68 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             }
 
 
-            // 处理变化值,规则当前的数据减去上一笔时间的数据
-            for (int i = 0; i < maps.size(); i++) {
-                Map<String, Object> map = maps.get(i);
-                String timeStr = (String) map.get("time");
-                long time = DateUtil.parse(timeStr).getTime();
+            // 处理变化值,规则当前的数据减去上一笔时间的数据.暂不删除,需求可能会变回来
+//            for (int i = 0; i < maps.size(); i++) {
+//                Map<String, Object> map = maps.get(i);
+//                String timeStr = (String) map.get("time");
+//                long time = DateUtil.parse(timeStr).getTime();
+//
+//                long lastDataTime = 0L;
+//                if (density.endsWith("h")) {
+//                    // 小时为单位
+//                    String hour = density.replaceAll("h", "");
+//                    Integer hourInt = Integer.valueOf(hour);
+//                    lastDataTime = time - hourInt * 60 * 60 * 1000;
+//                } else {
+//                    // 分钟为单位
+//                    String minute = density.replaceAll("m", "");
+//                    Integer minuteInt = Integer.valueOf(minute);
+//                    lastDataTime = time - minuteInt * 60 * 1000;
+//                }
+//
+//                // 在之前的Map对象中查找相应的v1值
+//                for (int j = 0; j < maps.size(); j++) {
+//                    Map<String, Object> prevMap = maps.get(j);
+//                    String prevTimeStr = (String) prevMap.get("time");
+//                    long prevTime = DateUtil.parse(prevTimeStr).getTime();
+//                    if (prevTime == lastDataTime && prevMap.get("sensorID").equals(map.get("sensorID"))) {
+//                        // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
+//                        if (prevMap.containsKey(typeKey)) {
+//                            double v1TwoHoursAgo = (double) prevMap.get(typeKey);
+//                            // 计算stressChange并添加到当前Map对象中
+//                            double changeValue = (double) map.get(typeKey) - v1TwoHoursAgo;
+//                            BigDecimal changeBD = new BigDecimal(changeValue);
+//                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+//                            map.put(key, rounded);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
 
-                long lastDataTime = 0L;
-                if (density.endsWith("h")) {
-                    // 小时为单位
-                    String hour = density.replaceAll("h", "");
-                    Integer hourInt = Integer.valueOf(hour);
-                    lastDataTime = time - hourInt * 60 * 60 * 1000;
-                } else {
-                    // 分钟为单位
-                    String minute = density.replaceAll("m", "");
-                    Integer minuteInt = Integer.valueOf(minute);
-                    lastDataTime = time - minuteInt * 60 * 1000;
+
+            Map<Integer, List<Map<String, Object>>> groupedMapsBySensorID = maps.stream()
+                    .collect(Collectors.groupingBy(map -> (Integer) map.get("sensorID")));
+
+            for (List<Map<String, Object>> sensorMaps : groupedMapsBySensorID.values()) {
+                sensorMaps.sort(Comparator.comparing(map -> (String) map.get("time"), Comparator.reverseOrder()));
+
+                for (int i = 0; i < sensorMaps.size() - 1; i++) {
+                    Map<String, Object> currentMap = sensorMaps.get(i);
+                    Map<String, Object> nextMap = sensorMaps.get(i + 1);
+
+                    double currentStrain = (double) currentMap.get(typeKey);
+                    double nextStrain = (double) nextMap.get(typeKey);
+
+                    double periodDisp = currentStrain - nextStrain;
+                    BigDecimal rounded = BigDecimal.valueOf(periodDisp).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    periodDisp = rounded.doubleValue();
+
+                    currentMap.put(key, periodDisp);
                 }
 
-                // 在之前的Map对象中查找相应的v1值
-                for (int j = 0; j < maps.size(); j++) {
-                    Map<String, Object> prevMap = maps.get(j);
-                    String prevTimeStr = (String) prevMap.get("time");
-                    long prevTime = DateUtil.parse(prevTimeStr).getTime();
-                    if (prevTime == lastDataTime && prevMap.get("sensorID").equals(map.get("sensorID"))) {
-                        // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
-                        if (prevMap.containsKey(typeKey)) {
-                            double v1TwoHoursAgo = (double) prevMap.get(typeKey);
-                            // 计算stressChange并添加到当前Map对象中
-                            double changeValue = (double) map.get(typeKey) - v1TwoHoursAgo;
-                            BigDecimal changeBD = new BigDecimal(changeValue);
-                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
-                            map.put(key, rounded);
-                            break;
-                        }
-                    }
-                }
             }
+
         }
     }
 
