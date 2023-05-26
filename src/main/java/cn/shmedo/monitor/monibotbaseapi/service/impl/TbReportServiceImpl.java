@@ -241,8 +241,10 @@ public class TbReportServiceImpl implements ITbReportService {
                     .monitorItemName(n.getMonitorItemName()).projectTypeName(n.getProjectTypeName())
                     .areaName(Optional.ofNullable(n.getAreaCode()).map(areaCodeNameMap::get).orElse("-"))
                     .time(getInfluxDataTime(influxData)).build();
-            getCustomFieldColumnTupleList(n.getCustomColumn()).stream().peek(s -> formDataInfo.addFieldDataList(
-                    s.getItem2(), Optional.ofNullable(influxData.get(s.getItem1())).orElse("-"))).toList();
+            getCustomFieldColumnTupleList(n.getCustomColumn()).stream()
+                    .filter(s -> !("video".equalsIgnoreCase(s.getItem1()) || "image".equalsIgnoreCase(s.getItem1())))
+                    .peek(s -> formDataInfo.addFieldDataList(
+                            s.getItem2(), Optional.ofNullable(influxData.get(s.getItem1())).orElse("-"))).toList();
             return formDataInfo;
         }).toList();
     }
