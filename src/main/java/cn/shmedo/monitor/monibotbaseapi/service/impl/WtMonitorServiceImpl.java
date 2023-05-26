@@ -205,7 +205,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
         if (monitorType.equals(MonitorType.STRESS.getKey())
                 || monitorType.equals(MonitorType.PRESSURE.getKey())
-                || monitorType.equals(MonitorType.WATER_LEVEL.getKey())
                 || monitorType.equals(MonitorType.ONE_DIMENSIONAL_DISPLACEMENT.getKey())
                 || monitorType.equals(MonitorType.THREE_DIMENSIONAL_DISPLACEMENT.getKey())
                 || monitorType.equals(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
