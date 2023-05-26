@@ -208,6 +208,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 || monitorType.equals(MonitorType.ONE_DIMENSIONAL_DISPLACEMENT.getKey())
                 || monitorType.equals(MonitorType.THREE_DIMENSIONAL_DISPLACEMENT.getKey())
                 || monitorType.equals(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
+            if (StringUtil.isNullOrEmpty(density)) {
+                return;
+            }
 
 //            if (monitorType.equals(MonitorType.LEVEL.getKey()) || monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
 //                key = "levelChange";
@@ -249,7 +252,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     Map<String, Object> prevMap = maps.get(j);
                     String prevTimeStr = (String) prevMap.get("time");
                     long prevTime = DateUtil.parse(prevTimeStr).getTime();
-                    if (prevTime == lastDataTime  && prevMap.get("sensorID").equals(map.get("sensorID"))) {
+                    if (prevTime == lastDataTime && prevMap.get("sensorID").equals(map.get("sensorID"))) {
                         // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
                         if (prevMap.containsKey(typeKey)) {
                             double v1TwoHoursAgo = (double) prevMap.get(typeKey);
@@ -791,7 +794,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
      */
     private List<Map<String, Object>> handleDataOrder(List<Map<String, Object>> dataList, Timestamp end, String density) {
         List<Map<String, Object>> result = new LinkedList<>();
-
+        if (StringUtil.isNullOrEmpty(density)) {
+            return dataList;
+        }
         long densityTime = 0L;
         if (density.endsWith("h")) {
             // 小时为单位
