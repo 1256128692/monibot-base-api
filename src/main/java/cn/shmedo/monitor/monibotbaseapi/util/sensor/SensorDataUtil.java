@@ -103,6 +103,11 @@ public class SensorDataUtil {
             String dateString = (String) item.get("time");
             DateTime time = DateUtil.parse(dateString);
 
+            monitorTypeFields.forEach(pojo -> {
+                double value = (double) item.get(pojo.getFieldToken());
+                item.put(pojo.getFieldToken(), String.format("%.2f", value));
+            });
+
             SensorHistoryAvgDataResponse response = sensorHistoryAvgDataResponseList.stream()
                     .filter(pojo -> pojo.getSensorID() == sensorID)
                     .findFirst()
@@ -206,6 +211,10 @@ public class SensorDataUtil {
             } else {
                 item.put("rainfall", item.get("periodRainfall"));
             }
+
+            double value = (double) item.get("rainfall");
+            item.put("rainfall", String.format("%.2f", value));
+
             SensorHistoryAvgDataResponse response = sensorHistoryAvgDataResponseList.stream()
                     .filter(pojo -> pojo.getSensorID() == sensorID)
                     .findFirst()

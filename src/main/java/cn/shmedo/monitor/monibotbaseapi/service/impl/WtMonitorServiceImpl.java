@@ -947,6 +947,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 监测子类型字段
         List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+        Optional<FieldSelectInfo> cOriginal = fieldList.stream().filter(pojo -> pojo.getFieldToken().equals("cOriginal")).findFirst();
+        cOriginal.get().setFieldName("C轴累加位移");
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
