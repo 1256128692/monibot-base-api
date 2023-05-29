@@ -1030,6 +1030,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             monitorTypeFields.add(vo);
         }
 
+        if (monitorTypeList.contains(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
+            TbMonitorTypeField cOriginal = monitorTypeFields.stream().filter(item -> item.getFieldToken().equals("cOriginal")).findFirst().get();
+            cOriginal.setFieldName("C轴累加位移");
+        }
+
         return new MonitorItemFieldResponse(monitorTypeFields, tbDataUnitList);
     }
 
