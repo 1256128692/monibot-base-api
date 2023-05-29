@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
@@ -180,8 +181,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
             // 处理需要计算的监测子类型返回token
             fieldList = MonitorTypeUtil.handlefieldList(monitorType, fieldList);
-
-            handleSpecialSensorDataList(monitorType, maps);
         } else {
             fieldList = null;
             maps = null;
@@ -196,90 +195,101 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     /**
      * @param monitorType 监测类型
      * @param maps        传感器数据列表
+     * @param density     密度
      */
     private void handleSpecialSensorDataList(Integer monitorType,
-                                             List<Map<String, Object>> maps) {
+                                             List<Map<String, Object>> maps,
+                                             String density, String key, String typeKey) {
         if (CollectionUtil.isNullOrEmpty(maps)) {
             return;
         }
-        // 雨量单独处理 TODO:雨量预计删除
-        if (monitorType.equals(MonitorType.RAINFALL.getKey())) {
-//            // 当前时间
-//            DateTime nowDate = DateUtil.date();
-//            // 当天早上8点
-//            DateTime nowDateEightclock = DateUtil.offsetHour(DateUtil.beginOfDay(nowDate), 8);
-//
-//            // 如果当前时间小于当天的早上8点,那么就统计昨天的早上8点到凌晨现在的时间
-//            if (DateUtil.compare(nowDate, nowDateEightclock) < 0) {
-//                DateTime yesterday = DateUtil.beginOfDay(DateUtil.offsetDay(nowDate, -1));
-//                nowDateEightclock = DateUtil.offsetHour(yesterday, 8);
-//            }
-//            List<Map<String, Object>> currentRainMaps = sensorDataDao.querySensorRainStatisticsData(maps, nowDateEightclock.toTimestamp(), nowDate.toTimestamp(), fieldList, monitorType);
-//            if (!CollectionUtil.isNullOrEmpty(maps) && !CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-//                for (Map<String, Object> mapEntry : maps) {
-//                    for (Map<String, Object> currentRainMap : currentRainMaps) {
-//                        String sid = mapEntry.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-//                        String currentSid = currentRainMap.get(DbConstant.SENSOR_ID_FIELD_TOKEN).toString();
-//                        if (currentSid.equals(sid)) {
-//                            Double currentRainfall = Double.parseDouble(currentRainMap.get(DbConstant.CURRENT_RAIN_FALL).toString());
-//                            BigDecimal rounded = new BigDecimal(currentRainfall).setScale(2, BigDecimal.ROUND_HALF_UP);
-//                            mapEntry.put(DbConstant.CURRENT_RAIN_FALL, rounded);
-//                            rainFailMaps.add(mapEntry);
-//                        }
-//                    }
-//                }
-//            }
-//            if (!CollectionUtil.isNullOrEmpty(maps) && CollectionUtil.isNullOrEmpty(currentRainMaps)) {
-//                for (Map<String, Object> mapEntry : maps) {
-//                    mapEntry.put(DbConstant.CURRENT_RAIN_FALL, 0.0);
-//                    rainFailMaps.add(mapEntry);
-//                }
-//            }
-        } else if (monitorType.equals(MonitorType.FLOW_VELOCITY.getKey())) {
-            // 流量暂不计算
-        } else if (monitorType.equals(MonitorType.LEVEL.getKey()) || monitorType.equals(MonitorType.STRESS.getKey())
-                || monitorType.equals(MonitorType.PRESSURE.getKey())) {
+        if (monitorType.equals(MonitorType.STRESS.getKey())
+                || monitorType.equals(MonitorType.PRESSURE.getKey())
+                || monitorType.equals(MonitorType.ONE_DIMENSIONAL_DISPLACEMENT.getKey())
+                || monitorType.equals(MonitorType.THREE_DIMENSIONAL_DISPLACEMENT.getKey())
+                || monitorType.equals(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
+            if (StringUtil.isNullOrEmpty(density)) {
+                return;
+            }
 
-            String key = "";
-            String typeKey = "";
-            if (monitorType.equals(MonitorType.LEVEL.getKey())) {
-                key = "levelChange";
-                typeKey = "distance";
-            } else if (monitorType.equals(MonitorType.STRESS.getKey())) {
+//            if (monitorType.equals(MonitorType.LEVEL.getKey()) || monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
+//                key = "levelChange";
+//                typeKey = "distance";
+//            }
+
+
+            if (monitorType.equals(MonitorType.STRESS.getKey())) {
                 key = "strainPeriodDisp";
                 typeKey = "strain";
             } else if (monitorType.equals(MonitorType.PRESSURE.getKey())) {
                 key = "pressurePeriodDisp";
                 typeKey = "pressure";
+            } else if (monitorType.equals(MonitorType.ONE_DIMENSIONAL_DISPLACEMENT.getKey())) {
+                key = "xPeriodDisp";
+                typeKey = "xTotalDisp";
             }
 
-            // 处理压力变化值,规则当前的数据减去上一笔的数据
-            for (int i = 0; i < maps.size(); i++) {
-                Map<String, Object> map = maps.get(i);
-                String timeStr = (String) map.get("time");
-                long time = DateUtil.parse(timeStr).getTime();
 
-                // 找到两个小时之前的时间戳
-                long twoHoursAgo = time - 2 * 60 * 60 * 1000;
+            // 处理变化值,规则当前的数据减去上一笔时间的数据.暂不删除,需求可能会变回来
+//            for (int i = 0; i < maps.size(); i++) {
+//                Map<String, Object> map = maps.get(i);
+//                String timeStr = (String) map.get("time");
+//                long time = DateUtil.parse(timeStr).getTime();
+//
+//                long lastDataTime = 0L;
+//                if (density.endsWith("h")) {
+//                    // 小时为单位
+//                    String hour = density.replaceAll("h", "");
+//                    Integer hourInt = Integer.valueOf(hour);
+//                    lastDataTime = time - hourInt * 60 * 60 * 1000;
+//                } else {
+//                    // 分钟为单位
+//                    String minute = density.replaceAll("m", "");
+//                    Integer minuteInt = Integer.valueOf(minute);
+//                    lastDataTime = time - minuteInt * 60 * 1000;
+//                }
+//
+//                // 在之前的Map对象中查找相应的v1值
+//                for (int j = 0; j < maps.size(); j++) {
+//                    Map<String, Object> prevMap = maps.get(j);
+//                    String prevTimeStr = (String) prevMap.get("time");
+//                    long prevTime = DateUtil.parse(prevTimeStr).getTime();
+//                    if (prevTime == lastDataTime && prevMap.get("sensorID").equals(map.get("sensorID"))) {
+//                        // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
+//                        if (prevMap.containsKey(typeKey)) {
+//                            double v1TwoHoursAgo = (double) prevMap.get(typeKey);
+//                            // 计算stressChange并添加到当前Map对象中
+//                            double changeValue = (double) map.get(typeKey) - v1TwoHoursAgo;
+//                            BigDecimal changeBD = new BigDecimal(changeValue);
+//                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
+//                            map.put(key, rounded);
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
 
-                // 在之前的Map对象中查找相应的v1值
-                for (int j = 0; j < maps.size(); j++) {
-                    Map<String, Object> prevMap = maps.get(j);
-                    String prevTimeStr = (String) prevMap.get("time");
-                    long prevTime = DateUtil.parse(prevTimeStr).getTime();
-                    if (prevTime == twoHoursAgo) {
-                        // 如果之前的Map对象中存在v1字段，则将其作为twoHoursAgo时刻的v1值
-                        if (prevMap.containsKey(typeKey)) {
-                            double v1TwoHoursAgo = (double) prevMap.get(typeKey);
-                            // 计算stressChange并添加到当前Map对象中
-                            double changeValue = (double) map.get(typeKey) - v1TwoHoursAgo;
-                            BigDecimal changeBD = new BigDecimal(changeValue);
-                            BigDecimal rounded = changeBD.setScale(2, BigDecimal.ROUND_HALF_UP);
-                            map.put(key, rounded);
-                            break;
-                        }
-                    }
+
+            Map<Integer, List<Map<String, Object>>> groupedMapsBySensorID = maps.stream()
+                    .collect(Collectors.groupingBy(map -> (Integer) map.get("sensorID")));
+
+            for (List<Map<String, Object>> sensorMaps : groupedMapsBySensorID.values()) {
+                sensorMaps.sort(Comparator.comparing(map -> (String) map.get("time"), Comparator.reverseOrder()));
+
+                for (int i = 0; i < sensorMaps.size() - 1; i++) {
+                    Map<String, Object> currentMap = sensorMaps.get(i);
+                    Map<String, Object> nextMap = sensorMaps.get(i + 1);
+
+                    double currentStrain = (double) currentMap.get(typeKey);
+                    double nextStrain = (double) nextMap.get(typeKey);
+
+                    double periodDisp = currentStrain - nextStrain;
+                    BigDecimal rounded = BigDecimal.valueOf(periodDisp).setScale(2, BigDecimal.ROUND_HALF_UP);
+                    periodDisp = rounded.doubleValue();
+
+                    currentMap.put(key, periodDisp);
                 }
+
             }
 
         }
@@ -604,11 +614,15 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             });
         }
         // 处理需要计算的监测子类型返回token
-        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps);
+        MonitorTypeUtil.handleHistoryDatafieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
+        if (pa.getTbMonitorPoint().getMonitorType().equals(MonitorType.THREE_DIMENSIONAL_DISPLACEMENT.getKey())) {
+            handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "xPeriodDisp", "xTotalDisp");
+            handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "yPeriodDisp", "yTotalDisp");
+            handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "zPeriodDisp", "zTotalDisp");
+        } else {
+            handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), null, null);
+        }
 
-        // 处理时间排序
-//        Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
@@ -664,8 +678,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 resultMaps.add(stringObjectMap);
             });
         }
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps);
-
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
@@ -753,7 +765,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-            resultList = handleDataOrder(maps, pa.getEnd());
+            resultList = handleDataOrder(maps, pa.getEnd(), pa.getDensity());
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
@@ -766,8 +778,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 }
             }
         }
-        // 处理需要计算的监测子类型返回token
-        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
@@ -801,18 +811,36 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     }
 
     /**
-     * 遍历 dataList，所有数据的时间都往后挪2小时
+     * 遍历 dataList，所有数据的时间都根据密度往后挪
+     * 比如2h,就是挪2个小时
      *
      * @param dataList
      * @param end
+     * @param density
      */
-    private List<Map<String, Object>> handleDataOrder(List<Map<String, Object>> dataList, Timestamp end) {
+    private List<Map<String, Object>> handleDataOrder(List<Map<String, Object>> dataList, Timestamp end, String density) {
         List<Map<String, Object>> result = new LinkedList<>();
+        if (StringUtil.isNullOrEmpty(density)) {
+            return dataList;
+        }
+        long densityTime = 0L;
+        if (density.endsWith("h")) {
+            // 小时为单位
+            String hour = density.replaceAll("h", "");
+            Integer hourInt = Integer.valueOf(hour);
+            densityTime = hourInt * 60 * 60 * 1000;
+        } else {
+            // 分钟为单位
+            String minute = density.replaceAll("m", "");
+            Integer minuteInt = Integer.valueOf(minute);
+            densityTime = minuteInt * 60 * 1000;
+        }
 
+        long finalDensityTime = densityTime;
         dataList.forEach(data -> {
             String timeStr = (String) data.get("time");
             long timeMillis = DateUtil.parse(timeStr).getTime();
-            timeMillis += 2 * 60 * 60 * 1000; // Add 2 hours
+            timeMillis += finalDensityTime; // Add 2 hours
             Date newTime = new Date(timeMillis);
             String newTimeStr = DateUtil.formatDateTime(newTime);
             data.put("time", newTimeStr);
@@ -875,7 +903,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), map);
             resultMaps.add(stringObjectMap);
         });
-        handleSpecialSensorDataList(pa.getMonitorType(), resultMaps);
 
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getMonitorType(), fieldList, dataUnitsMap);
@@ -920,6 +947,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 监测子类型字段
         List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(tbMonitorTypeFields);
+        Optional<FieldSelectInfo> cOriginal = fieldList.stream().filter(pojo -> pojo.getFieldToken().equals("cOriginal")).findFirst();
+        cOriginal.get().setFieldName("C轴累加位移");
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
@@ -933,9 +962,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 resultMaps.add(stringObjectMap);
             });
         }
-        // 处理需要计算的监测子类型返回token
-        MonitorTypeUtil.handlefieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
-        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), maps);
+        MonitorTypeUtil.handleHistoryDatafieldList(pa.getTbMonitorPoint().getMonitorType(), fieldList);
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "aPeriodDisp", "aAccu");
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "bPeriodDisp", "bAccu");
+        handleSpecialSensorDataList(pa.getTbMonitorPoint().getMonitorType(), resultMaps, pa.getDensity(), "cPeriodDisp", "cOriginal");
 
         // 处理时间排序
         Map<Date, List<Map<String, Object>>> sortedGroupedMaps = TimeUtil.handleTimeSort(resultMaps, false);
@@ -998,6 +1028,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             vo.setFieldName("降雨量");
             vo.setFieldDataType("Double");
             monitorTypeFields.add(vo);
+        }
+
+        if (monitorTypeList.contains(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())) {
+            TbMonitorTypeField cOriginal = monitorTypeFields.stream().filter(item -> item.getFieldToken().equals("cOriginal")).findFirst().get();
+            cOriginal.setFieldName("C轴累加位移");
         }
 
         return new MonitorItemFieldResponse(monitorTypeFields, tbDataUnitList);

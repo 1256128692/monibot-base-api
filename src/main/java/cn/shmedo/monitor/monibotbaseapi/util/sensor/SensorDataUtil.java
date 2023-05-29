@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.util.sensor;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
@@ -78,7 +79,7 @@ public class SensorDataUtil {
                     monitorTypeFields.forEach(item -> {
                         double totalValue = monthData.getOrDefault(item.getFieldToken(), 0.0);
                         double averageValue = totalValue / dataCount;
-                        averageData.put(item.getFieldToken(), String.format("%.2f", averageValue));
+                        averageData.put(item.getFieldToken(), NumberUtil.round(averageValue, 2).doubleValue());
                     });
 
 
@@ -102,6 +103,11 @@ public class SensorDataUtil {
             int sensorID = (int) item.get("sensorID");
             String dateString = (String) item.get("time");
             DateTime time = DateUtil.parse(dateString);
+
+            monitorTypeFields.forEach(pojo -> {
+                double value = (double) item.get(pojo.getFieldToken());
+                item.put(pojo.getFieldToken(), NumberUtil.round(value, 2).doubleValue());
+            });
 
             SensorHistoryAvgDataResponse response = sensorHistoryAvgDataResponseList.stream()
                     .filter(pojo -> pojo.getSensorID() == sensorID)
@@ -172,8 +178,8 @@ public class SensorDataUtil {
                     TbMonitorTypeField rainfall = monitorTypeFields.stream().filter(m -> m.getFieldToken().equals("dailyRainfall")).findFirst().orElse(null);
 
                     double totalValue = monthData.getOrDefault(rainfall.getFieldToken(), 0.0);
-                    sumData.put(rainfall.getFieldToken(), String.format("%.2f", totalValue));
-                    sumData.put("rainfall", String.format("%.2f", totalValue));
+                    sumData.put(rainfall.getFieldToken(), NumberUtil.round(totalValue, 2).doubleValue());
+                    sumData.put("rainfall", NumberUtil.round(totalValue, 2).doubleValue());
 
                     // 创建新的数据对象，并添加到数据列表
                     sumData.put("sensorID", sensorID);
@@ -206,6 +212,10 @@ public class SensorDataUtil {
             } else {
                 item.put("rainfall", item.get("periodRainfall"));
             }
+
+            double value = (double) item.get("rainfall");
+            item.put("rainfall", NumberUtil.round(value, 2).doubleValue());
+
             SensorHistoryAvgDataResponse response = sensorHistoryAvgDataResponseList.stream()
                     .filter(pojo -> pojo.getSensorID() == sensorID)
                     .findFirst()

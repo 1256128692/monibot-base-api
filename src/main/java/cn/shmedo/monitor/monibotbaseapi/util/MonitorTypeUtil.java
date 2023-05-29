@@ -4,6 +4,7 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 
+import java.util.Collections;
 import java.util.List;
 
 public class MonitorTypeUtil {
@@ -45,30 +46,124 @@ public class MonitorTypeUtil {
             vo.setFieldName("风力");
             vo.setFieldOrder(0);
             vo.setFieldStatisticsType("1");
-            fieldList.add(vo);
-        }
-
-        // 当前降雨量
-        if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())){
-//            FieldSelectInfo vo = new FieldSelectInfo();
-//            vo.setFieldToken("currentRainfall");
-//            vo.setFieldName("当前降雨量");
-//            vo.setFieldOrder(0);
-//            // 雨量单位ID:1
-//            vo.setFieldExValue("1");
-//            fieldList.add(vo);
-        }
-
-        // 物液位
-        if (monitorType.equals(MonitorType.LEVEL.getKey())){
-            FieldSelectInfo vo = new FieldSelectInfo();
-            vo.setFieldToken("levelChange");
-            vo.setFieldName("水位变化");
-            vo.setFieldOrder(0);
-            vo.setFieldExValue("9");
+            vo.setFieldExValue("38");
             fieldList.add(vo);
         }
 
         return fieldList;
+    }
+
+    /**
+     * 处理查询历史数据接口的额外的业务字段
+     */
+    public static void handleHistoryDatafieldList(Integer monitorType, List<FieldSelectInfo> fieldList) {
+
+        // 水质
+        if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("waterQuality");
+            vo.setFieldName("水质等级");
+            vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
+            fieldList.add(vo);
+        }
+
+        // 风力
+        if (monitorType.equals(MonitorType.WIND_SPEED.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("windPower");
+            vo.setFieldName("风力");
+            vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
+            vo.setFieldExValue("38");
+            fieldList.add(vo);
+        }
+
+        // 水位
+//        if (monitorType.equals(MonitorType.WATER_LEVEL.getKey())){
+//            FieldSelectInfo vo = new FieldSelectInfo();
+//            vo.setFieldToken("levelChange");
+//            vo.setFieldName("水位变化");
+//            vo.setFieldOrder(0);
+//            vo.setFieldExValue("9");
+//            fieldList.add(vo);
+//        }
+
+        // 压力
+        if (monitorType.equals(MonitorType.STRESS.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("strainPeriodDisp");
+            vo.setFieldName("压力变化");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("13");
+            fieldList.add(vo);
+        }
+
+        // 压强
+        if (monitorType.equals(MonitorType.PRESSURE.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("pressurePeriodDisp");
+            vo.setFieldName("压强变化");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("13");
+            fieldList.add(vo);
+        }
+
+        // 一维
+        if (monitorType.equals(MonitorType.ONE_DIMENSIONAL_DISPLACEMENT.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("xPeriodDisp");
+            vo.setFieldName("阶段位移");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("1");
+            fieldList.add(vo);
+        }
+
+        // 三维
+        if (monitorType.equals(MonitorType.THREE_DIMENSIONAL_DISPLACEMENT.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("xPeriodDisp");
+            vo.setFieldName("X轴阶段位移");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("1");
+
+            FieldSelectInfo vo1 = new FieldSelectInfo();
+            vo1.setFieldToken("yPeriodDisp");
+            vo1.setFieldName("Y轴阶段位移");
+            vo1.setFieldOrder(0);
+            vo1.setFieldExValue("1");
+
+
+            FieldSelectInfo vo2 = new FieldSelectInfo();
+            vo2.setFieldToken("zPeriodDisp");
+            vo2.setFieldName("Z轴阶段位移");
+            vo2.setFieldOrder(0);
+            vo2.setFieldExValue("1");
+            fieldList.addAll(List.of(vo,vo1,vo2));
+        }
+
+        // 内部三轴
+        if (monitorType.equals(MonitorType.INTERNAL_TRIAXIAL_DISPLACEMENT.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("aPeriodDisp");
+            vo.setFieldName("A轴阶段位移");
+            vo.setFieldOrder(0);
+            vo.setFieldExValue("1");
+
+            FieldSelectInfo vo1 = new FieldSelectInfo();
+            vo1.setFieldToken("bPeriodDisp");
+            vo1.setFieldName("B轴阶段位移");
+            vo1.setFieldOrder(0);
+            vo1.setFieldExValue("1");
+
+
+            FieldSelectInfo vo2 = new FieldSelectInfo();
+            vo2.setFieldToken("cPeriodDisp");
+            vo2.setFieldName("C轴阶段位移");
+            vo2.setFieldOrder(0);
+            vo2.setFieldExValue("1");
+            fieldList.addAll(List.of(vo,vo1,vo2));
+        }
+
     }
 }
