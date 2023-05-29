@@ -10,8 +10,7 @@ import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class InfluxDbBean {
-    private static final String IOT_DEVICE_STATE_RETENTION = "one_year";
-    private static final String IOT_DB_RETENTION = "ten_year";
+    private static final String MONITOR_DATA_RETENTION = "thirty_years";
 
     private FileConfig fileConfig;
 
@@ -25,7 +24,7 @@ public class InfluxDbBean {
     public InfluxDB getInfluxDB() {
         InfluxDBConnection influxDBConnection = new InfluxDBConnection(fileConfig.getInfluxUsername()
                 , fileConfig.getInfluxPassword(), fileConfig.getInfluxAddr()
-                , fileConfig.getInfluxDatabase(), IOT_DEVICE_STATE_RETENTION);// 保留策略模式为默认
+                , fileConfig.getInfluxDatabase(), MONITOR_DATA_RETENTION);// 保留策略模式为默认
         InfluxDB influxDB = influxDBConnection.influxDbBuild();
         influxDB.setDatabase(fileConfig.getInfluxDatabase());
         influxDB.enableBatch();
