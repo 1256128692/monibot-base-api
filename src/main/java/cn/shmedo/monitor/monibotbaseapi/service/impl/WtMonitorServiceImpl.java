@@ -763,11 +763,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         Double dailyRainfall = 0.0;
-        List<Map<String, Object>> resultList = null;
+//        List<Map<String, Object>> resultList = null;
         List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-            resultList = handleDataOrder(maps, pa.getEnd(), pa.getDensity());
+//            handleDataOrder(maps, pa.getEnd(), pa.getDensity());
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
@@ -783,7 +783,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
     private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps, String density) {
