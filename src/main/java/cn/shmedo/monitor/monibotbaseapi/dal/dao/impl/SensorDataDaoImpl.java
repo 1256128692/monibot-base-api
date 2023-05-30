@@ -328,7 +328,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         for (Map<String, Object> item : sensorDataList) {
             Point.Builder builder = Point.measurement(measurement);
 
-            Map<String, Object> collect = fieldSelectInfoList.stream().collect(Collectors.toMap(
+            Map<String, Object> collect = fieldSelectInfoList.stream().filter(e -> item.containsKey(e.getFieldToken())).collect(Collectors.toMap(
                     FieldSelectInfo::getFieldToken,
                     fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
             builder.fields(collect);
