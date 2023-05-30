@@ -708,7 +708,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         });
 
         vo.setTbMonitorPoints(tbMonitorPoints);
-        vo.setTbMonitorTypes(tbMonitorTypes);
+        vo.setTbMonitorTypes(tbMonitorTypes.stream().sorted(Comparator.comparingInt(TbMonitorType::getDisplayOrder)).collect(Collectors.toList()));
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorItemIDs)) {
             LambdaQueryWrapper<TbMonitorItem> tmiWrapper = new LambdaQueryWrapper<TbMonitorItem>()
