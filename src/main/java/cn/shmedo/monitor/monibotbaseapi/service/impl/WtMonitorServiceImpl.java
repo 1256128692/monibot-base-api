@@ -771,7 +771,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            dailyRainfallList = handleDailyRainfallList(maps, pa.getDensity());
+            dailyRainfallList = handleDailyRainfallList(maps);
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
                 if (dailyRainfallList.size() == 1) {
                     if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
@@ -786,16 +786,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
-    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps, String density) {
+    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps) {
         // 操作按日期分组
-        Map<LocalDate, List<Map<String, Object>>> groupedMaps = null;
-        if (StringUtils.isEmpty(density)) {
-            groupedMaps = maps.stream()
-                    .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
-        } else {
-            groupedMaps = maps.stream()
-                    .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate()));
-        }
+        Map<LocalDate, List<Map<String, Object>>> groupedMaps =  maps.stream()
+                .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
 
         // 遍历每一天的数据，生成新的newMaps列表
         List<Map<String, Object>> newMaps = new ArrayList<>();
