@@ -708,7 +708,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         });
 
         vo.setTbMonitorPoints(tbMonitorPoints);
-        vo.setTbMonitorTypes(tbMonitorTypes);
+        vo.setTbMonitorTypes(tbMonitorTypes.stream().sorted(Comparator.comparingInt(TbMonitorType::getDisplayOrder)).collect(Collectors.toList()));
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorItemIDs)) {
             LambdaQueryWrapper<TbMonitorItem> tmiWrapper = new LambdaQueryWrapper<TbMonitorItem>()
@@ -763,15 +763,15 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         Double dailyRainfall = 0.0;
-        List<Map<String, Object>> resultList = null;
+//        List<Map<String, Object>> resultList = null;
         List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-            resultList = handleDataOrder(maps, pa.getEnd(), pa.getDensity());
+//            handleDataOrder(maps, pa.getEnd(), pa.getDensity());
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            dailyRainfallList = handleDailyRainfallList(maps, pa.getDensity());
+            dailyRainfallList = handleDailyRainfallList(maps);
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
                 if (dailyRainfallList.size() == 1) {
                     if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
@@ -783,19 +783,13 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
-    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps, String density) {
+    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps) {
         // 操作按日期分组
-        Map<LocalDate, List<Map<String, Object>>> groupedMaps = null;
-        if (StringUtils.isEmpty(density)) {
-            groupedMaps = maps.stream()
-                    .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
-        } else {
-            groupedMaps = maps.stream()
-                    .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate()));
-        }
+        Map<LocalDate, List<Map<String, Object>>> groupedMaps =  maps.stream()
+                .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
 
         // 遍历每一天的数据，生成新的newMaps列表
         List<Map<String, Object>> newMaps = new ArrayList<>();
