@@ -239,6 +239,7 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeAlias   监测类型别名
      * @apiSuccess (响应结果) {Int} typeInfoList.pointCount   监测类型监测点统计数量
+     * @apiSuccess (响应结果) {Int} typeInfoList.displayOrder   监测类型排序
      * @apiSuccess (响应结果) {Object[]} typeInfoList.monitorItemList   监测项目类型
      * @apiSuccess (响应结果) {Int} typeInfoList.monitorItemList.monitorItemID   监测项目ID
      * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.name   监测项目名称

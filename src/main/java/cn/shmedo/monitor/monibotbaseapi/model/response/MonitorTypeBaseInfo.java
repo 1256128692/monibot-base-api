@@ -17,4 +17,6 @@ public class MonitorTypeBaseInfo {
 
     private List<TbProjectType> projectTypeList;
 
+    private Integer displayOrder;
+
 }
