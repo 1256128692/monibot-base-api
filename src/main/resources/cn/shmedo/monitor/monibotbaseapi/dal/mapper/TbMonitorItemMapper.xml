@@ -436,6 +436,7 @@
             tmt.MonitorType monitorTypeID,
             tmt.TypeName monitorTypeName,
             tmt.MultiSensor multiSensor,
+            tmt.DisplayOrder displayOrder,
             tmi.`Name` monitorItemName
         FROM
             tb_project_monitor_class tpmc

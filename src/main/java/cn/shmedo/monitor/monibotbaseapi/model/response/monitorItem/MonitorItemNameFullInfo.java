@@ -12,5 +12,6 @@ public class MonitorItemNameFullInfo {
     private Integer monitorTypeID;
     private String monitorTypeName;
     private Boolean multiSensor;
+    private Integer displayOrder;
     private String monitorItemName;
 }

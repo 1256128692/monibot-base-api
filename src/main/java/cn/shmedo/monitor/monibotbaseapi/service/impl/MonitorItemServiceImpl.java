@@ -231,10 +231,11 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                         MonitorItemNameFullInfo info = w.getValue().stream().findFirst()
                                 .orElseThrow(() -> new RuntimeException("Unreachable RuntimeException"));
                         return MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
-                                .multiSensor(info.getMultiSensor()).monitorTypeName(info.getMonitorTypeName())
+                                .displayOrder(info.getDisplayOrder()).multiSensor(info.getMultiSensor())
+                                .monitorTypeName(info.getMonitorTypeName())
                                 .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
                                         .distinct().toList()).build();
-                    }).toList()).build();
+                    }).sorted(Comparator.comparingInt(MonitorTypeItemNameInfo::getDisplayOrder)).toList()).build();
         }).toList();
     }
 
