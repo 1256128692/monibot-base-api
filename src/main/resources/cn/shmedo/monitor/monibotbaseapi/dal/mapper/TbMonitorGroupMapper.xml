@@ -311,4 +311,21 @@
           AND tmp.ProjectID =#{param.projectID}
           AND tmi.`Name` =#{param.monitorItemName}
     </select>
+    <select id="selectWettingLineGroupUpperLimit"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.thematicDataAnalysis.StRelateRuleDto">
+        SELECT
+            tmp.ID monitorPointID,
+            tmp.`Enable` monitorPointEnable,
+            TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperLimit" ) ) upperLimit
+        FROM
+            tb_monitor_group tmg
+            LEFT JOIN tb_monitor_group_point tmgp ON tmg.ID = tmgp.MonitorGroupID
+            LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
+            LEFT JOIN tb_warn_rule twr ON twr.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twt.RuleID = twr.ID
+        WHERE
+            tmg.ID = #{monitorGroupID}
+          AND tmp.MonitorType = #{monitorType}
+          AND IF(twt.ID IS NOT NULL,TRUE,TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName" ) ) = #{upperName})
+    </select>
 </mapper>
