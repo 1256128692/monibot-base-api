@@ -340,6 +340,9 @@
                     </foreach>
                     AND
                 </if>
+                <if test="pa.projectName != null and pa.projectName != ''">
+                    ProjectName LIKE CONCAT('%',#{pa.projectName},'%') AND
+                </if>
                 <if test="pa.queryCode != null and pa.queryCode != ''">
                     (
                     ProjectName LIKE CONCAT('%',#{pa.queryCode},'%')

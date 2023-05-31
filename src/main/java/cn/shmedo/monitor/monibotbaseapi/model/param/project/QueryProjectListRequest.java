@@ -40,6 +40,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     private String queryCode;
 
+    private String projectName;
 
     private String location;
 
