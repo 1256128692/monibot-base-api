@@ -109,10 +109,8 @@ public class MonitorItemController {
      * @apiDescription 查询监测项目分页, 系统权限，预定义权限，不允许授予第三方。
      * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
-     * @apiParam (请求参数) {Int} [monitorItemName] 监测项目名称, 模糊查询
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiParam (请求参数) {String} [fieldToken] 属性标识, 模糊查询
-     * @apiParam (请求参数) {String} [fieldName] 属性名称, 模糊查询
+     * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配 监测项目名称， 属性名称， 字段属性
      * @apiParam (请求参数) {Int} [createType] 创建类型 null:所有,0:预定义,1:自定义
      * @apiParam (请求参数) {Boolean} [companyItem] 公司监测项目模板？
      * @apiParam (请求参数) {Int} pageSize （1-100）

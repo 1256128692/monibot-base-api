@@ -302,18 +302,21 @@
             <if test="createType != null">
                 and it.CreateType = #{createType}
             </if>
-            <if test="monitorItemName != null and monitorItemName != ''">
-                and it.Name like concat('%', #{monitorItemName}, '%')
+            <if test="queryCode != null and queryCode != ''">
+                and (
+                it.Name like concat('%', #{queryCode}, '%')
+                <if test="idList != null and idList.size &gt; 0">
+                    or  it.id in
+                    <foreach close=")" collection="idList" item="id" open="(" separator=",">
+                        #{id}
+                    </foreach>
+                </if>
+                )
             </if>
             <if test="monitorType != null">
                 and it.monitorType = #{monitorType}
             </if>
-            <if test="idList != null and idList.size &gt; 0">
-                and  it.id in
-                <foreach close=")" collection="idList" item="id" open="(" separator=",">
-                    #{id}
-                </foreach>
-            </if>
+
             <if test="companyItem != null and companyItem == true">
                 and it.ProjectID = -1
             </if>

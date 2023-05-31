@@ -109,6 +109,13 @@
                 <if test="monitorFieldToken!=null and monitorFieldToken!=''">
                    and FieldToken like concat('%',#{monitorFieldToken},'%')
                 </if>
+                <if test="queryCode != null and queryCode != ''">
+                    and (
+                    FieldName like concat('%',#{queryCode},'%')
+                    or
+                    FieldToken like concat('%',#{queryCode},'%')
+                    )
+                </if>
             </where>
             )
     </select>

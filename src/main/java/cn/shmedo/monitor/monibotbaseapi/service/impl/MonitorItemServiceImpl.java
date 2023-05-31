@@ -164,14 +164,10 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         Page<MonitorItem4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
         List<Integer> idList = null;
-        if (StringUtils.isNotBlank(pa.getFieldName()) || StringUtils.isNotBlank(pa.getFieldToken())) {
-            idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(pa.getFieldName(), pa.getFieldToken());
-            if (CollectionUtils.isEmpty(idList)) {
-                return PageUtil.Page.empty();
-
-            }
+        if (StringUtils.isNotBlank(pa.getQueryCode())) {
+            idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(null, null, pa.getQueryCode());
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

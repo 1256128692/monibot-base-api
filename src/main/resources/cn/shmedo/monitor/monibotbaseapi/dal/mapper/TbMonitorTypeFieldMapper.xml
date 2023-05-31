@@ -209,6 +209,11 @@
             <if test="fuzzyFieldToken != null and fuzzyFieldToken != ''">
                 and FieldToken like concat('%', #{fuzzyFieldToken}, '%')
             </if>
+            <if test="queryCode != null and queryCode != ''">
+                and (
+                FieldName like concat('%', #{queryCode}, '%') or FieldToken like concat('%', #{queryCode}, '%')
+                )
+            </if>
         </where>
     </select>
     <insert id="insertBatch" keyColumn="ID" keyProperty="ID" useGeneratedKeys="true">

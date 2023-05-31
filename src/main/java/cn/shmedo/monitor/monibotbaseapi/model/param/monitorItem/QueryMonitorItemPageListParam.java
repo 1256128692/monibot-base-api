@@ -23,12 +23,10 @@ import lombok.NoArgsConstructor;
 public class QueryMonitorItemPageListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     private Integer companyID;
     private Integer projectID;
-    private String monitorItemName;
     private Integer monitorType;
     private Byte createType;
 
-    private String fieldToken;
-    private String fieldName;
+    private String queryCode;
     private Boolean companyItem;
 
     @NotNull
@@ -42,7 +40,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper validate() {
-        if (projectID!= null && projectID != -1){
+        if (projectID != null && projectID != -1) {
             TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
             var tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
             if (tbProjectInfo == null) {
