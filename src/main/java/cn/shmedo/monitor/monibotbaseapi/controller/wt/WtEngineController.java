@@ -116,6 +116,7 @@ public class WtEngineController {
      * @apiSuccess (返回结果) {String} dataList.fieldToken 源数据Token
      * @apiSuccess (返回结果) {String} dataList.fieldName 源数据名称
      * @apiSuccess (返回结果) {String} [dataList.compareRule] 比较区间json
+     * @apiSuccess (返回结果) {String} [dataList.compareRuleDesc] 比较区间描述
      * @apiSuccess (返回结果) {String} [dataList.triggerRule] 触发规则json
      * @apiSuccess (返回结果) {Object[]} [dataList.action] 动作描述list
      * @apiSuccess (返回结果) {Int} dataList.action.ID 动作ID

@@ -15,12 +15,12 @@ public enum CompareInterval {
     DIS3(2, "distance", "保证水位", "超保证水位", 1),
 
     //雨量-雨量
-    RAIN(5, "rainfall", "警戒雨量", "超警戒雨量", 1),
+    RAIN(31, "rainfall", "警戒雨量", "超警戒雨量", 1),
 
     //雨量-日降雨量
-    D_RAIN0(5, "dailyRainfall", "暴雨", "暴雨", 1),
-    D_RAIN1(5, "dailyRainfall", "大暴雨", "大暴雨", 1),
-    D_RAIN2(5, "dailyRainfall", "特大暴雨", "特大暴雨", 1),
+    D_RAIN0(31, "dailyRainfall", "暴雨", "暴雨", 1),
+    D_RAIN1(31, "dailyRainfall", "大暴雨", "大暴雨", 1),
+    D_RAIN2(31, "dailyRainfall", "特大暴雨", "特大暴雨", 1),
 
     //水质-PH
     PH0(4, "ph", "大于等于", "PH超标", 1),
@@ -34,11 +34,11 @@ public enum CompareInterval {
     W_QUALITY4(4, "waterQuality", "劣于V类", "水质等级超标", -1),
 
     //流量-流速
-    VELOCITY_FLOW(14, "velocityFlow", "警戒流速", "超警戒流速", 1),
+    VELOCITY_FLOW(3, "velocityFlow", "警戒流速", "超警戒流速", 1),
 
     //流量-流量
-    VOLUME_FLOW0(14, "volumeFlow", "警戒流量", "超警戒流量", 1),
-    VOLUME_FLOW1(14, "volumeFlow", "最小生态流量", "低于最小生态流量", -1),
+    VOLUME_FLOW0(3, "volumeFlow", "警戒流量", "超警戒流量", 1),
+    VOLUME_FLOW1(3, "volumeFlow", "最小生态流量", "低于最小生态流量", -1),
 
     //视频-设备离线
     VIDEO_OFFLINE(31, "offline", "离线", "设备离线", 1);
