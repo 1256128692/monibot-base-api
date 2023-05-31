@@ -30,7 +30,7 @@ public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
 
     void updateImg(String path, Integer groupID, Integer userID, Date date);
 
-    IPage<Group4Web> queryPage(Page<Group4Web> page, Integer projectID, String groupName, String secondaryGroupName, Integer monitorItemID, Boolean parented);
+    IPage<Group4Web> queryPage(Page<Group4Web> page, Integer projectID, String queryCode, Integer monitorItemID, Boolean parented);
 
     List<Group4Web> queryGroup4WebByParentIDs(List<Integer> parentIDList);
 

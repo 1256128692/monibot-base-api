@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author: gaoxu
  * @create: 2021-08-27 09:45
  **/
-public class StatisticsSensorDataParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class StatisticsSensorDataParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @JsonIgnore
     List<TbSensor> sensorList;
     @NotEmpty
@@ -50,13 +50,20 @@ public class StatisticsSensorDataParam implements ParameterValidator, ResourcePe
     }
 
     @Override
-    public List<Resource> parameter() {
-        return null;
+    public Resource parameter() {
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        if (subjectID == -1) {
+            // 应用访问
+            return null;
+        } else {
+            return new Resource(subjectID.toString(), ResourceType.COMPANY);
+        }
+
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
+        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 
     public List<Integer> getSensorIDList() {
