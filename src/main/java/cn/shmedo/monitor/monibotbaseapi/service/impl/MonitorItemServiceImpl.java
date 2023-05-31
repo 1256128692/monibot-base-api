@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -195,7 +196,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
             });
         }
-        return list;
+        return list.stream().filter(monitorItemV1 -> Objects.isNull(pa.getEnable()) || pa.getEnable().equals(monitorItemV1.getEnable())).toList();
     }
 
     @Override

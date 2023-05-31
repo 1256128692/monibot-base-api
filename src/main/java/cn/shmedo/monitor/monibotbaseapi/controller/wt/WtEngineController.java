@@ -164,6 +164,7 @@ public class WtEngineController {
      * @apiDescription 编辑规则引擎
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} engineID 引擎ID
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {String} [engineName] 引擎名称(30字)
      * @apiParam (请求参数) {String} [engineDesc] 引擎简介(200字)
      * @apiParam (请求参数) {String} [productID] 设备型号 对应产品ID或视频类型

@@ -23,6 +23,7 @@ public class QueryMonitorItemListParam implements ParameterValidator, ResourcePe
     private Integer projectID;
     private String monitorItemName;
     private Integer monitorType;
+    private Boolean enable;
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);

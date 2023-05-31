@@ -325,7 +325,7 @@
         select it.id    as itemID,
                it.Name  as itemName,
                it.Alias as itemAlias,
-               it.Enable,
+               it.Enable enable,
                it.MonitorType,
                t.TypeName,
                t.TypeAlias,

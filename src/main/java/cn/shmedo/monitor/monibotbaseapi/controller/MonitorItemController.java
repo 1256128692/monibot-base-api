@@ -208,6 +208,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} projectID 工程项目ID
      * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiSuccess (返回结果) {Object[]} list 监测项目列表
      * @apiSuccess (返回结果) {Int} list.itemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.itemName 监测项目名称
