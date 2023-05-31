@@ -80,6 +80,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {String} [queryCode] 检索关键字，可以模糊匹配直管单位, 项目名称
      * @apiParam (请求体) {String} [location] 行政区域
      * @apiParam (请求体) {Int} [projectType] 项目类型
