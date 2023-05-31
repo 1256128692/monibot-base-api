@@ -76,7 +76,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (StringUtils.isBlank(pa.getQueryCode())) {
             typeList = null;
         } else {
-            typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode());
+            typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode(), pa.getAllFiled());
             if (CollectionUtils.isEmpty(typeList)) {
             }
         }
