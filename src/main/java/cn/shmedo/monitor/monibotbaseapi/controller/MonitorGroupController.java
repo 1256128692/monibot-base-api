@@ -141,8 +141,7 @@ public class MonitorGroupController {
      * @apiName QueryMonitorGroupPage
      * @apiDescription 分页查询监测组列表
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {String} [groupName] 监测组名称(一级组)
-     * @apiParam (请求体) {String} [secondaryGroupName] 监测组名称(二级组)
+     * @apiParam (请求体) {String} [queryCode] 检索关键字，可以模糊匹配一二级组的名称
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
