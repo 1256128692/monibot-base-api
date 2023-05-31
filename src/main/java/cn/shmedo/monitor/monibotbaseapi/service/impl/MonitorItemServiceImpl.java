@@ -34,7 +34,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 
@@ -202,11 +201,18 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
         }
         if (pa.getCompanyID() != null) {
-            queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
-
+            if (pa.getContainPredefine() != null && pa.getContainPredefine()) {
+                queryWrapper.lambda().and(wrapper ->
+                        wrapper.eq(TbMonitorItem::getCompanyID, pa.getCompanyID()).or().eq(TbMonitorItem::getCompanyID, -1));
+            } else {
+                queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
+            }
         }
         if (pa.getProjectID() != null) {
             queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
+        }
+        if (pa.getProjectType() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getProjectType, pa.getProjectType());
         }
         queryWrapper.orderByDesc("ID");
         Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper.lambda()
