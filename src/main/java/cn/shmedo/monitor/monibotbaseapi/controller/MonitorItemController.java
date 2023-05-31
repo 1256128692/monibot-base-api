@@ -242,6 +242,8 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [createType] 创建类型
      * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
+     * @apiParam (请求参数) {Int} [projectType] 项目类型
+     * @apiParam (请求参数) {Bool} [containPredefine] 是否包含平台预定义监测项目，公司ID不为-1时生效
      * @apiParam (请求参数) {String} [keyword] 模糊检索关键字，支持: 监测项目名称、监测项目别名
      * @apiSuccess (返回结果) {Object[]} list 监测项目列表
      * @apiSuccess (返回结果) {Int} list.id 监测项目ID

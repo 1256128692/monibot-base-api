@@ -16,6 +16,9 @@ public class QuerySuperMonitorItemListParam implements ParameterValidator, Resou
     private Integer companyID;
     private Integer projectID;
     private String keyword;
+    private Boolean containPredefine;
+    private Integer projectType;
+
     @Override
     public ResultWrapper validate() {
         return null;
