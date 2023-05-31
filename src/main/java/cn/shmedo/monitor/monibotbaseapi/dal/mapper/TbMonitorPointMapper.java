@@ -48,7 +48,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     List<WtVideoPageInfo> selectVideoPointListByCondition(List<Integer> projectIDList, Integer onlineInt,
                                                           Integer status, String areaCode,
-                                                          Integer monitorItemID, String monitorItemName, Integer monitorType, String videoType);
+                                                          Integer monitorItemID, String monitorItemName, Integer monitorType, String videoType, Integer monitorPointID);
 
     List<MonitorPointWithSensor> selectListByProjectIDsAndMonitorItemName(List<Integer> projectIDList, String monitorItemName);
 

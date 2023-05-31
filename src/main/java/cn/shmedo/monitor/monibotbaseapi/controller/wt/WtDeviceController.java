@@ -34,6 +34,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
+     * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 记录条数
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -145,6 +146,7 @@ public class WtDeviceController {
      * @apiParam (请求参数) {String} [monitorItemName] 监测项目名称, 支持模糊查询
      * @apiParam (请求参数) {Int} [ruleID] 规则引擎ID
      * @apiParam (请求参数) {Bool} [select] 是否选中 true:选中 false:未选中
+     * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiSuccess (返回结果) {Int} totalCount 总条数
