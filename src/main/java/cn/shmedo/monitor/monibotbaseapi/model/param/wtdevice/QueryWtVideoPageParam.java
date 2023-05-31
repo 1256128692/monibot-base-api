@@ -3,15 +3,12 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -54,6 +51,9 @@ public class QueryWtVideoPageParam implements ParameterValidator, ResourcePermis
      * 是否选中 true:选中 false:未选中
      */
     private Boolean select;
+
+    @Positive
+    private Integer monitorPointID;
 
     @Min(value = 1, message = "当前页不能小于1")
     @NotNull(message = "currentPage不能为空")

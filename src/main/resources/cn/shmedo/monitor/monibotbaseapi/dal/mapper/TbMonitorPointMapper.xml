@@ -610,6 +610,9 @@
         <if test="monitorItemID != null">
             and p.monitorItemID = #{monitorItemID}
         </if>
+        <if test="monitorPointID != null">
+            and p.`ID` = #{monitorPointID}
+        </if>
         <if test="monitorItemName != null and monitorItemName != ''">
             and (
                         i.Name LIKE CONCAT('%', #{monitorItemName}, '%') or
