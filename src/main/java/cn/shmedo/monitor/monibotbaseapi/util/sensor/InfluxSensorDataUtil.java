@@ -81,9 +81,13 @@ public class InfluxSensorDataUtil {
                 } else {
                     boolean contains = selectField.contains(columnName);
                     if (contains) {
-//                        data.put(columnName, value);
-                        // 默认保留2位小数
-                        data.put(columnName, NumberUtil.round((Double) value, 2).doubleValue());
+                        if (value == null) {
+                            data.put(columnName, value);
+                        } else {
+                            // 默认保留2位小数
+                            data.put(columnName, NumberUtil.round((Double) value, 2).doubleValue());
+                        }
+
                     }
                 }
             }
