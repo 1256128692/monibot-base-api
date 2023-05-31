@@ -419,7 +419,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
                     .collect(Collectors.joining(" or "));
 
             StringBuilder sqlBuilder = new StringBuilder();
-            sqlBuilder.append("select sum(rainfall) as dailyRainfall from tb_5_data ");
+            sqlBuilder.append("select dailyRainfall from tb_31_data ");
             sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
             sqlBuilder.append(" and ( ");
             sqlBuilder.append(sidOrString).append(" ) group by sid tz('Asia/Shanghai') ; ");

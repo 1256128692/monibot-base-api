@@ -34,8 +34,8 @@ import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -771,12 +771,23 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            dailyRainfallList = handleDailyRainfallList(maps);
+            dailyRainfallList = handleDailyRainfallList(sensorIDList, pa.getBegin(), pa.getEnd());
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
-                if (dailyRainfallList.size() == 1) {
-                    if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
-                        dailyRainfall = (Double) dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL);
-                    }
+
+                LocalDateTime beginDateTime = pa.getBegin().toLocalDateTime(); // 转换为 LocalDateTime
+                LocalDateTime targetDateTime = LocalDateTime.of(beginDateTime.toLocalDate(), LocalTime.MIDNIGHT); // 当天凌晨零点零分零秒
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 时间格式化器
+
+                List<Map<String, Object>> filteredList = dailyRainfallList.stream()
+                        .filter(map -> {
+                            String timeString = (String) map.get("time");
+                            LocalDateTime dateTime = LocalDateTime.parse(timeString, formatter);
+                            return dateTime.equals(targetDateTime);
+                        })
+                        .collect(Collectors.toList());
+                if (!CollectionUtil.isNullOrEmpty(filteredList)) {
+                    dailyRainfall = (Double) filteredList.get(0).get(DbConstant.DAILY_RAINFALL);
                 }
             }
         }
@@ -786,9 +797,13 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
-    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps) {
+    private List<Map<String, Object>>  handleDailyRainfallList(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
+
+        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
+                begin, end);
+
         // 操作按日期分组
-        Map<LocalDate, List<Map<String, Object>>> groupedMaps =  maps.stream()
+        Map<LocalDate, List<Map<String, Object>>> groupedMaps =  dailyRainData.stream()
                 .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
 
         // 遍历每一天的数据，生成新的newMaps列表
@@ -805,9 +820,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             newMap.put("dailyRainfall", dailyRainfall);
             newMaps.add(newMap);
         }
-
-//        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
-//                new Timestamp(startTime.getTime()), new Timestamp(endTime.getTime()));
         return newMaps;
     }
 
