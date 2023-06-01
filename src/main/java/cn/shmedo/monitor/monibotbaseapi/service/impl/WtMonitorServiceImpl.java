@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -820,7 +821,21 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             newMap.put("dailyRainfall", dailyRainfall);
             newMaps.add(newMap);
         }
-        return newMaps;
+        if (CollectionUtil.isNullOrEmpty(newMaps)) {
+            return Collections.emptyList();
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Map<String, Object>> sortedList = newMaps.stream()
+                .sorted(Comparator.comparing(map -> {
+                    try {
+                        return dateFormat.parse((String) map.get("time"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }))
+                .collect(Collectors.toList());
+        return sortedList;
     }
 
     /**
