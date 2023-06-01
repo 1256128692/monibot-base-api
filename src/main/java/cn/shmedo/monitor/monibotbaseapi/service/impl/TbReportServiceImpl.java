@@ -161,7 +161,8 @@ public class TbReportServiceImpl implements ITbReportService {
             List<TbBaseReportInfo> value = Optional.ofNullable(u.getValue()).orElse(new ArrayList<>());
             List<Integer> sensorIDList = value.stream().map(TbBaseReportInfo::getSensorID).filter(Objects::nonNull).toList();
             List<FieldSelectInfo> fieldTokenList = Optional.of(value).filter(CollectionUtil::isNotEmpty)
-                    .map(w -> w.get(0)).map(TbBaseReportInfo::getCustomColumn)
+                    .map(w -> w.stream().map(TbBaseReportInfo::getCustomColumn).reduce((s1, s2) -> s1 + "," + s2)
+                            .orElseThrow(() -> new RuntimeException("Unreachable Exception")))
                     .map(w -> Arrays.stream(w.replaceAll("[{}]", "").split(","))
                             .map(s -> s.split(":")[1]).filter(ObjectUtil::isNotEmpty).map(s -> {
                                 FieldSelectInfo info = new FieldSelectInfo();
