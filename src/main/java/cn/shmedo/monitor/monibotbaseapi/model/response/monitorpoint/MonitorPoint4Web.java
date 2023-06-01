@@ -15,6 +15,8 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class MonitorPoint4Web extends TbMonitorPoint {
+
+    private Integer monitorTypeID;
     private String monitorTypeName;
     private String monitorTypeAlias;
 
