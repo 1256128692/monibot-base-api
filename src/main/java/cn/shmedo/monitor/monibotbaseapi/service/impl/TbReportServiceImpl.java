@@ -110,7 +110,12 @@ public class TbReportServiceImpl implements ITbReportService {
                         WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder()
                                 .monitorTypeName(w.getKey()).noData((int) wValue.stream()
                                         .filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
-                        List<WtReportWarn> warnList = dealWarnList(wValue);
+                        Map<Integer, List<TbBaseReportInfo>> statusInfoMap = wValue.stream()
+                                .collect(Collectors.groupingBy(TbBaseReportInfo::getStatus));
+                        List<WtReportWarn> warnList = List.of(dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL1),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL2),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL3),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL4));
                         Map<Integer, Integer> levelCountMap = CollUtil.countMap(warnList.stream()
                                 .map(WtReportWarn::getWarnLevel).toList());
                         List<WtReportWarn> addtionWarnList = Arrays.stream(SensorStatusDesc.values())
