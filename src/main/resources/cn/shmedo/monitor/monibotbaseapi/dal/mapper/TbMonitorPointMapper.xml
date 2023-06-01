@@ -334,14 +334,14 @@
         <if test="monitorType != null">
             and p.MonitorType = #{monitorType}
         </if>
-        <if test="sensorID != null">
-            and s.ID = #{sensorID}
+        <if test="monitorItemID != null">
+            and p.MonitorItemID = #{monitorItemID}
         </if>
         <if test="queryCode != null and queryCode != ''">
             and (
             p.Name like concat('%', #{queryCode}, '%')
-            or it.Alias like concat('%', #{queryCode}, '%')
-            or it.name like concat('%', #{queryCode}, '%')
+            or s.Name like concat('%', #{queryCode}, '%')
+            or s.Alias like concat('%', #{queryCode}, '%')
             )
         </if>
         order by p.ID desc

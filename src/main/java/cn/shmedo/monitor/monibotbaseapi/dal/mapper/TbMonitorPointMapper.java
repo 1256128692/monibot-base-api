@@ -34,7 +34,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     List<MonitorPointAndItemInfo> selectListByCondition(List<Integer> projectIDList, Integer monitorType, Integer monitorItemID, Integer monitorClassType, String monitorItemName);
 
-    IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, Integer sensorID, String queryCode);
+    IPage<MonitorPoint4Web> queryPage(Page<MonitorPoint4Web> page, Integer projectID, Integer monitorType, Integer monitorItemID, String queryCode);
 
     List<IDNameAlias> querySimpleBy(Integer projectID, Integer groupID, List<Integer> monitorItemIDList);
 

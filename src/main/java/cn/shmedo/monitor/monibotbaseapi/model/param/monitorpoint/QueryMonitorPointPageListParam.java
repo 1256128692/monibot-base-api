@@ -22,7 +22,7 @@ public class QueryMonitorPointPageListParam implements ParameterValidator, Resou
     private Integer projectID;
     private String queryCode;
     private Integer monitorType;
-    private Integer sensorID;
+    private Integer monitorItemID;
     @NotNull
     @Positive
     @Max(100)
