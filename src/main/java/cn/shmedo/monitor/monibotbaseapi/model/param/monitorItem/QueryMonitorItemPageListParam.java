@@ -24,6 +24,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
     private Integer companyID;
     private Integer projectID;
     private Integer monitorType;
+    private Integer monitorItemID;
     private Byte createType;
 
     private String queryCode;

@@ -204,8 +204,9 @@ public class MonitorTypeController {
      * @apiName QueryMonitorTypePage
      * @apiDescription 查询监测类型分页
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {Int} [createType] 定义类型，01预定义自定义, 注意排序，自定义在前
-     * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配 监测类型名称， 属性名称， 属性标识
+     * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配  属性名称， 属性标识
      * @apiParam (请求参数) {Boolean} [allFiled] 全属性，否则fieldClass只展示12
      * @apiParam (请求参数) {Int} pageSize
      * @apiParam (请求参数) {Int} currentPage

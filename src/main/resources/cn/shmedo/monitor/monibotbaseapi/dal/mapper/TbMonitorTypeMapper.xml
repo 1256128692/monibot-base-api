@@ -183,13 +183,13 @@
   <select id="queryPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web">
     select * from tb_monitor_type
     <where>
-
+      <if test="monitorType != null">
+         MonitorType = #{monitorType}
+      </if>
       <if test="queryCode != null and queryCode != ''">
         and (
-        TypeName like  concat('%',#{queryCode}, '%')
-        or TypeAlias like  concat('%',#{queryCode}, '%')
         <if test="typeList != null and typeList.size &gt; 0">
-            or  MonitorType in <foreach close=")" collection="typeList" item="type" open="(" separator=",">
+          MonitorType in <foreach close=")" collection="typeList" item="type" open="(" separator=",">
           #{type}
         </foreach>
         </if>

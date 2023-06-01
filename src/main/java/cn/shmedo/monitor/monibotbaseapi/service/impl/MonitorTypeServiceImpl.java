@@ -71,6 +71,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
+
         Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         List<Integer> typeList;
         if (StringUtils.isBlank(pa.getQueryCode())) {
@@ -78,9 +79,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         } else {
             typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode(), pa.getAllFiled());
             if (CollectionUtils.isEmpty(typeList)) {
+                return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList);
+        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType());
         if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

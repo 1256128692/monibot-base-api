@@ -22,6 +22,7 @@ public class QueryMonitorTypePageParam implements ParameterValidator, ResourcePe
     @NotNull
     private Integer companyID;
     private Byte createType;
+    private Integer monitorType;
     private String queryCode;
     private Boolean allFiled;
 

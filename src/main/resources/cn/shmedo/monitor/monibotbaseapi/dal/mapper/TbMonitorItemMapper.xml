@@ -293,8 +293,11 @@
         from tb_monitor_item as it
                  left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         <where>
+            <if test="monitorItemID != null">
+                it.ID = #{monitorItemID}
+            </if>
             <if test="companyID !=null">
-                it.CompanyID = #{companyID}
+              and  it.CompanyID = #{companyID}
             </if>
             <if test="projectID != null">
                 and it.ProjectID = #{projectID}
@@ -304,9 +307,8 @@
             </if>
             <if test="queryCode != null and queryCode != ''">
                 and (
-                it.Name like concat('%', #{queryCode}, '%')
                 <if test="idList != null and idList.size &gt; 0">
-                    or  it.id in
+                      it.id in
                     <foreach close=")" collection="idList" item="id" open="(" separator=",">
                         #{id}
                     </foreach>
