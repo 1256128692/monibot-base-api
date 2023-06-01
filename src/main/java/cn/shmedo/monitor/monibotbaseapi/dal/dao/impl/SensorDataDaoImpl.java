@@ -329,9 +329,11 @@ public class SensorDataDaoImpl implements SensorDataDao {
         for (Map<String, Object> item : sensorDataList) {
             Point.Builder builder = Point.measurement(measurement);
 
-            Map<String, Object> collect = fieldSelectInfoList.stream().filter(e -> item.containsKey(e.getFieldToken()) && ObjectUtil.isEmpty(item.get(e.getFieldToken()))).collect(Collectors.toMap(
-                    FieldSelectInfo::getFieldToken,
-                    fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
+            Map<String, Object> collect = fieldSelectInfoList.stream()
+                    .filter(e -> item.containsKey(e.getFieldToken()) && ObjectUtil.isNotEmpty(item.get(e.getFieldToken())))
+                    .collect(Collectors.toMap(
+                            FieldSelectInfo::getFieldToken,
+                            fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
             builder.fields(collect);
 
             builder.time(TimeUtil.dateTimeParse((String) item.get("time"), "yyyy-MM-dd HH:mm:ss.SSS").getTime(),
