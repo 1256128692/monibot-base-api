@@ -34,7 +34,6 @@ import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -833,7 +832,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         e.printStackTrace();
                         return null;
                     }
-                }))
+                }, Comparator.reverseOrder()))  // 修改此处为逆序比较器
                 .collect(Collectors.toList());
         return sortedList;
     }
