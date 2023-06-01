@@ -65,7 +65,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddBaseProject
      */
-    @LogParam(moduleName = "项目管理模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "项目管理模块", operationName = "创建工程项目", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
