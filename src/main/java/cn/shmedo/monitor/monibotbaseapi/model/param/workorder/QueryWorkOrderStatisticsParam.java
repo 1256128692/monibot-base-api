@@ -1,16 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.workorder;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -26,12 +29,19 @@ public class QueryWorkOrderStatisticsParam implements ParameterValidator, Resour
     @Range(min = 1, max = 3)
     private Integer sourceType;
 
+    @JsonIgnore
+    private List<Integer> projectIDList;
+
     @Override
     public ResultWrapper validate() {
+        projectIDList = PermissionUtil.getHavePermissionProjectList(companyID, projectID == null ? null: List.of(projectID)).stream().toList();
+        if (CollUtil.isEmpty(projectIDList)) {
+            return ResultWrapper.success(PageUtil.Page.empty());
+        }
         if (projectID != null) {
-            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-            if (tbProjectInfoMapper.selectCount(new LambdaQueryWrapper<TbProjectInfo>().eq(TbProjectInfo::getID, projectID)) < 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+            projectIDList = projectIDList.stream().filter(p -> p.equals(projectID)).collect(Collectors.toList());
+            if (CollUtil.isEmpty(projectIDList)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "找不到项目编号对应的工程项目");
             }
         }
         return null;
