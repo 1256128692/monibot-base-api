@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao.impl;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -326,17 +327,21 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         BatchPoints batchPoints = BatchPoints.database(fileConfig.getInfluxDatabase()).build();
         for (Map<String, Object> item : sensorDataList) {
-            Point.Builder builder = Point.measurement(measurement);
 
-            Map<String, Object> collect = fieldSelectInfoList.stream().filter(e -> item.containsKey(e.getFieldToken())).collect(Collectors.toMap(
-                    FieldSelectInfo::getFieldToken,
-                    fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
-            builder.fields(collect);
 
-            builder.time(TimeUtil.dateTimeParse((String) item.get("time"), "yyyy-MM-dd HH:mm:ss.SSS").getTime(),
-                    TimeUnit.MILLISECONDS);
-            builder.tag("sid", item.get("sensorID").toString());
-            batchPoints.point(builder.build());
+            Map<String, Object> collect = fieldSelectInfoList.stream()
+                    .filter(e -> item.containsKey(e.getFieldToken()) && ObjectUtil.isNotEmpty(item.get(e.getFieldToken())))
+                    .collect(Collectors.toMap(
+                            FieldSelectInfo::getFieldToken,
+                            fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
+            if (collect.size() > 0) {
+                Point.Builder builder = Point.measurement(measurement);
+                builder.fields(collect);
+                builder.time(TimeUtil.dateTimeParse((String) item.get("time"), "yyyy-MM-dd HH:mm:ss.SSS").getTime(),
+                        TimeUnit.MILLISECONDS);
+                builder.tag("sid", item.get("sensorID").toString());
+                batchPoints.point(builder.build());
+            }
         }
         influxDB.write(batchPoints);
 
