@@ -163,14 +163,13 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         Page<MonitorItem4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
         List<Integer> idList = null;
-        if (StringUtils.isNotBlank(pa.getFieldName()) || StringUtils.isNotBlank(pa.getFieldToken())) {
-            idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(pa.getFieldName(), pa.getFieldToken());
+        if (StringUtils.isNotBlank(pa.getQueryCode())) {
+            idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(null, null, pa.getQueryCode());
             if (CollectionUtils.isEmpty(idList)) {
                 return PageUtil.Page.empty();
-
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getMonitorItemName(), pa.getMonitorType(), idList, pa.getCompanyItem());
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem(), pa.getMonitorItemID());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
@@ -195,7 +194,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
             });
         }
-        return list;
+        return list.stream().filter(monitorItemV1 -> Objects.isNull(pa.getEnable()) || pa.getEnable().equals(monitorItemV1.getEnable())).toList();
     }
 
     @Override
@@ -205,11 +204,18 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
         }
         if (pa.getCompanyID() != null) {
-            queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
-
+            if (pa.getContainPredefine() != null && pa.getContainPredefine()) {
+                queryWrapper.lambda().and(wrapper ->
+                        wrapper.eq(TbMonitorItem::getCompanyID, pa.getCompanyID()).or().eq(TbMonitorItem::getCompanyID, -1));
+            } else {
+                queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
+            }
         }
         if (pa.getProjectID() != null) {
             queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
+        }
+        if (pa.getProjectType() != null) {
+            queryWrapper.lambda().eq(TbMonitorItem::getProjectType, pa.getProjectType());
         }
         queryWrapper.orderByDesc("ID");
         Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper.lambda()
@@ -231,10 +237,11 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                         MonitorItemNameFullInfo info = w.getValue().stream().findFirst()
                                 .orElseThrow(() -> new RuntimeException("Unreachable RuntimeException"));
                         return MonitorTypeItemNameInfo.builder().monitorTypeID(w.getKey())
-                                .multiSensor(info.getMultiSensor()).monitorTypeName(info.getMonitorTypeName())
+                                .displayOrder(info.getDisplayOrder()).multiSensor(info.getMultiSensor())
+                                .monitorTypeName(info.getMonitorTypeName())
                                 .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
                                         .distinct().toList()).build();
-                    }).toList()).build();
+                    }).sorted(Comparator.comparingInt(MonitorTypeItemNameInfo::getDisplayOrder)).toList()).build();
         }).toList();
     }
 

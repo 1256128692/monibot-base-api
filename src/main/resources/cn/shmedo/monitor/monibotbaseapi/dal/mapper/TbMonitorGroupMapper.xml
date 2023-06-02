@@ -201,8 +201,12 @@
         from tb_monitor_group
         <where>
             ProjectID = #{projectID}
-            <if test=" groupName != null and groupName != ''">
-                and `Name` like concat('%', #{groupName}, '%')
+            <if test=" queryCode != null and queryCode != ''">
+                and (
+                `Name` like concat('%', #{queryCode}, '%')
+                or  id in
+                (select ParentID from tb_monitor_group where ParentID is not null and `Name` like concat('%', #{queryCode}, '%'))
+                )
             </if>
             <if test="parented">
                 and ParentID is null
@@ -210,10 +214,6 @@
             <if test="monitorItemID != null">
                 and id in
                 (select MonitorGroupID from tb_monitor_group_item where MonitorItemID = #{monitorItemID})
-            </if>
-            <if test="secondaryGroupName != null and secondaryGroupName != ''">
-                and id in
-                (select ParentID from tb_monitor_group where ParentID is not null and `Name` like concat('%', #{secondaryGroupName}, '%'))
             </if>
         </where>
         order by id desc
@@ -310,5 +310,22 @@
           AND tmi.ID IS NOT NULL
           AND tmp.ProjectID =#{param.projectID}
           AND tmi.`Name` =#{param.monitorItemName}
+    </select>
+    <select id="selectWettingLineGroupUpperLimit"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.thematicDataAnalysis.StRelateRuleDto">
+        SELECT
+            tmp.ID monitorPointID,
+            tmp.`Enable` monitorPointEnable,
+            TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperLimit" ) ) upperLimit
+        FROM
+            tb_monitor_group tmg
+            LEFT JOIN tb_monitor_group_point tmgp ON tmg.ID = tmgp.MonitorGroupID
+            LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
+            LEFT JOIN tb_warn_rule twr ON twr.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twt.RuleID = twr.ID
+        WHERE
+            tmg.ID = #{monitorGroupID}
+          AND tmp.MonitorType = #{monitorType}
+          AND IF(twt.ID IS NOT NULL,TRUE,TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName" ) ) = #{upperName})
     </select>
 </mapper>

@@ -71,17 +71,18 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
+
         Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         List<Integer> typeList;
-        if (ObjectUtil.isAllEmpty(pa.getFuzzyFieldName(), pa.getFuzzyFieldToken())) {
+        if (StringUtils.isBlank(pa.getQueryCode())) {
             typeList = null;
         } else {
-            typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(pa.getFuzzyFieldName(), pa.getFuzzyFieldToken());
-            if (ObjectUtil.isEmpty(typeList)) {
+            typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode(), pa.getAllFiled());
+            if (CollectionUtils.isEmpty(typeList)) {
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getFuzzyTypeName(), typeList);
+        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType());
         if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

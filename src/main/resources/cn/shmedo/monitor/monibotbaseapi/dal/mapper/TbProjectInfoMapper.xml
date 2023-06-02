@@ -343,8 +343,13 @@
                 <if test="pa.projectName != null and pa.projectName != ''">
                     ProjectName LIKE CONCAT('%',#{pa.projectName},'%') AND
                 </if>
-                <if test="pa.directManageUnit != null and pa.directManageUnit != ''">
-                    DirectManageUnit LIKE CONCAT('%', #{pa.directManageUnit},'%') AND
+                <if test="pa.queryCode != null and pa.queryCode != ''">
+                    (
+                    ProjectName LIKE CONCAT('%',#{pa.queryCode},'%')
+                    or
+                    DirectManageUnit LIKE CONCAT('%', #{pa.queryCode},'%')
+
+                    ) AND
                 </if>
                 <if test="pa.location != null and pa.location != ''">
                     Location LIKE CONCAT('%', #{pa.location}, '%') AND

@@ -41,6 +41,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.formula.Origin;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
@@ -118,7 +119,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     public List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request) {
-        LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = new LambdaQueryWrapper<TbMonitorTypeTemplate>()
+        LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = Wrappers.lambdaQuery(TbMonitorTypeTemplate.class)
                 .eq(TbMonitorTypeTemplate::getDataSourceComposeType, request.getDataSourceComposeType());
         if (StrUtil.isNotBlank(request.getTemplateDataSourceID())) {
             wrapper.eq(TbMonitorTypeTemplate::getTemplateDataSourceID, request.getTemplateDataSourceID());
@@ -127,9 +128,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .stream().map(TbMonitorTypeTemplate::getMonitorType).collect(Collectors.toSet());
 
         if (!monitorTypes.isEmpty()) {
-            return monitorTypeMapper.selectList(new LambdaQueryWrapper<TbMonitorType>()
-                            .in(TbMonitorType::getMonitorType, monitorTypes)).stream()
-                    .map(MonitorTypeCatalogResponse::valueOf).toList();
+            CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+            return monitorTypeMapper.selectList(Wrappers.lambdaQuery(TbMonitorType.class)
+                            .in(TbMonitorType::getMonitorType, monitorTypes)
+                            .in(TbMonitorType::getCompanyID, List.of(-1, subject.getCompanyID())))
+                    .stream().map(MonitorTypeCatalogResponse::valueOf).toList();
         }
         return List.of();
     }

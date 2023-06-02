@@ -31,6 +31,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
     @NotNull(message = "引擎ID不能为空")
     @Min(value = 1, message = "引擎ID不能小于1")
     private Integer engineID;
+    private Boolean enable;
     @Size(min = 1, max = 30, message = "引擎名称必须在1~30字之间")
     private String engineName;
     @Size(min = 1, max = 200, message = "引擎简介必须在1~200字之间")
@@ -52,6 +53,7 @@ public class UpdateWtEngineParam implements ParameterValidator, ResourcePermissi
         Optional.ofNullable(monitorItemID).ifPresent(tbWarnRule::setMonitorItemID);
         Optional.ofNullable(monitorPointID).ifPresent(tbWarnRule::setMonitorPointID);
         Optional.ofNullable(projectID).ifPresent(tbWarnRule::setProjectID);
+        Optional.ofNullable(enable).ifPresent(tbWarnRule::setEnable);
         if (StringUtils.isNotBlank(productID)) {
             if (tbWarnRule.getRuleType().intValue() == 2) {
                 tbWarnRule.setVideoType(productID);

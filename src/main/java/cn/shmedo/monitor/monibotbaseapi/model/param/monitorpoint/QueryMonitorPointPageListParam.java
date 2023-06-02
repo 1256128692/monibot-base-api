@@ -20,10 +20,9 @@ import lombok.Data;
 public class QueryMonitorPointPageListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer projectID;
-    private String pointName;
+    private String queryCode;
     private Integer monitorType;
-    private String monitorItemName;
-    private Integer sensorID;
+    private Integer monitorItemID;
     @NotNull
     @Positive
     @Max(100)

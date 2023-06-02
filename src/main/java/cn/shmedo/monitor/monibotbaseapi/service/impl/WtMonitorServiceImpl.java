@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
@@ -40,6 +39,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -529,6 +529,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
                 item.setMonitorTypeName(tbMonitorType.getTypeName());
                 item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
+                item.setDisplayOrder(tbMonitorType.getDisplayOrder());
             }
             if (!projectTypeMap.isEmpty()) {
                 // 工程类型信息
@@ -558,6 +559,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<MonitorTypeBaseInfo> filteredList = monitorTypeBaseInfos.stream()
                 .filter(monitorTypeBaseInfo -> monitorTypeBaseInfo.getMonitorItemList() != null
                         && !monitorTypeBaseInfo.getMonitorItemList().isEmpty())
+                .sorted(Comparator.comparing(MonitorTypeBaseInfo::getDisplayOrder))
                 .collect(Collectors.toList());
         vo.setTypeInfoList(filteredList);
         return vo;
@@ -706,7 +708,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         });
 
         vo.setTbMonitorPoints(tbMonitorPoints);
-        vo.setTbMonitorTypes(tbMonitorTypes);
+        vo.setTbMonitorTypes(tbMonitorTypes.stream().sorted(Comparator.comparingInt(TbMonitorType::getDisplayOrder)).collect(Collectors.toList()));
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorItemIDs)) {
             LambdaQueryWrapper<TbMonitorItem> tmiWrapper = new LambdaQueryWrapper<TbMonitorItem>()
@@ -761,34 +763,48 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         Double dailyRainfall = 0.0;
-        List<Map<String, Object>> resultList = null;
+//        List<Map<String, Object>> resultList = null;
         List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-            resultList = handleDataOrder(maps, pa.getEnd(), pa.getDensity());
+//            handleDataOrder(maps, pa.getEnd(), pa.getDensity());
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
-            dailyRainfallList = handleDailyRainfallList(maps);
+            dailyRainfallList = handleDailyRainfallList(sensorIDList, pa.getBegin(), pa.getEnd());
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
-                if (dailyRainfallList.size() == 1) {
-                    if (dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL) != null) {
-                        dailyRainfall = (Double) dailyRainfallList.get(0).get(DbConstant.DAILY_RAINFALL);
-                    }
+
+                LocalDateTime beginDateTime = pa.getBegin().toLocalDateTime(); // 转换为 LocalDateTime
+                LocalDateTime targetDateTime = LocalDateTime.of(beginDateTime.toLocalDate(), LocalTime.MIDNIGHT); // 当天凌晨零点零分零秒
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"); // 时间格式化器
+
+                List<Map<String, Object>> filteredList = dailyRainfallList.stream()
+                        .filter(map -> {
+                            String timeString = (String) map.get("time");
+                            LocalDateTime dateTime = LocalDateTime.parse(timeString, formatter);
+                            return dateTime.equals(targetDateTime);
+                        })
+                        .collect(Collectors.toList());
+                if (!CollectionUtil.isNullOrEmpty(filteredList)) {
+                    dailyRainfall = (Double) filteredList.get(0).get(DbConstant.DAILY_RAINFALL);
                 }
             }
         }
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
-    private List<Map<String, Object>> handleDailyRainfallList(List<Map<String, Object>> maps) {
+    private List<Map<String, Object>>  handleDailyRainfallList(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
+
+        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
+                begin, end);
 
         // 操作按日期分组
-        Map<LocalDate, List<Map<String, Object>>> groupedMaps = maps.stream()
-                .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")).toLocalDate()));
+        Map<LocalDate, List<Map<String, Object>>> groupedMaps =  dailyRainData.stream()
+                .collect(Collectors.groupingBy(map -> LocalDateTime.parse((String) map.get("time"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")).toLocalDate()));
 
         // 遍历每一天的数据，生成新的newMaps列表
         List<Map<String, Object>> newMaps = new ArrayList<>();
@@ -804,10 +820,21 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             newMap.put("dailyRainfall", dailyRainfall);
             newMaps.add(newMap);
         }
-
-//        List<Map<String, Object>> dailyRainData = sensorDataDao.querySensorDailyRainData(sensorIDList,
-//                new Timestamp(startTime.getTime()), new Timestamp(endTime.getTime()));
-        return newMaps;
+        if (CollectionUtil.isNullOrEmpty(newMaps)) {
+            return Collections.emptyList();
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        List<Map<String, Object>> sortedList = newMaps.stream()
+                .sorted(Comparator.comparing(map -> {
+                    try {
+                        return dateFormat.parse((String) map.get("time"));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return null;
+                    }
+                }, Comparator.reverseOrder()))  // 修改此处为逆序比较器
+                .collect(Collectors.toList());
+        return sortedList;
     }
 
     /**

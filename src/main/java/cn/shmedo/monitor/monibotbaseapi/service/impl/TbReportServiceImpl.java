@@ -110,7 +110,12 @@ public class TbReportServiceImpl implements ITbReportService {
                         WtReportMonitorTypeCountInfo build = WtReportMonitorTypeCountInfo.builder()
                                 .monitorTypeName(w.getKey()).noData((int) wValue.stream()
                                         .filter(s -> s.getStatus() == -1).count()).total(wValue.size()).build();
-                        List<WtReportWarn> warnList = dealWarnList(wValue);
+                        Map<Integer, List<TbBaseReportInfo>> statusInfoMap = wValue.stream()
+                                .collect(Collectors.groupingBy(TbBaseReportInfo::getStatus));
+                        List<WtReportWarn> warnList = List.of(dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL1),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL2),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL3),
+                                dealWarnCount(statusInfoMap, SensorStatusDesc.WARM_LEVEL4));
                         Map<Integer, Integer> levelCountMap = CollUtil.countMap(warnList.stream()
                                 .map(WtReportWarn::getWarnLevel).toList());
                         List<WtReportWarn> addtionWarnList = Arrays.stream(SensorStatusDesc.values())
@@ -156,7 +161,8 @@ public class TbReportServiceImpl implements ITbReportService {
             List<TbBaseReportInfo> value = Optional.ofNullable(u.getValue()).orElse(new ArrayList<>());
             List<Integer> sensorIDList = value.stream().map(TbBaseReportInfo::getSensorID).filter(Objects::nonNull).toList();
             List<FieldSelectInfo> fieldTokenList = Optional.of(value).filter(CollectionUtil::isNotEmpty)
-                    .map(w -> w.get(0)).map(TbBaseReportInfo::getCustomColumn)
+                    .map(w -> w.stream().map(TbBaseReportInfo::getCustomColumn).reduce((s1, s2) -> s1 + "," + s2)
+                            .orElseThrow(() -> new RuntimeException("Unreachable Exception")))
                     .map(w -> Arrays.stream(w.replaceAll("[{}]", "").split(","))
                             .map(s -> s.split(":")[1]).filter(ObjectUtil::isNotEmpty).map(s -> {
                                 FieldSelectInfo info = new FieldSelectInfo();

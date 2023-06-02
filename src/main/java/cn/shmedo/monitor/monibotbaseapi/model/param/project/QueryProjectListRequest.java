@@ -38,9 +38,9 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     @NotNull(message = "currentPage不能为空")
     private Integer currentPage;
 
-    private String projectName;
+    private String queryCode;
 
-    private String directManageUnit;
+    private String projectName;
 
     private String location;
 
@@ -76,7 +76,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
         });
 
         if (beginCreateTime != null && endCreateTime != null) {
-            Assert.isTrue(beginCreateTime.getTime() >= endCreateTime.getTime(), "开始时间不能大于结束时间");
+            Assert.isTrue(beginCreateTime.getTime() < endCreateTime.getTime(), "开始时间不能大于结束时间");
         }
 
         Optional.ofNullable(platformTypeList).filter(e -> !e.isEmpty()).ifPresent(e -> {

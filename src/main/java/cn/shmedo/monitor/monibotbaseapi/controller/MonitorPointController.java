@@ -186,10 +186,9 @@ public class MonitorPointController {
      * @apiName QueryMonitorPointPageList
      * @apiDescription 分页查询监测点
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {String} [pointName] 监测点名称,模糊查询
-     * @apiParam (请求体) {Int} [monitorType] 监测项目
-     * @apiParam (请求体) {String} [monitorItemName] 监测项目名称
-     * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -197,6 +196,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Object[]} dataList 监测点分页列表
      * @apiSuccess (返回结果) {Int} dataList.id 监测点ID
      * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeID 监测类型ID
      * @apiSuccess (返回结果) {Int} dataList.monitorTypeName 监测类型名称
      * @apiSuccess (返回结果) {Int} dataList.monitorTypeAlias 监测类型别名
      * @apiSuccess (返回结果) {Boolean} dataList.monitorTypeMultiSensor 监测类型是否多传感器

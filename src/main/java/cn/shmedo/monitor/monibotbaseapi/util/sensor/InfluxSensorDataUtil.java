@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.util.sensor;
 
+import cn.hutool.core.util.NumberUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -80,7 +81,13 @@ public class InfluxSensorDataUtil {
                 } else {
                     boolean contains = selectField.contains(columnName);
                     if (contains) {
-                        data.put(columnName, value);
+                        if (value == null) {
+                            data.put(columnName, value);
+                        } else {
+                            // 默认保留2位小数
+                            data.put(columnName, NumberUtil.round((Double) value, 2).doubleValue());
+                        }
+
                     }
                 }
             }

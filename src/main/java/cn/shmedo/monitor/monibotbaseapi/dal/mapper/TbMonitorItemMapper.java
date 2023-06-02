@@ -40,7 +40,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     void updateProjectIDBatch(List<Integer> monitorItemIDList, Integer projectID, Integer userID, Date now);
 
-    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page,Integer companyID, Integer projectID, Byte createType, String monitorItemName, Integer monitorType, List<Integer> idList, Boolean companyItem);
+    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer companyID, Integer projectID, Byte createType, String queryCode, Integer monitorType, List<Integer> idList, Boolean companyItem, Integer monitorItemID);
 
     List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType);
 

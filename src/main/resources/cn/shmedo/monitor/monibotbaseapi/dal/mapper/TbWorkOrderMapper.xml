@@ -59,20 +59,22 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
         SELECT
-            COUNT( CASE WHEN two.`Status` = 1 THEN 1 END ) todoCount,
+            COUNT( CASE WHEN two.`Status` = 1 OR twl.WorkOrderID is NULL THEN 1 END ) todoCount,
             COUNT( CASE WHEN two.`Status` = 5 THEN 1 END ) completedCount,
             COUNT( CASE WHEN two.`Status` IN ( 2, 3, 4 ) THEN 1 END ) processingCount
         FROM
-            tb_work_order two
-            LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
+        tb_warn_log twl
+            LEFT JOIN tb_work_order two ON two.ID = twl.WorkOrderID
+            LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log WHERE WarnType = 1 GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
         WHERE
-            two.CompanyID =#{param.companyID}
-        <if test="param.projectID != null">
-            AND twl.ProjectID=#{param.projectID}
-        </if>
-        <if test="param.sourceType != null">
-            AND two.SourceType=#{param.sourceType}
-        </if>
+            twl1.latest_time = twl.WarnTime
+            AND twl.ProjectID IN
+            <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+            <if test="param.sourceType != null">
+                AND two.SourceType=#{param.sourceType}
+            </if>
     </select>
     <select id="queryWorkOrderDetail"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderDetailInfo"

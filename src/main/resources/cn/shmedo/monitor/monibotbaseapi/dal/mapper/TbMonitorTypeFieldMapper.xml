@@ -203,11 +203,19 @@
         select distinct MonitorType
         from tb_monitor_type_field
         <where>
+            <if test="allFiled==null or allFiled == false">
+                and FieldClass != 3
+            </if>
             <if test="fuzzyFieldName != null and fuzzyFieldName != ''">
-                FieldName like concat('%', #{fuzzyFieldName}, '%')
+              and   FieldName like concat('%', #{fuzzyFieldName}, '%')
             </if>
             <if test="fuzzyFieldToken != null and fuzzyFieldToken != ''">
                 and FieldToken like concat('%', #{fuzzyFieldToken}, '%')
+            </if>
+            <if test="queryCode != null and queryCode != ''">
+                and (
+                FieldName like concat('%', #{queryCode}, '%') or FieldToken like concat('%', #{queryCode}, '%')
+                )
             </if>
         </where>
     </select>

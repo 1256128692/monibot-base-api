@@ -65,7 +65,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddBaseProject
      */
-    @LogParam(moduleName = "项目管理模块", operationName = "创建单个设备", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "项目管理模块", operationName = "创建工程项目", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
@@ -81,7 +81,7 @@ public class ProjectController {
      * @apiName QueryProjectPageList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
-     * @apiParam (请求体) {String} [directManageUnit] 直管单位,支持模糊查询
+     * @apiParam (请求体) {String} [queryCode] 检索关键字，可以模糊匹配直管单位, 项目名称
      * @apiParam (请求体) {String} [location] 行政区域
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用

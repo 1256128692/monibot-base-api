@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,5 +16,7 @@ public class MonitorTypeItemNameInfo {
     private Integer monitorTypeID;
     private String monitorTypeName;
     private Boolean multiSensor;
+    @JsonIgnore
+    private Integer displayOrder;
     private List<String> monitorItemNameList;
 }

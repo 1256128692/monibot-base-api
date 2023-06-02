@@ -9,8 +9,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -25,6 +27,7 @@ public class QueryWaterRainSensorHistoryAvgDataPageParam implements ParameterVal
     private List<Integer> projectIDList;
 
     @NotEmpty(message = "监测点ID列表不能为空")
+    @Size(min = 2, max = 3)
     private List<Integer> monitorPointIDList;
 
     @NotNull(message = "开始时间不能为空")
@@ -55,7 +58,7 @@ public class QueryWaterRainSensorHistoryAvgDataPageParam implements ParameterVal
         } else {
             long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
             long monitorTypeCount = monitorItemList.stream().map(TbMonitorItem::getMonitorType).distinct().count();
-            if (count != 3 && monitorTypeCount != 3) {
+            if (count != monitorPointIDList.size() && monitorTypeCount != monitorPointIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点列表所属不同监测项目");
             }
         }

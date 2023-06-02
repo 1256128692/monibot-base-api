@@ -12,10 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.util.Collection;
@@ -43,6 +40,8 @@ public class QueryWtDevicePageListParam implements ParameterValidator, ResourceP
     private String monitorItemName;
     private Integer ruleID;
     private Boolean select;
+    @Positive
+    private Integer monitorPointID;
     @Positive
     @NotNull
     private Integer currentPage;

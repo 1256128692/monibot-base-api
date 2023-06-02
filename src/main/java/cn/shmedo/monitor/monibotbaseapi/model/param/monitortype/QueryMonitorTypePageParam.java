@@ -22,9 +22,8 @@ public class QueryMonitorTypePageParam implements ParameterValidator, ResourcePe
     @NotNull
     private Integer companyID;
     private Byte createType;
-    private String fuzzyTypeName;
-    private String fuzzyFieldName;
-    private String fuzzyFieldToken;
+    private Integer monitorType;
+    private String queryCode;
     private Boolean allFiled;
 
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")

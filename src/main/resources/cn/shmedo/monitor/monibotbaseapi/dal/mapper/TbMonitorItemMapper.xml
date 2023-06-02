@@ -293,8 +293,11 @@
         from tb_monitor_item as it
                  left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         <where>
+            <if test="monitorItemID != null">
+                it.ID = #{monitorItemID}
+            </if>
             <if test="companyID !=null">
-                it.CompanyID = #{companyID}
+              and  it.CompanyID = #{companyID}
             </if>
             <if test="projectID != null">
                 and it.ProjectID = #{projectID}
@@ -302,18 +305,20 @@
             <if test="createType != null">
                 and it.CreateType = #{createType}
             </if>
-            <if test="monitorItemName != null and monitorItemName != ''">
-                and it.Name like concat('%', #{monitorItemName}, '%')
+            <if test="queryCode != null and queryCode != ''">
+                and (
+                <if test="idList != null and idList.size &gt; 0">
+                      it.id in
+                    <foreach close=")" collection="idList" item="id" open="(" separator=",">
+                        #{id}
+                    </foreach>
+                </if>
+                )
             </if>
             <if test="monitorType != null">
                 and it.monitorType = #{monitorType}
             </if>
-            <if test="idList != null and idList.size &gt; 0">
-                and  it.id in
-                <foreach close=")" collection="idList" item="id" open="(" separator=",">
-                    #{id}
-                </foreach>
-            </if>
+
             <if test="companyItem != null and companyItem == true">
                 and it.ProjectID = -1
             </if>
@@ -325,7 +330,7 @@
         select it.id    as itemID,
                it.Name  as itemName,
                it.Alias as itemAlias,
-               it.Enable,
+               it.Enable enable,
                it.MonitorType,
                t.TypeName,
                t.TypeAlias,
@@ -436,6 +441,7 @@
             tmt.MonitorType monitorTypeID,
             tmt.TypeName monitorTypeName,
             tmt.MultiSensor multiSensor,
+            tmt.DisplayOrder displayOrder,
             tmi.`Name` monitorItemName
         FROM
             tb_project_monitor_class tpmc

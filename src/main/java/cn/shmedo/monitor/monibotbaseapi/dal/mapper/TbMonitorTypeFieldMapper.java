@@ -22,7 +22,7 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     int updateByPrimaryKey(TbMonitorTypeField record);
 
-    List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(String fuzzyFieldName, String fuzzyFieldToken);
+    List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(String fuzzyFieldName, String fuzzyFieldToken, String queryCode, Boolean allFiled);
 
     List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes, Boolean allFiled);
 
