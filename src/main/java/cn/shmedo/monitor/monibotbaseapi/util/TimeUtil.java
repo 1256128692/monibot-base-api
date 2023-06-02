@@ -493,4 +493,21 @@ public class TimeUtil {
         }
     }
 
+
+    public static Timestamp calculateNewBeginTime(LocalDateTime begin, String density) {
+        if (density != null && density.endsWith("h")) {
+            int hours = Integer.parseInt(density.substring(0, density.length() - 1));
+            begin = begin.plusHours(hours);
+        } else if (density != null && density.endsWith("m")) {
+            int minutes = Integer.parseInt(density.substring(0, density.length() - 1));
+            begin = begin.plusMinutes(minutes);
+        } else if (density != null && density.endsWith("d")) {
+            // Do nothing for "1d" density
+        } else {
+            // Default case: do nothing for empty density or unrecognized format
+        }
+
+        return Timestamp.valueOf(begin);
+    }
+
 }
