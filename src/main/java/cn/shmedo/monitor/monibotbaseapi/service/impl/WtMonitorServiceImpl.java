@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WaterQuality;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -763,11 +764,17 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 fieldList, false, pa.getTbMonitorPoint().getMonitorType());
 
         Double dailyRainfall = 0.0;
-//        List<Map<String, Object>> resultList = null;
+        List<Map<String, Object>> resultList = null;
         List<Map<String, Object>> dailyRainfallList = null;
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             // 处理雨量历史时间段的降雨量
-//            handleDataOrder(maps, pa.getEnd(), pa.getDensity());
+            resultList = handleDataOrder(maps, pa.getEnd(), pa.getDensity()).stream()
+                    .filter(map -> {
+                        String timestampStr = (String) map.get("time"); // 获取时间字符串
+                        Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
+                        return timestamp.after(pa.getBegin());
+                    })
+                    .collect(Collectors.toList());
             // 处理雨量历史时间段的当前雨量
 //            handleRainTypeSensorHistoryDataList(resultList, pa.getBegin(), pa.getEnd());
             // 处理日降雨量
@@ -794,7 +801,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 处理数据单位
         List<TbDataUnit> tbDataUnitList = handleDataUnit(pa.getTbMonitorPoint().getMonitorType(), fieldList, dataUnitsMap);
 
-        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, maps, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
+        return new RainMonitorPointHistoryData(pa.getTbMonitorPoint(), tbSensors, resultList, fieldList, tbDataUnitList, dailyRainfall, dailyRainfallList);
     }
 
     private List<Map<String, Object>>  handleDailyRainfallList(List<Integer> sensorIDList, Timestamp begin, Timestamp end) {
@@ -1185,7 +1192,20 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Integer monitorType = sensorHistoryAvgDataResponseList.get(0).getMonitorType();
         List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
         List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
-
+        // 处理雨量历史时间段的降雨量,根据密度,每个数据的时间往后推
+        if (pa.getDensity().equals(RainDensityType.ONE_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.THREE_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.SIX_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.TWELVE_HOURS.getValue())) {
+            String density = RainDensityType.getStringValue(pa.getDensity());
+            dataList = handleDataOrder(dataList, pa.getEnd(), density).stream()
+                    .filter(map -> {
+                        String timestampStr = (String) map.get("time"); // 获取时间字符串
+                        Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
+                        return timestamp.after(pa.getBegin());
+                    })
+                    .collect(Collectors.toList());
+        }
         // 处理传感器数据月累加值,年累加值
         List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
@@ -1211,6 +1231,20 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
         List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(sensorIDList, monitorTypeFields, pa.getBegin(), pa.getEnd(), pa.getDensity(), monitorType);
 
+        // 处理雨量历史时间段的降雨量,根据密度,每个数据的时间往后推
+        if (pa.getDensity().equals(RainDensityType.ONE_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.THREE_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.SIX_HOURS.getValue())
+                || pa.getDensity().equals(RainDensityType.TWELVE_HOURS.getValue())) {
+            String density = RainDensityType.getStringValue(pa.getDensity());
+            dataList = handleDataOrder(dataList, pa.getEnd(), density).stream()
+                    .filter(map -> {
+                        String timestampStr = (String) map.get("time"); // 获取时间字符串
+                        Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
+                        return timestamp.after(pa.getBegin());
+                    })
+                    .collect(Collectors.toList());
+        }
         // 处理传感器数据月累加值,年累加值
         List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                 monitorTypeFields, sensorHistoryAvgDataResponseList);
@@ -1276,6 +1310,20 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
             List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(waterLevelSensorIDList, monitorTypeFields,
                     pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WT_RAINFALL.getKey());
+            // 处理雨量历史时间段的降雨量,根据密度,每个数据的时间往后推
+            if (pa.getDensity().equals(RainDensityType.ONE_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.THREE_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.SIX_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.TWELVE_HOURS.getValue())) {
+                String density = RainDensityType.getStringValue(pa.getDensity());
+                dataList = handleDataOrder(dataList, pa.getEnd(), density).stream()
+                        .filter(map -> {
+                            String timestampStr = (String) map.get("time"); // 获取时间字符串
+                            Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
+                            return timestamp.after(pa.getBegin());
+                        })
+                        .collect(Collectors.toList());
+            }
             List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                     monitorTypeFields, rainList);
             resultList.addAll(responseList);
@@ -1343,6 +1391,20 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             List<TbMonitorTypeField> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByMonitorID(monitorPointID);
             List<Map<String, Object>> dataList = sensorDataDao.queryRainSensorHistorySumData(waterLevelSensorIDList, monitorTypeFields,
                     pa.getBegin(), pa.getEnd(), pa.getDensity(), MonitorType.WT_RAINFALL.getKey());
+            // 处理雨量历史时间段的降雨量,根据密度,每个数据的时间往后推
+            if (pa.getDensity().equals(RainDensityType.ONE_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.THREE_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.SIX_HOURS.getValue())
+                    || pa.getDensity().equals(RainDensityType.TWELVE_HOURS.getValue())) {
+                String density = RainDensityType.getStringValue(pa.getDensity());
+                dataList = handleDataOrder(dataList, pa.getEnd(), density).stream()
+                        .filter(map -> {
+                            String timestampStr = (String) map.get("time"); // 获取时间字符串
+                            Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
+                            return timestamp.after(pa.getBegin());
+                        })
+                        .collect(Collectors.toList());
+            }
             List<SensorHistoryAvgDataResponse> responseList = SensorDataUtil.handleRainDataList(dataList, pa.getDensity(),
                     monitorTypeFields, rainList);
             resultList.addAll(responseList);

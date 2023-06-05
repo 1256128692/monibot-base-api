@@ -8,6 +8,12 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.hystrix.HystrixCommand;
+import com.netflix.hystrix.HystrixCommandGroupKey;
+import com.netflix.hystrix.HystrixCommandKey;
+import com.netflix.hystrix.HystrixCommandProperties;
+import feign.Request;
+import feign.hystrix.SetterFactory;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
 import lombok.AllArgsConstructor;
@@ -16,6 +22,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Feign实例Bean
@@ -52,8 +60,19 @@ public class FeignBeans {
 
     @Bean
     public MdInfoService mdInfoService() {
-        return FeignFactory.hystrixClient(MdInfoService.class,
-                config.getMdInfoServiceAddress(), mdInfoServiceFallbackFactory);
+        SetterFactory timeoutCommandKey = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(MdInfoService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(30000));
+        return FeignFactory.hystrixClient(MdInfoService.class, config.getMdInfoServiceAddress(),
+                mdInfoServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(timeoutCommandKey)
+                        .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
+                        .requestInterceptor(template -> template
+                                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
+                                .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
     }
 
     @Bean

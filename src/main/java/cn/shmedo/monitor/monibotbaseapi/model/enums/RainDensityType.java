@@ -42,4 +42,14 @@ public enum RainDensityType {
         return false;
     }
 
+
+    public static String getStringValue(int value) {
+        for (RainDensityType density : RainDensityType.values()) {
+            if (density.getValue() == value) {
+                return density.getStr();
+            }
+        }
+        return ""; // 如果没有匹配的值，则返回空字符串或者你认为合适的默认值
+    }
+
 }

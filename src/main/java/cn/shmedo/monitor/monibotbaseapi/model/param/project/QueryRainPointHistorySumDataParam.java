@@ -18,6 +18,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
 
+
 @Data
 public class QueryRainPointHistorySumDataParam  implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
