@@ -92,7 +92,6 @@ public class FileService {
      * @return 文件key
      */
     public String base64Upload(String base64) {
-        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         String fileSuffix = StrUtil.subBetween(base64, StrUtil.SLASH, BASE64_FLAG);
         String fileContent = StrUtil.subAfter(base64, BASE64_FLAG, false);
         Assert.notEmpty(fileSuffix, "文件格式获取失败");
