@@ -29,6 +29,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
 
     private String queryCode;
     private Boolean companyItem;
+    private Boolean enable;
 
     @NotNull
     @Positive

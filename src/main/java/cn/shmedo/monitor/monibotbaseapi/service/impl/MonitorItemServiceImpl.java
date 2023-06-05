@@ -65,7 +65,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             List<TbProjectMonitorClass> tbProjectMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
             if (!CollectionUtil.isNullOrEmpty(tbProjectMonitorClassList)) {
                 List<Integer> monitorClassIDList = tbProjectMonitorClassList.stream().map(TbProjectMonitorClass::getMonitorClass).collect(Collectors.toList());
-                List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(monitorClassIDList, request.getProjectID());
+                List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(monitorClassIDList, request.getProjectID(), request.getEnable());
                 if (!CollectionUtil.isNullOrEmpty(monitorItemBaseInfos)) {
                     // 按照监测类别进行分组
                     monitorClassGroup = monitorItemBaseInfos.stream()
@@ -91,7 +91,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             vo.setMonitorClass(monitorClassType.getValue());
             vo.setMonitorClassCnName(monitorClassType.getName());
 
-            List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(null, request.getProjectID());
+            List<MonitorItemBaseInfo> monitorItemBaseInfos = tbMonitorItemMapper.selectListByMonitorClassAndProID(null, request.getProjectID(), request.getEnable());
             // 处理监测类型列表
             handleMonitorTypeList(vo, monitorItemBaseInfos);
             monitorClassList.add(vo);
@@ -169,7 +169,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                 return PageUtil.Page.empty();
             }
         }
-        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem(), pa.getMonitorItemID());
+        IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem(), pa.getMonitorItemID(), pa.getEnable());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
@@ -184,7 +184,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     @Override
     public List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa) {
-        List<MonitorItemV1> list = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType());
+        List<MonitorItemV1> list = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType(), pa.getEnable());
         if (CollectionUtils.isNotEmpty(list)) {
             List<Integer> monitorItemIDList = list.stream().map(MonitorItemV1::getItemID).collect(Collectors.toList());
             List<MonitorTypeFieldV1> temp = tbMonitorTypeFieldMapper.queryMonitorTypeFieldV1ByMonitorItems(monitorItemIDList);
@@ -199,26 +199,29 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     @Override
     public List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa) {
-        QueryWrapper<TbMonitorItem> queryWrapper = new QueryWrapper<>();
+        LambdaQueryWrapper<TbMonitorItem> queryWrapper = new QueryWrapper<TbMonitorItem>().lambda();
         if (pa.getCreateType() != null) {
-            queryWrapper.lambda().eq(TbMonitorItem::getCreateType, pa.getCreateType());
+            queryWrapper.eq(TbMonitorItem::getCreateType, pa.getCreateType());
         }
         if (pa.getCompanyID() != null) {
             if (pa.getContainPredefine() != null && pa.getContainPredefine()) {
-                queryWrapper.lambda().and(wrapper ->
+                queryWrapper.and(wrapper ->
                         wrapper.eq(TbMonitorItem::getCompanyID, pa.getCompanyID()).or().eq(TbMonitorItem::getCompanyID, -1));
             } else {
-                queryWrapper.lambda().eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
+                queryWrapper.eq(TbMonitorItem::getCompanyID, pa.getCompanyID());
             }
         }
         if (pa.getProjectID() != null) {
-            queryWrapper.lambda().eq(TbMonitorItem::getProjectID, pa.getProjectID());
+            queryWrapper.eq(TbMonitorItem::getProjectID, pa.getProjectID());
         }
         if (pa.getProjectType() != null) {
-            queryWrapper.lambda().eq(TbMonitorItem::getProjectType, pa.getProjectType());
+            queryWrapper.eq(TbMonitorItem::getProjectType, pa.getProjectType());
         }
-        queryWrapper.orderByDesc("ID");
-        Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper.lambda()
+        if (pa.getEnable() != null) {
+            queryWrapper.eq(TbMonitorItem::getEnable, pa.getEnable());
+        }
+        queryWrapper.orderByDesc(TbMonitorItem::getID);
+        Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper
                 .and(wrapper -> wrapper.like(TbMonitorItem::getAlias, e).or().like(TbMonitorItem::getName, e)));
         return tbMonitorItemMapper.selectList(
                 queryWrapper

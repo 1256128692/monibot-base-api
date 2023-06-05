@@ -111,6 +111,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测项目ID
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配  属性名称， 属性标识
      * @apiParam (请求参数) {Int} [createType] 创建类型 null:所有,0:预定义,1:自定义
      * @apiParam (请求参数) {Boolean} [companyItem] 公司监测项目模板？
@@ -173,6 +174,7 @@ public class MonitorItemController {
      * @apiName QueryWtMonitorItemList
      * @apiDescription 查询水利监测项目列表, monitorClass为空时, 查该项目下已有的监测类型, monitorClass不为空时,则进入编辑页面,查全部监测类型
      * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiParam (请求参数) {Boolean} enable 是否启用
      * @apiParam (请求参数) {Int} [monitorClass] 监测类别(0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测 空:all)
      * @apiSuccess (返回结果) {Object[]} data.monitorClassList 监测类别列表
      * @apiSuccess (返回结果) {Int} monitorClassList.monitorClass 监测类别ID
@@ -241,6 +243,7 @@ public class MonitorItemController {
      * @apiName QuerySuperMonitorItemList
      * @apiDescription 查询系统监测项目列表 系统权限，预定义权限，不允许授予第三方。
      * @apiParam (请求参数) {Int} [createType] 创建类型
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [companyID] 公司ID 预定义监测项目该项传-1
      * @apiParam (请求参数) {Int} [projectID] 项目ID, 公司监测项目模板该项传-1
      * @apiParam (请求参数) {Int} [projectType] 项目类型
@@ -268,6 +271,7 @@ public class MonitorItemController {
      * @apiName QueryMonitorItemNameList
      * @apiDescription 查询公司下全部已配置监测类别、监测类型和监测项目名称
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [projectID] 工程ID,若不加则认为是多工程
      * @apiSuccess (返回结果) {Object[]} list 监测项目信息列表
      * @apiSuccess (返回结果) {String} list.monitorClassName 监测类别名称

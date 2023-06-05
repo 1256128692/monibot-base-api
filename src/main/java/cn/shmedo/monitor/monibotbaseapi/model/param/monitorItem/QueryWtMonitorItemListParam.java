@@ -15,6 +15,7 @@ public class QueryWtMonitorItemListParam implements ParameterValidator, Resource
     private Integer projectID;
 
     private Integer monitorClass;
+    private Boolean enable;
 
     @Override
     public ResultWrapper<?> validate() {

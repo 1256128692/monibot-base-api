@@ -30,7 +30,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     int updateByPrimaryKey(TbMonitorItem record);
 
-    List<MonitorItemBaseInfo> selectListByMonitorClassAndProID(List<Integer> monitorClassIDList, Integer projectID);
+    List<MonitorItemBaseInfo> selectListByMonitorClassAndProID(List<Integer> monitorClassIDList, Integer projectID, Boolean enable);
 
     List<MonitorItemBaseInfo> selectListByCondition(Integer companyID, List<Integer> proIDList, Integer queryType);
 
@@ -40,9 +40,9 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     void updateProjectIDBatch(List<Integer> monitorItemIDList, Integer projectID, Integer userID, Date now);
 
-    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer companyID, Integer projectID, Byte createType, String queryCode, Integer monitorType, List<Integer> idList, Boolean companyItem, Integer monitorItemID);
+    IPage<MonitorItem4Web> queryPage(Page<MonitorItem4Web> page, Integer companyID, Integer projectID, Byte createType, String queryCode, Integer monitorType, List<Integer> idList, Boolean companyItem, Integer monitorItemID, Boolean enable);
 
-    List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType);
+    List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType, Boolean enable);
 
     List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList);
 
