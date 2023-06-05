@@ -15,6 +15,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 public class QueryRainMonitorPointSensorDataListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -63,10 +64,25 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
             if (density.equals("all")){
                 density = null;
             }
+
+            if (density.endsWith("h")) {
+                int hours = Integer.parseInt(density.substring(0, density.length() - 1));
+                LocalDateTime beginDateTime = begin.toLocalDateTime().minusHours(hours);
+                LocalDateTime endDateTime = end.toLocalDateTime().plusHours(hours);
+                this.begin = Timestamp.valueOf(beginDateTime);
+                this.end = Timestamp.valueOf(endDateTime);
+            } else if (density.endsWith("m")) {
+                int minutes = Integer.parseInt(density.substring(0, density.length() - 1));
+                LocalDateTime beginDateTime = begin.toLocalDateTime().minusMinutes(minutes);
+                LocalDateTime endDateTime = end.toLocalDateTime().plusMinutes(minutes);
+                this.begin = Timestamp.valueOf(beginDateTime);
+                this.end = Timestamp.valueOf(endDateTime);
+            }
         }
 
         // 将 begin 的时间减去 2 小时
 //        this.begin = new Timestamp(DateUtil.offsetHour(begin, -2).getTime());
+//        this.end = new Timestamp(DateUtil.offsetHour(end, 2).getTime());
         return null;
     }
 

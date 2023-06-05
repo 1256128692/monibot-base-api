@@ -15,7 +15,7 @@ public enum CompareInterval {
     DIS3(2, "distance", "保证水位", "超保证水位", 1),
 
     //雨量-雨量
-    RAIN(31, "rainfall", "警戒雨量", "超警戒雨量", 1),
+    RAIN(31, "periodRainfall", "警戒雨量", "超警戒雨量", 1),
 
     //雨量-日降雨量
     D_RAIN0(31, "dailyRainfall", "暴雨", "暴雨", 1),

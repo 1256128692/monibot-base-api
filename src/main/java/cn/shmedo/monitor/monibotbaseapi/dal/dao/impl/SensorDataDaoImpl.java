@@ -124,10 +124,11 @@ public class SensorDataDaoImpl implements SensorDataDao {
         } else {
             flag = false;
         }
-
+        // 时间根据密度往后推
+        Timestamp beginTime = TimeUtil.calculateNewBeginTime(begin.toLocalDateTime(), density);
 
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, flag);
-        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String beginString = TimeUtil.formatInfluxTimeString(beginTime);
         String endString = TimeUtil.formatInfluxTimeString(end);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
