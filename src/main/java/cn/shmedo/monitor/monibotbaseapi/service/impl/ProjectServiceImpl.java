@@ -84,6 +84,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final FileService fileService;
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
+    private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -155,6 +156,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 });
             });
             tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
+            // 根据监测项目处理监测类别
+            List<Byte> monitorClassList = pa.getMonitorItems().stream().map(TbMonitorItem::getMonitorClass).filter(Objects::nonNull).toList();
+            if (CollectionUtils.isNotEmpty(monitorClassList)) {
+                List<TbProjectMonitorClass> tempList = monitorClassList.stream().map(e -> {
+                    TbProjectMonitorClass obj = new TbProjectMonitorClass();
+                    obj.setProjectID(tbProjectInfo.getID());
+                    obj.setMonitorClass(e.intValue());
+                    obj.setEnable(true);
+                    obj.setDensity("2h");
+                    return obj;
+
+                }).toList();
+                tbProjectMonitorClassMapper.insertBatch(tempList);
+            }
+
         }
 
         // 新增项目权限
