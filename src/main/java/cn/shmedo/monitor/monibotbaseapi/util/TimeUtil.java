@@ -510,4 +510,17 @@ public class TimeUtil {
         return Timestamp.valueOf(begin);
     }
 
+
+
+    // 解析时间字符串为 Timestamp 对象
+    public static Timestamp parseTimestamp(String timestampStr) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            java.util.Date parsedDate = dateFormat.parse(timestampStr);
+            return new Timestamp(parsedDate.getTime());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
