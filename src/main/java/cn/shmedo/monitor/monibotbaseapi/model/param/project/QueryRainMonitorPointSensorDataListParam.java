@@ -63,21 +63,22 @@ public class QueryRainMonitorPointSensorDataListParam implements ParameterValida
             // 传输条件为all时,置空查询密度,即可查询全部数据
             if (density.equals("all")){
                 density = null;
+            }else {
+                if (density.endsWith("h")) {
+                    int hours = Integer.parseInt(density.substring(0, density.length() - 1));
+                    LocalDateTime beginDateTime = begin.toLocalDateTime().minusHours(hours);
+                    LocalDateTime endDateTime = end.toLocalDateTime().plusHours(hours);
+                    this.begin = Timestamp.valueOf(beginDateTime);
+                    this.end = Timestamp.valueOf(endDateTime);
+                } else if (density.endsWith("m")) {
+                    int minutes = Integer.parseInt(density.substring(0, density.length() - 1));
+                    LocalDateTime beginDateTime = begin.toLocalDateTime().minusMinutes(minutes);
+                    LocalDateTime endDateTime = end.toLocalDateTime().plusMinutes(minutes);
+                    this.begin = Timestamp.valueOf(beginDateTime);
+                    this.end = Timestamp.valueOf(endDateTime);
+                }
             }
 
-            if (density.endsWith("h")) {
-                int hours = Integer.parseInt(density.substring(0, density.length() - 1));
-                LocalDateTime beginDateTime = begin.toLocalDateTime().minusHours(hours);
-                LocalDateTime endDateTime = end.toLocalDateTime().plusHours(hours);
-                this.begin = Timestamp.valueOf(beginDateTime);
-                this.end = Timestamp.valueOf(endDateTime);
-            } else if (density.endsWith("m")) {
-                int minutes = Integer.parseInt(density.substring(0, density.length() - 1));
-                LocalDateTime beginDateTime = begin.toLocalDateTime().minusMinutes(minutes);
-                LocalDateTime endDateTime = end.toLocalDateTime().plusMinutes(minutes);
-                this.begin = Timestamp.valueOf(beginDateTime);
-                this.end = Timestamp.valueOf(endDateTime);
-            }
         }
 
         // 将 begin 的时间减去 2 小时

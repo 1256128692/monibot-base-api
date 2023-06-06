@@ -29,6 +29,7 @@ public class QueryWorkOrderStatisticsParam implements ParameterValidator, Resour
     @Range(min = 1, max = 3)
     private Integer sourceType;
 
+    private Boolean enable;
     @JsonIgnore
     private List<Integer> projectIDList;
 

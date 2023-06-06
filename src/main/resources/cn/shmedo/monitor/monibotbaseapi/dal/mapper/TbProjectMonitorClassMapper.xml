@@ -161,4 +161,13 @@
             and `Enable` = #{enable}
         </if>
     </select>
+
+    <insert id="insertBatch">
+        insert into tb_project_monitor_class (MonitorClass, ProjectID, `Enable`, Density)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.monitorClass,jdbcType=INTEGER}, #{item.projectID,jdbcType=INTEGER}, #{item.enable,jdbcType=BIT},
+             #{item.density,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
 </mapper>

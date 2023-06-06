@@ -229,6 +229,9 @@
         select ID as monitorItemID, ProjectID, `Name`, `Alias`, MonitorType, MonitorClass
         from tb_monitor_item
         where ProjectID = #{projectID}
+        <if test="enable != null">
+            and `Enable` = #{enable}
+        </if>
         <if test="monitorClassIDList != null">
             and MonitorClass in
             <foreach close=")" collection="monitorClassIDList" item="monitorClassID" open="(" separator=",">
@@ -296,6 +299,9 @@
             <if test="monitorItemID != null">
                 it.ID = #{monitorItemID}
             </if>
+            <if test="enable != null">
+                and it.Enable = #{enable}
+            </if>
             <if test="companyID !=null">
               and  it.CompanyID = #{companyID}
             </if>
@@ -338,6 +344,9 @@
         from tb_monitor_item as it
                  left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         where ProjectID = #{projectID}
+        <if test="enable != null">
+            and it.Enable = #{enable}
+        </if>
         <if test="monitorItemName != null and monitorItemName != ''">
             and (
                         Name like concat('%', #{monitorItemName}, '%')
@@ -455,5 +464,8 @@
           <if test="param.projectID != null">
               AND tpi.ID = #{param.projectID}
           </if>
+        <if test="param.enable != null">
+            and tmi.Enable = #{param.enable}
+        </if>
     </select>
 </mapper>

@@ -26,4 +26,6 @@ public interface TbProjectMonitorClassMapper extends BaseMapper<TbProjectMonitor
     void updateByCondition(UpdateWtMonitorClassParam request);
 
     List<ProjectMonitorClassBaseInfo> selectListByProjectIDAndEnable(QueryMonitorClassParam request);
+
+    void insertBatch(List<TbProjectMonitorClass> list);
 }

@@ -330,7 +330,6 @@
         from tb_monitor_point as p
                  left join tb_monitor_type as t on t.MonitorType = p.MonitorType
                  left join tb_monitor_item as it on it.id = p.MonitorItemID
-                 left join tb_sensor as s on s.MonitorPointID = p.ID
         where p.ProjectID = #{projectID}
         <if test="monitorType != null">
             and p.MonitorType = #{monitorType}
@@ -341,8 +340,10 @@
         <if test="queryCode != null and queryCode != ''">
             and (
                         p.Name like concat('%', #{queryCode}, '%')
-                    or s.Name like concat('%', #{queryCode}, '%')
-                    or s.Alias like concat('%', #{queryCode}, '%')
+                    or p.id in (select distinct MonitorPointID
+                                from tb_sensor
+                                where Name like concat('%', #{queryCode}, '%')
+                                   or Alias like concat('%', #{queryCode}, '%'))
                 )
         </if>
         order by p.ID desc
