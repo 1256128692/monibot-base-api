@@ -15,4 +15,7 @@ public class Constant {
     public static final String END_DATE = "endDate";
     public static final String FORMAT = "format";
     public static final String SELF_TIME = "self.time";
+    public static final String LEFT_PARENTHESIS = "(";
+    public static final String RIGHT_PARENTHESIS = ")";
+
 }
