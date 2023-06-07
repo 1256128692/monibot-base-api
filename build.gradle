@@ -26,6 +26,7 @@ ext {
     mathParserVersion = "5.1.0"
     jedisVersion = "3.7.0"
     lettuceVersion = "6.2.2.RELEASE"
+    feignFormVersion = "3.8.0"
 }
 
 repositories {
@@ -66,6 +67,8 @@ dependencies {
     implementation "io.github.openfeign:feign-jackson:$openFeignVersion"
     implementation "io.github.openfeign:feign-okhttp:$openFeignVersion"
     implementation "io.github.openfeign:feign-hystrix:$openFeignVersion"
+    implementation "io.github.openfeign.form:feign-form:$feignFormVersion"
+    implementation "io.github.openfeign.form:feign-form-spring:$feignFormVersion"
     testImplementation "org.projectlombok:lombok:$lombokVersion"
 
     implementation "javax.ws.rs:javax.ws.rs-api:$rsApiVerison"

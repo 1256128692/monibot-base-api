@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.file;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
@@ -9,13 +10,16 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.*;
+import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -27,6 +31,7 @@ import java.util.UUID;
 public class FileService {
 
     private final MdInfoService mdInfoService;
+    private final MdInfoFileService mdInfoFileService;
 
     private static final String BASE64_FLAG = ";base64,";
 
@@ -99,6 +104,24 @@ public class FileService {
         return base64Upload(fileContent, fileSuffix);
     }
 
+    @SneakyThrows
+    public String multipartFileUpload(MultipartFile file, String fileName, String fileType,
+                                      String fileSecret, String fileDesc, Integer folderID, String exValue,
+                                      Integer userID, Integer companyID) {
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        fileName = Optional.ofNullable(fileName).filter(e -> !e.isBlank()).orElse(FileUtil.mainName(file.getOriginalFilename()));
+        fileType = Optional.ofNullable(fileType).filter(e -> !e.isBlank()).orElse(FileUtil.extName(file.getOriginalFilename()));
+        userID = Optional.ofNullable(userID).orElse(subject.getSubjectID());
+        companyID = Optional.ofNullable(companyID).orElse(subject.getCompanyID());
+        ResultWrapper<FilePathResponse> info = mdInfoFileService.streamUploadFile(file, companyID, DefaultConstant.MD_INFO_BUCKETNAME, fileName, fileType, fileSecret,
+                fileDesc, userID, folderID, exValue );
+        if (!info.apiSuccess()) {
+            return ErrorConstant.IMAGE_INSERT_FAIL;
+        } else {
+            return info.getData().getPath();
+        }
+    }
+
 
     /**
      * 获取文件访问地址
@@ -123,7 +146,6 @@ public class FileService {
     }
 
 
-
     /**
      * 获取文件访问地址
      *
@@ -132,7 +154,7 @@ public class FileService {
      */
     @SneakyThrows
     public List<FileInfoResponse> getFileUrlList(List<String> ossPathList, Integer companyID) {
-        if (CollectionUtil.isNotEmpty(ossPathList)){
+        if (CollectionUtil.isNotEmpty(ossPathList)) {
             QueryFileListInfoRequest pojo = new QueryFileListInfoRequest();
             pojo.setCompanyID(companyID);
             pojo.setBucketName(DefaultConstant.MD_INFO_BUCKETNAME);

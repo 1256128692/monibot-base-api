@@ -4,6 +4,7 @@ package cn.shmedo.monitor.monibotbaseapi.config;
 import cn.shmedo.monitor.monibotbaseapi.factory.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
@@ -13,6 +14,7 @@ import com.netflix.hystrix.HystrixCommandGroupKey;
 import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.HystrixCommandProperties;
 import feign.Request;
+import feign.form.spring.SpringFormEncoder;
 import feign.hystrix.SetterFactory;
 import feign.jackson.JacksonDecoder;
 import feign.jackson.JacksonEncoder;
@@ -40,6 +42,7 @@ public class FeignBeans {
     private final MdInfoServiceFallbackFactory mdInfoServiceFallbackFactory;
     private final WtReportServiceFallbackFactory wtReportServiceFallbackFactory;
     private final YsServiceFallbackFactory ysServiceFallbackFactory;
+    private final MdInfoFileServiceFallbackFactory mdInfoFileServiceFallbackFactory;
 
     @Bean
     @Primary
@@ -71,6 +74,24 @@ public class FeignBeans {
                         .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
                         .requestInterceptor(template -> template
                                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
+                                .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
+    }
+
+    @Bean
+    public MdInfoFileService mdInfoFileService() {
+        SetterFactory timeoutCommandKey = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(MdInfoService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(30000));
+        return FeignFactory.hystrixClient(MdInfoFileService.class, config.getMdInfoServiceAddress(),
+                mdInfoFileServiceFallbackFactory, value -> value
+                        .encoder(new SpringFormEncoder())
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(timeoutCommandKey)
+                        .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
+                        .requestInterceptor(template -> template
+//                                .header(HttpHeaders.CONTENT_TYPE, MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
                                 .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
     }
