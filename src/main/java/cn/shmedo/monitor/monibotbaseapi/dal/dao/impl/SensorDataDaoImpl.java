@@ -248,7 +248,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             });
         } else {
             selectField.forEach(item -> {
-                querySql.append("last(").append(item).append(") as ").append(item).append(",");
+                querySql.append("mean(").append(item).append(") as ").append(item).append(",");
             });
         }
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
@@ -279,7 +279,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             });
         } else {
             selectField.forEach(item -> {
-                querySql.append("last(").append(item).append(") as ").append(item).append(",");
+                querySql.append("mean(").append(item).append(") as ").append(item).append(",");
             });
         }
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
@@ -305,7 +305,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
         selectField.forEach(item -> {
-            querySql.append("last(").append(item).append(") as ").append(item).append(",");
+            querySql.append("mean(").append(item).append(") as ").append(item).append(",");
         });
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
         sqlBuilder.append(" select ");
