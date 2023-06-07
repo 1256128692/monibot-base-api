@@ -186,6 +186,11 @@
       <if test="monitorType != null">
          MonitorType = #{monitorType}
       </if>
+      <if test="projectID != null">
+        and MonitorType in (
+        select MonitorType  from tb_monitor_item where ProjectID = #{projectID}
+        )
+      </if>
       <if test="queryCode != null and queryCode != ''">
         and (
         <if test="typeList != null and typeList.size &gt; 0">
