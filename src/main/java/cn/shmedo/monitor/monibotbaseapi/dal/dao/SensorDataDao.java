@@ -2,6 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import org.influxdb.dto.QueryResult;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -134,4 +138,13 @@ public interface SensorDataDao {
                                                             Timestamp begin, Timestamp end, Integer density, Integer monitorType);
 
 
+    /**
+     * 查询有无数据的日期返回
+     * @param sensorIDList
+     * @param begin
+     * @param end
+     * @param monitorType
+     * @return
+     */
+    List<Map<String, Object>> querySensorDayData(List<Integer> sensorIDList, Timestamp begin, Timestamp end, Integer monitorType);
 }
