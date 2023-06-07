@@ -369,6 +369,9 @@
         from tb_monitor_item as it
             left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         where it.ProjectID = #{projectID}
+        <if test="itemEnable != null">
+            and it.Enable = #{itemEnable}
+        </if>
         <if test="monitorItemIDList != null and monitorItemIDList.size &gt; 0">
             and it.id in
             <foreach close=")" collection="monitorItemIDList" item="id" open="(" separator=",">
