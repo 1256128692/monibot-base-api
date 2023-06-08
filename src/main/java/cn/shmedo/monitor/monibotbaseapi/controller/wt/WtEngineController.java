@@ -346,4 +346,25 @@ public class WtEngineController {
         tbWarnRuleService.mutateWarnRuleDevice(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
+
+    /**
+     * @api {POST} /QueryMonitorPointRuleWarnStatus 根据点位和比较区间名称查询比较区间值
+     * @apiVersion 1.0.0
+     * @apiGroup 警报规则引擎模块
+     * @apiName MutateWarnRuleDevice
+     * @apiDescription 根据点位和比较区间名称查询比较区间值
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} monitorPointID 监测点位ID
+     * @apiParam (请求参数) {String[]} upperNameList
+     * @apiSuccess (返回结果) {Object[]} dataList 数据
+     * @apiSuccess (返回结果) {String} dataList.upperName 比较区间名称
+     * @apiSuccess (返回结果) {Double} dataList.upperLimit 比较区间值
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseRuleEngine
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseRuleEngine")
+    @PostMapping(value = "/QueryMonitorPointRuleWarnStatus", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorPointRuleWarnStatus(@Valid @RequestBody QueryMonitorPointRuleWarnStatusParam param) {
+        return tbWarnRuleService.queryMonitorPointRuleWarnStatus(param);
+    }
 }

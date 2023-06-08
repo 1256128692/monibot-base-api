@@ -446,4 +446,9 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                         .set(TbWarnRule::getExValue, entity.getExValue())
         );
     }
+
+    @Override
+    public List<QueryMonitorPointRuleWarnStatusInfo> queryMonitorPointRuleWarnStatus(QueryMonitorPointRuleWarnStatusParam param) {
+        return this.baseMapper.selectMonitorPointRuleWarnStatus(param);
+    }
 }
