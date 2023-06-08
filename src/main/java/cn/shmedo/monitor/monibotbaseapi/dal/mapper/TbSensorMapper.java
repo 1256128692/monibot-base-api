@@ -27,7 +27,7 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     int updateByPrimaryKey(TbSensor record);
 
-    List<TbSensor> selectStatisticsCountByCompanyID(Integer companyID, Integer queryType);
+    List<TbSensor> selectListByCompanyIDAndQueryTypeAndProjectIDList(Integer companyID, Integer queryType, List<Integer> projectIDList);
 
     <T extends SensorListRequest> IPage<SensorListResponse> selectSensorPage(IPage<SensorListResponse> page, @Param("pa") T request);
 

@@ -414,11 +414,17 @@
 
 
 
-    <select id="selectProjectInfoByCompanyID" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <select id="selectListByCompanyIDAndProjectIDList" resultMap="BaseResultMap">
         select
         <include refid="Base_Column_List"/>
         from tb_project_info
         where CompanyID = #{companyID,jdbcType=INTEGER}
+        <if test="projectIDList != null and projectIDList.size &gt; 0">
+            and ID in
+            <foreach collection="projectIDList" item="id" separator="," open="(" close=")">
+                #{id}
+            </foreach>
+        </if>
     </select>
 
 

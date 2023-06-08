@@ -292,13 +292,17 @@
         where ID = #{ID,jdbcType=INTEGER}
     </update>
 
-    <select id="selectStatisticsCountByCompanyID" resultMap="BaseResultMap">
+    <select id="selectListByCompanyIDAndQueryTypeAndProjectIDList" resultMap="BaseResultMap">
         select ID, Status, MonitorType, MonitorPointID
         from tb_sensor
         where MonitorPointID in (select ID
                                  from tb_monitor_point
-                                 where MonitorItemID in
-            (select ID from tb_monitor_item where CompanyID = #{companyID} and MonitorClass = #{queryType})
+        where MonitorItemID in
+              (select ID from tb_monitor_item where CompanyID = #{companyID} and MonitorClass = #{queryType})
+          and ProjectID in
+        <foreach collection="projectIDList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
         )
     </select>
 

@@ -71,7 +71,8 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         Map<Integer, String> projectIDNameMap = null;
         List<Integer> projectIDList = null;
         if (WarnType.MONITOR.getCode().equals(param.getRuleType())) {
-            List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
+            List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(
+                    param.getCompanyID(), null);
             projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
             if (CollectionUtil.isEmpty(projectIDList)) {
                 return PageUtil.Page.empty();

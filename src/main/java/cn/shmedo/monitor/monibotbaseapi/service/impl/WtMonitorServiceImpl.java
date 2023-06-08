@@ -496,18 +496,19 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
-        List<TbSensor> sensorList = tbSensorMapper.selectStatisticsCountByCompanyID(pa.getCompanyID(), pa.getQueryType());
-        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(pa.getCompanyID());
+        List<TbSensor> sensorList = tbSensorMapper.selectListByCompanyIDAndQueryTypeAndProjectIDList(
+                pa.getCompanyID(), pa.getQueryType(), pa.getProjectIDList());
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(
+                pa.getCompanyID(), pa.getProjectIDList());
 
         // 当前公司下没有工程,则没有监测类型,返回空
         if (CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
             return null;
         }
         // 查询该公司下  已经存在监测点配置监测类别  的数据
-        List<Integer> projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).collect(Collectors.toList());
         LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
                 .eq(TbProjectMonitorClass::getMonitorClass, pa.getQueryType())
-                .in(TbProjectMonitorClass::getProjectID, projectIDList)
+                .in(TbProjectMonitorClass::getProjectID, pa.getProjectIDList())
                 .eq(TbProjectMonitorClass::getEnable, true);
         List<TbProjectMonitorClass> proMonitorClassList = tbProjectMonitorClassMapper.selectList(wrapper);
 
@@ -520,7 +521,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         // 监测项目列表
         List<MonitorItemBaseInfo> monitorItemList = tbMonitorItemMapper.selectListByCondition(pa.getCompanyID(), proIDList, pa.getQueryType());
         List<Integer> monitorItemIDList = monitorItemList.stream().map(MonitorItemBaseInfo::getMonitorItemID).collect(Collectors.toList());
-
+        if (CollectionUtil.isNullOrEmpty(monitorItemIDList)) {
+            return null;
+        }
         MonitorPointTypeStatisticsInfo vo = new MonitorPointTypeStatisticsInfo();
         List<MonitorTypeBaseInfo> monitorTypeBaseInfos = tbMonitorTypeMapper.selectMonitorBaseInfo(monitorItemIDList);
         monitorTypeBaseInfos.forEach(item -> {
