@@ -795,7 +795,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                     .filter(map -> {
                         String timestampStr = (String) map.get("time"); // 获取时间字符串
                         Timestamp timestamp = TimeUtil.parseTimestamp(timestampStr); // 将字符串解析为 Timestamp 对象
-                        return timestamp.after(pa.getBegin());
+                        assert timestamp != null;
+                        return timestamp.after(pa.getBegin()) && timestamp.before(pa.getEnd());
                     })
                     .collect(Collectors.toList());
             // 处理雨量历史时间段的当前雨量
@@ -816,7 +817,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             LocalDateTime dateTime = LocalDateTime.parse(timeString, formatter);
                             return dateTime.equals(targetDateTime);
                         })
-                        .collect(Collectors.toList());
+                        .toList();
                 if (!CollectionUtil.isNullOrEmpty(filteredList)) {
                     dailyRainfall = (Double) filteredList.get(0).get(DbConstant.DAILY_RAINFALL);
                 }
