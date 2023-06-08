@@ -449,7 +449,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Map<String, List<DeviceWithSensor>> iotMap = new HashMap<>();
         if (!iotSensorTypeSet.isEmpty()) {
             QueryDeviceAndSensorRequest param = QueryDeviceAndSensorRequest.builder()
-                    .companyID(CurrentSubjectHolder.getCurrentSubject().getCompanyID())
+                    .companyID(request.getCompanyID() == null ? CurrentSubjectHolder.getCurrentSubject().getCompanyID() : request.getCompanyID())
                     .iotSensorTypeList(iotSensorTypeSet)
                     .sendType(SendType.MDMBASE.toInt())
                     .sendAddressList(List.of(request.getProjectID().toString()))
