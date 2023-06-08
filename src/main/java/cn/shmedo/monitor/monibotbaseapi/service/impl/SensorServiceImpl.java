@@ -300,8 +300,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         result.setFieldList(fieldClassGroup.entrySet().stream()
                 .filter(e -> !FieldClass.EXTEND_CONFIG.equals(e.getKey()))
                 .flatMap(e -> e.getValue().values().stream())
-                        .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
-                        .filter(Objects::nonNull).toList());
+                .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(Field::getDisplayOrder))
+                .toList());
         //脚本
         Optional.ofNullable(request.getTypeTemplateCache().getTemplateScriptList())
                 .filter(e -> !e.isEmpty())
