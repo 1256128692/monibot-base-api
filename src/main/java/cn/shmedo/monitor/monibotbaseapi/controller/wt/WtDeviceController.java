@@ -260,6 +260,7 @@ public class WtDeviceController {
      * @apiName QueryProductSimpleList
      * @apiDescription 产品简要信息列表
      * @apiParam (请求参数) {Int[]} projectIDList 工程项目ID列表
+     * @apiParam (请求参数) {Int} [companyID] 公司ID,为null则获取当前用户所在公司ID
      * @apiParam (请求参数) {String} deviceToken 设备SN
      * @apiSuccess (返回结果) {Int} deviceID 设备ID
      * @apiSuccess (返回结果) {String} deviceToken 设备SN
