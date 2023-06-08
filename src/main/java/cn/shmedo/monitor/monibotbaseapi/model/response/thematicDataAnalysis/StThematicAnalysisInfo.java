@@ -16,6 +16,6 @@ public class StThematicAnalysisInfo {
     private String monitorPointGroupName;
     private String groupImage;
     private String groupConfig;
-    private List<StAnalysisDataGroup> newData;
+    private StAnalysisDataGroup newData;
     private List<StAnalysisDataGroup> avgData;
 }

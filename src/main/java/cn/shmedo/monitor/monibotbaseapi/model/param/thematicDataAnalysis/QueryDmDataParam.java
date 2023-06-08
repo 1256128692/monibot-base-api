@@ -15,7 +15,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.validator.constraints.Range;
 
+import java.sql.Timestamp;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +34,13 @@ public class QueryDmDataParam extends QueryThematicDataParam {
     @Min(value = 1, message = "监测点ID不能小于1")
     private Integer monitorPointID;
     private String fieldToken;
+    @NotNull(message = "开始时间不能为空")
+    private Timestamp startTime;
+    @NotNull(message = "结束时间不能为空")
+    private Timestamp endTime;
+    @Range(max = 3, message = "密度枚举错误,密度 0.全部;1.日平均;2.月平均;3.年平均")
+    @NotNull(message = "密度不能为空")
+    private Integer density;
     @JsonIgnore
     private TbMonitorPoint tbMonitorPoint;
     @JsonIgnore

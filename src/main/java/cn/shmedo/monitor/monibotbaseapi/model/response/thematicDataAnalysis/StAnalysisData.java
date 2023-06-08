@@ -13,7 +13,8 @@ import java.util.Date;
 @Builder(toBuilder = true)
 public class StAnalysisData {
     private Integer monitorPointID;
-    private Integer distance;
+    private Double distance;
+    private Double upperLimit;
     private Date time;
     private String monitorPointName;
     private String pointConfig;
