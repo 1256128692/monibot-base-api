@@ -187,6 +187,7 @@ public class MonitorItemController {
      * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.typeAlias 监测类型别名
      * @apiSuccess (返回结果) {Object[]} data.monitorClassList.monitorTypeList.monitorItemList 监测项目列表
      * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.monitorItemList.enable 项目是否启用
      * @apiSuccess (返回结果) {Int} data.monitorClassList.monitorTypeList.monitorItemList.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.monitorItemList.name 监测项目名称
      * @apiSuccess (返回结果) {String} data.monitorClassList.monitorTypeList.monitorItemList.alias 监测项目别名
