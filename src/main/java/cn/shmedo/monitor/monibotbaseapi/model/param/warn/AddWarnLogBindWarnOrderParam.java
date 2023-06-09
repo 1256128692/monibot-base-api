@@ -35,11 +35,20 @@ public class AddWarnLogBindWarnOrderParam implements ParameterValidator, Resourc
     @NotNull(message = "工单配置信息不能为空")
     private String exValue;
 
+    @NotNull(message = "所属组织不能为空")
+    private String organization;
+
+    @NotNull(message = "派单人姓名不能为空")
+    private String dispatcherName;
+
     @JsonIgnore
     private String orderCode;
 
     @JsonIgnore
     private Date createTime;
+
+    @JsonIgnore
+    private Date dispatchTime;
 
     @JsonIgnore
     private Integer status;
@@ -51,6 +60,7 @@ public class AddWarnLogBindWarnOrderParam implements ParameterValidator, Resourc
     public ResultWrapper<?> validate() {
         orderCode = UUID.randomUUID(true).toString();
         createTime = DateUtil.date();
+        dispatchTime = DateUtil.date();
         // 订单默认为未处理状态
         status = DefaultConstant.ORDER_NOT_STAT;
         return null;

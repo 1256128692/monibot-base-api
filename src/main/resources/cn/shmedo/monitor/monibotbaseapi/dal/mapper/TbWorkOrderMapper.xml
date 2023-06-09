@@ -136,9 +136,17 @@
                 `ExValue`,
             </if>
             <if test="createTime != null">
-                createTime,
+                CreateTime,
             </if>
-
+            <if test="organization != null">
+                Organization,
+            </if>
+            <if test="dispatcherName != null">
+                DispatcherName,
+            </if>
+            <if test="dispatchTime != null">
+                DispatchTime,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="companyID != null">
@@ -164,6 +172,15 @@
             </if>
             <if test="createTime != null">
                 #{createTime},
+            </if>
+            <if test="organization != null">
+                #{organization},
+            </if>
+            <if test="dispatcherName != null">
+                #{dispatcherName},
+            </if>
+            <if test="dispatchTime != null">
+                #{dispatchTime},
             </if>
         </trim>
     </insert>
