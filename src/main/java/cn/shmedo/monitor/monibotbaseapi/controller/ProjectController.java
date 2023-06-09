@@ -463,7 +463,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 + 应用权限 mdmbase:ListBaseProject
      */
-    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
+//    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
     @RequestMapping(value = "QueryWtProjectSimpleList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryWtProjectSimpleList(@Validated @RequestBody QueryWtProjectParam pa) {
         return projectService.queryWtProjectSimpleList(pa);
