@@ -244,6 +244,7 @@
                            on formula.FieldID = field.ID
         where field.MonitorType = #{monitorType}
           and FieldClass != 3
+        order by field.FieldClass, field.DisplayOrder
     </select>
 
     <update id="updateBatch">

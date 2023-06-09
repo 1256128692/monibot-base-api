@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWorkOrder;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.AddWarnLogBindWarnOrderParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
@@ -23,4 +24,6 @@ public interface TbWorkOrderMapper extends BaseMapper<TbWorkOrder> {
     WtWorkOrderStatisticsInfo queryWorkOrderStatistics(@Param("param") QueryWorkOrderStatisticsParam param);
 
     WtWorkOrderDetailInfo queryWorkOrderDetail(@Param("param") QueryWorkOrderWarnDetailParam param);
+
+    int insertByCondition(AddWarnLogBindWarnOrderParam param);
 }

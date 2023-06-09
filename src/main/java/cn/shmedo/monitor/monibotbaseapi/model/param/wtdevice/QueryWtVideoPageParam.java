@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -72,7 +73,7 @@ public class QueryWtVideoPageParam implements ParameterValidator, ResourcePermis
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
         if (permissionProjectList.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            return ResultWrapper.success(PageUtil.Page.empty());
         }
         this.projectIDList = permissionProjectList.stream().toList();
 

@@ -3,27 +3,30 @@
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWorkOrderMapper">
     <select id="queryWorkOrderPage"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderInfo">
-        SELECT
-            two.ID workOrderID,
-            two.OrderCode orderCode,
-            two.`Type` typeID,
-            (CASE two.`Type` WHEN 1 THEN '报警处置工单' WHEN 2 THEN '应急预案工单' WHEN 3 THEN '设备运维工单' WHEN 4 THEN '巡查巡检工单' ELSE 'unknown' END) typeName,
-            two.Organization organizationName,
-            two.Solution solution,
-            two.DispatcherName dispatcherName,
-            two.DispatchTime dispatchTime,
-            two.DisposerName disposerName,
-            two.DisposeTime disposeTime,
-            two.`Status` `status`
-        FROM
-            tb_work_order two
-            LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
-        WHERE two.CompanyID=#{param.companyID}
+        SELECT two.ID                   workOrderID,
+               two.OrderCode            orderCode,
+               two.`Type`               typeID,
+               (CASE two.`Type`
+                    WHEN 1 THEN '报警处置工单'
+                    WHEN 2 THEN '应急预案工单'
+                    WHEN 3 THEN '设备运维工单'
+                    WHEN 4 THEN '巡查巡检工单'
+                    ELSE 'unknown' END) typeName,
+               two.Organization         organizationName,
+               two.Solution             solution,
+               two.DispatcherName       dispatcherName,
+               two.DispatchTime         dispatchTime,
+               two.DisposerName         disposerName,
+               two.DisposeTime          disposeTime,
+               two.`Status`             `status`
+        FROM tb_work_order two
+                 LEFT JOIN tb_warn_log twl ON two.ID = twl.WorkOrderID
+        WHERE two.CompanyID = #{param.companyID}
         <if test="param.status != null and param.status != 0">
-            AND two.`Status`=#{param.status}
+            AND two.`Status` = #{param.status}
         </if>
         <if test="param.workOrderTypeID != null">
-            AND two.`Type`=#{param.workOrderTypeID}
+            AND two.`Type` = #{param.workOrderTypeID}
         </if>
         <if test="param.startTime != null">
             AND two.DispatchTime &gt;= #{param.startTime}
@@ -32,7 +35,7 @@
             AND two.DispatchTime &lt;= #{param.endTime}
         </if>
         <if test="param.sourceType != null">
-            AND two.SourceType=#{param.sourceType}
+            AND two.SourceType = #{param.sourceType}
         </if>
         <if test="param.projectIDList != null and param.sourceType != null and param.sourceType == 1">
             AND twl.ProjectID IN
@@ -64,39 +67,104 @@
     <select id="queryWorkOrderStatistics"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderStatisticsInfo"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam">
-        SELECT
-            COUNT( CASE WHEN two.`Status` = 1 OR twl.WorkOrderID is NULL THEN 1 END ) todoCount,
-            COUNT( CASE WHEN two.`Status` = 5 THEN 1 END ) completedCount,
-            COUNT( CASE WHEN two.`Status` IN ( 2, 3, 4 ) THEN 1 END ) processingCount
-        FROM
-        tb_warn_log twl
-            LEFT JOIN tb_work_order two ON two.ID = twl.WorkOrderID
-            LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log WHERE WarnType = 1 GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
-        WHERE
-            twl1.latest_time = twl.WarnTime
-            AND twl.ProjectID IN
-            <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
-                #{item}
-            </foreach>
-            <if test="param.sourceType != null">
-                AND two.SourceType=#{param.sourceType}
-            </if>
+        SELECT COUNT(CASE WHEN two.`Status` = 1 OR twl.WorkOrderID is NULL THEN 1 END) todoCount,
+               COUNT(CASE WHEN two.`Status` = 5 THEN 1 END)                            completedCount,
+               COUNT(CASE WHEN two.`Status` IN (2, 3, 4) THEN 1 END)                   processingCount
+        FROM tb_warn_log twl
+                 LEFT JOIN tb_work_order two ON two.ID = twl.WorkOrderID
+                 LEFT JOIN (SELECT MAX(WarnTime) latest_time, MonitorPointID
+                            FROM tb_warn_log
+                            WHERE WarnType = 1
+                            GROUP BY MonitorPointID) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
+        WHERE twl1.latest_time = twl.WarnTime
+          AND twl.ProjectID IN
+        <foreach collection="param.projectIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="param.sourceType != null">
+            AND two.SourceType = #{param.sourceType}
+        </if>
     </select>
     <select id="queryWorkOrderDetail"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderDetailInfo"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam">
-        SELECT
-            ID workOrderID,
-            OrderCode orderCode,
-            `Type` typeID,
-            ( CASE `Type` WHEN 1 THEN '报警处置工单' WHEN 2 THEN '应急预案工单' WHEN 3 THEN '设备运维工单' WHEN 4 THEN '巡查巡检工单' ELSE 'unknown' END ) typeName,
-            Organization organizationName,
-            Solution solution,
-            DispatcherName dispatcherName,
-            DispatchTime dispatchTime,
-            `Status` `status`
-        FROM
-            tb_work_order
-        WHERE ID=#{param.workOrderID}
+        SELECT ID                       workOrderID,
+               OrderCode                orderCode,
+               `Type`                   typeID,
+               (CASE `Type`
+                    WHEN 1 THEN '报警处置工单'
+                    WHEN 2 THEN '应急预案工单'
+                    WHEN 3 THEN '设备运维工单'
+                    WHEN 4 THEN '巡查巡检工单'
+                    ELSE 'unknown' END) typeName,
+               Organization             organizationName,
+               Solution                 solution,
+               DispatcherName           dispatcherName,
+               DispatchTime             dispatchTime,
+               `Status`                 `status`,
+               `ExValue`
+        FROM tb_work_order
+        WHERE ID = #{param.workOrderID}
     </select>
+
+
+
+    <insert id="insertByCondition" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.warn.AddWarnLogBindWarnOrderParam"
+            useGeneratedKeys="true">
+        insert into tb_work_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="companyID != null">
+                CompanyID,
+            </if>
+            <if test="orderCode != null">
+                OrderCode,
+            </if>
+            <if test="warnOrderName != null">
+                `Name`,
+            </if>
+            <if test="status != null">
+                `Status`,
+            </if>
+            <if test="warnType != null">
+                `Type`,
+            </if>
+            <if test="sourceType != null">
+                SourceType,
+            </if>
+            <if test="exValue != null">
+                `ExValue`,
+            </if>
+            <if test="createTime != null">
+                createTime,
+            </if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="companyID != null">
+                #{companyID,jdbcType=INTEGER},
+            </if>
+            <if test="orderCode != null">
+                #{orderCode},
+            </if>
+            <if test="warnOrderName != null">
+                #{warnOrderName},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=INTEGER},
+            </if>
+            <if test="warnType != null">
+                #{warnType,jdbcType=INTEGER},
+            </if>
+            <if test="sourceType != null">
+                #{sourceType,jdbcType=INTEGER},
+            </if>
+            <if test="exValue != null">
+                #{exValue},
+            </if>
+            <if test="createTime != null">
+                #{createTime},
+            </if>
+        </trim>
+    </insert>
 </mapper>
