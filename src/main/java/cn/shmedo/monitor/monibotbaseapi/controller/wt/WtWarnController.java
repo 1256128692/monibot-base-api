@@ -215,7 +215,7 @@ public class WtWarnController {
      * @apiName QueryWtWarnInfoDetail
      * @apiDescription 警报规则绑定工单
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
      * @apiParam (请求参数) {Int} warnID 报警记录ID
      * @apiParam (请求参数) {Int} warnType 工单类型
      * @apiParam (请求参数) {String} warnOrderName 工单名称

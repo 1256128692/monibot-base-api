@@ -39,6 +39,7 @@ public class QueryMonitorPointListParam implements ParameterValidator, ResourceP
         if (permissionProjectList.isEmpty()) {
             return ResultWrapper.withCode(ResultCode.SUCCESS, "");
         }
+        projectIDList = permissionProjectList.stream().toList();
         return null;
     }
 

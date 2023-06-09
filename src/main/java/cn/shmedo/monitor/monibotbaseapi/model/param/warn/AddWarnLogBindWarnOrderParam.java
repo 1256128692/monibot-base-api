@@ -19,7 +19,6 @@ public class AddWarnLogBindWarnOrderParam implements ParameterValidator, Resourc
 
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
-    @NotNull(message = "工程ID不能为空")
     private Integer projectID;
     @NotNull(message = "报警记录ID不能为空")
     private Integer warnID;
