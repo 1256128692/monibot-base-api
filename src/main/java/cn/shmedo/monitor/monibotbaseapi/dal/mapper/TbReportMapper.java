@@ -13,8 +13,9 @@ import java.util.List;
  */
 @Mapper
 public interface TbReportMapper {
-    List<TbBaseReportInfo> queryBaseReportInfo(@Param("companyID") Integer companyID, @Param("startTime") Date startTime,
-                                               @Param("endTime") Date endTime);
+    List<TbBaseReportInfo> queryBaseReportInfo(@Param("companyID") Integer companyID,
+                                               @Param("permissionProjectIDList") List<Integer> permissionProjectIDList,
+                                               @Param("startTime") Date startTime, @Param("endTime") Date endTime);
 
     List<TbBaseReportInfo> queryProjectReportInfo(@Param("projectIDList") List<Integer> projectIDList,
                                                   @Param("startTime") Date startTime, @Param("endTime") Date endTime);

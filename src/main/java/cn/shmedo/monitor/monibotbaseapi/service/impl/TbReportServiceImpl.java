@@ -71,7 +71,7 @@ public class TbReportServiceImpl implements ITbReportService {
                         .filter(CollectionUtil::isNotEmpty).map(u -> u.get(0)).map(Company::getShortName)
                         .orElse("余姚市水务局")).startTime(startTime).endTime(endTime);
         List<TbBaseReportInfo> tbBaseReportInfoList = tbReportMapper.queryBaseReportInfo(param.getCompanyID(),
-                startTime, endTime);
+                param.getPermissionProjectIDList(), startTime, endTime);
         Map<Integer, Map<String, Object>> sensorIDResMap = querySensorNewData(tbBaseReportInfoList);
         Collection<Object> areaCodeList = tbBaseReportInfoList.stream().map(TbBaseReportInfo::getAreaCode).distinct()
                 .map(u -> (Object) u).toList();

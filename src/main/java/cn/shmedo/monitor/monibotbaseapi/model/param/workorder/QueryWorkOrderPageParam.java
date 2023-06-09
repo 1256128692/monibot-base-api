@@ -1,17 +1,24 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.workorder;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,6 +45,8 @@ public class QueryWorkOrderPageParam implements ParameterValidator, ResourcePerm
     private Integer currentPage;
     @Range(min = 1, max = 3)
     private Integer sourceType;
+    @JsonIgnore
+    private List<Integer> projectIDList;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -45,8 +54,12 @@ public class QueryWorkOrderPageParam implements ParameterValidator, ResourcePerm
         if (endTime != null && endTime.after(current)) {
             endTime = current;
         }
-
         this.sourceType = Optional.ofNullable(sourceType).orElse(1);
+        Optional.of(sourceType).filter(u -> u == 1).ifPresent(u -> {
+            List<Integer> permissProjectIDList = PermissionUtil.getHavePermissionProjectList(companyID, null)
+                    .stream().toList();
+            projectIDList = CollectionUtil.isEmpty(permissProjectIDList) ? null : permissProjectIDList;
+        });
         return null;
     }
 
