@@ -355,7 +355,7 @@ public class WtEngineController {
      * @apiDescription 根据点位和比较区间名称查询比较区间值
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} monitorPointID 监测点位ID
-     * @apiParam (请求参数) {String[]} upperNameList
+     * @apiParam (请求参数) {String[]} upperNameList 比较区间名称list
      * @apiSuccess (返回结果) {Object[]} dataList 数据
      * @apiSuccess (返回结果) {String} dataList.upperName 比较区间名称
      * @apiSuccess (返回结果) {Double} dataList.upperLimit 比较区间值
