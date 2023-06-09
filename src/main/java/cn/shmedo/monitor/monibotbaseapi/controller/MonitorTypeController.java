@@ -434,11 +434,11 @@ public class MonitorTypeController {
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypeFieldWithFormula
-     * @apiDescription 查询监测类型属性与公式, 只包含12类型的属性
+     * @apiDescription 查询监测类型属性与公式, 只包含12类型的属性， 根据fieldClass和displayOrder排序
      * @apiParam (请求参数) {Int} companyID  公司ID
      * @apiParam (请求参数) {Int} monitorType  监测类型
      * @apiParam (请求参数) {Int} [templateID]  模板ID  该项不存在则只查询属性
-     * @apiSuccess (返回结果) {Object[]} list 当前页数据
+     * @apiSuccess (返回结果) {Object[]} list
      * @apiSuccess (返回结果) {Int} list.id 属性ID
      * @apiSuccess (返回结果) {String} list.fieldName 属性名称
      * @apiSuccess (返回结果) {String} list.fieldToken 属性标识
