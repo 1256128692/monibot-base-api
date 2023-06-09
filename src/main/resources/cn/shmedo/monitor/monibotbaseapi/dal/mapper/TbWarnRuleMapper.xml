@@ -378,8 +378,23 @@
             LEFT JOIN tb_monitor_point tmp ON twr.MonitorPointID = tmp.ID
         WHERE twr.ID = #{engineID}
     </select>
+    <select id="selectMonitorPointRuleWarnStatus"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.QueryMonitorPointRuleWarnStatusInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.engine.QueryMonitorPointRuleWarnStatusParam">
+        SELECT
+            TRIM( BOTH '"' FROM JSON_EXTRACT(twt.CompareRule, "$.upperName")) upperName,
+            TRIM( BOTH '"' FROM JSON_EXTRACT(twt.CompareRule, "$.upperLimit")) upperLimit
+        FROM
+            tb_warn_trigger twt
+        WHERE
+            twt.RuleID = ( SELECT ID FROM tb_warn_rule WHERE RuleType = 1 AND MonitorPointID = #{param.monitorPointID} ORDER BY CreateTime DESC LIMIT 1 )
+            AND TRIM(BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName")) IN
+            <foreach collection="param.upperNameList" open="(" close=")" index="index" item="item" separator=",">
+                #{item}
+            </foreach>
+    </select>
 
-  <update id="updateIGNORED">
+    <update id="updateIGNORED">
     update tb_warn_rule set
         RuleType = #{ruleType,jdbcType=INTEGER},
         ProjectID = #{projectID,jdbcType=INTEGER},

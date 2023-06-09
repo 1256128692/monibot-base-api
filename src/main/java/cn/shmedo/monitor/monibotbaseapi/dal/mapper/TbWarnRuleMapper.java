@@ -1,7 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.param.engine.QueryMonitorPointRuleWarnStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.QueryWtEnginePageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.QueryMonitorPointRuleWarnStatusInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -24,4 +26,6 @@ public interface TbWarnRuleMapper extends BaseMapper<TbWarnRule> {
      * @param tbWarnRule
      */
     void updateIGNORED(TbWarnRule tbWarnRule);
+
+    List<QueryMonitorPointRuleWarnStatusInfo> selectMonitorPointRuleWarnStatus(@Param("param") QueryMonitorPointRuleWarnStatusParam param);
 }

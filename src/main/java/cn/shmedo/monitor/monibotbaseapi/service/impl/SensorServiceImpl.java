@@ -302,7 +302,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .flatMap(e -> e.getValue().values().stream())
                 .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Field::getDisplayOrder))
+                .sorted(Comparator.comparing(e -> e.getDisplayOrder() != null ? e.getDisplayOrder() : Integer.MAX_VALUE))
                 .toList());
         //脚本
         Optional.ofNullable(request.getTypeTemplateCache().getTemplateScriptList())
@@ -351,7 +351,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     return entry.getValue().stream().map( e-> Param.valueOf(request.getMonitorTypeCache(),e ));
                 }
                 default -> {
-                    //TODO SELF、MON、HISTORY 待实现
+                    //TODO SELF、MON 待实现
                     return Stream.empty();
                 }
             }

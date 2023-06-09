@@ -103,7 +103,9 @@ public class FormulaUtil {
         final String originFormula = formula;
         //检查参数是否设值
         collection.stream().filter(e -> e.getFieldValue() == null).findFirst().ifPresent(e -> {
-            throw new IllegalArgumentException("缺少必要参数");
+            e.setFieldValue(0D);
+            log.warn("公式缺少必要参数: {}", e.getOrigin());
+//            throw new IllegalArgumentException("缺少必要参数");
         });
 
         for (FormulaData data : collection) {
