@@ -402,4 +402,16 @@
              LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE twl.`ID` = #{warnID}
     </select>
+
+
+
+    <update id="updateByIdAndWorkOrderID" >
+        update tb_warn_log
+        <set>
+            <if test="workOrderID != null">
+                workOrderID = #{workOrderID},
+            </if>
+        </set>
+        where ID = #{warnID,jdbcType=INTEGER}
+    </update>
 </mapper>

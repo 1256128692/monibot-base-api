@@ -74,6 +74,7 @@ public class WorkOrderController {
      * @apiSuccess (返回结果) {Int} organizationID 所属组织ID
      * @apiSuccess (返回结果) {String} organizationName 所属组织名称
      * @apiSuccess (返回结果) {String} solution 解决方案
+     * @apiSuccess (返回结果) {String} exValue 配置
      * @apiSuccess (返回结果) {String} dispatcherName 派单人名称
      * @apiSuccess (返回结果) {DateTime} dispatchTime 派单时间
      * @apiSuccess (返回结果) {Int} status 工单状态,默认0.全部 0.全部 1.待接单 2.处置中 3.已处置 4.审核中 5.已结束 6.已关闭

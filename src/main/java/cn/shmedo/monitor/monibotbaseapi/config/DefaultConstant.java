@@ -38,4 +38,7 @@ public class DefaultConstant {
 
     public static final long NORMAL_FILE_EXPIRE_MILLI = 3600 * 1000;
     public static final List<Integer> MDWT_PROJECT_TYPE_LIST = Arrays.asList(1, 2, 3, 4);
+
+
+    public static final int ORDER_NOT_STAT = 1;
 }

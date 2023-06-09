@@ -1,7 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.AddWarnLogBindWarnOrderParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
@@ -102,7 +104,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} regionArea 行政区划，仅视频/摄像头报警
      * @apiSuccess (返回结果) {String} ruleName 规则名称，仅视频/摄像头报警
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
+     * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
     @Permission(permissionName = "mdmbase:DescribeBaseWarn")
     @PostMapping(value = "/QueryWtWarnInfoDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
@@ -198,11 +200,36 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} regionArea 行政区划
      * @apiSuccess (返回结果) {String} ruleName 规则名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseWarn
+     * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
     @Permission(permissionName = "mdmbase:DescribeBaseWarn")
     @PostMapping(value = "/QueryWtTerminalWarnInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWtTerminalWarnInfo(@Valid @RequestBody QueryWtWarnDetailParam param) {
         return tbWarnLogService.queryTerminalWarnDetail(param);
     }
+
+    /**
+     * @api {POST} /AddWarnLogBindWarnOrder 警报规则绑定工单
+     * @apiVersion 1.0.0
+     * @apiGroup 警报规则引擎模块
+     * @apiName QueryWtWarnInfoDetail
+     * @apiDescription 警报规则绑定工单
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Int} warnID 报警记录ID
+     * @apiParam (请求参数) {Int} warnType 工单类型
+     * @apiParam (请求参数) {String} warnOrderName 工单名称
+     * @apiParam (请求参数) {Int} sourceType 工单来源类型
+     * @apiParam (请求参数) {String} exValue json格式的配置信息
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseWarn")
+    @PostMapping(value = "/AddWarnLogBindWarnOrder", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addWarnLogBindWarnOrder(@Valid @RequestBody AddWarnLogBindWarnOrderParam param) {
+        tbWarnLogService.addWarnLogBindWarnOrder(param);
+        return ResultWrapper.successWithNothing();
+    }
+
 }
