@@ -221,6 +221,8 @@ public class WtWarnController {
      * @apiParam (请求参数) {String} warnOrderName 工单名称
      * @apiParam (请求参数) {Int} sourceType 工单来源类型
      * @apiParam (请求参数) {String} exValue json格式的配置信息
+     * @apiParam (请求参数) {String} organization 所属组织
+     * @apiParam (请求参数) {String} disposerName 派单人
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
