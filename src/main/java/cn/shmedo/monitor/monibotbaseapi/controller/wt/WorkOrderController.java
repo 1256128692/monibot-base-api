@@ -53,7 +53,7 @@ public class WorkOrderController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWorkOrder
      */
-    @Permission(permissionName = "mdmbase:ListBaseWorkOrder")
+//    @Permission(permissionName = "mdmbase:ListBaseWorkOrder")
     @PostMapping(value = "/QueryWorkOrderPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWorkOrderPage(@Valid @RequestBody QueryWorkOrderPageParam param) {
         return workOrderService.queryWorkOrderPage(param);

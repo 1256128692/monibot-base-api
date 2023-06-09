@@ -34,6 +34,12 @@
         <if test="param.sourceType != null">
             AND two.SourceType=#{param.sourceType}
         </if>
+        <if test="param.projectIDList != null and param.sourceType != null and param.sourceType == 1">
+            AND twl.ProjectID IN
+            <foreach collection="param.projectIDList" item="item" separator="," open="(" close=")" index="index">
+                #{item}
+            </foreach>
+        </if>
         <if test="param.queryCode != null and param.queryCode != ''">
             <choose>
                 <when test="param.sourceType != 1">

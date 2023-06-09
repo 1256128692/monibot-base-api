@@ -65,6 +65,12 @@
             AND tmi.MonitorClass IN (0,1,4)
             AND tmt.TypeName IS NOT NULL
             AND tmp.CreateTime &lt;= #{endTime}
+            <if test="permissionProjectIDList != null">
+                AND tpi.ID IN
+                <foreach collection="permissionProjectIDList" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
     </select>
     <select id="queryProjectReportInfo"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.report.TbBaseReportInfo">
