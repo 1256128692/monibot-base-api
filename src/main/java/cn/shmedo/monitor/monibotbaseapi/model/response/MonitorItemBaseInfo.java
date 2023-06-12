@@ -20,4 +20,7 @@ public class MonitorItemBaseInfo {
 
     private Integer monitorClass;
 
+
+    private Boolean enable;
+
 }

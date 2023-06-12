@@ -94,7 +94,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
 
     @Override
     public List<MonitorItemWithPoint> queryMonitorItemPointList(QueryMonitorItemPointListParam pa) {
-        List<MonitorItemWithPoint>  list = tbMonitorItemMapper.queryMonitorItemWithPointBy(pa.getProjectID(), pa.getMonitorItemIDList());
+        List<MonitorItemWithPoint> list = tbMonitorItemMapper.queryMonitorItemWithPointBy(pa.getProjectID(), pa.getMonitorItemIDList(), pa.getItemEnable());
         if (CollectionUtils.isNotEmpty(list)){
             List<TbMonitorPoint> temp = tbMonitorPointMapper.selectList(
                     new QueryWrapper<TbMonitorPoint>()

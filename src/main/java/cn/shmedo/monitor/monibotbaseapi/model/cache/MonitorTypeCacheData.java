@@ -83,7 +83,7 @@ public class MonitorTypeCacheData extends AbstractCacheData {
                     field.setFieldDataType(tbMonitorTypeField.getFieldDataType());
                     field.setFieldClass(FieldClass.codeOf(tbMonitorTypeField.getFieldClass()));
                     field.setParentID(tbMonitorTypeField.getParentID());
-                    field.setFieldCalOrder(null);
+                    field.setDisplayOrder(tbMonitorTypeField.getDisplayOrder());
                     field.setExValues(tbMonitorTypeField.getExValues());
                     field.setOperator(null);
                     field.setFieldUnitID(tbMonitorTypeField.getFieldUnitID());
@@ -128,11 +128,6 @@ public class MonitorTypeCacheData extends AbstractCacheData {
         private Integer parentID;
 
         /**
-         * 计算排序
-         */
-        private Integer fieldCalOrder;
-
-        /**
          * 扩展字段
          */
         private String exValues;
@@ -142,6 +137,10 @@ public class MonitorTypeCacheData extends AbstractCacheData {
          */
         private String operator;
 
+        /**
+         * 排序字段
+         */
+        private Integer displayOrder;
     }
 }
 

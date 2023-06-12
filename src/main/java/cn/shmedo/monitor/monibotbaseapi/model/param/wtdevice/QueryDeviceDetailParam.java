@@ -33,6 +33,8 @@ public class QueryDeviceDetailParam implements ParameterValidator, ResourcePermi
     @NotEmpty
     private Set<Integer> projectIDList;
 
+    private Integer companyID;
+
     @NotBlank
     private String deviceToken;
 
@@ -41,11 +43,11 @@ public class QueryDeviceDetailParam implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper<?> validate() {
-        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        Integer cID = this.companyID == null ? CurrentSubjectHolder.getCurrentSubject().getCompanyID() : this.companyID;
         IotService iotService = SpringUtil.getBean(IotService.class);
         ResultWrapper<List<SimpleDeviceV5>> wrapper = iotService
                 .queryDeviceSimpleBySenderAddress(QueryDeviceSimpleBySenderAddressParam.builder()
-                        .companyID(subject.getCompanyID())
+                        .companyID(cID)
                         .deviceToken(deviceToken)
                         .sendType(SendType.MDMBASE.toInt())
                         .sendAddressList(projectIDList.stream().map(String::valueOf).toList())

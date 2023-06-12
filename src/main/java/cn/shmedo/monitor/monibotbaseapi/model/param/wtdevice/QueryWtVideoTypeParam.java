@@ -23,7 +23,7 @@ public class QueryWtVideoTypeParam implements ParameterValidator, ResourcePermis
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
         if (permissionProjectList.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            return ResultWrapper.success(List.of());
         }
         this.projectIDList = permissionProjectList.stream().toList();
         return null;

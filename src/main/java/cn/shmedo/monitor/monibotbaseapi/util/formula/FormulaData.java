@@ -5,6 +5,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -51,7 +52,7 @@ public class FormulaData implements Serializable {
     /**
      * 字段值
      */
-    private Double fieldValue;
+    private BigDecimal fieldValue;
 
     /**
      * 开始时间
@@ -64,16 +65,21 @@ public class FormulaData implements Serializable {
     private long endDate;
 
     /**
-     * 设置字段值
+     * 设置字段值，数据类型直接设置，时间戳类型单位为毫秒
      *
      * @param fieldValue 字段值
      */
     public void setFieldValue(Double fieldValue) {
         if (fieldValue != null) {
-            this.fieldValue = Provide.DATA.equals(provide) ?
-                    fieldValue:
-                    Provide.UNIXMILLI.equals(provide) ?
-                            fieldValue : fieldValue / 1000;
+            switch (provide) {
+                case DATA:
+                case UNIXMILLI:
+                    this.fieldValue = BigDecimal.valueOf(fieldValue);
+                    break;
+                case UNIXSECOND:
+                    this.fieldValue = BigDecimal.valueOf(fieldValue / 1000);
+                    break;
+            }
         }
     }
 
@@ -84,8 +90,8 @@ public class FormulaData implements Serializable {
      */
     public void setFieldValue(Date fieldValue) {
         if (fieldValue != null && !Provide.DATA.equals(provide)) {
-            this.fieldValue = (double) (Provide.UNIXMILLI.equals(provide) ?
-                    fieldValue.getTime() : fieldValue.getTime() / 1000);
+            this.fieldValue = BigDecimal.valueOf((Provide.UNIXMILLI.equals(provide) ?
+                    fieldValue.getTime() : fieldValue.getTime() / 1000));
         }
     }
 

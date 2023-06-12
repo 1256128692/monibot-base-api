@@ -57,6 +57,7 @@ public class Field extends TbMonitorTypeField {
         field.setFieldDataType(e.getFieldDataType());
         field.setFormula(formulaCacheData.getFormula());
         field.setDisplayFormula(formulaCacheData.getDisplayFormula());
+        field.setDisplayOrder(e.getDisplayOrder());
         return field;
     }
 }

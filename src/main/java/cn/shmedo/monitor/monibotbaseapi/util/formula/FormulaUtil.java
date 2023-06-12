@@ -10,6 +10,7 @@ import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.mariuszgromada.math.mxparser.Expression;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -102,11 +103,15 @@ public class FormulaUtil {
         final String originFormula = formula;
         //检查参数是否设值
         collection.stream().filter(e -> e.getFieldValue() == null).findFirst().ifPresent(e -> {
-            throw new IllegalArgumentException(StrUtil.format("缺少必要参数"));
+            e.setFieldValue(0D);
+            log.warn("公式缺少必要参数: {}", e.getOrigin());
+//            throw new IllegalArgumentException("缺少必要参数");
         });
 
         for (FormulaData data : collection) {
-            formula = formula.replace(data.getOrigin(), data.getFieldValue().toString());
+            formula = formula.replace(data.getOrigin(), data.getFieldValue().compareTo(BigDecimal.ZERO) < 0 ?
+                    StrUtil.concat(false, Constant.LEFT_PARENTHESIS, data.getFieldValue().toPlainString(),
+                            Constant.RIGHT_PARENTHESIS) : data.getFieldValue().toPlainString());
         }
         //调用mathParser进行计算
         Expression e = new Expression(formula);

@@ -20,6 +20,7 @@ import java.util.List;
 public class QueryMonitorItemPointListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer projectID;
+    private Boolean itemEnable;
     @Valid
     private List<@NotNull Integer> monitorItemIDList;
     @Override

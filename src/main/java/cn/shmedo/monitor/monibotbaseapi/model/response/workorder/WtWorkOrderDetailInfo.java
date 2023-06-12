@@ -20,4 +20,6 @@ public class WtWorkOrderDetailInfo {
     private String dispatcherName;
     private Date dispatchTime;
     private Integer status;
+
+    private String exValue;
 }

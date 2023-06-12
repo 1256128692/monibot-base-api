@@ -248,7 +248,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             });
         } else {
             selectField.forEach(item -> {
-                querySql.append("last(").append(item).append(") as ").append(item).append(",");
+                querySql.append("mean(").append(item).append(") as ").append(item).append(",");
             });
         }
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
@@ -279,7 +279,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             });
         } else {
             selectField.forEach(item -> {
-                querySql.append("last(").append(item).append(") as ").append(item).append(",");
+                querySql.append("mean(").append(item).append(") as ").append(item).append(",");
             });
         }
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
@@ -305,7 +305,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         StringBuilder querySql = new StringBuilder();
         selectField.forEach(item -> {
-            querySql.append("last(").append(item).append(") as ").append(item).append(",");
+            querySql.append("mean(").append(item).append(") as ").append(item).append(",");
         });
         String selectFieldString = querySql.toString().substring(0, querySql.toString().length() - 1);
         sqlBuilder.append(" select ");
@@ -496,6 +496,29 @@ public class SensorDataDaoImpl implements SensorDataDao {
         }
 
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
+
+    @Override
+    public List<Map<String, Object>> querySensorDayData(List<Integer> sensorIDList, Timestamp begin, Timestamp end, Integer monitorType) {
+
+        String beginString = TimeUtil.formatInfluxTimeString(begin);
+        String endString = TimeUtil.formatInfluxTimeString(end);
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, true);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+        StringBuilder sqlBuilder = new StringBuilder();
+        sqlBuilder.append(" select * from ").append(measurement);
+        sqlBuilder.append(" where time>='" + beginString + "' and time<='" + endString + "' ");
+        sqlBuilder.append(" and ( ");
+        sqlBuilder.append(sidOrString).append(" ) ");
+        sqlBuilder.append(" order by time asc ");
+        sqlBuilder.append(" tz('Asia/Shanghai') ");
+        String sql = sqlBuilder.toString();
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        List<String> selectField = new LinkedList<>();
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 

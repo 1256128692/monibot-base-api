@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
@@ -23,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class QueryProjectBaseInfoListParam  implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryProjectBaseInfoListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
 
     @NotNull
@@ -59,13 +56,15 @@ public class QueryProjectBaseInfoListParam  implements ParameterValidator, Resou
             return ResultWrapper.successWithNothing();
         }
         // 2.校验项目权限
-        this.projectIDs = PermissionUtil.getHavePermissionProjectList(companyID,projectIDList);
-        if (projectIDs.isEmpty()) {
-            return ResultWrapper.successWithNothing();
+        Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
+        if (permissionProjectList.isEmpty()) {
+            return ResultWrapper.withCode(ResultCode.SUCCESS, "");
+        } else {
+            projectIDs = permissionProjectList.stream().toList();
         }
 
         // 3.根据有权限的工程ID和监测项目名称,去查询监测点列表
-        monitorPointWithSensorList = tbMonitorPointMapper.selectListByProjectIDsAndMonitorItemName(projectIDList, monitorItemName);
+        monitorPointWithSensorList = tbMonitorPointMapper.selectListByProjectIDsAndMonitorItemName(projectIDs.stream().toList(), monitorItemName);
 
         List<Integer> monitorPointIDList = monitorPointWithSensorList.stream().map(MonitorPointWithSensor::getMonitorPointID).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(monitorPointIDList)) {

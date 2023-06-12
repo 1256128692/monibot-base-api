@@ -48,7 +48,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int deleteProjectInfoList(List idList);
 
-    List<TbProjectInfo> selectProjectInfoByCompanyID(Integer companyID);
+    List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(Integer companyID, List<Integer> projectIDList);
 
     List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName);
 
@@ -61,4 +61,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
                                                                  @Param("monitorType") Integer monitorType,
                                                                  @Param("groupName") String group,
                                                                  @Param("keyName") String key);
+
+;
 }

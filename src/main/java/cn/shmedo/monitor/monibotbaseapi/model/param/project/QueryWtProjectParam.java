@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +26,7 @@ import java.util.Optional;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QueryWtProjectParam  implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryWtProjectParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull
     private Integer companyID;
@@ -55,7 +57,7 @@ public class QueryWtProjectParam  implements ParameterValidator, ResourcePermiss
                     propertyList.add(new QueryProjectListRequest.Property(v1KeySet.get(projectType - 1), v)));
             Optional.ofNullable(v2).filter(StrUtil::isNotBlank).ifPresent(v ->
                     propertyList.add(new QueryProjectListRequest.Property(v2KeySet.get(projectType - 1), v)));
-        }else {
+        } else {
             Optional.ofNullable(v1).filter(StrUtil::isNotBlank).ifPresent(v ->
                     propertyList.addAll(v1KeySet.stream().map(key ->
                             new QueryProjectListRequest.Property(key, v1)).toList()));
@@ -64,9 +66,14 @@ public class QueryWtProjectParam  implements ParameterValidator, ResourcePermiss
                             new QueryProjectListRequest.Property(key, v2)).toList()));
         }
 
-        this.projectList = PermissionUtil.getHavePermissionProjectList(companyID);
-        if (projectList.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        if (tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(companyID, null).size() != 0) {
+            this.projectList = PermissionUtil.getHavePermissionProjectList(companyID);
+            if (projectList.isEmpty()) {
+                return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            }
+        } else {
+            projectList = new ArrayList<>();
         }
         return null;
     }

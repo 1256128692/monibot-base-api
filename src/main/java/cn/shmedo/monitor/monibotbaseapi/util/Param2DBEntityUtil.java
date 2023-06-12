@@ -43,7 +43,7 @@ public class Param2DBEntityUtil {
         obj.setLongitude(pa.getLongitude());
         obj.setLatitude(pa.getLatitude());
         obj.setImagePath(imgPath);
-        obj.setProjectDesc(pa.getProjectDesc());
+        obj.setProjectDesc(pa.getDesc());
         obj.setModelID(pa.getModelID());
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);

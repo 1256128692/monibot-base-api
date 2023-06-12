@@ -101,6 +101,7 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName DataSourceCatalog
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} [companyID] 公司ID， 该项为null则使用当前用户所在公司ID
      * @apiParam (请求体) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
      * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParam (请求体) {String} [keyword] 检索关键字

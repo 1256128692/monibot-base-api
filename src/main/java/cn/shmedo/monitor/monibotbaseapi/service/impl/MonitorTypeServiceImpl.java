@@ -82,7 +82,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType());
+        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID());
         if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }

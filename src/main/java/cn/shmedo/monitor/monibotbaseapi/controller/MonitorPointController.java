@@ -256,6 +256,7 @@ public class MonitorPointController {
      * @apiName QueryMonitorItemPointList
      * @apiDescription 查询监测项目下监测点列表
      * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Boolean} [itemEnable] 监测项目是否启用
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiSuccess (返回结果) {Object[]} list
      * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID

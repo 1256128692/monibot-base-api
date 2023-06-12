@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 @Builder(toBuilder = true)
 public class StAnalysisDataGroup {
-    private Integer distance;
+    private Double distance;
     private Date time;
     private List<StAnalysisData> dataList;
 }

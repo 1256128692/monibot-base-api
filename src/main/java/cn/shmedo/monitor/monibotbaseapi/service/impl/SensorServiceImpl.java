@@ -300,8 +300,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         result.setFieldList(fieldClassGroup.entrySet().stream()
                 .filter(e -> !FieldClass.EXTEND_CONFIG.equals(e.getKey()))
                 .flatMap(e -> e.getValue().values().stream())
-                        .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
-                        .filter(Objects::nonNull).toList());
+                .map(e -> Field.valueOf(e, formulaMap.get(e.getID())))
+                .filter(Objects::nonNull)
+                .sorted(Comparator.comparing(e -> e.getDisplayOrder() != null ? e.getDisplayOrder() : Integer.MAX_VALUE))
+                .toList());
         //脚本
         Optional.ofNullable(request.getTypeTemplateCache().getTemplateScriptList())
                 .filter(e -> !e.isEmpty())
@@ -349,7 +351,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     return entry.getValue().stream().map( e-> Param.valueOf(request.getMonitorTypeCache(),e ));
                 }
                 default -> {
-                    //TODO SELF、MON、HISTORY 待实现
+                    //TODO SELF、MON 待实现
                     return Stream.empty();
                 }
             }
@@ -447,7 +449,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Map<String, List<DeviceWithSensor>> iotMap = new HashMap<>();
         if (!iotSensorTypeSet.isEmpty()) {
             QueryDeviceAndSensorRequest param = QueryDeviceAndSensorRequest.builder()
-                    .companyID(CurrentSubjectHolder.getCurrentSubject().getCompanyID())
+                    .companyID(request.getCompanyID() == null ? CurrentSubjectHolder.getCurrentSubject().getCompanyID() : request.getCompanyID())
                     .iotSensorTypeList(iotSensorTypeSet)
                     .sendType(SendType.MDMBASE.toInt())
                     .sendAddressList(List.of(request.getProjectID().toString()))

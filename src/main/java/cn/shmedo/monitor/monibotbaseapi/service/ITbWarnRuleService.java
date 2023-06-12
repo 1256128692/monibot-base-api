@@ -2,9 +2,12 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.QueryMonitorPointRuleWarnStatusInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtengine.WtEngineDetail;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 public interface ITbWarnRuleService extends IService<TbWarnRule> {
     PageUtil.Page<?> queryWtEnginePage(QueryWtEnginePageParam param);
@@ -24,4 +27,6 @@ public interface ITbWarnRuleService extends IService<TbWarnRule> {
     void mutateWarnRuleDevice(MutateWarnRuleDeviceParam pa, Integer userID);
 
     void statRuleRelatDevice(Integer ruleID, Integer CompanyID);
+
+    List<QueryMonitorPointRuleWarnStatusInfo> queryMonitorPointRuleWarnStatus(QueryMonitorPointRuleWarnStatusParam param);
 }

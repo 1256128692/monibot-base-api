@@ -6,16 +6,25 @@ import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.QuerySensorHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.StatisticsSensorDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHasDataCountResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.AllArgsConstructor;
+import org.influxdb.dto.QueryResult;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -45,5 +54,32 @@ public class SensorDataServiceImpl implements SensorDataService {
                 fieldSelectInfoList, pa.getRaw(), pa.getMonitorType());
 
         sensorDataDao.insertSensorData(list, true, pa.getRaw(), fieldSelectInfoList, pa.getMonitorType());
+    }
+
+    @Override
+    public SensorHasDataCountResponse querySensorHasDataCount(QuerySensorHasDataCountParam pa) {
+        SensorHasDataCountResponse vo = new SensorHasDataCountResponse();
+        List<Map<String, Object>> sensorDataList = sensorDataDao.querySensorDayData(pa.getSensorIDList(), pa.getBegin(), pa.getEnd(), pa.getMonitorType());
+        if (CollectionUtil.isEmpty(sensorDataList)) {
+            return null;
+        }
+        vo.setDensity(pa.getDensity());
+        // (小时,日,全部)将时间格式转换为"yyyy-MM-dd"
+        List<String> dataList = sensorDataList.stream()
+                .filter(map -> map.containsKey("time"))
+                .map(map -> (String) map.get("time"))
+                .map(time -> time.substring(0, 10))
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+        if (pa.getDensity().equals(AvgDensityType.MONTHLY.getValue())) {
+            // (月份)将时间格式转换为"yyyy-MM"
+            dataList = dataList.stream().map(date -> date.substring(0, 7)).distinct().collect(Collectors.toList());
+        } else if (pa.getDensity().equals(AvgDensityType.YEARLY.getValue())) {
+            // (年份)将时间格式转换为"yyyy"
+            dataList = dataList.stream().map(date -> date.substring(0, 4)).distinct().collect(Collectors.toList());
+        }
+        vo.setDataList(dataList);
+        return vo;
     }
 }

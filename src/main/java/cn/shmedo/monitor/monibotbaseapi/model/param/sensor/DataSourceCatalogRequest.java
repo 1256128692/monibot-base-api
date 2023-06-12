@@ -39,6 +39,7 @@ public class DataSourceCatalogRequest implements ParameterValidator, ResourcePer
      */
     private String keyword;
 
+    private Integer companyID;
 
     @Override
     public ResultWrapper<?> validate() {

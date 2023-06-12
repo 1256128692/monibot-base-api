@@ -308,6 +308,10 @@
         WHERE tmg1.ID IS NOT NULL
           AND tmg2.ID IS NOT NULL
           AND tmi.ID IS NOT NULL
+          AND tmg1.`Enable`=1
+          AND tmg2.`Enable`=1
+          AND tmp.`Enable` =1
+          AND tmi.`Enable`=1
           AND tmp.ProjectID =#{param.projectID}
           AND tmi.`Name` =#{param.monitorItemName}
     </select>

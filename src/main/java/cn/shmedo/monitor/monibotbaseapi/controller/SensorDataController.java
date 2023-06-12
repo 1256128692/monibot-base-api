@@ -3,7 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.QuerySensorHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.StatisticsSensorDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHasDataCountResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -50,24 +52,23 @@ public class SensorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 设备模块
      * @apiName QuerySensorHasDataCount
-     * @apiDescription 计算传感器的统计数据。当天的统计数据的时间为当天的00:00:00.000
-     * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100],必须为同一种监测类型
-     * @apiParam (请求体) {Int[]} sensorIDList 传感器列表,[1-100],必须为同一种类型的传感器
+     * @apiDescription 计算传感器有数据的时间列表。
+     * @apiParam (请求体) {Int[]} projectIDList 工程ID列表
+     * @apiParam (请求体) {Int[]} sensorIDList 传感器列表,[1-100],必须为同一种监测类型
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end 结束时间
      * @apiParam (请求体) {Int} density 密度,(0:全部 1:日 2:月, 3:年 [4,5,6,7]:小时)
-     * @apiSuccess (返回结果) {DateTime[]} dataList 监测点有数据列表，yyyy-MM-dd
-     * @apiSuccess (返回结果) {Int} density 密度,(0:全部 1:日 2:月, 3:年 [4,5,6,7]:小时)
+     * @apiSuccess (返回结果) {Object} data 结果
+     * @apiSuccess (返回结果) {String[]} data.dataList 监测点有数据列表，日格式:yyyy-MM-dd,月格式:yyyy-MM,年格式:yyyy
+     * @apiSuccess (返回结果) {Int} data.density 密度,(0:全部 1:日 2:月, 3:年 [4,5,6,7]:小时)
      * @apiSampleRequest off
-     * @apiPermission 项目权限:mdmbase:ListSensor
+     * @apiPermission 项目权限:mdmbase:ListBaseSensorData
      */
-    @Permission(permissionName = "mdmbase:ListSensor")
+    @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QuerySensorHasDataCount", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object querySensorHasDataCount(@Valid @RequestBody Object pa) {
-//        sensorDataService.statisticsSensorData(pa);
-        return ResultWrapper.successWithNothing();
+    public Object querySensorHasDataCount(@Valid @RequestBody QuerySensorHasDataCountParam pa) {
+        return sensorDataService.querySensorHasDataCount(pa);
     }
 
 

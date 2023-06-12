@@ -540,7 +540,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         Optional.ofNullable(pa.getProjectName()).filter(StrUtil::isNotBlank)
                 .ifPresent(item -> wrapper.like(TbProjectInfo::getProjectName, item));
         Optional.ofNullable(pa.getProjectType()).ifPresent(item -> wrapper.eq(TbProjectInfo::getProjectType, item));
-        List<TbProjectInfo> list = this.list(wrapper);
+        List<TbProjectInfo> list = Optional.of(pa.getProjectList()).filter(CollectionUtil::isNotEmpty)
+                .map(u -> this.list(wrapper)).orElse(new ArrayList<>());
         List<Integer> idSet = list.stream().map(TbProjectInfo::getID).toList();
 
         //属性字典

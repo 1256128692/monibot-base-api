@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -36,9 +37,9 @@ public class QueryMonitorPointListParam implements ParameterValidator, ResourceP
     public ResultWrapper<?> validate() {
         Collection<Integer> permissionProjectList = PermissionUtil.getHavePermissionProjectList(companyID, projectIDList);
         if (permissionProjectList.isEmpty()) {
-            return ResultWrapper.withCode(ResultCode.NO_PERMISSION, "没有权限访问该公司下的项目");
+            return ResultWrapper.withCode(ResultCode.SUCCESS, "");
         }
-        this.projectIDList = permissionProjectList.stream().toList();
+        projectIDList = permissionProjectList.stream().toList();
         return null;
     }
 

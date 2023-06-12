@@ -44,7 +44,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType, Boolean enable);
 
-    List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList);
+    List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList, Boolean itemEnable);
 
     void insertBatch(Collection<TbMonitorItem> collection);
 

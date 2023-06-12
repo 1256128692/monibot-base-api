@@ -85,9 +85,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     @Override
     public PageUtil.PageWithMap<Device4Web> queryWtDevicePageList(QueryWtDevicePageListParam pa) {
         PageUtil.PageWithMap<Device4Web> empty = PageUtil.PageWithMap.empty();
-        List<Integer> projectIDList = CollectionUtils.isEmpty(pa.getProjectIDList())
-                ? pa.getProjectInfos().stream().map(TbProjectInfo::getID).toList()
-                : pa.getProjectIDList();
+        List<Integer> projectIDList =
+                pa.getProjectInfos().stream().map(TbProjectInfo::getID).toList();
         if (StringUtils.isNotBlank(pa.getAreaCode())) {
             projectIDList =
                     tbProjectInfoMapper.selectList(
@@ -171,7 +170,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
-        Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectBatchIds(projectIDList).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        Map<Integer, TbProjectInfo> projectInfoMap = pa.getProjectInfos().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         if (pa.getMonitorItemID() != null) {
             allData = allData.stream().filter(
                     item -> {
@@ -231,13 +230,15 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item -> {
                         if (item.getDeviceToken().contains(pa.getQueryCode())) {
                             return true;
-                        } else if (map.containsKey(item.getUniqueToken())) {
+                        }
+                        if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorPointName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
                             )) {
                                 return true;
                             }
-                        } else if (
+                        }
+                        if (
                                 item.getProjectIDList().stream().anyMatch(
                                         pid -> projectInfoMap.containsKey(pid) && projectInfoMap.get(pid).getProjectName().contains(pa.getQueryCode())
                                 )
@@ -473,9 +474,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
     @Override
     public List<Device4Web> exportWtDevice(ExportWtDeviceParam pa) {
-        List<Integer> projectIDList = CollectionUtils.isEmpty(pa.getProjectIDList())
-                ? pa.getProjectInfos().stream().map(TbProjectInfo::getID).toList()
-                : pa.getProjectIDList();
+        List<Integer> projectIDList =
+                pa.getProjectInfos().stream().map(TbProjectInfo::getID).toList();
         if (StringUtils.isNotBlank(pa.getAreaCode())) {
             projectIDList =
                     tbProjectInfoMapper.selectList(
@@ -577,7 +577,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
-        Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectBatchIds(projectIDList).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        Map<Integer, TbProjectInfo> projectInfoMap = pa.getProjectInfos().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         if (pa.getMonitorItemID() != null) {
             allData = allData.stream().filter(
                     item -> {
@@ -624,13 +624,15 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     item -> {
                         if (item.getDeviceToken().contains(pa.getQueryCode())) {
                             return true;
-                        } else if (map.containsKey(item.getUniqueToken())) {
+                        }
+                        if (map.containsKey(item.getUniqueToken())) {
                             if (map.get(item.getUniqueToken()).stream().anyMatch(
-                                    item2 -> StringUtils.isNotBlank(item2.getMonitorItemName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
+                                    item2 -> StringUtils.isNotBlank(item2.getMonitorPointName()) && item2.getMonitorPointName().contains(pa.getQueryCode())
                             )) {
                                 return true;
                             }
-                        } else if (
+                        }
+                        if (
                                 item.getProjectIDList().stream().anyMatch(
                                         pid -> projectInfoMap.containsKey(pid) && projectInfoMap.get(pid).getProjectName().contains(pa.getQueryCode())
                                 )

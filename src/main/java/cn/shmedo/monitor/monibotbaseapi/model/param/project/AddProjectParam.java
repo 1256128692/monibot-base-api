@@ -65,7 +65,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @NotNull
     private Double longitude;
     @Size(max = 2000)
-    private String projectDesc;
+    private String desc;
     private List<Integer> tagIDList;
     @Valid
     private List<@NotNull TagKeyAndValue> tagList;

@@ -71,11 +71,12 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         Map<Integer, String> projectIDNameMap = null;
         List<Integer> projectIDList = null;
         if (WarnType.MONITOR.getCode().equals(param.getRuleType())) {
-            List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectProjectInfoByCompanyID(param.getCompanyID());
-            projectIDList = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
+            projectIDList = PermissionUtil.getHavePermissionProjectList(param.getCompanyID(), null).stream().toList();
             if (CollectionUtil.isEmpty(projectIDList)) {
                 return PageUtil.Page.empty();
             }
+            List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(
+                    param.getCompanyID(), projectIDList);
             projectIDNameMap = tbProjectInfos.stream().collect(
                     Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
         }
@@ -444,5 +445,10 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                         .eq(TbWarnRule::getID, entity.getID())
                         .set(TbWarnRule::getExValue, entity.getExValue())
         );
+    }
+
+    @Override
+    public List<QueryMonitorPointRuleWarnStatusInfo> queryMonitorPointRuleWarnStatus(QueryMonitorPointRuleWarnStatusParam param) {
+        return this.baseMapper.selectMonitorPointRuleWarnStatus(param);
     }
 }
