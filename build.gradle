@@ -5,6 +5,8 @@ plugins {
 }
 
 group = "cn.shmedo.monitor"
+
+
 version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "17"
 

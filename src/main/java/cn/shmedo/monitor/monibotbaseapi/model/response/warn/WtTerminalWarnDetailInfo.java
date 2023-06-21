@@ -22,6 +22,7 @@ public class WtTerminalWarnDetailInfo {
     private String triggerRule;
     private Integer workOrderID;
     private String workOrderCode;
+    private String workOrderSolution;
     private String deviceToken;
     private String deviceTypeName;
     private String ruleName;
