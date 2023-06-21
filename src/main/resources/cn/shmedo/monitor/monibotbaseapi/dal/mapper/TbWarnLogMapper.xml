@@ -205,7 +205,9 @@
             twt.TriggerRule triggerRule,
             twt.FieldToken fieldToken,
             two.ID workOrderID,
-            two.OrderCode workOrderCode
+            two.OrderCode workOrderCode,
+        two.ExValue         workOrderExValue,
+        two.solution       workOrderSolution
         FROM `tb_warn_log` twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
@@ -243,7 +245,9 @@
             twt.FieldToken fieldToken,
             two.ID workOrderID,
             two.OrderCode workOrderCode,
-            twr.`Name` ruleName
+            twr.`Name` ruleName,
+            two.solution        workOrderSolution
+
         FROM tb_warn_log twl
                  LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
                  LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
@@ -313,10 +317,14 @@
                 </when>
                 <otherwise>
                     twl1.latest_time = twl.WarnTime
+
                 </otherwise>
             </choose>
+
             AND twl.WarnType = 3
+
             <if test="param.warnLevel != null">
+
                 AND twl.warnLevel = #{param.warnLevel}
             </if>
             <if test="param.beginTime != null">

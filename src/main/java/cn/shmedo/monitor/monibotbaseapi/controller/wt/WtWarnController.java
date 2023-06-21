@@ -103,6 +103,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSuccess (返回结果) {String} regionArea 行政区划，仅视频/摄像头报警
      * @apiSuccess (返回结果) {String} ruleName 规则名称，仅视频/摄像头报警
+     * @apiSuccess (返回结果) {String} [workOrderSolution] 解决方案
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
@@ -196,6 +197,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} workOrderID 工单ID
      * @apiSuccess (返回结果) {String} workOrderCode 工单编号
      * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} [workOrderSolution] 解决方案
      * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSuccess (返回结果) {String} regionArea 行政区划
      * @apiSuccess (返回结果) {String} ruleName 规则名称
