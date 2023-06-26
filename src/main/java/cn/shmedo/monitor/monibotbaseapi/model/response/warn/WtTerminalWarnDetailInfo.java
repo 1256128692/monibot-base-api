@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -28,4 +30,5 @@ public class WtTerminalWarnDetailInfo {
     private String ruleName;
     @JsonIgnore
     private String uniqueToken;
+    private List<TbWarnAction> actionList;
 }
