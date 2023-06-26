@@ -104,6 +104,13 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} regionArea 行政区划，仅视频/摄像头报警
      * @apiSuccess (返回结果) {String} ruleName 规则名称，仅视频/摄像头报警
      * @apiSuccess (返回结果) {String} [workOrderSolution] 解决方案
+     * @apiSuccess (返回结果) {Object[]} [actionList] 动作描述list
+     * @apiSuccess (返回结果) {Int} actionList.ID 动作ID
+     * @apiSuccess (返回结果) {Int} actionList.triggerID 触发报警ID
+     * @apiSuccess (返回结果) {Int} actionList.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiSuccess (返回结果) {String} actionList.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {String} actionList.desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiSuccess (返回结果) {Boolean} actionList.enable 是否开启
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */
@@ -201,6 +208,13 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} deviceTypeName 设备型号（对应物联网产品名称）
      * @apiSuccess (返回结果) {String} regionArea 行政区划
      * @apiSuccess (返回结果) {String} ruleName 规则名称
+     * @apiSuccess (返回结果) {Object[]} [actionList] 动作描述list
+     * @apiSuccess (返回结果) {Int} actionList.ID 动作ID
+     * @apiSuccess (返回结果) {Int} actionList.triggerID 触发报警ID
+     * @apiSuccess (返回结果) {Int} actionList.actionType 动作类型 1:生成通知 2.事件 3.短信 4.钉钉
+     * @apiSuccess (返回结果) {String} actionList.actionTarget 动作目标json,推送的企业通讯录信息
+     * @apiSuccess (返回结果) {String} actionList.desc 描述,一般是生成报警记录的解决方案说明(200字)
+     * @apiSuccess (返回结果) {Boolean} actionList.enable 是否开启
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseWarn
      */

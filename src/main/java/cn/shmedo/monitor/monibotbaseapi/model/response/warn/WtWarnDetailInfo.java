@@ -1,11 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IFieldToken;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IMonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -42,4 +44,5 @@ public class WtWarnDetailInfo implements IFieldToken, IMonitorType {
     private String deviceTypeName;
     private String regionArea;
     private String ruleName;
+    private List<TbWarnAction> actionList;
 }

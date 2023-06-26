@@ -38,6 +38,67 @@
         </collection>
     </resultMap>
 
+    <resultMap id="wtWarnDetailMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo">
+        <result property="warnID" column="warnID" jdbcType="INTEGER"/>
+<!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
+        <result property="warnName" column="warnName" jdbcType="VARCHAR"/>
+        <result property="warnLevel" column="warnLevel" jdbcType="INTEGER"/>
+        <result property="warnTime" column="warnTime" jdbcType="TIMESTAMP"/>
+        <result property="warnContent" column="warnContent" jdbcType="VARCHAR"/>
+        <result property="projectID" column="projectID" jdbcType="INTEGER"/>
+        <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
+        <result property="monitorItemID" column="monitorItemID" jdbcType="INTEGER"/>
+        <result property="monitorItemName" column="monitorItemName" jdbcType="VARCHAR"/>
+        <result property="monitorPointID" column="monitorPointID" jdbcType="INTEGER"/>
+        <result property="monitorPointName" column="monitorPointName" jdbcType="VARCHAR"/>
+        <result property="monitorType" column="monitorType" jdbcType="INTEGER"/>
+        <result property="monitorTypeID" column="monitorTypeID" jdbcType="INTEGER"/>
+        <result property="monitorTypeName" column="monitorTypeName" jdbcType="VARCHAR"/>
+        <result property="monitorTypeAlias" column="monitorTypeAlias" jdbcType="VARCHAR"/>
+        <result property="monitorPointLocation" column="monitorPointLocation" jdbcType="VARCHAR"/>
+        <result property="installLocation" column="installLocation" jdbcType="VARCHAR"/>
+        <result property="fieldToken" column="fieldToken" jdbcType="VARCHAR"/>
+        <result property="compareRule" column="compareRule" jdbcType="VARCHAR"/>
+        <result property="triggerRule" column="triggerRule" jdbcType="VARCHAR"/>
+        <result property="workOrderID" column="workOrderID" jdbcType="INTEGER"/>
+        <result property="workOrderCode" column="workOrderCode" jdbcType="VARCHAR"/>
+        <result property="workOrderExValue" column="workOrderExValue" jdbcType="VARCHAR"/>
+        <result property="workOrderSolution" column="workOrderSolution" jdbcType="VARCHAR"/>
+        <result property="deviceToken" column="deviceToken" jdbcType="VARCHAR"/>
+        <collection property="actionList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction">
+            <result property="ID" column="actionID" jdbcType="INTEGER"/>
+            <result property="triggerID" column="triggerID" jdbcType="INTEGER"/>
+            <result property="actionType" column="actionType" jdbcType="INTEGER"/>
+            <result property="actionTarget" column="actionTarget" jdbcType="VARCHAR"/>
+            <result property="enable" column="actionEnable" jdbcType="BIT"/>
+            <result property="desc" column="actionDesc" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
+    <resultMap id="wtTerminalWarnDetaiMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnDetailInfo">
+        <result property="warnID" column="warnID" jdbcType="INTEGER"/>
+        <result property="warnName" column="warnName" jdbcType="VARCHAR"/>
+<!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
+        <result property="deviceToken" column="deviceToken" jdbcType="VARCHAR"/>
+        <result property="warnLevel" column="warnLevel" jdbcType="INTEGER"/>
+        <result property="warnContent" column="warnContent" jdbcType="VARCHAR"/>
+        <result property="warnTime" column="warnTime" jdbcType="TIMESTAMP"/>
+        <result property="compareRule" column="compareRule" jdbcType="VARCHAR"/>
+        <result property="triggerRule" column="triggerRule" jdbcType="VARCHAR"/>
+        <result property="fieldToken" column="fieldToken" jdbcType="VARCHAR"/>
+        <result property="workOrderID" column="workOrderID" jdbcType="INTEGER"/>
+        <result property="workOrderCode" column="workOrderCode" jdbcType="VARCHAR"/>
+        <result property="ruleName" column="ruleName" jdbcType="VARCHAR"/>
+        <collection property="actionList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction">
+            <result property="ID" column="actionID" jdbcType="INTEGER"/>
+            <result property="triggerID" column="triggerID" jdbcType="INTEGER"/>
+            <result property="actionType" column="actionType" jdbcType="INTEGER"/>
+            <result property="actionTarget" column="actionTarget" jdbcType="VARCHAR"/>
+            <result property="enable" column="actionEnable" jdbcType="BIT"/>
+            <result property="desc" column="actionDesc" jdbcType="VARCHAR"/>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         `ID`,`WarnType`,`ProjectID`,`MonitorType`,`MonitorItemID`,`MonitorPointID`,`SensorID`,`Name`,`WarnTime`,`WarnLevel`,`WarnContent`,`WorkOrderID`,`triggerID`,`DeviceToken`
     </sql>
@@ -180,7 +241,7 @@
         </choose>
     </select>
 
-    <select id="queryMonitorDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo"
+    <select id="queryMonitorDetail" resultMap="wtWarnDetailMap"
             parameterType="java.lang.Integer">
         SELECT
             twl.`ID` warnID,
@@ -206,8 +267,14 @@
             twt.FieldToken fieldToken,
             two.ID workOrderID,
             two.OrderCode workOrderCode,
-        two.ExValue         workOrderExValue,
-        two.Solution       workOrderSolution
+            two.ExValue workOrderExValue,
+            two.Solution workOrderSolution,
+            twa.`ID` actionID,
+            twa.triggerID triggerID,
+            twa.actionType actionType,
+            twa.actionTarget actionTarget,
+            twa.enable actionEnable,
+            twa.desc actionDesc
         FROM `tb_warn_log` twl
             LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
             LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
@@ -215,10 +282,11 @@
             LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
             LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
             LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+            LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
         WHERE twl.`ID`=#{warnID}
     </select>
 
-    <select id="queryCameraDetail" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo">
+    <select id="queryCameraDetail" resultMap="wtWarnDetailMap">
         SELECT
             twl.`ID` warnID,
             twl.`Name` warnName,
@@ -246,14 +314,20 @@
             two.ID workOrderID,
             two.OrderCode workOrderCode,
             twr.`Name` ruleName,
-            two.solution        workOrderSolution
-
+            two.solution     workOrderSolution,
+            twa.`ID`         actionID,
+            twa.triggerID    triggerID,
+            twa.actionType   actionType,
+            twa.actionTarget actionTarget,
+            twa.enable       actionEnable,
+            twa.desc         actionDesc
         FROM tb_warn_log twl
                  LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
                  LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
                  LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
                  LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
                  LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+                 LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
                  LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
                  LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE twl.`ID` = #{warnID}
@@ -388,8 +462,7 @@
         </where>
     </select>
 
-    <select id="queryTerminalWarnDetail"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnDetailInfo">
+    <select id="queryTerminalWarnDetail" resultMap="wtTerminalWarnDetaiMap">
         SELECT
             twl.`ID` warnID,
             twl.`Name` warnName,
@@ -403,11 +476,18 @@
             twt.FieldToken fieldToken,
             two.ID workOrderID,
             two.OrderCode workOrderCode,
-            twr.`Name` ruleName
+            twr.`Name`       ruleName,
+            twa.`ID`         actionID,
+            twa.triggerID    triggerID,
+            twa.actionType   actionType,
+            twa.actionTarget actionTarget,
+            twa.enable       actionEnable,
+            twa.desc         actionDesc
         FROM tb_warn_log twl
              LEFT JOIN `tb_warn_trigger` twt ON twl.triggerID = twt.ID
              LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
              LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
+             LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
         WHERE twl.`ID` = #{warnID}
     </select>
 
