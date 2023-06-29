@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
@@ -94,9 +95,6 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
                     });
         }
 
-        if (projectIDList.isEmpty()) {
-            return ResultWrapper.successWithNothing();
-        }
         return null;
     }
 

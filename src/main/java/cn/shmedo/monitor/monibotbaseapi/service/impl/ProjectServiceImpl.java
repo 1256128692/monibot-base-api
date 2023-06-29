@@ -379,6 +379,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     public PageUtil.Page<ProjectInfo> queryProjectList(QueryProjectListRequest pa) {
+        if (pa.getProjectIDList().isEmpty()) {
+            return PageUtil.Page.empty();
+        }
         IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(new Page<>(pa.getCurrentPage(), pa.getPageSize()), pa);
         if (!pageData.getRecords().isEmpty()) {
             List<Integer> ids = pageData.getRecords().stream().map(TbProjectInfo::getID).toList();
