@@ -1,7 +1,7 @@
 FROM node:12 AS buildDoc
 WORKDIR /app
 COPY . .
-RUN npm --registry https://registry.npm.taobao.org install apidoc@0.24.0 -g
+RUN npm --registry https://registry.npmmirror.com install apidoc@0.24.0 -g
 RUN apidoc -i src/main/java -o src/main/resources/static/apidoc
 
 FROM gradle:7.6-jdk17-alpine AS build

@@ -94,9 +94,6 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
                     });
         }
 
-        if (projectIDList.isEmpty()) {
-            return ResultWrapper.successWithNothing();
-        }
         return null;
     }
 
