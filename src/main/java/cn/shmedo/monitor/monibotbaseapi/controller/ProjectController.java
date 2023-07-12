@@ -87,6 +87,8 @@ public class ProjectController {
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
+     * @apiParam (请求体) {DateTime} [expiryDateBegin] 有效期开始， 有效期应大于等于当前时间
+     * @apiParam (请求体) {DateTime} [expiryDateEnd] 有效期结束， 有效期应小于等于当前时间
      * @apiParam (请求体) {DateTime} [beginCreateTime] 创建时间-开始
      * @apiParam (请求体) {DateTime} [endCreateTime] 创建时间-结束
      * @apiParam (请求体) {Object[]} [propertyEntity] 属性查询实体

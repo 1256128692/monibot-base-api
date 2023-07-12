@@ -380,6 +380,12 @@
                 <if test="pa.expiryDate != null">
                     ExpiryDate &lt;= #{pa.expiryDate} AND
                 </if>
+                <if test="pa.expiryDateBegin != null">
+                    ExpiryDate >= #{pa.expiryDateBegin} AND
+                </if>
+                <if test="pa.expiryDateEnd != null">
+                    ExpiryDate &lt;= #{pa.expiryDateEnd} AND
+                </if>
                 <if test="pa.endCreateTime != null">
                     CreateTime &lt;= #{pa.endCreateTime} AND
                 </if>
