@@ -197,11 +197,13 @@ public class Param2DBEntityUtil {
         if (pa.getCreateType().equals(CreateType.PREDEFINED.getType())){
             obj.setProjectID(-1);
             obj.setProjectType(null);
+            obj.setCompanyID(-1);
         }else {
             obj.setProjectID(pa.getProjectID());
             obj.setProjectType(pa.getTbProjectInfo().getProjectType().intValue());
+            obj.setCompanyID(pa.getTbProjectInfo().getCompanyID());
         }
-        obj.setCompanyID(pa.getTbProjectInfo().getCompanyID());
+
         obj.setEnable(pa.getEnable());
         obj.setMonitorClass(null);
         obj.setMonitorType(pa.getMonitorType());
