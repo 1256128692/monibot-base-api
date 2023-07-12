@@ -74,6 +74,25 @@ public class ProjectController {
     }
 
     /**
+     * @api {POST} /CheckProjectName 检查项目名称是否重复
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName CheckProjectName
+     * @apiDescription 检查项目名称是否重复
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
+     * @apiSuccess (返回结果) {Boolean}   usable   是否可用
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:AddBaseProject
+     */
+    @LogParam(moduleName = "项目管理模块", operationName = "检查项目名称是否重复", operationProperty = OperationProperty.QUERY)
+    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @RequestMapping(value = "CheckProjectName", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object checkProjectName(@Validated @RequestBody CheckProjectNameParam pa) {
+        return projectService.checkProjectName(pa);
+    }
+
+    /**
      * @api {post} /QueryProjectPageList 分页查询工程项目列表
      * @apiDescription 分页查询工程项目列表
      * @apiVersion 1.0.0
