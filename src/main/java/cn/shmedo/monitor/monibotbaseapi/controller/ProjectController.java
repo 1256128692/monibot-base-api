@@ -78,9 +78,9 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName CheckProjectName
-     * @apiDescription 检查项目名称是否重复
+     * @apiDescription 检查项目名称是否重复, 不会有额外校验
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
+     * @apiParam (请求体) {String} projectName 项目名称
      * @apiSuccess (返回结果) {Boolean}   usable   是否可用
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddBaseProject
