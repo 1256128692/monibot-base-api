@@ -80,13 +80,13 @@ public class AddCustomizedMonitorTypeParam implements ParameterValidator, Resour
         if (fieldList.stream().anyMatch(item -> !CreateType.isValid(item.getCreateType().byteValue()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性创建类型不合法");
         }
-        if (fieldList.stream().anyMatch(item -> !StringUtils.isBlank(item.getExValues())&&!JSONUtil.isTypeJSON(item.getExValues()))){
+        if (fieldList.stream().anyMatch(item -> !StringUtils.isBlank(item.getExValues()) && !JSONUtil.isTypeJSON(item.getExValues()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性的额外属性不合法");
         }
-        if (fieldList.stream().anyMatch(item -> !DataUnitCache.dataUnitsMap.containsKey(item.getFieldUnitID()))){
+        if (fieldList.stream().anyMatch(item -> item.getFieldUnitID() != null && !DataUnitCache.dataUnitsMap.containsKey(item.getFieldUnitID()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性单位不合法");
         }
-        if (fieldList.stream().map(MonitorTypeField4Param::getFieldToken).distinct().count()!=fieldList.size()){
+        if (fieldList.stream().map(MonitorTypeField4Param::getFieldToken).distinct().count() != fieldList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的属性标识中存在重复");
         }
         if (fieldList.stream().map(MonitorTypeField4Param::getFieldToken).distinct().count()!=fieldList.size()){
