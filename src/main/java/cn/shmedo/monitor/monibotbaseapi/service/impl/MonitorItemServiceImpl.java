@@ -244,7 +244,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                                 .monitorTypeName(info.getMonitorTypeName())
                                 .monitorItemNameList(w.getValue().stream().map(MonitorItemNameFullInfo::getMonitorItemName)
                                         .distinct().toList()).build();
-                    }).sorted(Comparator.comparingInt(MonitorTypeItemNameInfo::getDisplayOrder)).toList()).build();
+                    }).sorted(Comparator.comparing(MonitorTypeItemNameInfo::getDisplayOrder, Comparator.nullsLast(Integer::compareTo)))
+                    .toList()).build();
         }).toList();
     }
 
