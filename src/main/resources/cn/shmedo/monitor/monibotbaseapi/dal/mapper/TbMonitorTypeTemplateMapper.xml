@@ -200,7 +200,7 @@
     tmtt.DisplayOrder, tmtt.ExValues, tmtt.CreateType, tmtt.CompanyID, tmtt.DefaultTemplate,
     ttds.TemplateDataSourceToken, ttds.DataSourceType,
     (SELECT COUNT(1) FROM `tb_template_formula` ttf WHERE ttf.TemplateID = tmtt.ID) formulaCount,
-    (SELECT COUNT(1) FROM `tb_monitor_type_field` tmtf WHERE tmtf.MonitorType = tmtt.MonitorType) fieldCount,
+    (SELECT COUNT(1) FROM `tb_monitor_type_field` tmtf WHERE tmtf.MonitorType = tmtt.MonitorType AND tmtf.FieldClass !=3) fieldCount,
     (SELECT COUNT(1) FROM `tb_template_script` tts WHERE tts.TemplateID = tmtt.ID) scriptCount
     FROM
       `tb_monitor_type_template` tmtt
