@@ -5,11 +5,13 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ByteUtil;
+import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
@@ -92,7 +94,17 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     public List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request) {
-        List<DataSourceCatalogResponse> result = monitorTypeTemplateMapper.dataSourceCatalog(request);
+        List<DataSourceCatalogResponse> result = monitorTypeTemplateMapper.dataSourceCatalog(request).stream()
+                .filter(e -> {
+                    //过滤掉配置不全的模板
+                    if (CalType.FORMULA.getCode() == e.getCalType()) {
+                        return ObjUtil.equals(e.getFieldCount(), e.getFormulaCount());
+                    } else if (CalType.SCRIPT.getCode() == e.getCalType()) {
+                        return ObjUtil.equals(e.getFieldCount(), e.getScriptCount());
+                    }
+                    return true;
+                }).toList();
+
         Map<String, List<DeviceWithSensor>> iotMap = getIotMap(result, request);
         Map<String, List<TbSensor>> monitorMap = getMonitorMap(() -> result.stream()
                 .flatMap(e -> e.getDataSourceList().stream())
