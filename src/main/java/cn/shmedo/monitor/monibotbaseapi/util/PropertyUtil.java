@@ -29,22 +29,22 @@ public class PropertyUtil {
      * @return
      */
     public static ResultWrapper validate(List<ModelItem> modelPropertyList){
-        if (modelPropertyList.stream().anyMatch(item -> {
-            if (!item.getType().equals(PropertyType.TYPE_NUMBER.getType()) && ObjectUtil.isNotEmpty(item.getUnit())){
-                return true;
-            }
-            return false;
-        })){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "非数值类型不能设置单位");
-        }
+//        if (modelPropertyList.stream().anyMatch(item -> {
+//            if (!item.getType().equals(PropertyType.TYPE_NUMBER.getType()) && ObjectUtil.isNotEmpty(item.getUnit())){
+//                return true;
+//            }
+//            return false;
+//        })){
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "非数值类型不能设置单位");
+//        }
         if (modelPropertyList.stream().anyMatch(item -> {
             // 枚举类型
-            if (item.getType().equals(PropertyType.TYPE_ENUM.getType())){
-                if (ObjectUtil.hasEmpty(item.getMultiSelect(),item.getEnumField())){
+            if (item.getType().equals(PropertyType.TYPE_ENUM.getType())) {
+                if (ObjectUtil.hasEmpty(item.getMultiSelect(), item.getEnumField())) {
                     return true;
                 }
-            }else {
-                if (!ObjectUtil.isAllEmpty(item.getMultiSelect(),item.getEnumField())){
+            } else {
+                if (!ObjectUtil.isAllEmpty(item.getMultiSelect(), item.getEnumField())) {
                     return true;
                 }
             }
