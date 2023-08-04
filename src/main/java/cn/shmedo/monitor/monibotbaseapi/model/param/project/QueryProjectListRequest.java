@@ -56,6 +56,12 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expiryDate;
 
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date expiryDateBegin;
+
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    private Date expiryDateEnd;
+
     //@Past(message = "开始时间不能大于当前时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date beginCreateTime;

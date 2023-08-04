@@ -42,7 +42,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
      * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
@@ -77,7 +77,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识(max=50)
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.fieldDesc] 属性描述(max = 500)
      * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
@@ -129,7 +129,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {Int} fieldList.id 属性ID
      * @apiParam (请求参数) {String} fieldList.fieldName 属性名称(max=50)
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiParam (请求参数) {String} [fieldList.fieldDesc] 属性描述
      * @apiParam (请求参数) {String} [fieldList.exValues] 额外属性
      * @apiSuccess (返回结果) {String} none 无
@@ -157,7 +157,7 @@ public class MonitorTypeController {
      * @apiParam (请求参数) {String} fieldList.fieldToken 属性标识
      * @apiParam (请求参数) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiParam (请求参数) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiParam (请求参数) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiParam (请求参数) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiParam (请求参数) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiParam (请求参数) {Int} fieldList.createType 创建类型
      * @apiParam (请求参数) {String} [fieldList.desc] 属性描述
@@ -228,7 +228,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiSuccess (返回结果) {String} currentPageData.fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [currentPageData.fieldList.fieldUnitID] 属性单位ID
      * @apiSuccess (返回结果) {Int} [currentPageData.fieldList.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} currentPageData.fieldList.createType 创建类型
@@ -302,7 +302,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} fieldList.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiSuccess (返回结果) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiSuccess (返回结果) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiSuccess (返回结果) {Int} [fieldList.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型
@@ -540,7 +540,7 @@ public class MonitorTypeController {
      * @apiSuccess (返回结果) {String} fieldList.fieldToken 属性标识
      * @apiSuccess (返回结果) {Int} fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
      * @apiSuccess (返回结果) {String} fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
-     * @apiSuccess (返回结果) {Int} fieldList.fieldUnitID 属性单位ID
+     * @apiSuccess (返回结果) {Int} [fieldList.fieldUnitID] 属性单位ID
      * @apiSuccess (返回结果) {Int} [fieldList.parentID] 父属性ID
      * @apiSuccess (返回结果) {Int} fieldList.fieldCalOrder 属性计算排序
      * @apiSuccess (返回结果) {Int} fieldList.createType 创建类型

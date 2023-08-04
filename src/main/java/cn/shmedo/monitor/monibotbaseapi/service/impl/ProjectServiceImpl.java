@@ -609,4 +609,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         });
         return projectInfoResponseList;
     }
+
+    @Override
+    public Boolean checkProjectName(CheckProjectNameParam pa) {
+        return tbProjectInfoMapper.selectCount(
+                new LambdaQueryWrapper<TbProjectInfo>()
+                        .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
+                        .eq(TbProjectInfo::getProjectName, pa.getProjectName())
+        ) == 0
+                ;
+    }
 }

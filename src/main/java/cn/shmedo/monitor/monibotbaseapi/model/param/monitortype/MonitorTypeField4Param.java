@@ -22,7 +22,6 @@ public class MonitorTypeField4Param {
     private Integer fieldClass;
     @NotBlank
     private String fieldDataType;
-    @NotNull
     private Integer fieldUnitID;
     @NotNull
     private Integer createType;

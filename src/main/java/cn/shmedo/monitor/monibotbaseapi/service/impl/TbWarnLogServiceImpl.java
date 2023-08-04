@@ -3,11 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWorkOrderMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
@@ -36,10 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -148,25 +143,29 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                                 e.setDeviceTypeName(device.getProductName());
                                 e.setUniqueToken(device.getUniqueToken());
                             });
-                    List<WtTerminalWarnLog> otherInfo = baseMapper.queryTerminalWarnListByUniqueToken(new QueryWtTerminalWarnLogPageParam(), List.of(base.getUniqueToken()));
-                    Set<WtTerminalWarnLog.Project> projects = otherInfo.stream().map(WtTerminalWarnLog::getProjectList).findFirst().orElse(Set.of());
-                    //从redis中获取regionArea信息填充regionArea(区域名)
-                    Set<Object> areaSet = projects.stream().map(WtTerminalWarnLog.Project::getRegionArea).filter(JSONUtil::isTypeJSON)
-                            .map(e -> CollUtil.getLast(JSONUtil.parseObj(e).values())).collect(Collectors.toSet());
-                    Map<Object, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areaSet, RegionArea.class)
-                            .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
-                    projects.forEach(e -> {
-                        if (JSONUtil.isTypeJSON(e.getRegionArea())) {
-                            Map<String, Object> regionInfo = JSONUtil.toBean(e.getRegionArea(), Dict.class);
-                            Object last = CollUtil.getLast(regionInfo.values());
-                            e.setRegionArea(areaMap.getOrDefault(last, null));
-                        }
+                    // Nesting a {@code Optional.of().filter()} that for device exists but not belongs to this company
+                    // which cause the RPC querying cannot get the device info
+                    Optional.of(base).filter(u -> Objects.nonNull(u.getUniqueToken())).ifPresent(u -> {
+                        List<WtTerminalWarnLog> otherInfo = baseMapper.queryTerminalWarnListByUniqueToken(
+                                new QueryWtTerminalWarnLogPageParam(), List.of(u.getUniqueToken()));
+                        Set<WtTerminalWarnLog.Project> projects = otherInfo.stream().map(WtTerminalWarnLog::getProjectList).findFirst().orElse(Set.of());
+                        //从redis中获取regionArea信息填充regionArea(区域名)
+                        Set<Object> areaSet = projects.stream().map(WtTerminalWarnLog.Project::getRegionArea).filter(JSONUtil::isTypeJSON)
+                                .map(e -> CollUtil.getLast(JSONUtil.parseObj(e).values())).collect(Collectors.toSet());
+                        Map<Object, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areaSet, RegionArea.class)
+                                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+                        projects.forEach(e -> {
+                            if (JSONUtil.isTypeJSON(e.getRegionArea())) {
+                                Map<String, Object> regionInfo = JSONUtil.toBean(e.getRegionArea(), Dict.class);
+                                Object last = CollUtil.getLast(regionInfo.values());
+                                e.setRegionArea(areaMap.getOrDefault(last, null));
+                            }
+                        });
+                        u.setProjectList(projects);
                     });
-                    base.setProjectList(projects);
                 });
         return base;
     }
-
 
 
     @Override

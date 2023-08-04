@@ -54,10 +54,10 @@ public class UpdateCustomizedMonitorTypeFieldParam implements ParameterValidator
         if (fieldList.stream().anyMatch(item -> !MonitorTypeFieldConfig.DataTypeList.contains(item.getFieldDataType()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性数据类型不合法");
         }
-        if (fieldList.stream().anyMatch(item -> !StringUtils.isBlank(item.getExValues())&&!JSONUtil.isTypeJSON(item.getExValues()))){
+        if (fieldList.stream().anyMatch(item -> !StringUtils.isBlank(item.getExValues()) && !JSONUtil.isTypeJSON(item.getExValues()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性的额外属性不合法");
         }
-        if (fieldList.stream().anyMatch(item -> !DataUnitCache.dataUnitsMap.containsKey(item.getFieldUnitID()))){
+        if (fieldList.stream().anyMatch(item -> item.getFieldUnitID() != null && !DataUnitCache.dataUnitsMap.containsKey(item.getFieldUnitID()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型属性单位不合法");
         }
         return null;

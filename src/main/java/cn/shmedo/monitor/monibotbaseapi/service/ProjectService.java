@@ -64,4 +64,6 @@ public interface ProjectService {
     QueryWtProjectResponse queryWtProjectSimpleList(QueryWtProjectParam pa);
 
     List<QueryProjectBaseInfoResponse> queryProjectBaseInfoList(QueryProjectBaseInfoListParam pa);
+
+    Boolean checkProjectName(CheckProjectNameParam pa);
 }
