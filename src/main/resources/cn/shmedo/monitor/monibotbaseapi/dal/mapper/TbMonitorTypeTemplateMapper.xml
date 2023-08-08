@@ -171,6 +171,10 @@
       <foreach collection="list" item="type" separator="," open="(" close=")">
           #{type}
       </foreach>
+      and compnayID in
+      <foreach collection="companyIDList" item="companyID" separator="," open="(" close=")">
+          #{companyID}
+      </foreach>
       group by MonitorType
   </select>
 

@@ -91,7 +91,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<Integer> monitorTypeList = pageData.getRecords().stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
         Map<Integer, List<TbMonitorTypeField>> typeMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
-        List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList);
+        List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList, List.of(pa.getCompanyID(), -1));
         Map<Integer, Integer> countMap = countList.stream().collect(Collectors.toMap(TypeAndCount::getType, TypeAndCount::getCount));
         pageData.getRecords().forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
