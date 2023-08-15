@@ -423,9 +423,9 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                         e -> e.getProjectID().toString(), Collectors.counting()
                 ));
 
-                Map<String, Long> nameCount = collect.entrySet().stream().collect(Collectors.toMap(
-                        e -> idNameMap.get(e.getKey()), Map.Entry::getValue
-                ));
+                Map<String, Long> nameCount = collect.entrySet().stream().filter(u -> idNameMap.containsKey(u.getKey())
+                        && Objects.nonNull(idNameMap.get(u.getKey()))).collect(Collectors
+                        .toMap(e -> idNameMap.get(e.getKey()), Map.Entry::getValue));
                 if (StringUtils.isBlank(entity.getExValue())) {
                     entity.setExValue(JSONUtil.toJsonStr(Map.of("proCount", nameCount)));
                 } else {
