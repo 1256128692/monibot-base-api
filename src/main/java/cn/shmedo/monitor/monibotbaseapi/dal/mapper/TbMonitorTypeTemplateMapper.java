@@ -21,7 +21,7 @@ public interface TbMonitorTypeTemplateMapper extends BaseMapper<TbMonitorTypeTem
 
     int updateByPrimaryKey(TbMonitorTypeTemplate record);
 
-    List<TypeAndCount> countGroupByMonitorType(List<Integer> monitorTypeList);
+    List<TypeAndCount> countGroupByMonitorType(List<Integer> monitorTypeList, List<Integer> companyIDList);
 
     List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
 }

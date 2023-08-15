@@ -34,6 +34,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -90,7 +91,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<Integer> monitorTypeList = pageData.getRecords().stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
         Map<Integer, List<TbMonitorTypeField>> typeMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
-        List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList);
+        List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList, List.of(pa.getCompanyID(), -1));
         Map<Integer, Integer> countMap = countList.stream().collect(Collectors.toMap(TypeAndCount::getType, TypeAndCount::getCount));
         pageData.getRecords().forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
@@ -138,8 +139,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         List<TbMonitorTypeField> list = tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(monitorType), true);
         monitorTypeDetail.setFieldList(list.stream().filter(item -> !item.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())).collect(Collectors.toList()));
         monitorTypeDetail.setClass3FieldList(list.stream().filter(item -> item.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())).collect(Collectors.toList()));
-        QueryWrapper<TbMonitorTypeTemplate> templateQueryWrapper = new QueryWrapper<>();
-        templateQueryWrapper.eq("monitorType", monitorType);
+        LambdaQueryWrapper<TbMonitorTypeTemplate> templateQueryWrapper = new LambdaQueryWrapper<>();
+        templateQueryWrapper.eq(TbMonitorTypeTemplate::getMonitorType, monitorType);
+        templateQueryWrapper.and(qw -> qw.eq(TbMonitorTypeTemplate::getCompanyID, -1).or().eq(TbMonitorTypeTemplate::getCompanyID, companyID));
         List<TbMonitorTypeTemplate> tbMonitorTypeTemplates = tbMonitorTypeTemplateMapper.selectList(templateQueryWrapper);
         if (ObjectUtil.isNotEmpty(tbMonitorTypeTemplates)) {
             List<String> templateDataSourceIDList = tbMonitorTypeTemplates.stream().map(TbMonitorTypeTemplate::getTemplateDataSourceID).collect(Collectors.toList());
