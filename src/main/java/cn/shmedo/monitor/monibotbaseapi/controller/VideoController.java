@@ -149,4 +149,57 @@ public class VideoController {
     public Object queryVideoBaseInfo(@Valid @RequestBody QueryVideoBaseInfoParam param) {
         return videoService.queryVideoBaseInfo(param);
     }
+
+    /**
+     * @api {POST} /QueryVideoViewBaseInfo 查询视频实时预览基础信息
+     * @apiDescription 查询视频实时预览基础信息，当工程ID不为null时代表当前视频实时预览基础信息是该工程下的基础信息。<br>具体结构请参考相应示例。
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryVideoViewBaseInfo
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
+     * @apiParam (请求体) {Int} [projectID] 工程ID
+     * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} [dataList.deviceVideoID] 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} [dataList.online] 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} [dataList.deviceSerial] 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {Int[]} [dataList.directionList] 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiSuccess (返回结果) {Int[]} [dataList.deviceChannel] 通道号
+     * @apiSuccess (返回结果) {Int} [dataList.projectID] 工程ID
+     * @apiSuccess (返回结果) {Int} [dataList.monitorGroupID] 监测分组ID
+     * @apiSuccess (返回结果) {String} [dataList.monitorGroupName] 监测分组名称
+     * @apiSuccess (返回结果) {Int} [dataList.displayOrder] 监测分组展示顺序
+     * @apiSuccess (返回结果) {Object[]} [dataList.children] 子分组数据列表
+     * @apiSuccess (返回结果) {Int} [dataList.children.projectID] 工程ID
+     * @apiSuccess (返回结果) {Int} [dataList.children.monitorGroupID] 监测分组ID
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorGroupName] 监测分组名称
+     * @apiSuccess (返回结果) {Int} [dataList.children.displayOrder] 监测分组展示顺序
+     * @apiSuccess (返回结果) {Object[]} [dataList.children.monitorPointList] 监测点数据列表
+     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.displayOrder] 监测点展示顺序
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.monitorPointName] 监测点名称
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.monitorPointAlias] 监测点别称
+     * @apiSuccess (返回结果) {Object[]} [dataList.children.monitorPointList.sensorList] 监测点关联传感器数据列表
+     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.sensorList.sensorID] 传感器ID
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.sensorName] 传感器名称
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.sensorAlias] 传感器别称
+     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.sensorList.deviceVideoID] 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} [dataList.children.monitorPointList.sensorList.online] 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.deviceSerial] 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {Int[]} [dataList.children.monitorPointList.sensorList.directionList] 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiSuccess (返回结果) {Int[]} [dataList.children.monitorPointList.sensorList.deviceChannel] 通道号列表
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 企业级响应结果示例
+     * [{"deviceVideoID":1,"directionList":[1],"online":true,"deviceSerial":"","deviceChannel":[1]}]
+     * @apiSuccessExample {json} 工程级响应结果示例
+     *[{"ProjectID":1,"monitorGroupID":1,"monitorGroupName":"","displayOrder":1,"children":[{"ProjectID":1,"monitorGroupID":1,"monitorGroupName":"","displayOrder":1,"monitorPointList":[{"monitorPointID":1,"displayOrder":1,"monitorPointName":"","monitorPointAlias":"","sensorList":[{"sensorID":1,"sensorName":"","sensorAlias":"","deviceVideoID":1,"directionList":[1],"online":true,"deviceSerial":"","deviceChannel":[1]}]}]}]}]
+     * @apiPermission 系统权限 mdmbase:
+     */
+//    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/QueryVideoViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryVideoViewBaseInfo(@Valid @RequestBody Object param) {
+        //
+        return null;
+    }
 }
