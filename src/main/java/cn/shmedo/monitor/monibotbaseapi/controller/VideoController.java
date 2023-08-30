@@ -170,25 +170,25 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} [dataList.monitorGroupID] 监测分组ID
      * @apiSuccess (返回结果) {String} [dataList.monitorGroupName] 监测分组名称
      * @apiSuccess (返回结果) {Int} [dataList.displayOrder] 监测分组展示顺序
-     * @apiSuccess (返回结果) {Object[]} [dataList.children] 子分组数据列表
-     * @apiSuccess (返回结果) {Int} [dataList.children.projectID] 工程ID
-     * @apiSuccess (返回结果) {Int} [dataList.children.monitorGroupID] 监测分组ID
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorGroupName] 监测分组名称
-     * @apiSuccess (返回结果) {Int} [dataList.children.displayOrder] 监测分组展示顺序
+     * @apiSuccess (返回结果) {Object[]} [dataList.children] 子分组数据列表,含有监测分组ID的每一级(监测分组)都可能含有此项
+     * @apiSuccess (返回结果) {Int} dataList.children.projectID 工程ID
+     * @apiSuccess (返回结果) {Int} dataList.children.monitorGroupID 监测分组ID
+     * @apiSuccess (返回结果) {String} dataList.children.monitorGroupName 监测分组名称
+     * @apiSuccess (返回结果) {Int} dataList.children.displayOrder 监测分组展示顺序
      * @apiSuccess (返回结果) {Object[]} [dataList.children.monitorPointList] 监测点数据列表
-     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.monitorPointID] 监测点ID
-     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.displayOrder] 监测点展示顺序
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.monitorPointName] 监测点名称
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.monitorPointAlias] 监测点别称
-     * @apiSuccess (返回结果) {Object[]} [dataList.children.monitorPointList.sensorList] 监测点关联传感器数据列表
-     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.sensorList.sensorID] 传感器ID
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.sensorName] 传感器名称
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.sensorAlias] 传感器别称
-     * @apiSuccess (返回结果) {Int} [dataList.children.monitorPointList.sensorList.deviceVideoID] 视频设备ID
-     * @apiSuccess (返回结果) {Boolean} [dataList.children.monitorPointList.sensorList.online] 在线状态 在线:true 离线:false
-     * @apiSuccess (返回结果) {String} [dataList.children.monitorPointList.sensorList.deviceSerial] 视频设备序列号/唯一标识
-     * @apiSuccess (返回结果) {Int[]} [dataList.children.monitorPointList.sensorList.directionList] 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
-     * @apiSuccess (返回结果) {Int[]} [dataList.children.monitorPointList.sensorList.deviceChannel] 通道号列表
+     * @apiSuccess (返回结果) {Int} dataList.children.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Int} dataList.children.monitorPointList.displayOrder 监测点展示顺序
+     * @apiSuccess (返回结果) {String} dataList.children.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} dataList.children.monitorPointList.monitorPointAlias 监测点别称
+     * @apiSuccess (返回结果) {Object[]} dataList.children.monitorPointList.sensorList 监测点关联传感器数据列表
+     * @apiSuccess (返回结果) {Int} dataList.children.monitorPointList.sensorList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} dataList.children.monitorPointList.sensorList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.children.monitorPointList.sensorList.sensorAlias 传感器别称
+     * @apiSuccess (返回结果) {Int} dataList.children.monitorPointList.sensorList.deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} dataList.children.monitorPointList.sensorList.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} dataList.children.monitorPointList.sensorList.deviceSerial 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {Int[]} dataList.children.monitorPointList.sensorList.directionList 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiSuccess (返回结果) {Int[]} dataList.children.monitorPointList.sensorList.deviceChannel 通道号列表
      * @apiSampleRequest off
      * @apiSuccessExample {json} 企业级响应结果示例
      * [{"deviceVideoID":1,"directionList":[1],"online":true,"deviceSerial":"","deviceChannel":[1]}]
