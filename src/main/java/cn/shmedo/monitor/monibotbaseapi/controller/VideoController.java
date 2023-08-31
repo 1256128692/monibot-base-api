@@ -337,7 +337,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /AddVideoDeviceList V2批量添加视频设备
+     * @api {POST} /AddVideoDeviceList 批量添加视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 添加视频设备,(同步到萤石云平台,海康平台,物联网平台),如果是萤石云设备的话,要把该设备的通道信息保存到ExValue中
@@ -360,7 +360,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryVideoDeviceList V3查询视频设备列表(不分页)
+     * @api {POST} /QueryVideoDeviceList 查询视频设备列表(不分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询视频设备列表(不分页)
@@ -394,7 +394,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryYsVideoDeviceList V8查询萤石云视频分页列表
+     * @api {POST} /QueryYsVideoDeviceList 查询萤石云视频分页列表
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询萤石云视频分页列表
@@ -420,7 +420,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryHkVideoDeviceList V7查询海康视频分页列表
+     * @api {POST} /QueryHkVideoDeviceList 查询海康视频分页列表
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询萤石云视频分页列表
@@ -446,7 +446,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /DeleteVideoDeviceList V6批量删除视频设备
+     * @api {POST} /DeleteVideoDeviceList 批量删除视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 添加删除设备,(同步删除萤石云平台,物联网平台),海康平台设备无法删除
@@ -465,7 +465,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /UpdateVideoDeviceList V5批量更新视频设备
+     * @api {POST} /UpdateVideoDeviceList 批量更新视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量更新视频设备,(同步萤石云平台,物联网平台),海康平台设备无法更改
@@ -487,7 +487,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /SaveVideoDeviceSensorList V4批量存储视频传感器
+     * @api {POST} /SaveVideoDeviceSensorList 批量存储视频传感器
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量存储视频传感器,生成的视频传感器可以绑定工程,绑定抓拍配置
@@ -515,7 +515,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryVideoDevicePage V1查询视频设备列表(分页)
+     * @api {POST} /QueryVideoDevicePage 查询视频设备列表(分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量生成视频传感器
@@ -565,26 +565,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /ManualCapture V9手动抓拍
-     * @apiVersion 1.0.0
-     * @apiGroup 视频模块
-     * @apiDescription 手动抓拍
-     * @apiName ManualCapture
-     * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {String} deviceSerial 设备序列号/监控点唯一标识
-     * @apiSuccess (返回结果) {String} none 空
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
-     */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
-    @RequestMapping(value = "/ManualCapture", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object manualCapture(@Validated @RequestBody Object pa) {
-        return null;
-    }
-
-
-    /**
-     * @api {POST} /QueryCapturePage V10查询抓拍列表(分页)
+     * @api {POST} /QueryCapturePage 查询抓拍列表(分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询抓拍列表
@@ -615,7 +596,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryCaptureList V11查询抓拍列表(不分页)
+     * @api {POST} /QueryCaptureList 查询抓拍列表(不分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询抓拍列表
