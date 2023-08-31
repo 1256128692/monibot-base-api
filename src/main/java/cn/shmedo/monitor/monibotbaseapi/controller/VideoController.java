@@ -52,7 +52,7 @@ public class VideoController {
      * @api {POST} /QueryVideoMonitorPointHistoryLiveInfo 查询视频类型监测点历史时间段的直播地址信息
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 查询视频类型监测点历史时间段的直播地址信息,该接口会根据监测点下的对应的视频设备,去分析是萤石云还是海康的,返回一个地址
+     * @apiDescription 查询视频类型监测点历史时间段的直播地址信息, 该接口会根据监测点下的对应的视频设备, 去分析是萤石云还是海康的, 返回一个地址
      * @apiName QueryVideoMonitorPointHistoryLiveInfo
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
@@ -72,12 +72,11 @@ public class VideoController {
     }
 
 
-
     /**
      * @api {POST} /PanControlVideoPoint 云台控制监测点视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 云台控制监测点视频设备的摄像头移动,有(上下左右,焦距)等操作
+     * @apiDescription 云台控制监测点视频设备的摄像头移动, 有(上下左右, 焦距)等操作
      * @apiName PanControlVideoPoint
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
@@ -95,12 +94,11 @@ public class VideoController {
     }
 
 
-
     /**
      * @api {POST} /QueryVideoMonitorPointPictureInfo 查询视频类型监测点图像信息
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 查询视频类型监测点图像信息,开始时间与结束时间不能超过一周
+     * @apiDescription 查询视频类型监测点图像信息, 开始时间与结束时间不能超过一周
      * @apiName QueryVideoMonitorPointPictureInfo
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int} monitorPointID  监测点ID
@@ -161,10 +159,20 @@ public class VideoController {
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.deviceVideoID 视频设备ID
-     * @apiSuccess (返回结果) {Boolean} dataList.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {Boolean} dataList.deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 视频设备序列号/唯一标识
-     * @apiSuccess (返回结果) {Int[]} dataList.directionList 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
-     * @apiSuccess (返回结果) {Int[]} dataList.deviceChannel 通道号
+     * @apiSuccess (返回结果) {String} dataList.deviceName 设备名称
+     * @apiSuccess (返回结果) {String} dataList.deviceType 设备类型/型号
+     * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备可接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.accessPlatform 平台:萤石云平台:0 海康平台:1
+     * @apiSuccess (返回结果) {Int} dataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
+     * @apiSuccess (返回结果) {Int} dataList.companyID 注册公司ID
+     * @apiSuccess (返回结果) {Int} dataList.projectID 项目ID
+     * @apiSuccess (返回结果) {Int} dataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
+     * @apiSuccess (返回结果) {Boolean} dataList.captureStatus 设备配置抓拍 true:1 false:0
+     * @apiSuccess (返回结果) {Boolean} dataList.allocationStatus 设备分配状态 true:1 false:0
+     * @apiSuccess (返回结果) {Int[]} dataList.deviceChannel 通道号列表
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
@@ -203,16 +211,112 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorName 传感器名称
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorAlias 传感器别称
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.deviceVideoID 视频设备ID
-     * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.online 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceSerial 视频设备序列号/唯一标识
-     * @apiSuccess (返回结果) {Int[]} dataList.monitorGroupDataList.monitorPointDataList.directionList 支持的方向List,只有该方向List含有对应枚举值时才能进行相应操作。<br>枚举值定义: 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceName 设备名称
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceType 设备类型/型号
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.deviceChannelNum 设备可接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessPlatform 平台:萤石云平台:0 海康平台:1
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.companyID 注册公司ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.projectID 项目ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
      * @apiSuccess (返回结果) {Int[]} dataList.monitorGroupDataList.monitorPointDataList.deviceChannel 通道号列表
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryVideoProjectViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryVideoProjectViewBaseInfo(@Valid @RequestBody Object param) {
+        //
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryYsVideoDeviceInfo 查询萤石视频设备信息
+     * @apiDescription 查询萤石视频设备信息
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryYsVideoDeviceInfo
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {String} deviceName 设备名称
+     * @apiSuccess (返回结果) {String} deviceType 设备类型/型号
+     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入的通道号数量
+     * @apiSuccess (返回结果) {Int} accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
+     * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
+     * @apiSuccess (返回结果) {Int} companyID 注册公司ID
+     * @apiSuccess (返回结果) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
+     * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
+     * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
+     * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
+     * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
+     * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)
+     * @apiSuccess (返回结果) {Int} support_audio_onoff 是否支持声音开关设置 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} support_volumn_set 是否支持音量调节 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} support_capture 是否支持封面抓图: 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} support_talk 是否支持对讲: 0-不支持, 1-全双工, 3-半双工
+     * @apiSuccess (返回结果) {Int} support_mcvolumn_set 是否支持麦克风音量调节：0-不支持，1-支持
+     * @apiSuccess (返回结果) {Int} ptz_focus 是否支持焦距模式 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} ptz_top_bottom 是否支持云台上下转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} ptz_left_right 是否支持云台左右转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} ptz_45 是否支持云台45度方向转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} ptz_zoom 是否支持云台缩放控制 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} ptz_preset 是否支持云台预置点 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} support_rate_limit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:
+     */
+//    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/QueryYsVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryYsVideoDeviceInfo(@Valid @RequestBody Object param) {
+        //@see #queryVideoMonitorPointLiveInfo(QueryVideoMonitorPointLiveInfoParam)
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryHikVideoDeviceInfo 查询海康视频设备信息
+     * @apiDescription 查询海康视频设备信息
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryHikVideoDeviceInfo
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {String} deviceName 设备名称
+     * @apiSuccess (返回结果) {String} deviceType 设备类型/型号
+     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入的通道号数量
+     * @apiSuccess (返回结果) {Int} accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
+     * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
+     * @apiSuccess (返回结果) {Int} companyID 注册公司ID
+     * @apiSuccess (返回结果) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
+     * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
+     * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
+     * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
+     * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
+     * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)。海康能力集未标识音频播放能力，这里暂时默认拥有该能力
+     * @apiSuccess (返回结果) {Int} vss 视频能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 手动抓图、语音对讲、预置点、视频质量 操作
+     * @apiSuccess (返回结果) {Int} ptz 云台能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 调节焦距、云台控制 操作
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:
+     */
+//    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/QueryHikVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryHikVideoDeviceInfo(@Valid @RequestBody Object param) {
         //
         return null;
     }
