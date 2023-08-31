@@ -39,4 +39,13 @@ public class FileConfig {
     private Integer ysMaxCount;
     @Value("${service.ysFlowCheckSeconds}")
     private Integer ysFlowCheckSeconds;
+
+    @Value("${ArtemisConfig.host}")
+    private String hkHost;
+
+    @Value("${ArtemisConfig.appKey}")
+    private String hkAppKey;
+
+    @Value("${ArtemisConfig.appSecret}")
+    private String hkAppSecret;
 }
