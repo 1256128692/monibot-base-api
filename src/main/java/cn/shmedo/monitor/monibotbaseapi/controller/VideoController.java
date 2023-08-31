@@ -177,11 +177,11 @@ public class VideoController {
      * @apiSuccess (返回结果) {Boolean} dataList.allocationStatus 设备分配状态 true:1 false:0
      * @apiSuccess (返回结果) {Int[]} dataList.deviceChannel 通道号列表
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryVideoCompanyViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryVideoCompanyViewBaseInfo(@Valid @RequestBody Object param) {
+    public Object queryVideoCompanyViewBaseInfo(@Valid @RequestBody QueryVideoCompanyViewBaseInfoParam param) {
         //
         return null;
     }
@@ -230,11 +230,11 @@ public class VideoController {
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
      * @apiSuccess (返回结果) {Int[]} dataList.monitorGroupDataList.monitorPointDataList.deviceChannel 通道号列表
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryVideoProjectViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryVideoProjectViewBaseInfo(@Valid @RequestBody Object param) {
+    public Object queryVideoProjectViewBaseInfo(@Valid @RequestBody QueryVideoProjectViewBaseInfo param) {
         //
         return null;
     }
@@ -278,11 +278,11 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} capabilitySet.ptz_preset 是否支持云台预置点 0-不支持, 1-支持
      * @apiSuccess (返回结果) {Int} capabilitySet.support_rate_limit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryYsVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryYsVideoDeviceInfo(@Valid @RequestBody Object param) {
+    public Object queryYsVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
         //@see #queryVideoMonitorPointLiveInfo(QueryVideoMonitorPointLiveInfoParam)
         return null;
     }
@@ -316,11 +316,11 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} capabilitySet.vss 视频能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 手动抓图、语音对讲、预置点、视频质量 操作
      * @apiSuccess (返回结果) {Int} capabilitySet.ptz 云台能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 调节焦距、云台控制 操作
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryHikVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryHikVideoDeviceInfo(@Valid @RequestBody Object param) {
+    public Object queryHikVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
         //
         return null;
     }

@@ -1,9 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoPresetPointService;
+import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +36,14 @@ public class VideoPresetPointController {
      * @apiSuccess (返回结果) {String} dataList.presetPointName 预置点名称
      * @apiSuccess (返回结果) {Int} dataList.presetPointIndex 预置点位置
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:ListBasePresetPoint
      */
-//    @Permission(permissionName = "mdmbase:")
+//    @Permission(permissionName = "mdmbase:ListBasePresetPoint")
     @PostMapping(value = "/QueryPresetPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryPresetPointList(@Valid @RequestBody Object param) {
-        //
-        return null;
+    public Object queryPresetPointList(@Valid @RequestBody QueryPresetPointListParam param) {
+        return ResultWrapper.success(this.tbVideoPresetPointService.list(new LambdaQueryWrapper<TbVideoPresetPoint>()
+                .eq(TbVideoPresetPoint::getDeviceVideoID, param.getDeviceVideoID())
+                .select(TbVideoPresetPoint::getID, TbVideoPresetPoint::getPresetPointName, TbVideoPresetPoint::getPresetPointIndex)));
     }
 
     /**
@@ -54,12 +58,12 @@ public class VideoPresetPointController {
      * @apiParam (请求体) {Int} presetPointIndex 预置点位置
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:AddBasePresetPoint
      */
-//    @Permission(permissionName = "mdmbase:")
+//    @Permission(permissionName = "mdmbase:AddBasePresetPoint")
     @PostMapping(value = "/AddPresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addPresetPoint(@Valid @RequestBody Object param) {
-        //
+    public Object addPresetPoint(@Valid @RequestBody AddPresetPointParam param) {
+        this.tbVideoPresetPointService.save(param.getTbVideoPresetPoint());
         return ResultWrapper.successWithNothing();
     }
 
@@ -74,12 +78,14 @@ public class VideoPresetPointController {
      * @apiParam (请求体) {String} presetPointName 预置点名称
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:UpdateBasePreset
      */
-//    @Permission(permissionName = "mdmbase:")
+//    @Permission(permissionName = "mdmbase:UpdateBasePreset")
     @PostMapping(value = "/UpdatePresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updatePresetPoint(@Valid @RequestBody Object param) {
-        //
+    public Object updatePresetPoint(@Valid @RequestBody UpdatePresetPointParam param) {
+        this.tbVideoPresetPointService.update(new LambdaUpdateWrapper<TbVideoPresetPoint>()
+                .eq(TbVideoPresetPoint::getID, param.getPresetPointID())
+                .set(TbVideoPresetPoint::getPresetPointName, param.getPresetPointName()));
         return ResultWrapper.successWithNothing();
     }
 
@@ -93,12 +99,12 @@ public class VideoPresetPointController {
      * @apiParam (请求体) {Int[]} presetPointIDList 预置点IDList
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DeleteBasePresetPoint
      */
-//    @Permission(permissionName = "mdmbase:")
+//    @Permission(permissionName = "mdmbase:DeleteBasePresetPoint")
     @PostMapping(value = "/DeletePresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deletePresetPoint(@Valid @RequestBody Object param) {
-        //
+    public Object deletePresetPoint(@Valid @RequestBody DeletePresetPointParam param) {
+        this.tbVideoPresetPointService.removeBatchByIds(param.getPresetPointIDList());
         return ResultWrapper.successWithNothing();
     }
 }
