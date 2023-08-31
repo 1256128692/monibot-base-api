@@ -22,6 +22,10 @@ public class QueryYsVideoDeviceInfoParam implements ParameterValidator, Resource
     private final Integer deviceVideoID;
     @Positive(message = "工程ID不能小于1")
     private final Integer projectID;
+    @Positive(message = "传感器ID不能小于1")
+    private Integer sensorID;
+    @Positive(message = "通道号不能小于1")
+    private Integer deviceChannel;
 
     @Override
     public ResultWrapper validate() {

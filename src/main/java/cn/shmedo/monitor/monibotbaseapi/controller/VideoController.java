@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoController {
     private final VideoService videoService;
-
+    private final ITbVideoDeviceService tbVideoDeviceService;
     private final HkVideoService hkVideoService;
 
     /**
@@ -182,8 +183,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryVideoCompanyViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryVideoCompanyViewBaseInfo(@Valid @RequestBody QueryVideoCompanyViewBaseInfoParam param) {
-        //
-        return null;
+        return this.tbVideoDeviceService.queryVideoCompanyViewBaseInfo(param);
     }
 
     /**
@@ -247,6 +247,8 @@ public class VideoController {
      * @apiName QueryYsVideoDeviceInfo
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号。通道号和传感器ID只有一个不为空,用于获取取流地址
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
      * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
@@ -296,6 +298,8 @@ public class VideoController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号。通道号和传感器ID只有一个不为空,用于获取取流地址
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
