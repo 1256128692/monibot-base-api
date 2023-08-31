@@ -97,6 +97,26 @@ public class VideoController {
         return videoService.panControlVideoPoint(pa);
     }
 
+    /**
+     * @api {POST} /PanControlCompanyVideoPoint 云台控制监测点视频设备(企业级)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 云台控制监测点视频设备的摄像头移动, 有(上下左右, 焦距)等操作
+     * @apiName PanControlCompanyVideoPoint
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} deviceChannel 通道号
+     * @apiParam (请求体) {Int} direction  方向   0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
+    @RequestMapping(value = "/PanControlCompanyVideoPoint", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object panControlCompanyVideoPoint(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
 
     /**
      * @api {POST} /QueryVideoMonitorPointPictureInfo 查询视频类型监测点图像信息
@@ -246,9 +266,10 @@ public class VideoController {
      * @apiGroup 视频模块
      * @apiName QueryYsVideoDeviceInfo
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
-     * @apiParam (请求体) {Int} [deviceChannel] 通道号。通道号和传感器ID只有一个不为空,用于获取取流地址
+     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
      * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
@@ -267,18 +288,18 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
      * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
      * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_audio_onoff 是否支持声音开关设置 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_volumn_set 是否支持音量调节 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_capture 是否支持封面抓图: 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_talk 是否支持对讲: 0-不支持, 1-全双工, 3-半双工
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_mcvolumn_set 是否支持麦克风音量调节：0-不支持，1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_focus 是否支持焦距模式 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_top_bottom 是否支持云台上下转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_left_right 是否支持云台左右转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_45 是否支持云台45度方向转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_zoom 是否支持云台缩放控制 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_preset 是否支持云台预置点 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} capabilitySet.support_rate_limit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportAudioOnoff 是否支持声音开关设置 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportVolumnSet 是否支持音量调节 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportCapture 是否支持封面抓图: 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportTalk 是否支持对讲: 0-不支持, 1-全双工, 3-半双工
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportMcvolumnSet 是否支持麦克风音量调节：0-不支持，1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptzFocus 是否支持焦距模式 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptzTopBottom 是否支持云台上下转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptzLeftRight 是否支持云台左右转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz45 是否支持云台45度方向转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptzZoom 是否支持云台缩放控制 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptzPreset 是否支持云台预置点 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.supportRateLimit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
@@ -296,10 +317,11 @@ public class VideoController {
      * @apiGroup 视频模块
      * @apiName QueryHikVideoDeviceInfo
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
-     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
-     * @apiParam (请求体) {Int} [deviceChannel] 通道号。通道号和传感器ID只有一个不为空,用于获取取流地址
+     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID,deviceVideoID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
+     * @apiParam (请求体) {Int} [streamType] 码流类型，0.主码流 1.子码流 2.第三码流 (默认为0.主码流)
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
      * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
@@ -314,8 +336,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
-     * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
-     * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
+     * @apiSuccess (返回结果) {String} baseUrl 直播地址
      * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)。海康能力集未标识音频播放能力，这里暂时默认拥有该能力
      * @apiSuccess (返回结果) {Int} capabilitySet.vss 视频能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 手动抓图、语音对讲、预置点、视频质量 操作
      * @apiSuccess (返回结果) {Int} capabilitySet.ptz 云台能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 调节焦距、云台控制 操作
@@ -325,6 +346,59 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryHikVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryHikVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
+        //
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryHikVideoPlayBack 海康设备视频回放
+     * @apiDescription 海康设备视频回放。<br>海康设备视频如果存储在设备里，会将设备截取成多段进行"分页"，每次查询"下一页"时需要传入"当前页"返回的uuid
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryHikVideoPlayBack
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
+     * @apiParam (请求体) {DateTime} beginTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID,deviceVideoID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
+     * @apiParam (请求体) {String} [uuid] uuid,用于继续查询剩余片段
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {String} [uuid] uuid,用于继续查询剩余片段
+     * @apiSuccess (返回结果) {String} baseUrl 回放地址
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryHikVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryHikVideoPlayBack(@Valid @RequestBody Object param) {
+        //
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryYsVideoPlayBack 萤石设备视频回放
+     * @apiDescription 萤石设备视频回放
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryYsVideoPlayBack
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
+     * @apiParam (请求体) {DateTime} beginTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {String} baseUrl 回放地址
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryYsVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryYsVideoPlayBack(@Valid @RequestBody Object param) {
         //
         return null;
     }
@@ -340,7 +414,7 @@ public class VideoController {
      * @api {POST} /AddVideoDeviceList V2批量添加视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 添加视频设备,(同步到萤石云平台,海康平台,物联网平台),如果是萤石云设备的话,要把该设备的通道信息保存到ExValue中
+     * @apiDescription 添加视频设备, (同步到萤石云平台, 海康平台, 物联网平台), 如果是萤石云设备的话, 要把该设备的通道信息保存到ExValue中
      * @apiName AddVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} addVideoList 新增视频设备(max = 100)
@@ -449,7 +523,7 @@ public class VideoController {
      * @api {POST} /DeleteVideoDeviceList V6批量删除视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 添加删除设备,(同步删除萤石云平台,物联网平台),海康平台设备无法删除
+     * @apiDescription 添加删除设备, (同步删除萤石云平台, 物联网平台), 海康平台设备无法删除
      * @apiName DeleteVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String[]} deviceSerialList 设备序列号/监控点唯一标识列表
@@ -468,7 +542,7 @@ public class VideoController {
      * @api {POST} /UpdateVideoDeviceList V5批量更新视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 批量更新视频设备,(同步萤石云平台,物联网平台),海康平台设备无法更改
+     * @apiDescription 批量更新视频设备, (同步萤石云平台, 物联网平台), 海康平台设备无法更改
      * @apiName UpdateVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} updateVideoList 更新视频设备列表(max = 100)
@@ -490,7 +564,7 @@ public class VideoController {
      * @api {POST} /SaveVideoDeviceSensorList V4批量存储视频传感器
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 批量存储视频传感器,生成的视频传感器可以绑定工程,绑定抓拍配置
+     * @apiDescription 批量存储视频传感器, 生成的视频传感器可以绑定工程, 绑定抓拍配置
      * @apiName SaveVideoDeviceSensorList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
@@ -511,7 +585,6 @@ public class VideoController {
     public Object saveVideoDeviceSensorList(@Validated @RequestBody Object pa) {
         return null;
     }
-
 
 
     /**
