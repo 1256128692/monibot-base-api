@@ -195,6 +195,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupParentID 监测组别ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupParentName 监测组别名称
