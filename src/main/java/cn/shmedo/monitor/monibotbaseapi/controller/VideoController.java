@@ -326,25 +326,25 @@ public class VideoController {
     }
 
 
-    /**
-     * @api {POST} /QueryHkVideoPage (测试)查询海康视频接口信息
-     * @apiVersion 1.0.0
-     * @apiGroup 视频模块
-     * @apiName QueryHkVideoPage
-     * @apiDescription 查询视频基本信息
-     * @apiSuccess (返回结果) {String} videoName 视频设备名称
-     * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
-     */
-//    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
-    @PostMapping(value = "/QueryHkVideoPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryHkVideoPage(@Valid @RequestBody Object param) {
-        return hkVideoService.QueryHkVideoPage(param);
-    }
+    //    /**
+//     * @api {POST} /QueryHkVideoPage (测试)查询海康视频接口信息
+//     * @apiVersion 1.0.0
+//     * @apiGroup 视频模块
+//     * @apiName QueryHkVideoPage
+//     * @apiDescription 查询视频基本信息
+//     * @apiSuccess (返回结果) {String} videoName 视频设备名称
+//     * @apiSampleRequest off
+//     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
+//     */
+////    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+//    @PostMapping(value = "/QueryHkVideoPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryHkVideoPage(@Valid @RequestBody Object param) {
+//        return hkVideoService.QueryHkVideoPage(param);
+//    }
 
 
     /**
-     * @api {POST} /AddVideoDeviceList 批量添加视频设备
+     * @api {POST} /AddVideoDeviceList V2批量添加视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 添加视频设备,(同步到萤石云平台,海康平台,物联网平台),如果是萤石云设备的话,要把该设备的通道信息保存到ExValue中
@@ -367,44 +367,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryVideoDeviceInfo 查询单个视频设备详情
-     * @apiVersion 1.0.0
-     * @apiGroup 视频模块
-     * @apiDescription 查询单个视频设备详情
-     * @apiName QueryVideoDeviceInfo
-     * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {String} deviceSerial 设备序列号/监控点唯一标识
-     * @apiParam (请求体) {Byte} accessPlatform 接入平台,萤石云平台:0 海康平台:1
-     * @apiSuccess (返回结果) {Int} videoDeviceID 视频设备ID
-     * @apiSuccess (返回结果) {String} deviceSerial 设备序列号/监控点唯一标识
-     * @apiSuccess (返回结果) {String} deviceType 视频设备类型
-     * @apiSuccess (返回结果) {String} deviceName 视频设备名称
-     * @apiSuccess (返回结果) {Boolean} deviceStatus 设备在线状态
-     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入通道号的数量
-     * @apiSuccess (返回结果) {Int} accessChannelNum 接入通道号的数量
-     * @apiSuccess (返回结果) {Int} hkChannelNo 海康通道号(萤石云平台设备该字段返回null)
-     * @apiSuccess (返回结果) {Object[]} accessChannelList 接入通道号列表(海康的话为null)
-     * @apiSuccess (返回结果) {String} accessChannelList.ipcSerial ipc设备序列号
-     * @apiSuccess (返回结果) {String} accessChannelList.channelNo 通道号
-     * @apiSuccess (返回结果) {String} accessChannelList.channelName 接入通道名称
-     * @apiSuccess (返回结果) {Object[]} sensorList 传感器列表
-     * @apiSuccess (返回结果) {Int} sensorList.sensorID 传感器ID
-     * @apiSuccess (返回结果) {String} sensorList.sensorName 传感器名称
-     * @apiSuccess (返回结果) {Int} sensorList.captureInterval 抓拍间隔(单位分钟)
-     * @apiSuccess (返回结果) {Int} sensorList.projectID 所属工程ID
-     * @apiSuccess (返回结果) {Int} sensorList.channelNo 通道号
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
-     */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
-    @RequestMapping(value = "/QueryVideoDeviceInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoDeviceInfo(@Validated @RequestBody Object pa) {
-        return null;
-    }
-
-
-    /**
-     * @api {POST} /QueryVideoDeviceList 查询视频设备列表(不分页)
+     * @api {POST} /QueryVideoDeviceList V3查询视频设备列表(不分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询视频设备列表(不分页)
@@ -420,16 +383,13 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.accessPlatformStr 接入平台名称
      * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备可接入通道号的数量(海康默认为1)
      * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 接入通道号的数量(海康默认为1)
-     * @apiSuccess (返回结果) {Object[]} dataList.accessChannelList 接入通道号列表(海康的话为null)
-     * @apiSuccess (返回结果) {String} dataList.accessChannelList.ipcSerial ipc设备序列号
-     * @apiSuccess (返回结果) {String} dataList.accessChannelList.channelNo 通道号
-     * @apiSuccess (返回结果) {String} dataList.accessChannelList.channelName 接入通道名称
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
-     * @apiSuccess (返回结果) {Int} dataList.sensorList.captureInterval 抓拍间隔(单位分钟)
-     * @apiSuccess (返回结果) {Int} dataList.sensorList.projectID 所属工程ID
+     * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
+     * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
      * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
+     * @apiSuccess (返回结果) {String} dataList.sensorList.ipcSerial ipc设备序列号
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
@@ -441,23 +401,21 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryYsVideoDeviceList 查询萤石云视频分页列表
+     * @api {POST} /QueryYsVideoDeviceList V8查询萤石云视频分页列表
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询萤石云视频分页列表
      * @apiName QueryYsVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} pageStart 分页起始页，从0开始
-     * @apiParam (请求体) {Int} pageSize 分页大小，最大为50
-     * @apiSuccess (返回结果) {Object} page 页面对象
-     * @apiSuccess (返回结果) {Int} page.total 查询数据记录总数
-     * @apiSuccess (返回结果) {Int} page.page 当前页
-     * @apiSuccess (返回结果) {Int} page.size 每页记录总数
-     * @apiSuccess (返回结果) {Object[]} data 对象
-     * @apiSuccess (返回结果) {String} data.deviceSerial 设备序列号/监控点唯一标识
-     * @apiSuccess (返回结果) {String} data.deviceType 视频设备类型
-     * @apiSuccess (返回结果) {String} data.deviceName 视频设备名称
-     * @apiSuccess (返回结果) {Boolean} data.existMd 是否在米度中台存在
+     * @apiParam (请求体) {Int} currentPage 当前页，从1开始
+     * @apiParam (请求体) {Int} pageSize 页大小，最大为50
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 对象
+     * @apiSuccess (返回结果) {String} currentPageData.deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} currentPageData.deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} currentPageData.deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} currentPageData.existMd 是否在米度中台存在
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
@@ -469,22 +427,21 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryHkVideoDeviceList 查询海康视频分页列表
+     * @api {POST} /QueryHkVideoDeviceList V7查询海康视频分页列表
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询萤石云视频分页列表
      * @apiName QueryHkVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} pageNo 分页起始页，从1开始
-     * @apiParam (请求体) {Int} pageSize 分页大小，最大为1000
-     * @apiSuccess (返回结果) {Object[]} data 对象
-     * @apiSuccess (返回结果) {String} data.total 查询数据记录总数
-     * @apiSuccess (返回结果) {String} data.pageNo 当前页码
-     * @apiSuccess (返回结果) {String} data.pageSize 每页记录总数
-     * @apiSuccess (返回结果) {String} data.deviceSerial 设备序列号/监控点唯一标识
-     * @apiSuccess (返回结果) {String} data.deviceType 视频设备类型
-     * @apiSuccess (返回结果) {String} data.deviceName 视频设备名称
-     * @apiSuccess (返回结果) {Boolean} data.existMd 是否在米度中台存在
+     * @apiParam (请求体) {Int} currentPage 当前页，从1开始
+     * @apiParam (请求体) {Int} pageSize 页大小，最大为1000
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {String} currentPageData.deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} currentPageData.deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} currentPageData.deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} currentPageData.existMd 是否在米度中台存在
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
@@ -496,7 +453,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /DeleteVideoDeviceList 批量删除视频设备
+     * @api {POST} /DeleteVideoDeviceList V6批量删除视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 添加删除设备,(同步删除萤石云平台,物联网平台),海康平台设备无法删除
@@ -515,7 +472,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /UpdateVideoDeviceList 批量更新视频设备
+     * @api {POST} /UpdateVideoDeviceList V5批量更新视频设备
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量更新视频设备,(同步萤石云平台,物联网平台),海康平台设备无法更改
@@ -537,7 +494,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /SaveVideoDeviceSensorList 批量存储视频传感器
+     * @api {POST} /SaveVideoDeviceSensorList V4批量存储视频传感器
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量存储视频传感器,生成的视频传感器可以绑定工程,绑定抓拍配置
@@ -550,7 +507,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} [list.addSensorList.sensorID] 传感器ID,为空时进行新增,不为空时进行更新
      * @apiParam (请求体) {String} list.addSensorList.sensorName 传感器名称
      * @apiParam (请求体) {Int} list.addSensorList.channelCode 通道号
-     * @apiParam (请求体) {Boolean} list.addSensorList.bindProject 是否绑定工程
+     * @apiParam (请求体) {Boolean} [list.addSensorList.bindProject] 是否绑定工程
      * @apiParam (请求体) {Int} [list.addSensorList.captureInterval] 抓拍间隔(单位:分钟)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -565,7 +522,7 @@ public class VideoController {
 
 
     /**
-     * @api {POST} /QueryVideoDevicePage 查询视频设备列表(分页)
+     * @api {POST} /QueryVideoDevicePage V1查询视频设备列表(分页)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量生成视频传感器
@@ -610,6 +567,83 @@ public class VideoController {
 //    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryVideoDevicePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryVideoDevicePage(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /ManualCapture V9手动抓拍
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 手动抓拍
+     * @apiName ManualCapture
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {String} deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/ManualCapture", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object manualCapture(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryCapturePage V10查询抓拍列表(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询抓拍列表
+     * @apiName ManualCapture
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {DateTime} [begin] 开始时间
+     * @apiParam (请求体) {DateTime} [end] 结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 图片ID
+     * @apiSuccess (返回结果) {Int} currentPageData.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Date} currentPageData.uploadTime 上传时间
+     * @apiSuccess (返回结果) {String} currentPageData.path 图片地址
+     * @apiSuccess (返回结果) {String} currentPageData.fileType 图片类型
+     * @apiSuccess (返回结果) {Int} currentPageData.fileSize 图片大小
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryCapturePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryCapturePage(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /QueryCaptureList V11查询抓拍列表(不分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询抓拍列表
+     * @apiName QueryCaptureList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {DateTime} [begin] 开始时间
+     * @apiParam (请求体) {DateTime} [end] 结束时间
+     * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
+     * @apiSuccess (返回结果) {Int} dataList.ID 图片ID
+     * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Date} dataList.uploadTime 上传时间
+     * @apiSuccess (返回结果) {String} dataList.path 图片地址
+     * @apiSuccess (返回结果) {String} dataList.fileType 图片类型
+     * @apiSuccess (返回结果) {Int} dataList.fileSize 图片大小
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryCaptureList(@Validated @RequestBody Object pa) {
         return null;
     }
 
