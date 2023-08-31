@@ -171,7 +171,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} dataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
      * @apiSuccess (返回结果) {Int} dataList.companyID 注册公司ID
-     * @apiSuccess (返回结果) {Int} dataList.projectID 项目ID
+     * @apiSuccess (返回结果) {Int} [dataList.projectID] 项目ID
      * @apiSuccess (返回结果) {Int} dataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} dataList.captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} dataList.allocationStatus 设备分配状态 true:1 false:0
@@ -258,25 +258,25 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
      * @apiSuccess (返回结果) {Int} companyID 注册公司ID
-     * @apiSuccess (返回结果) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Int} [projectID] 项目ID
      * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
      * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
      * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
      * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)
-     * @apiSuccess (返回结果) {Int} support_audio_onoff 是否支持声音开关设置 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} support_volumn_set 是否支持音量调节 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} support_capture 是否支持封面抓图: 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} support_talk 是否支持对讲: 0-不支持, 1-全双工, 3-半双工
-     * @apiSuccess (返回结果) {Int} support_mcvolumn_set 是否支持麦克风音量调节：0-不支持，1-支持
-     * @apiSuccess (返回结果) {Int} ptz_focus 是否支持焦距模式 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} ptz_top_bottom 是否支持云台上下转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} ptz_left_right 是否支持云台左右转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} ptz_45 是否支持云台45度方向转动 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} ptz_zoom 是否支持云台缩放控制 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} ptz_preset 是否支持云台预置点 0-不支持, 1-支持
-     * @apiSuccess (返回结果) {Int} support_rate_limit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_audio_onoff 是否支持声音开关设置 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_volumn_set 是否支持音量调节 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_capture 是否支持封面抓图: 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_talk 是否支持对讲: 0-不支持, 1-全双工, 3-半双工
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_mcvolumn_set 是否支持麦克风音量调节：0-不支持，1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_focus 是否支持焦距模式 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_top_bottom 是否支持云台上下转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_left_right 是否支持云台左右转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_45 是否支持云台45度方向转动 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_zoom 是否支持云台缩放控制 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz_preset 是否支持云台预置点 0-不支持, 1-支持
+     * @apiSuccess (返回结果) {Int} capabilitySet.support_rate_limit 是否支持高清码率限制 0-不支持码率限制, 1-支持高清码率限制
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
@@ -306,15 +306,15 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
      * @apiSuccess (返回结果) {Int} companyID 注册公司ID
-     * @apiSuccess (返回结果) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Int} [projectID] 项目ID
      * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
      * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
      * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
      * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)。海康能力集未标识音频播放能力，这里暂时默认拥有该能力
-     * @apiSuccess (返回结果) {Int} vss 视频能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 手动抓图、语音对讲、预置点、视频质量 操作
-     * @apiSuccess (返回结果) {Int} ptz 云台能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 调节焦距、云台控制 操作
+     * @apiSuccess (返回结果) {Int} capabilitySet.vss 视频能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 手动抓图、语音对讲、预置点、视频质量 操作
+     * @apiSuccess (返回结果) {Int} capabilitySet.ptz 云台能力,0-不支持, 1-支持<br>拥有该能力时，海康设备允许进行 调节焦距、云台控制 操作
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
