@@ -326,17 +326,6 @@ public class VideoController {
     }
 
 
-    //    /**
-//     * @api {POST} /QueryHkVideoPage (测试)查询海康视频接口信息
-//     * @apiVersion 1.0.0
-//     * @apiGroup 视频模块
-//     * @apiName QueryHkVideoPage
-//     * @apiDescription 查询视频基本信息
-//     * @apiSuccess (返回结果) {String} videoName 视频设备名称
-//     * @apiSampleRequest off
-//     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
-//     */
-////    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
 //    @PostMapping(value = "/QueryHkVideoPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    public Object queryHkVideoPage(@Valid @RequestBody Object param) {
 //        return hkVideoService.QueryHkVideoPage(param);
