@@ -1,20 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.video;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * @author youxian.kong@shmedo.cn
- * @date 2023-08-31 14:23
+ * @date 2023-09-01 11:29
  */
 @Data
-public class VideoCompanyViewBaseInfo {
+public class VideoProjectViewSensorInfo {
+    private Integer sensorID;
+    private String sensorName;
+    private String sensorAlias;
     private Integer deviceVideoID;
     private Boolean deviceStatus;
     private String deviceSerial;
@@ -30,10 +27,4 @@ public class VideoCompanyViewBaseInfo {
     private Boolean allocationStatus;
     @JsonIgnore
     private String channelDesc;
-
-    @JsonProperty("deviceChannel")
-    public List<Integer> deviceChannel() {
-        return Optional.ofNullable(channelDesc).filter(ObjectUtil::isNotEmpty).map(u -> u.split(",")).map(Arrays::stream)
-                .map(u -> u.filter(ObjectUtil::isNotEmpty).map(Integer::parseInt).toList()).orElse(List.of());
-    }
 }

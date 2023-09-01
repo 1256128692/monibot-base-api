@@ -19,4 +19,9 @@ public interface VideoService {
     ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa);
 
     Object queryVideoMonitorPointPictureInfo(QueryVideoMonitorPointPictureInfoParam pa);
+
+    /**
+     * @see #panControlVideoPoint(PanControlVideoPointParam)
+     */
+    ResultWrapper<Object> panControlCompanyVideoPoint(PanControlCompanyVideoPointParam pa);
 }

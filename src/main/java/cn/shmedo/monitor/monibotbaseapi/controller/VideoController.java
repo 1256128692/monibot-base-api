@@ -106,15 +106,15 @@ public class VideoController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
      * @apiParam (请求体) {Int} deviceChannel 通道号
-     * @apiParam (请求体) {Int} direction  方向   0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
+     * @apiParam (请求体) {Int} direction 方向 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/PanControlCompanyVideoPoint", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object panControlCompanyVideoPoint(@Validated @RequestBody Object pa) {
-        return null;
+    public Object panControlCompanyVideoPoint(@Validated @RequestBody PanControlCompanyVideoPointParam pa) {
+        return videoService.panControlCompanyVideoPoint(pa);
     }
 
 
@@ -215,7 +215,6 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
-     * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupParentID 监测组别ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupParentName 监测组别名称
@@ -230,7 +229,6 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.displayOrder 监测点展示顺序
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.monitorPointAlias 监测点别称
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.sensorID 传感器ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorName 传感器名称
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorAlias 传感器别称
@@ -239,7 +237,6 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceName 设备名称
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceType 设备类型/型号
-     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.deviceChannelNum 设备可接入的通道号数量
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessChannelNum 接入的通道号数量
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
@@ -255,8 +252,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryVideoProjectViewBaseInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryVideoProjectViewBaseInfo(@Valid @RequestBody QueryVideoProjectViewBaseInfo param) {
-        //
-        return null;
+        return tbVideoDeviceService.queryVideoProjectViewBaseInfo(param);
     }
 
     /**

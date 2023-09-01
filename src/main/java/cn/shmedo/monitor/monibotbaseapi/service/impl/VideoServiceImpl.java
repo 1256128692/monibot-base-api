@@ -13,10 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.HistoryLiveInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.QueryVideoBaseInfoResult;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
@@ -84,7 +81,7 @@ public class VideoServiceImpl implements VideoService {
 
         String ysToken = getYsToken();
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
-            liveInfos.forEach( item -> {
+            liveInfos.forEach(item -> {
                 String baseUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), false, item.getYsChannelNo());
                 String hdUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), true, item.getYsChannelNo());
                 item.setBaseUrl(baseUrl);
@@ -115,7 +112,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa) {
-
+        //TODO compatible with hik video device
         List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
 
@@ -131,16 +128,15 @@ public class VideoServiceImpl implements VideoService {
     }
 
 
-
     @Override
     public List<VideoMonitorPointPictureInfo> queryVideoMonitorPointPictureInfo(QueryVideoMonitorPointPictureInfoParam pa) {
 
         List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
-            List<VideoMonitorPointPictureInfo> list = sensorFileMapper.selectListByIDAndTime(liveInfos.get(0).getSensorID(), pa.getBeginTime() , pa.getEndTime());
+            List<VideoMonitorPointPictureInfo> list = sensorFileMapper.selectListByIDAndTime(liveInfos.get(0).getSensorID(), pa.getBeginTime(), pa.getEndTime());
             List<String> filePathList = list.stream().map(VideoMonitorPointPictureInfo::getFilePath).collect(Collectors.toList());
             List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(filePathList, liveInfos.get(0).getCompanyID());
-            if (!CollectionUtil.isNullOrEmpty(fileUrlList)){
+            if (!CollectionUtil.isNullOrEmpty(fileUrlList)) {
                 list.forEach(item -> {
                     FileInfoResponse fileInfoResponse = fileUrlList.stream().filter(pojo -> pojo.getFilePath().equals(item.getFilePath())).findFirst().orElse(null);
                     assert fileInfoResponse != null;
@@ -153,5 +149,34 @@ public class VideoServiceImpl implements VideoService {
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
+    }
+
+    @Override
+    public ResultWrapper<Object> panControlCompanyVideoPoint(PanControlCompanyVideoPointParam pa) {
+        final VideoCompanyViewBaseInfo baseInfo = pa.getBaseInfo();
+        final String deviceSerial = baseInfo.getDeviceSerial();
+        final Integer deviceChannel = pa.getDeviceChannel();
+        switch (baseInfo.getAccessPlatform()) {
+            case 0 -> {
+                //ys
+                String ysToken = getYsToken();
+                YsResultWrapper<?> startWrapper = ysService.startPtz(ysToken, deviceSerial, deviceChannel, pa.getDirection(), DefaultConstant.YS_DEFAULT_SPEED);
+                YsResultWrapper<?> endWrapper = ysService.stopPtz(ysToken, deviceSerial, deviceChannel, pa.getDirection());
+                if (!startWrapper.callSuccess()) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startWrapper.getMsg());
+                }
+                if (!endWrapper.callSuccess()) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, endWrapper.getMsg());
+                }
+            }
+            case 1 -> {
+                //hik
+                //TODO
+            }
+            default -> {
+                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "该类型视频摄像头暂时无法进行云台操作");
+            }
+        }
+        return ResultWrapper.successWithNothing();
     }
 }

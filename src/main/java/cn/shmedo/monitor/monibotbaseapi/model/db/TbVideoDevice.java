@@ -43,11 +43,6 @@ public class TbVideoDevice {
     @TableField("DeviceStatus")
     private Boolean deviceStatus;
     /**
-     * 设备可接入的通道号数量
-     */
-    @TableField("DeviceChannelNum")
-    private Integer deviceChannelNum;
-    /**
      * 接入的通道号数量
      */
     @TableField("AccessChannelNum")

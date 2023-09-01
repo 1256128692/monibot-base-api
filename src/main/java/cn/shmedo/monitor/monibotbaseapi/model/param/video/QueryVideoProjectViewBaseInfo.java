@@ -23,7 +23,6 @@ public class QueryVideoProjectViewBaseInfo implements ParameterValidator, Resour
     @Range(max = 2, message = "视频设备状态枚举 0.全部 1.仅在线 2.仅离线")
     private Integer status;
     private String deviceSerial;
-    private Integer deviceChannel;
 
     @Override
     public ResultWrapper validate() {

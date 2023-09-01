@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper">
+    <resultMap id="ProjectViewMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo">
+        <id column="monitorGroupParentID" jdbcType="INTEGER" property="monitorGroupParentID"/>
+        <result column="monitorGroupParentName" jdbcType="VARCHAR" property="monitorGroupParentName"/>
+        <result column="parentDisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+        <collection property="monitorGroupDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewSubGroupInfo">
+            <id column="monitorGroupID" jdbcType="INTEGER" property="monitorGroupID"/>
+            <result column="monitorGroupName" jdbcType="VARCHAR" property="monitorGroupName"/>
+            <result column="displayOrder" jdbcType="INTEGER" property="displayOrder"/>
+            <collection property="monitorPointDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewPointInfo">
+                <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+                <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+                <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+                <result column="pointDisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+                <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+                <collection property="sensorInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewSensorInfo">
+                    <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+                    <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
+                    <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
+                    <result column="channelDesc" jdbcType="VARCHAR" property="channelDesc"/>
+                    <result column="deviceVideoID" jdbcType="INTEGER" property="deviceVideoID"/>
+                    <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
+                    <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
+                    <result column="DeviceName" jdbcType="VARCHAR" property="deviceName"/>
+                    <result column="DeviceType" jdbcType="VARCHAR" property="deviceType"/>
+                    <result column="AccessChannelNum" jdbcType="INTEGER" property="accessChannelNum"/>
+                    <result column="AccessPlatform" jdbcType="TINYINT" property="accessPlatform"/>
+                    <result column="AccessProtocol" jdbcType="TINYINT" property="accessProtocol"/>
+                    <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
+                    <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+                    <result column="StorageType" jdbcType="TINYINT" property="storageType"/>
+                    <result column="CaptureStatus" jdbcType="BIT" property="captureStatus"/>
+                    <result column="AllocationStatus" jdbcType="BIT" property="allocationStatus"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="selectVideoCompanyViewBaseInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoCompanyViewBaseInfoParam">
+        SELECT
+            tvd.`ID` deviceVideoID,
+            tvd.`DeviceStatus` deviceStatus,
+            tvd.`DeviceSerial` deviceSerial,
+            tvd.`DeviceName` deviceName,
+            tvd.`DeviceType` deviceType,
+            tvd.`AccessChannelNum` accessChannelNum,
+            tvd.`AccessPlatform` accessPlatform,
+            tvd.`AccessProtocol` accessProtocol,
+            tvd.`CompanyID` companyID,
+            tvd.`ProjectID` projectID,
+            tvd.`StorageType` storageType,
+            tvd.`CaptureStatus` captureStatus,
+            tvd.`AllocationStatus` allocationStatus,
+            (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.ysChannelNo")) WHEN 1 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.channelNo")) ELSE NULL END) channelDesc
+        FROM
+            tb_video_device tvd
+            LEFT JOIN tb_sensor ts ON tvd.`ID` = ts.`DeviceVideoID`
+        WHERE tvd.`CompanyID` = 138
+        <if test="param.deviceSerial != null and param.deviceSerial != ''">
+            AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
+        </if>
+        <if test="param.status != null and param.status != 0">
+            AND tvd.`DeviceStatus` = (#{param.status} == 1)
+        </if>
+        <if test="param.deviceVideoID != null">
+            AND tvd.ID = #{param.deviceVideoID}
+        </if>
+        GROUP BY ts.`DeviceVideoID`
+    </select>
+    <select id="selectVideoProjectViewBaseInfo" resultMap="ProjectViewMap"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewBaseInfo">
+        SELECT
+            tmg1.ID monitorGroupParentID,
+            tmg1.`Name` monitorGroupParentName,
+            tmg1.DisplayOrder parentDisplayOrder,
+            tmg2.ID monitorGroupID,
+            tmg2.`Name` monitorGroupName,
+            tmg2.DisplayOrder displayOrder,
+            tmp.ID monitorPointID,
+            tmp.MonitorItemID monitorItemID,
+            tmp.MonitorType monitorType,
+            tmp.DisplayOrder pointDisplayOrder,
+            tmp.`Name` monitorPointName,
+            ts.ID sensorID,
+            ts.`Name` sensorName,
+            ts.Alias sensorAlias,
+            (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.ysChannelNo")) WHEN 1 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.channelNo")) ELSE NULL END) channelDesc,
+            tvd.ID deviceVideoID,
+            tvd.DeviceStatus,
+            tvd.DeviceSerial,
+            tvd.DeviceName,
+            tvd.DeviceType,
+            tvd.AccessChannelNum,
+            tvd.AccessPlatform,
+            tvd.AccessProtocol,
+            tvd.CompanyID,
+            tvd.ProjectID,
+            tvd.StorageType,
+            tvd.CaptureStatus,
+            tvd.AllocationStatus
+        FROM
+            tb_monitor_group tmg1
+            LEFT JOIN tb_monitor_group tmg2 ON tmg1.ID = tmg2.ParentID AND tmg2.`Enable` IS TRUE
+            LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorGroupID = tmg2.ID
+            LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
+            LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID AND ts.`Enable` IS TRUE
+            LEFT JOIN tb_video_device tvd ON tvd.ID = ts.DeviceVideoID
+        WHERE tmg1.`Enable` IS TRUE AND tmg1.`ProjectID`=#{param.projectID}
+        <if test="param.status != null and param.status != 0">
+            AND tvd.`DeviceStatus` = (#{param.status} == 1)
+        </if>
+        <if test="param.deviceSerial != null and param.deviceSerial != ''">
+            AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
+        </if>
+    </select>
+</mapper>
