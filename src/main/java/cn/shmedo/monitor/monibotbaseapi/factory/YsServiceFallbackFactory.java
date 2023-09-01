@@ -7,6 +7,8 @@ import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * 萤石云服务远程调用 熔断降级
  *
@@ -33,6 +35,16 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
             }
 
             @Override
+            public YsResultWrapper<YsBaseDeviceInfo> getBaseDeviceInfo(String accessToken, String deviceSerial) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper<List<YsChannelInfo>> getDeviceChannelInfo(String accessToken, String deviceSerial) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
             public YsResultWrapper startPtz(String accessToken, String deviceSerial, Integer channelNo, Integer direction, Integer speed) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
@@ -48,6 +60,11 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
                                                                   String type, Integer quality, String startTime,
                                                                   String stopTime, Integer supportH265, String playbackSpeed,
                                                                   String gbchannel) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper addDevice(String accessToken, String deviceSerial, String validateCode) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
 

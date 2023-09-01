@@ -116,4 +116,53 @@
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
         </if>
     </select>
+
+
+    <insert id="batchInsert" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfo">
+        INSERT INTO tb_video_device (deviceName,
+        deviceType,
+        companyID,
+        deviceSerial,
+        deviceStatus,
+        accessChannelNum,
+        accessPlatform,
+        accessProtocol,
+        projectID,
+        storageType,
+        captureStatus,
+        allocationStatus,
+        createUserID,
+        createTime,
+        updateUserID,
+        updateTime,
+        exValue,
+        s1,
+        s2)
+        VALUES
+        <foreach collection="videoDeviceInfoList" item="item" separator=",">
+            (#{item.deviceName},
+            #{item.deviceType},
+            #{item.companyID},
+            #{item.deviceSerial},
+            #{item.deviceStatus},
+            #{item.accessChannelNum},
+            #{item.accessPlatform},
+            #{item.accessProtocol},
+            #{item.projectID},
+            #{item.storageType},
+            #{item.captureStatus},
+            #{item.allocationStatus},
+            #{item.createUserID},
+            #{item.createTime},
+            #{item.updateUserID},
+            #{item.updateTime},
+            #{item.exValue},
+            #{item.s1},
+            #{item.s2})
+        </foreach>;
+        <!-- 获取插入记录数量 -->
+        <selectKey keyProperty="insertCount" order="AFTER" resultType="int">
+            SELECT ROW_COUNT() AS insertCount;
+        </selectKey>
+    </insert>
 </mapper>
