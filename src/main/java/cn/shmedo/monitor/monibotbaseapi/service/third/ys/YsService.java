@@ -1,12 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service.third.ys;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import feign.Body;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+import jakarta.validation.constraints.NotEmpty;
 
 public interface YsService {
     @RequestLine("POST /api/lapp/token/get")
@@ -37,4 +36,40 @@ public interface YsService {
                             @Param("deviceSerial") String deviceSerial,
                             @Param("channelNo") Integer channelNo,
                             @Param("direction") Integer direction);
+
+    /**
+     * 获取播放地址
+     *
+     * @see <a href="https://open.ys7.com/help/1414">接口文档-获取播放地址</a>
+     */
+    @RequestLine("POST /api/lapp/v2/live/address/get")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&protocol={protocol}&code={code}" +
+            "&expireTime={expireTime}&type={type}&quality={quality}&startTime={startTime}&stopTime={stopTime}" +
+            "&supportH265={supportH265}&playbackSpeed={playbackSpeed}&gbchannel={gbchannel}")
+    YsResultWrapper<YsStreamUrlInfo> getStreamInfo(@NotEmpty @Param("accessToken") String accessToken,
+                                                   @NotEmpty @Param("deviceSerial") String deviceSerial,
+                                                   @Param("channelNo") Integer channelNo,
+                                                   @Param("protocol") Integer protocol,
+                                                   @Param("code") String code,
+                                                   @Param("expireTime") Integer expireTime,
+                                                   @Param("type") String type,
+                                                   @Param("quality") Integer quality,
+                                                   @Param("startTime") String startTime,
+                                                   @Param("stopTime") String stopTime,
+                                                   @Param("supportH265") Integer supportH265,
+                                                   @Param("playbackSpeed") String playbackSpeed,
+                                                   @Param("gbchannel") String gbchannel);
+
+    /**
+     * 获取设备能力集
+     *
+     * @see <a href="https://open.ys7.com/help/678">接口文档-获取设备能力集</a>
+     * @see <a href="https://open.ys7.com/help/77">接口文档-设备能力集</a>
+     */
+    @RequestLine("POST /api/lapp/device/capacity")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}")
+    YsResultWrapper<YsCapacityInfo> capacity(@NotEmpty @Param("accessToken") String accessToken,
+                                             @NotEmpty @Param("deviceSerial") String deviceSerial);
 }

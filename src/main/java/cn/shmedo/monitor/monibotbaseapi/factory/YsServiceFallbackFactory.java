@@ -1,9 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.factory;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +42,19 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
 
+            @Override
+            public YsResultWrapper<YsStreamUrlInfo> getStreamInfo(String accessToken, String deviceSerial, Integer channelNo,
+                                                                  Integer protocol, String code, Integer expireTime,
+                                                                  String type, Integer quality, String startTime,
+                                                                  String stopTime, Integer supportH265, String playbackSpeed,
+                                                                  String gbchannel) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
 
+            @Override
+            public YsResultWrapper<YsCapacityInfo> capacity(String accessToken, String deviceSerial) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
         };
     }
 

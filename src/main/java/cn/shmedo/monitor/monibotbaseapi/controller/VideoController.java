@@ -302,8 +302,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryYsVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryYsVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
-        //@see #queryVideoMonitorPointLiveInfo(QueryVideoMonitorPointLiveInfoParam)
-        return null;
+        return this.tbVideoDeviceService.queryYsVideoDeviceInfo(param);
     }
 
     /**
@@ -347,6 +346,31 @@ public class VideoController {
     }
 
     /**
+     * @api {POST} /QueryYsVideoPlayBack 萤石设备视频回放
+     * @apiDescription 萤石设备视频回放
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryYsVideoPlayBack
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
+     * @apiParam (请求体) {DateTime} beginTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
+     * @apiParam (请求体) {Int} [deviceChannel] 通道号
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {String} baseUrl 回放地址
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryYsVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryYsVideoPlayBack(@Valid @RequestBody QueryYsVideoPlayBackParam param) {
+        return this.tbVideoDeviceService.queryYsVideoPlayBack(param);
+    }
+
+    /**
      * @api {POST} /QueryHikVideoPlayBack 海康设备视频回放
      * @apiDescription 海康设备视频回放。<br>海康设备视频如果存储在设备里，会将设备截取成多段进行"分页"，每次查询"下一页"时需要传入"当前页"返回的uuid
      * @apiVersion 1.0.0
@@ -368,33 +392,7 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryHikVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryHikVideoPlayBack(@Valid @RequestBody Object param) {
-        //
-        return null;
-    }
-
-    /**
-     * @api {POST} /QueryYsVideoPlayBack 萤石设备视频回放
-     * @apiDescription 萤石设备视频回放
-     * @apiVersion 1.0.0
-     * @apiGroup 视频模块
-     * @apiName QueryYsVideoPlayBack
-     * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
-     * @apiParam (请求体) {DateTime} beginTime 开始时间
-     * @apiParam (请求体) {DateTime} endTime 结束时间
-     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
-     * @apiParam (请求体) {Int} [deviceChannel] 通道号
-     * @apiParam (请求体) {Int} [sensorID] 传感器ID
-     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
-     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
-     * @apiSuccess (返回结果) {String} baseUrl 回放地址
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
-     */
-    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
-    @PostMapping(value = "/QueryYsVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryYsVideoPlayBack(@Valid @RequestBody Object param) {
+    public Object queryHikVideoPlayBack(@Valid @RequestBody QueryHikVideoPlayBackParam param) {
         //
         return null;
     }
