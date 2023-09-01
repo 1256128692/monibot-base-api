@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoCaptureMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture">
+    <!--@mbg.generated-->
+    <!--@Table tb_video_capture-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial" />
+    <result column="SensorID" jdbcType="INTEGER" property="sensorID" />
+    <result column="CaptureInterval" jdbcType="INTEGER" property="captureInterval" />
+    <result column="LastCaptureTime" jdbcType="TIMESTAMP" property="lastCaptureTime" />
+    <result column="NextCaptureTime" jdbcType="TIMESTAMP" property="nextCaptureTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, DeviceSerial, SensorID, CaptureInterval, LastCaptureTime, NextCaptureTime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_video_capture
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_video_capture
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_video_capture (DeviceSerial, SensorID, CaptureInterval, 
+      LastCaptureTime, NextCaptureTime)
+    values (#{deviceSerial,jdbcType=VARCHAR}, #{sensorID,jdbcType=INTEGER}, #{captureInterval,jdbcType=INTEGER}, 
+      #{lastCaptureTime,jdbcType=TIMESTAMP}, #{nextCaptureTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_video_capture
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="deviceSerial != null">
+        DeviceSerial,
+      </if>
+      <if test="sensorID != null">
+        SensorID,
+      </if>
+      <if test="captureInterval != null">
+        CaptureInterval,
+      </if>
+      <if test="lastCaptureTime != null">
+        LastCaptureTime,
+      </if>
+      <if test="nextCaptureTime != null">
+        NextCaptureTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="deviceSerial != null">
+        #{deviceSerial,jdbcType=VARCHAR},
+      </if>
+      <if test="sensorID != null">
+        #{sensorID,jdbcType=INTEGER},
+      </if>
+      <if test="captureInterval != null">
+        #{captureInterval,jdbcType=INTEGER},
+      </if>
+      <if test="lastCaptureTime != null">
+        #{lastCaptureTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nextCaptureTime != null">
+        #{nextCaptureTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture">
+    <!--@mbg.generated-->
+    update tb_video_capture
+    <set>
+      <if test="deviceSerial != null">
+        DeviceSerial = #{deviceSerial,jdbcType=VARCHAR},
+      </if>
+      <if test="sensorID != null">
+        SensorID = #{sensorID,jdbcType=INTEGER},
+      </if>
+      <if test="captureInterval != null">
+        CaptureInterval = #{captureInterval,jdbcType=INTEGER},
+      </if>
+      <if test="lastCaptureTime != null">
+        LastCaptureTime = #{lastCaptureTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="nextCaptureTime != null">
+        NextCaptureTime = #{nextCaptureTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture">
+    <!--@mbg.generated-->
+    update tb_video_capture
+    set DeviceSerial = #{deviceSerial,jdbcType=VARCHAR},
+      SensorID = #{sensorID,jdbcType=INTEGER},
+      CaptureInterval = #{captureInterval,jdbcType=INTEGER},
+      LastCaptureTime = #{lastCaptureTime,jdbcType=TIMESTAMP},
+      NextCaptureTime = #{nextCaptureTime,jdbcType=TIMESTAMP}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+</mapper>

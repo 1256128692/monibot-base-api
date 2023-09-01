@@ -24,4 +24,6 @@ public interface VideoService {
      * @see #panControlVideoPoint(PanControlVideoPointParam)
      */
     ResultWrapper<Object> panControlCompanyVideoPoint(PanControlCompanyVideoPointParam pa);
+
+    void addVideoDeviceList(AddVideoDeviceListParam pa);
 }

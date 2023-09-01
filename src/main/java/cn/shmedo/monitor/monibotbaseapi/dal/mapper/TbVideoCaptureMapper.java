@@ -1,13 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
 
-public interface TbVideoPresetPointMapper extends BaseMapper<TbVideoPresetPoint> {
+public interface TbVideoCaptureMapper {
     /**
      * delete by primary key
-     *
      * @param ID primaryKey
      * @return deleteCount
      */
@@ -15,41 +12,36 @@ public interface TbVideoPresetPointMapper extends BaseMapper<TbVideoPresetPoint>
 
     /**
      * insert record to table
-     *
      * @param record the record
      * @return insert count
      */
-    int insert(TbVideoPresetPoint record);
+    int insert(TbVideoCapture record);
 
     /**
      * insert record to table selective
-     *
      * @param record the record
      * @return insert count
      */
-    int insertSelective(TbVideoPresetPoint record);
+    int insertSelective(TbVideoCapture record);
 
     /**
      * select by primary key
-     *
      * @param ID primary key
      * @return object by primary key
      */
-    TbVideoPresetPoint selectByPrimaryKey(Integer ID);
+    TbVideoCapture selectByPrimaryKey(Integer ID);
 
     /**
      * update record selective
-     *
      * @param record the updated record
      * @return update count
      */
-    int updateByPrimaryKeySelective(TbVideoPresetPoint record);
+    int updateByPrimaryKeySelective(TbVideoCapture record);
 
     /**
      * update record
-     *
      * @param record the updated record
      * @return update count
      */
-    int updateByPrimaryKey(TbVideoPresetPoint record);
+    int updateByPrimaryKey(TbVideoCapture record);
 }

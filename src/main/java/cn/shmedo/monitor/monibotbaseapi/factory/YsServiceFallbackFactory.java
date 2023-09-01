@@ -1,13 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.factory;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsTokenInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 萤石云服务远程调用 熔断降级
@@ -35,12 +35,27 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
             }
 
             @Override
+            public YsResultWrapper<YsBaseDeviceInfo> getBaseDeviceInfo(String accessToken, String deviceSerial) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper<List<YsChannelInfo>> getDeviceChannelInfo(String accessToken, String deviceSerial) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
             public YsResultWrapper startPtz(String accessToken, String deviceSerial, Integer channelNo, Integer direction, Integer speed) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
 
             @Override
             public YsResultWrapper stopPtz(String accessToken, String deviceSerial, Integer channelNo, Integer direction) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper addDevice(String accessToken, String deviceSerial, String validateCode) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
 

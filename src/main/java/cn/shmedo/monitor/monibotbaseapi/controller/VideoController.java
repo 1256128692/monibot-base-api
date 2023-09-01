@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
@@ -420,12 +421,13 @@ public class VideoController {
      * @apiParam (请求体) {Byte} addVideoList.accessProtocol 接入协议:萤石云协议:0 国标协议:1
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     * @apiPermission 系统权限 mdmbase:AddVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:AddVideoDevice")
     @RequestMapping(value = "/AddVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object addVideoDeviceList(@Validated @RequestBody AddVideoDeviceListParam pa) {
+        videoService.addVideoDeviceList(pa);
+        return ResultWrapper.successWithNothing();
     }
 
 
