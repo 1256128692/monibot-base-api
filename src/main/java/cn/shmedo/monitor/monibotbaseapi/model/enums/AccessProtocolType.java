@@ -8,10 +8,7 @@ public enum AccessProtocolType {
     private final byte value;
     private final String description;
 
-    AccessProtocolType(byte value, String description) {
-        this.value = value;
-        this.description = description;
-    }
+
 
     public byte getValue() {
         return value;
@@ -20,6 +17,23 @@ public enum AccessProtocolType {
     public String getDescription() {
         return description;
     }
+
+    public static String getDescriptionByValue(byte value) {
+        for (AccessProtocolType protocol : AccessProtocolType.values()) {
+            if (protocol.getValue() == value) {
+                return protocol.getDescription();
+            }
+        }
+        // 如果没有匹配的值，可以根据需要返回一个默认值或抛出异常
+        return "未知协议";
+    }
+
+
+    AccessProtocolType(byte value, String description) {
+        this.value = value;
+        this.description = description;
+    }
+
 
     public static boolean isInvalidProtocol(byte value) {
         for (AccessProtocolType protocol : AccessProtocolType.values()) {

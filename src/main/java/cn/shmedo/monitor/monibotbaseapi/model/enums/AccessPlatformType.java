@@ -21,6 +21,16 @@ public enum AccessPlatformType {
         return description;
     }
 
+    public static String getDescriptionByValue(byte value) {
+        for (AccessPlatformType platform : AccessPlatformType.values()) {
+            if (platform.getValue() == value) {
+                return platform.getDescription();
+            }
+        }
+        // 如果没有匹配的值，可以根据需要返回一个默认值或抛出异常
+        return "未知平台";
+    }
+
     public static boolean isInvalidPlatform(byte value) {
         for (AccessPlatformType platform : AccessPlatformType.values()) {
             if (platform.getValue() == value) {

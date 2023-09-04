@@ -49,6 +49,8 @@ public class RedisKeys {
      * key:value  带过期时间
      */
     public static final String FILE_PATH_KEY_TEMPLATE = "cn.shmedo.mdnet.fileCache:";
+
+    public static final String COMPANY_ID_KEY = "cn.shmedo.mdauth.companyInfo";
 }
 
     

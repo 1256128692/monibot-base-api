@@ -51,7 +51,7 @@ public class VideoDeviceInfo extends TbVideoDevice {
         if (hkDeviceInfo.getStatus() != null) {
             vo.setDeviceStatus(Integer.parseInt(hkDeviceInfo.getStatus()) == 1);
         } else {
-            vo.setDeviceStatus(null);
+            vo.setDeviceStatus(false);
         }
         // 海康平台设备的通道数默认都是1个
         vo.setAccessChannelNum(1);
