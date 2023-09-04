@@ -20,6 +20,7 @@ public class VideoProjectViewSensorInfo {
     private Integer accessChannelNum;
     private Integer accessPlatform;
     private Integer accessProtocol;
+    private String deviceToken;
     private Integer companyID;
     private Integer projectID;
     private Integer storageType;

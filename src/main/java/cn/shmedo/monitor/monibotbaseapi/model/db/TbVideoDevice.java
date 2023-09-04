@@ -26,6 +26,8 @@ public class TbVideoDevice implements Serializable {
      */
     private String deviceType;
 
+    private String deviceToken;
+
     /**
      * 注册公司ID
      */

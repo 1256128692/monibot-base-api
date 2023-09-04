@@ -23,6 +23,7 @@
                     <result column="deviceVideoID" jdbcType="INTEGER" property="deviceVideoID"/>
                     <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
                     <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
+                    <result column="DeviceToken" jdbcType="VARCHAR" property="deviceToken"/>
                     <result column="DeviceName" jdbcType="VARCHAR" property="deviceName"/>
                     <result column="DeviceType" jdbcType="VARCHAR" property="deviceType"/>
                     <result column="AccessChannelNum" jdbcType="INTEGER" property="accessChannelNum"/>
@@ -131,6 +132,7 @@
         storageType,
         captureStatus,
         allocationStatus,
+        deviceToken,
         createUserID,
         createTime,
         updateUserID,
@@ -152,6 +154,7 @@
             #{item.storageType},
             #{item.captureStatus},
             #{item.allocationStatus},
+            #{item.deviceToken},
             #{item.createUserID},
             #{item.createTime},
             #{item.updateUserID},

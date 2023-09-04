@@ -420,8 +420,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:AddVideoDevice")
     @RequestMapping(value = "/AddVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addVideoDeviceList(@Validated @RequestBody AddVideoDeviceListParam pa) {
-        videoService.addVideoDeviceList(pa);
-        return ResultWrapper.successWithNothing();
+        return videoService.addVideoDeviceList(pa);
     }
 
 

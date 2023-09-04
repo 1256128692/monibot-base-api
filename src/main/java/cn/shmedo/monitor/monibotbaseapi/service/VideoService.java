@@ -28,7 +28,7 @@ public interface VideoService {
      */
     ResultWrapper<Object> panControlCompanyVideoPoint(PanControlCompanyVideoPointParam pa);
 
-    void addVideoDeviceList(AddVideoDeviceListParam pa);
+    ResultWrapper<Object> addVideoDeviceList(AddVideoDeviceListParam pa);
 
     PageUtil.Page<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa);
 }

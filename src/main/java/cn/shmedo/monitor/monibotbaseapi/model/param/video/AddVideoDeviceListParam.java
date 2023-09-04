@@ -29,6 +29,9 @@ public class AddVideoDeviceListParam implements ParameterValidator, ResourcePerm
     @JsonIgnore
     private CurrentSubject currentSubject;
 
+    @JsonIgnore
+    private String token;
+
     @Override
     public ResultWrapper validate() {
         long accessPlatformCount = addVideoList.stream().map(VideoDeviceBaseInfo::getAccessPlatform).distinct().count();
@@ -66,6 +69,7 @@ public class AddVideoDeviceListParam implements ParameterValidator, ResourcePerm
             }
         }
 
+        token = CurrentSubjectHolder.getCurrentSubjectExtractData();
         return null;
     }
 
