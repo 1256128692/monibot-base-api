@@ -401,12 +401,6 @@ public class VideoController {
     }
 
 
-//    @PostMapping(value = "/QueryHkVideoPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-//    public Object queryHkVideoPage(@Valid @RequestBody Object param) {
-//        return hkVideoService.QueryHkVideoPage(param);
-//    }
-
-
     /**
      * @api {POST} /AddVideoDeviceList 批量添加视频设备
      * @apiVersion 1.0.0
@@ -592,7 +586,7 @@ public class VideoController {
      * @apiDescription 批量生成视频传感器
      * @apiName QueryVideoDevicePage
      * @apiParam (请求体) {Int} companyID  当前公司ID
-     * @apiParam (请求体) {String} deviceSerial 设备序列号
+     * @apiParam (请求体) {String} [deviceSerial] 设备序列号
      * @apiParam (请求体) {Int} [ownedCompanyID] 所属公司ID,null查全部
      * @apiParam (请求体) {Int} [projectID] 项目ID,null查全部
      * @apiParam (请求体) {Boolean} [deviceStatus] 视频设备在线状态,null查全部
@@ -628,10 +622,10 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryVideoDevicePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoDevicePage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryVideoDevicePage(@Validated @RequestBody QueryVideoDevicePageParam pa) {
+        return videoService.queryVideoDevicePage(pa);
     }
 
 

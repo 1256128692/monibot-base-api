@@ -165,4 +165,68 @@
             SELECT ROW_COUNT() AS insertCount;
         </selectKey>
     </insert>
+
+    <select id="queryPageByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo">
+        select vd.ID        as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.createUserID,
+               vd.createTime,
+               vd.updateUserID,
+               vd.updateTime,
+               pi.ProjectName,
+               COUNT(ts.ID) AS sensorNum
+        from tb_video_device vd
+                 left join tb_project_info pi on pi.ID = vd.projectID
+                 left join tb_sensor ts on vd.ID = ts.VideoDeviceID
+        <where>
+            1 = 1
+            <if test="deviceSerial != null and deviceSerial != ''">
+                and vd.deviceSerial = #{deviceSerial}
+            </if>
+            <if test="deviceStatus != null">
+                and vd.deviceStatus = #{deviceStatus}
+            </if>
+            <if test="allocationStatus != null">
+                and vd.allocationStatus = #{allocationStatus}
+            </if>
+            <if test="ownedCompanyID != null">
+                and vd.CompanyID = #{ownedCompanyID}
+            </if>
+            <if test="projectID != null">
+                and vd.projectID = #{projectID}
+            </if>
+            <if test="begin != null">
+                AND vd.CreateTime &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                AND vd.CreateTime &lt;= #{end}
+            </if>
+        </where>
+        group by vd.ID,
+                 vd.deviceSerial,
+                 vd.deviceType,
+                 vd.companyID,
+                 vd.deviceStatus,
+                 vd.accessChannelNum,
+                 vd.accessPlatform,
+                 vd.projectID,
+                 vd.captureStatus,
+                 vd.allocationStatus,
+                 vd.createUserID,
+                 vd.createTime,
+                 vd.updateUserID,
+                 vd.updateTime,
+                 pi.ProjectName
+        order by vd.id desc
+    </select>
 </mapper>

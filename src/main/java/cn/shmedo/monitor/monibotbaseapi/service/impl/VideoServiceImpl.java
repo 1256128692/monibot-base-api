@@ -7,27 +7,34 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,6 +51,8 @@ public class VideoServiceImpl implements VideoService {
     private final HkVideoService hkVideoService;
 
     private final TbVideoDeviceMapper videoDeviceMapper;
+
+    private final RedisCompanyInfoDao redisCompanyInfoDao;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -242,5 +251,27 @@ public class VideoServiceImpl implements VideoService {
             // TODO:同步到物联网平台
         }
 
+    }
+
+    @Override
+    public PageUtil.Page<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa) {
+
+        Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+
+        IPage<VideoDevicePageInfo> pageData = videoDeviceMapper.queryPageByCondition(page, pa.getDeviceSerial(), pa.getDeviceStatus(), pa.getAllocationStatus(),
+            pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
+            return PageUtil.Page.empty();
+        }
+
+        pageData.getRecords().forEach(record -> {
+            record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
+            record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
+            if (redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()) != null) {
+                record.setCompanyName(redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()).getFullName());
+            }
+        });
+
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 }
