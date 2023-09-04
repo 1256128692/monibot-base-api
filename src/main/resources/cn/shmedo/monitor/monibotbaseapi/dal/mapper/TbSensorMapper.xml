@@ -26,6 +26,8 @@
         <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
         <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+        <result column="VideoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
+        <result column="ChannelCode" jdbcType="INTEGER" property="channelCode"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
@@ -50,7 +52,9 @@
         CreateTime,
         CreateUserID,
         UpdateTime,
-        UpdateUserID
+        UpdateUserID,
+        VideoDeviceID,
+        ChannelCode
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         <!--@mbg.generated-->
