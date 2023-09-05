@@ -70,4 +70,15 @@ public interface IotService {
                                                 @Param("appKey") String appKey,
                                                 @Param("appSecret") String appSecret,
                                                 @Param("accessToken") String accessToken);
+
+
+    /**
+     * 批量删除设备
+     * @return {@link ResultWrapper<Boolean>}
+     */
+    @RequestLine("POST /DeleteDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
+                                        @Param("appKey") String appKey,
+                                        @Param("appSecret") String appSecret);
 }

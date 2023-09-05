@@ -104,4 +104,13 @@
       NextCaptureTime = #{nextCaptureTime,jdbcType=TIMESTAMP}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <delete id="deleteByVedioIDList">
+      delete
+      from tb_video_capture
+      where DeviceSerial in
+      <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+          #{deviceSerial}
+      </foreach>
+  </delete>
 </mapper>

@@ -427,6 +427,7 @@ public class VideoController {
      * @apiParam (请求体) {String[]} deviceSerialList 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceType 视频设备类型
      * @apiSuccess (返回结果) {String} dataList.deviceName 视频设备名称
@@ -445,7 +446,7 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryVideoDeviceList(@Validated @RequestBody QueryVideoDeviceListParam pa) {
         return videoService.queryVideoDeviceList(pa);
@@ -503,6 +504,28 @@ public class VideoController {
         return null;
     }
 
+    /**
+     * @api {POST} /QueryHkVideoDeviceBaseInfo 查询海康视频设备基本信息
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询海康视频设备基本信息,调用海康api服务接口
+     * @apiName QueryHkVideoDeviceBaseInfo
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {String} deviceSerial 海康的设备序列号
+     * @apiSuccess (返回结果) {String} deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入通道号的数量(海康默认为1)
+     * @apiSuccess (返回结果) {Int} accessChannelNum 接入通道号的数量(海康默认为1)
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryHkVideoDeviceBaseInfo", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryHkVideoDeviceBaseInfo(@Validated @RequestBody QueryHkVideoDeviceBaseInfoParam pa) {
+        return videoService.queryHkVideoDeviceBaseInfo(pa);
+    }
+
 
     /**
      * @api {POST} /DeleteVideoDeviceList 批量删除视频设备
@@ -514,12 +537,12 @@ public class VideoController {
      * @apiParam (请求体) {String[]} deviceSerialList 设备序列号/监控点唯一标识列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     * @apiPermission 系统权限 mdmbase:DeleteVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:DeleteVideoDevice")
     @RequestMapping(value = "/DeleteVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object deleteVideoDeviceList(@Validated @RequestBody DeleteVideoDeviceParam pa) {
+        return videoService.deleteVideoDeviceList(pa);
     }
 
 

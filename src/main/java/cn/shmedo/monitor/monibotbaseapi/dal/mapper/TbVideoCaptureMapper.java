@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
 
+import java.util.List;
+
 public interface TbVideoCaptureMapper {
     /**
      * delete by primary key
@@ -44,4 +46,6 @@ public interface TbVideoCaptureMapper {
      * @return update count
      */
     int updateByPrimaryKey(TbVideoCapture record);
+
+    void deleteByVedioIDList(List<String> deviceSerialList);
 }
