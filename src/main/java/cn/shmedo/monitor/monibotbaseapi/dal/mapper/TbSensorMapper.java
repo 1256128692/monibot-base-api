@@ -59,4 +59,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorHistoryAvgDataResponse> selectListBySensorIDsAndProjectIDs(List<Integer> sensorIDList, List<Integer> projectIDList);
 
     List<VideoCaptureBaseInfo> queryListByCondition(List<Integer> videoIDList);
+
+    void deleteByVedioIDList(List<Integer> videoIDList);
 }

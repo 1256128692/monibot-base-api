@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class VideoDeviceInfoV1 {
 
-
+    private Integer companyID;
     private Integer videoDeviceID;
     private String deviceSerial;
     private String deviceType;

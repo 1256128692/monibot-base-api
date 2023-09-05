@@ -1,12 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
-import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
-import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
@@ -16,11 +18,9 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
-public class QueryVideoDeviceListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-
+public class DeleteVideoDeviceParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull
     private Integer companyID;
@@ -28,9 +28,16 @@ public class QueryVideoDeviceListParam implements ParameterValidator, ResourcePe
     @NotEmpty
     private List<@NotBlank String> deviceSerialList;
 
+    @JsonIgnore
+    private List<TbVideoDevice> tbVideoDevices = new ArrayList<>();
     @Override
     public ResultWrapper validate() {
+        TbVideoDeviceMapper tbVideoDeviceMapper = ContextHolder.getBean(TbVideoDeviceMapper.class);
+        LambdaQueryWrapper<TbVideoDevice> wrapper = new LambdaQueryWrapper<TbVideoDevice>()
+                .in(TbVideoDevice::getDeviceSerial, deviceSerialList);
+        tbVideoDevices = tbVideoDeviceMapper.selectList(wrapper);
         return null;
+
     }
 
     @Override
@@ -42,6 +49,5 @@ public class QueryVideoDeviceListParam implements ParameterValidator, ResourcePe
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
-
 
 }

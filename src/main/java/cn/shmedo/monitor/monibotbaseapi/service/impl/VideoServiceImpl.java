@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoCaptureMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
@@ -20,11 +21,14 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.DeleteDeviceParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
@@ -67,6 +71,8 @@ public class VideoServiceImpl implements VideoService {
     private final IotService iotService;
 
     private final TbSensorMapper sensorMapper;
+
+    private final TbVideoCaptureMapper videoCaptureMapper;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -431,5 +437,53 @@ public class VideoServiceImpl implements VideoService {
             v.setDeviceChannelNum(singleVideoSensorList.size());
         });
         return list;
+    }
+
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Object deleteVideoDeviceList(DeleteVideoDeviceParam pa) {
+
+        // 1. 删除视频设备
+        if (CollectionUtil.isNullOrEmpty(pa.getTbVideoDevices())) {
+            return ResultWrapper.successWithNothing();
+        }
+
+        List<Integer> videoIDList = pa.getTbVideoDevices().stream()
+                .map(TbVideoDevice::getID).collect(Collectors.toList());
+        videoDeviceMapper.deleteBatchIds(videoIDList);
+
+        // 2. 删除关联的传感器
+        sensorMapper.deleteByVedioIDList(videoIDList);
+
+        // 3. 删除抓拍配置
+        videoCaptureMapper.deleteByVedioIDList(pa.getDeviceSerialList());
+
+        // 4. 删除物联网平台设备
+        ResultWrapper<List<DeviceBaseInfo>> listResultWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
+                .companyID(pa.getCompanyID())
+                .deviceTokens(pa.getTbVideoDevices().stream().map(TbVideoDevice::getDeviceToken).collect(Collectors.toSet()))
+                .build());
+
+        if (listResultWrapper.apiSuccess() && !CollectionUtil.isNullOrEmpty(listResultWrapper.getData())) {
+            DeleteDeviceParam build = DeleteDeviceParam.builder().companyID(pa.getCompanyID())
+                    .idList(listResultWrapper.getData().stream().map(DeviceBaseInfo::getDeviceID).collect(Collectors.toList()))
+                    .saveData(false)
+                    .build();
+            iotService.deleteDevice(build,
+                    fileConfig.getAuthAppKey(),
+                    fileConfig.getAuthAppSecret());
+        }
+
+
+        // TODO,因为目前没有验证码,暂时不验证删除萤石云设备
+//        pa.getTbVideoDevices().forEach(d -> {
+//            if (d.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+//                ysService.deleteDevice(getYsToken(), d.getDeviceSerial());
+//            }
+//        });
+
+
+        return ResultWrapper.successWithNothing();
     }
 }

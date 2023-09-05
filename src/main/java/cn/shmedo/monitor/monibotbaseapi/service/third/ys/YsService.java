@@ -95,4 +95,10 @@ public interface YsService {
     YsResultWrapper addDevice(@Param("accessToken") String accessToken,
                               @Param("deviceSerial") String deviceSerial,
                               @Param("validateCode") String validateCode);
+
+    @RequestLine("POST /api/lapp/device/delete")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}")
+    YsResultWrapper deleteDevice(@Param("accessToken") String accessToken,
+                                 @Param("deviceSerial") String deviceSerial);
 }

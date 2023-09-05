@@ -427,6 +427,7 @@ public class VideoController {
      * @apiParam (请求体) {String[]} deviceSerialList 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceType 视频设备类型
      * @apiSuccess (返回结果) {String} dataList.deviceName 视频设备名称
@@ -516,10 +517,10 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:DeleteVideoDevice")
     @RequestMapping(value = "/DeleteVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object deleteVideoDeviceList(@Validated @RequestBody DeleteVideoDeviceParam pa) {
+        return videoService.deleteVideoDeviceList(pa);
     }
 
 

@@ -553,4 +553,13 @@
             #{videoID}
         </foreach>
     </select>
+
+    <delete id="deleteByVedioIDList">
+        delete
+        from tb_sensor
+        where VideoDeviceID in
+        <foreach collection="videoIDList" item="videoID" separator="," open="(" close=")">
+            #{videoID}
+        </foreach>
+    </delete>
 </mapper>

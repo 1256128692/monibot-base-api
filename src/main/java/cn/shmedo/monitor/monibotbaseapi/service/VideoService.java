@@ -34,4 +34,6 @@ public interface VideoService {
     String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param);
 
     List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa);
+
+    Object deleteVideoDeviceList(DeleteVideoDeviceParam pa);
 }
