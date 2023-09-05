@@ -486,4 +486,20 @@ public class VideoServiceImpl implements VideoService {
 
         return ResultWrapper.successWithNothing();
     }
+
+    @Override
+    public VideoDeviceInfoV1 queryHkVideoDeviceBaseInfo(QueryHkVideoDeviceBaseInfoParam pa) {
+
+        HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(pa.getDeviceSerial());
+        if (hkDeviceInfo == null) {
+            return null;
+        }
+        VideoDeviceInfoV1 vo = new VideoDeviceInfoV1();
+        vo.setDeviceChannelNum(1);
+        vo.setAccessChannelNum(1);
+        vo.setDeviceName(hkDeviceInfo.getCameraName());
+        vo.setDeviceType(hkDeviceInfo.getCameraTypeName());
+        vo.setDeviceSerial(pa.getDeviceSerial());
+        return vo;
+    }
 }
