@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewB
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -34,5 +35,5 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
                                                     Date begin, Date end);
 
 
-
+    List<VideoDeviceInfoV1> queryListByCondition(List<String> deviceSerialList);
 }

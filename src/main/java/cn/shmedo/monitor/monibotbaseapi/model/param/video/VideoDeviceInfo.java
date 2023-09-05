@@ -23,7 +23,7 @@ public class VideoDeviceInfo extends TbVideoDevice {
                                           AddVideoDeviceListParam pa) {
         VideoDeviceInfo vo = new VideoDeviceInfo();
 
-        vo.setDeviceName(data.getDeviceName());
+        vo.setDeviceName(data.getDeviceSerial());
         vo.setDeviceType(data.getModel());
         vo.setDeviceSerial(data.getDeviceSerial());
         vo.setDeviceToken(data.getDeviceSerial());

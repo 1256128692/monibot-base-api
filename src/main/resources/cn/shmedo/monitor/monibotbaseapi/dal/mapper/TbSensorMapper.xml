@@ -536,4 +536,20 @@
             #{projectID}
         </foreach>
     </select>
+
+    <select id="queryListByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo">
+        select s.ID     as sensorID,
+               s.`Name` as sensorName,
+               s.projectID,
+               s.channelCode as channelNo,
+               s.videoDeviceID,
+               c.CaptureInterval
+        from tb_sensor s
+                 left join tb_video_capture c on s.VideoDeviceID = c.ID
+        where s.VideoDeviceID in
+        <foreach collection="videoIDList" item="videoID" separator="," open="(" close=")">
+            #{videoID}
+        </foreach>
+    </select>
 </mapper>
