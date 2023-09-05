@@ -11,6 +11,8 @@ public class VideoCaptureBaseInfo {
     // 可以为空
     private Integer sensorID;
     private String sensorName;
+
+    private Boolean sensorEnable;
     // 可以为空
     private Integer captureInterval;
     // 可以为空
