@@ -413,8 +413,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:AddVideoDevice")
     @RequestMapping(value = "/AddVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addVideoDeviceList(@Validated @RequestBody AddVideoDeviceListParam pa) {
-        videoService.addVideoDeviceList(pa);
-        return ResultWrapper.successWithNothing();
+        return videoService.addVideoDeviceList(pa);
     }
 
 
@@ -438,6 +437,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.sensorEnable] 传感器是否开启
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
      * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
@@ -447,8 +447,8 @@ public class VideoController {
      */
 //    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryVideoDeviceList(@Validated @RequestBody QueryVideoDeviceListParam pa) {
+        return videoService.queryVideoDeviceList(pa);
     }
 
 
@@ -558,6 +558,7 @@ public class VideoController {
      * @apiParam (请求体) {Object[]} list.addSensorList 新增视频传感器(max = 100)
      * @apiParam (请求体) {Int} [list.addSensorList.sensorID] 传感器ID,为空时进行新增,不为空时进行更新
      * @apiParam (请求体) {String} list.addSensorList.sensorName 传感器名称
+     * @apiParam (请求体) {Boolean} [list.addSensorList.sensorEnable] 传感器是否启用
      * @apiParam (请求体) {Int} list.addSensorList.channelCode 通道号
      * @apiParam (请求体) {Boolean} [list.addSensorList.bindProject] 是否绑定工程
      * @apiParam (请求体) {Int} [list.addSensorList.captureInterval] 抓拍间隔(单位:分钟)

@@ -23,6 +23,7 @@
                     <result column="deviceVideoID" jdbcType="INTEGER" property="deviceVideoID"/>
                     <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
                     <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
+                    <result column="DeviceToken" jdbcType="VARCHAR" property="deviceToken"/>
                     <result column="DeviceName" jdbcType="VARCHAR" property="deviceName"/>
                     <result column="DeviceType" jdbcType="VARCHAR" property="deviceType"/>
                     <result column="AccessChannelNum" jdbcType="INTEGER" property="accessChannelNum"/>
@@ -131,6 +132,7 @@
         storageType,
         captureStatus,
         allocationStatus,
+        deviceToken,
         createUserID,
         createTime,
         updateUserID,
@@ -152,6 +154,7 @@
             #{item.storageType},
             #{item.captureStatus},
             #{item.allocationStatus},
+            #{item.deviceToken},
             #{item.createUserID},
             #{item.createTime},
             #{item.updateUserID},
@@ -236,6 +239,28 @@
         WHERE ts.`ID` IN
         <foreach collection="sensorList" separator="," open="(" close=")" item="item" index="index">
             #{#item}
+        </foreach>
+    </select>
+
+    <select id="queryListByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1">
+        select vd.ID as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.exValue
+        from tb_video_device vd
+        where vd.deviceSerial in
+        <foreach collection="deviceSerialList" separator="," open="(" item="deviceSerial" close=")">
+            #{deviceSerial}
         </foreach>
     </select>
 </mapper>

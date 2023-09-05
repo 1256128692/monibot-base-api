@@ -25,11 +25,13 @@ public interface VideoService {
      */
     ResultWrapper<Object> panControlCompanyVideoPoint(PanControlCompanyVideoPointParam pa);
 
-    void addVideoDeviceList(AddVideoDeviceListParam pa);
+    ResultWrapper<Object> addVideoDeviceList(AddVideoDeviceListParam pa);
 
     PageUtil.Page<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa);
 
     VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param);
 
     String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param);
+
+    List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa);
 }

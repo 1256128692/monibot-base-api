@@ -58,4 +58,16 @@ public interface IotService {
      */
     @RequestLine("POST /QueryDeviceExpandNewState")
     ResultWrapper<DeviceStateResponse> queryDeviceExpandState(QueryDeviceStateParam param);
+
+
+    /**
+     * 批量创建设备
+     * @return {@link ResultWrapper<Boolean>}
+     */
+    @RequestLine("POST /CreateMultipleDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}", "Authorization: Bearer {accessToken}"})
+    ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
+                                                @Param("appKey") String appKey,
+                                                @Param("appSecret") String appSecret,
+                                                @Param("accessToken") String accessToken);
 }

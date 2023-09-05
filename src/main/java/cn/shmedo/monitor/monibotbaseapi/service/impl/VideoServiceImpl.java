@@ -2,12 +2,15 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSON;
+import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
@@ -15,7 +18,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceItem;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
@@ -23,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -30,6 +37,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,6 +63,10 @@ public class VideoServiceImpl implements VideoService {
     private final TbVideoDeviceMapper videoDeviceMapper;
 
     private final RedisCompanyInfoDao redisCompanyInfoDao;
+
+    private final IotService iotService;
+
+    private final TbSensorMapper sensorMapper;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -221,7 +233,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addVideoDeviceList(AddVideoDeviceListParam pa) {
+    public ResultWrapper<Object> addVideoDeviceList(AddVideoDeviceListParam pa) {
 
         List<VideoDeviceBaseInfo> addVideoList = pa.getAddVideoList();
         String ysToken = getYsToken();
@@ -229,51 +241,71 @@ public class VideoServiceImpl implements VideoService {
         List<VideoDeviceInfo> videoDeviceInfoList = new LinkedList<>();
         // 萤石云数据
         if (pa.getAccessPlatform() == AccessPlatformType.YING_SHI.getValue()) {
-            addVideoList.forEach(a -> {
+            for (int i = 0; i < addVideoList.size(); i++) {
                 // 先去查询萤石云接口
-                YsResultWrapper<YsDeviceInfo> deviceInfoWrapper = ysService.getDeviceInfo(ysToken, a.getDeviceSerial());
+                YsResultWrapper<YsDeviceInfo> deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                 YsResultWrapper<List<YsChannelInfo>> deviceChannelInfo = null;
                 if (deviceInfoWrapper != null && deviceInfoWrapper.getMsg().equals("设备不存在")) {
                     // 查询不到则直接添加
-                    YsResultWrapper ysResultWrapper = ysService.addDevice(ysToken, a.getDeviceSerial(), a.getValidateCode());
+                    YsResultWrapper ysResultWrapper = ysService.addDevice(ysToken, addVideoList.get(i).getDeviceSerial(), addVideoList.get(i).getValidateCode());
                     if (!ysResultWrapper.getMsg().equals("操作成功")) {
-                        throw new RuntimeException("添加萤石云平台设备失败");
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "添加萤石云平台设备失败,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
                     }
-                    deviceInfoWrapper = ysService.getDeviceInfo(ysToken, a.getDeviceSerial());
-                    deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, a.getDeviceSerial());
+                    deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
+                    deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
-                        throw new RuntimeException("未查到萤石云对应数据");
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
                     }
                 } else {
-                    deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, a.getDeviceSerial());
+                    deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
-                        throw new RuntimeException("未查到萤石云对应数据");
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
                     }
                 }
 
                 videoDeviceInfoList.add(VideoDeviceInfo.ysToNewValue(deviceInfoWrapper.getData(),
-                        deviceChannelInfo.getData(), a, pa));
+                        deviceChannelInfo.getData(), addVideoList.get(i), pa));
+            }
 
-            });
         }
 
         // 海康数据
         if (pa.getAccessPlatform() == AccessPlatformType.HAI_KANG.getValue()) {
-            addVideoList.forEach(a -> {
-                HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(a.getDeviceSerial());
+            String yyyyMMdd = DateUtil.format(DateUtil.date(), "yyyyMMdd");
+            for (int i = 0; i < addVideoList.size(); i++) {
+                Integer num = i + 1;
+                HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(addVideoList.get(i).getDeviceSerial());
                 if (hkDeviceInfo == null) {
-                    throw new RuntimeException("未查到海康对应数据");
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
                 }
 
-                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, a, pa));
-            });
+                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK"+yyyyMMdd+num.toString()));
+            }
         }
         int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
 
         if (successInsertCount > 0) {
-            // TODO:同步到物联网平台
-        }
+            CreateMultipleDeviceParam iotRequest = new CreateMultipleDeviceParam();
+            iotRequest.setCompanyID(pa.getCompanyID());
 
+            if (pa.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+                videoDeviceInfoList.forEach(v -> {
+                    iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getYsProductID(),
+                            v.getDeviceToken(), v.getDeviceName()));
+                });
+            } else {
+                videoDeviceInfoList.forEach(v -> {
+                    iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getHkProductID(),
+                            v.getDeviceToken(), v.getDeviceName()));
+                });
+            }
+            ResultWrapper<Boolean> multipleDevice = iotService.createMultipleDevice(iotRequest,
+                    fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
+            if (!multipleDevice.apiSuccess()) {
+                return ResultWrapper.withCode(ResultCode.SUCCESS, "设备在iot服务已存在");
+            }
+        }
+        return ResultWrapper.successWithNothing();
     }
 
     @Override
@@ -336,5 +368,68 @@ public class VideoServiceImpl implements VideoService {
                 null, null, null, param.getYsVideoType(), 2, startTime, stopTime, null, null, null);
         return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
                 .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
+    }
+
+    @Override
+    public List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa) {
+
+        List<VideoDeviceInfoV1> list = videoDeviceMapper.queryListByCondition(pa.getDeviceSerialList());
+
+        if (CollectionUtil.isNullOrEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        List<VideoCaptureBaseInfo> sensorInfoList = sensorMapper.queryListByCondition(list.stream().map(VideoDeviceInfoV1::getVideoDeviceID).collect(Collectors.toList()));
+
+        // 根据协议去转换json对象
+        list.forEach(v -> {
+            v.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(v.getAccessPlatform()));
+            if (!CollectionUtils.isNotEmpty(sensorInfoList)) {
+                v.setSensorList(sensorInfoList.stream().filter(s -> s.getVideoDeviceID().equals(v.getVideoDeviceID())).collect(Collectors.toList()));
+            }
+
+            List<VideoCaptureBaseInfo> singleVideoSensorList = new LinkedList<>();
+            if (v.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+                if (!StringUtil.isNullOrEmpty(v.getExValue())) {
+                    JSONArray jsonArray = JSONUtil.parseArray(v.getExValue());
+                    v.setYsChannelInfoList(jsonArray.toList(YsChannelInfo.class));
+                    // 如果传感器列表为空，遍历 ysChannelInfoList 并转换成 VideoCaptureBaseInfo
+                    if (CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        if (!CollectionUtil.isNullOrEmpty(v.getYsChannelInfoList())) {
+                            for (int i = 0; i < v.getYsChannelInfoList().size(); i++) {
+                                YsChannelInfo ysChannelInfo = v.getYsChannelInfoList().get(i);
+                                // 添加到 singleVideoSensorList
+                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i+1));
+                            }
+                        }
+                    } else {
+                        if (!CollectionUtil.isNullOrEmpty(v.getYsChannelInfoList())) {
+                            List<YsChannelInfo> filteredYsChannelInfoList = v.getYsChannelInfoList().stream()
+                                    .filter(ys -> v.getSensorList().stream().noneMatch(sensor -> sensor.getChannelNo().equals(ys.getChannelNo())))
+                                    .collect(Collectors.toList());
+
+                            for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
+                                YsChannelInfo ysChannelInfo = filteredYsChannelInfoList.get(i);
+                                // 添加到 singleVideoSensorList
+                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i+1));
+                                singleVideoSensorList.addAll(v.getSensorList());
+                            }
+                        }
+                    }
+                }
+            } else {
+                if (!StringUtil.isNullOrEmpty(v.getExValue())) {
+                    JSON json = JSONUtil.parse(v.getExValue());
+                    HkChannelInfo hkChannelInfo = json.toBean(HkChannelInfo.class);
+                    v.setHkChannelInfo(hkChannelInfo);
+                    if (CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromHkChannelInfo(hkChannelInfo, v.getDeviceName()));
+                    }
+                }
+            }
+            v.setSensorList(singleVideoSensorList);
+            v.setDeviceChannelNum(singleVideoSensorList.size());
+        });
+        return list;
     }
 }

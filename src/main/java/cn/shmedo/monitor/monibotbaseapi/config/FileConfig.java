@@ -48,4 +48,12 @@ public class FileConfig {
 
     @Value("${ArtemisConfig.appSecret}")
     private String hkAppSecret;
+
+
+    @Value("${iot.hkProductID}")
+    private Integer hkProductID;
+
+
+    @Value("${iot.ysProductID}")
+    private Integer ysProductID;
 }

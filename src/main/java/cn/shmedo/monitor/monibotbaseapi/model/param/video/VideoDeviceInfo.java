@@ -8,10 +8,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class VideoDeviceInfo extends TbVideoDevice {
 
 
@@ -21,9 +23,10 @@ public class VideoDeviceInfo extends TbVideoDevice {
                                           AddVideoDeviceListParam pa) {
         VideoDeviceInfo vo = new VideoDeviceInfo();
 
-        vo.setDeviceName(data.getDeviceName());
+        vo.setDeviceName(data.getDeviceSerial());
         vo.setDeviceType(data.getModel());
         vo.setDeviceSerial(data.getDeviceSerial());
+        vo.setDeviceToken(data.getDeviceSerial());
         vo.setDeviceStatus(data.getStatus() == 1);
         vo.setAccessChannelNum(ysChannelInfoList.size());
         vo.setAccessPlatform(a.getAccessPlatform());
@@ -42,12 +45,14 @@ public class VideoDeviceInfo extends TbVideoDevice {
 
     public static VideoDeviceInfo hkToNewValue(HkDeviceInfo hkDeviceInfo,
                                                VideoDeviceBaseInfo a,
-                                               AddVideoDeviceListParam pa) {
+                                               AddVideoDeviceListParam pa,
+                                               String deviceToken) {
         VideoDeviceInfo vo = new VideoDeviceInfo();
 
         vo.setDeviceName(hkDeviceInfo.getCameraName());
         vo.setDeviceType(hkDeviceInfo.getCameraTypeName());
         vo.setDeviceSerial(a.getDeviceSerial());
+        vo.setDeviceToken(deviceToken);
         if (hkDeviceInfo.getStatus() != null) {
             vo.setDeviceStatus(Integer.parseInt(hkDeviceInfo.getStatus()) == 1);
         } else {
