@@ -282,7 +282,7 @@ public class VideoServiceImpl implements VideoService {
             ResultWrapper<Boolean> multipleDevice = iotService.createMultipleDevice(iotRequest,
                     fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
             if (!multipleDevice.apiSuccess()) {
-                return ResultWrapper.withCode(ResultCode.SUCCESS, "设备已添加至中台,同步到iot平台视频设备失败,原因:"+multipleDevice.getMsg());
+                return ResultWrapper.withCode(ResultCode.SUCCESS, "设备在iot服务已存在");
             }
         }
         return ResultWrapper.successWithNothing();

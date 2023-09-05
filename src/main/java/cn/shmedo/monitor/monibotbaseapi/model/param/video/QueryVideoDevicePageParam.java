@@ -36,7 +36,11 @@ public class QueryVideoDevicePageParam  implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper validate() {
-
+        if (begin != null && end != null) {
+            if (begin.after(end)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
+            }
+        }
         return null;
     }
 
