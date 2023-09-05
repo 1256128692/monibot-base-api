@@ -19,7 +19,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLi
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +31,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
     private Integer projectID;
     private Integer monitorPointID;
-
+    @NotNull(message = "方向不能为空")
+    @Range(max = 16, message = "方向 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制")
     private Integer direction;
 
     @JsonIgnore
@@ -39,6 +42,9 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
     @Override
     public ResultWrapper<?> validate() {
+        if (direction > 11 && direction < 16) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石摄像头设备暂不支持该方向");
+        }
         TbProjectMonitorClassMapper projectMonitorClassMapper = ContextHolder.getBean(TbProjectMonitorClassMapper.class);
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
@@ -94,9 +100,6 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                 }
             });
         }
-
-        // TODO 加上参数方向的校验
-
         return null;
     }
 

@@ -35,6 +35,9 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
 
     @Override
     public ResultWrapper validate() {
+        if (List.of(8, 9, 12, 13, 14, 15, 16).contains(direction)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "海康摄像头设备暂不支持该方向");
+        }
         QueryVideoCompanyViewBaseInfoParam param = new QueryVideoCompanyViewBaseInfoParam();
         param.setCompanyID(companyID);
         param.setVideoDeviceID(videoDeviceID);
