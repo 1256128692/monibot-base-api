@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.video;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -42,7 +43,7 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
             setStorageType(info.getStorageType());
             setCaptureStatus(info.getCaptureStatus());
             setAllocationStatus(info.getAllocationStatus());
-            setDeviceChannel(u.stream().map(VideoProjectViewSensorInfo::getChannelDesc).map(Integer::parseInt).toList());
+            setDeviceChannel(u.stream().map(VideoProjectViewSensorInfo::getChannelDesc).filter(ObjectUtil::isNotEmpty).map(Integer::parseInt).toList());
         });
     }
 }

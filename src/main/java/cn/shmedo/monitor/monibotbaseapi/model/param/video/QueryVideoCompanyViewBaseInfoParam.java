@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -22,10 +23,12 @@ public class QueryVideoCompanyViewBaseInfoParam implements ParameterValidator, R
     private Integer status;
     private String deviceSerial;
     private Integer videoDeviceID;
+    @JsonIgnore
+    private Boolean deviceStatus;
 
     @Override
     public ResultWrapper validate() {
-        status = Objects.isNull(status) ? 0 : status;
+        deviceStatus = Objects.isNull(status) || status == 0 ? null : status == 1;
         return null;
     }
 

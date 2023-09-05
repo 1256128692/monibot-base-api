@@ -6,10 +6,13 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
+
+import java.util.Objects;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -23,12 +26,12 @@ public class QueryVideoProjectViewBaseInfo implements ParameterValidator, Resour
     @Range(max = 2, message = "视频设备状态枚举 0.全部 1.仅在线 2.仅离线")
     private Integer status;
     private String deviceSerial;
+    @JsonIgnore
+    private Boolean deviceStatus;
 
     @Override
     public ResultWrapper validate() {
-        if (!ContextHolder.getBean(TbProjectInfoMapper.class).exists(new LambdaQueryWrapper<TbProjectInfo>().eq(TbProjectInfo::getID, projectID))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程不存在");
-        }
+        deviceStatus = Objects.isNull(status) || status == 0 ? null : status == 1;
         return null;
     }
 

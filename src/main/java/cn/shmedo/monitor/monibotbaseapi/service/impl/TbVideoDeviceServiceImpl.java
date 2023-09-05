@@ -33,7 +33,8 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public List<VideoProjectViewBaseInfo> queryVideoProjectViewBaseInfo(QueryVideoProjectViewBaseInfo param) {
-        return this.baseMapper.selectVideoProjectViewBaseInfo(param).stream().peek(u -> u.getMonitorGroupDataList().stream()
+        List<VideoProjectViewBaseInfo> videoProjectViewBaseInfos = this.baseMapper.selectVideoProjectViewBaseInfo(param);
+        return videoProjectViewBaseInfos.stream().peek(u -> u.getMonitorGroupDataList().stream()
                 .map(VideoProjectViewSubGroupInfo::getMonitorPointDataList).flatMap(Collection::stream)
                 .peek(VideoProjectViewPointInfo::afterProperties).toList()).toList();
     }
