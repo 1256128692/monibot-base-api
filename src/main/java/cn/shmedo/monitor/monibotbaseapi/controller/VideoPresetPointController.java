@@ -30,7 +30,7 @@ public class VideoPresetPointController {
      * @apiGroup 预置点模块
      * @apiName QueryPresetPointList
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.presetPointID 预置点ID
      * @apiSuccess (返回结果) {String} dataList.presetPointName 预置点名称
@@ -42,7 +42,7 @@ public class VideoPresetPointController {
     @PostMapping(value = "/QueryPresetPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryPresetPointList(@Valid @RequestBody QueryPresetPointListParam param) {
         return ResultWrapper.success(this.tbVideoPresetPointService.list(new LambdaQueryWrapper<TbVideoPresetPoint>()
-                .eq(TbVideoPresetPoint::getDeviceVideoID, param.getDeviceVideoID())
+                .eq(TbVideoPresetPoint::getVideoDeviceID, param.getVideoDeviceID())
                 .select(TbVideoPresetPoint::getID, TbVideoPresetPoint::getPresetPointName, TbVideoPresetPoint::getPresetPointIndex)));
     }
 
@@ -53,7 +53,7 @@ public class VideoPresetPointController {
      * @apiGroup 预置点模块
      * @apiName AddPresetPoint
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} videoDeviceID 视频设备ID
      * @apiParam (请求体) {String} presetPointName 预置点名称
      * @apiParam (请求体) {Int} presetPointIndex 预置点位置
      * @apiSuccess (返回结果) {String} none 无

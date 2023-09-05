@@ -17,7 +17,7 @@ public class TbVideoPresetPoint implements Serializable {
     /**
      * 设备视频ID
      */
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
 
     /**
      * 预置点名称

@@ -105,7 +105,7 @@ public class VideoController {
      * @apiDescription 云台控制监测点视频设备的摄像头移动, 有(上下左右, 焦距)等操作
      * @apiName PanControlCompanyVideoPoint
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} deviceVideoID 视频设备ID
+     * @apiParam (请求体) {Int} videoDeviceID 视频设备ID
      * @apiParam (请求体) {Int} deviceChannel 通道号
      * @apiParam (请求体) {Int} direction 方向 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制
      * @apiSuccess (返回结果) {String} none 空
@@ -183,12 +183,12 @@ public class VideoController {
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
-     * @apiSuccess (返回结果) {Int} dataList.deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} dataList.deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceName 设备名称
      * @apiSuccess (返回结果) {String} dataList.deviceType 设备类型/型号
-     * @apiSuccess (返回结果) {Int} dataList.aqccessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 接入的通道号数量
      * @apiSuccess (返回结果) {Int} dataList.accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} dataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
      * @apiSuccess (返回结果) {Int} dataList.companyID 注册公司ID
@@ -232,7 +232,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.sensorID 传感器ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorName 传感器名称
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.sensorAlias 传感器别称
-     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.deviceName 设备名称
@@ -262,12 +262,12 @@ public class VideoController {
      * @apiGroup 视频模块
      * @apiName QueryYsVideoDeviceInfo
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
+     * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID (videoDeviceID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
      * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
-     * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Int} videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} deviceName 设备名称
@@ -311,12 +311,12 @@ public class VideoController {
      * @apiGroup 视频模块
      * @apiName QueryHikVideoDeviceInfo
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID,deviceVideoID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
+     * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID,videoDeviceID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求体) {Int} [streamType] 码流类型，0.主码流 1.子码流 2.第三码流 (默认为0.主码流)
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
-     * @apiSuccess (返回结果) {Int} deviceVideoID 视频设备ID
+     * @apiSuccess (返回结果) {Int} videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Boolean} deviceStatus 在线状态 在线:true 离线:false
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} deviceName 设备名称
@@ -352,7 +352,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
      * @apiParam (请求体) {DateTime} beginTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
-     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID (deviceVideoID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
+     * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID (videoDeviceID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
      * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
@@ -377,7 +377,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
      * @apiParam (请求体) {DateTime} beginTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
-     * @apiParam (请求体) {Int} [deviceVideoID] 视频设备ID,deviceVideoID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
+     * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID,videoDeviceID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求体) {String} [uuid] uuid,用于继续查询剩余片段

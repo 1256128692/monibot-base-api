@@ -24,7 +24,7 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
     @Positive(message = "公司ID不能小于1")
     private final Integer companyID;
     @NotNull(message = "视频设备ID不能为空")
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
     @NotNull(message = "视频设备通道号不能为空")
     private Integer deviceChannel;
     @NotNull(message = "方向不能为空")
@@ -37,7 +37,7 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
     public ResultWrapper validate() {
         QueryVideoCompanyViewBaseInfoParam param = new QueryVideoCompanyViewBaseInfoParam();
         param.setCompanyID(companyID);
-        param.setDeviceVideoID(deviceVideoID);
+        param.setVideoDeviceID(videoDeviceID);
         final List<VideoCompanyViewBaseInfo> videoCompanyViewBaseInfos = ContextHolder.getBean(TbVideoDeviceMapper.class)
                 .selectVideoCompanyViewBaseInfo(param);
         if (CollUtil.isEmpty(videoCompanyViewBaseInfos)) {

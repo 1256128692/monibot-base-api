@@ -29,7 +29,7 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
             VideoProjectViewSensorInfo info = u.get(0);
             setSensorName(info.getSensorName());
             setSensorAlias(info.getSensorAlias());
-            setDeviceVideoID(info.getDeviceVideoID());
+            setVideoDeviceID(info.getVideoDeviceID());
             setDeviceStatus(info.getDeviceStatus());
             setDeviceSerial(info.getDeviceSerial());
             setDeviceName(info.getDeviceName());

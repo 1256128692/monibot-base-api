@@ -20,7 +20,7 @@
                     <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
                     <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
                     <result column="channelDesc" jdbcType="VARCHAR" property="channelDesc"/>
-                    <result column="deviceVideoID" jdbcType="INTEGER" property="deviceVideoID"/>
+                    <result column="videoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
                     <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
                     <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
                     <result column="DeviceToken" jdbcType="VARCHAR" property="deviceToken"/>
@@ -42,7 +42,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoCompanyViewBaseInfoParam">
         SELECT
-            tvd.`ID` deviceVideoID,
+            tvd.`ID` videoDeviceID,
             tvd.`DeviceStatus` deviceStatus,
             tvd.`DeviceSerial` deviceSerial,
             tvd.`DeviceName` deviceName,
@@ -55,21 +55,21 @@
             tvd.`StorageType` storageType,
             tvd.`CaptureStatus` captureStatus,
             tvd.`AllocationStatus` allocationStatus,
-            (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.ysChannelNo")) WHEN 1 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.channelNo")) ELSE NULL END) channelDesc
+            (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValues,"$.ysChannelNo")) WHEN 1 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValues,"$.channelNo")) ELSE NULL END) channelDesc
         FROM
             tb_video_device tvd
-            LEFT JOIN tb_sensor ts ON tvd.`ID` = ts.`DeviceVideoID`
-        WHERE tvd.`CompanyID` = 138
+            LEFT JOIN tb_sensor ts ON tvd.`ID` = ts.`VideoDeviceID`
+        WHERE tvd.`CompanyID` = #{param.companyID}
         <if test="param.deviceSerial != null and param.deviceSerial != ''">
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
         </if>
         <if test="param.status != null and param.status != 0">
             AND tvd.`DeviceStatus` = (#{param.status} == 1)
         </if>
-        <if test="param.deviceVideoID != null">
-            AND tvd.ID = #{param.deviceVideoID}
+        <if test="param.videoDeviceID != null">
+            AND tvd.ID = #{param.videoDeviceID}
         </if>
-        GROUP BY ts.`DeviceVideoID`
+        GROUP BY ts.`VideoDeviceID`
     </select>
     <select id="selectVideoProjectViewBaseInfo" resultMap="ProjectViewMap"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewBaseInfo">
@@ -89,7 +89,7 @@
             ts.`Name` sensorName,
             ts.Alias sensorAlias,
             (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.ysChannelNo")) WHEN 1 THEN GROUP_CONCAT(JSON_EXTRACT(ts.ExValue,"$.channelNo")) ELSE NULL END) channelDesc,
-            tvd.ID deviceVideoID,
+            tvd.ID videoDeviceID,
             tvd.DeviceStatus,
             tvd.DeviceSerial,
             tvd.DeviceName,
@@ -108,7 +108,7 @@
             LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorGroupID = tmg2.ID
             LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID AND ts.`Enable` IS TRUE
-            LEFT JOIN tb_video_device tvd ON tvd.ID = ts.DeviceVideoID
+            LEFT JOIN tb_video_device tvd ON tvd.ID = ts.videoDeviceID
         WHERE tmg1.`Enable` IS TRUE AND tmg1.`ProjectID`=#{param.projectID}
         <if test="param.status != null and param.status != 0">
             AND tvd.`DeviceStatus` = (#{param.status} == 1)
@@ -235,7 +235,7 @@
 
     <select id="selectListWithSensorIDBySensorIDList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo">
-        SELECT tvd.*,ts.`ID` sensorID FROM tb_video_device tvd LEFT JOIN tb_sensor ts ON ts.`DeviceVideoID`=tvd.`ID`
+        SELECT tvd.*,ts.`ID` sensorID FROM tb_video_device tvd LEFT JOIN tb_sensor ts ON ts.`VideoDeviceID`=tvd.`ID`
         WHERE ts.`ID` IN
         <foreach collection="sensorList" separator="," open="(" close=")" item="item" index="index">
             #{#item}

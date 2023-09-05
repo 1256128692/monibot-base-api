@@ -12,7 +12,7 @@ public class VideoProjectViewSensorInfo {
     private Integer sensorID;
     private String sensorName;
     private String sensorAlias;
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
     private Boolean deviceStatus;
     private String deviceSerial;
     private String deviceName;

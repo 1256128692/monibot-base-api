@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Data
 public class VideoDeviceBaseInfoV2 {
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
     private Boolean deviceStatus;
     private String deviceSerial;
     private String deviceName;
@@ -32,7 +32,7 @@ public class VideoDeviceBaseInfoV2 {
     public static VideoDeviceBaseInfoV2 build(TbVideoDevice tbVideoDevice) {
         VideoDeviceBaseInfoV2 res = new VideoDeviceBaseInfoV2();
         BeanUtil.copyProperties(tbVideoDevice, res);
-        res.setDeviceVideoID(tbVideoDevice.getID());
+        res.setVideoDeviceID(tbVideoDevice.getID());
         return res;
     }
 }

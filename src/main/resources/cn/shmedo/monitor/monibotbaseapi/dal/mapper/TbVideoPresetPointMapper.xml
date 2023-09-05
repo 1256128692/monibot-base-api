@@ -5,13 +5,13 @@
     <!--@mbg.generated-->
     <!--@Table tb_video_preset_point-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="DeviceVideoID" jdbcType="INTEGER" property="deviceVideoID" />
+    <result column="videoDeviceID" jdbcType="INTEGER" property="videoDeviceID" />
     <result column="PresetPointName" jdbcType="VARCHAR" property="presetPointName" />
     <result column="PresetPointIndex" jdbcType="INTEGER" property="presetPointIndex" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, DeviceVideoID, PresetPointName, PresetPointIndex
+    ID, VideoDeviceID, PresetPointName, PresetPointIndex
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -27,17 +27,17 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_video_preset_point (DeviceVideoID, PresetPointName, PresetPointIndex
+    insert into tb_video_preset_point (ViedoDeviceID, PresetPointName, PresetPointIndex
       )
-    values (#{deviceVideoID,jdbcType=INTEGER}, #{presetPointName,jdbcType=VARCHAR}, #{presetPointIndex,jdbcType=INTEGER}
+    values (#{videoDeviceID,jdbcType=INTEGER}, #{presetPointName,jdbcType=VARCHAR}, #{presetPointIndex,jdbcType=INTEGER}
       )
   </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_video_preset_point
     <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="deviceVideoID != null">
-        DeviceVideoID,
+      <if test="videoDeviceID != null">
+        VideoDeviceID,
       </if>
       <if test="presetPointName != null">
         PresetPointName,
@@ -47,8 +47,8 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="deviceVideoID != null">
-        #{deviceVideoID,jdbcType=INTEGER},
+      <if test="videoDeviceID != null">
+        #{videoDeviceID,jdbcType=INTEGER},
       </if>
       <if test="presetPointName != null">
         #{presetPointName,jdbcType=VARCHAR},
@@ -62,8 +62,8 @@
     <!--@mbg.generated-->
     update tb_video_preset_point
     <set>
-      <if test="deviceVideoID != null">
-        DeviceVideoID = #{deviceVideoID,jdbcType=INTEGER},
+      <if test="videoDeviceID != null">
+        videoDeviceID = #{videoDeviceID,jdbcType=INTEGER},
       </if>
       <if test="presetPointName != null">
         PresetPointName = #{presetPointName,jdbcType=VARCHAR},
@@ -77,7 +77,7 @@
   <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint">
     <!--@mbg.generated-->
     update tb_video_preset_point
-    set DeviceVideoID = #{deviceVideoID,jdbcType=INTEGER},
+    set VideoDeviceID = #{videoDeviceID,jdbcType=INTEGER},
       PresetPointName = #{presetPointName,jdbcType=VARCHAR},
       PresetPointIndex = #{presetPointIndex,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}

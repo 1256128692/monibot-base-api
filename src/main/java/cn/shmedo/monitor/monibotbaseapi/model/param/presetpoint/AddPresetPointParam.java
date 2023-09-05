@@ -25,7 +25,7 @@ public class AddPresetPointParam extends QueryPresetPointListParam {
     @Override
     public ResultWrapper validate() {
         this.tbVideoPresetPoint = new TbVideoPresetPoint();
-        this.tbVideoPresetPoint.setDeviceVideoID(getDeviceVideoID());
+        this.tbVideoPresetPoint.setVideoDeviceID(getVideoDeviceID());
         this.tbVideoPresetPoint.setPresetPointName(presetPointName);
         this.tbVideoPresetPoint.setPresetPointIndex(presetPointIndex);
         return super.validate();

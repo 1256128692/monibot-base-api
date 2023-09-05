@@ -25,7 +25,7 @@ import java.util.List;
  * @see #valid()
  */
 public interface IVideoCameraCheck {
-    Integer getDeviceVideoID();
+    Integer getVideoDeviceID();
 
     Integer getMonitorPointID();
 

@@ -21,11 +21,11 @@ public class QueryPresetPointListParam implements ParameterValidator, ResourcePe
     private Integer companyID;
     @NotNull(message = "视频设备ID不能为空")
     @Positive(message = "视频设备ID不能小于1")
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
 
     @Override
     public ResultWrapper validate() {
-        if (!ContextHolder.getBean(TbVideoDeviceMapper.class).exists(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, deviceVideoID))) {
+        if (!ContextHolder.getBean(TbVideoDeviceMapper.class).exists(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, videoDeviceID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在");
         }
         return null;

@@ -31,7 +31,7 @@ import java.util.Optional;
 @Slf4j
 public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck {
     @Positive(message = "视频设备ID不能小于1")
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
     @Positive(message = "传感器ID不能小于1")
     private Integer sensorID;
     @Positive(message = "监测点ID不能小于1")
@@ -54,11 +54,11 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
             }
             this.tbSensor = resultWrapper.getData().get(0);
             this.sensorID = this.tbSensor.getID();
-            this.deviceVideoID = this.tbSensor.getVideoDeviceID();
+            this.videoDeviceID = this.tbSensor.getVideoDeviceID();
         }
-        if (Objects.nonNull(this.deviceVideoID)) {
+        if (Objects.nonNull(this.videoDeviceID)) {
             List<TbVideoDevice> tbVideoDeviceList = ContextHolder.getBean(TbVideoDeviceMapper.class)
-                    .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, this.deviceVideoID));
+                    .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, this.videoDeviceID));
             if (CollUtil.isEmpty(tbVideoDeviceList)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在!");
             }
@@ -66,7 +66,7 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
             if (!tbVideoDevice.getAccessPlatform().equals(AccessPlatformType.HAI_KANG.getValue())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不是海康设备!");
             }
-            List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getVideoDeviceID, this.deviceVideoID));
+            List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getVideoDeviceID, this.videoDeviceID));
             if (CollUtil.isEmpty(sensorList)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备未关联传感器!");
             }
@@ -79,9 +79,9 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器不存在!");
             }
             this.tbSensor = sensorList.get(0);
-            this.deviceVideoID = this.tbSensor.getVideoDeviceID();
+            this.videoDeviceID = this.tbSensor.getVideoDeviceID();
         }
-        if (Objects.isNull(this.deviceVideoID)) {
+        if (Objects.isNull(this.videoDeviceID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器未关联视频设备!");
         }
         if (!tbSensor.getMonitorType().equals(MonitorType.VIDEO.getKey())) {
@@ -93,7 +93,7 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
     @Override
     public boolean valid() {
         final CustomWrapper<Integer> wrapper = new CustomWrapper<>(1);
-        Optional.ofNullable(getDeviceVideoID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
+        Optional.ofNullable(getVideoDeviceID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
         Optional.ofNullable(getSensorID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
         Optional.ofNullable(getMonitorPointID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
         return wrapper.get() == 0;

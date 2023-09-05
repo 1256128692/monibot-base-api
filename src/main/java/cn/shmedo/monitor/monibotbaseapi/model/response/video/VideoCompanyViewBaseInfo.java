@@ -15,7 +15,7 @@ import java.util.Optional;
  */
 @Data
 public class VideoCompanyViewBaseInfo {
-    private Integer deviceVideoID;
+    private Integer videoDeviceID;
     private Boolean deviceStatus;
     private String deviceSerial;
     private String deviceName;
