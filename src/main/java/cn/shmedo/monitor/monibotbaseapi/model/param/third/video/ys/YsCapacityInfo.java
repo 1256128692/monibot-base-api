@@ -1,9 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -53,5 +57,10 @@ public class YsCapacityInfo {
         this.ptzZoom = Objects.isNull(ptzZoom) ? 0 : ptzZoom;
         this.ptzPreset = Objects.isNull(ptzPreset) ? 0 : ptzPreset;
         this.supportRateLimit = Objects.isNull(supportRateLimit) ? 0 : supportRateLimit;
+    }
+
+    public Map<String, Integer> toMap() {
+        afterProperties();
+        return BeanUtil.beanToMap(this).entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, v -> (Integer) v.getValue()));
     }
 }

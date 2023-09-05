@@ -188,8 +188,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceName 设备名称
      * @apiSuccess (返回结果) {String} dataList.deviceType 设备类型/型号
-     * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备可接入的通道号数量
-     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.aqccessChannelNum 接入的通道号数量
      * @apiSuccess (返回结果) {Int} dataList.accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} dataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
      * @apiSuccess (返回结果) {Int} dataList.companyID 注册公司ID
@@ -273,7 +272,6 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} deviceName 设备名称
      * @apiSuccess (返回结果) {String} deviceType 设备类型/型号
-     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入的通道号数量
      * @apiSuccess (返回结果) {Int} accessChannelNum 接入的通道号数量
      * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
@@ -303,7 +301,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryYsVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryYsVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
-        return this.tbVideoDeviceService.queryYsVideoDeviceInfo(param);
+        return this.videoService.queryYsVideoDeviceInfo(param);
     }
 
     /**
@@ -323,7 +321,6 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} deviceSerial 视频设备序列号/唯一标识
      * @apiSuccess (返回结果) {String} deviceName 设备名称
      * @apiSuccess (返回结果) {String} deviceType 设备类型/型号
-     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备可接入的通道号数量
      * @apiSuccess (返回结果) {Int} accessChannelNum 接入的通道号数量
      * @apiSuccess (返回结果) {Int} accessPlatform 平台:萤石云平台:0 海康平台:1
      * @apiSuccess (返回结果) {Int} accessProtocol 协议:萤石云协议:0 , 国标协议:1
@@ -341,9 +338,8 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryHikVideoDeviceInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryHikVideoDeviceInfo(@Valid @RequestBody QueryYsVideoDeviceInfoParam param) {
-        //
-        return null;
+    public Object queryHikVideoDeviceInfo(@Valid @RequestBody QueryHikVideoDeviceInfoParam param) {
+        return tbVideoDeviceService.queryHikVideoDeviceInfo(param);
     }
 
     /**
@@ -368,7 +364,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryYsVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryYsVideoPlayBack(@Valid @RequestBody QueryYsVideoPlayBackParam param) {
-        return this.tbVideoDeviceService.queryYsVideoPlayBack(param);
+        return this.videoService.queryYsVideoPlayBack(param);
     }
 
     /**
@@ -394,8 +390,7 @@ public class VideoController {
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @PostMapping(value = "/QueryHikVideoPlayBack", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryHikVideoPlayBack(@Valid @RequestBody QueryHikVideoPlayBackParam param) {
-        //
-        return null;
+        return tbVideoDeviceService.queryHikVideoPlayBack(param);
     }
 
 

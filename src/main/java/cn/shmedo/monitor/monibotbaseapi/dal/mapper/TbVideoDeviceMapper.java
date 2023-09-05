@@ -4,9 +4,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoCompanyViewBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -25,6 +25,7 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
 
     List<VideoProjectViewBaseInfo> selectVideoProjectViewBaseInfo(@Param("param") QueryVideoProjectViewBaseInfo param);
 
+    List<VideoDeviceWithSensorIDInfo> selectListWithSensorIDBySensorIDList(List<Integer> sensorList);
 
     int batchInsert(List<VideoDeviceInfo> videoDeviceInfoList);
 
@@ -32,7 +33,4 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
                                                     Boolean deviceStatus, Boolean allocationStatus,
                                                     Integer ownedCompanyID, Integer projectID,
                                                     Date begin, Date end);
-
-
-
 }

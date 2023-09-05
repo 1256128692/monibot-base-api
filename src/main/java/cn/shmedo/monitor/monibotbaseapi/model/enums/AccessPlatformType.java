@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum AccessPlatformType {
 
     YING_SHI((byte) 0, "萤石云平台"),
@@ -38,5 +41,11 @@ public enum AccessPlatformType {
             }
         }
         return true;
+    }
+
+    public static AccessPlatformType getByValue(Byte value) {
+        return Optional.ofNullable(value).map(u -> Arrays.stream(values()).filter(w -> w.getValue() == u).findAny()
+                        .orElseThrow(() -> new IllegalArgumentException("枚举中暂无该平台,平台value: " + value)))
+                .orElseThrow(() -> new IllegalArgumentException("平台value不能为空"));
     }
 }

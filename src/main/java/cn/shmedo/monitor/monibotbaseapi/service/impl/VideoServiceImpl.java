@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -9,14 +11,14 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
@@ -25,18 +27,18 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class VideoServiceImpl implements VideoService {
@@ -128,16 +130,29 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa) {
-        //TODO compatible with hik video device
         List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
+        VideoDeviceWithSensorIDInfo withSensorIDInfo = pa.getWithSensorIDInfo();
+        AccessPlatformType platformType = AccessPlatformType.getByValue(withSensorIDInfo.getAccessPlatform());
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
-
-            String ysToken = getYsToken();
-            YsResultWrapper ysResultWrapper = ysService.startPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection(),
-                    DefaultConstant.YS_DEFAULT_SPEED);
-            ysService.stopPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection());
-            if (!ysResultWrapper.callSuccess()) {
-                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, ysResultWrapper.getMsg());
+            switch (platformType) {
+                case YING_SHI -> {
+                    String ysToken = getYsToken();
+                    YsResultWrapper ysResultWrapper = ysService.startPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection(),
+                            DefaultConstant.YS_DEFAULT_SPEED);
+                    ysService.stopPtz(ysToken, liveInfos.get(0).getSeqNo(), Integer.valueOf(liveInfos.get(0).getYsChannelNo()), pa.getDirection());
+                    if (!ysResultWrapper.callSuccess()) {
+                        return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, ysResultWrapper.getMsg());
+                    }
+                }
+                case HAI_KANG -> {
+                    String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
+                    Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 0, command, null, null);
+                    hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 1, command, null, null);
+                    if (!"0".equals(response.getOrDefault("code", "1"))) {
+                        return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get("msg"));
+                    }
+                }
+                default -> log.error("新平台云台操作暂未实现，平台: {}", platformType.name());
             }
         }
         return ResultWrapper.successWithNothing();
@@ -187,7 +202,15 @@ public class VideoServiceImpl implements VideoService {
             }
             case 1 -> {
                 //hik
-                //TODO
+                String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
+                Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, 0, command, null, null);
+                Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, 1, command, null, null);
+                if (!"0".equals(startResponse.getOrDefault("code", "1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
+                }
+                if (!"0".equals(endResponse.getOrDefault("code", "1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
+                }
             }
             default -> {
                 return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "该类型视频摄像头暂时无法进行云台操作");
@@ -259,7 +282,7 @@ public class VideoServiceImpl implements VideoService {
         Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
         IPage<VideoDevicePageInfo> pageData = videoDeviceMapper.queryPageByCondition(page, pa.getDeviceSerial(), pa.getDeviceStatus(), pa.getAllocationStatus(),
-            pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
+                pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
@@ -273,5 +296,45 @@ public class VideoServiceImpl implements VideoService {
         });
 
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+    }
+
+    @Override
+    public VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param) {
+        final String ysToken = getYsToken();
+        final TbVideoDevice device = param.getTbVideoDevice();
+        final String deviceSerial = device.getDeviceSerial();
+        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr("ysChannelNo"));
+        final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
+        YsResultWrapper<YsCapacityInfo> capacityInfo = ysService.capacity(ysToken, deviceSerial);
+        YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
+                channelNo, 1, null, null, "1", 2, null, null,
+                null, null, null);
+        Optional.ofNullable(baseStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+                .map(YsStreamUrlInfo::getUrl).ifPresent(build::setBaseUrl);
+        Optional.ofNullable(capacityInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+                .map(YsCapacityInfo::toMap).ifPresent(build::setCapabilitySet);
+
+        // whether set {@code hdUrl} decided by {@code supportRateLimit} capability.
+        if (build.getCapabilitySet().get("supportRateLimit") == 1) {
+            YsResultWrapper<YsStreamUrlInfo> hdStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
+                    channelNo, 1, null, null, "1", 1, null, null,
+                    null, null, null);
+            Optional.ofNullable(hdStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+                    .map(YsStreamUrlInfo::getUrl).ifPresent(build::setHdUrl);
+        }
+        return build;
+    }
+
+    @Override
+    public String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param) {
+        String ysToken = getYsToken();
+        TbVideoDevice device = param.getTbVideoDevice();
+        Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr("ysChannelNo"));
+        String startTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
+        String stopTime = DateUtil.format(param.getEndTime(), "yyyy-MM-dd HH:mm:ss");
+        YsResultWrapper<YsStreamUrlInfo> streamInfo = ysService.getStreamInfo(ysToken, device.getDeviceSerial(), channelNo,
+                null, null, null, param.getYsVideoType(), 2, startTime, stopTime, null, null, null);
+        return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+                .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
     }
 }

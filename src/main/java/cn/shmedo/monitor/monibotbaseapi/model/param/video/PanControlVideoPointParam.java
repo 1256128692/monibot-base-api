@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
@@ -8,9 +9,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorQueryType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -30,6 +34,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
     @JsonIgnore
     private List<VideoMonitorPointLiveInfo> liveInfos;
+    @JsonIgnore
+    private VideoDeviceWithSensorIDInfo withSensorIDInfo;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -46,7 +52,7 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
         }
 
         liveInfos = tbMonitorPointMapper.selectListByIDList(Arrays.asList(monitorPointID));
-        if (!CollectionUtil.isNullOrEmpty(liveInfos)){
+        if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
             // 过滤监测点列表,如果存在非法监测类型,则返回错误
             long count = liveInfos.stream().filter(item -> !item.getMonitorType().equals(MonitorType.VIDEO.getKey())).count();
             if (count > 0) {
@@ -59,17 +65,32 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表含未绑定设备的监测点");
             }
 
+            List<Integer> sensorIDList = liveInfos.stream().map(VideoMonitorPointLiveInfo::getSensorID).toList();
+            //一般情况下，一个视频监测点只会绑定一个传感器，一个传感器就是一个视频设备的通道，只可能绑定在同一个设备下
+            if (sensorIDList.size() > 1) {
+                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "一个视频监测点绑定了多个传感器");
+            }
+            List<VideoDeviceWithSensorIDInfo> videoDeviceWithSensorIDInfos = ContextHolder.getBean(TbVideoDeviceMapper.class)
+                    .selectListWithSensorIDBySensorIDList(sensorIDList);
+            if (CollUtil.isEmpty(videoDeviceWithSensorIDInfos)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测点绑定的传感器未绑定视频设备");
+            }
+            withSensorIDInfo = videoDeviceWithSensorIDInfos.get(0);
+            Byte accessPlatform = withSensorIDInfo.getAccessPlatform();
+
             liveInfos.forEach(pojo -> {
-                String exValues = pojo.getExValues();
-                Dict dict = JSONUtil.toBean(exValues, Dict.class);
-                if (dict.get("protocol") != null) {
-                    pojo.setProtocol(dict.get("protocol").toString());
-                }
-                if (dict.get("seqNo") != null) {
-                    pojo.setSeqNo(dict.get("seqNo").toString());
-                }
-                if (dict.get("ysChannelNo") != null) {
-                    pojo.setYsChannelNo(dict.get("ysChannelNo").toString());
+                if (accessPlatform.equals(AccessPlatformType.YING_SHI.getValue())) {
+                    String exValues = pojo.getExValues();
+                    Dict dict = JSONUtil.toBean(exValues, Dict.class);
+                    if (dict.get("protocol") != null) {
+                        pojo.setProtocol(dict.get("protocol").toString());
+                    }
+                    if (dict.get("seqNo") != null) {
+                        pojo.setSeqNo(dict.get("seqNo").toString());
+                    }
+                    if (dict.get("ysChannelNo") != null) {
+                        pojo.setYsChannelNo(dict.get("ysChannelNo").toString());
+                    }
                 }
             });
         }
