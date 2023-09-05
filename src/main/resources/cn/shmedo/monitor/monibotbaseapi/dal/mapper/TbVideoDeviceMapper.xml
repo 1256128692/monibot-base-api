@@ -109,12 +109,12 @@
             LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID AND ts.`Enable` IS TRUE
             LEFT JOIN tb_video_device tvd ON tvd.ID = ts.videoDeviceID
-            <if test="param.deviceStatus != null">
-                AND tvd.`DeviceStatus` =#{param.deviceStatus}
-            </if>
         WHERE tmg1.`Enable` IS TRUE AND tmp.MonitorType=40 AND tmg1.`ProjectID`=#{param.projectID}
         <if test="param.deviceSerial != null and param.deviceSerial != ''">
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
+        </if>
+        <if test="param.deviceStatus != null">
+            AND tvd.`DeviceStatus` =#{param.deviceStatus}
         </if>
     </select>
 

@@ -22,7 +22,7 @@ import java.util.List;
 public class PanControlCompanyVideoPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID不能小于1")
-    private final Integer companyID;
+    private Integer companyID;
     @NotNull(message = "视频设备ID不能为空")
     private Integer videoDeviceID;
     @NotNull(message = "视频设备通道号不能为空")

@@ -12,7 +12,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IVideoCameraCheck;
-import cn.shmedo.monitor.monibotbaseapi.util.CustomWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Positive;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -88,14 +86,5 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器不是视频传感器!");
         }
         return null;
-    }
-
-    @Override
-    public boolean valid() {
-        final CustomWrapper<Integer> wrapper = new CustomWrapper<>(1);
-        Optional.ofNullable(getVideoDeviceID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
-        Optional.ofNullable(getSensorID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
-        Optional.ofNullable(getMonitorPointID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
-        return wrapper.get() == 0;
     }
 }

@@ -21,9 +21,9 @@ import java.util.Objects;
 public class QueryHikVideoDeviceInfoParam extends HikVideoBaseParam implements ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID不能小于1")
-    private final Integer companyID;
+    private Integer companyID;
     @Positive(message = "工程ID不能小于1")
-    private final Integer projectID;
+    private Integer projectID;
     @Range(max = 2, message = "码流类型，0.主码流 1.子码流 2.第三码流 (默认为0.主码流)")
     private Integer streamType;
 

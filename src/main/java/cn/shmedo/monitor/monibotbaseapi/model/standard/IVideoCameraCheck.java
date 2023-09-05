@@ -8,9 +8,11 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.util.CustomWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 唯一确定某个视频摄像头的三组入参校验接口，校验方法{@link #valid()}。<br>
@@ -31,7 +33,16 @@ public interface IVideoCameraCheck {
 
     Integer getSensorID();
 
-    boolean valid();
+    /**
+     * 这里提供一种等权重实现，可适用于海康设备<br>
+     */
+    default boolean valid() {
+        final CustomWrapper<Integer> wrapper = new CustomWrapper<>(1);
+        Optional.ofNullable(getVideoDeviceID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
+        Optional.ofNullable(getSensorID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
+        Optional.ofNullable(getMonitorPointID()).ifPresent(u -> wrapper.setValue(v -> v - 1));
+        return wrapper.get() == 0;
+    }
 
     default ResultWrapper<List<TbSensor>> checkMonitorPoint() {
         if (!ContextHolder.getBean(TbMonitorPointMapper.class).exists(new LambdaQueryWrapper<TbMonitorPoint>()

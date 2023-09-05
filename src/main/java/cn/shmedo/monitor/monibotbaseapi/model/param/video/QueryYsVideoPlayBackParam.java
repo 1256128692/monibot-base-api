@@ -22,7 +22,7 @@ import java.util.Objects;
 public class QueryYsVideoPlayBackParam extends YsVideoBaseParam implements ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID不能小于1")
-    private final Integer companyID;
+    private Integer companyID;
     @NotNull(message = "存储类型不能为空")
     @Range(max = 1, message = "存储类型 0.中心存储 1.设备存储")
     private Integer recordLocation;
