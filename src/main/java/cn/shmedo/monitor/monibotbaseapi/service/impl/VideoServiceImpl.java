@@ -335,10 +335,19 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param) {
+        /*
+         * 萤石设备ExValue（json）里通道号数据的key
+         */
+        final String ysChannelNoKey = "ysChannelNo";
+        /*
+         * @see YsCapacityInfo
+         * @see YsService#capacity(String, String)
+         */
+        final String supportRateLimitKey = "supportRateLimit";
         final String ysToken = getYsToken();
         final TbVideoDevice device = param.getTbVideoDevice();
         final String deviceSerial = device.getDeviceSerial();
-        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr("ysChannelNo"));
+        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(ysChannelNoKey));
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         YsResultWrapper<YsCapacityInfo> capacityInfo = ysService.capacity(ysToken, deviceSerial);
         YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
@@ -350,7 +359,7 @@ public class VideoServiceImpl implements VideoService {
                 .map(YsCapacityInfo::toMap).ifPresent(build::setCapabilitySet);
 
         // whether set {@code hdUrl} decided by {@code supportRateLimit} capability.
-        if (build.getCapabilitySet().get("supportRateLimit") == 1) {
+        if (build.getCapabilitySet().get(supportRateLimitKey) == 1) {
             YsResultWrapper<YsStreamUrlInfo> hdStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
                     channelNo, 1, null, null, "1", 1, null, null,
                     null, null, null);
@@ -524,7 +533,7 @@ public class VideoServiceImpl implements VideoService {
         // 2. 修改物联网数据库
         ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
-            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改物联网视频设备失败,原因:"+booleanResultWrapper.getMsg());
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改物联网视频设备失败,原因:" + booleanResultWrapper.getMsg());
         }
 
         // 3. 修改萤石云数据库,(海康无接口支持,不用修改)
@@ -534,7 +543,7 @@ public class VideoServiceImpl implements VideoService {
                         pa.getUpdateVideoList().get(i).getDeviceSerial(), pa.getUpdateVideoList().get(i).getDeviceName());
                 if (!ysResultWrapper.getCode().equals("200")) {
                     return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改萤石云平台设备失败,设备序列号为:"
-                            + pa.getUpdateVideoList().get(i).getDeviceSerial() + ",失败原因为:"+ysResultWrapper.getMsg());
+                            + pa.getUpdateVideoList().get(i).getDeviceSerial() + ",失败原因为:" + ysResultWrapper.getMsg());
                 }
             }
         }
