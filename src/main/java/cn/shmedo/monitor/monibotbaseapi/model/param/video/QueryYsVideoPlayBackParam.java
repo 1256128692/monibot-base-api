@@ -30,14 +30,6 @@ public class QueryYsVideoPlayBackParam extends YsVideoBaseParam implements Resou
     private Date beginTime;
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
-    @Positive(message = "视频设备不能小于1")
-    private Integer videoDeviceID;
-    @Positive(message = "通道号不能小于1")
-    private Integer deviceChannel;
-    @Positive(message = "传感器ID不能小于1")
-    private Integer sensorID;
-    @Positive(message = "监测点ID不能小于1")
-    private Integer monitorPointID;
     @Positive(message = "工程ID不能小于1")
     private Integer projectID;
     @JsonIgnore
