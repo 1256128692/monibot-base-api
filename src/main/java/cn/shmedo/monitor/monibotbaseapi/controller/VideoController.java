@@ -112,7 +112,7 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
+    @Permission(permissionName = "mdmbase:DescribeBaseMonitorPoint")
     @RequestMapping(value = "/PanControlCompanyVideoPoint", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object panControlCompanyVideoPoint(@Validated @RequestBody PanControlCompanyVideoPointParam pa) {
         return videoService.panControlCompanyVideoPoint(pa);
