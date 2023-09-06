@@ -21,6 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
@@ -30,8 +31,11 @@ import java.util.Objects;
 
 @Data
 public class PanControlVideoPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-
+    @NotNull(message = "工程ID不能为空")
+    @Positive(message = "工程ID不能小于1")
     private Integer projectID;
+    @NotNull(message = "监测点ID不能为空")
+    @Positive(message = "监测点ID不能小于1")
     private Integer monitorPointID;
     @NotNull(message = "方向不能为空")
     @Range(max = 16, message = "方向 0-上，1-下，2-左，3-右，4-左上，5-左下，6-右上，7-右下，8-放大，9-缩小，10-近焦距，11-远焦距，16-自动控制")
