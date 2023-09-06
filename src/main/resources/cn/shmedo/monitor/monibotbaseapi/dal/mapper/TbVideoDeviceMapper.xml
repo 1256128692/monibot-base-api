@@ -235,10 +235,13 @@
 
     <select id="selectListWithSensorIDBySensorIDList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo">
-        SELECT tvd.*,ts.`ID` sensorID FROM tb_video_device tvd LEFT JOIN tb_sensor ts ON ts.`VideoDeviceID`=tvd.`ID`
+        SELECT
+            tvd.*,
+            ts.`ID` sensorID
+        FROM tb_video_device tvd LEFT JOIN tb_sensor ts ON ts.`VideoDeviceID`=tvd.`ID`
         WHERE ts.`ID` IN
         <foreach collection="sensorList" separator="," open="(" close=")" item="item" index="index">
-            #{#item}
+            #{item}
         </foreach>
     </select>
 

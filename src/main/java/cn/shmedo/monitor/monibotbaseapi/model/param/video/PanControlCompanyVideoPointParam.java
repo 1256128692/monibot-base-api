@@ -25,6 +25,7 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID不能小于1")
     private Integer companyID;
+    @Positive(message = "视频设备ID不能小于1")
     @NotNull(message = "视频设备ID不能为空")
     private Integer videoDeviceID;
     @NotNull(message = "视频设备通道号不能为空")
