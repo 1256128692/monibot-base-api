@@ -350,8 +350,8 @@ public class VideoController {
      * @apiName QueryYsVideoPlayBack
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
-     * @apiParam (请求体) {DateTime} beginTime 开始时间
-     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {DateTime} beginTime 开始时间,云存储开始结束时间必须在同一天
+     * @apiParam (请求体) {DateTime} endTime 结束时间,云存储开始结束时间必须在同一天
      * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID (videoDeviceID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
      * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
@@ -375,8 +375,8 @@ public class VideoController {
      * @apiName QueryHikVideoPlayBack
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
-     * @apiParam (请求体) {DateTime} beginTime 开始时间
-     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {DateTime} beginTime 开始时间,开始时间和结束时间相差不超过3天
+     * @apiParam (请求体) {DateTime} endTime 结束时间,开始时间和结束时间相差不超过3天
      * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID,videoDeviceID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
+import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import jakarta.validation.constraints.NotNull;
@@ -31,6 +32,14 @@ public class QueryHikVideoPlayBackParam extends HikVideoBaseParam implements Res
     @Positive(message = "工程ID不能小于1")
     private Integer projectID;
     private String uuid;
+
+    @Override
+    public ResultWrapper validate() {
+        if (DateUtil.betweenDay(beginTime, endTime, false) > 2) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "海康设备回放时要求开始时间和结束时间相差不超过3天！");
+        }
+        return super.validate();
+    }
 
     @Override
     public Resource parameter() {
