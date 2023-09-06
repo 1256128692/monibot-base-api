@@ -72,6 +72,16 @@ public class VideoServiceImpl implements VideoService {
     private final TbVideoCaptureMapper videoCaptureMapper;
 
     /**
+     * 萤石设备ExValue（json）里通道号数据的key
+     */
+    private static final String YS_CHANNEL_KEY = "ysChannelNo";
+    /**
+     * @see YsCapacityInfo
+     * @see YsService#capacity(String, String)
+     */
+    private static final String SUPPORT_RATE_LIMIT_KEY = "supportRateLimit";
+
+    /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
      *
      * @return
@@ -335,19 +345,10 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param) {
-        /*
-         * 萤石设备ExValue（json）里通道号数据的key
-         */
-        final String ysChannelNoKey = "ysChannelNo";
-        /*
-         * @see YsCapacityInfo
-         * @see YsService#capacity(String, String)
-         */
-        final String supportRateLimitKey = "supportRateLimit";
         final String ysToken = getYsToken();
         final TbVideoDevice device = param.getTbVideoDevice();
         final String deviceSerial = device.getDeviceSerial();
-        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(ysChannelNoKey));
+        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(YS_CHANNEL_KEY));
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         YsResultWrapper<YsCapacityInfo> capacityInfo = ysService.capacity(ysToken, deviceSerial);
         YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
@@ -359,7 +360,7 @@ public class VideoServiceImpl implements VideoService {
                 .map(YsCapacityInfo::toMap).ifPresent(build::setCapabilitySet);
 
         // whether set {@code hdUrl} decided by {@code supportRateLimit} capability.
-        if (build.getCapabilitySet().get(supportRateLimitKey) == 1) {
+        if (build.getCapabilitySet().get(SUPPORT_RATE_LIMIT_KEY) == 1) {
             YsResultWrapper<YsStreamUrlInfo> hdStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
                     channelNo, 1, null, null, "1", 1, null, null,
                     null, null, null);

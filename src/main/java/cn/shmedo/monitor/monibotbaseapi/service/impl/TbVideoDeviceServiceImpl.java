@@ -24,6 +24,12 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, TbVideoDevice> implements ITbVideoDeviceService {
     private final HkVideoService hkVideoService;
+    /*
+     * 海康能力集key<br>
+     * vss 视频能力集; ptz 云台操作能力集
+     */
+    private static final String VSS_KEY = "vss";
+    private static final String PTZ_KEY = "ptz";
 
     @Override
     public List<VideoCompanyViewBaseInfo> queryVideoCompanyViewBaseInfo(QueryVideoCompanyViewBaseInfoParam param) {
@@ -41,12 +47,6 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
 
     @Override
     public VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param) {
-        /*
-         * 海康能力集key<br>
-         * vss 视频能力集; ptz 云台操作能力集
-         */
-        final String vssKey = "vss";
-        final String ptzKey = "ptz";
         TbVideoDevice device = param.getTbVideoDevice();
         VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         final String deviceSerial = device.getDeviceSerial();
@@ -54,8 +54,8 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         final HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(deviceSerial);
         Optional.ofNullable(url).filter(ObjectUtil::isNotEmpty).ifPresent(build::setBaseUrl);
         Optional.ofNullable(hkDeviceInfo).map(HkDeviceInfo::getCapabilitySet).filter(ObjectUtil::isNotEmpty)
-                .map(u -> u.split(",")).map(List::of).map(u -> Map.of("vss", u.stream().filter(vssKey::equals)
-                        .findAny().map(s -> 1).orElse(0), "ptz", u.stream().filter(ptzKey::equals).findAny()
+                .map(u -> u.split(",")).map(List::of).map(u -> Map.of("vss", u.stream().filter(VSS_KEY::equals)
+                        .findAny().map(s -> 1).orElse(0), "ptz", u.stream().filter(PTZ_KEY::equals).findAny()
                         .map(s -> 1).orElse(0))).ifPresent(build::setCapabilitySet);
         return build;
     }
