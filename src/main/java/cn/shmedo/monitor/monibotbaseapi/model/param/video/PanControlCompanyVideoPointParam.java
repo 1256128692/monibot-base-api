@@ -5,6 +5,8 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -35,9 +37,6 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
 
     @Override
     public ResultWrapper validate() {
-        if (List.of(8, 9, 12, 13, 14, 15, 16).contains(direction)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "海康摄像头设备暂不支持该方向");
-        }
         QueryVideoCompanyViewBaseInfoParam param = new QueryVideoCompanyViewBaseInfoParam();
         param.setCompanyID(companyID);
         param.setVideoDeviceID(videoDeviceID);
@@ -49,6 +48,12 @@ public class PanControlCompanyVideoPointParam implements ParameterValidator, Res
         this.baseInfo = videoCompanyViewBaseInfos.get(0);
         if (!this.baseInfo.deviceChannel().contains(deviceChannel)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在该通道号!");
+        }
+        byte accessPlatform = this.baseInfo.getAccessPlatform().byteValue();
+        if (AccessPlatformType.YING_SHI.getValue() == accessPlatform && direction < 16 && direction > 11) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石摄像头设备暂不支持该方向");
+        } else if (AccessPlatformType.HAI_KANG.getValue() == accessPlatform && !HikPtzCommandEnum.isValidHikPtzCommandEnum(direction)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "海康摄像头设备暂不支持该方向");
         }
         return null;
     }

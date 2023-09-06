@@ -100,6 +100,23 @@ public enum HikPtzCommandEnum {
 
     private final String command;
 
+    private final static List<HikPtzCommandEnum> commandList = new ArrayList<>() {
+        {
+            add(UP);
+            add(DOWN);
+            add(LEFT);
+            add(RIGHT);
+            add(LEFT_UP);
+            add(LEFT_DOWN);
+            add(RIGHT_UP);
+            add(RIGHT_DOWN);
+            add(null);
+            add(null);
+            add(ZOOM_OUT);
+            add(ZOOM_IN);
+        }
+    };
+
     /**
      * 萤石有方向的Int枚举，因为是海康设备是后来兼容的，接口不变的情况下就只能在这里做个映射来获取海康的操作。
      * 因为{@code direction}并不是海康设备的枚举，直接写成成员变量其实是不合适的，所以只能在这里加了个方法做映射。<br>
@@ -107,25 +124,17 @@ public enum HikPtzCommandEnum {
      * 其中 8-放大，9-缩小，16-自动控制 在海康操作里是没有的。
      */
     public static HikPtzCommandEnum getByYsDirection(final Integer direction) {
-        return Optional.ofNullable(direction).filter(u -> u < 12).map(u -> {
-            List<HikPtzCommandEnum> list = new ArrayList<>() {
-                {
-                    add(RIGHT);
-                    add(DOWN);
-                    add(LEFT);
-                    add(RIGHT);
-                    add(LEFT_UP);
-                    add(LEFT_DOWN);
-                    add(RIGHT_UP);
-                    add(RIGHT_DOWN);
-                    add(null);
-                    add(null);
-                    add(ZOOM_OUT);
-                    add(ZOOM_IN);
-                }
-            };
-            return Optional.ofNullable(list.get(u)).orElseThrow(() ->
-                    new IllegalArgumentException("海康设备暂不支持此操作,萤石方向枚举: " + direction));
-        }).orElseThrow(() -> new IllegalArgumentException("海康设备暂不支持此操作,萤石方向枚举: " + direction));
+        return Optional.ofNullable(direction).filter(u -> u < 12 && u >= 0).map(u -> Optional.ofNullable(commandList.get(u))
+                        .orElseThrow(() -> new IllegalArgumentException("海康设备暂不支持此操作,萤石方向枚举: " + direction)))
+                .orElseThrow(() -> new IllegalArgumentException("海康设备暂不支持此操作,萤石方向枚举: " + direction));
+    }
+
+    /**
+     * (non-Javadoc)
+     *
+     * @see #getByYsDirection(Integer)
+     */
+    public static boolean isValidHikPtzCommandEnum(final Integer direction) {
+        return Optional.ofNullable(direction).filter(u -> u < 12 && u >= 0).map(commandList::get).isPresent();
     }
 }

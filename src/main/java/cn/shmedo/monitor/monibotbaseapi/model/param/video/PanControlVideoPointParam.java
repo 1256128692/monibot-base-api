@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorQueryType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo;
@@ -25,6 +26,7 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class PanControlVideoPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -42,9 +44,6 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
     @Override
     public ResultWrapper<?> validate() {
-        if (direction > 11 && direction < 16) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石摄像头设备暂不支持该方向");
-        }
         TbProjectMonitorClassMapper projectMonitorClassMapper = ContextHolder.getBean(TbProjectMonitorClassMapper.class);
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         LambdaQueryWrapper<TbProjectMonitorClass> wrapper = new LambdaQueryWrapper<TbProjectMonitorClass>()
@@ -83,6 +82,11 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
             }
             withSensorIDInfo = videoDeviceWithSensorIDInfos.get(0);
             Byte accessPlatform = withSensorIDInfo.getAccessPlatform();
+            if (accessPlatform.equals(AccessPlatformType.YING_SHI.getValue()) && direction > 11 && direction < 16) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石摄像头设备暂不支持该方向");
+            } else if (accessPlatform.equals(AccessPlatformType.HAI_KANG.getValue()) && !HikPtzCommandEnum.isValidHikPtzCommandEnum(direction)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "海康摄像头设备暂不支持该方向");
+            }
 
             liveInfos.forEach(pojo -> {
                 if (accessPlatform.equals(AccessPlatformType.YING_SHI.getValue())) {
