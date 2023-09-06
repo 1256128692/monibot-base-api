@@ -107,6 +107,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                     }
                 }
             });
+        } else {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
         }
         return null;
     }
