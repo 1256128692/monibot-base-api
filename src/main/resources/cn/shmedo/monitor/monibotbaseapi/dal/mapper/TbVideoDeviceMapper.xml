@@ -266,4 +266,12 @@
             #{deviceSerial}
         </foreach>
     </select>
+
+    <update id="batchUpdate" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2">
+        <foreach collection="updateVideoList" item="item" separator=";">
+            UPDATE tb_video_device
+            SET deviceName = #{item.deviceName}
+            WHERE deviceSerial = #{item.deviceSerial}
+        </foreach>
+    </update>
 </mapper>

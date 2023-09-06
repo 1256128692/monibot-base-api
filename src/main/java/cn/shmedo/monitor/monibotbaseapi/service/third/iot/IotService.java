@@ -81,4 +81,10 @@ public interface IotService {
     ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
                                         @Param("appKey") String appKey,
                                         @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /UpdateDeviceInfoBatch")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
+                                                 @Param("appKey") String appKey,
+                                                 @Param("appSecret") String appSecret);
 }

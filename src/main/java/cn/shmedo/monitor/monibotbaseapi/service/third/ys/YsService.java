@@ -94,11 +94,18 @@ public interface YsService {
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&validateCode={validateCode}")
     YsResultWrapper addDevice(@Param("accessToken") String accessToken,
                               @Param("deviceSerial") String deviceSerial,
-                              @Param("validateCode") String validateCode);
+                              @Param("validateCode")  String validateCode);
 
     @RequestLine("POST /api/lapp/device/delete")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}")
     YsResultWrapper deleteDevice(@Param("accessToken") String accessToken,
                                  @Param("deviceSerial") String deviceSerial);
+
+    @RequestLine("POST /api/lapp/device/name/update")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&deviceName={deviceName}")
+    YsResultWrapper updateDevice(@Param("accessToken") String accessToken,
+                                 @Param("deviceSerial") String deviceSerial,
+                                 @Param("deviceName") String deviceName);
 }

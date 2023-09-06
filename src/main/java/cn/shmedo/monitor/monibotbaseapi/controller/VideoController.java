@@ -559,12 +559,12 @@ public class VideoController {
      * @apiParam (请求体) {Byte} updateVideoList.accessPlatform 接入平台
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice")
     @RequestMapping(value = "/UpdateVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object updateVideoDeviceList(@Validated @RequestBody UpdateVideoDeviceParam pa) {
+        return videoService.updateVideoDeviceList(pa);
     }
 
 

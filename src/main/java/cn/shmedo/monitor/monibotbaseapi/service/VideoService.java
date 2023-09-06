@@ -38,4 +38,6 @@ public interface VideoService {
     Object deleteVideoDeviceList(DeleteVideoDeviceParam pa);
 
     VideoDeviceInfoV1 queryHkVideoDeviceBaseInfo(QueryHkVideoDeviceBaseInfoParam pa);
+
+    Object updateVideoDeviceList(UpdateVideoDeviceParam pa);
 }

@@ -19,10 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceItem;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.CreateMultipleDeviceParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.DeleteDeviceParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
@@ -255,17 +252,17 @@ public class VideoServiceImpl implements VideoService {
                     // 查询不到则直接添加
                     YsResultWrapper ysResultWrapper = ysService.addDevice(ysToken, addVideoList.get(i).getDeviceSerial(), addVideoList.get(i).getValidateCode());
                     if (!ysResultWrapper.getMsg().equals("操作成功")) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "添加萤石云平台设备失败,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "添加萤石云平台设备失败,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                     deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                 } else {
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                 }
 
@@ -282,10 +279,10 @@ public class VideoServiceImpl implements VideoService {
                 Integer num = i + 1;
                 HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(addVideoList.get(i).getDeviceSerial());
                 if (hkDeviceInfo == null) {
-                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:"+addVideoList.get(i).getDeviceSerial());
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                 }
 
-                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK"+yyyyMMdd+num.toString()));
+                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + yyyyMMdd + num.toString()));
             }
         }
         int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
@@ -405,7 +402,7 @@ public class VideoServiceImpl implements VideoService {
                             for (int i = 0; i < v.getYsChannelInfoList().size(); i++) {
                                 YsChannelInfo ysChannelInfo = v.getYsChannelInfoList().get(i);
                                 // 添加到 singleVideoSensorList
-                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i+1));
+                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i + 1));
                             }
                         }
                     } else {
@@ -417,7 +414,7 @@ public class VideoServiceImpl implements VideoService {
                             for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
                                 YsChannelInfo ysChannelInfo = filteredYsChannelInfoList.get(i);
                                 // 添加到 singleVideoSensorList
-                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i+1));
+                                singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i + 1));
                                 singleVideoSensorList.addAll(v.getSensorList());
                             }
                         }
@@ -501,5 +498,47 @@ public class VideoServiceImpl implements VideoService {
         vo.setDeviceType(hkDeviceInfo.getCameraTypeName());
         vo.setDeviceSerial(pa.getDeviceSerial());
         return vo;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Object updateVideoDeviceList(UpdateVideoDeviceParam pa) {
+
+        // 1. 修改中台数据库
+        Integer successNum = videoDeviceMapper.batchUpdate(pa.getUpdateVideoList());
+        if (successNum != 1) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改中台视频设备失败");
+        }
+
+        UpdateDeviceInfoBatchParam param = new UpdateDeviceInfoBatchParam();
+        List<DeviceInfoV1> deviceInfoV1List = new LinkedList<>();
+        pa.getVideoDeviceList().stream().forEach(item -> {
+            DeviceInfoV1 deviceInfoV1 = new DeviceInfoV1();
+            deviceInfoV1.setDeviceToken(item.getDeviceToken());
+            VideoDeviceInfoV2 videoDeviceInfoV2 = pa.getUpdateVideoList().stream().filter(u -> u.getDeviceSerial().equals(item.getDeviceSerial())).findFirst().orElse(null);
+            assert videoDeviceInfoV2 != null;
+            deviceInfoV1.setDeviceName(videoDeviceInfoV2.getDeviceName());
+            deviceInfoV1List.add(deviceInfoV1);
+        });
+        param.setList(deviceInfoV1List);
+        // 2. 修改物联网数据库
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改物联网视频设备失败,原因:"+booleanResultWrapper.getMsg());
+        }
+
+        // 3. 修改萤石云数据库,(海康无接口支持,不用修改)
+        for (int i = 0; i < pa.getUpdateVideoList().size(); i++) {
+            if (pa.getUpdateVideoList().get(i).getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+                YsResultWrapper ysResultWrapper = ysService.updateDevice(getYsToken(),
+                        pa.getUpdateVideoList().get(i).getDeviceSerial(), pa.getUpdateVideoList().get(i).getDeviceName());
+                if (!ysResultWrapper.getCode().equals("200")) {
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改萤石云平台设备失败,设备序列号为:"
+                            + pa.getUpdateVideoList().get(i).getDeviceSerial() + ",失败原因为:"+ysResultWrapper.getMsg());
+                }
+            }
+        }
+
+        return ResultWrapper.successWithNothing();
     }
 }

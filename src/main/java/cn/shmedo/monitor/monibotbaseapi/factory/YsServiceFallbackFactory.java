@@ -77,6 +77,11 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
             public YsResultWrapper deleteDevice(String accessToken, String deviceSerial) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
+
+            @Override
+            public YsResultWrapper updateDevice(String accessToken, String deviceSerial, String deviceName) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
         };
     }
 

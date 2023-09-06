@@ -78,6 +78,13 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
                                                        String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
+
+            @Override
+            public ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
+                                                                String appKey,
+                                                                String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
         };
     }
 
