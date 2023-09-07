@@ -27,6 +27,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
@@ -36,6 +37,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.YsPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -614,6 +616,35 @@ public class VideoServiceImpl implements VideoService {
         }
 
         return ResultWrapper.successWithNothing();
+    }
+
+    @Override
+    public PageUtil.Page<VideoDeviceBaseInfoV1> queryYsVideoDeviceList(QueryYsVideoDeviceParam pa) {
+
+        String ysToken = getYsToken();
+        Integer currentPage = pa.getCurrentPage() - 1;
+        YsResultPageWrapper<VideoDeviceBaseInfoV1> baseDeviceInfoByPage = ysService.getBaseDeviceInfoByPage(
+                ysToken,
+                currentPage,
+                pa.getPageSize());
+
+        if (baseDeviceInfoByPage.callSuccess() && baseDeviceInfoByPage.getData() != null) {
+            baseDeviceInfoByPage.getData();
+
+            // 获取分页信息
+            YsPageInfo page = baseDeviceInfoByPage.getPage();
+//            int total = page.getTotal();
+//            int currentPage = page.getPage();
+//            int pageSize = page.getSize();
+
+            // 构建分页结果
+//            PageUtil.Page<VideoDeviceBaseInfoV1> pageResult = new PageUtil.Page<>(total, currentPage, pageSize, data);
+
+            return null;
+        } else {
+            // 处理调用失败的情况，例如抛出异常或返回空结果
+            return null;
+        }
     }
 
 

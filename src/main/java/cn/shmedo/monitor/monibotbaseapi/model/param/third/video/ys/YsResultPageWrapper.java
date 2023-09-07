@@ -8,14 +8,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.util.List;
+
+
 @Data
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class YsResultWrapper<T> {
+public class YsResultPageWrapper<T> {
+
     private String code;
     private String msg;
-    private T data;
+    private List<T> data;
 
     private YsPageInfo page;
 
@@ -29,9 +33,7 @@ public class YsResultWrapper<T> {
         return StrUtil.isNotBlank(this.code) && YsCode.SUCCESS.equals(this.code);
     }
 
-    public static <T> YsResultWrapper<T> withCode(String resultCode, String msg) {
-        return new YsResultWrapper<>(resultCode, msg, null , null);
+    public static <T> YsResultPageWrapper<T> withCode(String resultCode, String msg) {
+        return new YsResultPageWrapper<>(resultCode, msg, null , null);
     }
-
-
 }

@@ -108,7 +108,9 @@ public class FeignBeans {
     public YsService ysService() {
         return FeignFactory.hystrixClient(YsService.class, config.getYsUrl(),
                 ysServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
-                        .decoder(new JacksonDecoder(objectMapper)));
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
+        );
     }
 }
 

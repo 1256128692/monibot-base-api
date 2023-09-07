@@ -42,4 +42,6 @@ public interface VideoService {
     Object updateVideoDeviceList(UpdateVideoDeviceParam pa);
 
     Object saveVideoDeviceSensorList(SaveVideoDeviceSensorParam pa);
+
+    PageUtil.Page<VideoDeviceBaseInfoV1> queryYsVideoDeviceList(QueryYsVideoDeviceParam pa);
 }

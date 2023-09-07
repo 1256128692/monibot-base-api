@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.factory;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -81,6 +82,11 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
             @Override
             public YsResultWrapper updateDevice(String accessToken, String deviceSerial, String deviceName) {
                 return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(String accessToken, Integer pageStart, Integer pageSize) {
+                return YsResultPageWrapper.withCode("500", "萤石云服务调用失败");
             }
         };
     }

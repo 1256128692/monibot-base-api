@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.third.ys;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceBaseInfoV1;
 import feign.Body;
 import feign.Headers;
 import feign.Param;
@@ -108,4 +109,11 @@ public interface YsService {
     YsResultWrapper updateDevice(@Param("accessToken") String accessToken,
                                  @Param("deviceSerial") String deviceSerial,
                                  @Param("deviceName") String deviceName);
+
+    @RequestLine("POST /lapp/device/list")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&pageStart={pageStart}&pageSize={pageSize}")
+    YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(@Param("accessToken") String accessToken,
+                                                                   @Param("pageStart") Integer pageStart,
+                                                                   @Param("pageSize") Integer pageSize);
 }
