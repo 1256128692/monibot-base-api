@@ -87,4 +87,10 @@ public interface IotService {
     ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
                                                  @Param("appKey") String appKey,
                                                  @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /TransferDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
+                                           @Param("appKey") String appKey,
+                                           @Param("appSecret") String appSecret);
 }

@@ -113,4 +113,12 @@
           #{deviceSerial}
       </foreach>
   </delete>
+
+  <insert id="insertBatch">
+      <foreach collection="captureSensorList" item="item" separator=";">
+          INSERT INTO tb_video_capture (sensorID, deviceSerial, captureInterval)
+          VALUES (#{item.sensorID}, #{item.deviceSerial}, #{item.captureInterval})
+          ON DUPLICATE KEY UPDATE captureInterval = VALUES(captureInterval)
+      </foreach>
+  </insert>
 </mapper>

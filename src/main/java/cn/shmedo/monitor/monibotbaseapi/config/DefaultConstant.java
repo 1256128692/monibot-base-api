@@ -41,4 +41,13 @@ public class DefaultConstant {
 
 
     public static final int ORDER_NOT_STAT = 1;
+
+
+    public static final String VIDEO_CHANNEL = "channelNo";
+
+    public static final String VIDEO_IMAGECAPTURE = "imageCapture";
+
+    public static final String VIDEO_CAPTUREINTERVAL = "captureInterval";
+
+
 }

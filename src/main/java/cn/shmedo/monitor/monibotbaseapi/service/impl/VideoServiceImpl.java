@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -19,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
@@ -550,5 +552,105 @@ public class VideoServiceImpl implements VideoService {
         }
 
         return ResultWrapper.successWithNothing();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Object saveVideoDeviceSensorList(SaveVideoDeviceSensorParam pa) {
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+
+        // 1. 筛选出来不同企业的视频设备,然后同步到iot进行转移
+        List<VideoDeviceInfoV4> transferVideoDeviceList = pa.getVideoDeviceList().stream().filter(i -> !i.getCompanyID().equals(pa.getCompanyID())).collect(Collectors.toList());
+        if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList)) {
+            handlerTransferDevice(transferVideoDeviceList, pa.getCompanyID());
+        }
+
+        // 2. 直接批量修改视频设备所属公司,以及所属工程
+        videoDeviceMapper.batchUpdateCompanyAndProject(pa.getVideoDeviceList());
+
+        // 3. 批量生成传感器设备,过滤出来传感器ID为空的数据,为新增数据,  不为空的数据,为批量修改数据
+        List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
+        List<SensorBaseInfoV1> updateSensorList = new LinkedList<>();
+        // 抓拍配置
+        List<SensorBaseInfoV1> captureSensorList = new LinkedList<>();
+        List<SensorBaseInfoV1> finalCaptureSensorList = captureSensorList;
+        pa.getList().forEach(v -> {
+            List<SensorBaseInfoV1> addSensorList = v.getAddSensorList();
+            if (!CollectionUtil.isNullOrEmpty(addSensorList)) {
+                Integer maxDisplayOrder = sensorMapper.queryMaxDisplayOrderByMonitorType(MonitorType.VIDEO.getKey());
+                for (int i = 0; i < addSensorList.size(); i++) {
+                    if (addSensorList.get(i).getSensorID() == null) {
+                        insertSensorList.add(SensorBaseInfoV1.createNewSensor(addSensorList.get(i),
+                                subjectID, v, maxDisplayOrder + i + 1));
+                    } else {
+                        updateSensorList.add(SensorBaseInfoV1.createUpdateSensor(addSensorList.get(i), subjectID, v));
+                    }
+                }
+                finalCaptureSensorList.clear();
+                finalCaptureSensorList.addAll(insertSensorList);
+                finalCaptureSensorList.addAll(updateSensorList);
+            }
+        });
+        // 3.进行分流,传感器ID为空的新增,传感器ID不为空的修改
+        if (!CollectionUtil.isNullOrEmpty(insertSensorList)) {
+            sensorMapper.insertSensorList(insertSensorList);
+        }
+        if (!CollectionUtil.isNullOrEmpty(updateSensorList)) {
+            sensorMapper.updateSensorList(updateSensorList);
+        }
+
+        // 4.批量插入定时抓拍
+        if (!CollectionUtil.isNullOrEmpty(captureSensorList)) {
+            List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(captureSensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList()),
+                    captureSensorList.get(0).getProjectID());
+            captureSensorList.forEach( c -> {
+                SensorBaseInfoV1 sensorBaseInfoV1 = sensorList.stream().filter(s -> s.getSensorName().equals(c.getSensorName())).findFirst().orElse(null);
+                if (sensorBaseInfoV1 != null ) {
+                    c.setSensorID(sensorBaseInfoV1.getSensorID());
+                    c.setDeviceSerial(sensorBaseInfoV1.getDeviceSerial());
+                }
+            });
+            videoCaptureMapper.insertBatch(captureSensorList);
+        }
+
+        return ResultWrapper.successWithNothing();
+    }
+
+
+    /**
+     * 处理转移iot设备
+     */
+    private Object handlerTransferDevice(List<VideoDeviceInfoV4> transferVideoDeviceList, Integer companyID) {
+
+        ResultWrapper<List<DeviceBaseInfo>> listResultWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
+                .companyID(transferVideoDeviceList.get(0).getCompanyID())
+                .deviceTokens(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getDeviceToken).collect(Collectors.toSet()))
+                .build());
+        if (!listResultWrapper.apiSuccess()) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "查询物联网设备失败,原因:" + listResultWrapper.getMsg());
+        }
+        if (!CollectionUtil.isNullOrEmpty(listResultWrapper.getData())) {
+            Map<String, Integer> deviceTokenToIdMap = listResultWrapper.getData().stream()
+                    .collect(Collectors.toMap(DeviceBaseInfo::getDeviceToken, DeviceBaseInfo::getDeviceID));
+
+            transferVideoDeviceList.forEach(videoDeviceInfo -> {
+                Integer deviceID = deviceTokenToIdMap.get(videoDeviceInfo.getDeviceToken());
+                if (deviceID != null) {
+                    videoDeviceInfo.setIotDeviceID(deviceID);
+                }
+            });
+        }
+
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(TransferDeviceParam.builder()
+                        .originalCompanyID(companyID)
+                        .companyID(transferVideoDeviceList.get(0).getCompanyID())
+                        .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
+                        .build(),
+                fileConfig.getAuthAppKey(),
+                fileConfig.getAuthAppSecret());
+        if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
+        }
+        return null;
     }
 }

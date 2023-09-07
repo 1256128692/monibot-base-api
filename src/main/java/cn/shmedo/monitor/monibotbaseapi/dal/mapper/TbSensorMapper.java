@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
@@ -61,4 +62,12 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<VideoCaptureBaseInfo> queryListByCondition(List<Integer> videoIDList);
 
     void deleteByVedioIDList(List<Integer> videoIDList);
+
+    Integer queryMaxDisplayOrderByMonitorType(Integer key);
+
+    void insertSensorList(List<SensorBaseInfoV1> insertSensorList);
+
+    void updateSensorList(List<SensorBaseInfoV1> updateSensorList);
+
+    List<SensorBaseInfoV1> selectListByNameAndProjectID(List<String> sensorNameList, Integer projectID);
 }

@@ -274,4 +274,43 @@
             WHERE deviceSerial = #{item.deviceSerial}
         </foreach>
     </update>
+
+    <select id="selectByIdList" resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV4">
+        select vd.ID as videoDeviceID,
+               vd.deviceToken,
+               vd.companyID,
+               vd.projectID
+        from tb_video_device vd
+        where vd.ID in
+        <foreach collection="videoIDList" separator="," open="(" item="videoID" close=")">
+            #{videoID}
+        </foreach>
+    </select>
+
+    <update id="batchUpdateCompanyAndProject" >
+        <foreach collection="videoDeviceInfoV4List" item="item" separator=";">
+            UPDATE tb_video_device
+            SET
+            projectID =
+            <choose>
+                <when test="item.projectID != null">
+                    #{item.projectID}
+                </when>
+                <otherwise>
+                    projectID
+                </otherwise>
+            </choose>,
+            companyID = #{item.companyID},
+            AllocationStatus =
+            <choose>
+                <when test="item.projectID != null">
+                    true
+                </when>
+                <otherwise>
+                    AllocationStatus
+                </otherwise>
+            </choose>
+            WHERE ID = #{item.videoDeviceID}
+        </foreach>
+    </update>
 </mapper>

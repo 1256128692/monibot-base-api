@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 
 import java.util.List;
 
@@ -48,4 +49,6 @@ public interface TbVideoCaptureMapper {
     int updateByPrimaryKey(TbVideoCapture record);
 
     void deleteByVedioIDList(List<String> deviceSerialList);
+
+    void insertBatch(List<SensorBaseInfoV1> captureSensorList);
 }

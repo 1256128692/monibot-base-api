@@ -40,4 +40,6 @@ public interface VideoService {
     VideoDeviceInfoV1 queryHkVideoDeviceBaseInfo(QueryHkVideoDeviceBaseInfoParam pa);
 
     Object updateVideoDeviceList(UpdateVideoDeviceParam pa);
+
+    Object saveVideoDeviceSensorList(SaveVideoDeviceSensorParam pa);
 }

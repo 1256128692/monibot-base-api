@@ -1,10 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoCompanyViewBaseInfoParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
@@ -38,4 +35,8 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     List<VideoDeviceInfoV1> queryListByCondition(List<String> deviceSerialList);
 
     Integer batchUpdate(List<VideoDeviceInfoV2> updateVideoList);
+
+    List<VideoDeviceInfoV4> selectByIdList(List<Integer> videoIDList);
+
+    Integer batchUpdateCompanyAndProject(List<VideoDeviceInfoV4> videoDeviceInfoV4List);
 }
