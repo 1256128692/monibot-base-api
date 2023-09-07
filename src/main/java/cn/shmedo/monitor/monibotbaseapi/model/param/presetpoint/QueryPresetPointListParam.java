@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -9,6 +10,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -22,11 +25,19 @@ public class QueryPresetPointListParam implements ParameterValidator, ResourcePe
     @NotNull(message = "视频设备ID不能为空")
     @Positive(message = "视频设备ID不能小于1")
     private Integer videoDeviceID;
+    @NotNull(message = "通道号不能为空")
+    private Integer channelNo;
 
     @Override
     public ResultWrapper validate() {
-        if (!ContextHolder.getBean(TbVideoDeviceMapper.class).exists(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, videoDeviceID))) {
+        List<TbVideoDevice> tbVideoDeviceList = ContextHolder.getBean(TbVideoDeviceMapper.class)
+                .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, videoDeviceID));
+        if (CollUtil.isEmpty(tbVideoDeviceList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在");
+        }
+        String exValue = tbVideoDeviceList.get(0).getExValue();
+        if (!exValue.contains("\"channelNo\":" + channelNo)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该视频设备没有通道号为" + channelNo + "的通道");
         }
         return null;
     }
