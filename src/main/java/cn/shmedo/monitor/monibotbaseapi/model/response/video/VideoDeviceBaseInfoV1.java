@@ -10,8 +10,8 @@ public class VideoDeviceBaseInfoV1 implements Serializable {
 
 
     private String deviceSerial;
-    private String deviceType;
-    private String deviceName;
 
+    private String deviceName;
+    private String deviceType;
 
 }
