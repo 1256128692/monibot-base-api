@@ -38,5 +38,5 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
 
     List<VideoDeviceInfoV4> selectByIdList(List<Integer> videoIDList);
 
-    Integer batchUpdateCompanyAndProject(List<VideoDeviceInfoV4> videoDeviceInfoV4List);
+    Integer batchUpdateCompanyAndProject(List<VideoDeviceInfoV4> videoDeviceInfoV4List, Integer companyID);
 }

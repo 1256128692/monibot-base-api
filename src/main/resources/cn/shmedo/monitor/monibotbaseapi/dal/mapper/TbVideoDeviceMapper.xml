@@ -300,7 +300,7 @@
                     projectID
                 </otherwise>
             </choose>,
-            companyID = #{item.companyID},
+            companyID = #{companyID},
             AllocationStatus =
             <choose>
                 <when test="item.projectID != null">
