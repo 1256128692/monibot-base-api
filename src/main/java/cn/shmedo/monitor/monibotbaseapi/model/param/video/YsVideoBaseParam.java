@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
@@ -96,7 +97,7 @@ public class YsVideoBaseParam implements ParameterValidator, IVideoCameraCheck {
                 // {@code exValueList} might be empty,for setting {@code ExValue} mistakenly which is occurred in table `tb_sensor`.
                 tbSensor = sensorList.stream().filter(u -> Objects.nonNull(u.getExValues())).filter(u -> this
                         .deviceChannel.equals(Integer.parseInt(JSONUtil.parseObj(u.getExValues())
-                                .getStr("ysChannelNo")))).findAny().orElse(null);
+                                .getStr(DefaultConstant.VIDEO_CHANNEL)))).findAny().orElse(null);
                 if (Objects.isNull(tbSensor)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备通道号不存在!");
                 }
