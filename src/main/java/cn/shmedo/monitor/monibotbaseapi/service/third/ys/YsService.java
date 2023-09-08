@@ -7,6 +7,7 @@ import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
@@ -55,7 +56,9 @@ public interface YsService {
                             @Param("direction") Integer direction);
 
     /**
-     * 获取播放地址
+     * 获取播放地址<br>
+     * 本接口不要使用，在传入正确的设备序列号和通道号时，会提示该设备不存在该通道号<br>
+     * 此外，虽然萤石文档上写的{@code channelNo}和{@code expireTime}是非必填项,但是实际传参为null时会提示该参数不正确。<br>
      *
      * @see <a href="https://open.ys7.com/help/1414">接口文档-获取播放地址</a>
      */
@@ -69,7 +72,7 @@ public interface YsService {
                                                    @Param("channelNo") Integer channelNo,
                                                    @Param("protocol") Integer protocol,
                                                    @Param("code") String code,
-                                                   @Param("expireTime") Integer expireTime,
+                                                   @NotNull @Param("expireTime") Integer expireTime,
                                                    @Param("type") String type,
                                                    @Param("quality") Integer quality,
                                                    @Param("startTime") String startTime,
@@ -95,7 +98,7 @@ public interface YsService {
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&validateCode={validateCode}")
     YsResultWrapper addDevice(@Param("accessToken") String accessToken,
                               @Param("deviceSerial") String deviceSerial,
-                              @Param("validateCode")  String validateCode);
+                              @Param("validateCode") String validateCode);
 
     @RequestLine("POST /api/lapp/device/delete")
     @Headers("Content-Type: application/x-www-form-urlencoded")
@@ -114,6 +117,6 @@ public interface YsService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&pageStart={pageStart}&pageSize={pageSize}")
     YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(@Param("accessToken") String accessToken,
-                                                                   @Param("pageStart") Integer pageStart,
-                                                                   @Param("pageSize") Integer pageSize);
+                                                                       @Param("pageStart") Integer pageStart,
+                                                                       @Param("pageSize") Integer pageSize);
 }
