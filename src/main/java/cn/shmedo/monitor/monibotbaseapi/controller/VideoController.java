@@ -442,7 +442,6 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
      * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
-     * @apiSuccess (返回结果) {String} dataList.sensorList.ipcSerial ipc设备序列号
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */

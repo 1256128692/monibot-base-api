@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Data
 public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -50,67 +51,71 @@ public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourceP
                     .map(VideoDeviceInfoV3::getProjectID).findFirst().orElse(-1));
         });
 
-
-        List<String> sensorNameList = list.stream()
-                .flatMap(videoDeviceInfo -> videoDeviceInfo.getAddSensorList().stream())
-                .map(SensorBaseInfoV1::getSensorName)
+        List<SensorBaseInfoV1> allSensorBaseInfoList = list.stream()
+                .filter(v -> v.getAddSensorList() != null)
+                .flatMap(v -> v.getAddSensorList().stream())
                 .collect(Collectors.toList());
 
-        int sensorListnum = 0;
-        for (VideoDeviceInfoV3 videoDeviceInfo : list) {
-            if (videoDeviceInfo.getAddSensorList() != null) {
-                sensorListnum += videoDeviceInfo.getAddSensorList().size();
-            }
-        }
-        if (CollectionUtil.isNullOrEmpty(sensorNameList) || sensorNameList.size() != sensorListnum) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器名称不能为空");
-        }
 
+        if (!CollectionUtil.isNullOrEmpty(allSensorBaseInfoList)) {
+            List<String> sensorNameList = allSensorBaseInfoList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList());
 
-        List<String> sensorNamesWithNullSensorID = new ArrayList<>();
-        List<Integer> notNullSensorIDList = new ArrayList<>();
-        TbSensorMapper sensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-        LambdaQueryWrapper<TbSensor> wrapper = new LambdaQueryWrapper<TbSensor>()
-                .in(TbSensor::getVideoDeviceID, list.stream().map(VideoDeviceInfoV3::getVideoDeviceID).collect(Collectors.toList()));
-        // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
-        List<TbSensor> tbSensorsList = sensorMapper.selectList(wrapper);
-
-
-
-        for (int i = 0; i < list.size(); i++) {
-            VideoDeviceInfoV3 videoDeviceInfo = list.get(i);
-            if (!CollectionUtil.isNullOrEmpty(tbSensorsList)) {
-                if (!tbSensorsList.stream().map(TbSensor::getProjectID).collect(Collectors.toList())
-                        .contains(list.get(i).getProjectID())) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不允许跨工程配置传感器");
+            int sensorListnum = 0;
+            for (VideoDeviceInfoV3 videoDeviceInfo : list) {
+                if (videoDeviceInfo.getAddSensorList() != null) {
+                    sensorListnum += videoDeviceInfo.getAddSensorList().size();
                 }
             }
-            if (videoDeviceInfo.getAddSensorList() != null) {
-                for (int j = 0; j < videoDeviceInfo.getAddSensorList().size(); j++) {
-                    SensorBaseInfoV1 sensor = videoDeviceInfo.getAddSensorList().get(j);
-                    if (sensor.getSensorID() == null) {
-                        sensorNamesWithNullSensorID.add(sensor.getSensorName());
-                    } else {
-                        notNullSensorIDList.add(sensor.getSensorID());
+            if (CollectionUtil.isNullOrEmpty(sensorNameList) || sensorNameList.size() != sensorListnum) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器名称不能为空");
+            }
+
+
+            List<String> sensorNamesWithNullSensorID = new ArrayList<>();
+            List<Integer> notNullSensorIDList = new ArrayList<>();
+            TbSensorMapper sensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+            LambdaQueryWrapper<TbSensor> wrapper = new LambdaQueryWrapper<TbSensor>()
+                    .in(TbSensor::getVideoDeviceID, list.stream().map(VideoDeviceInfoV3::getVideoDeviceID).collect(Collectors.toList()));
+            // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
+            List<TbSensor> tbSensorsList = sensorMapper.selectList(wrapper);
+
+
+
+            for (int i = 0; i < list.size(); i++) {
+                VideoDeviceInfoV3 videoDeviceInfo = list.get(i);
+                if (!CollectionUtil.isNullOrEmpty(tbSensorsList)) {
+                    if (!tbSensorsList.stream().map(TbSensor::getProjectID).collect(Collectors.toList())
+                            .contains(list.get(i).getProjectID())) {
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不允许跨工程配置传感器");
                     }
+                }
+                if (videoDeviceInfo.getAddSensorList() != null) {
+                    for (int j = 0; j < videoDeviceInfo.getAddSensorList().size(); j++) {
+                        SensorBaseInfoV1 sensor = videoDeviceInfo.getAddSensorList().get(j);
+                        if (sensor.getSensorID() == null) {
+                            sensorNamesWithNullSensorID.add(sensor.getSensorName());
+                        } else {
+                            notNullSensorIDList.add(sensor.getSensorID());
+                        }
 
+                    }
                 }
             }
-        }
 
-        if (!CollectionUtil.isNullOrEmpty(sensorNamesWithNullSensorID)) {
-            List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(sensorNamesWithNullSensorID,
-                    list.get(0).getProjectID());
-            if (!CollectionUtil.isNullOrEmpty(sensorList)) {
-                List<String> sensorNameInTableList = sensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList());
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传输参数中,有传感器名称已存在:"+sensorNameInTableList.toString());
+            if (!CollectionUtil.isNullOrEmpty(sensorNamesWithNullSensorID)) {
+                List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(sensorNamesWithNullSensorID,
+                        list.get(0).getProjectID());
+                if (!CollectionUtil.isNullOrEmpty(sensorList)) {
+                    List<String> sensorNameInTableList = sensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList());
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传输参数中,有传感器名称已存在:"+sensorNameInTableList.toString());
+                }
             }
-        }
 
-        if (!CollectionUtil.isNullOrEmpty(notNullSensorIDList)) {
-            List<TbSensor> tbSensors = sensorMapper.selectBatchIds(notNullSensorIDList);
-            if (CollectionUtil.isNullOrEmpty(tbSensors) || tbSensors.size() != notNullSensorIDList.size()) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传输参数中有不存在的传感器设备");
+            if (!CollectionUtil.isNullOrEmpty(notNullSensorIDList)) {
+                List<TbSensor> tbSensors = sensorMapper.selectBatchIds(notNullSensorIDList);
+                if (CollectionUtil.isNullOrEmpty(tbSensors) || tbSensors.size() != notNullSensorIDList.size()) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传输参数中有不存在的传感器设备");
+                }
             }
         }
 

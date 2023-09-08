@@ -548,7 +548,7 @@
                s.Enable      as sensorEnable,
                c.CaptureInterval
         from tb_sensor s
-                 left join tb_video_capture c on s.VideoDeviceID = c.ID
+                 left join tb_video_capture c on s.ID = c.SensorID
         where s.VideoDeviceID in
         <foreach collection="videoIDList" item="videoID" separator="," open="(" close=")">
             #{videoID}
