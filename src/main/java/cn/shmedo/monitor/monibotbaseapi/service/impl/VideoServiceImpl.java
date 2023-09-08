@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
@@ -565,11 +566,14 @@ public class VideoServiceImpl implements VideoService {
         // 1. 筛选出来不同企业的视频设备,然后同步到iot进行转移
         List<VideoDeviceInfoV4> transferVideoDeviceList = pa.getVideoDeviceList().stream().filter(i -> !i.getCompanyID().equals(pa.getCompanyID())).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList)) {
-            handlerTransferDevice(transferVideoDeviceList, pa.getCompanyID());
+            Object o = handlerTransferDevice(transferVideoDeviceList, pa.getCompanyID());
+            if (ObjectUtil.isNotNull(o)) {
+                return o;
+            }
         }
 
         // 2. 直接批量修改视频设备所属公司,以及所属工程
-        videoDeviceMapper.batchUpdateCompanyAndProject(pa.getVideoDeviceList());
+        videoDeviceMapper.batchUpdateCompanyAndProject(pa.getVideoDeviceList(), pa.getCompanyID());
 
         // 3. 批量生成传感器设备,过滤出来传感器ID为空的数据,为新增数据,  不为空的数据,为批量修改数据
         List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
@@ -583,8 +587,10 @@ public class VideoServiceImpl implements VideoService {
                 Integer maxDisplayOrder = sensorMapper.queryMaxDisplayOrderByMonitorType(MonitorType.VIDEO.getKey());
                 for (int i = 0; i < addSensorList.size(); i++) {
                     if (addSensorList.get(i).getSensorID() == null) {
-                        insertSensorList.add(SensorBaseInfoV1.createNewSensor(addSensorList.get(i),
-                                subjectID, v, maxDisplayOrder + i + 1));
+                        if (addSensorList.get(i).getSensorEnable()) {
+                            insertSensorList.add(SensorBaseInfoV1.createNewSensor(addSensorList.get(i),
+                                    subjectID, v, maxDisplayOrder + i + 1));
+                        }
                     } else {
                         updateSensorList.add(SensorBaseInfoV1.createUpdateSensor(addSensorList.get(i), subjectID, v));
                     }
@@ -719,16 +725,19 @@ public class VideoServiceImpl implements VideoService {
             });
         }
 
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(TransferDeviceParam.builder()
-                        .originalCompanyID(companyID)
-                        .companyID(transferVideoDeviceList.get(0).getCompanyID())
-                        .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
-                        .build(),
+        TransferDeviceParam param = TransferDeviceParam.builder()
+                .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
+                .companyID(companyID)
+                .originalCompanyID(transferVideoDeviceList.get(0).getCompanyID())
+                .build();
+
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param,
                 fileConfig.getAuthAppKey(),
                 fileConfig.getAuthAppSecret());
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
+        } else {
+            return null;
         }
-        return null;
     }
 }
