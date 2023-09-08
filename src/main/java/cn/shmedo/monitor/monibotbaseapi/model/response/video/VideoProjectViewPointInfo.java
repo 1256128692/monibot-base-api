@@ -28,6 +28,7 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
     public void afterProperties() {
         Optional.ofNullable(sensorInfoList).filter(CollUtil::isNotEmpty).ifPresent(u -> {
             VideoProjectViewSensorInfo info = u.get(0);
+            setSensorID(info.getSensorID());
             setSensorName(info.getSensorName());
             setSensorAlias(info.getSensorAlias());
             setVideoDeviceID(info.getVideoDeviceID());
