@@ -19,6 +19,7 @@ public class VideoCaptureBaseInfo {
     private Integer projectID;
     private Integer channelNo;
     // 可以为空
+    @JsonIgnore
     private String ipcSerial;
 
     @JsonIgnore

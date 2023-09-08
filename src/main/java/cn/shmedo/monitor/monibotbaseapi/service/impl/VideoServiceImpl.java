@@ -401,7 +401,7 @@ public class VideoServiceImpl implements VideoService {
         // 根据协议去转换json对象
         list.forEach(v -> {
             v.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(v.getAccessPlatform()));
-            if (!CollectionUtils.isNotEmpty(sensorInfoList)) {
+            if (CollectionUtils.isNotEmpty(sensorInfoList)) {
                 v.setSensorList(sensorInfoList.stream().filter(s -> s.getVideoDeviceID().equals(v.getVideoDeviceID())).collect(Collectors.toList()));
             }
 
@@ -431,6 +431,7 @@ public class VideoServiceImpl implements VideoService {
                                 singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i + 1));
                                 singleVideoSensorList.addAll(v.getSensorList());
                             }
+                            singleVideoSensorList.addAll(v.getSensorList());
                         }
                     }
                 }
