@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util.device.ys;
 
 import cn.hutool.core.date.DateUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -28,6 +29,20 @@ public class YsUtil {
         }
         builder.append(".live");
         return builder.toString();
+    }
+
+    /**
+     * 萤石回放接口，跟播放接口一样的拼接形式
+     *
+     * @param isCloud   是否是云存储
+     * @param beginTime 开始时间
+     * @param endTime   结束时间
+     * @see #getEzOpenAddress(String, boolean, String)
+     */
+    public static String getEzPlayBackAddress(String seqNo, String ysChannelNo, boolean isCloud, Date beginTime, Date endTime) {
+        return "ezopen://open.ys7.com/" + seqNo + "/" + ysChannelNo + (isCloud ? ".cloud" : "") + ".rec?begin="
+                + DateUtil.format(beginTime, TimeUtil.YS_PLAY_BACK_TIME_FORMAT) + "&end"
+                + DateUtil.format(endTime, TimeUtil.YS_PLAY_BACK_TIME_FORMAT);
     }
 
 

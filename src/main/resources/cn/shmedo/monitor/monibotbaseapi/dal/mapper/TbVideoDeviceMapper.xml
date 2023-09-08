@@ -55,7 +55,7 @@
             tvd.`StorageType` storageType,
             tvd.`CaptureStatus` captureStatus,
             tvd.`AllocationStatus` allocationStatus,
-            (CASE tvd.`AccessPlatform` WHEN 0 THEN GROUP_CONCAT( TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.ysChannelNo")) ) WHEN 1 THEN GROUP_CONCAT( TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo") ) ) ELSE NULL END) channelDesc
+            GROUP_CONCAT( TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo") ) ) channelDesc
         FROM
             tb_video_device tvd
             LEFT JOIN tb_sensor ts ON tvd.`ID` = ts.`VideoDeviceID`
@@ -88,7 +88,7 @@
             ts.ID sensorID,
             ts.`Name` sensorName,
             ts.Alias sensorAlias,
-            (CASE tvd.`AccessPlatform` WHEN 0 THEN TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.ysChannelNo")) WHEN 1 THEN TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo")) ELSE NULL END) channelDesc,
+            TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo")) channelDesc,
             tvd.ID videoDeviceID,
             tvd.DeviceStatus,
             tvd.DeviceSerial,

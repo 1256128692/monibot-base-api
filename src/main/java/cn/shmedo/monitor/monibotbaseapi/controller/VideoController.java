@@ -383,7 +383,7 @@ public class VideoController {
      * @apiParam (请求体) {String} [uuid] uuid,用于继续查询剩余片段
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
      * @apiSuccess (返回结果) {String} [uuid] uuid,用于继续查询剩余片段
-     * @apiSuccess (返回结果) {String} baseUrl 回放地址
+     * @apiSuccess (返回结果) {String} [baseUrl] 回放地址,如果为空代表海康接口未返回回放地址
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */

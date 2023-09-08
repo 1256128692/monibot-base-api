@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
+import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,9 +63,8 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
 
     @Override
     public Map<String, String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param) {
-        String beginTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
-        String endTime = DateUtil.format(param.getEndTime(), "yyyy-MM-dd HH:mm:ss");
-        //这里到时候看下能不能用ws，文档里回放接口没写支持这种协议，但是文档直播接口、前端给过来的海康H5Player的demo支持这种协议
+        String beginTime = DateUtil.format(param.getBeginTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
+        String endTime = DateUtil.format(param.getEndTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
         Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(param.getTbVideoDevice().getDeviceSerial(), param.getRecordLocation().toString(),
                 "ws", null, beginTime, endTime, param.getUuid(), null, null, null);
         return new HashMap<>() {

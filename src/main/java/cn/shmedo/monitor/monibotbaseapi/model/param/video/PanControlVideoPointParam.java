@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
@@ -102,8 +103,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                     if (dict.get("seqNo") != null) {
                         pojo.setSeqNo(dict.get("seqNo").toString());
                     }
-                    if (dict.get("ysChannelNo") != null) {
-                        pojo.setYsChannelNo(dict.get("ysChannelNo").toString());
+                    if (dict.get(DefaultConstant.VIDEO_CHANNEL) != null) {
+                        pojo.setYsChannelNo(dict.get(DefaultConstant.VIDEO_CHANNEL).toString());
                     }
                 }
             });

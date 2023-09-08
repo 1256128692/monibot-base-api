@@ -75,15 +75,11 @@ public class VideoServiceImpl implements VideoService {
 
     private final TbVideoCaptureMapper videoCaptureMapper;
 
-    /**
-     * 萤石设备ExValue（json）里通道号数据的key
-     */
-    private static final String YS_CHANNEL_KEY = "ysChannelNo";
-    /**
-     * @see YsCapacityInfo
-     * @see YsService#capacity(String, String)
-     */
-    private static final String SUPPORT_RATE_LIMIT_KEY = "supportRateLimit";
+//    /**
+//     * @see YsCapacityInfo
+//     * @see YsService#capacity(String, String)
+//     */
+//    private static final String SUPPORT_RATE_LIMIT_KEY = "supportRateLimit";
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -352,39 +348,42 @@ public class VideoServiceImpl implements VideoService {
         final String ysToken = getYsToken();
         final TbVideoDevice device = param.getTbVideoDevice();
         final String deviceSerial = device.getDeviceSerial();
-        final Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(YS_CHANNEL_KEY));
+        final String channelNo = JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(DefaultConstant.VIDEO_CHANNEL);
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
+        build.setBaseUrl(YsUtil.getEzOpenAddress(deviceSerial, false, channelNo));
+        build.setHdUrl(YsUtil.getEzOpenAddress(deviceSerial, true, channelNo));
         YsResultWrapper<YsCapacityInfo> capacityInfo = ysService.capacity(ysToken, deviceSerial);
-        YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
-                channelNo, 1, null, null, "1", 2, null, null,
-                null, null, null);
-        Optional.ofNullable(baseStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
-                .map(YsStreamUrlInfo::getUrl).ifPresent(build::setBaseUrl);
+//        YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
+//                channelNo, 1, null, 300, "1", 2, null, null,
+//                null, null, null);
+//        Optional.ofNullable(baseStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+//                .map(YsStreamUrlInfo::getUrl).ifPresent(build::setBaseUrl);
         Optional.ofNullable(capacityInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
                 .map(YsCapacityInfo::toMap).ifPresent(build::setCapabilitySet);
 
         // whether set {@code hdUrl} decided by {@code supportRateLimit} capability.
-        if (build.getCapabilitySet().get(SUPPORT_RATE_LIMIT_KEY) == 1) {
-            YsResultWrapper<YsStreamUrlInfo> hdStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
-                    channelNo, 1, null, null, "1", 1, null, null,
-                    null, null, null);
-            Optional.ofNullable(hdStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
-                    .map(YsStreamUrlInfo::getUrl).ifPresent(build::setHdUrl);
-        }
+//        if (build.getCapabilitySet().get(SUPPORT_RATE_LIMIT_KEY) == 1) {
+//            YsResultWrapper<YsStreamUrlInfo> hdStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
+//                    channelNo, 1, null, 300, "1", 1, null, null,
+//                    null, null, null);
+//            Optional.ofNullable(hdStreamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+//                    .map(YsStreamUrlInfo::getUrl).ifPresent(build::setHdUrl);
+//        }
         return build;
     }
 
     @Override
     public String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param) {
-        String ysToken = getYsToken();
+//        String ysToken = getYsToken();
         TbVideoDevice device = param.getTbVideoDevice();
-        Integer channelNo = Integer.parseInt(JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr("ysChannelNo"));
-        String startTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
-        String stopTime = DateUtil.format(param.getEndTime(), "yyyy-MM-dd HH:mm:ss");
-        YsResultWrapper<YsStreamUrlInfo> streamInfo = ysService.getStreamInfo(ysToken, device.getDeviceSerial(), channelNo,
-                null, null, null, param.getYsVideoType(), 2, startTime, stopTime, null, null, null);
-        return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
-                .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
+        String channelNo = JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(DefaultConstant.VIDEO_CHANNEL);
+//        String startTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
+//        String stopTime = DateUtil.format(param.getEndTime(), "yyyy-MM-dd HH:mm:ss");
+//        YsResultWrapper<YsStreamUrlInfo> streamInfo = ysService.getStreamInfo(ysToken, device.getDeviceSerial(), channelNo,
+//                null, null, null, param.getYsVideoType(), 2, startTime, stopTime, null, null, null);
+//        return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+//                .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
+        return YsUtil.getEzPlayBackAddress(device.getDeviceSerial(), channelNo, param.getRecordLocation() == 0, param.getBeginTime(), param.getEndTime());
     }
 
     @Override
@@ -605,9 +604,9 @@ public class VideoServiceImpl implements VideoService {
         if (!CollectionUtil.isNullOrEmpty(captureSensorList)) {
             List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(captureSensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList()),
                     captureSensorList.get(0).getProjectID());
-            captureSensorList.forEach( c -> {
+            captureSensorList.forEach(c -> {
                 SensorBaseInfoV1 sensorBaseInfoV1 = sensorList.stream().filter(s -> s.getSensorName().equals(c.getSensorName())).findFirst().orElse(null);
-                if (sensorBaseInfoV1 != null ) {
+                if (sensorBaseInfoV1 != null) {
                     c.setSensorID(sensorBaseInfoV1.getSensorID());
                     c.setDeviceSerial(sensorBaseInfoV1.getDeviceSerial());
                 }

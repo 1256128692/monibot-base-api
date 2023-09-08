@@ -25,6 +25,14 @@ public class TimeUtil {
     private static final String MILLI_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String STANDARD_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String MILLI_TIME_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    /**
+     * 海康视频设备回放的时间格式
+     */
+    public static final String HIK_PLAY_BACK_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+    /**
+     * 萤石视频设备回放的时间格式
+     */
+    public static final String YS_PLAY_BACK_TIME_FORMAT = "yyyyMMddhhmmss";
     public static final long MILLI_SECOND_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     public static final long MILLI_SECOND_IN_ONE_HOUR = MILLI_SECOND_IN_ONE_DAY / 24;
     public static final int MILLI_SECOND_IN_ONE_SECOND = 1000;
@@ -42,7 +50,6 @@ public class TimeUtil {
     public static SimpleDateFormat getMilliDefaultFormatter() {
         return new SimpleDateFormat(MILLI_TIME_FORMAT);
     }
-
 
 
     public static String format(Timestamp time) {
@@ -429,6 +436,7 @@ public class TimeUtil {
 
     /**
      * 根据开始时间和结束时间去返回list,每个对象是每天的8点到第二天的8点
+     *
      * @param begin
      * @param end
      * @return
@@ -453,6 +461,7 @@ public class TimeUtil {
 
     /**
      * 判断开始时间和结束时间是否为今日
+     *
      * @param begin
      * @param end
      * @return
@@ -470,9 +479,10 @@ public class TimeUtil {
      * 当density为1的时候,校验begin和end是否为当天
      * 当density为2的时候,校验begin和end是否为当月
      * 当density为3的时候,校验begin和end是否为当年
+     *
      * @param begin
      * @param end
-     * @return 如果符合条件,则返回true
+     * @return 如果符合条件, 则返回true
      */
     public static boolean validateTime(Timestamp begin, Timestamp end, int density) {
         LocalDate beginDate = begin.toLocalDateTime().toLocalDate();
@@ -484,7 +494,7 @@ public class TimeUtil {
             case 2: // 当月
                 LocalDate now = LocalDate.now();
                 LocalDate firstDayOfMonth = now.withDayOfMonth(1);
-                return  ( beginDate.isAfter(firstDayOfMonth)) || ( endDate.isAfter(firstDayOfMonth));
+                return (beginDate.isAfter(firstDayOfMonth)) || (endDate.isAfter(firstDayOfMonth));
             case 3: // 当年
                 LocalDate firstDayOfYear = LocalDate.now().withDayOfYear(1);
                 return (beginDate.isAfter(firstDayOfYear)) || (endDate.isAfter(firstDayOfYear));
@@ -509,7 +519,6 @@ public class TimeUtil {
 
         return Timestamp.valueOf(begin);
     }
-
 
 
     // 解析时间字符串为 Timestamp 对象
