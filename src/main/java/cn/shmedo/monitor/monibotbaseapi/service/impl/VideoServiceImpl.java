@@ -675,11 +675,16 @@ public class VideoServiceImpl implements VideoService {
                 totalYsDeviceList.removeIf(device -> deviceSerialsToRemove.contains(device.getDeviceSerial()));
             }
 
+            int totalPageSize = totalYsDeviceList.size() / pa.getPageSize();
+            if (totalYsDeviceList.size() % pa.getPageSize() > 0) {
+                // 如果余数大于0，总页数加1
+                totalPageSize++;
+            }
             // 根据参数进行分页
-            PageUtil.Page<VideoDeviceBaseInfoV1> page = PageUtil.page(totalYsDeviceList, pageSize, pa.getCurrentPage());
+            PageUtil.Page<VideoDeviceBaseInfoV1> page = PageUtil.page(totalYsDeviceList, pa.getPageSize(), pa.getCurrentPage());
 
             // 返回分页结果
-            return new PageUtil.Page<>(pa.getPageSize(), page.currentPageData(), totalYsDeviceList.size());
+            return new PageUtil.Page<>(totalPageSize, page.currentPageData(), totalYsDeviceList.size());
 
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
