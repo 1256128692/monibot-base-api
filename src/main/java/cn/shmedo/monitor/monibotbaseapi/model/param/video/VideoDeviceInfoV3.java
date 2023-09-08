@@ -13,6 +13,9 @@ public class VideoDeviceInfoV3 {
     @NotNull
     private Integer videoDeviceID;
 
+    @NotNull
+    private String deviceSerial;
+
     private Integer projectID;
 
     private Integer companyID;

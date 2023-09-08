@@ -576,6 +576,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
      * @apiParam (请求体) {Int} list.videoDeviceID 视频设备ID
+     * @apiParam (请求体) {String} list.deviceSerial 设备序列号
      * @apiParam (请求体) {Int} [list.projectID] 所属工程项目ID
      * @apiParam (请求体) {Object[]} list.addSensorList 新增视频传感器(max = 100)
      * @apiParam (请求体) {Int} [list.addSensorList.sensorID] 传感器ID,为空时进行新增,不为空时进行更新
