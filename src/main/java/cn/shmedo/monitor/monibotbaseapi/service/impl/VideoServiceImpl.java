@@ -49,6 +49,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -621,29 +622,70 @@ public class VideoServiceImpl implements VideoService {
     public PageUtil.Page<VideoDeviceBaseInfoV1> queryYsVideoDeviceList(QueryYsVideoDeviceParam pa) {
 
         String ysToken = getYsToken();
-        Integer currentPage = pa.getCurrentPage() - 1;
+        int pageSize = 50;
+        // 创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+
         YsResultPageWrapper<VideoDeviceBaseInfoV1> baseDeviceInfoByPage = ysService.getBaseDeviceInfoByPage(
                 ysToken,
-                currentPage,
-                pa.getPageSize());
-
-        if (baseDeviceInfoByPage.callSuccess() && baseDeviceInfoByPage.getData() != null) {
-            baseDeviceInfoByPage.getData();
-
-            // 获取分页信息
-            YsPageInfo page = baseDeviceInfoByPage.getPage();
-//            int total = page.getTotal();
-//            int currentPage = page.getPage();
-//            int pageSize = page.getSize();
-
-            // 构建分页结果
-//            PageUtil.Page<VideoDeviceBaseInfoV1> pageResult = new PageUtil.Page<>(total, currentPage, pageSize, data);
-
-            return null;
-        } else {
-            // 处理调用失败的情况，例如抛出异常或返回空结果
-            return null;
+                0,
+                1);
+        if (!baseDeviceInfoByPage.callSuccess() || baseDeviceInfoByPage.getData() == null) {
+            return PageUtil.Page.empty();
         }
+
+        // 创建查询任务列表
+        List<Callable<List<VideoDeviceBaseInfoV1>>> tasks = new ArrayList<>();
+        // 总设备数
+        int totalDevices = baseDeviceInfoByPage.getPage().getTotal();
+
+        for (int pageStart = 0; pageStart < totalDevices; pageStart += pageSize) {
+            int currentPage = (pageStart / pageSize);
+            tasks.add(() -> {
+                // 发起查询请求
+                YsResultPageWrapper<VideoDeviceBaseInfoV1> result = ysService.getBaseDeviceInfoByPage(getYsToken(), currentPage, pageSize);
+                List<VideoDeviceBaseInfoV1> deviceList = result.getData();
+                if (deviceList == null) {
+                    // 如果为null，创建一个空列表
+                    deviceList = new ArrayList<>();
+                }
+                return deviceList;
+            });
+        }
+
+        // 并发执行任务
+        try {
+            List<Future<List<VideoDeviceBaseInfoV1>>> futures = executorService.invokeAll(tasks);
+
+            // 处理任务结果
+            List<VideoDeviceBaseInfoV1> totalYsDeviceList = new ArrayList<>();
+            for (Future<List<VideoDeviceBaseInfoV1>> future : futures) {
+                List<VideoDeviceBaseInfoV1> deviceList = future.get();
+                totalYsDeviceList.addAll(deviceList);
+            }
+
+            // 关闭线程池
+            executorService.shutdown();
+
+            List<String> deviceSerialList = totalYsDeviceList.stream().map(VideoDeviceBaseInfoV1::getDeviceSerial).collect(Collectors.toList());
+            List<VideoDeviceInfoV1> videoDeviceInfoV1s = videoDeviceMapper.queryListByCondition(deviceSerialList);
+
+            if (!CollectionUtil.isNullOrEmpty(videoDeviceInfoV1s)) {
+                List<String> deviceSerialsToRemove = videoDeviceInfoV1s.stream().map(VideoDeviceInfoV1::getDeviceSerial).collect(Collectors.toList());
+                totalYsDeviceList.removeIf(device -> deviceSerialsToRemove.contains(device.getDeviceSerial()));
+            }
+
+            // 根据参数进行分页
+            PageUtil.Page<VideoDeviceBaseInfoV1> page = PageUtil.page(totalYsDeviceList, pageSize, pa.getCurrentPage());
+
+            // 返回分页结果
+            return new PageUtil.Page<>(pa.getPageSize(), page.currentPageData(), totalYsDeviceList.size());
+
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 

@@ -110,7 +110,7 @@ public interface YsService {
                                  @Param("deviceSerial") String deviceSerial,
                                  @Param("deviceName") String deviceName);
 
-    @RequestLine("POST /lapp/device/list")
+    @RequestLine("POST /api/lapp/device/list")
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&pageStart={pageStart}&pageSize={pageSize}")
     YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(@Param("accessToken") String accessToken,
