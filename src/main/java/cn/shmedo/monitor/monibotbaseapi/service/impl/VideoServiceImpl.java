@@ -26,6 +26,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
@@ -38,7 +39,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.base.YsPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -696,6 +696,22 @@ public class VideoServiceImpl implements VideoService {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
+
+        return null;
+    }
+
+    @Override
+    public PageUtil.Page<VideoDeviceBaseInfoV1> queryHkVideoDeviceList(QueryHkVideoDeviceParam pa) {
+
+        HkMonitorPointInfo hkMonitorPointInfo = hkVideoService.queryHkVideoPage(1);
+        if (hkMonitorPointInfo == null || hkMonitorPointInfo.getTotal() == 0) {
+            return PageUtil.Page.empty();
+        }
+
+        if (hkMonitorPointInfo.getTotal() > 1000) {
+
+        }
+
 
         return null;
     }

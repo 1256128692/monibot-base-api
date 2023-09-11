@@ -31,7 +31,7 @@ public class HkVideoServiceImpl implements HkVideoService {
     private final String contentType = "application/json";
 
     @Override
-    public HkMonitorPointInfo queryHkVideoPage(Object param) {
+    public HkMonitorPointInfo queryHkVideoPage(Integer pageNo) {
 
         /**
          * 设置接口的URI地址
@@ -47,7 +47,7 @@ public class HkVideoServiceImpl implements HkVideoService {
          * 组装请求参数
          */
         Map<String, String> paramMap = new HashMap<String, String>(2);// post请求Form表单参数
-        paramMap.put("pageNo", "1");
+        paramMap.put("pageNo", pageNo.toString());
         paramMap.put("pageSize", "1000");
         String body = JSONUtil.toJsonStr(paramMap);
 

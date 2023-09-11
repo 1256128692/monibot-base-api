@@ -485,21 +485,20 @@ public class VideoController {
      * @apiName QueryHkVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Int} currentPage 当前页，从1开始
-     * @apiParam (请求体) {Int} pageSize 页大小，最大为1000
+     * @apiParam (请求体) {Int} pageSize 页大小，最大为20
      * @apiSuccess (返回结果) {Int} totalCount 总数量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {String} currentPageData.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} currentPageData.deviceType 视频设备类型
      * @apiSuccess (返回结果) {String} currentPageData.deviceName 视频设备名称
-     * @apiSuccess (返回结果) {Boolean} currentPageData.existMd 是否在米度中台存在
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryHkVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryHkVideoDeviceList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryHkVideoDeviceList(@Validated @RequestBody QueryHkVideoDeviceParam pa) {
+        return videoService.queryHkVideoDeviceList(pa);
     }
 
     /**
