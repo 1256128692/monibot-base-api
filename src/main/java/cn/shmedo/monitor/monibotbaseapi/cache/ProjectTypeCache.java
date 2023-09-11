@@ -41,7 +41,6 @@ public class ProjectTypeCache {
         projectTypeMap = projectTypeList.stream().collect(Collectors.toMap(TbProjectType::getID, Function.identity()));
         redisTemplate.delete(RedisKeys.PROJECT_TYPE_KEY);
         redisTemplate.opsForHash().putAll(RedisKeys.PROJECT_TYPE_KEY, projectTypeList.stream()
-                .collect(Collectors.toMap(k -> k.getID().toString(), JSONUtil::toJsonStr))
-        );
+                .collect(Collectors.toMap(k -> k.getID().toString(), JSONUtil::toJsonStr)));
     }
 }
