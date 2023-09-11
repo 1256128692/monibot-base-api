@@ -9,7 +9,7 @@ import java.util.Map;
 public interface HkVideoService {
 
 
-    HkMonitorPointInfo queryHkVideoPage(Object param);
+    HkMonitorPointInfo queryHkVideoPage(Integer pageNo);
 
     HkDeviceInfo queryDevice(String deviceSerial);
 

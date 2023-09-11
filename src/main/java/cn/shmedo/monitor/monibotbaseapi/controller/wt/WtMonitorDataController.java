@@ -233,7 +233,7 @@ public class WtMonitorDataController {
      * @apiDescription 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
+     * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测 5:水情监测 6:雨晴监测 7:农情监测 8:工情监测)
      * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
      * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称

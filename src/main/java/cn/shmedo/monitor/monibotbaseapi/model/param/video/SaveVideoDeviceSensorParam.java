@@ -6,10 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorQueryType;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Data
 public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -86,7 +82,7 @@ public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourceP
                 if (!CollectionUtil.isNullOrEmpty(tbSensorsList)) {
                     if (!tbSensorsList.stream().map(TbSensor::getProjectID).collect(Collectors.toList())
                             .contains(list.get(i).getProjectID())) {
-                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不允许跨工程配置传感器");
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备转移企业前,需要删除设备下的传感器");
                     }
                 }
                 if (videoDeviceInfo.getAddSensorList() != null) {
