@@ -703,17 +703,66 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public PageUtil.Page<VideoDeviceBaseInfoV1> queryHkVideoDeviceList(QueryHkVideoDeviceParam pa) {
 
+        List<VideoDeviceBaseInfoV1> allVideoDevices = new ArrayList<>();
+
+        // 首次查询
         HkMonitorPointInfo hkMonitorPointInfo = hkVideoService.queryHkVideoPage(1);
+
         if (hkMonitorPointInfo == null || hkMonitorPointInfo.getTotal() == 0) {
             return PageUtil.Page.empty();
         }
 
-        if (hkMonitorPointInfo.getTotal() > 1000) {
+        allVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
 
+        if (hkMonitorPointInfo.getTotal() > 1000) {
+            int total = hkMonitorPointInfo.getTotal();
+            int pageSize = 1000;
+            int jkTotalPageSize = total / pageSize;
+            if (total % pageSize > 0) {
+                // 如果余数大于0，总页数加1
+                jkTotalPageSize++;
+            }
+
+            // 从第二页开始查询，因为第一页已经查询过了
+            for (int pageNo = 2; pageNo <= jkTotalPageSize; pageNo++) {
+                hkMonitorPointInfo = hkVideoService.queryHkVideoPage(pageNo);
+                if (hkMonitorPointInfo != null) {
+                    allVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
+                }
+            }
         }
 
+        List<String> deviceSerialList = allVideoDevices.stream().map(VideoDeviceBaseInfoV1::getDeviceSerial).collect(Collectors.toList());
+        List<VideoDeviceInfoV1> videoDeviceInfoV1s = videoDeviceMapper.queryListByCondition(deviceSerialList);
 
-        return null;
+        if (!CollectionUtil.isNullOrEmpty(videoDeviceInfoV1s)) {
+            List<String> deviceSerialsToRemove = videoDeviceInfoV1s.stream().map(VideoDeviceInfoV1::getDeviceSerial).collect(Collectors.toList());
+            allVideoDevices.removeIf(device -> deviceSerialsToRemove.contains(device.getDeviceSerial()));
+        }
+
+        // 根据参数进行分页
+        PageUtil.Page<VideoDeviceBaseInfoV1> page = PageUtil.page(allVideoDevices, pa.getPageSize(), pa.getCurrentPage());
+
+        int totalPageSize = allVideoDevices.size() / pa.getPageSize();
+        if (allVideoDevices.size() % pa.getPageSize() > 0) {
+            // 如果余数大于0，总页数加1
+            totalPageSize++;
+        }
+        // 返回分页结果
+        return new PageUtil.Page<>(totalPageSize, page.currentPageData(), allVideoDevices.size());
+
+    }
+
+    private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
+        return monitorPointDetails.stream()
+                .map(detail -> {
+                    VideoDeviceBaseInfoV1 videoDevice = new VideoDeviceBaseInfoV1();
+                    videoDevice.setDeviceSerial(detail.getCameraIndexCode());
+                    videoDevice.setDeviceName(detail.getCameraName());
+                    videoDevice.setDeviceType(detail.getCameraTypeName());
+                    return videoDevice;
+                })
+                .collect(Collectors.toList());
     }
 
 
