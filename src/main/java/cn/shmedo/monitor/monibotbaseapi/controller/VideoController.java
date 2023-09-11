@@ -280,6 +280,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} allocationStatus 设备分配状态 true:1 false:0
+     * @apiSuccess (返回结果) {String} ysToken 萤石token
      * @apiSuccess (返回结果) {String} baseUrl 标清直播地址
      * @apiSuccess (返回结果) {String} [hdUrl] 高清直播地址(缺少对应能力集时,该项可能为空)
      * @apiSuccess (返回结果) {Object} capabilitySet 能力集(能力集中缺少某项时,也表示不支持该能力)
@@ -358,6 +359,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
      * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
      * @apiSuccess (返回结果) {String} baseUrl 回放地址
+     * @apiSuccess (返回结果) {String} ysToken 萤石token
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */

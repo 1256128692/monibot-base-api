@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.List;
+import java.util.Map;
 
 public interface VideoService {
     QueryVideoBaseInfoResult queryVideoBaseInfo(QueryVideoBaseInfoParam param);
@@ -31,7 +32,7 @@ public interface VideoService {
 
     VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param);
 
-    String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param);
+    Map<String, String> queryYsVideoPlayBack(QueryYsVideoPlayBackParam param);
 
     List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa);
 

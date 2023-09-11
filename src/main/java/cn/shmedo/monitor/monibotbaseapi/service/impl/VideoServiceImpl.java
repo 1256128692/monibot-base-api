@@ -354,6 +354,7 @@ public class VideoServiceImpl implements VideoService {
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         build.setBaseUrl(YsUtil.getEzOpenAddress(deviceSerial, false, channelNo));
         build.setHdUrl(YsUtil.getEzOpenAddress(deviceSerial, true, channelNo));
+        build.setYsToken(ysToken);
         YsResultWrapper<YsCapacityInfo> capacityInfo = ysService.capacity(ysToken, deviceSerial);
 //        YsResultWrapper<YsStreamUrlInfo> baseStreamInfo = ysService.getStreamInfo(ysToken, deviceSerial,
 //                channelNo, 1, null, 300, "1", 2, null, null,
@@ -375,8 +376,8 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public String queryYsVideoPlayBack(QueryYsVideoPlayBackParam param) {
-//        String ysToken = getYsToken();
+    public Map<String, String> queryYsVideoPlayBack(QueryYsVideoPlayBackParam param) {
+        String ysToken = getYsToken();
         TbVideoDevice device = param.getTbVideoDevice();
         String channelNo = JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(DefaultConstant.VIDEO_CHANNEL);
 //        String startTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
@@ -385,7 +386,9 @@ public class VideoServiceImpl implements VideoService {
 //                null, null, null, param.getYsVideoType(), 2, startTime, stopTime, null, null, null);
 //        return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
 //                .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
-        return YsUtil.getEzPlayBackAddress(device.getDeviceSerial(), channelNo, param.getRecordLocation() == 0, param.getBeginTime(), param.getEndTime());
+        return Map.of("baseUrl", YsUtil.getEzPlayBackAddress(device.getDeviceSerial(), channelNo,
+                        param.getRecordLocation() == 0, param.getBeginTime(), param.getEndTime()),
+                "ysToken", ysToken);
     }
 
     @Override

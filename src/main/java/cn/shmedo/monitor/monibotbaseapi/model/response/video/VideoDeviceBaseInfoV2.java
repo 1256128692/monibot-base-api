@@ -27,6 +27,7 @@ public class VideoDeviceBaseInfoV2 {
     private Boolean allocationStatus;
     private String baseUrl;
     private String hdUrl;
+    private String ysToken;
     private Map<String, Integer> capabilitySet;
 
     public static VideoDeviceBaseInfoV2 build(TbVideoDevice tbVideoDevice) {
