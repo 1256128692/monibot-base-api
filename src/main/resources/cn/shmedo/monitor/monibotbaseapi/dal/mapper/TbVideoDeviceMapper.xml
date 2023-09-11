@@ -194,7 +194,7 @@
         <where>
             1 = 1
             <if test="deviceSerial != null and deviceSerial != ''">
-                and vd.deviceSerial = #{deviceSerial}
+                and vd.`DeviceSerial` LIKE CONCAT('%',#{deviceSerial},'%')
             </if>
             <if test="deviceStatus != null">
                 and vd.deviceStatus = #{deviceStatus}
@@ -313,4 +313,27 @@
             WHERE ID = #{item.videoDeviceID}
         </foreach>
     </update>
+
+    <select id="queryListByDeviceSerialListAndCompanyID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1">
+        select vd.ID as videoDeviceID,
+        vd.deviceSerial,
+        vd.deviceType,
+        vd.deviceName,
+        vd.companyID,
+        vd.deviceStatus,
+        vd.accessChannelNum,
+        vd.accessPlatform,
+        vd.accessProtocol,
+        vd.projectID,
+        vd.captureStatus,
+        vd.allocationStatus,
+        vd.exValue
+        from tb_video_device vd
+        where vd.deviceSerial in
+        <foreach collection="deviceSerialList" separator="," open="(" item="deviceSerial" close=")">
+            #{deviceSerial}
+        </foreach>
+        and vd.CompanyID = #{companyID}
+    </select>
 </mapper>

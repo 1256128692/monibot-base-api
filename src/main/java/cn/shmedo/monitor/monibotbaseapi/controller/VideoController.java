@@ -600,7 +600,7 @@ public class VideoController {
      * @apiDescription 批量生成视频传感器
      * @apiName QueryVideoDevicePage
      * @apiParam (请求体) {Int} companyID  当前公司ID
-     * @apiParam (请求体) {String} [deviceSerial] 设备序列号
+     * @apiParam (请求体) {String} [deviceSerial] 设备序列号,模糊查询
      * @apiParam (请求体) {Int} [ownedCompanyID] 所属公司ID,null查全部
      * @apiParam (请求体) {Int} [projectID] 项目ID,null查全部
      * @apiParam (请求体) {Boolean} [deviceStatus] 视频设备在线状态,null查全部

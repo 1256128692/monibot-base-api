@@ -3,11 +3,13 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
+import java.util.Objects;
 
 @Data
 public class QueryVideoDevicePageParam  implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -40,6 +42,9 @@ public class QueryVideoDevicePageParam  implements ParameterValidator, ResourceP
             if (begin.after(end)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
             }
+        }
+        if (!Objects.equals(companyID, DefaultConstant.MD_ID)) {
+            ownedCompanyID = companyID;
         }
         return null;
     }
