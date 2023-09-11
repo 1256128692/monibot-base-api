@@ -51,6 +51,11 @@ public class RedisKeys {
     public static final String FILE_PATH_KEY_TEMPLATE = "cn.shmedo.mdnet.fileCache:";
 
     public static final String COMPANY_ID_KEY = "cn.shmedo.mdauth.companyInfo";
+
+    /**
+     * 工程类型缓存
+     */
+    public static final String PROJECT_TYPE_KEY = "cn.shmedo.mdmbse.projectTypeCache";
 }
 
     
