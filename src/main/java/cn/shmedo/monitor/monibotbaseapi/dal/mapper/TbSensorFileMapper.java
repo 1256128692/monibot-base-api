@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryCaptureParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo;
@@ -29,4 +30,6 @@ public interface TbSensorFileMapper  extends BasicMapper<TbSensorFile>{
     List<VideoMonitorPointPictureInfo> selectListByIDAndTime(Integer sensorID, Date beginTime, Date endTime);
 
     IPage<VideoSensorFileInfo> queryPageByCondition(Page<VideoDevicePageInfo> page, Integer sensorID, Date begin, Date end);
+
+    List<VideoSensorFileInfo> selectListBySensorIDAndTime(QueryCaptureParam pa);
 }

@@ -696,10 +696,10 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryCaptureList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryCaptureList(@Validated @RequestBody QueryCaptureParam pa) {
+        return videoService.queryCaptureList(pa);
     }
 
 

@@ -781,6 +781,27 @@ public class VideoServiceImpl implements VideoService {
 
     }
 
+    @Override
+    public List<VideoSensorFileInfo> queryCaptureList(QueryCaptureParam pa) {
+
+        List<VideoSensorFileInfo> videoSensorFileInfos = sensorFileMapper.selectListBySensorIDAndTime(pa);
+
+        if (CollectionUtils.isEmpty(videoSensorFileInfos)) {
+            return Collections.emptyList();
+        }
+
+        List<String> filePathList = videoSensorFileInfos.stream().map(VideoSensorFileInfo::getFilePath).collect(Collectors.toList());
+        List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(filePathList, pa.getCompanyID());
+
+        videoSensorFileInfos.forEach(record -> {
+            FileInfoResponse fileInfoResponse = fileUrlList.stream().filter(f -> f.getFilePath().equals(record.getFilePath())).findFirst().orElse(null);
+            if (fileInfoResponse != null) {
+                record.setPath(fileInfoResponse.getAbsolutePath());
+            }
+        });
+        return videoSensorFileInfos;
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {
