@@ -756,6 +756,31 @@ public class VideoServiceImpl implements VideoService {
 
     }
 
+    @Override
+    public PageUtil.Page<VideoSensorFileInfo> queryCapturePage(QueryCapturePageParam pa) {
+
+        Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+
+        IPage<VideoSensorFileInfo> pageData = sensorFileMapper.queryPageByCondition(page, pa.getSensorID(),
+                pa.getBegin(), pa.getEnd());
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
+            return PageUtil.Page.empty();
+        }
+
+        List<String> filePathList = pageData.getRecords().stream().map(VideoSensorFileInfo::getFilePath).collect(Collectors.toList());
+        List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(filePathList, pa.getCompanyID());
+
+        pageData.getRecords().forEach(record -> {
+            FileInfoResponse fileInfoResponse = fileUrlList.stream().filter(f -> f.getFilePath().equals(record.getFilePath())).findFirst().orElse(null);
+            if (fileInfoResponse != null) {
+                record.setPath(fileInfoResponse.getAbsolutePath());
+            }
+        });
+
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {

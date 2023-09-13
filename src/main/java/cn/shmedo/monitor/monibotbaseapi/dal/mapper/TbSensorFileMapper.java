@@ -2,7 +2,11 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Date;
@@ -23,4 +27,6 @@ public interface TbSensorFileMapper  extends BasicMapper<TbSensorFile>{
     int updateByPrimaryKey(TbSensorFile record);
 
     List<VideoMonitorPointPictureInfo> selectListByIDAndTime(Integer sensorID, Date beginTime, Date endTime);
+
+    IPage<VideoSensorFileInfo> queryPageByCondition(Page<VideoDevicePageInfo> page, Integer sensorID, Date begin, Date end);
 }

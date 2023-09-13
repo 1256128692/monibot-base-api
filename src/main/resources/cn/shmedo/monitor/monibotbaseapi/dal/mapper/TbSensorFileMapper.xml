@@ -237,4 +237,22 @@
           AND UploadTime &lt;= #{endTime}
       </if>
   </select>
+
+  <select id="queryPageByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo">
+      select ID,
+             SensorID,
+             UploadTime,
+             filePath,
+             fileType,
+             fileSize
+      from tb_sensor_file
+      where sensorID = #{sensorID,jdbcType=INTEGER}
+      <if test="begin != null">
+          AND UploadTime &gt;= #{begin}
+      </if>
+      <if test="end != null">
+          AND UploadTime &lt;= #{end}
+      </if>
+  </select>
 </mapper>

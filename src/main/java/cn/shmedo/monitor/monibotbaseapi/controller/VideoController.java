@@ -650,7 +650,7 @@ public class VideoController {
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询抓拍列表
-     * @apiName ManualCapture
+     * @apiName QueryCapturePage
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {DateTime} [begin] 开始时间
@@ -660,7 +660,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} totalCount 总数量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.ID 图片ID
+     * @apiSuccess (返回结果) {Int} currentPageData.id 图片ID
      * @apiSuccess (返回结果) {Int} currentPageData.sensorID 传感器ID
      * @apiSuccess (返回结果) {Date} currentPageData.uploadTime 上传时间
      * @apiSuccess (返回结果) {String} currentPageData.path 图片地址
@@ -669,10 +669,10 @@ public class VideoController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
-//    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
     @RequestMapping(value = "/QueryCapturePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryCapturePage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryCapturePage(@Validated @RequestBody QueryCapturePageParam pa) {
+        return videoService.queryCapturePage(pa);
     }
 
 
@@ -687,7 +687,7 @@ public class VideoController {
      * @apiParam (请求体) {DateTime} [begin] 开始时间
      * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
-     * @apiSuccess (返回结果) {Int} dataList.ID 图片ID
+     * @apiSuccess (返回结果) {Int} dataList.id 图片ID
      * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
      * @apiSuccess (返回结果) {Date} dataList.uploadTime 上传时间
      * @apiSuccess (返回结果) {String} dataList.path 图片地址

@@ -47,4 +47,6 @@ public interface VideoService {
     PageUtil.Page<VideoDeviceBaseInfoV1> queryYsVideoDeviceList(QueryYsVideoDeviceParam pa);
 
     PageUtil.Page<VideoDeviceBaseInfoV1> queryHkVideoDeviceList(QueryHkVideoDeviceParam pa);
+
+    PageUtil.Page<VideoSensorFileInfo> queryCapturePage(QueryCapturePageParam pa);
 }
