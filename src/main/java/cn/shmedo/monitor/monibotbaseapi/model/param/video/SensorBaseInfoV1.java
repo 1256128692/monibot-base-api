@@ -20,6 +20,8 @@ public class SensorBaseInfoV1 {
 
     private Integer channelCode;
 
+    private Boolean imageCapture;
+
     private Integer captureInterval;
 
     @JsonIgnore
@@ -86,7 +88,7 @@ public class SensorBaseInfoV1 {
         // 设置 JSON 对象的字段
         jsonObject.put(DefaultConstant.VIDEO_DEVICE_SN, videoDeviceID.getDeviceSerial());
         jsonObject.put(DefaultConstant.VIDEO_CHANNEL, inputSensor.getChannelCode());
-        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getCaptureInterval() != null);
+        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
         jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
 
         newSensor.setExValues(jsonObject.toString());
@@ -118,7 +120,7 @@ public class SensorBaseInfoV1 {
         // 设置 JSON 对象的字段
         jsonObject.put(DefaultConstant.VIDEO_DEVICE_SN, videoDeviceInfoV3.getDeviceSerial());
         jsonObject.put(DefaultConstant.VIDEO_CHANNEL, inputSensor.getChannelCode());
-        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getCaptureInterval() != null);
+        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
         jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
 
         newSensor.setExValues(jsonObject.toString());

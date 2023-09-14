@@ -583,7 +583,8 @@ public class VideoController {
      * @apiParam (请求体) {String} list.addSensorList.sensorName 传感器名称
      * @apiParam (请求体) {Boolean} [list.addSensorList.sensorEnable] 传感器是否启用
      * @apiParam (请求体) {Int} list.addSensorList.channelCode 通道号
-     * @apiParam (请求体) {Int} [list.addSensorList.captureInterval] 抓拍间隔(单位:分钟)
+     * @apiParam (请求体) {Boolean} list.addSensorList.imageCapture 是否开启抓拍
+     * @apiParam (请求体) {Int} list.addSensorList.captureInterval 抓拍间隔(单位:分钟)
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
