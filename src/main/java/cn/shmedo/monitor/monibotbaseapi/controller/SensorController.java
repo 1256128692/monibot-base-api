@@ -293,6 +293,12 @@ public class SensorController {
      * @apiSuccess (响应结果) {Boolean} data.warnNoData 是否无数据报警
      * @apiSuccess (响应结果) {DateTime} data.monitorBeginTime 监测开始时间
      * @apiSuccess (响应结果) {String} data.imagePath 传感器图片路径
+     * @apiSuccess (响应结果) {Int} [data.videoDeviceID] 视频设备ID
+     * @apiSuccess (响应结果) {Byte} [data.accessPlatform] 视频设备平台类型
+     * @apiSuccess (响应结果) {String} [data.accessPlatformStr] 视频设备平台类型名称
+     * @apiSuccess (响应结果) {String} [data.deviceSerial] 视频设备序列号
+     * @apiSuccess (响应结果) {Int} [data.channelCode] 通道号
+     * @apiSuccess (响应结果) {String} [data.videoDeviceSource] 视频设备来源
      * @apiSuccess (响应结果) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
      * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID

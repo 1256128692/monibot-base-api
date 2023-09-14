@@ -84,6 +84,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Resource
     private FileService fileService;
 
+    @Resource
+    private TbVideoDeviceMapper videoDeviceMapper;
+
 
     @Override
     public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
@@ -203,7 +206,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         TbSensor sensor = baseMapper.selectById(request.getSensorID());
         Assert.notNull(sensor, "传感器不存在");
 
-        SensorInfoResponse response = SensorInfoResponse.valueOf(sensor);
+        TbVideoDevice videoDevice = null;
+        if (sensor.getVideoDeviceID() != null) {
+             videoDevice = videoDeviceMapper.selectById(sensor.getVideoDeviceID());
+        }
+
+        SensorInfoResponse response = SensorInfoResponse.valueOf(sensor, videoDevice);
         //图片
         response.setImagePath(fileService.getFileUrl(sensor.getImagePath()));
         //扩展配置
