@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -802,6 +803,117 @@ public class VideoServiceImpl implements VideoService {
         return videoSensorFileInfos;
     }
 
+    @Override
+    public Boolean batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam pa) {
+
+        // 查询到所有萤石云设备,海康设备
+        List<VideoDeviceBaseInfoV1> allVideoDevices = new LinkedList<>();
+        List<VideoDeviceBaseInfoV1> hkAllVideoDevices = new LinkedList<>();
+        List<VideoDeviceBaseInfoV1> ysAllVideoDevices = new LinkedList<>();
+        // 首次查询
+        HkMonitorPointInfo hkMonitorPointInfo = hkVideoService.queryHkVideoPage(1);
+
+        if (hkMonitorPointInfo != null && hkMonitorPointInfo.getTotal() != 0) {
+            hkAllVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
+
+            if (hkMonitorPointInfo.getTotal() > 1000) {
+                int total = hkMonitorPointInfo.getTotal();
+                int pageSize = 1000;
+                int jkTotalPageSize = total / pageSize;
+                if (total % pageSize > 0) {
+                    // 如果余数大于0，总页数加1
+                    jkTotalPageSize++;
+                }
+
+                // 从第二页开始查询，因为第一页已经查询过了
+                for (int pageNo = 2; pageNo <= jkTotalPageSize; pageNo++) {
+                    hkMonitorPointInfo = hkVideoService.queryHkVideoPage(pageNo);
+                    if (hkMonitorPointInfo != null) {
+                        hkAllVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
+                    }
+                }
+            }
+        }
+
+
+        String ysToken = getYsToken();
+        int pageSize = 50;
+        // 创建线程池
+        ExecutorService executorService = Executors.newFixedThreadPool(5);
+
+        YsResultPageWrapper<VideoDeviceBaseInfoV1> baseDeviceInfoByPage = ysService.getBaseDeviceInfoByPage(
+                ysToken,
+                0,
+                1);
+        if (baseDeviceInfoByPage.callSuccess() && baseDeviceInfoByPage.getData() != null) {
+            // 创建查询任务列表
+            List<Callable<List<VideoDeviceBaseInfoV1>>> tasks = new ArrayList<>();
+            // 总设备数
+            int totalDevices = baseDeviceInfoByPage.getPage().getTotal();
+
+            for (int pageStart = 0; pageStart < totalDevices; pageStart += pageSize) {
+                int currentPage = (pageStart / pageSize);
+                tasks.add(() -> {
+                    // 发起查询请求
+                    YsResultPageWrapper<VideoDeviceBaseInfoV1> result = ysService.getBaseDeviceInfoByPage(getYsToken(), currentPage, pageSize);
+                    List<VideoDeviceBaseInfoV1> deviceList = result.getData();
+                    if (deviceList == null) {
+                        // 如果为null，创建一个空列表
+                        deviceList = new ArrayList<>();
+                    }
+                    return deviceList;
+                });
+            }
+
+            // 并发执行任务
+            try {
+                List<Future<List<VideoDeviceBaseInfoV1>>> futures = executorService.invokeAll(tasks);
+
+                // 处理任务结果
+                for (Future<List<VideoDeviceBaseInfoV1>> future : futures) {
+                    List<VideoDeviceBaseInfoV1> deviceList = future.get();
+                    ysAllVideoDevices.addAll(deviceList);
+                }
+
+                // 关闭线程池
+                executorService.shutdown();
+
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        }
+
+        allVideoDevices.addAll(ysAllVideoDevices);
+        allVideoDevices.addAll(hkAllVideoDevices);
+
+
+        List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectList(null);
+        if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
+            return true;
+        } else {
+            tbVideoDevices.forEach( v -> {
+                VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream().filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
+                if (videoDeviceBaseInfoV1 != null) {
+                    v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
+                }
+            });
+
+            if (tbVideoDevices.size() > 100) {
+
+                List<List<TbVideoDevice>> splitList = ListUtil.split(tbVideoDevices, 100);
+                for (int i = 0; i < splitList.size(); i++) {
+                    videoDeviceMapper.batchUpdateDeviceStatus(splitList.get(i));
+                }
+
+
+            } else {
+                videoDeviceMapper.batchUpdateDeviceStatus(tbVideoDevices);
+            }
+        }
+
+        return true;
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {
@@ -809,6 +921,13 @@ public class VideoServiceImpl implements VideoService {
                     videoDevice.setDeviceSerial(detail.getCameraIndexCode());
                     videoDevice.setDeviceName(detail.getCameraName());
                     videoDevice.setDeviceType(detail.getCameraTypeName());
+                    if (detail.getStatus() == null || detail.getStatus() == 0) {
+                        videoDevice.setStatus(false);
+                    } else if (detail.getStatus() == 1) {
+                        videoDevice.setStatus(true);
+                    } else {
+                        videoDevice.setStatus(false);
+                    }
                     return videoDevice;
                 })
                 .collect(Collectors.toList());

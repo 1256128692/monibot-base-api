@@ -14,4 +14,6 @@ public class VideoDeviceBaseInfoV1 implements Serializable {
     private String deviceName;
     private String deviceType;
 
+    private Boolean status;
+
 }

@@ -51,4 +51,6 @@ public interface VideoService {
     PageUtil.Page<VideoSensorFileInfo> queryCapturePage(QueryCapturePageParam pa);
 
     List<VideoSensorFileInfo> queryCaptureList(QueryCaptureParam pa);
+
+    Boolean batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam pa);
 }

@@ -41,4 +41,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     Integer batchUpdateCompanyAndProject(List<VideoDeviceInfoV4> videoDeviceInfoV4List, Integer companyID);
 
     List<VideoDeviceInfoV1> queryListByDeviceSerialListAndCompanyID(List<String> deviceSerialList, Integer companyID);
+
+    void batchUpdateDeviceStatus(List<TbVideoDevice> tbVideoDevices);
 }

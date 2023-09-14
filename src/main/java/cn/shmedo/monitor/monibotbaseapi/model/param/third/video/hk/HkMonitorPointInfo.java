@@ -44,7 +44,7 @@ public class HkMonitorPointInfo {
         private String recordLocation;
         private String recordLocationName;
         private String regionIndexCode;
-        private int status;
+        private Integer status;
         private String statusName;
         private int transType;
         private String transTypeName;

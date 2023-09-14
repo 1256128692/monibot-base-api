@@ -703,4 +703,22 @@ public class VideoController {
     }
 
 
+    /**
+     * @api {POST} /BatchUpdateVideoDeviceStatus 批量更新视频设备在线离线状态
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量更新视频设备在线离线状态
+     * @apiName BatchUpdateVideoDeviceStatus
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiSuccess (返回结果) {Boolean} data 数据
+     * @apiSampleRequest off
+     * @apiPermission 系统权限+应用权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice", allowApplication = true)
+    @RequestMapping(value = "/BatchUpdateVideoDeviceStatus", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object batchUpdateVideoDeviceStatus(@Validated @RequestBody BatchUpdateVideoDeviceStatusParam pa) {
+        return videoService.batchUpdateVideoDeviceStatus(pa);
+    }
+
+
 }

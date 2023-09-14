@@ -336,4 +336,13 @@
         </foreach>
         and vd.CompanyID = #{companyID}
     </select>
+
+    <update id="batchUpdateDeviceStatus">
+        <foreach collection="tbVideoDevices" item="item" separator=";">
+            UPDATE tb_video_device
+            SET
+            deviceStatus = #{item.deviceStatus}
+            WHERE ID = #{item.ID}
+        </foreach>
+    </update>
 </mapper>
