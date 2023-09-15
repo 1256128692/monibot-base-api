@@ -332,10 +332,11 @@
         from tb_video_device vd
         where 1 = 1
         <if test="deviceSerialList != null and deviceSerialList.size() != 0">
-            and vd.deviceSerial in
-            <foreach collection="deviceSerialList" separator="," open="(" item="deviceSerial" close=")">
-                #{deviceSerial}
+            and (
+            <foreach collection="deviceSerialList" separator="OR" item="deviceSerial">
+                vd.deviceSerial LIKE CONCAT('%', #{deviceSerial}, '%')
             </foreach>
+            )
         </if>
         and vd.CompanyID = #{companyID}
     </select>
