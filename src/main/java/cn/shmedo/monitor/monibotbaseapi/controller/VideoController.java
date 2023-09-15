@@ -426,7 +426,7 @@ public class VideoController {
      * @apiDescription 查询视频设备列表(不分页)
      * @apiName QueryVideoDeviceList
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {String[]} deviceSerialList 设备序列号/监控点唯一标识
+     * @apiParam (请求体) {String[]} [deviceSerialList] 设备序列号/监控点唯一标识,null查询该公司下全部
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
