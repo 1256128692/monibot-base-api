@@ -6,7 +6,12 @@ public enum MonitorQueryType {
     SAFETY(1),
     WORK_STATUS(2),
     FLOOD_CONTROL(3),
-    VIDEO(4);
+    VIDEO(4),
+
+    WATER(5),
+    RAIN(6),
+    AGRICULTURE(7),
+    WORKSITE(8);
 
     private int value;
 
