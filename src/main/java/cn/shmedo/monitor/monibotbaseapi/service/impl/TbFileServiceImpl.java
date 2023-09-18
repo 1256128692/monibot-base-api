@@ -15,22 +15,22 @@ import org.springframework.stereotype.Service;
 @Service
 public class TbFileServiceImpl implements ITbFileService {
     @Override
-    public Object describeFileList(QueryFileListParameter queryFileListParameter) {
+    public Object queryDocumentPage(QueryDocumentFilePageParameter queryDocumentFilePageParameter) {
         return null;
     }
 
     @Override
-    public Object addFile(AddFileParameter addFileParameter) {
+    public Object addDocumentFile(AddDocumentFileParameter addDocumentFileParameter) {
         return null;
     }
 
     @Override
-    public Object deleteFile(DeleteFileParameter deleteFileParameter) {
+    public Object deleteDocumentFile(DeleteDocumentFileParameter deleteDocumentFileParameter) {
         return null;
     }
 
     @Override
-    public Object describeFile(QueryFileParameter queryFileParameter) {
+    public Object queryDocumentFile(QueryDocumentFileParameter queryDocumentFileParameter) {
         return null;
     }
 }

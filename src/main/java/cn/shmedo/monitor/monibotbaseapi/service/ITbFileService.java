@@ -11,12 +11,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.file.*;
  * @Version 1.0
  */
 public interface ITbFileService {
-    Object describeFileList(QueryFileListParameter queryFileListParameter);
+    Object queryDocumentPage(QueryDocumentFilePageParameter queryDocumentFilePageParameter);
 
-    Object addFile(AddFileParameter addFileParameter);
+    Object addDocumentFile(AddDocumentFileParameter addDocumentFileParameter);
 
-    Object deleteFile(DeleteFileParameter deleteFileParameter);
+    Object deleteDocumentFile(DeleteDocumentFileParameter deleteDocumentFileParameter);
 
-    Object describeFile(QueryFileParameter queryFileParameter);
+    Object queryDocumentFile(QueryDocumentFileParameter queryDocumentFileParameter);
 
 }
