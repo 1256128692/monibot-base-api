@@ -28,8 +28,8 @@ public class QueryFileParameter implements ParameterValidator, ResourcePermissio
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;
 
-    @NotEmpty(message = "文件ID列表不能为空")
-    private List<Integer> fileIDList;
+    @NotNull(message = "文件ID不能为空")
+    private Integer fileID;
 
     @Override
     public ResultWrapper<?> validate() {

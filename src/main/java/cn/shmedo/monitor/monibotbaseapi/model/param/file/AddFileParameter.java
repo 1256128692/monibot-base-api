@@ -26,8 +26,11 @@ public class AddFileParameter implements ParameterValidator, ResourcePermissionP
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;
 
-    @NotNull(message = "关联ID不能为空")
-    private Integer correlationID;
+    @NotNull(message = "对象类型不能为空")
+    private Integer subjectType;
+
+    @NotNull(message = "对象ID不能为空")
+    private Integer subjectID;
 
     @NotBlank(message = "文件名称不能为空")
     private String fileName;

@@ -4,7 +4,6 @@ import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.file.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.propertymodelgroup.DeletePropertyModelGroupParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbFileService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class FileController {
     /**
      * @api {POST} /DescribeFileList 查看资料文件列表
      * @apiVersion 1.0.0
-     * @apiGroup 资料文件
+     * @apiGroup 资料文件模块
      * @apiName DescribeFileList
      * @apiDescription 查看资料文件列表
      * @apiParam (请求体) {Int} projectID 项目ID
@@ -38,11 +37,12 @@ public class FileController {
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {int} ID 主键ID
-     * @apiSuccess (返回结果) {int} correlationID 关联ID（其他设备ID/项目ID）
+     * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
+     * @apiSuccess (返回结果) {int} subjectID 对象ID
      * @apiSuccess (返回结果) {String} fileName 文件名称
      * @apiSuccess (返回结果) {String} fileType 文件类型
      * @apiSuccess (返回结果) {int} fileSize 文件大小
-     * @apiSuccess (返回结果) {String} filePath 文件地址（oss）
+     * @apiSuccess (返回结果) {String} filePath 文件地址
      * @apiSuccess (返回结果) {String} [fileDesc] 文件描述
      * @apiSuccess (返回结果) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {String} createUserName 创建人名称
@@ -59,22 +59,24 @@ public class FileController {
     /**
      * @api {POST} /AddFile 新增资料文件
      * @apiVersion 1.0.0
-     * @apiGroup 资料文件
+     * @apiGroup 资料文件模块
      * @apiName AddFile
      * @apiDescription 新增资料文件
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {int} correlationID 关联ID（其他设备ID/项目ID）
+     * @apiParam (请求体) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
+     * @apiParam (请求体) {int} SubjectID  对象ID
      * @apiParam (请求体) {String} fileName 文件名称
+     * @apiParam (请求体) {String} fileName 文件
      * @apiParam (请求体) {String} fileType 文件类型
      * @apiParam (请求体) {int} fileSize 文件大小
-     * @apiParam (请求体) {String} filePath 文件地址（oss）
+     * @apiParam (请求体) {String} filePath 文件地址
      * @apiParam (请求体) {String} [fileDesc] 文件描述
      * @apiParam (请求体) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {int} fileID 主键ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddFile
      */
-    @LogParam(moduleName = "资料文件管理模块", operationName = "新增资料文件", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "资料文件模块", operationName = "新增资料文件", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddFile")
     @PostMapping("/AddFile")
     public Object addFile(@Valid @RequestBody AddFileParameter addFileParameter) {
@@ -84,7 +86,7 @@ public class FileController {
     /**
      * @api {POST} /DeleteFile 删除资料文件
      * @apiVersion 1.0.0
-     * @apiGroup 资料文件
+     * @apiGroup 资料文件模块
      * @apiName DeleteFile
      * @apiDescription 删除资料文件
      * @apiParam (请求体) {Int} projectID 项目ID
@@ -93,7 +95,7 @@ public class FileController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteFile
      */
-    @LogParam(moduleName = "资料文件管理模块", operationName = "删除资料文件", operationProperty = OperationProperty.DELETE)
+    @LogParam(moduleName = "资料文件模块", operationName = "删除资料文件", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeleteFile")
     @PostMapping("/DeleteFile")
     public Object deleteFile(@Valid @RequestBody DeleteFileParameter deleteFileParameter) {
@@ -103,22 +105,22 @@ public class FileController {
     /**
      * @api {POST} /DescribeFile 查询资料文件
      * @apiVersion 1.0.0
-     * @apiGroup 资料文件
+     * @apiGroup 资料文件模块
      * @apiName DescribeFile
      * @apiDescription 查询资料文件
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Int[]} fileIDList 文件ID列表
-     * @apiSuccess (返回结果) {Object[]} fileList 文件列表
-     * @apiSuccess (返回结果) {int} fileList.ID 主键ID
-     * @apiSuccess (返回结果) {int} fileList.correlationID 关联ID（其他设备ID/项目ID）
-     * @apiSuccess (返回结果) {String} fileList.fileName 文件名称
-     * @apiSuccess (返回结果) {String} fileList.fileType 文件类型
-     * @apiSuccess (返回结果) {int} fileList.fileSize 文件大小
-     * @apiSuccess (返回结果) {String} fileList.filePath 文件地址（oss）
-     * @apiSuccess (返回结果) {String} [fileList.fileDesc] 文件描述
-     * @apiSuccess (返回结果) {String} [fileList.exValue] 扩展字段
-     * @apiSuccess (返回结果) {String} fileList.createUserName 创建人名称
-     * @apiSuccess (返回结果) {Date} fileList.createTime 创建时间
+     * @apiParam (请求体) {Int[]} fileID 文件ID
+     * @apiSuccess (返回结果) {int} ID 主键ID
+     * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
+     * @apiSuccess (返回结果) {int} SubjectID  对象ID
+     * @apiSuccess (返回结果) {String} fileName 文件名称
+     * @apiSuccess (返回结果) {String} fileType 文件类型
+     * @apiSuccess (返回结果) {int} fileSize 文件大小
+     * @apiSuccess (返回结果) {String} filePath 文件地址
+     * @apiSuccess (返回结果) {String} [fileDesc] 文件描述
+     * @apiSuccess (返回结果) {String} [exValue] 扩展字段
+     * @apiSuccess (返回结果) {String} createUserName 创建人名称
+     * @apiSuccess (返回结果) {Date} createTime 创建时间
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeFile
      */
