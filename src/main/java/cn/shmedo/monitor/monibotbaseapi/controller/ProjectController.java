@@ -559,7 +559,7 @@ public class ProjectController {
 
     /**
      * @api {post} /QueryNextLevelAndAvailableProject 查询下级项目列表和可使用的项目列表
-     * @apiDescription 设置项目关联关系, 覆盖处理
+     * @apiDescription 查询下级项目列表和可使用的项目列表
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName QueryNextLevelProjectAndCanUsed
@@ -573,7 +573,6 @@ public class ProjectController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "QueryNextLevelProjectAndCanUsed", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();

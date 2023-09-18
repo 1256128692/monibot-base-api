@@ -47,7 +47,7 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName UpdateAsset
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} id 资产ID
+     * @apiParam (请求体) {Int} ID 资产ID
      * @apiParam (请求体) {String} name 名称型号
      * @apiParam (请求体) {String} vendor 厂商品牌
      * @apiParam (请求体) {Int} warnValue  预警值
@@ -92,7 +92,7 @@ public class AssetController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} type 类型10, 20 救灾物资、备品备件
      * @apiSuccess (返回结果) {Jsonp[]} list 资产列表
-     * @apiSuccess (返回结果) {Int} list.id 资产ID
+     * @apiSuccess (返回结果) {Int} list.ID 资产ID
      * @apiSuccess (返回结果) {String} list.name 名称型号
      * @apiSuccess (返回结果) {String} list.vendor 厂商品牌
      * @apiSuccess (返回结果) {Int}   list.unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
@@ -138,7 +138,7 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName UpdateAssetHouse
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} id 资产库ID
+     * @apiParam (请求体) {Int} ID 资产库ID
      * @apiParam (请求体) {String} name 名称
      * @apiParam (请求体) {String} code 编号
      * @apiParam (请求体) {String}   address 地址
@@ -181,7 +181,7 @@ public class AssetController {
      * @apiName QueryAssetHouseList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {Jsonp[]} list 资产库列表
-     * @apiSuccess (返回结果) {Int} list.id 资产库ID
+     * @apiSuccess (返回结果) {Int} list.ID 资产库ID
      * @apiSuccess (返回结果) {String} list.name 名称型号
      * @apiSuccess (返回结果) {String} list.code 编号
      * @apiSuccess (返回结果) {String}   list.address 地址
@@ -233,7 +233,7 @@ public class AssetController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.id 日志ID
+     * @apiSuccess (返回结果) {Int} currentPageData.ID日志ID
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
      * @apiSuccess (返回结果) {Int} currentPageData.assetID 资产ID
      * @apiSuccess (返回结果) {String} currentPageData.assetName 资产名称
@@ -272,8 +272,7 @@ public class AssetController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.id 日志ID
-     * @apiSuccess (返回结果) {Int} currentPageData.id 资产ID
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 资产ID
      * @apiSuccess (返回结果) {String} currentPageData.name 资产名称
      * @apiSuccess (返回结果) {String} currentPageData.vendor 资产厂商品牌
      * @apiSuccess (返回结果) {Int} currentPageData.type 资产类型

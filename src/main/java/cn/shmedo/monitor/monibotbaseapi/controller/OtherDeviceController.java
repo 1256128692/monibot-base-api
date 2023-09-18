@@ -31,7 +31,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {Int} list.projectID 项目ID
      * @apiParam (请求体) {String} [list.exValue] 扩展字段,json字符串（500）
      * @apiParam (请求体) {Json[]} [list.propertyList] 属性列表
-     * @apiParam (请求体) {Int} list.propertyList.id 属性id
+     * @apiParam (请求体) {Int} list.propertyList.ID属性id
      * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
@@ -52,13 +52,13 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName UpdateOtherDevice
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} id 设备ID
+     * @apiParam (请求体) {Int} ID 设备ID
      * @apiParam (请求体) {String} name 设备名称
      * @apiParam (请求体) {String} model 设备型号
      * @apiParam (请求体) {String} vendor 设备厂商/品牌
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiParam (请求体) {Json[]} [propertyList] 属性列表
-     * @apiParam (请求体) {Int} propertyList.id 属性id
+     * @apiParam (请求体) {Int} propertyList.ID 属性id
      * @apiParam (请求体) {String} propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
@@ -105,7 +105,7 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.id 设备ID
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 设备ID
      * @apiSuccess (返回结果) {String} currentPageData.name 设备名称
      * @apiSuccess (返回结果) {String}  currentPageData.token 设备编号
      * @apiSuccess (返回结果) {String} currentPageData.model 设备型号
@@ -130,8 +130,8 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName QueryOtherDeviceWithProperty
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} id 设备ID
-     * @apiSuccess (返回结果) {Int} id 设备ID
+     * @apiParam (请求体) {Int} ID 设备ID
+     * @apiSuccess (返回结果) {Int} ID 设备ID
      * @apiSuccess (返回结果) {String} name 设备名称
      * @apiSuccess (返回结果) {String}  token 设备编号
      * @apiSuccess (返回结果) {String} model 设备型号
@@ -141,7 +141,7 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {Int} templateID 模板ID
      * @apiSuccess (返回结果) {String} templateName 模板名称
      * @apiSuccess (返回结果) {Json[]} propertyList 属性列表
-     * @apiSuccess (返回结果) {Int} propertyList.id 属性id
+     * @apiSuccess (返回结果) {Int} propertyList.ID 属性id
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {String} propertyList.token 属性标识
      * @apiSuccess (返回结果) {String} propertyList.unit 属性单位
