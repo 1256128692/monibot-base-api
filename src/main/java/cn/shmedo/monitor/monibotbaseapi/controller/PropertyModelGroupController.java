@@ -35,7 +35,7 @@ public class PropertyModelGroupController {
      * @apiName AddPropertyModelGroup
      * @apiDescription 新增属性模板组
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} groupName 属性模板组名称名称
+     * @apiParam (请求体) {String} groupName 属性模板组名称
      * @apiParam (请求体) {String} [desc] 模板描述
      * @apiParam (请求体) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {Int} GroupID 属性模板组ID
@@ -122,12 +122,15 @@ public class PropertyModelGroupController {
      * @apiParam (请求体) {String} [groupName] 属性模板组名称
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiSuccess (返回结果) {Object[]} groupList 属性模板组列表
-     * @apiSuccess (返回结果) {Int} groupList.ID 属性模板组ID
-     * @apiSuccess (返回结果) {Int} groupList.companyID 公司ID
-     * @apiSuccess (返回结果) {String} groupList.groupName 属性模板组名称
-     * @apiSuccess (返回结果) {String} [groupList.desc] 模板描述
-     * @apiSuccess (返回结果) {String} [groupList.exValue] 扩展字段
+     * @apiSuccess (返回结果) {Int} totalCount 总条数
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Object[]} currentPageData.groupList 属性模板组列表
+     * @apiSuccess (返回结果) {Int} currentPageData.groupList.ID 属性模板组ID
+     * @apiSuccess (返回结果) {Int} currentPageData.groupList.companyID 公司ID
+     * @apiSuccess (返回结果) {String} currentPageData.groupList.groupName 属性模板组名称
+     * @apiSuccess (返回结果) {String} [currentPageData.groupList.desc] 模板描述
+     * @apiSuccess (返回结果) {String} [currentPageData.groupList.exValue] 扩展字段
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribePropertyModelGroupList
      */

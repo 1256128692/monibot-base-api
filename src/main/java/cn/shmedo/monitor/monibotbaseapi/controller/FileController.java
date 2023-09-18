@@ -33,20 +33,24 @@ public class FileController {
      * @apiName QueryDocumentPage
      * @apiDescription 查看资料文件列表
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {String} [fileName] 文件名称
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiSuccess (返回结果) {int} ID 主键ID
-     * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
-     * @apiSuccess (返回结果) {int} subjectID 对象ID
-     * @apiSuccess (返回结果) {String} fileName 文件名称
-     * @apiSuccess (返回结果) {String} fileType 文件类型
-     * @apiSuccess (返回结果) {int} fileSize 文件大小
-     * @apiSuccess (返回结果) {String} filePath 文件地址
-     * @apiSuccess (返回结果) {String} [fileDesc] 文件描述
-     * @apiSuccess (返回结果) {String} [exValue] 扩展字段
-     * @apiSuccess (返回结果) {String} createUserName 创建人名称
-     * @apiSuccess (返回结果) {Date} createTime 创建时间
+     * @apiSuccess (返回结果) {Int} totalCount 总条数
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {int} currentPageData.ID 主键ID
+     * @apiSuccess (返回结果) {int} currentPageData.subjectType 对象类型 （1.工程项目  2.其他设备）
+     * @apiSuccess (返回结果) {int} currentPageData.subjectID 对象ID
+     * @apiSuccess (返回结果) {String} currentPageData.fileName 文件名称
+     * @apiSuccess (返回结果) {String} currentPageData.fileType 文件类型
+     * @apiSuccess (返回结果) {int} currentPageData.fileSize 文件大小
+     * @apiSuccess (返回结果) {String} currentPageData.filePath 文件地址
+     * @apiSuccess (返回结果) {String} [currentPageData.fileDesc] 文件描述
+     * @apiSuccess (返回结果) {String} [currentPageData.exValue] 扩展字段
+     * @apiSuccess (返回结果) {String} currentPageData.createUserName 创建人名称
+     * @apiSuccess (返回结果) {Date} currentPageData.createTime 创建时间
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:QueryDocumentPage
      */
@@ -62,17 +66,16 @@ public class FileController {
      * @apiGroup 资料文件模块
      * @apiName AddDocumentFile
      * @apiDescription 新增资料文件
-     * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {int} SubjectID  对象ID
      * @apiParam (请求体) {String} fileName 文件名称
      * @apiParam (请求体) {String} fileName 文件
      * @apiParam (请求体) {String} fileType 文件类型
      * @apiParam (请求体) {int} fileSize 文件大小
-     * @apiParam (请求体) {String} filePath 文件地址
+     * @apiParam (请求体) {MultipartFile} file 资产文件
      * @apiParam (请求体) {String} [fileDesc] 文件描述
      * @apiParam (请求体) {String} [exValue] 扩展字段
-     * @apiSuccess (返回结果) {int} fileID 主键ID
+     * @apiSuccess (返回结果) {int} ID 主键ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddDocumentFile
      */
@@ -109,7 +112,7 @@ public class FileController {
      * @apiName QueryDocumentFile
      * @apiDescription 查询资料文件
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Int[]} fileID 文件ID
+     * @apiParam (请求体) {Int} ID ID
      * @apiSuccess (返回结果) {int} ID 主键ID
      * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiSuccess (返回结果) {int} SubjectID  对象ID

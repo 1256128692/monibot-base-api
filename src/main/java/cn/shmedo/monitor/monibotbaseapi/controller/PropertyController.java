@@ -30,9 +30,8 @@ public class PropertyController {
      * @apiName AddModel
      * @apiDescription 新增模板
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} projectType 项目类型（已废弃，待适配后删除）
-     * @apiParam (请求体) {Int} modelType 模板类型（0-监测项目；1-设备；2-工作流）
-     * @apiParam (请求体) {Int} groupID 模板组ID
+     * @apiParam (请求体) {Int} modelType 模板类型（0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} [groupID] 模板组ID（不传或空，默认分组为-1；当modelType为0时，group对应projectType）
      * @apiParam (请求体) {String} modelName 模型名称
      * @apiParam (请求体) {String} [desc] 模板描述
      * @apiParam (请求体) {Object[]} modelPropertyList 自定义属性列表
@@ -65,9 +64,8 @@ public class PropertyController {
      * @apiDescription 修改模板
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} modelID 模板ID
-     * @apiParam (请求体) {Int} projectType 项目类型（已废弃，待适配后删除）
-     * @apiParam (请求体) {Int} [modelType] 模板类型（0-监测项目；1-设备；2-工作流）
-     * @apiParam (请求体) {Int} [groupID] 模板组ID
+     * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} [groupID] 模板组ID（不传或空，默认分组为-1；当modelType为0时，group对应projectType）
      * @apiParam (请求体) {String} [modelName] 模型名称
      * @apiParam (请求体) {String} [desc] 模板描述
      * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表
@@ -119,13 +117,14 @@ public class PropertyController {
      * @apiDescription 查询模板信息
      * @apiParam (请求体) {Int} [modelID] 模板ID, 优先级最高的参数
      * @apiParam (请求体) {Int} projectType 项目类型（已废弃，待适配后删除）
-     * @apiParam (请求体) {Int} modelType 模板类型（0-监测项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} modelType 模板类型（0-工程项目；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [createType] 创建类型
      * @apiSuccess (返回结果) {Object[]} modelList  模板列表
      * @apiSuccess (返回结果) {Int} modelList.modelID  模板ID
      * @apiSuccess (返回结果) {Int} modelList.companyID  公司ID
-     * @apiSuccess (返回结果) {Int} modelList.modelType  模板类型（0-监测项目；1-设备；2-工作流）
-     * @apiSuccess (返回结果) {Int} modelList.groupID  模板组ID
+     * @apiSuccess (返回结果) {Int} modelList.modelType  模板类型（0-工程项目；1-设备；2-工作流）
+     * @apiSuccess (返回结果) {Int} modelList.groupID  模板组ID（当modelType为0时，group对应projectType）
+     * @apiSuccess (返回结果) {Int} modelList.groupName  模板组名称（当modelType为0时，group对应projectType）
      * @apiSuccess (返回结果) {String} modelList.name  模板名称
      * @apiSuccess (返回结果) {Int} modelList.createType  模板创建类型
      * @apiSuccess (返回结果) {Object[]} modelList.propertyList  模板的属性列表
