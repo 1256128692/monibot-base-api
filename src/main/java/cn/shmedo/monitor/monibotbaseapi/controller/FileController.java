@@ -67,7 +67,7 @@ public class FileController {
      * @apiName AddDocumentFile
      * @apiDescription 新增资料文件
      * @apiParam (请求体) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
-     * @apiParam (请求体) {int} SubjectID  对象ID
+     * @apiParam (请求体) {int} subjectID  对象ID
      * @apiParam (请求体) {String} fileName 文件名称
      * @apiParam (请求体) {String} fileName 文件
      * @apiParam (请求体) {String} fileType 文件类型
@@ -115,7 +115,7 @@ public class FileController {
      * @apiParam (请求体) {Int} ID ID
      * @apiSuccess (返回结果) {int} ID 主键ID
      * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
-     * @apiSuccess (返回结果) {int} SubjectID  对象ID
+     * @apiSuccess (返回结果) {int} subjectID  对象ID
      * @apiSuccess (返回结果) {String} fileName 文件名称
      * @apiSuccess (返回结果) {String} fileType 文件类型
      * @apiSuccess (返回结果) {int} fileSize 文件大小
