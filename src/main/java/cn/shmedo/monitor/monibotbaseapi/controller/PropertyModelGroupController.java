@@ -31,7 +31,7 @@ public class PropertyModelGroupController {
     /**
      * @api {POST} /AddPropertyModelGroup 新增属性模板组
      * @apiVersion 1.0.0
-     * @apiGroup 项目属性模板组管理模块
+     * @apiGroup 项目属性模板组模块
      * @apiName AddPropertyModelGroup
      * @apiDescription 新增属性模板组
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -42,7 +42,7 @@ public class PropertyModelGroupController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddPropertyModelGroup
      */
-    @LogParam(moduleName = "项目属性模板组管理模块", operationName = "新增属性模板组", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "项目属性模板组模块", operationName = "新增属性模板组", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddPropertyModelGroup")
     @PostMapping("/AddPropertyModelGroup")
     public Object addPropertyModelGroup(@Valid @RequestBody AddPropertyModelGroupParam addPropertyModelGroupParam) {
@@ -52,7 +52,7 @@ public class PropertyModelGroupController {
     /**
      * @api {POST} /UpdatePropertyModelGroup 更新属性模板组
      * @apiVersion 1.0.0
-     * @apiGroup 项目属性模板组管理模块
+     * @apiGroup 项目属性模板组模块
      * @apiName UpdatePropertyModelGroup
      * @apiDescription 更新属性模板组
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -64,7 +64,7 @@ public class PropertyModelGroupController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdatePropertyModelGroup
      */
-    @LogParam(moduleName = "项目属性模板组管理模块", operationName = "更新属性模板组", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "项目属性模板组模块", operationName = "更新属性模板组", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdatePropertyModelGroup")
     @PostMapping("/UpdatePropertyModelGroup")
     public Object updatePropertyModelGroup(@Valid @RequestBody UpdatePropertyModelGroupParam updatePropertyModelGroupParam) {
@@ -74,7 +74,7 @@ public class PropertyModelGroupController {
     /**
      * @api {POST} /DescribePropertyModelGroup 查看属性模板组
      * @apiVersion 1.0.0
-     * @apiGroup 项目属性模板组管理模块
+     * @apiGroup 项目属性模板组模块
      * @apiName DescribePropertyModelGroup
      * @apiDescription 更新属性模板组
      * @apiParam (请求体) {Int} ID 属性模板组ID
@@ -96,7 +96,7 @@ public class PropertyModelGroupController {
     /**
      * @api {POST} /DeletePropertyModelGroup 删除属性模板组
      * @apiVersion 1.0.0
-     * @apiGroup 项目属性模板组管理模块
+     * @apiGroup 项目属性模板组模块
      * @apiName DeletePropertyModelGroup
      * @apiDescription 删除属性模板组
      * @apiParam (请求体) {Int[]} IDList 属性模板组ID集合
@@ -105,7 +105,7 @@ public class PropertyModelGroupController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeletePropertyModelGroup
      */
-    @LogParam(moduleName = "项目属性模板组管理模块", operationName = "删除属性模板组", operationProperty = OperationProperty.DELETE)
+    @LogParam(moduleName = "项目属性模板组模块", operationName = "删除属性模板组", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeletePropertyModelGroup")
     @PostMapping("/DeletePropertyModelGroup")
     public Object deletePropertyModelGroup(@Valid @RequestBody DeletePropertyModelGroupParam describePropertyModelGroupParam) {
@@ -115,7 +115,7 @@ public class PropertyModelGroupController {
     /**
      * @api {POST} /DescribePropertyModelGroupList 查看属性模板组列表
      * @apiVersion 1.0.0
-     * @apiGroup 项目属性模板组管理模块
+     * @apiGroup 项目属性模板组模块
      * @apiName DescribePropertyModelGroupList
      * @apiDescription 查看属性模板组列表
      * @apiParam (请求体) {Int} companyID 公司ID
