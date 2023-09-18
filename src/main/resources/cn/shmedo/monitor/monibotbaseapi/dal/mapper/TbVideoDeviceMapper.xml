@@ -338,6 +338,9 @@
             </foreach>
             )
         </if>
+        <if test="deviceStatus != null">
+            and vd.deviceStatus = #{deviceStatus}
+        </if>
         and vd.CompanyID = #{companyID}
     </select>
 
