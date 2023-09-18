@@ -201,10 +201,10 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName IOAsset
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiSuccess (返回结果) {Int} assetID 资产ID
-     * @apiSuccess (返回结果) {Int} houseID 资产库ID
-     * @apiSuccess (返回结果) {Int} value 数量, 正数为入库，负数为出库
-     * @apiSuccess (返回结果) {String}  [comment] 备注
+     * @apiParam (请求体) {Int} assetID 资产ID
+     * @apiParam (请求体) {Int} houseID 资产库ID
+     * @apiParam (请求体) {Int} value 数量, 正数为入库，负数为出库
+     * @apiParam (请求体) {String}  [comment] 备注
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
      */
