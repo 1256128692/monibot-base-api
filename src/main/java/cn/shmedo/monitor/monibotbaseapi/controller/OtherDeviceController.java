@@ -32,7 +32,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} [list.exValue] 扩展字段,json字符串（500）
      * @apiParam (请求体) {Json[]} list.propertyList 属性列表
      * @apiParam (请求体) {Int} list.propertyList.id 属性id
-     * @apiParam (请求体) {String} list.propertyList 属性值
+     * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -59,7 +59,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiParam (请求体) {Json[]} [propertyList] 属性列表
      * @apiParam (请求体) {Int} propertyList.id 属性id
-     * @apiParam (请求体) {String} propertyList 属性值
+     * @apiParam (请求体) {String} propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -122,6 +122,38 @@ public class OtherDeviceController {
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryOtherDevicePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryOtherDevicePage(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {post} /QueryOtherDeviceWithProperty 查询其他设备及属性
+     * @apiDescription 分页查询其他设备
+     * @apiVersion 1.0.0
+     * @apiGroup 其他设备模块
+     * @apiName QueryOtherDeviceWithProperty
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} id 设备ID
+     * @apiSuccess (返回结果) {Int} id 设备ID
+     * @apiSuccess (返回结果) {String} name 设备名称
+     * @apiSuccess (返回结果) {String}  token 设备编号
+     * @apiSuccess (返回结果) {String} model 设备型号
+     * @apiSuccess (返回结果) {String} vendor 设备厂商/品牌
+     * @apiSuccess (返回结果) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {String} projectName 项目名称
+     * @apiSuccess (返回结果) {Int} templateID 模板ID
+     * @apiSuccess (返回结果) {String} templateName 模板名称
+     * @apiSuccess (返回结果) {Json[]} propertyList 属性列表
+     * @apiSuccess (返回结果) {Int} propertyList.id 属性id
+     * @apiSuccess (返回结果) {String} propertyList.name 属性名称
+     * @apiSuccess (返回结果) {String} propertyList.token 属性标识
+     * @apiSuccess (返回结果) {String} propertyList.unit 属性单位
+     * @apiSuccess (返回结果) {String} propertyList.value 属性值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+    @RequestMapping(value = "QueryOtherDeviceWithProperty", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryOtherDeviceWithProperty(@Validated @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();
     }
 }

@@ -69,7 +69,7 @@ public class AssetController {
      * @apiDescription 删除资产
      * @apiVersion 1.0.0
      * @apiGroup 资产模块
-     * @apiName UpdateAsset
+     * @apiName DeleteAsset
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} idList 资产ID列表
      * @apiSuccess (返回结果) {String} none
