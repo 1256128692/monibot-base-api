@@ -41,7 +41,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
      * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
      * @apiParam (请求体) {Int} projectType 项目类型
-     * @apiParam (请求体) {Int} level 项目等级 -1,0,代表子工程，未分配得非子工程
+     * @apiParam (请求体) {Int} [level] 项目等级 -1,0,代表子工程，未分配得非子工程 为null时候为设置为-1
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
