@@ -2,10 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 
@@ -26,4 +23,8 @@ public interface PropertyService {
     List<String> queryPropertyValue(QueryPropertyValueParam param);
 
     List<Model4Web> queryModelList(QueryModelListParam param);
+
+    Integer deleteModel(DeleteModelParam param);
+
+    void updateModel(UpdateModelParam param);
 }

@@ -8,10 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryModelListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.QueryPropertyValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.property.UpdatePropertyParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -95,5 +92,15 @@ public class PropertyServiceImpl implements PropertyService {
         list.forEach(item -> item.setPropertyList(modelIDAndPropertyListMap.get(item.getID()))
         );
         return list;
+    }
+
+    @Override
+    public void updateModel(UpdateModelParam param) {
+
+    }
+
+    @Override
+    public Integer deleteModel(DeleteModelParam param) {
+        return null;
     }
 }
