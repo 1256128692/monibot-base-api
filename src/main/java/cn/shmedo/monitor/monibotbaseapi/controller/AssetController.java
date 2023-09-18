@@ -90,6 +90,7 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName QueryAssetList
      * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} type 类型10, 20 救灾物资、备品备件
      * @apiSuccess (返回结果) {Jsonp[]} list 资产列表
      * @apiSuccess (返回结果) {Int} list.id 资产ID
      * @apiSuccess (返回结果) {String} list.name 名称型号
@@ -205,6 +206,7 @@ public class AssetController {
      * @apiParam (请求体) {Int} houseID 资产库ID
      * @apiParam (请求体) {Int} value 数量, 正数为入库，负数为出库
      * @apiParam (请求体) {String}  [comment] 备注
+     * @apiSuccess (返回结果) {String}   none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
      */
@@ -222,9 +224,8 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName QueryAssetIOLogPage
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} [fuzzyAssetName] 资产型号名称模糊查询
-     * @apiParam (请求体) {String} [fuzzyAssetVendor] 资产厂商品牌模糊查询
-     * @apiParam (请求体) {Int} [fuzzyAssetType] 资产类型
+     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询资产型号/名称， 厂商品牌
+     * @apiParam (请求体) {Int} [type] 资产类型
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [inOrOut] 出库还是入库
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -262,9 +263,8 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName QueryAssetPage
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} [fuzzyAssetName] 资产型号名称模糊查询
-     * @apiParam (请求体) {String} [fuzzyAssetVendor] 资产厂商品牌模糊查询
-     * @apiParam (请求体) {Int} [fuzzyAssetType] 资产类型
+     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询资产型号/名称， 厂商品牌，
+     * @apiParam (请求体) {Int} [type] 资产类型
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [isWarn] 是否预警
      * @apiParam (请求体) {Int} pageSize 页大小

@@ -22,7 +22,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName AddOtherDeviceBatch
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} templateID 模板ID
+     * @apiParam (请求体) {Int} [templateID] 模板ID
      * @apiParam (请求体) {Json[]} list 列表
      * @apiParam (请求体) {String} list.name 设备名称
      * @apiParam (请求体) {String} list.token 设备编号
@@ -30,7 +30,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} list.vendor 设备厂商/品牌
      * @apiParam (请求体) {Int} list.projectID 项目ID
      * @apiParam (请求体) {String} [list.exValue] 扩展字段,json字符串（500）
-     * @apiParam (请求体) {Json[]} list.propertyList 属性列表
+     * @apiParam (请求体) {Json[]} [list.propertyList] 属性列表
      * @apiParam (请求体) {Int} list.propertyList.id 属性id
      * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
@@ -97,9 +97,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName QueryOtherDevicePage
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} [fuzzyTokenOrName] 模糊设备名称或编号
-     * @apiParam (请求体) {String} [fuzzyModel] 模糊设备型号
-     * @apiParam (请求体) {String} [fuzzyVendor] 模糊设备厂商/品牌
+     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询设备名称/编号, 设备型号,厂商/品牌
      * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {Int} [templateID] 模板ID
      * @apiParam (请求体) {Int} pageSize 页大小

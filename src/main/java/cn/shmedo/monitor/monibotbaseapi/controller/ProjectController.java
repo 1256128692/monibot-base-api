@@ -41,12 +41,13 @@ public class ProjectController {
      * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
      * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
      * @apiParam (请求体) {Int} projectType 项目类型
-     * @apiParam (请求体) {Int} level 项目等级 -1,0,1,2代表子工程，分配得非子工程，一级工程，二级工程
+     * @apiParam (请求体) {Int} level 项目等级 -1,0,代表子工程，未分配得非子工程
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
-     * @apiParam (请求体) {Int} platformType 所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {Int} platformType (废弃)所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {Int[]} platformTypeList 所属平台类型
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
@@ -542,8 +543,9 @@ public class ProjectController {
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
      * @apiName SetProjectRelation
-     * @apiParam (请求体) {Int[][]} list 关系列表
-     * @apiParam (请求体) {Int[]} list.item  关系项，长度比为3[ 一级工程ID， 二级工程ID， 子工程ID]
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int[]} nextLevelPIDList 下属设备ID列表 当前项目为level = 1时候，列表为level为0或者2，当项目level=2时候，列表为level为0或者-1
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -552,6 +554,28 @@ public class ProjectController {
 //    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "SetProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object setProjectRelation(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {post} /QueryNextLevelAndAvailableProject 查询下级项目列表和可使用的项目列表
+     * @apiDescription 设置项目关联关系, 覆盖处理
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryNextLevelProjectAndCanUsed
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Json[]} nextLevelProjectList 下级项目列表
+     * @apiSuccess (返回结果) {Int} nextLevelProjectList.id 项目ID
+     * @apiSuccess (返回结果) {String} nextLevelProjectList.name 项目名称
+     * @apiSuccess (返回结果) {Json[]} availableProjectList 下级项目列表, 结构同nextLevelProjectList
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+//    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
+    @RequestMapping(value = "QueryNextLevelProjectAndCanUsed", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();
     }
 
