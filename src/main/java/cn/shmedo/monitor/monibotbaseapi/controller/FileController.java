@@ -77,7 +77,7 @@ public class FileController {
      * @apiParam (请求体) {int} fileSize 文件大小
      * @apiParam (请求体) {String} [fileDesc] 文件描述
      * @apiParam (请求体) {String} [exValue] 扩展字段
-     * @apiSuccess (返回结果) {int} ID 主键ID
+     * @apiSuccess (返回结果) {int} ID ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddDocumentFile
      */
