@@ -530,4 +530,24 @@ public class ProjectController {
         return projectService.queryProjectImg(pa);
     }
 
+
+    /**
+     * @api {post} /SetProjectRelation 设置项目关联关系
+     * @apiDescription 设置项目关联关系, 覆盖处理
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName SetProjectRelation
+     * @apiParam (请求体) {Int[][]} list 关系列表
+     * @apiParam (请求体) {Int[]} list.item  关系项，长度比为3[ 一级工程ID， 二级工程ID， 子工程ID]
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+//    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
+    @RequestMapping(value = "SetProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object setProjectRelation(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
 }
