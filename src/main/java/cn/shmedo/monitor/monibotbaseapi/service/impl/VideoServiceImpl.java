@@ -395,7 +395,8 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa) {
 
-        List<VideoDeviceInfoV1> list = videoDeviceMapper.queryListByDeviceSerialListAndCompanyID(pa.getDeviceSerialList(), pa.getCompanyID());
+        List<VideoDeviceInfoV1> list = videoDeviceMapper.queryListByDeviceSerialListAndCompanyID(
+                pa.getDeviceSerialList(), pa.getCompanyID(), pa.getDeviceStatus());
 
         if (CollectionUtil.isNullOrEmpty(list)) {
             return Collections.emptyList();
