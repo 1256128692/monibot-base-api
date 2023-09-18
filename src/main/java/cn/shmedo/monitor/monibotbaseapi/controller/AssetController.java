@@ -71,7 +71,7 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName DeleteAsset
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} idList 资产ID列表
+     * @apiParam (请求体) {Int[]} assetIDList 资产ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -160,7 +160,7 @@ public class AssetController {
      * @apiGroup 资产模块
      * @apiName DeleteAssetHouse
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} idList 资产库ID列表
+     * @apiParam (请求体) {Int[]} houseIDList 资产库ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX

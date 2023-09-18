@@ -78,7 +78,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName DeleteOtherDevice
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} idList 设备ID列表
+     * @apiParam (请求体) {Int[]} deviceIDList 设备ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
