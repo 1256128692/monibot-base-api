@@ -25,17 +25,17 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
     }
 
     @Override
-    public Object describePropertyModelGroup(DescribePropertyModelGroupParam describePropertyModelGroupParam) {
+    public Object queryPropertyModelGroup(QueryPropertyModelGroupParam queryPropertyModelGroupParam) {
         return null;
     }
 
     @Override
-    public Object deletePropertyModelGroup(DeletePropertyModelGroupParam describePropertyModelGroupParam) {
+    public Object deletePropertyModelGroup(DeletePropertyModelGroupParam deletePropertyModelGroupParam) {
         return null;
     }
 
     @Override
-    public Object describePropertyModelGroupList(DescribePropertyModelGroupListParam describePropertyModelGroupListParam) {
+    public Object queryPropertyModelGroupList(QueryPropertyModelGroupListParam queryPropertyModelGroupListParam) {
         return null;
     }
 }

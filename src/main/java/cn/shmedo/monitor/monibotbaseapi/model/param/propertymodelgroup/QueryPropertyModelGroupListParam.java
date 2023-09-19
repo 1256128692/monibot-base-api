@@ -19,7 +19,7 @@ import lombok.ToString;
  */
 @Data
 @ToString
-public class DescribePropertyModelGroupListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryPropertyModelGroupListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 

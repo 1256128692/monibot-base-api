@@ -74,10 +74,10 @@ public class PropertyModelGroupController {
     }
 
     /**
-     * @api {POST} /DescribePropertyModelGroup 查看属性模板组
+     * @api {POST} /QueryPropertyModelGroup 查看属性模板组
      * @apiVersion 1.0.0
      * @apiGroup 项目属性模板组模块
-     * @apiName DescribePropertyModelGroup
+     * @apiName QueryPropertyModelGroup
      * @apiDescription 更新属性模板组
      * @apiParam (请求体) {Int} ID 属性模板组ID
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -88,12 +88,12 @@ public class PropertyModelGroupController {
      * @apiSuccess (返回结果) {String} [desc] 模板描述
      * @apiSuccess (返回结果) {String} [exValue] 扩展字段
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:DescribePropertyModelGroup
+     * @apiPermission 系统权限 mdmbase:QueryPropertyModelGroup
      */
-    @Permission(permissionName = "mdmbase:DescribePropertyModelGroup")
-    @PostMapping("/DescribePropertyModelGroup")
-    public Object describePropertyModelGroup(@Valid @RequestBody DescribePropertyModelGroupParam describePropertyModelGroupParam) {
-        return propertyModelGroupService.describePropertyModelGroup(describePropertyModelGroupParam);
+    @Permission(permissionName = "mdmbase:QueryPropertyModelGroup")
+    @PostMapping("/QueryPropertyModelGroup")
+    public Object queryPropertyModelGroup(@Valid @RequestBody QueryPropertyModelGroupParam queryPropertyModelGroupParam) {
+        return propertyModelGroupService.queryPropertyModelGroup(queryPropertyModelGroupParam);
     }
 
     /**
@@ -111,15 +111,15 @@ public class PropertyModelGroupController {
     @LogParam(moduleName = "项目属性模板组模块", operationName = "删除属性模板组", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeletePropertyModelGroup")
     @PostMapping("/DeletePropertyModelGroup")
-    public Object deletePropertyModelGroup(@Valid @RequestBody DeletePropertyModelGroupParam describePropertyModelGroupParam) {
-        return propertyModelGroupService.deletePropertyModelGroup(describePropertyModelGroupParam);
+    public Object deletePropertyModelGroup(@Valid @RequestBody DeletePropertyModelGroupParam deletePropertyModelGroupParam) {
+        return propertyModelGroupService.deletePropertyModelGroup(deletePropertyModelGroupParam);
     }
 
     /**
-     * @api {POST} /DescribePropertyModelGroupList 查看属性模板组列表
+     * @api {POST} /QueryPropertyModelGroupPage 查看属性模板组列表
      * @apiVersion 1.0.0
      * @apiGroup 项目属性模板组模块
-     * @apiName DescribePropertyModelGroupList
+     * @apiName QueryPropertyModelGroupPage
      * @apiDescription 查看属性模板组列表
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [groupName] 属性模板组名称
@@ -131,11 +131,11 @@ public class PropertyModelGroupController {
      * @apiSuccess (返回结果) {String} [groupList.desc] 模板描述
      * @apiSuccess (返回结果) {String} [groupList.exValue] 扩展字段
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:DescribePropertyModelGroupList
+     * @apiPermission 系统权限 mdmbase:QueryPropertyModelGroupPage
      */
-    @Permission(permissionName = "mdmbase:DescribePropertyModelGroupList")
-    @PostMapping("/DescribePropertyModelGroupList")
-    public Object describePropertyModelGroupList(@Valid @RequestBody DescribePropertyModelGroupListParam describePropertyModelGroupListParam) {
-        return propertyModelGroupService.describePropertyModelGroupList(describePropertyModelGroupListParam);
+    @Permission(permissionName = "mdmbase:QueryPropertyModelGroupPage")
+    @PostMapping("/QueryPropertyModelGroupPage")
+    public Object queryPropertyModelGroupPage(@Valid @RequestBody QueryPropertyModelGroupListParam queryPropertyModelGroupListParam) {
+        return propertyModelGroupService.queryPropertyModelGroupList(queryPropertyModelGroupListParam);
     }
 }

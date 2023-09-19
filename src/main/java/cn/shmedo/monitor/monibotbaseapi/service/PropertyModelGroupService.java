@@ -15,9 +15,9 @@ public interface PropertyModelGroupService {
 
     Object updatePropertyModelGroup(UpdatePropertyModelGroupParam updatePropertyModelGroupParam);
 
-    Object describePropertyModelGroup(DescribePropertyModelGroupParam describePropertyModelGroupParam);
+    Object queryPropertyModelGroup(QueryPropertyModelGroupParam queryPropertyModelGroupParam);
 
-    Object deletePropertyModelGroup(DeletePropertyModelGroupParam describePropertyModelGroupParam);
+    Object deletePropertyModelGroup(DeletePropertyModelGroupParam deletePropertyModelGroupParam);
 
-    Object describePropertyModelGroupList(DescribePropertyModelGroupListParam describePropertyModelGroupListParam);
+    Object queryPropertyModelGroupList(QueryPropertyModelGroupListParam queryPropertyModelGroupListParam);
 }
