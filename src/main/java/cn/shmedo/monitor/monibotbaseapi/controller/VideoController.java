@@ -256,6 +256,52 @@ public class VideoController {
     }
 
     /**
+     * @api {POST} /QueryVideoProjectViewBaseInfoV2 查询视频实时预览基础信息(工程级)
+     * @apiDescription 查询视频实时预览基础信息(工程级)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryVideoProjectViewBaseInfoV2
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
+     * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Object[]} dataList 监测组数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测分组ID
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupName 监测分组名称
+     * @apiSuccess (返回结果) {Int} dataList.displayOrder 监测分组展示顺序
+     * @apiSuccess (返回结果) {Object[]} [dataList.monitorPointDataList] 监测点数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.displayOrder 监测点展示顺序
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.sensorAlias 传感器别称
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.deviceStatus 在线状态 在线:true 离线:false
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.deviceSerial 视频设备序列号/唯一标识
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.deviceName 设备名称
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.deviceType 设备类型/型号
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.accessChannelNum 接入的通道号数量
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.accessPlatform 平台:萤石云平台:0 海康平台:1
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.accessProtocol 协议:萤石云协议:0 , 国标协议:1
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.companyID 注册公司ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.projectID 项目ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
+     * @apiSuccess (返回结果) {Int[]} dataList.monitorPointDataList.deviceChannel 通道号列表
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryVideoProjectViewBaseInfoV2", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryVideoProjectViewBaseInfoV2(@Valid @RequestBody QueryVideoProjectViewBaseInfo param) {
+        return tbVideoDeviceService.queryVideoProjectViewBaseInfoV2(param);
+    }
+
+    /**
      * @api {POST} /QueryYsVideoDeviceInfo 查询萤石视频设备信息
      * @apiDescription 查询萤石视频设备信息
      * @apiVersion 1.0.0

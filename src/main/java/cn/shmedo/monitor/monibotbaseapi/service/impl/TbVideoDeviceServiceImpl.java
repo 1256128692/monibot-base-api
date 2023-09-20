@@ -46,6 +46,14 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
                 .peek(VideoProjectViewPointInfo::afterProperties).toList()).toList();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public List<VideoProjectViewSubGroupInfo> queryVideoProjectViewBaseInfoV2(QueryVideoProjectViewBaseInfo param) {
+        return this.baseMapper.selectVideoProjectViewBaseInfo(param).stream().map(VideoProjectViewBaseInfo::getMonitorGroupDataList)
+                .flatMap(Collection::stream).peek(u -> u.getMonitorPointDataList().stream()
+                        .peek(VideoProjectViewPointInfo::afterProperties).toList()).toList();
+    }
+
     @Override
     public VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param) {
         TbVideoDevice device = param.getTbVideoDevice();

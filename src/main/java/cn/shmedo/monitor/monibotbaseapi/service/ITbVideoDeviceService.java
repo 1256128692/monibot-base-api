@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewSubGroupInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -19,7 +20,9 @@ public interface ITbVideoDeviceService extends IService<TbVideoDevice> {
 
     List<VideoProjectViewBaseInfo> queryVideoProjectViewBaseInfo(QueryVideoProjectViewBaseInfo param);
 
+    List<VideoProjectViewSubGroupInfo> queryVideoProjectViewBaseInfoV2(QueryVideoProjectViewBaseInfo param);
+
     VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param);
 
-    Map<String,String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
+    Map<String, String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
 }
