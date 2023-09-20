@@ -41,11 +41,13 @@ public class ProjectController {
      * @apiParam (请求体) {String} projectName 项目名称(<=50),只允许数字，字母与中文
      * @apiParam (请求体) {String} [shortName] 项目简称(<=10)
      * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {Int} [level] 项目等级 -1,0,代表子工程，未分配得非子工程 为null时候为设置为-1
      * @apiParam (请求体) {String} [imageContent] 图片内容,该项存在则imageSuffix不能为空
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
-     * @apiParam (请求体) {Int} platformType 所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {Int} platformType (废弃)所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {Int[]} platformTypeList 所属平台类型
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
@@ -123,6 +125,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} currentPageData.projectName 项目名称
      * @apiSuccess (返回结果) {String} currentPageData.shortName 项目简称
      * @apiSuccess (返回结果) {Int} currentPageData.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} currentPageData.level 项目等级
      * @apiSuccess (返回结果) {String} currentPageData.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} currentPageData.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Int} currentPageData.platformType 平台类型
@@ -141,6 +144,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} currentPageData.createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 修改用户ID
+     * @apiSuccess (返回结果) {Json[]} [currentPageData.twoLevelProjectList] 当该项目为oneLevel等级时候，存在该列表，每项包含一个sonLevelProjectList
      * @apiSuccess (返回结果) {Object} company 公司信息
      * @apiSuccess (返回结果) {Int} company.id id
      * @apiSuccess (返回结果) {String} company.ShortName 公司简称
@@ -179,7 +183,7 @@ public class ProjectController {
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryProjectPageList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa ){
+    public Object queryProjectList(@Validated @RequestBody QueryProjectListRequest pa) {
         return projectService.queryProjectList(pa);
     }
 
@@ -195,6 +199,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectName 项目名称
      * @apiSuccess (返回结果) {String} shortName 项目简称
      * @apiSuccess (返回结果) {Int} projectType 项目类型
+     * @apiSuccess (返回结果) {Int} level 项目等级
      * @apiSuccess (返回结果) {String} projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Byte} platformType 平台类型
@@ -410,6 +415,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} data.projectName 项目名称
      * @apiSuccess (返回结果) {String} data.shortName 项目简称
      * @apiSuccess (返回结果) {Int} data.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} data.level 项目等级
      * @apiSuccess (返回结果) {String} data.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} data.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {String} [data.imagePath] 项目图片地址
@@ -427,7 +433,7 @@ public class ProjectController {
      * @api {POST} /QueryProjectBaseInfoList 查询公司下的工程基本信息以及监测项目信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
-     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表,最终只展示有传感器的监测点,已经对应的工程
+     * @apiDescription 查询公司下的工程基本信息以及监测项目信息列表, 最终只展示有传感器的监测点, 已经对应的工程
      * @apiName QueryProjectBaseInfoList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String} monitorItemName 监测项目名称
@@ -528,6 +534,48 @@ public class ProjectController {
     @RequestMapping(value = "QueryProjectImg", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectImg(@Validated @RequestBody QueryProjectImgParam pa) {
         return projectService.queryProjectImg(pa);
+    }
+
+
+    /**
+     * @api {post} /SetProjectRelation 设置项目关联关系
+     * @apiDescription 设置项目关联关系, 覆盖处理
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName SetProjectRelation
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int[]} nextLevelPIDList 下属设备ID列表 当前项目为level = 1时候，列表为level为0或者2，当项目level=2时候，列表为level为0或者-1
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+//    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
+    @RequestMapping(value = "SetProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object setProjectRelation(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {post} /QueryNextLevelAndAvailableProject 查询下级项目列表和可使用的项目列表
+     * @apiDescription 查询下级项目列表和可使用的项目列表
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryNextLevelProjectAndCanUsed
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiSuccess (返回结果) {Json[]} nextLevelProjectList 下级项目列表
+     * @apiSuccess (返回结果) {Int} nextLevelProjectList.id 项目ID
+     * @apiSuccess (返回结果) {String} nextLevelProjectList.name 项目名称
+     * @apiSuccess (返回结果) {Json[]} availableProjectList 下级项目列表, 结构同nextLevelProjectList
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+    @RequestMapping(value = "QueryNextLevelProjectAndCanUsed", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
     }
 
 }
