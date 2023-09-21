@@ -1,13 +1,16 @@
-package cn.shmedo.monitor.monibotbaseapi.model.param.file;
+package cn.shmedo.monitor.monibotbaseapi.model.param.documentfile;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDocumentFileMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbDocumentFile;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+
+import java.util.Objects;
 
 /**
  * @Author wuxl
@@ -27,8 +30,16 @@ public class QueryDocumentFileParameter implements ParameterValidator, ResourceP
     @NotNull(message = "文件ID不能为空")
     private Integer fileID;
 
+    @JsonIgnore
+    private TbDocumentFile tbDocumentFile;
+
     @Override
     public ResultWrapper<?> validate() {
+        TbDocumentFileMapper tbDocumentFileMapper = ContextHolder.getBean(TbDocumentFileMapper.class);
+        tbDocumentFile = tbDocumentFileMapper.selectById(fileID);
+        if(Objects.isNull(tbDocumentFile)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "为找到对应的资料文件");
+        }
         return null;
     }
 

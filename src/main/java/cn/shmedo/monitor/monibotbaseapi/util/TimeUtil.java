@@ -169,6 +169,12 @@ public class TimeUtil {
         return Timestamp.valueOf(timeStr);
     }
 
+    public static Date getDate(LocalDateTime localDateTime){
+        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        Instant instant2 = zonedDateTime.toInstant();
+        return Date.from(instant2);
+    }
+
     public static Timestamp getHour(Timestamp raw) {
         LocalDateTime localDateTime = raw.toLocalDateTime();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH");

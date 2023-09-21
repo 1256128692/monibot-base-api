@@ -2,15 +2,18 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.base.OperationProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.param.file.*;
-import cn.shmedo.monitor.monibotbaseapi.service.ITbFileService;
+import cn.shmedo.monitor.monibotbaseapi.core.annotation.ResourceSymbol;
+import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.*;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbDocumentFileService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @Author wuxl
@@ -22,9 +25,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping
-public class FileController {
+public class DocumentFileController {
     @Autowired
-    private ITbFileService iTbFileService;
+    private ITbDocumentFileService iTbDocumentFileService;
 
     /**
      * @api {POST} /QueryDocumentPage 查看资料文件列表
@@ -58,7 +61,7 @@ public class FileController {
     @Permission(permissionName = "mdmbase:QueryDocumentPage")
     @PostMapping("/QueryDocumentPage")
     public Object queryDocumentPage(@Valid @RequestBody QueryDocumentFilePageParameter queryDocumentFilePageParameter) {
-        return iTbFileService.queryDocumentPage(queryDocumentFilePageParameter);
+        return iTbDocumentFileService.queryDocumentPage(queryDocumentFilePageParameter);
     }
 
     /**
@@ -68,13 +71,10 @@ public class FileController {
      * @apiName AddDocumentFile
      * @apiDescription 新增资料文件
      * @apiHeader {String} Content-Type multipart/form-data
+     * @apiParam (请求体) {int} projectID  工程项目ID
      * @apiParam (请求体) {MultipartFile} file 资产文件
      * @apiParam (请求体) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {int} subjectID  对象ID
-     * @apiParam (请求体) {String} fileName 文件名称
-     * @apiParam (请求体) {String} fileName 文件
-     * @apiParam (请求体) {String} fileType 文件类型
-     * @apiParam (请求体) {int} fileSize 文件大小
      * @apiParam (请求体) {String} [fileDesc] 文件描述
      * @apiParam (请求体) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {int} ID ID
@@ -84,8 +84,14 @@ public class FileController {
     @LogParam(moduleName = "资料文件模块", operationName = "新增资料文件", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddDocumentFile")
     @PostMapping("/AddDocumentFile")
-    public Object addDocumentFile(@Valid @RequestBody AddDocumentFileParameter addDocumentFileParameter) {
-        return iTbFileService.addDocumentFile(addDocumentFileParameter);
+    public Object addDocumentFile(
+            @RequestParam @Valid @NotNull @Positive @ResourceSymbol(ResourceType.BASE_PROJECT) Integer projectID,
+            @RequestParam MultipartFile file,
+            @RequestParam @Valid @NotNull Integer subjectType,
+            @RequestParam @Valid @NotNull Integer subjectID,
+            @RequestParam(required = false) String fileDesc,
+            @RequestParam(required = false) String exValue) {
+        return iTbDocumentFileService.addDocumentFile(file, subjectType, subjectID, fileDesc, exValue);
     }
 
     /**
@@ -104,7 +110,7 @@ public class FileController {
     @Permission(permissionName = "mdmbase:DeleteDocumentFile")
     @PostMapping("/DeleteDocumentFile")
     public Object deleteDocumentFile(@Valid @RequestBody DeleteDocumentFileParameter deleteDocumentFileParameter) {
-        return iTbFileService.deleteDocumentFile(deleteDocumentFileParameter);
+        return iTbDocumentFileService.deleteDocumentFile(deleteDocumentFileParameter);
     }
 
     /**
@@ -133,7 +139,7 @@ public class FileController {
     @Permission(permissionName = "mdmbase:QueryDocumentFile")
     @PostMapping("/QueryDocumentFile")
     public Object queryDocumentFile(@Valid @RequestBody QueryDocumentFileParameter queryDocumentFileParameter) {
-        return iTbFileService.queryDocumentFile(queryDocumentFileParameter);
+        return iTbDocumentFileService.queryDocumentFile(queryDocumentFileParameter);
     }
 
 }
