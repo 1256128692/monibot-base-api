@@ -18,12 +18,17 @@ public class VideoCaptureBaseInfo {
     // 可以为空
     private Integer projectID;
     private Integer channelNo;
+
+    private Boolean imageCapture;
     // 可以为空
     @JsonIgnore
     private String ipcSerial;
 
     @JsonIgnore
     private Integer videoDeviceID;
+
+    @JsonIgnore
+    private String exValues;
 
 
     // 添加一个静态方法用于转换

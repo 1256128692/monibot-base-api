@@ -546,6 +546,7 @@
                s.channelCode as channelNo,
                s.videoDeviceID,
                s.Enable      as sensorEnable,
+               s.ExValues,
                c.CaptureInterval
         from tb_sensor s
                  left join tb_video_capture c on s.ID = c.SensorID

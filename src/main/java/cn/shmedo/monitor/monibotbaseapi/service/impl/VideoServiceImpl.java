@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
@@ -403,6 +404,17 @@ public class VideoServiceImpl implements VideoService {
         }
 
         List<VideoCaptureBaseInfo> sensorInfoList = sensorMapper.queryListByCondition(list.stream().map(VideoDeviceInfoV1::getVideoDeviceID).collect(Collectors.toList()));
+
+        if (!CollectionUtil.isNullOrEmpty(sensorInfoList)) {
+            sensorInfoList.forEach(s -> {
+                if (!StringUtil.isNullOrEmpty(s.getExValues())) {
+                    Dict dict = JSONUtil.toBean(s.getExValues(), Dict.class);
+                    if (dict.get("imageCapture") != null) {
+                        s.setImageCapture((Boolean) dict.get("imageCapture"));
+                    }
+                }
+            });
+        }
 
         // 根据协议去转换json对象
         list.forEach(v -> {
