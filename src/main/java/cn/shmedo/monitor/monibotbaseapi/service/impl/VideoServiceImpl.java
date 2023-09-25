@@ -26,9 +26,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPointInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
@@ -828,10 +826,10 @@ public class VideoServiceImpl implements VideoService {
         List<VideoDeviceBaseInfoV1> hkAllVideoDevices = new LinkedList<>();
         List<VideoDeviceBaseInfoV1> ysAllVideoDevices = new LinkedList<>();
         // 首次查询
-        HkMonitorPointInfo hkMonitorPointInfo = hkVideoService.queryHkVideoPage(1);
+        DeviceListResponse hkMonitorPointInfo = hkVideoService.queryHkVideoStatus(1);
 
         if (hkMonitorPointInfo != null && hkMonitorPointInfo.getTotal() != 0) {
-            hkAllVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
+            hkAllVideoDevices.addAll(convertHkDeviceStatusInfoToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
 
             if (hkMonitorPointInfo.getTotal() > 1000) {
                 int total = hkMonitorPointInfo.getTotal();
@@ -844,9 +842,9 @@ public class VideoServiceImpl implements VideoService {
 
                 // 从第二页开始查询，因为第一页已经查询过了
                 for (int pageNo = 2; pageNo <= jkTotalPageSize; pageNo++) {
-                    hkMonitorPointInfo = hkVideoService.queryHkVideoPage(pageNo);
+                    hkMonitorPointInfo = hkVideoService.queryHkVideoStatus(pageNo);
                     if (hkMonitorPointInfo != null) {
-                        hkAllVideoDevices.addAll(convertMonitorPointDetailToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
+                        hkAllVideoDevices.addAll(convertHkDeviceStatusInfoToVideoDeviceBaseInfoV1(hkMonitorPointInfo.getList()));
                     }
                 }
             }
@@ -941,6 +939,24 @@ public class VideoServiceImpl implements VideoService {
                     if (detail.getStatus() == null || detail.getStatus() == 0) {
                         videoDevice.setStatus(false);
                     } else if (detail.getStatus() == 1) {
+                        videoDevice.setStatus(true);
+                    } else {
+                        videoDevice.setStatus(false);
+                    }
+                    return videoDevice;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+    private List<VideoDeviceBaseInfoV1> convertHkDeviceStatusInfoToVideoDeviceBaseInfoV1(List<HkDeviceStatusInfo> monitorPointDetails) {
+        return monitorPointDetails.stream()
+                .map(detail -> {
+                    VideoDeviceBaseInfoV1 videoDevice = new VideoDeviceBaseInfoV1();
+                    videoDevice.setDeviceSerial(detail.getIndexCode());
+                    if (detail.getOnline() == null || detail.getOnline() == 0) {
+                        videoDevice.setStatus(false);
+                    } else if (detail.getOnline() == 1) {
                         videoDevice.setStatus(true);
                     } else {
                         videoDevice.setStatus(false);

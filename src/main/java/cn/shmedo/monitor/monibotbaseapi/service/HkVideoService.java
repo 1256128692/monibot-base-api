@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.DeviceListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPointInfo;
 
@@ -25,4 +26,8 @@ public interface HkVideoService {
     String getTalkStreamInfo(String deviceSerial, String protocol, Integer transmode, String expand, String eurlExand);
 
     Map<String, String> controllingPtz(String deviceSerial, Integer action, String command, Integer speed, Integer presetIndex);
+
+
+    DeviceListResponse queryHkVideoStatus(Integer pageNo);
+
 }
