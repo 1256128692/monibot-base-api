@@ -177,7 +177,7 @@ public class VideoServiceImpl implements VideoService {
                     String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
                     Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 0, command, null, null);
                     hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 1, command, null, null);
-                    if (!"0".equals(response.getOrDefault("code", "1"))) {
+                    if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(response.getOrDefault("code", "1"))) {
                         return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get("msg"));
                     }
                 }
@@ -186,7 +186,6 @@ public class VideoServiceImpl implements VideoService {
         }
         return ResultWrapper.successWithNothing();
     }
-
 
     @Override
     public List<VideoMonitorPointPictureInfo> queryVideoMonitorPointPictureInfo(QueryVideoMonitorPointPictureInfoParam pa) {
@@ -234,10 +233,10 @@ public class VideoServiceImpl implements VideoService {
                 String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
                 Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, 0, command, null, null);
                 Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, 1, command, null, null);
-                if (!"0".equals(startResponse.getOrDefault("code", "1"))) {
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(startResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "1"))) {
                     return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
                 }
-                if (!"0".equals(endResponse.getOrDefault("code", "1"))) {
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(endResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "1"))) {
                     return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
                 }
             }
@@ -389,7 +388,7 @@ public class VideoServiceImpl implements VideoService {
 //        return Optional.of(streamInfo).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
 //                .map(YsStreamUrlInfo::getUrl).orElseThrow(() -> new IllegalArgumentException("萤石云第三方接口调用失败!"));
         return Map.of("baseUrl", YsUtil.getEzPlayBackAddress(device.getDeviceSerial(), channelNo,
-                        param.getRecordLocation() == 0, param.getBeginTime(), param.getEndTime()),
+                        param.getRecordLocation() == 0, param.getBeginTime()),
                 "ysToken", ysToken);
     }
 

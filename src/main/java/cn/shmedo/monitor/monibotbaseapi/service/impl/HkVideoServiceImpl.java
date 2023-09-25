@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.*;
 
+import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.HikVideoParamKeys.*;
 
 @EnableTransactionManagement
 @Service
@@ -121,23 +122,15 @@ public class HkVideoServiceImpl implements HkVideoService {
         };
         Map<String, Object> paramMap = new HashMap<>(16) {
             {
-                put("cameraIndexCode", deviceSerial);
-                Optional.ofNullable(streamType).ifPresent(u -> put("streamType", u));
-                Optional.ofNullable(protocol).ifPresent(u -> put("protocol", u));
-                Optional.ofNullable(transmode).ifPresent(u -> put("transmode", u));
-                Optional.ofNullable(expand).ifPresent(u -> put("expand", u));
-                Optional.ofNullable(streamform).ifPresent(u -> put("streamform", u));
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                Optional.ofNullable(streamType).ifPresent(u -> put(HIK_STREAM_TYPE, u));
+                Optional.ofNullable(protocol).ifPresent(u -> put(HIK_STREAM_PROTOCOL, u));
+                Optional.ofNullable(transmode).ifPresent(u -> put(HIK_TRANS_MODE_PROTOCOL, u));
+                Optional.ofNullable(expand).ifPresent(u -> put(HIK_EXPAND, u));
+                Optional.ofNullable(streamform).ifPresent(u -> put(HIK_STREAM_FORM, u));
             }
         };
-        String body = JSONUtil.toJsonStr(paramMap);
-        try {
-            String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
-            return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
-                    .filter(u -> "0".equals(u.getStr("code", "-1"))).map(u -> u.get("data")).map(JSONUtil::parseObj)
-                    .map(u -> u.getStr("url")).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
-        } catch (Exception e) {
-            throw new RuntimeException("海康接口调用失败!");
-        }
+        return getDataUrl(path, paramMap);
     }
 
     /**
@@ -158,27 +151,53 @@ public class HkVideoServiceImpl implements HkVideoService {
         };
         Map<String, Object> paramMap = new HashMap<>(16) {
             {
-                put("cameraIndexCode", deviceSerial);
-                Optional.ofNullable(recordLocation).ifPresent(u -> put("recordLocation", u));
-                Optional.ofNullable(protocol).ifPresent(u -> put("protocol", u));
-                Optional.ofNullable(transmode).ifPresent(u -> put("transmode", u));
-                Optional.ofNullable(beginTime).ifPresent(u -> put("beginTime", u));
-                Optional.ofNullable(endTime).ifPresent(u -> put("endTime", u));
-                Optional.ofNullable(uuid).ifPresent(u -> put("uuid", u));
-                Optional.ofNullable(expand).ifPresent(u -> put("expand", u));
-                Optional.ofNullable(streamform).ifPresent(u -> put("streamform", u));
-                Optional.ofNullable(lockType).ifPresent(u -> put("lockType", u));
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                Optional.ofNullable(recordLocation).ifPresent(u -> put(HIK_RECORD_LOCATION, u));
+                Optional.ofNullable(protocol).ifPresent(u -> put(HIK_STREAM_PROTOCOL, u));
+                Optional.ofNullable(transmode).ifPresent(u -> put(HIK_TRANS_MODE_PROTOCOL, u));
+                Optional.ofNullable(beginTime).ifPresent(u -> put(HIK_BEGIN_TIME, u));
+                Optional.ofNullable(endTime).ifPresent(u -> put(HIK_END_TIME, u));
+                Optional.ofNullable(uuid).ifPresent(u -> put(HIK_PLAYBACK_UUID, u));
+                Optional.ofNullable(expand).ifPresent(u -> put(HIK_EXPAND, u));
+                Optional.ofNullable(streamform).ifPresent(u -> put(HIK_STREAM_FORM, u));
+                Optional.ofNullable(lockType).ifPresent(u -> put(HIK_LOCK_TYPE, u));
             }
         };
         String body = JSONUtil.toJsonStr(paramMap);
         try {
             String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
             return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
-                    .filter(u -> "0".equals(u.getStr("code", "-1"))).map(u -> u.get("data"))
+                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
                     .map(JSONUtil::parseObj).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
             throw new RuntimeException("海康接口调用失败!");
         }
+    }
+
+    /**
+     * 语音对讲
+     *
+     * @see <a href="https://open.hikvision.com/docs/docId?productId=5c67f1e2f05948198c909700&version=%2F60df74fdc6f24041ac3d2d7f81c32325&tagPath=API%E5%88%97%E8%A1%A8-%E8%A7%86%E9%A2%91%E4%B8%9A%E5%8A%A1-%E8%A7%86%E9%A2%91%E5%8A%9F%E8%83%BD#d16e79ef">接口文档-查询对讲URL</a>
+     */
+    @Override
+    public String getTalkStreamInfo(String deviceSerial, String protocol, Integer transmode, String expand,
+                                    String eurlExand) {
+        final String previewURLsApi = ARTEMIS_PATH + "/api/video/v1/cameras/talkURLs";
+        Map<String, String> path = new HashMap<>(2) {
+            {
+                put("https://", previewURLsApi);//根据现场环境部署确认是http还是https
+            }
+        };
+        Map<String, Object> paramMap = new HashMap<>(16) {
+            {
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                Optional.ofNullable(protocol).ifPresent(u -> put(HIK_STREAM_PROTOCOL, u));
+                Optional.ofNullable(transmode).ifPresent(u -> put(HIK_TRANS_MODE_PROTOCOL, u));
+                Optional.ofNullable(expand).ifPresent(u -> put(HIK_EXPAND, u));
+                Optional.ofNullable(eurlExand).ifPresent(u -> put(HIK_EURL_EXPAND, u));
+            }
+        };
+        return getDataUrl(path, paramMap);
     }
 
     /**
@@ -196,11 +215,11 @@ public class HkVideoServiceImpl implements HkVideoService {
         };
         Map<String, Object> paramMap = new HashMap<>(16) {
             {
-                put("cameraIndexCode", deviceSerial);
-                put("action", action);
-                put("command", command);
-                Optional.ofNullable(speed).ifPresent(u -> put("speed", u));
-                Optional.ofNullable(presetIndex).ifPresent(u -> put("presetIndex", u));
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                put(HIK_ACTION, action);
+                put(HIK_COMMAND, command);
+                Optional.ofNullable(speed).ifPresent(u -> put(HIK_SPEED, u));
+                Optional.ofNullable(presetIndex).ifPresent(u -> put(HIK_PRESET_INDEX, u));
             }
         };
         String body = JSONUtil.toJsonStr(paramMap);
@@ -209,10 +228,28 @@ public class HkVideoServiceImpl implements HkVideoService {
             return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
                     .map(u -> new HashMap<String, String>() {
                         {
-                            Optional.ofNullable(u.get("code")).map(String::valueOf).ifPresent(w -> put("code", w));
-                            Optional.ofNullable(u.get("msg")).map(String::valueOf).ifPresent(w -> put("msg", w));
+                            Optional.ofNullable(u.get(HIK_CODE)).map(String::valueOf).ifPresent(w -> put(HIK_CODE, w));
+                            Optional.ofNullable(u.get(HIK_MSG)).map(String::valueOf).ifPresent(w -> put(HIK_MSG, w));
                         }
                     }).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
+        } catch (Exception e) {
+            throw new RuntimeException("海康接口调用失败!");
+        }
+    }
+
+    /**
+     * 获取url，适用于海康接口返回的{@code data}中含有{@code url}字段，且仅需要这个{@code url}值的时候
+     *
+     * @return url
+     */
+    private String getDataUrl(Map<String, String> path, Map<String, Object> paramMap) {
+        String body = JSONUtil.toJsonStr(paramMap);
+        try {
+            String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
+            return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
+                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
+                    .map(JSONUtil::parseObj).map(u -> u.getStr(HIK_STREAM_URL))
+                    .orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
             throw new RuntimeException("海康接口调用失败!");
         }

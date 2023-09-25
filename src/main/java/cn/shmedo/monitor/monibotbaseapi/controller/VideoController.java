@@ -398,7 +398,6 @@ public class VideoController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} recordLocation 存储类型 0.中心存储 1.设备存储
      * @apiParam (请求体) {DateTime} beginTime 开始时间,云存储开始结束时间必须在同一天
-     * @apiParam (请求体) {DateTime} endTime 结束时间,云存储开始结束时间必须在同一天
      * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID (videoDeviceID和deviceChannel)、sensorID、monitorPointID这三组数据有且仅有一组不为空,用于确定对应萤石摄像头。
      * @apiParam (请求体) {Int} [deviceChannel] 通道号
      * @apiParam (请求体) {Int} [sensorID] 传感器ID
@@ -441,6 +440,26 @@ public class VideoController {
         return tbVideoDeviceService.queryHikVideoPlayBack(param);
     }
 
+    /**
+     * @api {POST} /QueryHikVideoTalk 海康设备语音对讲取流
+     * @apiDescription 海康设备语音对讲取流
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiName QueryHikVideoTalk
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [videoDeviceID] 视频设备ID,videoDeviceID、sensorID、monitorPointID有且仅有一个不为空,用于确定对应海康摄像头
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点ID
+     * @apiParam (请求体) {Int} [projectID] 工程ID,若该项不为空则为项目权限
+     * @apiSuccess (返回结果) {String} baseUrl 语音对讲地址
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @PostMapping(value = "/QueryHikVideoTalk", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryHikVideoTalk(@Valid @RequestBody QueryHikVideoTalkParam param) {
+        return tbVideoDeviceService.queryHikVideoTalk(param);
+    }
 
     /**
      * @api {POST} /AddVideoDeviceList 批量添加视频设备

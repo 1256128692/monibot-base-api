@@ -39,10 +39,9 @@ public class YsUtil {
      * @param endTime   结束时间
      * @see #getEzOpenAddress(String, boolean, String)
      */
-    public static String getEzPlayBackAddress(String seqNo, String ysChannelNo, boolean isCloud, Date beginTime, Date endTime) {
+    public static String getEzPlayBackAddress(String seqNo, String ysChannelNo, boolean isCloud, Date beginTime) {
         return "ezopen://open.ys7.com/" + seqNo + "/" + ysChannelNo + (isCloud ? ".cloud" : "") + ".rec?begin="
-                + DateUtil.format(beginTime, TimeUtil.YS_PLAY_BACK_TIME_FORMAT) + "&end"
-                + DateUtil.format(endTime, TimeUtil.YS_PLAY_BACK_TIME_FORMAT);
+                + DateUtil.format(beginTime, TimeUtil.YS_PLAY_BACK_TIME_FORMAT);
     }
 
 

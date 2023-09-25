@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
@@ -25,12 +26,6 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, TbVideoDevice> implements ITbVideoDeviceService {
     private final HkVideoService hkVideoService;
-    /*
-     * 海康能力集key<br>
-     * vss 视频能力集; ptz 云台操作能力集
-     */
-    private static final String VSS_KEY = "vss";
-    private static final String PTZ_KEY = "ptz";
 
     @Override
     public List<VideoCompanyViewBaseInfo> queryVideoCompanyViewBaseInfo(QueryVideoCompanyViewBaseInfoParam param) {
@@ -59,13 +54,14 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         TbVideoDevice device = param.getTbVideoDevice();
         VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         final String deviceSerial = device.getDeviceSerial();
-        final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), "ws", null, null, null);
+        final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
         final HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(deviceSerial);
         Optional.ofNullable(url).filter(ObjectUtil::isNotEmpty).ifPresent(build::setBaseUrl);
         Optional.ofNullable(hkDeviceInfo).map(HkDeviceInfo::getCapabilitySet).filter(ObjectUtil::isNotEmpty)
-                .map(u -> u.split(",")).map(List::of).map(u -> Map.of("vss", u.stream().filter(VSS_KEY::equals)
-                        .findAny().map(s -> 1).orElse(0), "ptz", u.stream().filter(PTZ_KEY::equals).findAny()
-                        .map(s -> 1).orElse(0))).ifPresent(build::setCapabilitySet);
+                .map(u -> u.split(",")).map(List::of).map(u -> Map.of("vss", u.stream().filter(DefaultConstant
+                                .HikVideoParamKeys.HIK_VSS_KEY::equals).findAny().map(s -> 1).orElse(0), "ptz",
+                        u.stream().filter(DefaultConstant.HikVideoParamKeys.HIK_PTZ_KEY::equals).findAny().map(s -> 1)
+                                .orElse(0))).ifPresent(build::setCapabilitySet);
         return build;
     }
 
@@ -74,12 +70,20 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         String beginTime = DateUtil.format(param.getBeginTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
         String endTime = DateUtil.format(param.getEndTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
         Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(param.getTbVideoDevice().getDeviceSerial(), param.getRecordLocation().toString(),
-                "ws", null, beginTime, endTime, param.getUuid(), null, null, null);
+                DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, beginTime, endTime, param.getUuid(), null, null, null);
         return new HashMap<>() {
             {
-                Optional.ofNullable(streamInfo).filter(u -> u.containsKey("url")).map(u -> u.get("url")).map(Object::toString).ifPresent(u -> put("baseUrl", u));
-                Optional.ofNullable(streamInfo).filter(u -> u.containsKey("uuid")).map(u -> u.get("uuid")).map(Object::toString).ifPresent(u -> put("uuid", u));
+                Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL))
+                        .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL)).map(Object::toString).ifPresent(u -> put("baseUrl", u));
+                Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID))
+                        .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID)).map(Object::toString).ifPresent(u -> put("uuid", u));
             }
         };
+    }
+
+    @Override
+    public String queryHikVideoTalk(QueryHikVideoTalkParam param) {
+        return hkVideoService.getTalkStreamInfo(param.getTbVideoDevice().getDeviceSerial(),
+                DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
     }
 }

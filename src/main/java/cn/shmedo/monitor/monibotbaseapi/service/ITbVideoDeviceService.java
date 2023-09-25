@@ -25,4 +25,6 @@ public interface ITbVideoDeviceService extends IService<TbVideoDevice> {
     VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param);
 
     Map<String, String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
+
+    String queryHikVideoTalk(QueryHikVideoTalkParam param);
 }

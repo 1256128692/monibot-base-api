@@ -22,5 +22,7 @@ public interface HkVideoService {
                                               Integer transmode, String beginTime, String endTime, String uuid,
                                               String expand, String streamform, Integer lockType);
 
+    String getTalkStreamInfo(String deviceSerial, String protocol, Integer transmode, String expand, String eurlExand);
+
     Map<String, String> controllingPtz(String deviceSerial, Integer action, String command, Integer speed, Integer presetIndex);
 }

@@ -28,8 +28,8 @@ public class QueryYsVideoPlayBackParam extends YsVideoBaseParam implements Resou
     private Integer recordLocation;
     @NotNull(message = "开始时间不能为空")
     private Date beginTime;
-    @NotNull(message = "结束时间不能为空")
-    private Date endTime;
+//    @NotNull(message = "结束时间不能为空")
+//    private Date endTime;
     @Positive(message = "工程ID不能小于1")
     private Integer projectID;
     @JsonIgnore
@@ -37,9 +37,9 @@ public class QueryYsVideoPlayBackParam extends YsVideoBaseParam implements Resou
 
     @Override
     public ResultWrapper validate() {
-        if (recordLocation == 0 && DateUtil.betweenDay(beginTime, endTime, true) > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石云设备回放云存储录像时要求开始时间和结束时间必须在同一天!");
-        }
+//        if (recordLocation == 0 && DateUtil.betweenDay(beginTime, endTime, true) > 0) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "萤石云设备回放云存储录像时要求开始时间和结束时间必须在同一天!");
+//        }
         this.ysVideoType = recordLocation == 0 ? "3" : "2";
         return super.validate();
     }
