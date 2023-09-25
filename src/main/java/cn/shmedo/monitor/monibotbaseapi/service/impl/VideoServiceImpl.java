@@ -86,6 +86,11 @@ public class VideoServiceImpl implements VideoService {
 //    private static final String SUPPORT_RATE_LIMIT_KEY = "supportRateLimit";
 
     /**
+     * 海康云台操作默认速度
+     */
+    private static final Integer HIK_DEFAULT_PTZ_SPEED = 50;
+
+    /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
      *
      * @return
@@ -175,8 +180,8 @@ public class VideoServiceImpl implements VideoService {
                 }
                 case HAI_KANG -> {
                     String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
-                    Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 0, command, null, null);
-                    hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 1, command, null, null);
+                    Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 0, command, HIK_DEFAULT_PTZ_SPEED, null);
+                    hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 1, command, HIK_DEFAULT_PTZ_SPEED, null);
                     if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(response.getOrDefault("code", "1"))) {
                         return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get("msg"));
                     }
@@ -231,8 +236,8 @@ public class VideoServiceImpl implements VideoService {
             case 1 -> {
                 //hik
                 String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
-                Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, 0, command, null, null);
-                Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, 1, command, null, null);
+                Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, 0, command, HIK_DEFAULT_PTZ_SPEED, null);
+                Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, 1, command, HIK_DEFAULT_PTZ_SPEED, null);
                 if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(startResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "1"))) {
                     return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
                 }
