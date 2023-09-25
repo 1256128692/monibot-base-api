@@ -217,9 +217,9 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     * @apiPermission 项目权限+应用权限 mdmbase:ListBaseSensorData
      */
-    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @Permission(permissionName = "mdmbase:ListBaseSensorData", allowApplication = true)
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return wtMonitorService.querySingleMonitorPointNewData(pa);
