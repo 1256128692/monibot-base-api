@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
 * @author 22386
@@ -9,18 +10,5 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 * @createDate 2023-09-15 17:04:56
 * @Entity generator.domain.TbPropertyModelGroup
 */
-public interface TbPropertyModelGroupMapper {
-
-    int deleteByPrimaryKey(Long ID);
-
-    int insert(TbPropertyModelGroup record);
-
-    int insertSelective(TbPropertyModelGroup record);
-
-    TbPropertyModelGroup selectByPrimaryKey(Long ID);
-
-    int updateByPrimaryKeySelective(TbPropertyModelGroup record);
-
-    int updateByPrimaryKey(TbPropertyModelGroup record);
-
+public interface TbPropertyModelGroupMapper extends BaseMapper<TbPropertyModelGroup> {
 }

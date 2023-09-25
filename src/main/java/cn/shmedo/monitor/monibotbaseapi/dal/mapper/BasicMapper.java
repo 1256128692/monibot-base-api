@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,4 +17,12 @@ public interface BasicMapper<T> extends BaseMapper<T> {
      * @return 影响行数
      */
     Integer insertBatchSomeColumn(List<T> entityList);
+
+    /**
+     * 根据Id部分字段更新 仅适用于mysql
+     *
+     * @param entity 实体
+     * @return 影响行数
+     */
+    Integer alwaysUpdateSomeColumnById(@Param("et") T entity);
 }

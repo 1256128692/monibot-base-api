@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -75,8 +77,9 @@ public class DocumentFileResponse {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd hh:mm:ss")
-    private Date createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    private LocalDateTime createTime;
 
     /**
      * 创建用户ID
@@ -100,7 +103,7 @@ public class DocumentFileResponse {
                 .filePath(tbDocumentFile.getFilePath())
                 .fileDesc(tbDocumentFile.getFileDesc())
                 .exValue(tbDocumentFile.getExValue())
-                .createTime(TimeUtil.getDate(tbDocumentFile.getCreateTime()))
+                .createTime(tbDocumentFile.getCreateTime())
                 .createUserId(tbDocumentFile.getCreateUserID()).build();
     }
 }

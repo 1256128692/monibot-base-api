@@ -1,14 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.propertymodelgroup;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+
+import java.util.Objects;
 
 /**
  * @Author wuxl
@@ -21,20 +25,35 @@ import lombok.ToString;
 @Data
 @ToString
 public class UpdatePropertyModelGroupParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @NotNull(message = "ID不能为空")
+    @JsonProperty("ID")
+    private Integer ID;
+
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    @NotNull(message = "主键ID不能为空")
-    private Integer ID;
+    private String platform;
 
-    private String groupName;
+    private Integer groupType;
+
+    private Integer groupTypeSubType;
+
+    private String name;
 
     private String desc;
 
-    private String exValues;
+    private String exValue;
+
+    @JsonIgnore
+    private TbPropertyModelGroup tbPropertyModelGroup;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
+        TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
+        tbPropertyModelGroup = tbPropertyModelGroupMapper.selectById(this.ID);
+        if (Objects.isNull(tbPropertyModelGroup)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应属性模板组");
+        }
         return null;
     }
 

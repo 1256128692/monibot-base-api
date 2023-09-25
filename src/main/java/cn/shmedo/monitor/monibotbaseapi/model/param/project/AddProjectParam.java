@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -104,7 +105,11 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             if (tbPropertyModel == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不存在");
             }
-            if (!tbPropertyModel.getProjectType().equals(projectType)) {
+            //todo 重构待验证
+            if(!PropertyModelType.BASE_PROJECT.getCode().equals(tbPropertyModel.getModelType())){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不是项目模板");
+            }
+            if (!tbPropertyModel.getGroupID().equals(projectType)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
         }

@@ -5,7 +5,7 @@
         <!--@mbg.generated-->
         <!--@Table tb_property-->
         <id column="ID" jdbcType="INTEGER" property="ID"/>
-        <result column="ProjectType" jdbcType="TINYINT" property="projectType"/>
+        <result column="GroupID" jdbcType="INTEGER" property="groupID"/>
         <result column="Name" jdbcType="VARCHAR" property="name"/>
         <result column="Type" jdbcType="TINYINT" property="type"/>
         <result column="Unit" jdbcType="VARCHAR" property="unit"/>
@@ -20,7 +20,7 @@
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        ID, ProjectType, `Name`, `Type`, Unit, Required, MultiSelect, EnumField, CreateType,
+        ID, GroupID, `Name`, `Type`, Unit, Required, MultiSelect, EnumField, CreateType,
         ClassName, DisplayOrder, ModelID, ExValue
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -38,12 +38,12 @@
     <insert id="insert" keyColumn="ID" keyProperty="ID"
             parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty" useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into tb_property (ProjectType, `Name`, `Type`,
+        insert into tb_property (GroupID, `Name`, `Type`,
         Unit, Required, MultiSelect,
         EnumField, CreateType, ClassName,
         DisplayOrder, ModelID, ExValue
         )
-        values (#{projectType,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT},
+        values (#{groupID}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=TINYINT},
         #{unit,jdbcType=VARCHAR}, #{required,jdbcType=BIT}, #{multiSelect,jdbcType=BIT},
         #{enumField,jdbcType=VARCHAR}, #{createType,jdbcType=TINYINT}, #{className,jdbcType=VARCHAR},
         #{displayOrder,jdbcType=INTEGER}, #{modelID,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}
@@ -54,8 +54,8 @@
         <!--@mbg.generated-->
         insert into tb_property
         <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="projectType != null">
-                ProjectType,
+            <if test="groupID != null">
+                GroupID,
             </if>
             <if test="name != null">
                 `Name`,
@@ -92,8 +92,8 @@
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="projectType != null">
-                #{projectType,jdbcType=TINYINT},
+            <if test="groupID != null">
+                #{groupID,jdbcType=INTEGER},
             </if>
             <if test="name != null">
                 #{name,jdbcType=VARCHAR},
@@ -134,8 +134,8 @@
         <!--@mbg.generated-->
         update tb_property
         <set>
-            <if test="projectType != null">
-                ProjectType = #{projectType,jdbcType=TINYINT},
+            <if test="groupID != null">
+                ProjectType = #{groupID,jdbcType=INTEGER},
             </if>
             <if test="name != null">
                 `Name` = #{name,jdbcType=VARCHAR},
@@ -176,7 +176,7 @@
     <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty">
         <!--@mbg.generated-->
         update tb_property
-        set ProjectType = #{projectType,jdbcType=TINYINT},
+        set GroupID = #{groupID,jdbcType=INTEGER},
         `Name` = #{name,jdbcType=VARCHAR},
         `Type` = #{type,jdbcType=TINYINT},
         Unit = #{unit,jdbcType=VARCHAR},
@@ -208,11 +208,11 @@
 
     <insert id="insertBatch">
         insert into tb_property
-        (projecttype, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid,
+        (groupID, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid,
         exvalue)
         value
         <foreach collection="list" item="item" separator=",">
-            (#{item.projectType}, #{item.name}, #{item.type}, #{item.unit}, #{item.required}, #{item.multiSelect},
+            (#{item.groupID}, #{item.name}, #{item.type}, #{item.unit}, #{item.required}, #{item.multiSelect},
             #{item.enumField}
             , #{item.createType}, #{item.className}, #{item.displayOrder}, #{item.modelID}, #{item.exValue})
         </foreach>

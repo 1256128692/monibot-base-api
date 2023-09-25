@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -24,12 +25,20 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    @NotBlank(message = "组名称不能为空")
-    private String groupName;
+    @NotBlank(message = "所属平台不能为空")
+    private String platform;
+
+    @NotNull(message = "模板组类型不能为空")
+    private Integer groupType;
+
+    private Integer groupTypeSubType;
+
+    @NotBlank(message = "名称不能为空")
+    private String name;
 
     private String desc;
 
-    private String exValues;
+    private String exValue;
 
     @Override
     public ResultWrapper validate() {
