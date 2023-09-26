@@ -122,7 +122,8 @@ public interface YsService {
                                                                        @Param("pageSize") Integer pageSize);
 
     /**
-     * 添加预置点
+     * 添加预置点<br>
+     * 该萤石接口性能较低,响应经常在1s以上
      *
      * @return 预置点序号 e.g.{"index":3}
      * @see <a href="https://open.ys7.com/help/59#device_ptz-api4">接口文档-添加预置点</a>
@@ -131,7 +132,7 @@ public interface YsService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}")
     YsResultWrapper<Map<String, Integer>> addPresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
-                                                             @Param("channelNo") Integer channelNo);
+                                                         @Param("channelNo") Integer channelNo);
 
     /**
      * 调用预置点
@@ -142,7 +143,7 @@ public interface YsService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&index={index}")
     YsResultWrapper movePresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
-                                        @Param("channelNo") Integer channelNo, @Param("index") Integer index);
+                                    @Param("channelNo") Integer channelNo, @Param("index") Integer index);
 
     /**
      * 删除预置点
@@ -153,5 +154,5 @@ public interface YsService {
     @Headers("Content-Type: application/x-www-form-urlencoded")
     @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&index={index}")
     YsResultWrapper clearPresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
-                                         @Param("channelNo") Integer channelNo, @Param("index") Integer index);
+                                     @Param("channelNo") Integer channelNo, @Param("index") Integer index);
 }

@@ -106,9 +106,15 @@ public class FeignBeans {
     @Bean
     @Primary
     public YsService ysService() {
+        // 萤石新增预置点接口延时在1s以上，所以这里修改了延时配置
+        SetterFactory ysTimeoutCommandKey = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(YsService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(30000));
         return FeignFactory.hystrixClient(YsService.class, config.getYsUrl(),
                 ysServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
                         .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(ysTimeoutCommandKey)
                         .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
         );
     }

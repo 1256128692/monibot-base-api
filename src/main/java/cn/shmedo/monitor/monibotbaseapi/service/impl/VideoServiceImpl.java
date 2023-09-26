@@ -942,7 +942,8 @@ public class VideoServiceImpl implements VideoService {
         AccessPlatformType platformType = AccessPlatformType.getByValue(tbVideoDevice.getAccessPlatform());
         switch (platformType) {
             case YING_SHI -> {
-                YsResultWrapper<Map<String, Integer>> ysResultPageWrapper = ysService.addPresetPoint(getYsToken(), deviceSerial, channelNo);
+                String ysToken = getYsToken();
+                YsResultWrapper<Map<String, Integer>> ysResultPageWrapper = ysService.addPresetPoint(ysToken, deviceSerial, channelNo);
                 Optional.of(ysResultPageWrapper).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
                         .filter(u -> u.containsKey(DefaultConstant.YS_PRESET_POINT_INDEX_KEY))
                         .map(u -> u.get(DefaultConstant.YS_PRESET_POINT_INDEX_KEY)).ifPresent(param::setPresetPointIndex);
@@ -992,23 +993,23 @@ public class VideoServiceImpl implements VideoService {
 
         //ys
         String ysToken = getYsToken();
-        List<PresetPointWithDeviceInfo> ysPresetPointWithDeviceInfoList = collect.get(AccessPlatformType.YING_SHI);
+        List<PresetPointWithDeviceInfo> ysPresetPointWithDeviceInfoList = Optional.ofNullable(collect.get(AccessPlatformType.YING_SHI)).orElse(List.of());
         List<PresetPointWithDeviceInfo> deleteSuccessPresetPointWithDeviceInfoList = new ArrayList<>();
         for (PresetPointWithDeviceInfo ysInfo : ysPresetPointWithDeviceInfoList) {
             String deviceSerial = ysInfo.getDeviceSerial();
             Integer channelNo = ysInfo.getChannelNo();
             Integer presetPointIndex = ysInfo.getPresetPointIndex();
-            try {
-                ysService.clearPresetPoint(ysToken, deviceSerial, channelNo, presetPointIndex);
+            YsResultWrapper ysResultWrapper = ysService.clearPresetPoint(ysToken, deviceSerial, channelNo, presetPointIndex);
+            if (ysResultWrapper.callSuccess()) {
                 deleteSuccessPresetPointWithDeviceInfoList.add(ysInfo);
-            } catch (Exception e) {
+            } else {
                 log.error("萤石设备预置点删除失败,设备唯一标识:{}, 通道号:{}, 预置点编号:{}", deviceSerial, channelNo, presetPointIndex);
                 failedPresetIDList.add(ysInfo.getPresetPointID());
             }
         }
 
         //hik
-        List<PresetPointWithDeviceInfo> hikPresetPointWithDeviceInfoList = collect.get(AccessPlatformType.HAI_KANG);
+        List<PresetPointWithDeviceInfo> hikPresetPointWithDeviceInfoList = Optional.ofNullable(collect.get(AccessPlatformType.HAI_KANG)).orElse(List.of());
         for (PresetPointWithDeviceInfo hikInfo : hikPresetPointWithDeviceInfoList) {
             String deviceSerial = hikInfo.getDeviceSerial();
             Integer presetPointIndex = hikInfo.getPresetPointIndex();
