@@ -31,6 +31,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorDataUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.soli.SoliUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -391,27 +392,6 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 水质
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())) {
-//            if (projectTypeID == null) {
-//                Object phosphorusTotal = currentSensorData.get("phosphorusTotal");
-//                Object temperature = currentSensorData.get("temperature");
-//                if (ObjectUtil.isNotNull(phosphorusTotal)) {
-//                    // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-//                    int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
-//                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-//                    int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
-//                    int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
-//                    int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
-//                    List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
-//                    int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
-//                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
-//
-//                } else if (ObjectUtil.isNotNull(temperature)) {
-//                    // 水库水位,校验水质规则 ,含溶解氧(v3)
-//                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-//                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
-//                }
-//            } else {
-//            }
 
             if (projectTypeID == 1) {
                 // 水库水位,校验水质规则 ,含溶解氧(v3)
@@ -429,8 +409,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
             }
-            if (projectTypeID == 7) {
-                // 灌区水质校验,校验水质规则,[浑浊度,ph,总硬度,溶解性固体]
+            if (projectTypeID == 9) {
+                // 地下水质校验,校验水质规则,[浑浊度,ph,总硬度,溶解性固体]
                 int turbidity = WaterQualityUtil.getGqTurbidityCategory((Double) currentSensorData.get("turbidity"));
                 int ph = WaterQualityUtil.getGqPhCategory((Double) currentSensorData.get("ph"));
                 int hardness = WaterQualityUtil.getGqHardnessCategory((Double) currentSensorData.get("hardness"));
@@ -439,8 +419,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
             }
-            if (projectTypeID == 9) {
-                // 地下水质校验,校验水质规则,[水温,悬浮物,化学需氧量,氯化物,硫化物,全盐量]
+            if (projectTypeID == 7) {
+                // 灌区水质校验,校验水质规则,[水温,悬浮物,化学需氧量,氯化物,硫化物,全盐量]
                 int temperature = WaterQualityUtil.getDxTemperatureCategory((Double) currentSensorData.get("temperature"));
                 int suspendedsolids = WaterQualityUtil.getDxSuspendedsolidsCategory((Double) currentSensorData.get("suspendedsolids"));
                 int oxygendemand = WaterQualityUtil.getDxOxygendemandCategory((Double) currentSensorData.get("oxygendemand"));
@@ -466,6 +446,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
             // 水位变化
             currentSensorData.put("levelChange", 0.0);
+        } else if (monitorType.equals(MonitorType.SOIL_PH.getKey())) {
+            // 土壤PH值
+            currentSensorData.put("soilph", SoliUtil.getV1Category((Double) currentSensorData.get("soilph")));
         }
         return currentSensorData;
     }
