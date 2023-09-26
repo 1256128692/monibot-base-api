@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.DeviceListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPointInfo;
 
@@ -29,4 +30,6 @@ public interface HkVideoService {
     void deletePresetPoint(String deviceSerial, Integer presetIndex);
 
     Map<String, String> managePresetPoint(String deviceSerial, String presetName, Integer presetIndex);
+
+    DeviceListResponse queryHkVideoStatus(Integer pageNo);
 }

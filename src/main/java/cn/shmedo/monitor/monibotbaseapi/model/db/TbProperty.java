@@ -1,69 +1,88 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+
+@TableName("tb_property")
 public class TbProperty {
     /**
      * 主键
      */
+    @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
 
     /**
-     * 项目类型
+     * 分组ID
      */
-    private Byte projectType;
+    @TableField("GroupID")
+    private Integer groupID;
 
     /**
      * 属性名称
      */
+    @TableField("`Name`")
     private String name;
 
     /**
      * 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
      */
+    @TableField("Type")
     private Byte type;
 
     /**
      * 属性单位
      */
+    @TableField("Unit")
     private String unit;
 
     /**
      * 是否必填
      */
+    @TableField("Required")
     private Boolean required;
 
     /**
      * 是否多选,限定枚举
      */
+    @TableField("MultiSelect")
     private Boolean multiSelect;
 
     /**
      * 枚举字段
      */
+    @TableField("EnumField")
     private String enumField;
 
     /**
      * 创建类型 0-预定义 1-自定义
      */
+    @TableField("CreateType")
     private Byte createType;
 
     /**
      * 结构名称
      */
+    @TableField("ClassName")
     private String className;
 
     /**
      * 排序字段
      */
+    @TableField("DisplayOrder")
     private Integer displayOrder;
 
     /**
      * 模板ID
      */
+    @TableField("ModelID")
     private Integer modelID;
 
     /**
      * 拓展信息
      */
+    @TableField("ExValue")
     private String exValue;
 
     public Integer getID() {
@@ -74,12 +93,21 @@ public class TbProperty {
         this.ID = ID;
     }
 
-    public Byte getProjectType() {
-        return projectType;
+//    public Byte getProjectType() {
+//        return projectType;
+//    }
+//
+//    public void setProjectType(Byte projectType) {
+//        this.projectType = projectType;
+//    }
+
+
+    public Integer getGroupID() {
+        return groupID;
     }
 
-    public void setProjectType(Byte projectType) {
-        this.projectType = projectType;
+    public void setGroupID(Integer groupID) {
+        this.groupID = groupID;
     }
 
     public String getName() {
@@ -174,7 +202,8 @@ public class TbProperty {
     public String toString() {
         return "TbProperty{" +
                 "ID=" + ID +
-                ", projectType=" + projectType +
+//                ", projectType=" + projectType +
+                ", groupID='" + groupID + '\'' +
                 ", name='" + name + '\'' +
                 ", type=" + type +
                 ", unit='" + unit + '\'' +

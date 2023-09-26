@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.TagKeyAndValue;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -71,17 +72,23 @@ public class Param2DBEntityUtil {
 
     public static TbPropertyModel fromAddModelParam2TbPropertyModel(AddModelParam param, Integer userID) {
         TbPropertyModel obj = new TbPropertyModel();
+        obj.setCompanyID(param.getCompanyID());
         obj.setName(param.getModelName());
-        obj.setProjectType(param.getProjectType());
-        obj.setCreateType(CreateType.CUSTOMIZED.getType());
+        obj.setPlatform(param.getPlatform());
+        obj.setModelType(param.getModelType());
+        obj.setModelTypeSubType(param.getModelTypeSubType());
+        obj.setGroupID(param.getGroupID());
+        obj.setCreateType(Integer.valueOf(CreateType.CUSTOMIZED.getType()));
         obj.setDesc(param.getDesc());
+        obj.setCreateTime(LocalDateTime.now());
+        obj.setCreateUserID(userID);
         return obj;
     }
 
     public static List<TbProperty> fromAddModelParam2TbPropertyList(AddModelParam param, Integer userID, Integer modelID) {
         return param.getModelPropertyList().stream().map(item -> {
             TbProperty obj = new TbProperty();
-            obj.setProjectType(param.getProjectType());
+            obj.setGroupID(param.getGroupID());
             obj.setName(item.getName());
             obj.setType(item.getType());
             obj.setUnit(item.getUnit());

@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Component
 public class PredefinedModelProperTyCache {
     private static List<TbProperty> propertyList;
-    public static Map<Byte, List<TbProperty>> projectTypeAndPropertyListMap;
+    public static Map<Integer, List<TbProperty>> projectTypeAndPropertyListMap;
 
 
     private TbPropertyMapper tbPropertyMapper;
@@ -33,6 +33,6 @@ public class PredefinedModelProperTyCache {
     @PostConstruct
     void init(){
         propertyList = tbPropertyMapper.queryByCreateType(CreateType.PREDEFINED.getType());
-        projectTypeAndPropertyListMap = propertyList.stream().collect(Collectors.groupingBy(TbProperty::getProjectType));
+        projectTypeAndPropertyListMap = propertyList.stream().collect(Collectors.groupingBy(TbProperty::getGroupID));
     }
 }

@@ -5,10 +5,13 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+
+import java.util.List;
 
 /**
  * @Author wuxl
@@ -25,10 +28,11 @@ public class DeletePropertyModelGroupParam implements ParameterValidator, Resour
     private Integer companyID;
 
     @NotEmpty(message = "主键ID集合不能为空")
-    private Integer IDList;
+    @JsonProperty("IDList")
+    private List<Integer> IDList;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         return null;
     }
 

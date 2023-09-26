@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import java.util.List;
 
 @Mapper
-public interface TbPropertyMapper extends BaseMapper<TbProperty> {
+public interface TbPropertyMapper extends BasicMapper<TbProperty>  {
     int deleteByPrimaryKey(Integer ID);
 
     int insert(TbProperty record);

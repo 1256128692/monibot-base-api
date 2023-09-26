@@ -5,25 +5,43 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.ToString;
+
+import java.util.Objects;
 
 /**
  * @program: monibot-base-api
  * @author: gaoxu
  * @create: 2023-03-02 10:23
  **/
+@Data
+@ToString
 public class QueryModelListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     private Integer modelID;
-    @NotNull
-    private Byte projectType;
+
+    private String name;
+
+    @NotNull(message = "模板类型不能为空")
+    private Integer modelType;
+
+    private Integer modelTypeSubType;
+
+    private Integer groupID;
+
     private Byte createType;
 
     @Override
-    public ResultWrapper validate() {
-        if (!ProjectTypeCache.projectTypeMap.containsKey(projectType)){
+    public ResultWrapper<?> validate() {
+        if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(groupID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为项目时，groupID不能为空");
+        }
+        if (!ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
-        if (createType!=null &&!CreateType.isValid(createType)){
+        if (createType != null && !CreateType.isValid(createType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
         return null;
@@ -40,29 +58,4 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 
-
-
-    public Integer getModelID() {
-        return modelID;
-    }
-
-    public void setModelID(Integer modelID) {
-        this.modelID = modelID;
-    }
-
-    public Byte getProjectType() {
-        return projectType;
-    }
-
-    public void setProjectType(Byte projectType) {
-        this.projectType = projectType;
-    }
-
-    public Byte getCreateType() {
-        return createType;
-    }
-
-    public void setCreateType(Byte createType) {
-        this.createType = createType;
-    }
 }

@@ -23,7 +23,10 @@ public class QueryPropertyModelGroupListParam implements ParameterValidator, Res
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    private String groupName;
+    @NotNull(message = "groupType不能为空")
+    private Integer groupType;
+
+    private String name;
 
     @Override
     public ResultWrapper validate() {

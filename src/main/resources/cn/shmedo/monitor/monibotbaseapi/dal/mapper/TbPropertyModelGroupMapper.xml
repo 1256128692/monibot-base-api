@@ -7,76 +7,20 @@
     <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup">
             <id property="ID" column="ID" jdbcType="INTEGER"/>
             <result property="companyID" column="CompanyID" jdbcType="INTEGER"/>
-            <result property="groupname" column="GroupName" jdbcType="VARCHAR"/>
+            <result property="platform" column="Platform" jdbcType="VARCHAR"/>
+            <result property="groupType" column="ModelType" jdbcType="TINYINT"/>
+            <result property="groupTypeSubType" column="ModelTypeSubType" jdbcType="TINYINT"/>
+            <result property="name" column="Name" jdbcType="VARCHAR"/>
             <result property="desc" column="Desc" jdbcType="VARCHAR"/>
-            <result property="exvalues" column="ExValues" jdbcType="VARCHAR"/>
+            <result property="exValue" column="ExValue" jdbcType="VARCHAR"/>
+            <result property="createTime" column="CreateTime" jdbcType="TIMESTAMP"/>
+            <result property="createUserID" column="CreateUserID" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        ID,CompanyID,GroupName,
-        Desc,ExValues
+        ID,CompanyID,Platform,
+        GroupType,GroupTypeSubType,Name,
+        Desc,ExValue,CreateTime,
+        CreateUserID
     </sql>
-
-    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
-        select
-        <include refid="Base_Column_List" />
-        from tb_property_model_group
-        where  ID = #{id,jdbcType=INTEGER} 
-    </select>
-
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-        delete from tb_property_model_group
-        where  ID = #{id,jdbcType=INTEGER} 
-    </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup" useGeneratedKeys="true">
-        insert into tb_property_model_group
-        ( ID,CompanyID,GroupName
-        ,Desc,ExValues)
-        values (#{id,jdbcType=INTEGER},#{companyid,jdbcType=INTEGER},#{groupname,jdbcType=VARCHAR}
-        ,#{desc,jdbcType=VARCHAR},#{exvalues,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" keyColumn="ID" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup" useGeneratedKeys="true">
-        insert into tb_property_model_group
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-                <if test="id != null">ID,</if>
-                <if test="companyid != null">CompanyID,</if>
-                <if test="groupname != null">GroupName,</if>
-                <if test="desc != null">Desc,</if>
-                <if test="exvalues != null">ExValues,</if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-                <if test="id != null">#{id,jdbcType=INTEGER},</if>
-                <if test="companyid != null">#{companyid,jdbcType=INTEGER},</if>
-                <if test="groupname != null">#{groupname,jdbcType=VARCHAR},</if>
-                <if test="desc != null">#{desc,jdbcType=VARCHAR},</if>
-                <if test="exvalues != null">#{exvalues,jdbcType=VARCHAR},</if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup">
-        update tb_property_model_group
-        <set>
-                <if test="companyid != null">
-                    CompanyID = #{companyid,jdbcType=INTEGER},
-                </if>
-                <if test="groupname != null">
-                    GroupName = #{groupname,jdbcType=VARCHAR},
-                </if>
-                <if test="desc != null">
-                    Desc = #{desc,jdbcType=VARCHAR},
-                </if>
-                <if test="exvalues != null">
-                    ExValues = #{exvalues,jdbcType=VARCHAR},
-                </if>
-        </set>
-        where   ID = #{id,jdbcType=INTEGER} 
-    </update>
-    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup">
-        update tb_property_model_group
-        set 
-            CompanyID =  #{companyid,jdbcType=INTEGER},
-            GroupName =  #{groupname,jdbcType=VARCHAR},
-            Desc =  #{desc,jdbcType=VARCHAR},
-            ExValues =  #{exvalues,jdbcType=VARCHAR}
-        where   ID = #{id,jdbcType=INTEGER} 
-    </update>
 </mapper>
