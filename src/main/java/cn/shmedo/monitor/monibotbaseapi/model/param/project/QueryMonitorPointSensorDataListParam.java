@@ -40,6 +40,9 @@ public class QueryMonitorPointSensorDataListParam implements ParameterValidator,
     @JsonIgnore
     private TbMonitorPoint tbMonitorPoint;
 
+    @JsonIgnore
+    private TbProjectInfo tbProjectInfo;
+
 
     @Override
     public ResultWrapper<?> validate() {
@@ -48,6 +51,11 @@ public class QueryMonitorPointSensorDataListParam implements ParameterValidator,
         LambdaQueryWrapper<TbMonitorPoint> wrapper = new LambdaQueryWrapper<TbMonitorPoint>()
                 .eq(TbMonitorPoint::getID, monitorPointID);
         this.tbMonitorPoint = tbMonitorPointMapper.selectOne(wrapper);
+
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        LambdaQueryWrapper<TbProjectInfo> pWrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getID, projectID);
+        this.tbProjectInfo = tbProjectInfoMapper.selectOne(pWrapper);
 
         if (tbMonitorPoint == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测点不存在");

@@ -104,6 +104,172 @@ public class WaterQualityUtil {
         }
     }
 
+
+    /**
+     * 灌区水质计算
+     * @param v1 污浊度计算
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getGqTurbidityCategory(double v1) {
+        if (v1 <= 3) {
+            return WaterQuality.TYPE_1.getKey();
+        } else if (v1 > 3 && v1 <= 10) {
+            return WaterQuality.TYPE_4.getKey();
+        } else {
+            return WaterQuality.TYPE_5.getKey();
+        }
+    }
+
+    /**
+     * 灌区水质计算
+     * @param v1 灌区ph
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getGqPhCategory(double v1) {
+        if (v1 >= 6.5 && v1 <= 8.5) {
+            return WaterQuality.TYPE_1.getKey();
+        } else if (v1 > 5.5 && v1 < 6.5) {
+            return WaterQuality.TYPE_4.getKey();
+        } else if (v1 > 8.5 && v1 <= 9) {
+            return WaterQuality.TYPE_4.getKey();
+        } else {
+            return WaterQuality.TYPE_5.getKey();
+        }
+    }
+
+    /**
+     * 灌区水质计算
+     * @param v1 灌区总硬度
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getGqHardnessCategory(double v1) {
+        if (v1 <= 150) {
+            return WaterQuality.TYPE_1.getKey();
+        } else if (v1 <= 300) {
+            return WaterQuality.TYPE_2.getKey();
+        } else if (v1 <= 450) {
+            return WaterQuality.TYPE_3.getKey();
+        } else if (v1 <= 650) {
+            return WaterQuality.TYPE_4.getKey();
+        } else {
+            return WaterQuality.TYPE_5.getKey();
+        }
+    }
+
+
+    /**
+     * 灌区水质计算
+     * @param v1 灌区溶解性总固体
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getGqDissolvedCategory(double v1) {
+        if (v1 <= 300) {
+            return WaterQuality.TYPE_1.getKey();
+        } else if (v1 <= 500) {
+            return WaterQuality.TYPE_2.getKey();
+        } else if (v1 <= 1000) {
+            return WaterQuality.TYPE_3.getKey();
+        } else if (v1 <= 2000) {
+            return WaterQuality.TYPE_4.getKey();
+        } else {
+            return WaterQuality.TYPE_5.getKey();
+        }
+    }
+
+
+    /**
+     * 地下水质计算
+     * @param v1 地下水温
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxTemperatureCategory(double v1) {
+        if (v1 <= 35) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+    /**
+     * 地下水质计算
+     * @param v1 地下悬浮物
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxSuspendedsolidsCategory(double v1) {
+        if (v1 <= 100) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+
+    /**
+     * 地下水质计算
+     * @param v1 地下化学需氧量
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxOxygendemandCategory(double v1) {
+        if (v1 <= 200) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+    /**
+     * 地下水质计算
+     * @param v1 地下氯化物
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxChlorideCategory(double v1) {
+        if (v1 <= 350) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+    /**
+     * 地下水质计算
+     * @param v1 地下硫化物
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxSulfideCategory(double v1) {
+        if (v1 <= 1) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+
+    /**
+     * 地下水质计算
+     * @param v1 地下全盐量
+     * @return
+     */
+    // 定义v1的判定规则
+    public static int getDxTotalsaltCategory(double v1) {
+        if (v1 <= 2000) {
+            return WaterQuality.TYPE_7.getKey();
+        } else {
+            return WaterQuality.TYPE_8.getKey();
+        }
+    }
+
+
+
+
     // 获取判定结果的最大值
     public static int getMaxCategory(List<Integer> categories) {
         return Collections.max(categories);
