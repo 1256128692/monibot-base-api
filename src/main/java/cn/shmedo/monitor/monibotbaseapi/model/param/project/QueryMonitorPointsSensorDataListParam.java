@@ -5,7 +5,9 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -43,6 +45,9 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
     @JsonIgnore
     private Integer monitorItemID;
 
+    @JsonIgnore
+    private TbProjectInfo tbProjectInfo;
+
     @Override
     public ResultWrapper<?> validate() {
         // 加校验(1.监测点的项目ID必须与项目ID一致 2.密度不为空是,必须以h或者d结尾)
@@ -50,6 +55,11 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
         LambdaQueryWrapper<TbMonitorPoint> wrapper = new LambdaQueryWrapper<TbMonitorPoint>()
                 .in(TbMonitorPoint::getID, monitorPointIDs);
         tbMonitorPointList = tbMonitorPointMapper.selectList(wrapper);
+
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        LambdaQueryWrapper<TbProjectInfo> pWrapper = new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getID, projectID);
+        this.tbProjectInfo = tbProjectInfoMapper.selectOne(pWrapper);
 
         if (CollectionUtil.isNullOrEmpty(tbMonitorPointList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未找到监测点数据");

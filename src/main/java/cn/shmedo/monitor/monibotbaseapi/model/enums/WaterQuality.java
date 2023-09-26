@@ -7,7 +7,11 @@ public enum WaterQuality {
     TYPE_3(3, "Ⅲ类"),
     TYPE_4(4, "Ⅳ类"),
     TYPE_5(5, "Ⅴ类"),
-    TYPE_6(6, "劣五类");
+    TYPE_6(6, "劣五类"),
+
+    TYPE_7(7, "达标"),
+
+    TYPE_8(8, "超标");
 
     private final int key;
     private final String value;
