@@ -1,11 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoPresetPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -24,12 +25,19 @@ public class DeletePresetPointParam implements ParameterValidator, ResourcePermi
     private Integer companyID;
     @NotEmpty(message = "预置点IDList不能为空")
     private List<Integer> presetPointIDList;
+    @JsonIgnore
+    private List<PresetPointWithDeviceInfo> tbPresetPointWithDeviceInfoList;
 
     @Override
     public ResultWrapper validate() {
-        if (presetPointIDList.size() == 1 && !ContextHolder.getBean(TbVideoPresetPointMapper.class)
-                .exists(new LambdaQueryWrapper<TbVideoPresetPoint>().eq(TbVideoPresetPoint::getID, presetPointIDList.get(0)))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的预置点不存在!");
+        this.tbPresetPointWithDeviceInfoList = ContextHolder.getBean(TbVideoPresetPointMapper.class)
+                .selectPresetPointWithDeviceInfo(presetPointIDList);
+        if (presetPointIDList.size() == 1) {
+            if (this.tbPresetPointWithDeviceInfoList.size() < 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的预置点不存在!");
+            } else if (ObjectUtil.isEmpty(this.tbPresetPointWithDeviceInfoList.get(0).getDeviceSerial())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的预置点的设备不存在!");
+            }
         }
         return null;
     }

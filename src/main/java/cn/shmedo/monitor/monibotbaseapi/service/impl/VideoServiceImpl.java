@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
@@ -13,17 +14,16 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoCaptureMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkChannelInfo;
@@ -32,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPoin
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
+import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
@@ -42,6 +43,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -74,6 +76,7 @@ public class VideoServiceImpl implements VideoService {
     private final RedisCompanyInfoDao redisCompanyInfoDao;
 
     private final IotService iotService;
+    private final TbVideoPresetPointMapper tbVideoPresetPointMapper;
 
     private final TbSensorMapper sensorMapper;
 
@@ -85,10 +88,6 @@ public class VideoServiceImpl implements VideoService {
 //     */
 //    private static final String SUPPORT_RATE_LIMIT_KEY = "supportRateLimit";
 
-    /**
-     * 海康云台操作默认速度
-     */
-    private static final Integer HIK_DEFAULT_PTZ_SPEED = 50;
 
     /**
      * 获取萤石云TOKEN，如果REDIS中没有，则从接口中获取
@@ -161,7 +160,6 @@ public class VideoServiceImpl implements VideoService {
         return vo;
     }
 
-
     @Override
     public ResultWrapper<Object> panControlVideoPoint(PanControlVideoPointParam pa) {
         List<VideoMonitorPointLiveInfo> liveInfos = pa.getLiveInfos();
@@ -180,13 +178,19 @@ public class VideoServiceImpl implements VideoService {
                 }
                 case HAI_KANG -> {
                     String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
-                    Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 0, command, HIK_DEFAULT_PTZ_SPEED, null);
-                    hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), 1, command, HIK_DEFAULT_PTZ_SPEED, null);
+                    Map<String, String> response = hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(),
+                            DefaultConstant.HikVideoConstant.HIK_PTZ_ACTION_START, command,
+                            DefaultConstant.HikVideoConstant.HIK_DEFAULT_PTZ_SPEED, null);
+                    hkVideoService.controllingPtz(withSensorIDInfo.getDeviceSerial(), DefaultConstant.HikVideoConstant.HIK_PTZ_ACTION_END,
+                            command, DefaultConstant.HikVideoConstant.HIK_DEFAULT_PTZ_SPEED, null);
                     if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(response.getOrDefault("code", "1"))) {
-                        return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get("msg"));
+                        return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get(DefaultConstant.HikVideoParamKeys.HIK_MSG));
                     }
                 }
-                default -> log.error("新平台云台操作暂未实现，平台: {}", platformType.name());
+                default -> {
+                    log.error("该平台云台操作暂未实现，平台: {}", platformType.getDescription());
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, platformType.getDescription() + "视频摄像头云台操作功能暂不可用");
+                }
             }
         }
         return ResultWrapper.successWithNothing();
@@ -220,9 +224,9 @@ public class VideoServiceImpl implements VideoService {
         final VideoCompanyViewBaseInfo baseInfo = pa.getBaseInfo();
         final String deviceSerial = baseInfo.getDeviceSerial();
         final Integer deviceChannel = pa.getDeviceChannel();
-        switch (baseInfo.getAccessPlatform()) {
-            case 0 -> {
-                //ys
+        AccessPlatformType platformType = AccessPlatformType.getByValue(baseInfo.getAccessPlatform().byteValue());
+        switch (platformType) {
+            case YING_SHI -> {
                 String ysToken = getYsToken();
                 YsResultWrapper<?> startWrapper = ysService.startPtz(ysToken, deviceSerial, deviceChannel, pa.getDirection(), DefaultConstant.YS_DEFAULT_SPEED);
                 YsResultWrapper<?> endWrapper = ysService.stopPtz(ysToken, deviceSerial, deviceChannel, pa.getDirection());
@@ -233,20 +237,20 @@ public class VideoServiceImpl implements VideoService {
                     return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, endWrapper.getMsg());
                 }
             }
-            case 1 -> {
-                //hik
+            case HAI_KANG -> {
                 String command = HikPtzCommandEnum.getByYsDirection(pa.getDirection()).getCommand();
-                Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, 0, command, HIK_DEFAULT_PTZ_SPEED, null);
-                Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, 1, command, HIK_DEFAULT_PTZ_SPEED, null);
-                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(startResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "1"))) {
-                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
+                Map<String, String> startResponse = hkVideoService.controllingPtz(deviceSerial, DefaultConstant.HikVideoConstant.HIK_PTZ_ACTION_START, command, DefaultConstant.HikVideoConstant.HIK_DEFAULT_PTZ_SPEED, null);
+                Map<String, String> endResponse = hkVideoService.controllingPtz(deviceSerial, DefaultConstant.HikVideoConstant.HIK_PTZ_ACTION_END, command, DefaultConstant.HikVideoConstant.HIK_DEFAULT_PTZ_SPEED, null);
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(startResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "-1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get(DefaultConstant.HikVideoParamKeys.HIK_MSG));
                 }
-                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(endResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "1"))) {
-                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get("msg"));
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(endResponse.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "-1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, startResponse.get(DefaultConstant.HikVideoParamKeys.HIK_MSG));
                 }
             }
             default -> {
-                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "该类型视频摄像头暂时无法进行云台操作");
+                log.error("该平台云台操作暂未实现，平台: {}", platformType.getDescription());
+                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, platformType.getDescription() + "视频摄像头云台操作功能暂不可用");
             }
         }
         return ResultWrapper.successWithNothing();
@@ -908,7 +912,7 @@ public class VideoServiceImpl implements VideoService {
         if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
             return true;
         } else {
-            tbVideoDevices.forEach( v -> {
+            tbVideoDevices.forEach(v -> {
                 VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream().filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
                 if (videoDeviceBaseInfoV1 != null) {
                     v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
@@ -929,6 +933,124 @@ public class VideoServiceImpl implements VideoService {
         }
 
         return true;
+    }
+
+    @Override
+    @Transactional
+    public ResultWrapper<Object> addPresetPoint(AddPresetPointParam param) {
+        final TbVideoDevice tbVideoDevice = param.getTbVideoDevice();
+        final String deviceSerial = tbVideoDevice.getDeviceSerial();
+        final Integer channelNo = param.getChannelNo();
+        AccessPlatformType platformType = AccessPlatformType.getByValue(tbVideoDevice.getAccessPlatform());
+        switch (platformType) {
+            case YING_SHI -> {
+                YsResultWrapper<Map<String, Integer>> ysResultPageWrapper = ysService.addPresetPoint(getYsToken(), deviceSerial, channelNo);
+                Optional.of(ysResultPageWrapper).filter(YsResultWrapper::callSuccess).map(YsResultWrapper::getData)
+                        .filter(u -> u.containsKey(DefaultConstant.YS_PRESET_POINT_INDEX_KEY))
+                        .map(u -> u.get(DefaultConstant.YS_PRESET_POINT_INDEX_KEY)).ifPresent(param::setPresetPointIndex);
+            }
+            case HAI_KANG -> {
+                //acquire the video device maximum {@code presetPointIndex} currently,then execute the RPC to generate a preset point in hik platform.
+                TbVideoPresetPoint maxPresetPoint = tbVideoPresetPointMapper.selectOne(new LambdaQueryWrapper<TbVideoPresetPoint>()
+                        .eq(TbVideoPresetPoint::getVideoDeviceID, tbVideoDevice.getID()).orderByDesc(TbVideoPresetPoint::getPresetPointIndex).last("LIMIT 1"));
+                Integer presetPointIndex = Objects.isNull(maxPresetPoint) || Objects.isNull(maxPresetPoint.getPresetPointIndex()) ?
+                        1 : maxPresetPoint.getPresetPointIndex() + 1;
+                Map<String, String> response = hkVideoService.managePresetPoint(deviceSerial, param.getPresetPointName(), presetPointIndex);
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(response.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "-1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get(DefaultConstant.HikVideoParamKeys.HIK_MSG));
+                }
+                param.setPresetPointIndex(presetPointIndex);
+            }
+            default -> {
+                log.error("该平台预置点暂未实现，平台: {}", platformType.getDescription());
+                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, platformType.getDescription() + "视频摄像头预置点功能暂不可用");
+            }
+        }
+        if (Objects.isNull(param.getPresetPointIndex())) {
+            return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR,
+                    AccessPlatformType.getDescriptionByValue(tbVideoDevice.getAccessPlatform()) + "新增预置点失败");
+        }
+        TbVideoPresetPoint point = new TbVideoPresetPoint();
+        point.setPresetPointName(param.getPresetPointName());
+        point.setChannelNo(channelNo);
+        point.setVideoDeviceID(param.getVideoDeviceID());
+        point.setPresetPointIndex(param.getPresetPointIndex());
+        tbVideoPresetPointMapper.insert(point);
+        return ResultWrapper.successWithNothing();
+    }
+
+    @Override
+    @Transactional
+    public ResultWrapper<Object> deletePresetPoint(List<PresetPointWithDeviceInfo> presetPointWithDeviceInfoList) {
+        Map<AccessPlatformType, List<PresetPointWithDeviceInfo>> collect = presetPointWithDeviceInfoList.stream()
+                .collect(Collectors.groupingBy(u -> AccessPlatformType.getByValue(u.getAccessPlatform().byteValue())));
+        List<AccessPlatformType> unsupportPlatformList = collect.keySet().stream()
+                .filter(u -> !(AccessPlatformType.YING_SHI.equals(u) || AccessPlatformType.HAI_KANG.equals(u))).toList();
+        if (CollUtil.isNotEmpty(unsupportPlatformList)) {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "存在不支持的平台,不支持平台名称列表: {}"
+                    + unsupportPlatformList.stream().map(AccessPlatformType::getDescription).toList());
+        }
+        List<Integer> failedPresetIDList = new ArrayList<>();
+
+        //ys
+        String ysToken = getYsToken();
+        List<PresetPointWithDeviceInfo> ysPresetPointWithDeviceInfoList = collect.get(AccessPlatformType.YING_SHI);
+        List<PresetPointWithDeviceInfo> deleteSuccessPresetPointWithDeviceInfoList = new ArrayList<>();
+        for (PresetPointWithDeviceInfo ysInfo : ysPresetPointWithDeviceInfoList) {
+            String deviceSerial = ysInfo.getDeviceSerial();
+            Integer channelNo = ysInfo.getChannelNo();
+            Integer presetPointIndex = ysInfo.getPresetPointIndex();
+            try {
+                ysService.clearPresetPoint(ysToken, deviceSerial, channelNo, presetPointIndex);
+                deleteSuccessPresetPointWithDeviceInfoList.add(ysInfo);
+            } catch (Exception e) {
+                log.error("萤石设备预置点删除失败,设备唯一标识:{}, 通道号:{}, 预置点编号:{}", deviceSerial, channelNo, presetPointIndex);
+                failedPresetIDList.add(ysInfo.getPresetPointID());
+            }
+        }
+
+        //hik
+        List<PresetPointWithDeviceInfo> hikPresetPointWithDeviceInfoList = collect.get(AccessPlatformType.HAI_KANG);
+        for (PresetPointWithDeviceInfo hikInfo : hikPresetPointWithDeviceInfoList) {
+            String deviceSerial = hikInfo.getDeviceSerial();
+            Integer presetPointIndex = hikInfo.getPresetPointIndex();
+            try {
+                hkVideoService.deletePresetPoint(deviceSerial, presetPointIndex);
+                deleteSuccessPresetPointWithDeviceInfoList.add(hikInfo);
+            } catch (Exception e) {
+                log.error("海康设备预置点删除失败,设备唯一标识:{}, 预置点编号:{}", deviceSerial, presetPointIndex);
+                failedPresetIDList.add(hikInfo.getPresetPointID());
+            }
+        }
+        Optional.of(deleteSuccessPresetPointWithDeviceInfoList).filter(CollUtil::isNotEmpty).map(u -> u.stream()
+                .map(PresetPointWithDeviceInfo::getPresetPointID).toList()).ifPresent(tbVideoPresetPointMapper::deleteBatchIds);
+        return CollUtil.isEmpty(failedPresetIDList) ? ResultWrapper.successWithNothing() :
+                ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, "部分预置点删除失败,失败的预置点ID List:" + failedPresetIDList);
+    }
+
+    @Override
+    public ResultWrapper<Object> movePresetPoint(PresetPointWithDeviceInfo info) {
+        AccessPlatformType platformType = AccessPlatformType.getByValue(info.getAccessPlatform().byteValue());
+        switch (platformType) {
+            case YING_SHI -> {
+                YsResultWrapper ysResultWrapper = ysService.movePresetPoint(getYsToken(), info.getDeviceSerial(), info.getChannelNo(), info.getPresetPointIndex());
+                if (!ysResultWrapper.callSuccess()) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, ysResultWrapper.getMsg());
+                }
+            }
+            case HAI_KANG -> {
+                Map<String, String> response = hkVideoService.controllingPtz(info.getDeviceSerial(), DefaultConstant.HikVideoConstant.HIK_PTZ_ACTION_START,
+                        HikPtzCommandEnum.GOTO_PRESET.getCommand(), DefaultConstant.HikVideoConstant.HIK_DEFAULT_PTZ_SPEED, info.getPresetPointIndex());
+                if (!DefaultConstant.HikVideoParamKeys.HIK_SUCCESS_CODE.equals(response.getOrDefault(DefaultConstant.HikVideoParamKeys.HIK_CODE, "-1"))) {
+                    return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR, response.get(DefaultConstant.HikVideoParamKeys.HIK_MSG));
+                }
+            }
+            default -> {
+                log.error("该平台移动到预置点暂未实现，平台: {}", platformType.getDescription());
+                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, platformType.getDescription() + "视频摄像头移动到预置点功能暂不可用");
+            }
+        }
+        return ResultWrapper.successWithNothing();
     }
 
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {

@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -27,6 +28,8 @@ public class QueryPresetPointListParam implements ParameterValidator, ResourcePe
     private Integer videoDeviceID;
     @NotNull(message = "通道号不能为空")
     private Integer channelNo;
+    @JsonIgnore
+    private TbVideoDevice tbVideoDevice;
 
     @Override
     public ResultWrapper validate() {
@@ -35,7 +38,8 @@ public class QueryPresetPointListParam implements ParameterValidator, ResourcePe
         if (CollUtil.isEmpty(tbVideoDeviceList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在");
         }
-        String exValue = tbVideoDeviceList.get(0).getExValue();
+        tbVideoDevice = tbVideoDeviceList.get(0);
+        String exValue = tbVideoDevice.getExValue();
         if (!exValue.contains("\"channelNo\":" + channelNo)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该视频设备没有通道号为" + channelNo + "的通道");
         }

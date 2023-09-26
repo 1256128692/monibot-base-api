@@ -25,4 +25,8 @@ public interface HkVideoService {
     String getTalkStreamInfo(String deviceSerial, String protocol, Integer transmode, String expand, String eurlExand);
 
     Map<String, String> controllingPtz(String deviceSerial, Integer action, String command, Integer speed, Integer presetIndex);
+
+    void deletePresetPoint(String deviceSerial, Integer presetIndex);
+
+    Map<String, String> managePresetPoint(String deviceSerial, String presetName, Integer presetIndex);
 }

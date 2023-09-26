@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoPresetPointService;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import jakarta.validation.Valid;
@@ -25,6 +26,7 @@ import java.util.Map;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class VideoPresetPointController {
     private final ITbVideoPresetPointService tbVideoPresetPointService;
+    private final VideoService videoService;
 
     /**
      * @api {POST} /QueryPresetPointList 查询设备预置点列表
@@ -61,7 +63,6 @@ public class VideoPresetPointController {
      * @apiParam (请求体) {Int} videoDeviceID 视频设备ID
      * @apiParam (请求体) {Int} channelNo 通道号
      * @apiParam (请求体) {String} presetPointName 预置点名称
-     * @apiParam (请求体) {Int} presetPointIndex 预置点位置
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddBasePresetPoint
@@ -69,8 +70,7 @@ public class VideoPresetPointController {
     @Permission(permissionName = "mdmbase:AddBasePresetPoint")
     @PostMapping(value = "/AddPresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addPresetPoint(@Valid @RequestBody AddPresetPointParam param) {
-        this.tbVideoPresetPointService.save(param.getTbVideoPresetPoint());
-        return ResultWrapper.successWithNothing();
+        return videoService.addPresetPoint(param);
     }
 
     /**
@@ -110,7 +110,24 @@ public class VideoPresetPointController {
     @Permission(permissionName = "mdmbase:DeleteBasePresetPoint")
     @PostMapping(value = "/DeletePresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deletePresetPoint(@Valid @RequestBody DeletePresetPointParam param) {
-        this.tbVideoPresetPointService.removeBatchByIds(param.getPresetPointIDList());
-        return ResultWrapper.successWithNothing();
+        return videoService.deletePresetPoint(param.getTbPresetPointWithDeviceInfoList());
+    }
+
+    /**
+     * @api {POST} /MovePresetPoint 移动到该预置点
+     * @apiDescription 移动到该预置点
+     * @apiVersion 1.0.0
+     * @apiGroup 预置点模块
+     * @apiName MovePresetPoint
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} presetPointID 预置点ID
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:MoveBasePresetPoint
+     */
+    @Permission(permissionName = "mdmbase:MoveBasePresetPoint")
+    @PostMapping(value = "/MovePresetPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object movePresetPoint(@Valid @RequestBody MovePresetPointParam param) {
+        return videoService.movePresetPoint(param.getPresetPointWithDeviceInfo());
     }
 }

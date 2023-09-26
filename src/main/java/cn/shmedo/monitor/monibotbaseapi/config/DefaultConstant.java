@@ -50,6 +50,11 @@ public class DefaultConstant {
     public static final String VIDEO_CAPTUREINTERVAL = "captureInterval";
 
     /**
+     * 萤石预置点序号key
+     */
+    public static final String YS_PRESET_POINT_INDEX_KEY = "index";
+
+    /**
      * 海康视频参数key<br>
      * 这里仅注释它的含义,具体取值等需在对应接口上查看相应海康接口文档引用。
      */
@@ -138,6 +143,10 @@ public class DefaultConstant {
          */
         String HIK_PRESET_INDEX = "presetIndex";
         /**
+         * 预置点名称
+         */
+        String HIK_PRESET_NAME = "presetName";
+        /**
          * 通用返参code、msg和data
          */
         String HIK_CODE = "code";
@@ -148,5 +157,18 @@ public class DefaultConstant {
          * 成功返参
          */
         String HIK_SUCCESS_CODE = "0";
+    }
+
+    public interface HikVideoConstant {
+        /**
+         * 海康云台操作默认速度
+         */
+        Integer HIK_DEFAULT_PTZ_SPEED = 50;
+
+        /**
+         * 海康云台操作动作action
+         */
+        Integer HIK_PTZ_ACTION_START = 0;
+        Integer HIK_PTZ_ACTION_END = 1;
     }
 }

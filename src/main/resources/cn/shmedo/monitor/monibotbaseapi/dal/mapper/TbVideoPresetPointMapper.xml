@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoPresetPointMapper">
+    <select id="selectPresetPointWithDeviceInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo">
+        SELECT
+            tvpp.ID presetPointID,
+            tvpp.PresetPointName presetPointName,
+            tvpp.PresetPointIndex presetPointIndex,
+            tvpp.`ChannelNo` channelNo,
+            tvd.ID videoDeviceID,
+            tvd.DeviceSerial deviceSerial,
+            tvd.AccessPlatform accessPlatform,
+            tvd.ExValue exValue
+        FROM tb_video_preset_point tvpp
+            LEFT JOIN tb_video_device tvd ON tvpp.VideoDeviceID = tvd.ID
+        WHERE tvpp.ID IN
+        <foreach collection="presetPointIDList" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

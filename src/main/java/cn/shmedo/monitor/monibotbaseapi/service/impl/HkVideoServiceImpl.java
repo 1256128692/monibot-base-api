@@ -238,6 +238,73 @@ public class HkVideoServiceImpl implements HkVideoService {
     }
 
     /**
+     * 删除预置点信息
+     *
+     * @see <a href="https://open.hikvision.com/docs/docId?productId=5c67f1e2f05948198c909700&tagPath=API%E5%88%97%E8%A1%A8-%E8%A7%86%E9%A2%91%E4%B8%9A%E5%8A%A1-%E8%A7%86%E9%A2%91%E5%8A%9F%E8%83%BD&version=%2F60df74fdc6f24041ac3d2d7f81c32325#c4281e8b">接口文档-删除预置点信息</a>
+     */
+    @Override
+    public void deletePresetPoint(String deviceSerial, Integer presetIndex) {
+        final String previewURLsApi = ARTEMIS_PATH + "/api/video/v1/presets/deletion";
+        Map<String, String> path = new HashMap<>(2) {
+            {
+                put("https://", previewURLsApi);//根据现场环境部署确认是http还是https
+            }
+        };
+        Map<String, Object> paramMap = new HashMap<>(16) {
+            {
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                put(HIK_PRESET_INDEX, presetIndex);
+            }
+        };
+        String body = JSONUtil.toJsonStr(paramMap);
+        try {
+            String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
+            Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
+                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1")))
+                    .orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
+        } catch (Exception e) {
+            throw new RuntimeException("海康接口调用失败!");
+        }
+    }
+
+    /**
+     * 设置预置点信息<br>
+     * 若参数传已经存在的预置点编号，则可修改预置点信息
+     *
+     * @see <a href="https://open.hikvision.com/docs/docId?productId=5c67f1e2f05948198c909700&tagPath=API%E5%88%97%E8%A1%A8-%E8%A7%86%E9%A2%91%E4%B8%9A%E5%8A%A1-%E8%A7%86%E9%A2%91%E5%8A%9F%E8%83%BD&version=%2F60df74fdc6f24041ac3d2d7f81c32325#f0cf5c24">接口文档-设置预置点信息</a>
+     */
+    @Override
+    public Map<String, String> managePresetPoint(String deviceSerial, String presetName, Integer presetIndex) {
+        final String previewURLsApi = ARTEMIS_PATH + "/api/video/v1/presets/addition";
+        Map<String, String> path = new HashMap<>(2) {
+            {
+                put("https://", previewURLsApi);//根据现场环境部署确认是http还是https
+            }
+        };
+        Map<String, Object> paramMap = new HashMap<>(16) {
+            {
+                put(HIK_DEVICE_SERIAL, deviceSerial);
+                put(HIK_PRESET_NAME, presetName);
+                put(HIK_PRESET_INDEX, presetIndex);
+            }
+        };
+        String body = JSONUtil.toJsonStr(paramMap);
+        try {
+            String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
+            return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
+                    .map(u -> new HashMap<String, String>() {
+                        {
+                            Optional.ofNullable(u.get(HIK_CODE)).map(String::valueOf).ifPresent(w -> put(HIK_CODE, w));
+                            Optional.ofNullable(u.get(HIK_MSG)).map(String::valueOf).ifPresent(w -> put(HIK_MSG, w));
+                        }
+                    }).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
+
+        } catch (Exception e) {
+            throw new RuntimeException("海康接口调用失败!");
+        }
+    }
+
+    /**
      * 获取url，适用于海康接口返回的{@code data}中含有{@code url}字段，且仅需要这个{@code url}值的时候
      *
      * @return url

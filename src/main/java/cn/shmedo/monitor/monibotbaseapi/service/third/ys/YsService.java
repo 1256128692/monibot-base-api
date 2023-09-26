@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Map;
 
 public interface YsService {
     @RequestLine("POST /api/lapp/token/get")
@@ -119,4 +120,38 @@ public interface YsService {
     YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(@Param("accessToken") String accessToken,
                                                                        @Param("pageStart") Integer pageStart,
                                                                        @Param("pageSize") Integer pageSize);
+
+    /**
+     * 添加预置点
+     *
+     * @return 预置点序号 e.g.{"index":3}
+     * @see <a href="https://open.ys7.com/help/59#device_ptz-api4">接口文档-添加预置点</a>
+     */
+    @RequestLine("POST /api/lapp/device/preset/add")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}")
+    YsResultWrapper<Map<String, Integer>> addPresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
+                                                             @Param("channelNo") Integer channelNo);
+
+    /**
+     * 调用预置点
+     *
+     * @see <a href="https://open.ys7.com/help/59#device_ptz-api5">接口文档-调用预置点</a>
+     */
+    @RequestLine("POST /api/lapp/device/preset/move")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&index={index}")
+    YsResultWrapper movePresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
+                                        @Param("channelNo") Integer channelNo, @Param("index") Integer index);
+
+    /**
+     * 删除预置点
+     *
+     * @see <a href="https://open.ys7.com/help/59#device_ptz-api6">接口文档-删除预置点</a>
+     */
+    @RequestLine("POST /api/lapp/device/preset/clear")
+    @Headers("Content-Type: application/x-www-form-urlencoded")
+    @Body("accessToken={accessToken}&deviceSerial={deviceSerial}&channelNo={channelNo}&index={index}")
+    YsResultWrapper clearPresetPoint(@Param("accessToken") String accessToken, @Param("deviceSerial") String deviceSerial,
+                                         @Param("channelNo") Integer channelNo, @Param("index") Integer index);
 }

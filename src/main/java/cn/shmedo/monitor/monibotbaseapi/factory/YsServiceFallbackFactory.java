@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 萤石云服务远程调用 熔断降级
@@ -87,6 +88,21 @@ public class YsServiceFallbackFactory implements FallbackFactory<YsService> {
             @Override
             public YsResultPageWrapper<VideoDeviceBaseInfoV1> getBaseDeviceInfoByPage(String accessToken, Integer pageStart, Integer pageSize) {
                 return YsResultPageWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper<Map<String, Integer>> addPresetPoint(String accessToken, String deviceSerial, Integer channelNo) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper movePresetPoint(String accessToken, String deviceSerial, Integer channelNo, Integer index) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
+            }
+
+            @Override
+            public YsResultWrapper clearPresetPoint(String accessToken, String deviceSerial, Integer channelNo, Integer index) {
+                return YsResultWrapper.withCode("500", "萤石云服务调用失败");
             }
         };
     }

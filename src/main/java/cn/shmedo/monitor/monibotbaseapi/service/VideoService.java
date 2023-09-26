@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
@@ -53,4 +54,10 @@ public interface VideoService {
     List<VideoSensorFileInfo> queryCaptureList(QueryCaptureParam pa);
 
     Boolean batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam pa);
+
+    ResultWrapper<Object> addPresetPoint(AddPresetPointParam param);
+
+    ResultWrapper<Object> deletePresetPoint(List<PresetPointWithDeviceInfo> presetPointWithDeviceInfoList);
+
+    ResultWrapper<Object> movePresetPoint(PresetPointWithDeviceInfo info);
 }
