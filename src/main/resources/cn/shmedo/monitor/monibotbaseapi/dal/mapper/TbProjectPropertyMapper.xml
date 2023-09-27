@@ -140,8 +140,8 @@
                 <if test="projectID != null">
                     tpi.ID = #{projectID} AND
                 </if>
-                <if test="projectType != null">
-                    tpi.ProjectType = #{projectType} AND
+                <if test="groupID != null">
+                    tpi.ProjectType = #{groupID} AND
                 </if>
                 <if test="propertyName != null">
                     tp.`Name` = #{propertyName} AND

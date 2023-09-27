@@ -1,16 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.cache;
 
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -21,9 +18,7 @@ import java.util.stream.Collectors;
  **/
 @Component
 public class PredefinedModelProperTyCache {
-    private static List<TbProperty> propertyList;
-    public static Map<Integer, List<TbProperty>> projectTypeAndPropertyListMap;
-
+    public static Map<Byte, List<TbProperty>> projectTypeAndPropertyListMap;
 
     private TbPropertyMapper tbPropertyMapper;
     public PredefinedModelProperTyCache(TbPropertyMapper tbPropertyMapper) {
@@ -32,7 +27,12 @@ public class PredefinedModelProperTyCache {
 
     @PostConstruct
     void init(){
-        propertyList = tbPropertyMapper.queryByCreateType(CreateType.PREDEFINED.getType());
-        projectTypeAndPropertyListMap = propertyList.stream().collect(Collectors.groupingBy(TbProperty::getGroupID));
+        List<TbProperty> propertyList = tbPropertyMapper.queryByCreateType(CreateType.PREDEFINED.getType());
+        // 由于之前设计，projectType字段类型为Byte，项目类型最多只能有128种，因此，这里projectTypeAndPropertyListMap只缓存项目模板
+        projectTypeAndPropertyListMap = propertyList.stream()
+                .filter(item -> item.getGroupID() <= Byte.MAX_VALUE)
+                .collect(Collectors.groupingBy(
+                        property -> Byte.valueOf(String.valueOf(property.getGroupID()))
+                ));
     }
 }

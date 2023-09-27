@@ -111,7 +111,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             if (tbPropertyModel == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不存在");
             }
-            //todo 重构待验证
             if(!PropertyModelType.BASE_PROJECT.getCode().equals(tbPropertyModel.getModelType())){
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不是项目模板");
             }

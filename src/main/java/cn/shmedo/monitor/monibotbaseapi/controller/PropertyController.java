@@ -200,9 +200,10 @@ public class PropertyController {
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName UpdateProperty
-     * @apiDescription 更新项目属性
+     * @apiDescription 更新项目属性，目前只支持模板类型为工程项目，其他类型功能暂未开放
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} modelType 模板类型（-1-默认分组；0-工程项目；1-设备；2-工作流）
      * @apiParam (请求体) {Object[]} modelValueList 模型值列表
      * @apiParam (请求体) {String} modelValueList.id 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值
@@ -223,10 +224,11 @@ public class PropertyController {
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName QueryPropertyValue
-     * @apiDescription 查询指定属性所有值（去重）
+     * @apiDescription 查询指定属性所有值（去重），目前只支持模板类型为工程项目，其他类型功能暂未开放
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectID] 项目ID
-     * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {Int} modelType 模板类型（-1-默认分组；0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0时，groupID为projectType）
      * @apiParam (请求体) {Int} [createType] 创建类型 0-预定义 1-自定义, 默认0
      * @apiParam (请求体) {String} propertyName 属性名称
      * @apiSuccess (返回结果) {Object[]} data 属性值列表

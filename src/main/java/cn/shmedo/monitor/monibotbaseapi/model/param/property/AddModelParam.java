@@ -31,7 +31,6 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     @NotNull
     private String modelName;
 
-    //todo 重构待验证
     @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
