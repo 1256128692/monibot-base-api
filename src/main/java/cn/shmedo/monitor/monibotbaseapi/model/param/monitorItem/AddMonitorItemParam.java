@@ -65,7 +65,7 @@ public class AddMonitorItemParam implements ParameterValidator, ResourcePermissi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+        tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程项目不存在");
         }

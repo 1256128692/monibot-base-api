@@ -46,7 +46,7 @@ public class AddMonitorPointBatchParam implements ParameterValidator, ResourcePe
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectByPrimaryKey(projectID) == null) {
+        if (tbProjectInfoMapper.selectById(projectID) == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }
         TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);

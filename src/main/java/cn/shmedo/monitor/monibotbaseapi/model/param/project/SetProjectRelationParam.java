@@ -35,7 +35,7 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+        tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
         List<TbProjectInfo> nextProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelPIDList);
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前projectID不存在");

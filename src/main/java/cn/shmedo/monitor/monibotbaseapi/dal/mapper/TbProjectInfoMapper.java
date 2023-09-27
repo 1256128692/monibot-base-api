@@ -15,17 +15,7 @@ import java.util.Date;
 import java.util.List;
 @Mapper
 public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
-    int deleteByPrimaryKey(Integer ID);
 
-    int insert(TbProjectInfo record);
-
-    int insertSelective(TbProjectInfo record);
-
-    TbProjectInfo selectByPrimaryKey(Integer ID);
-
-    int updateByPrimaryKeySelective(TbProjectInfo record);
-
-    int updateByPrimaryKey(TbProjectInfo record);
 
     void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
 

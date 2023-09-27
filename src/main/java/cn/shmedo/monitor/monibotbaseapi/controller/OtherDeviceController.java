@@ -1,7 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +40,7 @@ public class OtherDeviceController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "其他设备模块", operationName = "批量新增其他设备", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "其他设备模块", operationName = "批量新增其他设备", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddOtherDeviceBatch", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addOtherDeviceBatch(@Validated @RequestBody Object pa) {
         return ResultWrapper.successWithNothing();

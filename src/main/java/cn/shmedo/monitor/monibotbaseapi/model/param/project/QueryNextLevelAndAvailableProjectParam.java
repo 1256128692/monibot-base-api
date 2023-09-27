@@ -28,7 +28,7 @@ public class QueryNextLevelAndAvailableProjectParam implements ParameterValidato
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+        tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前projectID不存在");
         }

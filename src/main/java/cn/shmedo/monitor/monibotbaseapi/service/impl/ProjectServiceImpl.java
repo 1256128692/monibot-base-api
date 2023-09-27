@@ -314,7 +314,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Transactional(rollbackFor = Exception.class)
     public void updateProject(UpdateProjectParameter pa, Integer userID) {
         TbProjectInfo projectInfo = pa.buildProject(userID);
-        tbProjectInfoMapper.updateByPrimaryKey(projectInfo);
+        tbProjectInfoMapper.updateById(projectInfo);
         if (!CollectionUtil.isEmpty(pa.getPropertyDataList())) {
             List<TbProjectProperty> projectProperties = pa.buildPropertyDataList();
             tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties);

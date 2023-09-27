@@ -83,7 +83,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper projectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        projectInfo = projectInfoMapper.selectByPrimaryKey(projectID);
+        projectInfo = projectInfoMapper.selectById(projectID);
         if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "找不到对应的工程项目");
         }
