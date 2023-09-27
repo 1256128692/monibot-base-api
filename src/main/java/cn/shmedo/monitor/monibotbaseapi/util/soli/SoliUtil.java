@@ -24,4 +24,24 @@ public class SoliUtil {
             return "极强碱性";
         }
     }
+
+
+    /**
+     * @param v1 土壤盐分电导率
+     * @return
+     */
+    public static String getV2Category(double v1) {
+        if (v1 < 0.2) {
+            // 0级风,级越大,风力越大
+            return "低盐土";
+        } else if (v1 >= 0.2 && v1 < 0.5) {
+            return "轻度盐土";
+        } else if (v1 >= 0.5 && v1 < 2) {
+            return "中度盐土";
+        } else if (v1 >= 2 && v1 < 4) {
+            return "重度盐土";
+        } else {
+            return "极重度盐土";
+        }
+    }
 }

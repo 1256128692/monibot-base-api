@@ -451,7 +451,10 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             currentSensorData.put("levelChange", 0.0);
         } else if (monitorType.equals(MonitorType.SOIL_PH.getKey())) {
             // 土壤PH值
-            currentSensorData.put("soilph", SoliUtil.getV1Category((Double) currentSensorData.get("soilph")));
+            currentSensorData.put("soilphQuality", SoliUtil.getV1Category((Double) currentSensorData.get("soilph")));
+        } else if (monitorType.equals(MonitorType.SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY.getKey())) {
+            // 土壤盐分电导率
+            currentSensorData.put("soilconductivityQuality", SoliUtil.getV2Category((Double) currentSensorData.get("soilconductivity")));
         }
         return currentSensorData;
     }
