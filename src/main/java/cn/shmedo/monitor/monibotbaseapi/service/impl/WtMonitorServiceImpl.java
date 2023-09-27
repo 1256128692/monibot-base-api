@@ -354,6 +354,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             }
                             snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), currentSensorData, snd.getProjectTypeID()));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
+                            snd.setMultiSensorData(List.of(handleSpecialType(tbSensor.getMonitorType(), currentSensorData, snd.getProjectTypeID())));
                         }
                     }
                 }
