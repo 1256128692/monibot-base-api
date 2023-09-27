@@ -13,7 +13,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-
 @Mapper
 public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     int deleteByPrimaryKey(Integer ID);
@@ -37,7 +36,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
                                          @Param("projectIDList") Collection<Integer> projectIDList);
 
-    IPage<ProjectInfo> getProjectList(IPage<ProjectInfo> page,
+    IPage<ProjectInfo> getProjectPage(IPage<ProjectInfo> page,
                                       @Param("pa") QueryProjectListRequest pa);
 
     int countByNameExcludeID(String projectName, Integer projectID);
@@ -62,5 +61,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
                                                                  @Param("groupName") String group,
                                                                  @Param("keyName") String key);
 
-;
+    void updateLevel(Byte level, List<Integer> pidList, Integer userID, Date date);
+
+    List<ProjectInfo> getProjectList(QueryProjectListRequest pa);
 }

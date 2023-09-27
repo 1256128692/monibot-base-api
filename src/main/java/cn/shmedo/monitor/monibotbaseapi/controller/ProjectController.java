@@ -47,7 +47,7 @@ public class ProjectController {
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
      * @apiParam (请求体) {Int} platformType (废弃)所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
-     * @apiParam (请求体) {Int[]} platformTypeList 所属平台类型
+     * @apiParam (请求体) {String} platformTypeSet 所属平台类型集合(,分隔)， 可选为 流域平台，灌区平台，水库平台，MDNET,林业平台
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
@@ -106,6 +106,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} [location] 行政区域
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
+     * @apiParam (请求体) {Boolean} [isSonLevel]  是否为子工程，只对最外层过滤
      * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [expiryDateBegin] 有效期开始， 有效期应大于等于当前时间
@@ -144,7 +145,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} currentPageData.createUserID 创建用户ID
      * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间
      * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 修改用户ID
-     * @apiSuccess (返回结果) {Json[]} [currentPageData.twoLevelProjectList] 当该项目为oneLevel等级时候，存在该列表，每项包含一个sonLevelProjectList
+     * @apiSuccess (返回结果) {Json[]} [currentPageData.downLevelProjectList] 下级项目列表
      * @apiSuccess (返回结果) {Object} company 公司信息
      * @apiSuccess (返回结果) {Int} company.id id
      * @apiSuccess (返回结果) {String} company.ShortName 公司简称
@@ -551,14 +552,15 @@ public class ProjectController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "SetProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object setProjectRelation(@Validated @RequestBody Object pa) {
+    public Object setProjectRelation(@Validated @RequestBody SetProjectRelationParam pa) {
+        projectService.setProjectRelation(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {post} /QueryNextLevelAndAvailableProject 查询下级项目列表和可使用的项目列表
+     * @api {post} /QueryNextLevelProjectAndCanUsed 查询下级项目列表和可使用的项目列表
      * @apiDescription 查询下级项目列表和可使用的项目列表
      * @apiVersion 1.0.0
      * @apiGroup 工程项目管理模块
@@ -574,8 +576,8 @@ public class ProjectController {
      */
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryNextLevelProjectAndCanUsed", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody QueryNextLevelAndAvailableProjectParam pa) {
+        return projectService.queryNextLevelProjectAndCanUsed(pa);
     }
 
 }

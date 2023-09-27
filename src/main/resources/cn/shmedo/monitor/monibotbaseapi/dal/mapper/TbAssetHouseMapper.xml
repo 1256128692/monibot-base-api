@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbAssetHouseMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetHouse">
+    <!--@mbg.generated-->
+    <!--@Table tb_asset_house-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="Name" jdbcType="VARBINARY" property="name" />
+    <result column="Code" jdbcType="VARCHAR" property="code" />
+    <result column="Address" jdbcType="VARCHAR" property="address" />
+    <result column="Comment" jdbcType="VARCHAR" property="comment" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, `Name`, Code, Address, `Comment`, CreateTime, CreateUserID, UpdateTime, 
+    UpdateUserID
+  </sql>
+</mapper>

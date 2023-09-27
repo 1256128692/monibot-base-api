@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice">
+    <!--@mbg.generated-->
+    <!--@Table tb_other_device-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Model" jdbcType="VARCHAR" property="model" />
+    <result column="Vendor" jdbcType="VARCHAR" property="vendor" />
+    <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, ProjectID, `Name`, Token, Model, Vendor, TemplateID, ExValue, CreateTime, 
+    CreateUserID, UpdateTime, UpdateUserID
+  </sql>
+</mapper>

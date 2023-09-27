@@ -52,6 +52,8 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     private Boolean enable;
 
+    private Boolean isSonLevel;
+
     private List<Byte> platformTypeList;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")

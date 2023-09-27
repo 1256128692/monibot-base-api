@@ -9,6 +9,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
@@ -22,8 +23,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -34,11 +37,15 @@ import java.util.List;
  **/
 @Data
 public class AddProjectParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @JsonIgnore
+    List<TbProperty> properties;
+    @JsonIgnore
+    List<TbMonitorItem> monitorItems;
     @NotNull
     private Integer companyID;
     @NotBlank
     @Size(max = 50)
-    @Pattern(regexp = "^[\\u4e00-\\u9fa5A-Za-z0-9]+$" , message = "只允许数字字母和中文")
+    @Pattern(regexp = "^[\\u4e00-\\u9fa5A-Za-z0-9]+$", message = "只允许数字字母和中文")
     private String projectName;
     @Size(max = 10)
     private String shortName;
@@ -76,10 +83,11 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @Valid
     @NotEmpty
     private List<@NotNull PropertyIdAndValue> modelValueList;
-    @JsonIgnore
-    List<TbProperty> properties;
-    @JsonIgnore
-    List<TbMonitorItem> monitorItems;
+    @NotNull
+    @Range(min = -1, max = 0)
+    private Byte level;
+    @NotBlank
+    private String platformTypeSet;
 
     @Override
     public ResultWrapper validate() {
@@ -113,7 +121,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
         }
-        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)){
+        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
         }
         properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType));
@@ -123,7 +131,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             properties.addAll(tbPropertyMapper.queryByMID(modelID));
         }
         ResultWrapper temp = PropertyUtil.validPropertyValue(modelValueList, properties, true);
-        if (temp!=null){
+        if (temp != null) {
             return temp;
         }
         //校验标签
@@ -141,7 +149,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (ObjectUtil.isNotEmpty(tagList)) {
             if (tagList.stream().map(
                     item -> item.getKey() + (ObjectUtil.isEmpty(item.getValue()) ? "_" : item.getKey())
-            ).distinct().count() !=tagList.size()) {
+            ).distinct().count() != tagList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的标签中存在重复");
             }
             if (tbTagMapper.countByCIDAndTags(companyID, tagList) > 0) {
@@ -167,6 +175,12 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             }
 
         }
+        // 校验平台集合
+        if (Arrays.stream(platformTypeSet.split(",")).anyMatch(
+                e -> !DefaultConstant.platformTypeList.contains(e)
+        )) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
+        }
         return null;
 
 
@@ -181,9 +195,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
-
-
-
 
 
 }

@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectLevel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.engine.AddWtDeviceWarnRuleParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.AddMonitorItemParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.AddMonitorGroupParam;
@@ -50,6 +51,9 @@ public class Param2DBEntityUtil {
         obj.setUpdateUserID(userID);
         obj.setCreateTime(now);
         obj.setUpdateTime(now);
+
+        obj.setLevel(pa.getLevel() == null ? ProjectLevel.Son.getLevel() : pa.getLevel());
+        obj.setPlatformTypeSet(pa.getPlatformTypeSet());
         return obj;
     }
 

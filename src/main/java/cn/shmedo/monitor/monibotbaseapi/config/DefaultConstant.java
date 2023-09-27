@@ -42,8 +42,10 @@ public class DefaultConstant {
     /** ================================项目表单start================================ **/
     public static final String PROPERTY_MODEL_COPY_SUFFIX = "_副本";
     /** ================================项目表单end================================ **/
-
-
+    /**
+     * 平台类型的合集
+     */
+    public static final List<String> platformTypeList = Arrays.asList("流域平台", "灌区平台", "水库平台", "MDNET", "林业平台");
     public static final int ORDER_NOT_STAT = 1;
 
     public static final String VIDEO_DEVICE_SN = "seqNo";
