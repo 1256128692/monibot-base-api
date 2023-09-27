@@ -25,11 +25,11 @@
   <select id="queryByCompanyID" resultMap="BaseResultMap">
     select  * from tb_project_relation
     where UpLevelID  in (
-    select  ID from tb_project
+    select  ID from tb_project_info
     where CompanyID = #{companyID}
     )
     or DownLevelID in (
-    select  ID from tb_project
+    select  ID from tb_project_info
     where CompanyID = #{companyID}
     )
   </select>

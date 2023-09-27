@@ -251,36 +251,36 @@
       SELECT <include refid="Base_Column_List" /> FROM tb_project_info
       <where>
           <trim suffixOverrides="AND">
-              <if test="pa.projectIDList != null and pa.projectIDList.size() != 0">
+              <if test="projectIDList != null and projectIDList.size() != 0">
                   ID IN
-                  <foreach close=")" collection="pa.projectIDList" item="item" open="(" separator=",">
+                  <foreach close=")" collection="projectIDList" item="item" open="(" separator=",">
                       #{item}
                   </foreach>
                   AND
               </if>
-              <if test="pa.projectName != null and pa.projectName != ''">
-                  ProjectName LIKE CONCAT('%',#{pa.projectName},'%') AND
+              <if test="projectName != null and projectName != ''">
+                  ProjectName LIKE CONCAT('%',#{projectName},'%') AND
               </if>
-              <if test="pa.queryCode != null and pa.queryCode != ''">
+              <if test="queryCode != null and queryCode != ''">
                   (
-                  ProjectName LIKE CONCAT('%',#{pa.queryCode},'%')
+                  ProjectName LIKE CONCAT('%',#{queryCode},'%')
                   or
-                  DirectManageUnit LIKE CONCAT('%', #{pa.queryCode},'%')
+                  DirectManageUnit LIKE CONCAT('%', #{queryCode},'%')
 
                   ) AND
               </if>
-              <if test="pa.location != null and pa.location != ''">
-                  Location LIKE CONCAT('%', #{pa.location}, '%') AND
+              <if test="location != null and location != ''">
+                  Location LIKE CONCAT('%', #{location}, '%') AND
               </if>
-              <if test="pa.companyID != null">
-                  CompanyID = #{pa.companyID} AND
+              <if test="companyID != null">
+                  CompanyID = #{companyID} AND
               </if>
-              <if test="pa.projectType != null">
-                  ProjectType = #{pa.projectType} AND
+              <if test="projectType != null">
+                  ProjectType = #{projectType} AND
               </if>
-              <if test="pa.enable != null ">
+              <if test="enable != null ">
                   <choose>
-                      <when test="pa.enable">
+                      <when test="enable">
                           Enable = 1 AND
                       </when>
                       <otherwise>
@@ -288,27 +288,27 @@
                       </otherwise>
                   </choose>
               </if>
-              <if test="pa.platformTypeList != null and pa.platformTypeList.size() != 0">
+              <if test="platformTypeList != null and platformTypeList.size() != 0">
                   PlatformType IN
-                  <foreach close=")" collection="pa.platformTypeList" item="item" open="(" separator=",">
+                  <foreach close=")" collection="platformTypeList" item="item" open="(" separator=",">
                       #{item}
                   </foreach>
                   AND
               </if>
-              <if test="pa.expiryDate != null">
-                  ExpiryDate &lt;= #{pa.expiryDate} AND
+              <if test="expiryDate != null">
+                  ExpiryDate &lt;= #{expiryDate} AND
               </if>
-              <if test="pa.expiryDateBegin != null">
-                  ExpiryDate &gt;= #{pa.expiryDateBegin} AND
+              <if test="expiryDateBegin != null">
+                  ExpiryDate &gt;= #{expiryDateBegin} AND
               </if>
-              <if test="pa.expiryDateEnd != null">
-                  ExpiryDate &lt;= #{pa.expiryDateEnd} AND
+              <if test="expiryDateEnd != null">
+                  ExpiryDate &lt;= #{expiryDateEnd} AND
               </if>
-              <if test="pa.endCreateTime != null">
-                  CreateTime &lt;= #{pa.endCreateTime} AND
+              <if test="endCreateTime != null">
+                  CreateTime &lt;= #{endCreateTime} AND
               </if>
-              <if test="pa.beginCreateTime != null">
-                  CreateTime &gt;= #{pa.beginCreateTime} AND
+              <if test="beginCreateTime != null">
+                  CreateTime &gt;= #{beginCreateTime} AND
               </if>
           </trim>
       </where>

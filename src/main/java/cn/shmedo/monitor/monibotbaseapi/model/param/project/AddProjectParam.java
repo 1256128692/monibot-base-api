@@ -98,9 +98,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (DateUtil.between(DateUtil.date(), expiryDate, DateUnit.DAY, false) <= 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于1日");
         }
-        if (!PlatformType.validate(platformType)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
-        }
+
 
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (tbProjectInfoMapper.countByNameExcludeID(projectName, null) > 0) {

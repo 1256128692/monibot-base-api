@@ -46,6 +46,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -412,15 +413,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         // 进行填充
         // 先从下往上填充
         List<ProjectInfo> finalThreeList = threeList;
-        List<Integer> temTwoIDList = relationList.stream().filter(
+        List<Integer> temTwoIDList = new ArrayList<>(relationList.stream().filter(
                 e -> finalThreeList.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
-        ).map(TbProjectRelation::getUpLevelID).toList();
+        ).map(TbProjectRelation::getUpLevelID).toList());
         temTwoIDList.addAll(twoList.stream().map(TbProjectInfo::getID).toList());
-        temTwoIDList = temTwoIDList.stream().distinct().toList();
+        temTwoIDList = new ArrayList<>(temTwoIDList.stream().distinct().toList());
 
-        List<Integer> temOneIDList = relationList.stream().filter(
-                e -> twoList.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
-        ).map(TbProjectRelation::getUpLevelID).toList();
+        List<ProjectInfo> finalTwoList1 = twoList;
+        List<Integer> temOneIDList = new ArrayList<>(relationList.stream().filter(
+                e -> finalTwoList1.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
+        ).map(TbProjectRelation::getUpLevelID).toList());
         temOneIDList.addAll(oneList.stream().map(TbProjectInfo::getID).toList());
         // 过滤
         oneList = tbProjectInfoMapper.selectBatchIds(temOneIDList)
@@ -439,21 +441,22 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 e -> finalOneList1.stream().anyMatch(item -> item.getID().equals(e.getUpLevelID()))
         ).map(TbProjectRelation::getDownLevelID).toList();
         temTwoIDList.addAll(tttow);
-        threeList = tbProjectInfoMapper.selectBatchIds(temTwoIDList)
+        twoList = ObjectUtil.isEmpty(temTwoIDList) ? new ArrayList<>() : tbProjectInfoMapper.selectBatchIds(temTwoIDList)
                 .stream().map(e ->
                         BeanUtil.copyProperties(e, ProjectInfo.class)
                 ).toList();
 
 
-        List<Integer> ttthree = relationList.stream().filter(
-                e -> twoList.stream().anyMatch(item -> item.getID().equals(e.getUpLevelID()))
-        ).map(TbProjectRelation::getDownLevelID).toList();
+        List<ProjectInfo> finalTwoList = twoList;
+        List<Integer> ttthree = new ArrayList<>(relationList.stream().filter(
+                e -> finalTwoList.stream().anyMatch(item -> item.getID().equals(e.getUpLevelID()))
+        ).map(TbProjectRelation::getDownLevelID).toList());
         ttthree.addAll(threeList.stream().map(TbProjectInfo::getID).toList());
-        threeList = tbProjectInfoMapper.selectBatchIds(ttthree)
+        threeList = ObjectUtil.isEmpty(ttthree) ? new ArrayList<>() : tbProjectInfoMapper.selectBatchIds(ttthree)
                 .stream().map(e ->
                         BeanUtil.copyProperties(e, ProjectInfo.class)
                 ).toList();
-
+        oneList = new ArrayList<>(oneList);
         // 分页及填充downLevelProjectList
         oneList.sort(Comparator.comparing(ProjectInfo::getID).reversed());
         PageUtil.Page<ProjectInfo> pageData = PageUtil.page(oneList, pa.getPageSize(), pa.getCurrentPage());
@@ -461,12 +464,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         Set<Integer> pidAllSet = new HashSet<>();
         Set<Integer> companyIDAllSet = new HashSet<>();
         Set<String> locationInfoSet = new HashSet<>();
+        List<ProjectInfo> finalTwoList2 = twoList;
         pageData.currentPageData().forEach(item -> {
             pidAllSet.add(item.getID());
             companyIDAllSet.add(item.getCompanyID());
             locationInfoSet.add(item.getLocationInfo());
             List<Integer> list = relationList.stream().filter(e -> e.getUpLevelID().equals(item.getID())).map(TbProjectRelation::getDownLevelID).toList();
-            item.setDownLevelProjectList(twoList.stream().filter(e -> list.contains(e.getID())).toList());
+            item.setDownLevelProjectList(finalTwoList2.stream().filter(e -> list.contains(e.getID())).toList());
             pidAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getID).toList());
             companyIDAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getCompanyID).toList());
             locationInfoSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getLocationInfo).toList());
@@ -495,7 +499,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                             .collect(Collectors.toSet()), RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
             //公司信息
-            Map<Integer, Company> companyMap = iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, new ArrayList<>(companyIDAllSet), Company.class)
+            Map<Integer, Company> companyMap = iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, new ArrayList<>(companyIDAllSet.stream().map(String::valueOf).toList()), Company.class)
                     .stream().collect(Collectors.toMap(Company::getId, e -> e));
             //图片 TODO 任意文件不存在会返回null，故无法批量获取
 //            Map<String, String> imgMap = fileService.getFileUrlList(pageData.getRecords().stream().map(ProjectInfo::getImagePath)
