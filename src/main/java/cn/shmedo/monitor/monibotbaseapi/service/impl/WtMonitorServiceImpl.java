@@ -1,10 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
@@ -37,6 +39,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -419,7 +422,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                 int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
                 currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
             }
-            if (projectTypeID == 7) {
+            if (projectTypeID == 10) {
                 // 灌区水质校验,校验水质规则,[水温,悬浮物,化学需氧量,氯化物,硫化物,全盐量]
                 int temperature = WaterQualityUtil.getDxTemperatureCategory((Double) currentSensorData.get("temperature"));
                 int suspendedsolids = WaterQualityUtil.getDxSuspendedsolidsCategory((Double) currentSensorData.get("suspendedsolids"));
@@ -1455,6 +1458,30 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
         return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
+    }
+
+    @Override
+    public Object queryProjectLocation(QueryProjectLocationParam pa) {
+        List<ProjectLocationInfo> projectLocationInfoList = tbMonitorItemMapper.getProjectLocation(pa.getCompanyID(), pa.getMonitorType());
+
+        projectLocationInfoList.forEach(p -> {
+            if (StringUtils.isNotBlank(p.getLocation())){
+                if (JSONUtil.isTypeJSON(p.getLocation())) {
+                    JSONObject json = JSONUtil.parseObj(p.getLocation());
+                    p.setKey(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                }
+            }
+        });
+
+        Collection<Object> areas = projectLocationInfoList
+                .stream().map(ProjectLocationInfo::getKey).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+        projectLocationInfoList.forEach(i -> {
+            i.setLocationInfo(areaMap.getOrDefault(i.getKey(), null));
+        });
+        return projectLocationInfoList;
     }
 
 

@@ -471,4 +471,12 @@
             and tmi.Enable = #{param.enable}
         </if>
     </select>
+
+  <select id="getProjectLocation" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectLocationInfo">
+      select distinct pi.location
+      from tb_monitor_item mi
+               right join tb_project_info pi on mi.ProjectID = pi.ID
+      where mi.MonitorType = #{monitorType}
+        and mi.CompanyID = #{companyID}
+  </select>
 </mapper>

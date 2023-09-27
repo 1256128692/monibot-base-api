@@ -245,6 +245,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.name   监测项目名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.alias   监测项目别名
      * @apiSuccess (响应结果) {Object} typeInfoList.warnInfo          监测点预警统计信息
+     * @apiSuccess (响应结果) {Object[]} typeInfoList.projectLocationInfoList   监测类型
+     * @apiSuccess (响应结果) {Int} typeInfoList.projectLocationInfoList.projectID   工程ID
+     * @apiSuccess (响应结果) {String} typeInfoList.projectLocationInfoList.location   区域代码
+     * @apiSuccess (响应结果) {String} typeInfoList.projectLocationInfoList.locationInfo  区域名称
      * @apiSuccess (响应结果) {Int} warnInfo.normalCount         正常数量
      * @apiSuccess (响应结果) {Int} warnInfo.noDataCount         无数据数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelOneCount   一级警报数量
@@ -261,6 +265,29 @@ public class WtMonitorDataController {
     public Object queryMonitorPointTypeStatistics(@Validated @RequestBody StatisticsMonitorPointTypeParam pa) {
         return wtMonitorService.queryMonitorPointTypeStatistics(pa);
     }
+
+
+    /**
+     * @api {POST} /QueryProjectLocation 查询工程区域信息
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 根据公司ID和监测类型去查询工程区域信息
+     * @apiName QueryProjectLocation
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (响应结果) {Object[]} dataList 统计信息
+     * @apiSuccess (响应结果) {String} dataList.location   区域代码
+     * @apiSuccess (响应结果) {String} dataList.key   区域code
+     * @apiSuccess (响应结果) {String} dataList.locationInfo  区域名称
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListCompanySensorData
+     */
+    @Permission(permissionName = "mdmbase:ListCompanySensorData")
+    @RequestMapping(value = "/QueryProjectLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectLocation(@Validated @RequestBody QueryProjectLocationParam pa) {
+        return wtMonitorService.queryProjectLocation(pa);
+    }
+
 
     /**
      * @api {POST} /QueryMonitorPointHistoryDataList 查询监测点历史数据列表
