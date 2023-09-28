@@ -15,6 +15,8 @@ public class QueryProjectLocationParam  implements ParameterValidator, ResourceP
 
     @NotNull
     private Integer monitorType;
+    @NotNull
+    private Integer monitorClassType;
 
     @Override
     public ResultWrapper<?> validate() {

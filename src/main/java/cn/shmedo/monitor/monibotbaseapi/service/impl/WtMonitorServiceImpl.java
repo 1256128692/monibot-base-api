@@ -1466,7 +1466,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
     @Override
     public Object queryProjectLocation(QueryProjectLocationParam pa) {
-        List<ProjectLocationInfo> projectLocationInfoList = tbMonitorItemMapper.getProjectLocation(pa.getCompanyID(), pa.getMonitorType());
+        List<ProjectLocationInfo> projectLocationInfoList = tbMonitorItemMapper.getProjectLocation(pa.getCompanyID(),
+                pa.getMonitorType(), pa.getMonitorClassType());
 
         projectLocationInfoList.forEach(p -> {
             if (StringUtils.isNotBlank(p.getLocation())){

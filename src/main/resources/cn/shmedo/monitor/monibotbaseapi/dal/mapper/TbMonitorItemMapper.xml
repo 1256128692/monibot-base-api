@@ -478,5 +478,6 @@
                right join tb_project_info pi on mi.ProjectID = pi.ID
       where mi.MonitorType = #{monitorType}
         and mi.CompanyID = #{companyID}
+        and mi.ProjectID in (select ProjectID from tb_project_monitor_class where MonitorClass = #{monitorClassType})
   </select>
 </mapper>
