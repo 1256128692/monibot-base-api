@@ -11,6 +11,7 @@
             <result column="displayOrder" jdbcType="INTEGER" property="displayOrder"/>
             <collection property="monitorPointDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewPointInfo">
                 <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+                <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
                 <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
                 <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
                 <result column="pointDisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
@@ -30,7 +31,6 @@
                     <result column="AccessPlatform" jdbcType="TINYINT" property="accessPlatform"/>
                     <result column="AccessProtocol" jdbcType="TINYINT" property="accessProtocol"/>
                     <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
-                    <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
                     <result column="StorageType" jdbcType="TINYINT" property="storageType"/>
                     <result column="CaptureStatus" jdbcType="BIT" property="captureStatus"/>
                     <result column="AllocationStatus" jdbcType="BIT" property="allocationStatus"/>
@@ -81,6 +81,7 @@
             tmg2.`Name` monitorGroupName,
             tmg2.DisplayOrder displayOrder,
             tmp.ID monitorPointID,
+            tmg1.ProjectID,
             tmp.MonitorItemID monitorItemID,
             tmp.MonitorType monitorType,
             tmp.DisplayOrder pointDisplayOrder,
@@ -98,7 +99,6 @@
             tvd.AccessPlatform,
             tvd.AccessProtocol,
             tvd.CompanyID,
-            tvd.ProjectID,
             tvd.StorageType,
             tvd.CaptureStatus,
             tvd.AllocationStatus

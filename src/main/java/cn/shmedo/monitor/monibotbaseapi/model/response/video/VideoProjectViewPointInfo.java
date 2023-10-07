@@ -40,7 +40,6 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
             setAccessPlatform(info.getAccessPlatform());
             setAccessProtocol(info.getAccessProtocol());
             setCompanyID(info.getCompanyID());
-            setProjectID(info.getProjectID());
             setStorageType(info.getStorageType());
             setCaptureStatus(info.getCaptureStatus());
             setAllocationStatus(info.getAllocationStatus());
