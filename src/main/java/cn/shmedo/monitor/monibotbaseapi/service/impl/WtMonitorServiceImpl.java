@@ -821,9 +821,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             dailyRainfallList = handleDailyRainfallList(sensorIDList, pa.getBegin(), pa.getEnd());
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
                 // 转换为 LocalDateTime
-                LocalDateTime beginDateTime = pa.getBegin().toLocalDateTime();
+                LocalDateTime end = pa.getEnd().toLocalDateTime();
                 // 当天凌晨零点零分零秒
-                LocalDateTime targetDateTime = LocalDateTime.of(beginDateTime.toLocalDate(), LocalTime.MIDNIGHT);
+                LocalDateTime targetDateTime = LocalDateTime.of(end.toLocalDate(), LocalTime.MIDNIGHT);
                 // 时间格式化器
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
