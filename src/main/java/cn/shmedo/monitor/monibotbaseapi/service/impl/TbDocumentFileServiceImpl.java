@@ -1,24 +1,29 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDocumentFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDocumentFile;
 import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.response.documentfile.DocumentFileResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDocumentFileService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
+import com.alibaba.nacos.shaded.com.google.common.collect.Maps;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -44,7 +49,6 @@ import java.util.stream.Collectors;
  */
 @Service
 public class TbDocumentFileServiceImpl implements ITbDocumentFileService, InitializingBean {
-    private static final String BUCKET_NAME = TbDocumentFile.class.getAnnotation(TableName.class).value();
     private String appKey = null;
     private String appSecret = null;
 
@@ -53,6 +57,9 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private FileService fileService;
 
     @Autowired
     private MdInfoFileService mdInfoFileService;
@@ -71,25 +78,39 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
         // 分页条件
         Page<TbDocumentFile> queryPage = new Page<>(queryDocumentFilePageParameter.getCurrentPage(), queryDocumentFilePageParameter.getPageSize());
         // 查询条件
-        QueryWrapper<TbDocumentFile> queryWrapper = new QueryWrapper<>();
-        if (StringUtils.isNotEmpty(queryDocumentFilePageParameter.getFileName())) {
-            queryWrapper.lambda().eq(TbDocumentFile::getFileName, queryDocumentFilePageParameter.getFileName());
-        }
+        LambdaQueryWrapper<TbDocumentFile> queryWrapper = new QueryWrapper<TbDocumentFile>().lambda()
+                .eq(TbDocumentFile::getSubjectType, queryDocumentFilePageParameter.getSubjectType())
+                .eq(TbDocumentFile::getSubjectID, queryDocumentFilePageParameter.getProjectID())
+                .eq(StringUtils.isNotEmpty(queryDocumentFilePageParameter.getFileName()), TbDocumentFile::getFileName, queryDocumentFilePageParameter.getFileName());
         IPage<TbDocumentFile> resultPage = tbDocumentFileMapper.selectPage(queryPage, queryWrapper);
         List<DocumentFileResponse> documentFileResponseList = new ArrayList<>();
         if (Objects.nonNull(resultPage)) {
+            Map<Integer, String> userIdNameMap = Maps.newHashMap();
+            Map<String, String> fileInfoResponseMap = Maps.newHashMap();
             List<TbDocumentFile> records = resultPage.getRecords();
-            List<Integer> userIDList = records.stream().map(TbDocumentFile::getCreateUserID).collect(Collectors.toList());
-            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIDList), appKey, appSecret);
+            List<Integer> userIdList = records.stream().map(TbDocumentFile::getCreateUserID).collect(Collectors.toList());
+            List<String> ossKeyList = records.stream().map(TbDocumentFile::getFilePath).collect(Collectors.toList());
+
+            // 获取CreateUserID对应的CreateUserName
+            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
             if (resultWrapper.apiSuccess()) {
-                // 获取CreateUserID对应的CreateUserName
-                List<Map<String, Object>> userIDNameList = (List<Map<String, Object>>) resultWrapper.getData();
-                if (!CollectionUtil.isNullOrEmpty(userIDNameList)) {
-                    List<UserIDName> newUserIDNameList = CustomizeBeanUtil.toBeanList(userIDNameList, UserIDName.class);
-                    Map<Integer, UserIDName> userIDNameMap = newUserIDNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
-                    documentFileResponseList = CustomizeBeanUtil.copyListProperties(records, DocumentFileResponse::new);
-                    documentFileResponseList.forEach(res -> res.setCreateUserName(userIDNameMap.get(res.getCreateUserId()).getUserName()));
+                List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+                if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
+                    List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+                    userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
                 }
+            }
+            // 处理filePath
+            List<FileInfoResponse> fileInfoResponseList = fileService.getFileUrlList(ossKeyList, CurrentSubjectHolder.getCurrentSubject().getCompanyID());
+            if(!CollectionUtil.isNullOrEmpty(fileInfoResponseList)){
+                fileInfoResponseMap = fileInfoResponseList.stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
+            }
+
+            // 包装返回数据
+            documentFileResponseList = CustomizeBeanUtil.copyListProperties(records, DocumentFileResponse::new);
+            for(DocumentFileResponse documentFileResponse: documentFileResponseList){
+                documentFileResponse.setCreateUserName(userIdNameMap.getOrDefault(documentFileResponse.getCreateUserId(), ""));
+                documentFileResponse.setFilePath(fileInfoResponseMap.getOrDefault(documentFileResponse.getFilePath(), ""));
             }
         }
         return new PageUtil.Page<>(resultPage.getPages(), documentFileResponseList, resultPage.getTotal());
@@ -110,7 +131,7 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
 
         // 文件上传到oss
         ResultWrapper<FilePathResponse> resultWrapper = mdInfoFileService
-                .streamUploadFile(file, companyID, BUCKET_NAME, fileName, fileType, "", fileDesc, subjectID, -1, exValue);
+                .streamUploadFile(file, companyID, DefaultConstant.MD_INFO_BUCKETNAME, fileName, fileType, "", fileDesc, subjectID, -1, exValue);
         if (!resultWrapper.apiSuccess()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, resultWrapper.getMsg());
         }
@@ -138,16 +159,20 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
     @Override
     public DocumentFileResponse queryDocumentFile(QueryDocumentFileParameter queryDocumentFileParameter) {
         DocumentFileResponse documentFileResponse = DocumentFileResponse.getDocumentFile(queryDocumentFileParameter.getTbDocumentFile());
-        List<Integer> userIDList = Collections.singletonList(documentFileResponse.getCreateUserId());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIDList), appKey, appSecret);
+        List<Integer> userIdList = Collections.singletonList(documentFileResponse.getCreateUserId());
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
         if (resultWrapper.apiSuccess()) {
-            List<Map<String, Object>> userIDNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (CollectionUtil.isNullOrEmpty(userIDNameList)) {
+            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+            if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
                 return documentFileResponse;
             }
-            List<UserIDName> newUserIDNameList = CustomizeBeanUtil.toBeanList(userIDNameList, UserIDName.class);
-            documentFileResponse.setCreateUserName(newUserIDNameList.get(0).getUserName());
+            List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+            documentFileResponse.setCreateUserName(newUserIdNameList.get(0).getUserName());
         }
+
+        // 文件绝对路径
+        String filePath = fileService.getFileUrl(queryDocumentFileParameter.getTbDocumentFile().getFilePath());
+        documentFileResponse.setFilePath(filePath);
         return documentFileResponse;
     }
 

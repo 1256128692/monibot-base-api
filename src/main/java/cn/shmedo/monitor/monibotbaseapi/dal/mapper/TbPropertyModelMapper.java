@@ -16,5 +16,6 @@ public interface TbPropertyModelMapper extends BaseMapper<TbPropertyModel> {
 
     List<Model4Web> queryModel4WebBy(Byte projectType, Byte createType);
 
+    @Deprecated
     int countByName(String modelName);
 }

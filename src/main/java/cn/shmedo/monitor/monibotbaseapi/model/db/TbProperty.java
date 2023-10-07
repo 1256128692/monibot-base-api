@@ -93,15 +93,6 @@ public class TbProperty {
         this.ID = ID;
     }
 
-//    public Byte getProjectType() {
-//        return projectType;
-//    }
-//
-//    public void setProjectType(Byte projectType) {
-//        this.projectType = projectType;
-//    }
-
-
     public Integer getGroupID() {
         return groupID;
     }
@@ -202,7 +193,6 @@ public class TbProperty {
     public String toString() {
         return "TbProperty{" +
                 "ID=" + ID +
-//                ", projectType=" + projectType +
                 ", groupID='" + groupID + '\'' +
                 ", name='" + name + '\'' +
                 ", type=" + type +

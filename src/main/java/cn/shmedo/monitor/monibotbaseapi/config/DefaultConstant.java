@@ -40,8 +40,13 @@ public class DefaultConstant {
     public static final List<Integer> MDWT_PROJECT_TYPE_LIST = Arrays.asList(1, 2, 3, 4);
 
     /** ================================项目表单start================================ **/
+    /** 表单复制时，填充后缀 **/
     public static final String PROPERTY_MODEL_COPY_SUFFIX = "_副本";
+
+    /** 默认属性模板组 **/
+    public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
     /** ================================项目表单end================================ **/
+
     /**
      * 平台类型的合集
      */

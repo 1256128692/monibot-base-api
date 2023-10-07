@@ -76,15 +76,15 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
     public PropertyModelGroupResponse queryPropertyModelGroup(QueryPropertyModelGroupParam queryPropertyModelGroupParam) {
         TbPropertyModelGroup tbPropertyModelGroup = queryPropertyModelGroupParam.getTbPropertyModelGroup();
         PropertyModelGroupResponse propertyModelGroupResponse = CustomizeBeanUtil.copyProperties(tbPropertyModelGroup, PropertyModelGroupResponse.class);
-        QueryUserIDNameParameter queryUserIDNameParameter = new QueryUserIDNameParameter(Collections.singletonList(propertyModelGroupResponse.getCreateUserID()));
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(queryUserIDNameParameter, appKey, appSecret);
-        if(resultWrapper.apiSuccess()){
-            List<Map<String, Object>> userIDNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (CollectionUtil.isNullOrEmpty(userIDNameList)) {
+        QueryUserIDNameParameter queryUserIdNameParameter = new QueryUserIDNameParameter(Collections.singletonList(propertyModelGroupResponse.getCreateUserID()));
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(queryUserIdNameParameter, appKey, appSecret);
+        if (resultWrapper.apiSuccess()) {
+            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+            if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
                 return propertyModelGroupResponse;
             }
-            List<UserIDName> newUserIDNameList = CustomizeBeanUtil.toBeanList(userIDNameList, UserIDName.class);
-            propertyModelGroupResponse.setCreateUserName(newUserIDNameList.get(0).getUserName());
+            List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+            propertyModelGroupResponse.setCreateUserName(newUserIdNameList.get(0).getUserName());
         }
         return propertyModelGroupResponse;
     }
@@ -98,22 +98,24 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
     public Object queryPropertyModelGroupList(QueryPropertyModelGroupListParam queryPropertyModelGroupListParam) {
         LambdaQueryWrapper<TbPropertyModelGroup> queryWrapper = new QueryWrapper<TbPropertyModelGroup>().lambda()
                 .eq(TbPropertyModelGroup::getCompanyID, queryPropertyModelGroupListParam.getCompanyID())
-                .eq(TbPropertyModelGroup::getGroupType ,queryPropertyModelGroupListParam.getGroupType());
-        if(StringUtils.isNotEmpty(queryPropertyModelGroupListParam.getName())){
-            queryWrapper.eq(TbPropertyModelGroup::getName, queryPropertyModelGroupListParam.getName());
-        }
+                .eq(TbPropertyModelGroup::getGroupType, queryPropertyModelGroupListParam.getGroupType())
+                .eq(StringUtils.isNotEmpty(queryPropertyModelGroupListParam.getName()), TbPropertyModelGroup::getName, queryPropertyModelGroupListParam.getName());
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(queryWrapper);
+        if (CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
+            return Collections.emptyList();
+        }
+
         List<PropertyModelGroupResponse> propertyModelGroupResponseList = new ArrayList<>();
-        List<Integer> userIDList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIDList), appKey, appSecret);
+        List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
         if (resultWrapper.apiSuccess()) {
             // 获取CreateUserID对应的CreateUserName
-            List<Map<String, Object>> userIDNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (!CollectionUtil.isNullOrEmpty(userIDNameList)) {
-                List<UserIDName> newUserIDNameList = CustomizeBeanUtil.toBeanList(userIDNameList, UserIDName.class);
-                Map<Integer, UserIDName> userIDNameMap = newUserIDNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
+            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+            if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
+                List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+                Map<Integer, UserIDName> userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
                 propertyModelGroupResponseList = CustomizeBeanUtil.copyListProperties(tbPropertyModelGroupList, PropertyModelGroupResponse::new);
-                propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIDNameMap.get(res.getCreateUserID()).getUserName()));
+                propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIdNameMap.get(res.getCreateUserID()).getUserName()));
             }
         }
         return propertyModelGroupResponseList;

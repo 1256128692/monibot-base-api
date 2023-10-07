@@ -47,6 +47,7 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
         if (!PropertyModelType.getModelTypeValues().contains(modelType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型不合法");
         }
+
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
         tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
         if (Objects.isNull(tbPropertyModel)) {

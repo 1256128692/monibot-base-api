@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
@@ -42,10 +43,11 @@ public class DeleteModelParam implements ParameterValidator, ResourcePermissionP
         if(CollectionUtil.isEmpty(tbPropertyModelList)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应模板");
         }
-        // 设备表单支持分组管理，默认分组不可删除
+
+        // 设备表单和工作流支持分组管理，默认分组不可删除
         Map<Integer, List<TbPropertyModel>> modelGroup = tbPropertyModelList.stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
-        if(modelGroup.containsKey(PropertyModelType.DEFAULT.getCode())){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备表单下默认分组不可删除");
+        if(modelGroup.containsKey(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP)){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "表单下默认分组不可删除");
         }
         return null;
     }

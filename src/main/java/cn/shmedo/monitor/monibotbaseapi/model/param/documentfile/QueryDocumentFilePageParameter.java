@@ -25,6 +25,9 @@ public class QueryDocumentFilePageParameter implements ParameterValidator, Resou
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;
 
+    @NotNull(message = "对象类型不能为空")
+    private Integer subjectType;
+
     private String fileName;
 
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")

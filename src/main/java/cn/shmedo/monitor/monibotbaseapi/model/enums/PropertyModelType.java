@@ -14,8 +14,6 @@ import java.util.Set;
  * @Version 1.0
  */
 public enum PropertyModelType {
-    /** 默认分组 **/
-    DEFAULT(-1, "默认分组"),
     /** 监测项目 **/
     BASE_PROJECT(0, "监测项目"),
     /** 设备 **/

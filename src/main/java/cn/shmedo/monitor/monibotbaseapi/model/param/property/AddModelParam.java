@@ -8,12 +8,13 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.ToString;
 
 import java.util.List;
@@ -25,15 +26,17 @@ import java.util.List;
  **/
 @ToString
 public class AddModelParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @NotNull
+    @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    @NotNull
+    @NotNull(message = "模板名称不能为空")
     private String modelName;
 
     @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
+    @Min(0)
+    @Max(3)
     private Integer modelTypeSubType;
 
     private Integer groupID;
@@ -50,25 +53,35 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
 
     @Override
     public ResultWrapper<?> validate() {
-        // 校验表单类型
+        // 校验表单类型是否正确
         if(!PropertyModelType.getModelTypeValues().contains(modelType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型不合法");
         }
+
         // 如果表单模板类型为项目表单模板，需要校验项目类型
         if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
+
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
-        if (tbPropertyModelMapper.countByName(modelName) > 0) {
+        List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
+                .eq(TbPropertyModel::getCompanyID, this.companyID)
+                .eq(TbPropertyModel::getModelType, this.modelType)
+                .eq(TbPropertyModel::getPlatform, this.platform)
+                .eq(TbPropertyModel::getGroupID, this.groupID));
+        if (!CollectionUtil.isNullOrEmpty(tbPropertyModelList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的名称已存在");
         }
+
         if (modelPropertyList.stream().map(ModelItem::getName).distinct().count() != modelPropertyList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
         }
+
         if (modelPropertyList.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性的额外属性应为json字符串");
         }
-        ResultWrapper temp = PropertyUtil.validate(modelPropertyList);
+
+        ResultWrapper<?> temp = PropertyUtil.validate(modelPropertyList);
         if (temp != null) {
             return temp;
         }

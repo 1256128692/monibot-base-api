@@ -131,7 +131,6 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 模糊查询
-        //todo 对于groupID字段，可能存在重复的情况，projectType和groupID来源于两张不同表
         LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda().eq(TbPropertyModel::getModelType, param.getModelType());
         queryWrapper.like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName());
         queryWrapper.eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType());
@@ -203,7 +202,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer deleteModel(DeleteModelParam param) {
-        // todo 如果模板，或者模板下属性有被使用，这个模板不能删除，或者怎么提示前端
+        // todo 表单模板为工作流模板，删除模板时，需要校验模板是否已经被应用
         LambdaQueryWrapper<TbProperty> propertyLambdaQueryWrapper = new QueryWrapper<TbProperty>().lambda().in(TbProperty::getModelID, param.getModelIDList());
         tbPropertyMapper.delete(propertyLambdaQueryWrapper);
         return tbPropertyModelMapper.deleteBatchIds(param.getModelIDList());

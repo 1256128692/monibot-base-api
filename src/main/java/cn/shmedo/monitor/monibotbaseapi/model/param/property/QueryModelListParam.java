@@ -38,7 +38,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(groupID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为项目时，groupID不能为空");
         }
-        if (!ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
+        if (Objects.nonNull(groupID) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (createType != null && !CreateType.isValid(createType)) {

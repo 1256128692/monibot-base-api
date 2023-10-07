@@ -5,8 +5,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -36,6 +40,8 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
 
     private Integer groupType;
 
+    @Min(0)
+    @Max(Byte.MAX_VALUE)
     private Integer groupTypeSubType;
 
     private String name;
@@ -50,9 +56,19 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
     @Override
     public ResultWrapper<?> validate() {
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
+        // 校验是否存在属性模板组
         tbPropertyModelGroup = tbPropertyModelGroupMapper.selectById(this.ID);
-        if (Objects.isNull(tbPropertyModelGroup)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应属性模板组");
+        if (Objects.isNull(tbPropertyModelGroup)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应模板组");
+        }
+
+        // 校验名称是否重复
+        TbPropertyModelGroup tbPropertyModelGroup1 = tbPropertyModelGroupMapper.selectOne(new QueryWrapper<TbPropertyModelGroup>().lambda()
+                .eq(TbPropertyModelGroup::getID, this.ID)
+                .eq(TbPropertyModelGroup::getCompanyID, this.companyID)
+                .ne(TbPropertyModelGroup::getName, this.name));
+        if (Objects.nonNull(tbPropertyModelGroup1)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组名称不能重复");
         }
         return null;
     }

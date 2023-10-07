@@ -42,7 +42,7 @@ public class TbPropertyModel implements Serializable {
     private String platform;
 
     /**
-     * 模板类型（-1-默认分组；0-工程项目；1-设备；2-工作流）
+     * 模板类型（0-工程项目；1-设备；2-工作流）
      */
     @TableField(value = "ModelType")
     private Integer modelType;
