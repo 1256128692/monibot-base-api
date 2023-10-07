@@ -17,6 +17,8 @@ public class VideoDeviceInfoV1 {
     private String deviceName;
     private Byte accessPlatform;
     private String accessPlatformStr;
+
+    private Boolean deviceStatus;
     /**
      * 海康默认为1,萤石云根据具体的ysChannelInfoList数量
      */
