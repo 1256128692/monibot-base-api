@@ -466,10 +466,10 @@ public class VideoServiceImpl implements VideoService {
                     v.setHkChannelInfo(hkChannelInfo);
                     if (CollectionUtil.isNullOrEmpty(v.getSensorList())) {
                         singleVideoSensorList.add(VideoCaptureBaseInfo.fromHkChannelInfo(hkChannelInfo, v.getDeviceName()));
+                        v.setSensorList(singleVideoSensorList);
                     }
                 }
             }
-            v.setSensorList(singleVideoSensorList);
             v.setDeviceChannelNum(singleVideoSensorList.size());
         });
         return list;
