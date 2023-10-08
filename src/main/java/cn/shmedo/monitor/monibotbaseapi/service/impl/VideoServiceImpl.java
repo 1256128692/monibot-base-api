@@ -459,6 +459,9 @@ public class VideoServiceImpl implements VideoService {
                         }
                     }
                 }
+                if (singleVideoSensorList.size() != 0) {
+                    v.setSensorList(singleVideoSensorList);
+                }
                 v.setDeviceChannelNum(singleVideoSensorList.size());
             } else {
                 v.setDeviceChannelNum(1);
