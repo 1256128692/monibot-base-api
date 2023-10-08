@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
@@ -24,7 +25,7 @@ public interface ITbVideoDeviceService extends IService<TbVideoDevice> {
 
     VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param);
 
-    Map<String, String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
+    ResultWrapper<Map<String,String>> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
 
     String queryHikVideoTalk(QueryHikVideoTalkParam param);
 }

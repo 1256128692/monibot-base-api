@@ -171,7 +171,7 @@ public class HkVideoServiceImpl implements HkVideoService {
                     .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
                     .map(JSONUtil::parseObj).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
-            throw new RuntimeException("海康接口调用失败!");
+            throw new RuntimeException("海康接口调用失败!报错信息:" + e.getMessage());
         }
     }
 

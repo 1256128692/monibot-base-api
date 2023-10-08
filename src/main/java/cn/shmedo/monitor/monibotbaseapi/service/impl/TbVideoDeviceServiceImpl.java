@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
@@ -13,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,7 @@ import java.util.*;
  * @author youxian.kong@shmedo.cn
  * @date 2023-08-31 14:20
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, TbVideoDevice> implements ITbVideoDeviceService {
@@ -66,19 +70,29 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
     }
 
     @Override
-    public Map<String, String> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param) {
+    public ResultWrapper<Map<String, String>> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param) {
         String beginTime = DateUtil.format(param.getBeginTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
         String endTime = DateUtil.format(param.getEndTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
-        Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(param.getTbVideoDevice().getDeviceSerial(), param.getRecordLocation().toString(),
-                DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, beginTime, endTime, param.getUuid(), null, null, null);
-        return new HashMap<>() {
-            {
-                Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL))
-                        .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL)).map(Object::toString).ifPresent(u -> put("baseUrl", u));
-                Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID))
-                        .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID)).map(Object::toString).ifPresent(u -> put("uuid", u));
+        try {
+            Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(param.getTbVideoDevice().getDeviceSerial(), param.getRecordLocation().toString(),
+                    DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, beginTime, endTime, param.getUuid(), null, null, null);
+            Map<String, String> res = new HashMap<>() {
+                {
+                    Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL))
+                            .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL)).map(Object::toString).ifPresent(u -> put("baseUrl", u));
+                    Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID))
+                            .map(u -> u.get(DefaultConstant.HikVideoParamKeys.HIK_PLAYBACK_UUID)).map(Object::toString).ifPresent(u -> put("uuid", u));
+                }
+            };
+            if (res.containsKey("baseUrl")) {
+                return ResultWrapper.success(res);
             }
-        };
+        } catch (Exception e) {
+            //如果catch到异常，说明运管中心超时
+            log.error("运管中心请求超时,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n报错信息:{}",
+                    param.getTbVideoDevice().getDeviceSerial(), beginTime, endTime, param.getRecordLocation(), e.getMessage());
+        }
+        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该时段内暂无录像");
     }
 
     @Override
