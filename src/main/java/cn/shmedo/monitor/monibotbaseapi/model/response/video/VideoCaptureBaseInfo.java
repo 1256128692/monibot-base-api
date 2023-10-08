@@ -32,11 +32,11 @@ public class VideoCaptureBaseInfo {
 
 
     // 添加一个静态方法用于转换
-    public static VideoCaptureBaseInfo fromYsChannelInfo(YsChannelInfo ysChannelInfo, String deviceName, int index) {
+    public static VideoCaptureBaseInfo fromYsChannelInfo(YsChannelInfo ysChannelInfo, String deviceName) {
         VideoCaptureBaseInfo videoCaptureBaseInfo = new VideoCaptureBaseInfo();
 
         // 生成传感器名称 sensorName，设备 deviceName 名称加 "@" 加 index
-        String sensorName = deviceName + "@" + index;
+        String sensorName = deviceName + "@" + ysChannelInfo.getChannelNo();
 
         // 设置属性
         videoCaptureBaseInfo.setSensorName(sensorName);

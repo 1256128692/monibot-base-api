@@ -44,6 +44,7 @@ public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourceP
         videoDeviceList.forEach(videoDeviceInfoV4 ->  {
             videoDeviceInfoV4.setProjectID(list.stream()
                     .filter(l -> Objects.equals(l.getVideoDeviceID(), videoDeviceInfoV4.getVideoDeviceID()))
+                    .filter(l -> l.getProjectID() != null)
                     .map(VideoDeviceInfoV3::getProjectID).findFirst().orElse(-1));
         });
 
