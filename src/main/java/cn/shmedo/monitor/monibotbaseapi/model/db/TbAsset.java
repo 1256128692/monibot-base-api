@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 资产表
@@ -16,6 +18,8 @@ import lombok.Data;
 @Data
 @Builder
 @TableName(value = "tb_asset")
+@AllArgsConstructor
+@NoArgsConstructor
 public class TbAsset {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
@@ -54,7 +58,7 @@ public class TbAsset {
     private Integer warnValue;
 
     @TableField(value = "Comparison")
-    private Object comparison;
+    private String comparison;
 
     @TableField(value = "ExValue")
     private String exValue;
@@ -68,6 +72,6 @@ public class TbAsset {
     @TableField(value = "UpdateTime")
     private Date updateTime;
 
-    @TableField(value = "UpdadteUserID")
-    private Integer updadteUserID;
+    @TableField(value = "UpdateUserID")
+    private Integer updateUserID;
 }

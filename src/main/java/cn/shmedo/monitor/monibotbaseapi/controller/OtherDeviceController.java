@@ -1,9 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.iot.entity.base.OperationProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.*;
+import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
+import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,7 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @create: 2023-09-18 13:42
  **/
 @RestController
+@AllArgsConstructor
 public class OtherDeviceController {
+    private final IOtherDeviceService otherDeviceService;
     /**
      * @api {post} /AddOtherDeviceBatch 批量新增其他设备
      * @apiDescription 批量新增其他设备
@@ -24,7 +30,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName AddOtherDeviceBatch
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} [templateID] 模板ID
+     * @apiParam (请求体) {Int} templateID 模板ID
      * @apiParam (请求体) {Json[]} list 列表
      * @apiParam (请求体) {String} list.name 设备名称
      * @apiParam (请求体) {String} list.token 设备编号
@@ -32,7 +38,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} list.vendor 设备厂商/品牌
      * @apiParam (请求体) {Int} list.projectID 项目ID
      * @apiParam (请求体) {String} [list.exValue] 扩展字段,json字符串（500）
-     * @apiParam (请求体) {Json[]} [list.propertyList] 属性列表
+     * @apiParam (请求体) {Json[]} list.propertyList 属性列表
      * @apiParam (请求体) {Int} list.propertyList.ID属性id
      * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
@@ -42,7 +48,8 @@ public class OtherDeviceController {
 //    @Permission(permissionName = "mdmbase:XX")
     @LogParam(moduleName = "其他设备模块", operationName = "批量新增其他设备", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddOtherDeviceBatch", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addOtherDeviceBatch(@Validated @RequestBody Object pa) {
+    public Object addOtherDeviceBatch(@Validated @RequestBody AddOtherDeviceBatchParam pa) {
+        otherDeviceService.addOtherDeviceBatch(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -67,9 +74,10 @@ public class OtherDeviceController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "其他设备模块", operationName = "更新其他设备", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "其他设备模块", operationName = "更新其他设备", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateOtherDevice", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateOtherDevice(@Validated @RequestBody Object pa) {
+    public Object updateOtherDevice(@Validated @RequestBody UpdateOtherDeviceParam pa) {
+        otherDeviceService.updateOtherDevice(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -86,9 +94,10 @@ public class OtherDeviceController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "其他设备模块", operationName = "删除其他设备", operationProperty = OperationProperty.DELETE)
+    @LogParam(moduleName = "其他设备模块", operationName = "删除其他设备", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteOtherDevice", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteOtherDevice(@Validated @RequestBody Object pa) {
+    public Object deleteOtherDevice(@Validated @RequestBody DeleteOtherDeviceParam pa) {
+        otherDeviceService.deleteOtherDevice(pa.getDeviceIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -99,7 +108,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName QueryOtherDevicePage
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询设备名称/编号, 设备型号,厂商/品牌
+     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询设备名称,编号, 设备型号,厂商/品牌
      * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {Int} [templateID] 模板ID
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -121,8 +130,8 @@ public class OtherDeviceController {
      */
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryOtherDevicePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryOtherDevicePage(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryOtherDevicePage(@Validated @RequestBody QueryOtherDevicePageParam pa) {
+        return otherDeviceService.queryOtherDevicePage(pa);
     }
 
     /**
@@ -145,7 +154,6 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {Json[]} propertyList 属性列表
      * @apiSuccess (返回结果) {Int} propertyList.ID 属性id
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
-     * @apiSuccess (返回结果) {String} propertyList.token 属性标识
      * @apiSuccess (返回结果) {String} propertyList.unit 属性单位
      * @apiSuccess (返回结果) {String} propertyList.value 属性值
      * @apiSampleRequest off
@@ -153,7 +161,7 @@ public class OtherDeviceController {
      */
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryOtherDeviceWithProperty", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryOtherDeviceWithProperty(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryOtherDeviceWithProperty(@Validated @RequestBody QueryOtherDeviceWithPropertyParam pa) {
+        return otherDeviceService.queryOtherDeviceWithProperty(pa);
     }
 }

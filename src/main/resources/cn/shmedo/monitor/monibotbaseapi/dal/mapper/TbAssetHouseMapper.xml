@@ -6,7 +6,7 @@
     <!--@Table tb_asset_house-->
     <id column="ID" jdbcType="INTEGER" property="ID" />
     <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
-    <result column="Name" jdbcType="VARBINARY" property="name" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
     <result column="Code" jdbcType="VARCHAR" property="code" />
     <result column="Address" jdbcType="VARCHAR" property="address" />
     <result column="Comment" jdbcType="VARCHAR" property="comment" />

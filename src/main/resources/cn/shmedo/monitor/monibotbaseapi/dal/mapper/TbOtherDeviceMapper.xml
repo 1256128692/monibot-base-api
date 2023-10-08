@@ -23,4 +23,26 @@
     ID, CompanyID, ProjectID, `Name`, Token, Model, Vendor, TemplateID, ExValue, CreateTime, 
     CreateUserID, UpdateTime, UpdateUserID
   </sql>
+
+  <select id="queryOtherDevicePage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web">
+      select tod.* , tpm.Name as templateName, tp.projectName
+      from tb_other_device as tod
+               left join tb_property_model as tpm on tod.TemplateID = tpm.ID
+                left join tb_project_info as tp on tod.ProjectID = tp.ID
+      where tod.CompanyID = #{pa.companyID}
+      <if test="pa.projectID != null">
+          and tod.ProjectID = #{pa.projectID}
+      </if>
+      <if test="pa.templateID != null">
+          and tod.TemplateID = #{pa.templateID}
+      </if>
+      <if test="pa.fuzzyItem != null and pa.fuzzyItem != ''">
+          and (tod.Name like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.token like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.Model like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.Vendor like concat('%', #{pa.fuzzyItem}, '%')
+              )
+      </if>
+      order by tod.id desc
+  </select>
 </mapper>
