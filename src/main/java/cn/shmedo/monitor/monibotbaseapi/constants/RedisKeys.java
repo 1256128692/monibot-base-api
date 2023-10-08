@@ -56,6 +56,8 @@ public class RedisKeys {
      * 工程类型缓存
      */
     public static final String PROJECT_TYPE_KEY = "cn.shmedo.mdmbse.projectTypeCache";
+
+    public static final String ASSET_HOUSE_KEY = "cn.shmedo.monitor.assetHouse";
 }
 
     

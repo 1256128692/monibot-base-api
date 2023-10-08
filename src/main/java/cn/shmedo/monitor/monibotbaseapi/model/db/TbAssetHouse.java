@@ -24,7 +24,7 @@ public class TbAssetHouse {
     private Integer companyID;
 
     @TableField(value = "`Name`")
-    private byte[] name;
+    private String name;
 
     /**
      * 编号

@@ -7,14 +7,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 其他设备表，非iot，非视频
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName(value = "tb_other_device")
 public class TbOtherDevice {
     @TableId(value = "ID", type = IdType.AUTO)

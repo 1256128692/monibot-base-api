@@ -1,7 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.iot.entity.base.OperationProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbAsset;
+import cn.shmedo.monitor.monibotbaseapi.model.param.asset.*;
+import cn.shmedo.monitor.monibotbaseapi.service.IAssetService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
  * @create: 2023-09-18 14:44
  **/
 @RestController
+@AllArgsConstructor
 public class AssetController {
+    private final IAssetService assetService;
     /**
      * @api {post} /AddAsset 新增资产
      * @apiDescription 新增资产
@@ -26,7 +36,7 @@ public class AssetController {
      * @apiParam (请求体) {String} vendor 厂商品牌
      * @apiParam (请求体) {Int}   unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
      * @apiParam (请求体) {Int}  type 类型10, 20 救灾物资、备品备件
-     * @apiParam (请求体) {Int} warnValue  预警值
+     * @apiParam (请求体) {Int} warnValue  预警值(>=0)
      * @apiParam (请求体) {String} comparison 比较方式< ,> , =, <=,  >=
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiSuccess (返回结果) {String} none
@@ -34,9 +44,10 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "新增资产", operationProperty = OperationProperty.ADD)
+    @LogParam(moduleName = "资产模块", operationName = "新增资产", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addAsset(@Validated @RequestBody Object pa) {
+    public Object addAsset(@Validated @RequestBody AddAssetParam pa) {
+        assetService.save(pa.toEntity(CurrentSubjectHolder.getCurrentSubject().getSubjectID()));
         return ResultWrapper.successWithNothing();
     }
 
@@ -58,15 +69,16 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "更新资产", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "资产模块", operationName = "更新资产", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateAsset(@Validated @RequestBody Object pa) {
+    public Object updateAsset(@Validated @RequestBody UpdateAssetParam pa) {
+        assetService.updateById(pa.update(CurrentSubjectHolder.getCurrentSubject().getSubjectID()));
         return ResultWrapper.successWithNothing();
     }
 
     /**
      * @api {post} /DeleteAsset 删除资产
-     * @apiDescription 删除资产
+     * @apiDescription 删除资产，有库存则不允许删除
      * @apiVersion 1.0.0
      * @apiGroup 资产模块
      * @apiName DeleteAsset
@@ -77,9 +89,9 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "删除资产", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteAsset(@Validated @RequestBody Object pa) {
+    public Object deleteAsset(@Validated @RequestBody DeleteAssetParam pa) {
+        assetService.removeByIds(pa.getAssetIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -105,8 +117,12 @@ public class AssetController {
      */
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryAssetList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryAssetList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryAssetList(@Validated @RequestBody QueryAssetListParam pa) {
+        return assetService.list(new LambdaQueryWrapper<TbAsset>()
+                .eq(TbAsset::getCompanyID, pa.getCompanyID())
+                .eq(TbAsset::getType, pa.getType())
+                .orderByDesc(TbAsset::getID)
+        );
     }
 
     /**
@@ -127,7 +143,8 @@ public class AssetController {
 //    @Permission(permissionName = "mdmbase:XX")
 //    @LogParam(moduleName = "资产模块", operationName = "新增资产库", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object AddAssetHouse(@Validated @RequestBody Object pa) {
+    public Object AddAssetHouse(@Validated @RequestBody AddAssetHouseParam pa) {
+        assetService.addAssetHouse(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -148,9 +165,10 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "更新资产库", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "资产模块", operationName = "更新资产库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateAssetHouse(@Validated @RequestBody Object pa) {
+    public Object updateAssetHouse(@Validated @RequestBody UpdateAssetHouseParam pa) {
+        assetService.updateAssetHouse(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -167,9 +185,10 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "删除资产库", operationProperty = OperationProperty.DELETE)
+    @LogParam(moduleName = "资产模块", operationName = "删除资产库", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object DeleteAssetHouse(@Validated @RequestBody Object pa) {
+    public Object DeleteAssetHouse(@Validated @RequestBody DeleteAssetHouseParam pa) {
+        assetService.deleteAssetHouse(pa.getHouseIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -191,8 +210,8 @@ public class AssetController {
      */
 //    @Permission(permissionName = "mdmbase:XX")
     @RequestMapping(value = "QueryAssetHouseList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryAssetHouseList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryAssetHouseList(@Validated @RequestBody QueryAssetHouseListParam pa) {
+        return assetService.queryAssetHouseList(pa.getCompanyID());
     }
 
     /**
@@ -211,9 +230,10 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "入库出库", operationProperty = OperationProperty.UPDATE)
+    @LogParam(moduleName = "资产模块", operationName = "入库出库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "IOAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object ioAsset(@Validated @RequestBody Object pa) {
+    public Object ioAsset(@Validated @RequestBody IOAssetParam pa) {
+        assetService.ioAsset(pa, CurrentSubjectHolder.getCurrentSubject());
         return ResultWrapper.successWithNothing();
     }
 
@@ -250,10 +270,9 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "入库出库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "QueryAssetIOLogPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryAssetIOLogPage(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryAssetIOLogPage(@Validated @RequestBody QueryAssetIOLogPageParam pa) {
+        return assetService.queryAssetIOLogPage(pa);
     }
 
     /**
@@ -286,9 +305,8 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "入库出库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "QueryAssetPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryAssetPage(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryAssetPage(@Validated @RequestBody QueryAssetPageParam pa) {
+        return assetService.queryAssetPage(pa);
     }
 }

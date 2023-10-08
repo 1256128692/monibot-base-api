@@ -16,11 +16,11 @@
     <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
     <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="UpdadteUserID" jdbcType="INTEGER" property="updadteUserID" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     ID, CompanyID, `Name`, Vendor, Unit, `Type`, WarnValue, Comparison, ExValue, CreateTime, 
-    CreateUserID, UpdateTime, UpdadteUserID
+    CreateUserID, UpdateTime, UpdateUserID
   </sql>
 </mapper>

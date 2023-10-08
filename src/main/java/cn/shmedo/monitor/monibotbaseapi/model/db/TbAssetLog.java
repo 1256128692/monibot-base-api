@@ -7,8 +7,10 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 资产日志
@@ -16,6 +18,8 @@ import lombok.Data;
 @Data
 @Builder
 @TableName(value = "tb_asset_log")
+@NoArgsConstructor
+@AllArgsConstructor
 public class TbAssetLog {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
