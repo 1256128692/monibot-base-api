@@ -459,7 +459,9 @@ public class VideoServiceImpl implements VideoService {
                         }
                     }
                 }
+                v.setDeviceChannelNum(singleVideoSensorList.size());
             } else {
+                v.setDeviceChannelNum(1);
                 if (!StringUtil.isNullOrEmpty(v.getExValue())) {
                     JSON json = JSONUtil.parse(v.getExValue());
                     HkChannelInfo hkChannelInfo = json.toBean(HkChannelInfo.class);
@@ -470,7 +472,6 @@ public class VideoServiceImpl implements VideoService {
                     }
                 }
             }
-            v.setDeviceChannelNum(v.getSensorList().size());
         });
         return list;
     }
