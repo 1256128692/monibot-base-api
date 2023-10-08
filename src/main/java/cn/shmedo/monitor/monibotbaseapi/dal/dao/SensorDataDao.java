@@ -2,10 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import org.influxdb.dto.QueryResult;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -33,11 +29,12 @@ public interface SensorDataDao {
      * @param density             查询密度
      * @param fieldSelectInfoList 字段信息列表
      * @param raw                 是否为原始数据
+     * @param queryType
      * @return 监测数据列表
      */
     List<Map<String, Object>> querySensorData(List<Integer> sensorIDList, Timestamp begin, Timestamp end,
                                               String density, List<FieldSelectInfo> fieldSelectInfoList,
-                                              boolean raw, Integer monitorType);
+                                              boolean raw, Integer monitorType, Integer queryType);
 
     /**
      * 从实时表中查询传感器(雨量)的当前统计数据。查询返回数据含有：sensorID,time,currentRainfall

@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.QueryType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +37,8 @@ public class QueryMonitorPointSensorDataListParam implements ParameterValidator,
     private Timestamp end;
 
     private String density;
+
+    private Integer queryType;
 
     @JsonIgnore
     private TbMonitorPoint tbMonitorPoint;
@@ -72,6 +75,12 @@ public class QueryMonitorPointSensorDataListParam implements ParameterValidator,
             // 传输条件为all时,置空查询密度,即可查询全部数据
             if (density.equals("all")){
                 density = null;
+            }
+        }
+
+        if (queryType != null) {
+            if (!QueryType.isValidDensity(queryType)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "非法的请求查询方式");
             }
         }
 

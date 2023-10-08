@@ -443,26 +443,25 @@ public class VideoServiceImpl implements VideoService {
                                 singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i + 1));
                             }
                         }
+                        v.setDeviceChannelNum(0);
                     } else {
                         if (!CollectionUtil.isNullOrEmpty(v.getYsChannelInfoList())) {
                             List<YsChannelInfo> filteredYsChannelInfoList = v.getYsChannelInfoList().stream()
                                     .filter(ys -> v.getSensorList().stream().noneMatch(sensor -> sensor.getChannelNo().equals(ys.getChannelNo())))
                                     .collect(Collectors.toList());
+                            v.setDeviceChannelNum(v.getSensorList().size());
 
                             for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
                                 YsChannelInfo ysChannelInfo = filteredYsChannelInfoList.get(i);
                                 // 添加到 singleVideoSensorList
                                 singleVideoSensorList.add(VideoCaptureBaseInfo.fromYsChannelInfo(ysChannelInfo, v.getDeviceName(), i + 1));
-                                singleVideoSensorList.addAll(v.getSensorList());
                             }
                             singleVideoSensorList.addAll(v.getSensorList());
                         }
                     }
                 }
-                if (singleVideoSensorList.size() != 0) {
-                    v.setSensorList(singleVideoSensorList);
-                }
-                v.setDeviceChannelNum(singleVideoSensorList.size());
+                v.setSensorList(singleVideoSensorList);
+
             } else {
                 v.setDeviceChannelNum(1);
                 if (!StringUtil.isNullOrEmpty(v.getExValue())) {

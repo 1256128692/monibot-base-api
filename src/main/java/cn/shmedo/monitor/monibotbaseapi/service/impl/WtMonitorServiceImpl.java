@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -644,7 +643,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), pa.getQueryType());
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -710,7 +709,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -800,7 +799,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         Double dailyRainfall = 0.0;
         List<Map<String, Object>> resultList = null;
@@ -970,7 +969,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getMonitorType());
+                fieldList, false, pa.getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         maps.forEach(map -> {
@@ -1028,7 +1027,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {

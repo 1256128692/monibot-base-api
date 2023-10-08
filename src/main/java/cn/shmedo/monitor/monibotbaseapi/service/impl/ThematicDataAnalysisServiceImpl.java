@@ -203,9 +203,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         final Timestamp endTime = param.getEndTime();
         final SimpleDateFormat sensorDateFormatter = TimeUtil.getMilliDefaultFormatter();
         final List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(sensorIDList, startTime, endTime,
-                "1d", fieldSelectInfoList, false, monitorType);
+                "1d", fieldSelectInfoList, false, monitorType, null);
         final List<Map<String, Object>> damMetadataList = sensorDataDao.querySensorData(damFrontSensorIDList, startTime,
-                endTime, "1d", fieldSelectInfoList, false, monitorType);
+                endTime, "1d", fieldSelectInfoList, false, monitorType, null);
         if (Objects.nonNull(density)) {
             switch (density) {
                 case 1 -> {
@@ -296,7 +296,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // all
                 case 0 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(
-                            sensorIDList, startTime, endTime, null, fieldSelectInfoList, false, monitorType);
+                            sensorIDList, startTime, endTime, null, fieldSelectInfoList, false, monitorType, null);
                     List<Map<String, Object>> sourceList = getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> {
                                 String dateStr = o.toString();
@@ -310,7 +310,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // daily avg
                 case 1 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(
-                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     List<Map<String, Object>> sourceList = getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> {
                                 String dateStr = o.toString();
@@ -324,7 +324,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // month avg
                 case 2 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(
-                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     List<Map<String, Object>> sourceList = getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> {
                                 String dateStr = o.toString();
@@ -338,7 +338,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // year avg
                 case 3 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(
-                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            sensorIDList, startTime, endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     List<Map<String, Object>> sourceList = getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> {
                                 String dateStr = o.toString();
@@ -376,21 +376,21 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // all
                 case 0 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(sensorIDList, startTime,
-                            endTime, null, fieldSelectInfoList, false, monitorType);
+                            endTime, null, fieldSelectInfoList, false, monitorType, null);
                     return getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> DateUtil.parse(o.toString(), sensorDateFormatter));
                 }
                 // daily avg
                 case 1 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(sensorIDList, startTime,
-                            endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     return getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> getZeroDateTime(DateUtil.parse(o.toString(), sensorDateFormatter)));
                 }
                 // month avg
                 case 2 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(sensorIDList, startTime,
-                            endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     return getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> getZeroDateTime(DateUtil.parse(o.toString(), sensorDateFormatter)
                                     .setField(DateField.DAY_OF_MONTH, 1)));
@@ -398,7 +398,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 // year avg
                 case 3 -> {
                     List<Map<String, Object>> metadataList = sensorDataDao.querySensorData(sensorIDList, startTime,
-                            endTime, "1d", fieldSelectInfoList, false, monitorType);
+                            endTime, "1d", fieldSelectInfoList, false, monitorType, null);
                     return getDmHistoryData(metadataList, configMap, fieldToken,
                             o -> getZeroDateTime(DateUtil.parse(o.toString(), sensorDateFormatter)
                                     .setField(DateField.MONTH, 1).setField(DateField.DAY_OF_MONTH, 1)));
