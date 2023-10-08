@@ -55,14 +55,9 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
             this.videoDeviceID = this.tbSensor.getVideoDeviceID();
         }
         if (Objects.nonNull(this.videoDeviceID)) {
-            List<TbVideoDevice> tbVideoDeviceList = ContextHolder.getBean(TbVideoDeviceMapper.class)
-                    .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, this.videoDeviceID));
-            if (CollUtil.isEmpty(tbVideoDeviceList)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在!");
-            }
-            tbVideoDevice = tbVideoDeviceList.get(0);
-            if (!tbVideoDevice.getAccessPlatform().equals(AccessPlatformType.HAI_KANG.getValue())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不是海康设备!");
+            ResultWrapper<?> checkDevice = checkDevice();
+            if (Objects.nonNull(checkDevice)) {
+                return checkDevice;
             }
             List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getVideoDeviceID, this.videoDeviceID));
             if (CollUtil.isEmpty(sensorList)) {
@@ -81,9 +76,27 @@ public class HikVideoBaseParam implements ParameterValidator, IVideoCameraCheck 
         }
         if (Objects.isNull(this.videoDeviceID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器未关联视频设备!");
+        } else if (Objects.isNull(tbVideoDevice)) {
+            ResultWrapper<?> checkDevice = checkDevice();
+            if (Objects.nonNull(checkDevice)) {
+                return checkDevice;
+            }
         }
         if (!tbSensor.getMonitorType().equals(MonitorType.VIDEO.getKey())) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器不是视频传感器!");
+        }
+        return null;
+    }
+
+    private ResultWrapper<?> checkDevice() {
+        List<TbVideoDevice> tbVideoDeviceList = ContextHolder.getBean(TbVideoDeviceMapper.class)
+                .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, this.videoDeviceID));
+        if (CollUtil.isEmpty(tbVideoDeviceList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在!");
+        }
+        tbVideoDevice = tbVideoDeviceList.get(0);
+        if (!tbVideoDevice.getAccessPlatform().equals(AccessPlatformType.HAI_KANG.getValue())) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不是海康设备!");
         }
         return null;
     }
