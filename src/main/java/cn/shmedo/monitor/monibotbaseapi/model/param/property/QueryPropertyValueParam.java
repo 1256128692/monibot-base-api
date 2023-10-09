@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -35,9 +36,14 @@ public class QueryPropertyValueParam implements ParameterValidator, ResourcePerm
     private Integer projectID;
 
     /**
+     * 项目类型
+     */
+    @NotNull(message = "项目类型不能为空")
+    private Integer projectType;
+
+    /**
      * 模板类型
      */
-    @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
     /**
@@ -64,13 +70,16 @@ public class QueryPropertyValueParam implements ParameterValidator, ResourcePerm
 
     @Override
     public ResultWrapper<?> validate() {
+        modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
+        groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
+
         if (createType == null) {
             createType = 0;
         }
-        if(!PropertyModelType.BASE_PROJECT.getCode().equals(modelType))
+        if (!PropertyModelType.BASE_PROJECT.getCode().equals(modelType))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型除工程项目外，其他模板类型功能暂未开放");
-        if(Objects.isNull(groupID))
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工程项目时，groupID不能为空");
+        if (modelType.equals(PropertyModelType.BASE_PROJECT.getCode()) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID))))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         return null;
     }
 

@@ -21,6 +21,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @program: monibot-base-api
@@ -36,7 +37,6 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
     @NotNull
     private Integer projectID;
 
-    @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
     @NotEmpty
@@ -47,10 +47,13 @@ public class UpdatePropertyParam implements ParameterValidator, ResourcePermissi
     private List<TbProperty> properties;
     @Override
     public ResultWrapper<?> validate() {
+        modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
+
         if(!PropertyModelType.BASE_PROJECT.getCode().equals(modelType))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型除工程项目外，其他模板类型功能暂未开放");
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
+
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
         }

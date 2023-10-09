@@ -22,9 +22,11 @@ import java.util.Objects;
 public class QueryModelListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     private Integer modelID;
 
+    @NotNull(message = "项目类型不能为空")
+    private Integer projectType;
+
     private String name;
 
-    @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
     private Integer modelTypeSubType;
@@ -35,10 +37,10 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
 
     @Override
     public ResultWrapper<?> validate() {
-        if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(groupID)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为项目时，groupID不能为空");
-        }
-        if (Objects.nonNull(groupID) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
+        modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
+        groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
+
+        if (modelType.equals(PropertyModelType.BASE_PROJECT.getCode()) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (createType != null && !CreateType.isValid(createType)) {
