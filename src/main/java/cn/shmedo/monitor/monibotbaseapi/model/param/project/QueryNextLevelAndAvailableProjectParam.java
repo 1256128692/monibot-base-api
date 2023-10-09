@@ -35,7 +35,7 @@ public class QueryNextLevelAndAvailableProjectParam implements ParameterValidato
         if (!tbProjectInfo.getCompanyID().equals(companyID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前projectID不属于该companyID");
         }
-        if (tbProjectInfo.getLevel().equals(ProjectLevel.Son.getLevel()) || tbProjectInfo.getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+        if (tbProjectInfo.getLevel().equals(ProjectLevel.Son.getLevel())) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该工程不是一级或二级工程");
         }
         return null;
