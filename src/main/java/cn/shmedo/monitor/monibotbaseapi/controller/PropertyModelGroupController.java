@@ -36,7 +36,7 @@ public class PropertyModelGroupController {
      * @apiDescription 新增属性模板组
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} platform 所属平台
-     * @apiParam (请求体) {Int} groupType 属性模板组类型（0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [groupTypeSubType] 模板组类型子分类（冗余字段，当且仅当groupType为2-工作流时候，有值：0-工单、1-巡检、2-调度、3-OA）
      * @apiParam (请求体) {String} name 属性模板组名称
      * @apiParam (请求体) {String} [desc] 模板描述
@@ -61,7 +61,7 @@ public class PropertyModelGroupController {
      * @apiParam (请求体) {Int} ID ID
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [platform] 所属平台
-     * @apiParam (请求体) {Int} [groupType] 属性模板组类型（0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} [groupType] 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [groupTypeSubType] 模板组类型子分类（冗余字段，当且仅当groupType为2-工作流时候，有值：0-工单、1-巡检、2-调度、3-OA）
      * @apiParam (请求体) {String} [name] 属性模板组名称
      * @apiParam (请求体) {String} [desc] 模板描述
@@ -89,7 +89,7 @@ public class PropertyModelGroupController {
      * @apiSuccess (返回结果) {Int} ID 属性模板组ID
      * @apiSuccess (返回结果) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {String} platform 所属平台
-     * @apiSuccess (返回结果) {Int} groupType 属性模板组类型（0-工程项目；1-设备；2-工作流）
+     * @apiSuccess (返回结果) {Int} groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiSuccess (返回结果) {Int} [groupTypeSubType] 模板组类型子分类（冗余字段，当且仅当groupType为2-工作流时候，有值：0-工单、1-巡检、2-调度、3-OA）
      * @apiSuccess (返回结果) {String} name 属性模板组名称
      * @apiSuccess (返回结果) {String} [desc] 模板描述
@@ -132,11 +132,11 @@ public class PropertyModelGroupController {
      * @apiName QueryPropertyModelGroupList
      * @apiDescription 查看属性模板组列表
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} groupType 属性模板组类型（0-工程项目；1-设备；2-工作流）
+     * @apiParam (请求体) {Int} groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {String} [groupName] 属性模板组名称
      * @apiSuccess (返回结果) {Object[]} groupList 属性模板组列表
      * @apiSuccess (返回结果) {Int} groupList.ID 属性模板组ID
-     * @apiSuccess (返回结果) {Int} groupList.groupType 属性模板组类型（0-工程项目；1-设备；2-工作流）
+     * @apiSuccess (返回结果) {Int} groupList.groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiSuccess (返回结果) {Int} groupList.companyID 公司ID
      * @apiSuccess (返回结果) {String} groupList.groupName 属性模板组名称
      * @apiSuccess (返回结果) {String} [groupList.desc] 模板描述

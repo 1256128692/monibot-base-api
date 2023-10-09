@@ -54,9 +54,9 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应模板");
         }
 
-        // 只支持设备模板转移分组
+        // 只支持设备模板和工作流模板转移分组
         if(!PropertyModelType.DEVICE.getCode().equals(modelType) && !PropertyModelType.WORK_FLOW.getCode().equals(modelType)){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持设备、工作流模板转移分组");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持设备模板、工作流模板转移分组");
         }
 
         // 校验新的模板分组是否存在
