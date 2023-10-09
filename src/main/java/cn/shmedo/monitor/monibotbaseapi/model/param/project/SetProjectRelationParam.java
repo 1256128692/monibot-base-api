@@ -58,25 +58,24 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "nextLevelPIDList中存在不属于该companyID的projectID");
         }
         if (tbProjectInfo.getLevel().equals(ProjectLevel.Son.getLevel())) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该工程不是一级或二级工程");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该工程不能是子工程");
         }
         if (nextProjectList.stream().anyMatch(item -> item.getLevel().equals(ProjectLevel.One.getLevel()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "nextLevelPIDList中存在一级工程");
         }
-        if (tbProjectInfo.getLevel().equals(ProjectLevel.One.getLevel())
-                && nextProjectList.stream().anyMatch(item -> !item.getLevel().equals(ProjectLevel.Two.getLevel()) || !item.getLevel().equals(ProjectLevel.Unallocated.getLevel()))
-        ) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级工程只能关联二级或未分配工程");
+        if (nextProjectList.stream().allMatch(item -> item.getLevel().equals(ProjectLevel.Son.getLevel()))) {
+            if (tbProjectInfo.getLevel().equals(ProjectLevel.One.getLevel())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "一级工程不能关联子工程");
+            }
+            raltionType = ProjectLevel.Two.getLevel();
+        } else if (nextProjectList.stream().allMatch(item -> item.getLevel().equals(ProjectLevel.Unallocated.getLevel()) || item.getLevel().equals(ProjectLevel.Two.getLevel()))) {
+            if (tbProjectInfo.getLevel().equals(ProjectLevel.Two.getLevel())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级工程不能关联二级工程");
+            }
+            raltionType = ProjectLevel.Son.getLevel();
+        } else {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "关联关系不合法");
         }
-        if (tbProjectInfo.getLevel().equals(ProjectLevel.Two.getLevel())
-                && nextProjectList.stream().anyMatch(item -> !item.getLevel().equals(ProjectLevel.Son.getLevel())
-        )) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级工程只能关联子工程");
-        }
-        raltionType = tbProjectInfo.getLevel().equals(ProjectLevel.Unallocated.getLevel())
-                ?
-                nextProjectList.stream().filter(e -> !e.getLevel().equals(ProjectLevel.Unallocated.getLevel())).findFirst().get().getLevel()
-                : tbProjectInfo.getLevel();
         return null;
     }
 

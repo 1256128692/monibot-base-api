@@ -731,8 +731,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 pa.getProjectID(), pa.getNextLevelPIDList(), pa.getRaltionType()
         );
         // 下一级的level
-        Byte nextLevel = pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel())
-                ? ProjectLevel.Two.getLevel() : ProjectLevel.Son.getLevel();
+        Byte nextLevel = pa.getRaltionType().equals(ProjectLevel.One.getLevel()) ? ProjectLevel.Two.getLevel() : ProjectLevel.Son.getLevel();
         Date now = new Date();
         // 更新下一级项目的level
         tbProjectInfoMapper.updateLevel(nextLevel, pa.getNextLevelPIDList(), subjectID, now);

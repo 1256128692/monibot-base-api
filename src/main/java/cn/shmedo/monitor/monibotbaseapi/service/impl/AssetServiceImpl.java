@@ -20,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
@@ -110,19 +111,21 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
 
     @Override
     public PageUtil.Page<TbAsset4Web> queryAssetPage(QueryAssetPageParam pa) {
-        this.lambdaQuery().eq(TbAsset::getCompanyID, pa.getCompanyID());
+        LambdaQueryChainWrapper<TbAsset> lambdaQuery = this.lambdaQuery();
+        lambdaQuery.eq(TbAsset::getCompanyID, pa.getCompanyID());
         if (pa.getType() != null) {
-            this.lambdaQuery().eq(TbAsset::getType, pa.getType());
+            lambdaQuery.eq(TbAsset::getType, pa.getType());
         }
         if (pa.getFuzzyItem() != null) {
-            this.lambdaQuery().or(
+            lambdaQuery.and(
                     e -> {
                         e.like(TbAsset::getName, pa.getFuzzyItem());
+                        e.or();
                         e.like(TbAsset::getVendor, pa.getFuzzyItem());
                     }
             );
         }
-        List<TbAsset> assets = this.lambdaQuery().list();
+        List<TbAsset> assets = lambdaQuery.list();
         Map<Integer, TbAsset> assetMap = assets.stream().collect(Collectors.toMap(TbAsset::getID, Function.identity()));
         if (ObjectUtil.isEmpty(assets)) {
             return new PageUtil.Page<>(0, null, 0);
@@ -138,7 +141,7 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                         TbAsset4Web tbAsset4Web = BeanUtil.copyProperties(e, TbAsset4Web.class);
                         tbAsset4Web.setHouseName(tbAssetHouse.getName());
                         tbAsset4Web.setHouseID(tbAssetHouse.getID());
-                        tbAsset4Web.setValue(Integer.valueOf((String) map.get(e.getID().toString())));
+                        tbAsset4Web.setCurrentValue(Integer.valueOf((String) map.get(e.getID().toString())));
                         tbAsset4Web.setIsWarn(isWarn(tbAsset4Web));
                         return tbAsset4Web;
                     }
@@ -158,7 +161,7 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                                             TbAsset4Web tbAsset4Web = BeanUtil.copyProperties(e, TbAsset4Web.class);
                                             tbAsset4Web.setHouseName(tbAssetHouse.getName());
                                             tbAsset4Web.setHouseID(tbAssetHouse.getID());
-                                            tbAsset4Web.setValue((Integer) aMap.get(e.getID().toString()));
+                                            tbAsset4Web.setCurrentValue((Integer) aMap.get(e.getID().toString()));
                                             tbAsset4Web.setIsWarn(isWarn(tbAsset4Web));
                                             return tbAsset4Web;
                                         }
@@ -188,15 +191,15 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
     private Boolean isWarn(TbAsset4Web tbAsset4Web) {
         switch (tbAsset4Web.getComparison()) {
             case ">":
-                return tbAsset4Web.getValue() > tbAsset4Web.getWarnValue();
+                return tbAsset4Web.getCurrentValue() > tbAsset4Web.getWarnValue();
             case "<":
-                return tbAsset4Web.getValue() < tbAsset4Web.getWarnValue();
+                return tbAsset4Web.getCurrentValue() < tbAsset4Web.getWarnValue();
             case ">=":
-                return tbAsset4Web.getValue() >= tbAsset4Web.getWarnValue();
+                return tbAsset4Web.getCurrentValue() >= tbAsset4Web.getWarnValue();
             case "<=":
-                return tbAsset4Web.getValue() <= tbAsset4Web.getWarnValue();
+                return tbAsset4Web.getCurrentValue() <= tbAsset4Web.getWarnValue();
             case "=":
-                return tbAsset4Web.getValue().equals(tbAsset4Web.getWarnValue());
+                return tbAsset4Web.getCurrentValue().equals(tbAsset4Web.getWarnValue());
             default:
                 return false;
         }
