@@ -17,7 +17,6 @@ public class PropertyDto extends TbProperty {
 
     private Integer projectID;
 
-    private Integer projectType;
 
     private Integer propertyID;
 
