@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.util.List;
@@ -42,6 +43,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
     private String model;
     @NotNull
     private String vendor;
+    @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
     private String exValue;
     @Valid
     private List<@NotNull PropertyIdAndValue> propertyList;
@@ -56,19 +58,24 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
         if (!tbOtherDevice.getCompanyID().equals(companyID)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备不属于该公司");
         }
-        if (ObjectUtil.isNotEmpty(exValue) && JSONUtil.isTypeJSON(exValue)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段格式错误");
+        if (ObjectUtil.isNotEmpty(exValue) && (!JSONUtil.isTypeJSON(exValue))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段应为JSON格式");
 
         }
         if (tbOtherDeviceMapper.selectCount(
                 new LambdaQueryWrapper<TbOtherDevice>()
-                        .eq(TbOtherDevice::getToken, token)
+                        .eq(TbOtherDevice::getVendor, token)
+                        .eq(TbOtherDevice::getModel, name)
+                        .eq(TbOtherDevice::getName, model)
                         .ne(TbOtherDevice::getID, ID)
         ) > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备标识已存在");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");
         }
         if (tbOtherDevice.getTemplateID() == null && ObjectUtil.isNotEmpty(propertyList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备没有模板，不能修改属性");
+        }
+        if (tbOtherDevice.getTemplateID() == null && ObjectUtil.isNotEmpty(propertyList)) {
+
         }
         if (ObjectUtil.isNotEmpty(propertyList)) {
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);

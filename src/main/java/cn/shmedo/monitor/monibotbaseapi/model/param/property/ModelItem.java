@@ -15,7 +15,6 @@ import lombok.ToString;
 public class ModelItem {
     @JsonProperty("ID")
     private Integer ID;
-    @NotNull(message = "组ID不能为空")
     private Integer groupID;
     @NotBlank
     @Size(max = 20)
@@ -38,14 +37,6 @@ public class ModelItem {
 
     public void setID(Integer ID) {
         this.ID = ID;
-    }
-
-    public Integer getGroupID() {
-        return groupID;
-    }
-
-    public void setGroupID(Integer groupID) {
-        this.groupID = groupID;
     }
 
     public String getName() {

@@ -46,12 +46,9 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.A;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
@@ -161,7 +158,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             });
             tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
             // 根据监测项目处理监测类别
-            List<Byte> monitorClassList = pa.getMonitorItems().stream().map(TbMonitorItem::getMonitorClass).filter(Objects::nonNull).toList();
+            List<Byte> monitorClassList = pa.getMonitorItems().stream().map(TbMonitorItem::getMonitorClass).filter(Objects::nonNull).distinct().toList();
             if (CollectionUtils.isNotEmpty(monitorClassList)) {
                 List<TbProjectMonitorClass> tempList = monitorClassList.stream().map(e -> {
                     TbProjectMonitorClass obj = new TbProjectMonitorClass();
@@ -424,6 +421,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 e -> finalTwoList1.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
         ).map(TbProjectRelation::getUpLevelID).toList());
         temOneIDList.addAll(oneList.stream().map(TbProjectInfo::getID).toList());
+        if (temOneIDList.isEmpty()) {
+            return PageUtil.Page.empty();
+        }
         // 过滤
         oneList = tbProjectInfoMapper.selectBatchIds(temOneIDList)
                 .stream().map(e ->
@@ -728,25 +728,33 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
         );
         tbProjectRelationMapper.insertBatch(
-                pa.getProjectID(), pa.getNextLevelPIDList(), pa.getTbProjectInfo().getLevel()
+                pa.getProjectID(), pa.getNextLevelPIDList(), pa.getRaltionType()
         );
         // 下一级的level
         Byte nextLevel = pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel())
                 ? ProjectLevel.Two.getLevel() : ProjectLevel.Son.getLevel();
-        tbProjectInfoMapper.updateLevel(nextLevel, pa.getNextLevelPIDList(), subjectID, new Date());
+        Date now = new Date();
+        // 更新下一级项目的level
+        tbProjectInfoMapper.updateLevel(nextLevel, pa.getNextLevelPIDList(), subjectID, now);
+        // 更新当前项目的level
+        tbProjectInfoMapper.updateLevel(pa.getRaltionType(), List.of(pa.getProjectID()), subjectID, now);
     }
 
     @Override
     public QueryNextLevelAndAvailableProjectResult queryNextLevelProjectAndCanUsed(QueryNextLevelAndAvailableProjectParam pa) {
-        List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
-                new LambdaQueryWrapper<TbProjectRelation>(
-                ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
-        );
-        List<Integer> nextLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
-        List<TbProjectInfo> nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+        List<TbProjectInfo> nextLevelProjectList = new ArrayList<>();
+
+        if (!pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+            List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectRelation>(
+                    ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+            );
+            List<Integer> nextLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
+            nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+        }
         LambdaQueryWrapper<TbProjectInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-        if (ObjectUtil.isNotEmpty(nextLevelProjectIDList)) {
-            lambdaQueryWrapper.notIn(TbProjectInfo::getID, nextLevelProjectIDList);
+        if (ObjectUtil.isNotEmpty(nextLevelProjectList)) {
+            lambdaQueryWrapper.notIn(TbProjectInfo::getID, nextLevelProjectList.stream().map(TbProjectInfo::getID).toList());
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel())) {
             lambdaQueryWrapper.and(e ->
@@ -756,7 +764,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             );
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Two.getLevel())) {
-            lambdaQueryWrapper.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel());
+            lambdaQueryWrapper.and(e ->
+                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
+            );
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+            lambdaQueryWrapper.and(e ->
+                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Two.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
+            );
+            lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
         return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList);

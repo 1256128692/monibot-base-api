@@ -288,10 +288,9 @@
                       </otherwise>
                   </choose>
               </if>
-              <if test="platformTypeList != null and platformTypeList.size() != 0">
-                  PlatformType IN
-                  <foreach close=")" collection="platformTypeList" item="item" open="(" separator=",">
-                      #{item}
+              <if test="platformTypeSet != null and platformTypeSet.size() != 0">
+                  <foreach  collection="platformTypeSet" item="item"  separator="or" open="(" close=")">
+                      FIND_IN_SET(#{item}, platformTypeSet) > 0
                   </foreach>
                   AND
               </if>

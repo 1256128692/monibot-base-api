@@ -140,8 +140,8 @@
                 <if test="projectID != null">
                     tpi.ID = #{projectID} AND
                 </if>
-                <if test="groupID != null">
-                    tpi.GroupID = #{groupID} AND
+                <if test="projectType != null">
+                    tpi.ProjectType = #{projectType} AND
                 </if>
                 <if test="propertyName != null">
                     tp.`Name` = #{propertyName} AND
@@ -155,7 +155,7 @@
 
     <select id="queryPropertyByProjectID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto">
         SELECT
-            tpp.ID, tpp.ProjectID, tpp.PropertyID, tpp.Value, tp.`ProjectType`, tp.`Name`, tp.`Type`, tp.`Unit`,
+            tpp.ID, tpp.ProjectID, tpp.PropertyID, tpp.Value, tp.`Name`, tp.`Type`, tp.`Unit`,
             tp.`Required`,tp.`MultiSelect`, tp.`EnumField`, tp.`CreateType`,  tp.`ClassName`, tp.`DisplayOrder`,
             tp.`ModelID`, tp.`ExValue`
         FROM `tb_property` tp

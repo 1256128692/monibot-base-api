@@ -15,24 +15,29 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @program: monibot-base-api
  * @author: gaoxu
  * @create: 2023-02-23 17:08
  **/
+@Data
 @ToString
 public class AddModelParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
+    @NotNull(message = "项目类型不能为空")
+    private Integer projectType;
+
     @NotNull(message = "模板名称不能为空")
     private String modelName;
 
-    @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
     @Min(0)
@@ -40,8 +45,6 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     private Integer modelTypeSubType;
 
     private Integer groupID;
-
-    @NotBlank(message = "所属平台不能为空")
 
     private String platform;
 
@@ -53,6 +56,9 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
 
     @Override
     public ResultWrapper<?> validate() {
+        modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
+        groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
+
         // 校验表单类型是否正确
         if(!PropertyModelType.getModelTypeValues().contains(modelType)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型不合法");
@@ -68,7 +74,8 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
                 .eq(TbPropertyModel::getCompanyID, this.companyID)
                 .eq(TbPropertyModel::getModelType, this.modelType)
                 .eq(TbPropertyModel::getPlatform, this.platform)
-                .eq(TbPropertyModel::getGroupID, this.groupID));
+                .eq(TbPropertyModel::getGroupID, this.groupID)
+                .eq(TbPropertyModel::getName, this.modelName));
         if (!CollectionUtil.isNullOrEmpty(tbPropertyModelList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的名称已存在");
         }
@@ -96,71 +103,6 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     @Override
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
-    }
-
-
-    public Integer getCompanyID() {
-        return companyID;
-    }
-
-    public void setCompanyID(Integer companyID) {
-        this.companyID = companyID;
-    }
-
-    public String getModelName() {
-        return modelName;
-    }
-
-    public void setModelName(String modelName) {
-        this.modelName = modelName;
-    }
-
-    public Integer getModelType() {
-        return modelType;
-    }
-
-    public void setModelType(Integer modelType) {
-        this.modelType = modelType;
-    }
-
-    public Integer getModelTypeSubType() {
-        return modelTypeSubType;
-    }
-
-    public void setModelTypeSubType(Integer modelTypeSubType) {
-        this.modelTypeSubType = modelTypeSubType;
-    }
-
-    public String getPlatform() {
-        return platform;
-    }
-
-    public void setPlatform(String platform) {
-        this.platform = platform;
-    }
-
-    public Integer getGroupID() {
-        return groupID;
-    }
-
-    public void setGroupID(Integer groupID) {
-        this.groupID = groupID;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public List<ModelItem> getModelPropertyList() {
-        return modelPropertyList;
-    }
-
-    public void setModelPropertyList(List<ModelItem> modelPropertyList) {
-        this.modelPropertyList = modelPropertyList;
     }
 
 }

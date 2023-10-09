@@ -107,7 +107,8 @@ public class ProjectController {
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Boolean} [isSonLevel]  是否为子工程，只对最外层过滤
-     * @apiParam (请求体) {Int[]} [platformTypeList] 平台类型列表
+     * @apiParam (请求体) {Int[]} [platformTypeList] （废弃）平台类型列表
+     * @apiParam (请求体) {String[]} [platformTypeSet] 平台类型集合
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [expiryDateBegin] 有效期开始， 有效期应大于等于当前时间
      * @apiParam (请求体) {DateTime} [expiryDateEnd] 有效期结束， 有效期应小于等于当前时间
@@ -168,7 +169,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
      * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.图片
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
@@ -240,7 +241,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
      * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.图片
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
@@ -570,6 +571,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Json[]} nextLevelProjectList 下级项目列表
      * @apiSuccess (返回结果) {Int} nextLevelProjectList.id 项目ID
      * @apiSuccess (返回结果) {String} nextLevelProjectList.name 项目名称
+     * @apiSuccess (返回结果) {Int} nextLevelProjectList.level 项目等级
      * @apiSuccess (返回结果) {Json[]} availableProjectList 下级项目列表, 结构同nextLevelProjectList
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX

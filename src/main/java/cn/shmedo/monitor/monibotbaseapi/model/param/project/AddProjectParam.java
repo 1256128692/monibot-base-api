@@ -118,10 +118,10 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
         }
-        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType.intValue())) {
+        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
         }
-        properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType.intValue()));
+        properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType));
 
         if (modelID != null) {
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
