@@ -39,7 +39,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} [desc] 模板描述
      * @apiParam (请求体) {Object[]} modelPropertyList 自定义属性列表
      * @apiParam (请求体) {String} modelPropertyList.name 属性名称
-     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期，图片
+     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：1.数值,2.字符串,3.枚举,4.日期时间,5.图片
      * @apiParam (请求体) {String} [modelPropertyList.unit] 自定义属性单位
      * @apiParam (请求体) {Boolean} modelPropertyList.required 自定义属性是否必填
      * @apiParam (请求体) {String} [modelPropertyList.enumField] 枚举字段，json数组, 限制长度为10
@@ -74,7 +74,7 @@ public class PropertyController {
      * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表
      * @apiParam (请求体) {Int} modelPropertyList.ID 属性ID
      * @apiParam (请求体) {String} modelPropertyList.name 属性名称
-     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：数值，字符串，枚举，日期，图片
+     * @apiParam (请求体) {Int} modelPropertyList.type 属性类型：1.数值,2.字符串,3.枚举,4.日期时间,5.图片
      * @apiParam (请求体) {String} modelPropertyList.unit 自定义属性单位
      * @apiParam (请求体) {Boolean} modelPropertyList.required 自定义属性是否必填
      * @apiParam (请求体) {String} modelPropertyList.enumField 枚举字段，json数组, 限制长度为10
@@ -178,7 +178,7 @@ public class PropertyController {
      * @apiSuccess (返回结果) {Object[]} modelList.propertyList  模板的属性列表
      * @apiSuccess (返回结果) {Int} modelList.propertyList.propertyID  属性ID
      * @apiSuccess (返回结果) {String} modelList.propertyList.name  模板的属性名称
-     * @apiSuccess (返回结果) {Int} modelList.propertyList.type  属性类型：1数值，2字符串，3枚举，4日期，5图片
+     * @apiSuccess (返回结果) {Int} modelList.propertyList.type  属性类型：1.数值,2.字符串,3.枚举,4.日期时间,5.图片
      * @apiSuccess (返回结果) {Int} modelList.propertyList.groupID  模板组ID（当modelType为0时，groupID对应projectType）
      * @apiSuccess (返回结果) {String} [modelList.propertyList.unit] 属性单位
      * @apiSuccess (返回结果) {Boolean} modelList.propertyList.required 属性是否必填
