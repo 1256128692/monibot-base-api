@@ -1,19 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.AddOtherDeviceBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDevicePageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDeviceWithPropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.UpdateOtherDeviceParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDeviceWithProperty;
 import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -36,6 +39,8 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     private final TbOtherDeviceMapper tbOtherDeviceMapper;
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final TbPropertyMapper tbPropertyMapper;
+    private final RedisService redisService;
+    private final TbProjectInfoMapper tbProjectInfoMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -70,7 +75,12 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                 new LambdaQueryWrapper<TbProjectProperty>()
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
         );
-        return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties);
+        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
+        RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY,
+                BeanUtil.copyProperties(tbProjectInfo, ProjectInfo.class).getLocationInfo()
+                , RegionArea.class);
+        String location = area != null ? area.getName() : StrUtil.EMPTY;
+        return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location);
     }
 
     @Override

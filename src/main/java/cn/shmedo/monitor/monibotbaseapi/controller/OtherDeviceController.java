@@ -30,7 +30,7 @@ public class OtherDeviceController {
      * @apiGroup 其他设备模块
      * @apiName AddOtherDeviceBatch
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} templateID 模板ID
+     * @apiParam (请求体) {Int} [templateID] 模板ID
      * @apiParam (请求体) {Json[]} list 列表
      * @apiParam (请求体) {String} list.name 设备名称
      * @apiParam (请求体) {String} list.token 设备编号
@@ -38,7 +38,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} list.vendor 设备厂商/品牌
      * @apiParam (请求体) {Int} list.projectID 项目ID
      * @apiParam (请求体) {String} [list.exValue] 扩展字段,json字符串（500）
-     * @apiParam (请求体) {Json[]} list.propertyList 属性列表
+     * @apiParam (请求体) {Json[]} [list.propertyList] 属性列表
      * @apiParam (请求体) {Int} list.propertyList.ID属性id
      * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
@@ -63,6 +63,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 设备ID
      * @apiParam (请求体) {String} name 设备名称
+     * @apiParam (请求体) {String} token 设备编号
      * @apiParam (请求体) {String} model 设备型号
      * @apiParam (请求体) {String} vendor 设备厂商/品牌
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）

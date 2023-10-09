@@ -6,10 +6,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 
 /**
  * @program: monibot-base-api
@@ -24,8 +26,8 @@ public class QueryOtherDeviceWithPropertyParam implements ParameterValidator, Re
     @JsonAlias("ID")
     private Integer ID;
     @JsonIgnore
+    @ToString.Exclude
     private TbOtherDevice tbOtherDevice;
-
     @Override
     public ResultWrapper validate() {
         TbOtherDeviceMapper tbOtherDeviceMapper = ContextHolder.getBean(TbOtherDeviceMapper.class);
