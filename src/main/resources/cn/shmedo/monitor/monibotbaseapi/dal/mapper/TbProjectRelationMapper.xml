@@ -17,8 +17,8 @@
   <insert id="insertBatch">
     insert into tb_project_relation ( UpLevelID, DownLevelID, `type`)
     values
-    <foreach collection="nextLevelPIDList" item="id" separator="," open="(" close=")">
-        #{projectID}, #{id}, #{type}
+    <foreach collection="nextLevelPIDList" item="id" separator=",">
+      (  #{projectID}, #{id}, #{type})
     </foreach>
     </insert>
 

@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -23,8 +24,7 @@ import java.util.List;
  **/
 @Data
 public class SetProjectRelationParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    @JsonIgnore
-    TbProjectInfo tbProjectInfo;
+
     @NotNull
     private Integer companyID;
     @NotNull
@@ -32,6 +32,13 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
     @NotEmpty
     @Valid
     private List<@NotNull Integer> nextLevelPIDList;
+
+    @JsonIgnore
+    @ToString.Exclude
+    TbProjectInfo tbProjectInfo;
+    @JsonIgnore
+    @ToString.Exclude
+    private Byte raltionType;
 
     @Override
     public ResultWrapper validate() {
@@ -66,6 +73,10 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
         )) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级工程只能关联子工程");
         }
+        raltionType = tbProjectInfo.getLevel().equals(ProjectLevel.Unallocated.getLevel())
+                ?
+                nextProjectList.stream().filter(e -> !e.getLevel().equals(ProjectLevel.Unallocated.getLevel())).findFirst().get().getLevel()
+                : tbProjectInfo.getLevel();
         return null;
     }
 

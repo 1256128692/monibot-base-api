@@ -421,6 +421,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 e -> finalTwoList1.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
         ).map(TbProjectRelation::getUpLevelID).toList());
         temOneIDList.addAll(oneList.stream().map(TbProjectInfo::getID).toList());
+        if (temOneIDList.isEmpty()) {
+            return PageUtil.Page.empty();
+        }
         // 过滤
         oneList = tbProjectInfoMapper.selectBatchIds(temOneIDList)
                 .stream().map(e ->
@@ -725,7 +728,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
         );
         tbProjectRelationMapper.insertBatch(
-                pa.getProjectID(), pa.getNextLevelPIDList(), pa.getTbProjectInfo().getLevel()
+                pa.getProjectID(), pa.getNextLevelPIDList(), pa.getRaltionType()
         );
         // 下一级的level
         Byte nextLevel = pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel())
