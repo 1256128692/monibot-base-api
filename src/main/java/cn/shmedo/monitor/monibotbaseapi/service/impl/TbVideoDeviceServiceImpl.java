@@ -86,10 +86,13 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
             };
             if (res.containsKey("baseUrl")) {
                 return ResultWrapper.success(res);
+            } else {
+                log.error("运管中心请求错误,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n运管中心返回信息:{}",
+                        param.getTbVideoDevice().getDeviceSerial(), beginTime, endTime, param.getRecordLocation(), res.get("responseBody"));
             }
         } catch (Exception e) {
-            //如果catch到异常，说明运管中心超时
-            log.error("运管中心请求超时,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n报错信息:{}",
+            //如果catch到异常，说明运管中心报错
+            log.error("运管中心请求错误,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n报错信息:{}",
                     param.getTbVideoDevice().getDeviceSerial(), beginTime, endTime, param.getRecordLocation(), e.getMessage());
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该时段内暂无录像");

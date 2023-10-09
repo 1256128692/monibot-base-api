@@ -74,7 +74,8 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
                 .eq(TbPropertyModel::getCompanyID, this.companyID)
                 .eq(TbPropertyModel::getModelType, this.modelType)
                 .eq(TbPropertyModel::getPlatform, this.platform)
-                .eq(TbPropertyModel::getGroupID, this.groupID));
+                .eq(TbPropertyModel::getGroupID, this.groupID)
+                .eq(TbPropertyModel::getName, this.modelName));
         if (!CollectionUtil.isNullOrEmpty(tbPropertyModelList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的名称已存在");
         }
