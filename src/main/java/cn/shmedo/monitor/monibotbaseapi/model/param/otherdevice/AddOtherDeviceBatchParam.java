@@ -34,9 +34,7 @@ import java.util.stream.Collectors;
 public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
-    @NotNull
     private Integer templateID;
-    @NotEmpty
     @Valid
     private List<@NotNull AddOtherDeviceItem> list;
     @JsonIgnore
@@ -73,18 +71,16 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "没有模板时，属性列表应为空");
             }
         }
-        if (list.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && JSONUtil.isTypeJSON(item.getExValue()))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段格式错误");
+        if (list.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段应为JSON格式");
         }
-        if (list.stream().map(AddOtherDeviceItem::getToken).distinct().count() != list.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备标识重复");
+        if (list.stream().map(e -> e.getVendor() + e.getModel() + e.getName()).distinct().count() != list.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");
         }
         TbOtherDeviceMapper tbOtherDeviceMapper = ContextHolder.getBean(TbOtherDeviceMapper.class);
-        if (tbOtherDeviceMapper.selectCount(
-                new LambdaQueryWrapper<TbOtherDevice>()
-                        .in(TbOtherDevice::getToken, list.stream().map(AddOtherDeviceItem::getToken).toArray())
-        ) > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备标识已存在");
+        // 校验设备厂商，型号，名称是否重复
+        if (tbOtherDeviceMapper.countExist(list) > 0) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");
         }
         return null;
     }
