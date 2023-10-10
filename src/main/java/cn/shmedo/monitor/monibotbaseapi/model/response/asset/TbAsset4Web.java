@@ -12,6 +12,6 @@ import lombok.Data;
 public class TbAsset4Web extends TbAsset {
     private Integer houseID;
     private String houseName;
-    private Integer value;
+    private Integer currentValue;
     private Boolean isWarn;
 }

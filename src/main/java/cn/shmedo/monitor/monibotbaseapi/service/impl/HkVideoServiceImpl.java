@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSON;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.ArtemisConfigWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -11,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkMonitorPoin
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import com.hikvision.artemis.sdk.ArtemisHttpUtil;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -18,6 +20,7 @@ import java.util.*;
 
 import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.HikVideoParamKeys.*;
 
+@Slf4j
 @EnableTransactionManagement
 @Service
 @AllArgsConstructor
@@ -168,8 +171,10 @@ public class HkVideoServiceImpl implements HkVideoService {
         try {
             String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
             return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
-                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
-                    .map(JSONUtil::parseObj).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
+                    .map(u -> u.get(HIK_DATA)).map(JSONUtil::parseObj).map(u -> (Map<String, Object>) u).filter(ObjectUtil::isNotEmpty)
+                    .orElse(Map.of("responseBody", Optional.ofNullable(responseBody).orElse("")));
+//                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
+//                    .map(JSONUtil::parseObj).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
             throw new RuntimeException("海康接口调用失败!报错信息:" + e.getMessage());
         }
