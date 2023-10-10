@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbAsset;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetHouse;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.asset.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.asset.TbAsset4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.asset.TbAssetLog4Web;
@@ -30,5 +29,9 @@ public interface IAssetService extends IService<TbAsset> {
 
     PageUtil.Page<TbAssetLog4Web> queryAssetIOLogPage(QueryAssetIOLogPageParam pa);
 
-    PageUtil.Page<TbAsset4Web> queryAssetPage(QueryAssetPageParam pa);
+    PageUtil.Page<TbAsset4Web> queryAssetWithValuePage(QueryAssetWithValuePageParam pa);
+
+    PageUtil.Page<TbAssetHouse> queryAssetHousePage(QueryAssetHousePageParam pa);
+
+    PageUtil.Page<TbAsset> queryAssetPage(QueryAssetPageParam pa);
 }

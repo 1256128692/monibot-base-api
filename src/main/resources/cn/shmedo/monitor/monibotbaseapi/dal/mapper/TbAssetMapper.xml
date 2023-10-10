@@ -23,4 +23,13 @@
     ID, CompanyID, `Name`, Vendor, Unit, `Type`, WarnValue, Comparison, ExValue, CreateTime, 
     CreateUserID, UpdateTime, UpdateUserID
   </sql>
+
+  <select id="queryPage" resultMap="BaseResultMap">
+    select * from tb_asset
+    where companyID = #{pa.companyID}
+    <if test="pa.type!=null">
+      and type = #{pa.type}
+    </if>
+    order by ID desc
+  </select>
 </mapper>

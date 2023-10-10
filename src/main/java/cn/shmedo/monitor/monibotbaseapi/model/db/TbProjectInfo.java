@@ -78,7 +78,7 @@ public class TbProjectInfo {
      * 平台类型集
      */
     @TableField(value = "PlatformTypeSet")
-    private Object platformTypeSet;
+    private String platformTypeSet;
 
     /**
      * 是否可用，需要配合有效期使用

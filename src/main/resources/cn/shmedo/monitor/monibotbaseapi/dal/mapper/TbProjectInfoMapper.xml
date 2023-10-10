@@ -13,7 +13,7 @@
     <result column="ExpiryDate" jdbcType="TIMESTAMP" property="expiryDate" />
     <result column="DirectManageUnit" jdbcType="VARCHAR" property="directManageUnit" />
     <result column="PlatformType" jdbcType="TINYINT" property="platformType" />
-    <result column="PlatformTypeSet" jdbcType="OTHER" property="platformTypeSet" />
+    <result column="PlatformTypeSet" jdbcType="VARCHAR" property="platformTypeSet" />
     <result column="Enable" jdbcType="BIT" property="enable" />
     <result column="Location" jdbcType="VARCHAR" property="location" />
     <result column="ProjectAddress" jdbcType="VARCHAR" property="projectAddress" />

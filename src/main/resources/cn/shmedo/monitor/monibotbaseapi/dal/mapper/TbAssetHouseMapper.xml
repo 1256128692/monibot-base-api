@@ -20,4 +20,10 @@
     ID, CompanyID, `Name`, Code, Address, `Comment`, CreateTime, CreateUserID, UpdateTime, 
     UpdateUserID
   </sql>
+
+  <select id="queryPage" resultMap="BaseResultMap">
+    select * from tb_asset_house
+    where companyID = #{pa.companyID}
+    order by ID desc
+  </select>
 </mapper>

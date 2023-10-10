@@ -10,9 +10,12 @@ import lombok.Data;
  **/
 @Data
 @Builder
-public class IDNameLevel {
+public class SimpleProject {
     private Integer id;
     private String name;
 
     private Byte level;
+    private String platformTypeSet;
+    private Byte projectType;
+    private String projectTypeStr;
 }

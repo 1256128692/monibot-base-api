@@ -110,23 +110,31 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
     }
 
     @Override
-    public PageUtil.Page<TbAsset4Web> queryAssetPage(QueryAssetPageParam pa) {
-        LambdaQueryChainWrapper<TbAsset> lambdaQuery = this.lambdaQuery();
-        lambdaQuery.eq(TbAsset::getCompanyID, pa.getCompanyID());
-        if (pa.getType() != null) {
-            lambdaQuery.eq(TbAsset::getType, pa.getType());
+    public PageUtil.Page<TbAsset4Web> queryAssetWithValuePage(QueryAssetWithValuePageParam pa) {
+        List<TbAsset> assets;
+        if (pa.getAssetID() != null) {
+            TbAsset tbAsset = this.getById(pa.getAssetID());
+            assets = new ArrayList<>();
+            assets.add(tbAsset);
+        } else {
+            LambdaQueryChainWrapper<TbAsset> lambdaQuery = this.lambdaQuery();
+            lambdaQuery.eq(TbAsset::getCompanyID, pa.getCompanyID());
+            if (pa.getType() != null) {
+                lambdaQuery.eq(TbAsset::getType, pa.getType());
+            }
+
+            if (pa.getFuzzyItem() != null) {
+                lambdaQuery.and(
+                        e -> {
+                            e.like(TbAsset::getName, pa.getFuzzyItem());
+                            e.or();
+                            e.like(TbAsset::getVendor, pa.getFuzzyItem());
+                        }
+                );
+            }
+            assets = lambdaQuery.list();
         }
-        if (pa.getFuzzyItem() != null) {
-            lambdaQuery.and(
-                    e -> {
-                        e.like(TbAsset::getName, pa.getFuzzyItem());
-                        e.or();
-                        e.like(TbAsset::getVendor, pa.getFuzzyItem());
-                    }
-            );
-        }
-        List<TbAsset> assets = lambdaQuery.list();
-        Map<Integer, TbAsset> assetMap = assets.stream().collect(Collectors.toMap(TbAsset::getID, Function.identity()));
+
         if (ObjectUtil.isEmpty(assets)) {
             return new PageUtil.Page<>(0, null, 0);
         }
@@ -180,6 +188,20 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                         .thenComparing(TbAsset4Web::getHouseID).reversed()
         ).toList();
         return PageUtil.page(resultAll, pa.getPageSize(), pa.getCurrentPage());
+    }
+
+    @Override
+    public PageUtil.Page<TbAssetHouse> queryAssetHousePage(QueryAssetHousePageParam pa) {
+        Page<TbAssetHouse> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+        IPage<TbAssetHouse> pageData = tbAssetHouseMapper.queryPage(page, pa);
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+    }
+
+    @Override
+    public PageUtil.Page<TbAsset> queryAssetPage(QueryAssetPageParam pa) {
+        Page<TbAsset> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+        IPage<TbAsset> pageData = this.baseMapper.queryPage(page, pa);
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
     /**

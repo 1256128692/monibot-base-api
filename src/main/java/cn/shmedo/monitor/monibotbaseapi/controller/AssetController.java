@@ -111,7 +111,7 @@ public class AssetController {
      * @apiSuccess (返回结果) {Int}  list.type 类型12 救灾物资、备品备件
      * @apiSuccess (返回结果) {Int} list.warnValue  预警值
      * @apiSuccess (返回结果) {String} list.comparison 比较方式< ,> , =, <=,  >=
-     * @apiSuccess (返回结果) {String} [exValue] 扩展字段,json字符串（500）
+     * @apiSuccess (返回结果) {String} [list.exValue] 扩展字段,json字符串（500）
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
      */
@@ -123,6 +123,36 @@ public class AssetController {
                 .eq(TbAsset::getType, pa.getType())
                 .orderByDesc(TbAsset::getID)
         );
+    }
+
+    /**
+     * @api {post} /QueryAssetPage 分页查询资产
+     * @apiDescription 分页查询资产
+     * @apiVersion 1.0.0
+     * @apiGroup 资产模块
+     * @apiName QueryAssetPage
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [type] 类型10, 20 救灾物资、备品备件
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 数据总量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 资产ID
+     * @apiSuccess (返回结果) {String} currentPageData.name 名称型号
+     * @apiSuccess (返回结果) {String} currentPageData.vendor 厂商品牌
+     * @apiSuccess (返回结果) {Int}   currentPageData.unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
+     * @apiSuccess (返回结果) {Int}  currentPageData.type 类型12 救灾物资、备品备件
+     * @apiSuccess (返回结果) {Int} currentPageData.warnValue  预警值
+     * @apiSuccess (返回结果) {String} currentPageData.comparison 比较方式< ,> , =, <=,  >=
+     * @apiSuccess (返回结果) {String} [currentPageData.exValue] 扩展字段,json字符串（500）
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+    @RequestMapping(value = "QueryAssetPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryAssetPage(@Validated @RequestBody QueryAssetPageParam pa) {
+        return assetService.queryAssetPage(pa);
     }
 
     /**
@@ -215,6 +245,33 @@ public class AssetController {
     }
 
     /**
+     * @api {post} /QueryAssetHousePage 查询资产库分页
+     * @apiDescription 查询资产库分页
+     * @apiVersion 1.0.0
+     * @apiGroup 资产模块
+     * @apiName QueryAssetHousePage
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 数据总量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.ID 资产库ID
+     * @apiSuccess (返回结果) {String} currentPageData.name 名称型号
+     * @apiSuccess (返回结果) {String} currentPageData.code 编号
+     * @apiSuccess (返回结果) {String}   currentPageData.address 地址
+     * @apiSuccess (返回结果) {String}  [currentPageData.comment] 备注
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+    @RequestMapping(value = "QueryAssetHousePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryAssetHousePage(@Validated @RequestBody QueryAssetHousePageParam pa) {
+        return assetService.queryAssetHousePage(pa);
+    }
+
+
+    /**
      * @api {post} /IOAsset 入库出库
      * @apiDescription 入库出库
      * @apiVersion 1.0.0
@@ -276,14 +333,15 @@ public class AssetController {
     }
 
     /**
-     * @api {post} /QueryAssetPage 分页查询资产
-     * @apiDescription 分页查询资产
+     * @api {post} /QueryAssetWithValuePage 分页查询资产及值
+     * @apiDescription 分页查询资产及值, 当资产在多个资产点，会分条展示，以资产点，资产进行排序
      * @apiVersion 1.0.0
      * @apiGroup 资产模块
-     * @apiName QueryAssetPage
+     * @apiName QueryAssetWithValuePage
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [fuzzyItem] 模糊查询资产型号/名称， 厂商品牌，
      * @apiParam (请求体) {Int} [type] 资产类型
+     * @apiParam (请求体) {Int} [assetID] 资产库ID
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [isWarn] 是否预警
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -305,8 +363,8 @@ public class AssetController {
      * @apiPermission 项目权限 mdmbase:XX
      */
 //    @Permission(permissionName = "mdmbase:XX")
-    @RequestMapping(value = "QueryAssetPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryAssetPage(@Validated @RequestBody QueryAssetPageParam pa) {
-        return assetService.queryAssetPage(pa);
+    @RequestMapping(value = "QueryAssetWithValuePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryAssetWithValuePage(@Validated @RequestBody QueryAssetWithValuePageParam pa) {
+        return assetService.queryAssetWithValuePage(pa);
     }
 }

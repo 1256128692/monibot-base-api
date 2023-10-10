@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ import lombok.Data;
 @TableName(value = "tb_asset_house")
 public class TbAssetHouse {
     @TableId(value = "ID", type = IdType.AUTO)
+    @JsonProperty(value = "ID")
     private Integer ID;
 
     @TableField(value = "CompanyID")

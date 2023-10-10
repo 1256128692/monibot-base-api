@@ -72,7 +72,7 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
             if (tbProjectInfo.getLevel().equals(ProjectLevel.Two.getLevel())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "二级工程不能关联二级工程");
             }
-            raltionType = ProjectLevel.Son.getLevel();
+            raltionType = ProjectLevel.One.getLevel();
         } else {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "关联关系不合法");
         }

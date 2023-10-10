@@ -1,29 +1,34 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.asset;
 
-import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AssetType;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
 /**
  * @program: monibot-base-api
  * @author: gaoxu
- * @create: 2023-10-07 18:03
+ * @create: 2023-10-10 14:44
  **/
 @Data
-public class QueryAssetListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryAssetHousePageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
     @NotNull
-    private Byte type;
+    @Range(min = 1, max = 100)
+    private Integer pageSize;
+    @NotNull
+    @Positive
+    private Integer currentPage;
 
     @Override
     public ResultWrapper validate() {
-        if (!AssetType.isExist(type)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "资产类型不存在");
-        }
         return null;
     }
 
