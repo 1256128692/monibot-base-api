@@ -121,7 +121,7 @@ public class PropertyController {
      * @apiDescription 转移分组，此功能目前为设备模板/工作流模板使用
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} modelID 模板ID
-     * @apiParam (请求体) {Int} ModelType 模板类型
+     * @apiParam (请求体) {Int} modelType 模板类型
      * @apiParam (请求体) {Int} newGroupID 转移后的分组ID
      * @apiSuccess (返回结果) {Bool} data 更新结果状态
      * @apiSampleRequest off
@@ -162,7 +162,7 @@ public class PropertyController {
      * @apiDescription 查询模板信息
      * @apiParam (请求体) {Int} [modelID] 模板ID, 优先级最高的参数
      * @apiParam (请求体) {Int} projectType 项目类型
-     * @apiParam (请求体) {String} [Name] 模板名称
+     * @apiParam (请求体) {String} [name] 模板名称
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度、3-OA>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID对应projectType）
