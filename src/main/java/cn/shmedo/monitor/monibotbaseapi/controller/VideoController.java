@@ -502,8 +502,8 @@ public class VideoController {
      * @apiSuccess (返回结果) {Boolean} dataList.deviceStatus  设备在线状态
      * @apiSuccess (返回结果) {Byte} dataList.accessPlatform 接入平台
      * @apiSuccess (返回结果) {String} dataList.accessPlatformStr 接入平台名称
-     * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备可接入通道号的数量(海康默认为1)
-     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 接入通道号的数量(海康默认为1)
+     * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备接入平台通道号的数量(海康默认为1)
+     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 可接入通道号的总量(海康默认为1)
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称

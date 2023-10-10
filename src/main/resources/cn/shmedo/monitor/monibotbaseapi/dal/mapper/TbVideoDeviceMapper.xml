@@ -303,11 +303,11 @@
             companyID = #{companyID},
             AllocationStatus =
             <choose>
-                <when test="item.projectID != null">
+                <when test="item.projectID != null and item.projectID != -1">
                     true
                 </when>
                 <otherwise>
-                    AllocationStatus
+                    false
                 </otherwise>
             </choose>
             WHERE ID = #{item.videoDeviceID}

@@ -71,6 +71,16 @@ public class DefaultConstant {
     public static final String YS_PRESET_POINT_INDEX_KEY = "index";
 
     /**
+     * 萤石设备异常码(设备不存在)
+     */
+    public static final String YS_DEVICE_ERROR_CODE_NO_EXIST = "20002";
+
+    /**
+     * 萤石接口调用通过msg
+     */
+    public static final String YS_DEVICE_NORMAL_MSG = "操作成功";
+
+    /**
      * 海康视频参数key<br>
      * 这里仅注释它的含义,具体取值等需在对应接口上查看相应海康接口文档引用。
      */

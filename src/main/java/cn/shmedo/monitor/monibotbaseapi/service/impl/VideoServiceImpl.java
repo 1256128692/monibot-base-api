@@ -268,10 +268,10 @@ public class VideoServiceImpl implements VideoService {
                 // 先去查询萤石云接口
                 YsResultWrapper<YsDeviceInfo> deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                 YsResultWrapper<List<YsChannelInfo>> deviceChannelInfo = null;
-                if (deviceInfoWrapper != null && deviceInfoWrapper.getMsg().equals("设备不存在")) {
+                if (deviceInfoWrapper != null && deviceInfoWrapper.getCode().equals(DefaultConstant.YS_DEVICE_ERROR_CODE_NO_EXIST)) {
                     // 查询不到则直接添加
                     YsResultWrapper ysResultWrapper = ysService.addDevice(ysToken, addVideoList.get(i).getDeviceSerial(), addVideoList.get(i).getValidateCode());
-                    if (!ysResultWrapper.getMsg().equals("操作成功")) {
+                    if (!ysResultWrapper.getMsg().equals(DefaultConstant.YS_DEVICE_NORMAL_MSG)) {
                         return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "添加萤石云平台设备失败,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                     deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
