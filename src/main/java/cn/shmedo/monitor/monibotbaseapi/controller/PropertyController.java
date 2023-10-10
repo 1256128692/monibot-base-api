@@ -101,7 +101,7 @@ public class PropertyController {
      * @apiName CopyModel
      * @apiDescription 复制模板
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} modelID 模板ID
+     * @apiParam (请求体) {Int} modelID 模板ID
      * @apiSuccess (返回结果) {Int} ID ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:CopyModel

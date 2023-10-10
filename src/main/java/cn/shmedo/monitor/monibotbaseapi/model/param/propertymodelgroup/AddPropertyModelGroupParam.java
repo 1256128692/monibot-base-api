@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
@@ -32,7 +33,6 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    @NotBlank(message = "所属平台不能为空")
     private String platform;
 
     @NotNull(message = "模板组类型不能为空")
@@ -51,6 +51,9 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper<?> validate() {
+        if(PropertyModelType.WORK_FLOW.getCode().equals(groupType))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型为工作流时，所属平台不能为空");
+
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
         // 校验名称是否重复
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(new QueryWrapper<TbPropertyModelGroup>().lambda()

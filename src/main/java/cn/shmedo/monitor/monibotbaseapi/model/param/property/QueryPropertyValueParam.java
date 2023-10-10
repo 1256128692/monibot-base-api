@@ -78,7 +78,7 @@ public class QueryPropertyValueParam implements ParameterValidator, ResourcePerm
         }
         if (!PropertyModelType.BASE_PROJECT.getCode().equals(modelType))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型除工程项目外，其他模板类型功能暂未开放");
-        if (modelType.equals(PropertyModelType.BASE_PROJECT.getCode()) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID))))
+        if (!ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID))))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         return null;
     }
