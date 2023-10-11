@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.asset;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
@@ -10,6 +12,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.ToString;
 
@@ -34,6 +37,10 @@ public class UpdateAssetHouseParam implements ParameterValidator, ResourcePermis
     @NotBlank
     private String address;
     private String comment;
+    private String contactPerson;
+    private String contactNumber;
+    @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
+    private String exValue;
 
     @JsonAlias
     @ToString.Exclude
@@ -56,6 +63,9 @@ public class UpdateAssetHouseParam implements ParameterValidator, ResourcePermis
         ) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "公司下资产名称已存在");
         }
+        if (ObjectUtil.isNotEmpty(exValue) && !JSONUtil.isTypeJSON(exValue)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段应为JSON格式");
+        }
         return null;
     }
 
@@ -74,6 +84,9 @@ public class UpdateAssetHouseParam implements ParameterValidator, ResourcePermis
         tbAssetHouse.setCode(code);
         tbAssetHouse.setAddress(address);
         tbAssetHouse.setComment(comment);
+        tbAssetHouse.setContactPerson(contactPerson);
+        tbAssetHouse.setContactNumber(contactNumber);
+        tbAssetHouse.setExValue(exValue);
         tbAssetHouse.setUpdateUserID(subjectID);
         tbAssetHouse.setUpdateTime(new Date());
         return tbAssetHouse;

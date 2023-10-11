@@ -749,7 +749,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
             );
             List<Integer> nextLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
-            nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+            if (ObjectUtil.isNotEmpty(nextLevelProjectIDList)) {
+                nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+            }
         }
         LambdaQueryWrapper<TbProjectInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         if (ObjectUtil.isNotEmpty(nextLevelProjectList)) {
@@ -781,5 +783,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
         return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList);
+    }
+
+    @Override
+    @Transactional
+    public void removeProjectRelation(RemoveProjectRelationParam pa, Integer subjectID) {
+        tbProjectRelationMapper.delete(
+                new LambdaQueryWrapper<TbProjectRelation>()
+                        .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+                        .in(TbProjectRelation::getDownLevelID, pa.getNextLevelPIDList())
+        );
+        if (tbProjectRelationMapper.selectCount(
+                new LambdaQueryWrapper<TbProjectRelation>()
+                        .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+        ) == 0) {
+            tbProjectInfoMapper.updateLevel(ProjectLevel.Unallocated.getLevel(), List.of(pa.getProjectID()), subjectID, new Date());
+        }
     }
 }

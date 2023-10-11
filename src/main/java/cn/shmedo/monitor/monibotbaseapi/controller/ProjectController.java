@@ -561,6 +561,27 @@ public class ProjectController {
     }
 
     /**
+     * @api {post} /RemoveProjectRelation 移除项目关联关系
+     * @apiDescription 移除项目关联关系，当项目下属项目为0时候，该项目重置为level=0
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName RemoveProjectRelation
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int[]} nextLevelPIDList 下属设备ID列表
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:XX
+     */
+//    @Permission(permissionName = "mdmbase:XX")
+    @LogParam(moduleName = "项目管理模块", operationName = "移除项目关联关系", operationProperty = OperationProperty.DELETE)
+    @RequestMapping(value = "RemoveProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object removeProjectRelation(@Validated @RequestBody RemoveProjectRelationParam pa) {
+        projectService.removeProjectRelation(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
      * @api {post} /QueryNextLevelProjectAndCanUsed 查询下级项目列表和可使用的项目列表
      * @apiDescription 查询下级项目列表和可使用的项目列表
      * @apiVersion 1.0.0

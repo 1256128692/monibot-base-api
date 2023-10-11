@@ -10,6 +10,9 @@
     <result column="Code" jdbcType="VARCHAR" property="code" />
     <result column="Address" jdbcType="VARCHAR" property="address" />
     <result column="Comment" jdbcType="VARCHAR" property="comment" />
+    <result column="ContactPerson" jdbcType="VARCHAR" property="contactPerson" />
+    <result column="ContactNumber" jdbcType="VARCHAR" property="contactNumber" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
     <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
     <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
     <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
@@ -17,8 +20,8 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, CompanyID, `Name`, Code, Address, `Comment`, CreateTime, CreateUserID, UpdateTime, 
-    UpdateUserID
+    ID, CompanyID, `Name`, Code, Address, `Comment`, ContactPerson, ContactNumber, ExValue, 
+    CreateTime, CreateUserID, UpdateTime, UpdateUserID
   </sql>
 
   <select id="queryPage" resultMap="BaseResultMap">

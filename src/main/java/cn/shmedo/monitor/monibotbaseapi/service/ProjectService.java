@@ -71,4 +71,6 @@ public interface ProjectService {
     void setProjectRelation(SetProjectRelationParam pa, Integer subjectID);
 
     QueryNextLevelAndAvailableProjectResult queryNextLevelProjectAndCanUsed(QueryNextLevelAndAvailableProjectParam pa);
+
+    void removeProjectRelation(RemoveProjectRelationParam pa, Integer subjectID);
 }

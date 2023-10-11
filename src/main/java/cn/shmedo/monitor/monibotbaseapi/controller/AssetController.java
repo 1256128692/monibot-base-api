@@ -166,6 +166,9 @@ public class AssetController {
      * @apiParam (请求体) {String} code 编号
      * @apiParam (请求体) {String}   address 地址
      * @apiParam (请求体) {String}  [comment] 备注
+     * @apiParam (请求体) {String}  [contactPerson] 联系人
+     * @apiParam (请求体) {String}  [contactNumber] 联系电话
+     * @apiParam (请求体) {String}  [exValue] 额外属性,Json字符串
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -190,6 +193,9 @@ public class AssetController {
      * @apiParam (请求体) {String} code 编号
      * @apiParam (请求体) {String}   address 地址
      * @apiParam (请求体) {String}  [comment] 备注
+     * @apiParam (请求体) {String}  [contactPerson] 联系人
+     * @apiParam (请求体) {String}  [contactNumber] 联系电话
+     * @apiParam (请求体) {String}  [exValue] 额外属性,Json字符串
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
@@ -235,6 +241,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} list.code 编号
      * @apiSuccess (返回结果) {String}   list.address 地址
      * @apiSuccess (返回结果) {String}  [list.comment] 备注
+     * @apiSuccess (返回结果) {String}  [list.contactPerson] 备注
+     * @apiSuccess (返回结果) {String}  [list.contactNumber] 备注
+     * @apiSuccess (返回结果) {String}  [list.exValue] 备注
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
      */
@@ -261,6 +270,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} currentPageData.code 编号
      * @apiSuccess (返回结果) {String}   currentPageData.address 地址
      * @apiSuccess (返回结果) {String}  [currentPageData.comment] 备注
+     * @apiSuccess (返回结果) {String}  [currentPageData.contactPerson] 备注
+     * @apiSuccess (返回结果) {String}  [currentPageData.contactNumber] 备注
+     * @apiSuccess (返回结果) {String}  [currentPageData.exValue] 备注
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:XX
      */
