@@ -25,6 +25,8 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     @NotNull(message = "项目类型不能为空")
     private Integer projectType;
 
+    private Integer companyID;
+
     private String name;
 
     private Integer modelType;
@@ -52,7 +54,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     @Override
     public Resource parameter() {
         CurrentSubject currentSubject = CurrentSubjectHolder.getCurrentSubject();
-        return new Resource(currentSubject.getCompanyID().toString(), ResourceType.COMPANY);
+        return new Resource(Objects.nonNull(companyID) ? companyID.toString() : currentSubject.getCompanyID().toString(), ResourceType.COMPANY);
     }
 
     @Override
