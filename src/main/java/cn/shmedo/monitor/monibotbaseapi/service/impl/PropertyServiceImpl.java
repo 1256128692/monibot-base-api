@@ -137,6 +137,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         queryWrapper.eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType());
         queryWrapper.eq(Objects.nonNull(param.getGroupID()), TbPropertyModel::getGroupID, param.getGroupID());
         queryWrapper.eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType());
+        queryWrapper.eq(TbPropertyModel::getCompanyID, param.getCompanyID());
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         if (ObjectUtil.isEmpty(tbPropertyModelList)) {
             return List.of();

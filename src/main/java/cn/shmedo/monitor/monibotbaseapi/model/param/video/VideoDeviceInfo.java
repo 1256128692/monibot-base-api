@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -18,20 +19,27 @@ public class VideoDeviceInfo extends TbVideoDevice {
 
 
     public static VideoDeviceInfo ysToNewValue(YsDeviceInfo data,
-                                          List<YsChannelInfo> ysChannelInfoList,
-                                          VideoDeviceBaseInfo a,
-                                          AddVideoDeviceListParam pa) {
+                                               List<YsChannelInfo> ysChannelInfoList,
+                                               VideoDeviceBaseInfo a,
+                                               AddVideoDeviceListParam pa, int num) {
         VideoDeviceInfo vo = new VideoDeviceInfo();
 
         vo.setDeviceName(data.getDeviceSerial());
         vo.setDeviceType(data.getModel());
         vo.setDeviceSerial(data.getDeviceSerial());
-        vo.setDeviceToken(data.getDeviceSerial());
+        if (data.getDeviceSerial().length() <= 30) {
+            vo.setDeviceToken(data.getDeviceSerial());
+        } else {
+            String yyyyMMdd = DateUtil.format(DateUtil.date(), "yyyyMMdd");
+            vo.setDeviceToken("YS" + yyyyMMdd + num);
+        }
         vo.setDeviceStatus(data.getStatus() == 1);
-        vo.setAccessChannelNum(ysChannelInfoList.size());
+        vo.setAccessChannelNum(ysChannelInfoList.size() == 0 ? 1 : ysChannelInfoList.size());
         vo.setAccessPlatform(a.getAccessPlatform());
         vo.setAccessProtocol(a.getAccessProtocol());
-        vo.setExValue(JSONUtil.toJsonStr(ysChannelInfoList));
+        if (!CollectionUtil.isNullOrEmpty(ysChannelInfoList)) {
+            vo.setExValue(JSONUtil.toJsonStr(ysChannelInfoList));
+        }
         vo.setCreateTime(DateUtil.date());
         vo.setUpdateTime(DateUtil.date());
         // 第一次添加设备,都是未分配工程状态

@@ -20,9 +20,6 @@ public class VideoCaptureBaseInfo {
     private Integer channelNo;
 
     private Boolean imageCapture;
-    // 可以为空
-    @JsonIgnore
-    private String ipcSerial;
 
     @JsonIgnore
     private Integer videoDeviceID;
@@ -41,7 +38,7 @@ public class VideoCaptureBaseInfo {
         // 设置属性
         videoCaptureBaseInfo.setSensorName(sensorName);
         videoCaptureBaseInfo.setChannelNo(ysChannelInfo.getChannelNo());
-        videoCaptureBaseInfo.setIpcSerial(ysChannelInfo.getIpcSerial());
+//        videoCaptureBaseInfo.setIpcSerial(ysChannelInfo.getIpcSerial());
         // 设置其他属性，根据需要设置
 
         return videoCaptureBaseInfo;
