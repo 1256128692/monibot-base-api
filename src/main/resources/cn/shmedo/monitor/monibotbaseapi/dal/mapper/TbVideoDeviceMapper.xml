@@ -341,7 +341,9 @@
         <if test="deviceStatus != null">
             and vd.deviceStatus = #{deviceStatus}
         </if>
-        and vd.CompanyID = #{companyID}
+        <if test="companyID != null">
+            and vd.CompanyID = #{companyID}
+        </if>
     </select>
 
     <update id="batchUpdateDeviceStatus">

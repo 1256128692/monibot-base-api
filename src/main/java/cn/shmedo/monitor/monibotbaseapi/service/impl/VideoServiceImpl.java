@@ -403,7 +403,7 @@ public class VideoServiceImpl implements VideoService {
     public List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa) {
 
         List<VideoDeviceInfoV1> list = videoDeviceMapper.queryListByDeviceSerialListAndCompanyID(
-                pa.getDeviceSerialList(), pa.getCompanyID(), pa.getDeviceStatus());
+                pa.getDeviceSerialList(), pa.getCompanyID().equals(DefaultConstant.MD_ID) ? null : pa.getCompanyID(), pa.getDeviceStatus());
 
         if (CollectionUtil.isNullOrEmpty(list)) {
             return Collections.emptyList();
