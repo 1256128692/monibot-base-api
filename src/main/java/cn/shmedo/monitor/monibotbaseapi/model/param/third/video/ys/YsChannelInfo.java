@@ -6,9 +6,7 @@ import lombok.Data;
 public class YsChannelInfo {
 
     private String deviceSerial;
-    private String ipcSerial;
     private Integer channelNo;
-    private String channelName;
     private Integer status;
 
 }

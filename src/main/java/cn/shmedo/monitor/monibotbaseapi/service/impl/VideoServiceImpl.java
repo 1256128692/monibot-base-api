@@ -276,18 +276,18 @@ public class VideoServiceImpl implements VideoService {
                     }
                     deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
-                    if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
+                    if (null == deviceInfoWrapper.getData()) {
                         return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                 } else {
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
-                    if (null == deviceInfoWrapper.getData() || CollectionUtil.isNullOrEmpty(deviceChannelInfo.getData())) {
+                    if (null == deviceInfoWrapper.getData()) {
                         return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                     }
                 }
 
                 videoDeviceInfoList.add(VideoDeviceInfo.ysToNewValue(deviceInfoWrapper.getData(),
-                        deviceChannelInfo.getData(), addVideoList.get(i), pa));
+                        deviceChannelInfo.getData(), addVideoList.get(i), pa, i + 1));
             }
 
         }
@@ -314,7 +314,7 @@ public class VideoServiceImpl implements VideoService {
             if (pa.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
                 videoDeviceInfoList.forEach(v -> {
                     iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getYsProductID(),
-                            v.getDeviceToken(), v.getDeviceName()));
+                            v.getDeviceToken(), v.getDeviceToken()));
                 });
             } else {
                 videoDeviceInfoList.forEach(v -> {
