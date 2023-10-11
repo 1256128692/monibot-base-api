@@ -161,6 +161,7 @@ public class PropertyController {
      * @apiName QueryModelList
      * @apiDescription 查询模板信息
      * @apiParam (请求体) {Int} [modelID] 模板ID, 优先级最高的参数
+     * @apiParam (请求体) {Int} [companyID] 公司ID
      * @apiParam (请求体) {Int} projectType 项目类型
      * @apiParam (请求体) {String} [name] 模板名称
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
