@@ -10,6 +10,7 @@ public class VideoDevicePageInfo {
     private Integer videoDeviceID;
     private String deviceSerial;
     private String deviceType;
+    private String deviceName;
     private Integer companyID;
     private String companyName;
     private Boolean deviceStatus;
