@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
@@ -81,6 +82,11 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
         // 校验设备厂商，型号，名称是否重复
         if (tbOtherDeviceMapper.countExist(list) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");
+        }
+        List<Integer> projectIDList = list.stream().map(AddOtherDeviceItem::getProjectID).distinct().toList();
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        if (tbProjectInfoMapper.selectBatchIds(projectIDList).size() != projectIDList.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "projectID不存在");
         }
         return null;
     }

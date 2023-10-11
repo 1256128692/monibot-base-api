@@ -12,6 +12,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.Date;
+
 /**
  * @program: monibot-base-api
  * @author: gaoxu
@@ -25,6 +27,8 @@ public class QueryAssetIOLogPageParam implements ParameterValidator, ResourcePer
     private String fuzzyItem;
     private Byte type;
     private Boolean inOrOut;
+    private Date begin;
+    private Date end;
     @NotNull
     @Positive
     private Integer currentPage;

@@ -37,11 +37,11 @@ public class UpdateAssetParam implements ParameterValidator, ResourcePermissionP
     @NotBlank
     private String name;
     @NotNull
-    private String vendor;
+    @Range(min = 1, max = 8)
+    private Byte unit;
     @NotNull
-    @Min(0)
+    private String vendor;
     private Integer warnValue;
-    @NotBlank
     private String comparison;
     @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
     private String exValue;
@@ -86,6 +86,7 @@ public class UpdateAssetParam implements ParameterValidator, ResourcePermissionP
 
     public TbAsset update(Integer subjectID) {
         tbAsset.setName(name);
+        tbAsset.setUnit(unit);
         tbAsset.setVendor(vendor);
         tbAsset.setWarnValue(warnValue);
         tbAsset.setComparison(comparison);

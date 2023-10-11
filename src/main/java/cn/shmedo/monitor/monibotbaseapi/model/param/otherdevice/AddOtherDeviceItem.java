@@ -30,6 +30,5 @@ public class AddOtherDeviceItem {
     @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
     private String exValue;
     @Valid
-    @NotEmpty
     private List<@NotNull PropertyIdAndValue> propertyList;
 }

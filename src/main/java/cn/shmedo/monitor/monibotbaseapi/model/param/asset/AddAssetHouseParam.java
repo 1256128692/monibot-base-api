@@ -29,7 +29,6 @@ public class AddAssetHouseParam implements ParameterValidator, ResourcePermissio
     private Integer companyID;
     @NotBlank
     private String name;
-    @NotBlank
     private String code;
     @NotEmpty
     private String address;

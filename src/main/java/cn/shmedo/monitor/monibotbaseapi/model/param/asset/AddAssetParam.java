@@ -38,10 +38,7 @@ public class AddAssetParam implements ParameterValidator, ResourcePermissionProv
     private Byte unit;
     @NotNull
     private Byte type;
-    @NotNull
-    @Min(0)
     private Integer warnValue;
-    @NotBlank
     private String comparison;
     @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
     private String exValue;

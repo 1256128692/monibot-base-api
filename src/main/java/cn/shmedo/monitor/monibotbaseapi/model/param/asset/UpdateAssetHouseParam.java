@@ -32,7 +32,6 @@ public class UpdateAssetHouseParam implements ParameterValidator, ResourcePermis
     private Integer ID;
     @NotBlank
     private String name;
-    @NotBlank
     private String code;
     @NotBlank
     private String address;

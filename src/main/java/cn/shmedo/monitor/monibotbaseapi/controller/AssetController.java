@@ -36,8 +36,8 @@ public class AssetController {
      * @apiParam (请求体) {String} vendor 厂商品牌
      * @apiParam (请求体) {Int}   unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
      * @apiParam (请求体) {Int}  type 类型10, 20 救灾物资、备品备件
-     * @apiParam (请求体) {Int} warnValue  预警值(>=0)
-     * @apiParam (请求体) {String} comparison 比较方式< ,> , =, <=,  >=
+     * @apiParam (请求体) {Int} [warnValue]  预警值(>=0)
+     * @apiParam (请求体) {String} [comparison] 比较方式< ,> , =, <=,  >=
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
@@ -60,9 +60,10 @@ public class AssetController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 资产ID
      * @apiParam (请求体) {String} name 名称型号
+     *  @apiParam (请求体) {Int}   unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
      * @apiParam (请求体) {String} vendor 厂商品牌
-     * @apiParam (请求体) {Int} warnValue  预警值
-     * @apiParam (请求体) {String} comparison 比较方式< ,> , =, <=,  >=
+     * @apiParam (请求体) {Int} [warnValue]  预警值
+     * @apiParam (请求体) {String} [comparison] 比较方式< ,> , =, <=,  >=
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
@@ -163,7 +164,7 @@ public class AssetController {
      * @apiName AddAssetHouse
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} name 名称
-     * @apiParam (请求体) {String} code 编号
+     * @apiParam (请求体) {String} [code] 编号
      * @apiParam (请求体) {String}   address 地址
      * @apiParam (请求体) {String}  [comment] 备注
      * @apiParam (请求体) {String}  [contactPerson] 联系人
@@ -190,7 +191,7 @@ public class AssetController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 资产库ID
      * @apiParam (请求体) {String} name 名称
-     * @apiParam (请求体) {String} code 编号
+     * @apiParam (请求体) {String} [code] 编号
      * @apiParam (请求体) {String}   address 地址
      * @apiParam (请求体) {String}  [comment] 备注
      * @apiParam (请求体) {String}  [contactPerson] 联系人
@@ -317,6 +318,8 @@ public class AssetController {
      * @apiParam (请求体) {Int} [type] 资产类型
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [inOrOut] 出库还是入库
+     * @apiParam (请求体) {DateTime} [begin] 开始时间
+     * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量

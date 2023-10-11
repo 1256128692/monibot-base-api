@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
@@ -76,10 +77,14 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
         );
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
-        RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY,
-                BeanUtil.copyProperties(tbProjectInfo, ProjectInfo.class).getLocationInfo()
-                , RegionArea.class);
-        String location = area != null ? area.getName() : StrUtil.EMPTY;
+        String location = null;
+        if (tbProjectInfo == null || ObjectUtil.isNotEmpty(tbProjectInfo.getLocation())) {
+            RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY,
+                    BeanUtil.copyProperties(tbProjectInfo, ProjectInfo.class).getLocationInfo()
+                    , RegionArea.class);
+            location = area != null ? area.getName() : StrUtil.EMPTY;
+        }
+
         return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location);
     }
 

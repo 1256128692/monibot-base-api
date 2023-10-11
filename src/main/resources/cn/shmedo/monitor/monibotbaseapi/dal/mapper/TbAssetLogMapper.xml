@@ -44,6 +44,12 @@ select log.*, a.name as assetName, a.vendor as assetVendor, a.type as assetType,
     <if test="pa.fuzzyItem != null and pa.fuzzyItem != ''">
       and (a.name like concat('%', #{pa.fuzzyItem}, '%') or a.vendor like concat('%', #{pa.fuzzyItem}, '%'))
     </if>
+    <if test="pa.begin !=null">
+      and log.time >= #{pa.begin}
+    </if>
+    <if test="pa.end !=null">
+      and log.time &lt;= #{pa.end}
+    </if>
     order by log.id desc
   </select>
 </mapper>

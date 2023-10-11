@@ -79,7 +79,7 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
         HashOperations<String, Object, Object> hashOperations = redisService.getTemplate().opsForHash();
         Map map = redisService.get(RedisKeys.ASSET_HOUSE_KEY, pa.getHouseID().toString(), Map.class);
         if (map == null) {
-            map = Map.of(pa.getAssetID(), pa.getValue());
+            map = Map.of(pa.getAssetID().toString(), pa.getValue());
         } else {
             if (map.containsKey(pa.getAssetID().toString())) {
                 Integer value = (Integer) map.get(pa.getAssetID().toString());
@@ -149,7 +149,7 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                         TbAsset4Web tbAsset4Web = BeanUtil.copyProperties(e, TbAsset4Web.class);
                         tbAsset4Web.setHouseName(tbAssetHouse.getName());
                         tbAsset4Web.setHouseID(tbAssetHouse.getID());
-                        tbAsset4Web.setCurrentValue(Integer.valueOf((String) map.get(e.getID().toString())));
+                        tbAsset4Web.setCurrentValue((Integer) map.get(e.getID().toString()));
                         tbAsset4Web.setIsWarn(isWarn(tbAsset4Web));
                         return tbAsset4Web;
                     }
@@ -211,6 +211,9 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
      * @return
      */
     private Boolean isWarn(TbAsset4Web tbAsset4Web) {
+        if (tbAsset4Web.getWarnValue() == null || ObjectUtil.isEmpty(tbAsset4Web.getComparison())) {
+            return false;
+        }
         switch (tbAsset4Web.getComparison()) {
             case ">":
                 return tbAsset4Web.getCurrentValue() > tbAsset4Web.getWarnValue();
