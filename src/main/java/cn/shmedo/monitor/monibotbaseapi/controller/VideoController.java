@@ -687,6 +687,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} currentPageData.videoDeviceID 视频设备ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} currentPageData.deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} currentPageData.deviceName 视频设备名称
      * @apiSuccess (返回结果) {Int} currentPageData.companyID 公司ID
      * @apiSuccess (返回结果) {String} currentPageData.companyName 公司名称
      * @apiSuccess (返回结果) {Boolean} currentPageData.deviceStatus 设备在线状态

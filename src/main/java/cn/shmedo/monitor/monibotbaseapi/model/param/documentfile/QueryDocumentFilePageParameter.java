@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.documentfile;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -27,6 +24,8 @@ public class QueryDocumentFilePageParameter implements ParameterValidator, Resou
 
     @NotNull(message = "对象类型不能为空")
     private Integer subjectType;
+
+    private Integer subjectID;
 
     private String fileName;
 

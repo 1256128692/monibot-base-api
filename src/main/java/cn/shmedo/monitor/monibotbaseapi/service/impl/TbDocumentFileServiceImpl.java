@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDocumentFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDocumentFile;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
@@ -74,14 +75,15 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
     }
 
     @Override
-    public PageUtil.Page<DocumentFileResponse> queryDocumentPage(QueryDocumentFilePageParameter queryDocumentFilePageParameter) {
+    public PageUtil.Page<DocumentFileResponse> queryDocumentPage(QueryDocumentFilePageParameter parameter) {
         // 分页条件
-        Page<TbDocumentFile> queryPage = new Page<>(queryDocumentFilePageParameter.getCurrentPage(), queryDocumentFilePageParameter.getPageSize());
+        Page<TbDocumentFile> queryPage = new Page<>(parameter.getCurrentPage(), parameter.getPageSize());
         // 查询条件
         LambdaQueryWrapper<TbDocumentFile> queryWrapper = new QueryWrapper<TbDocumentFile>().lambda()
-                .eq(TbDocumentFile::getSubjectType, queryDocumentFilePageParameter.getSubjectType())
-                .eq(TbDocumentFile::getSubjectID, queryDocumentFilePageParameter.getProjectID())
-                .eq(StringUtils.isNotEmpty(queryDocumentFilePageParameter.getFileName()), TbDocumentFile::getFileName, queryDocumentFilePageParameter.getFileName());
+                .eq(TbDocumentFile::getSubjectType, parameter.getSubjectType())
+                .eq(DocumentSubjectType.PROJECT.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getProjectID())
+                .eq(DocumentSubjectType.OTHER_DEVICE.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getSubjectID())
+                .eq(StringUtils.isNotEmpty(parameter.getFileName()), TbDocumentFile::getFileName, parameter.getFileName());
         IPage<TbDocumentFile> resultPage = tbDocumentFileMapper.selectPage(queryPage, queryWrapper);
         List<DocumentFileResponse> documentFileResponseList = new ArrayList<>();
         if (Objects.nonNull(resultPage)) {

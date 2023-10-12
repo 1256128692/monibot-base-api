@@ -174,6 +174,7 @@
         select vd.ID        as videoDeviceID,
                vd.deviceSerial,
                vd.deviceType,
+               vd.deviceName,
                vd.companyID,
                vd.deviceStatus,
                vd.accessChannelNum,
