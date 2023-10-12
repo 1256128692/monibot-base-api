@@ -7,10 +7,11 @@
     <id column="ID" jdbcType="TINYINT" property="ID" />
     <result column="TypeName" jdbcType="VARCHAR" property="typeName" />
     <result column="MainType" jdbcType="VARCHAR" property="mainType" />
+    <result column="PlatformTypeSet" jdbcType="VARCHAR" property="platformTypeSet" />
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, TypeName, MainType
+    ID, TypeName, MainType, PlatformTypeSet
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Byte" resultMap="BaseResultMap">
     <!--@mbg.generated-->
