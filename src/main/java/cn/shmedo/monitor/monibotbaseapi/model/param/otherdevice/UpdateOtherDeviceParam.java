@@ -90,7 +90,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
 
     @Override
     public Resource parameter() {
-        return new Resource(companyID.toString(), ResourceType.COMPANY);
+        return new Resource(tbOtherDevice.getProjectID().toString(), ResourceType.BASE_PROJECT);
     }
 
     @Override

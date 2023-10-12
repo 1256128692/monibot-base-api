@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
@@ -41,9 +42,9 @@ public class AssetController {
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:AddAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:AddAsset")
     @LogParam(moduleName = "资产模块", operationName = "新增资产", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addAsset(@Validated @RequestBody AddAssetParam pa) {
@@ -67,9 +68,9 @@ public class AssetController {
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:UpdateAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:UpdateAsset")
     @LogParam(moduleName = "资产模块", operationName = "更新资产", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateAsset(@Validated @RequestBody UpdateAssetParam pa) {
@@ -87,9 +88,9 @@ public class AssetController {
      * @apiParam (请求体) {Int[]} assetIDList 资产ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DeleteAsset	
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DeleteAsse")
     @RequestMapping(value = "DeleteAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object deleteAsset(@Validated @RequestBody DeleteAssetParam pa) {
         assetService.removeByIds(pa.getAssetIDList());
@@ -114,9 +115,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} list.comparison 比较方式< ,> , =, <=,  >=
      * @apiSuccess (返回结果) {String} [list.exValue] 扩展字段,json字符串（500）
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAsset")
     @RequestMapping(value = "QueryAssetList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetList(@Validated @RequestBody QueryAssetListParam pa) {
         return assetService.list(new LambdaQueryWrapper<TbAsset>()
@@ -148,9 +149,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} currentPageData.comparison 比较方式< ,> , =, <=,  >=
      * @apiSuccess (返回结果) {String} [currentPageData.exValue] 扩展字段,json字符串（500）
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAsset")
     @RequestMapping(value = "QueryAssetPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetPage(@Validated @RequestBody QueryAssetPageParam pa) {
         return assetService.queryAssetPage(pa);
@@ -172,10 +173,10 @@ public class AssetController {
      * @apiParam (请求体) {String}  [exValue] 额外属性,Json字符串
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:AddAssetHouse
      */
-//    @Permission(permissionName = "mdmbase:XX")
-//    @LogParam(moduleName = "资产模块", operationName = "新增资产库", operationProperty = OperationProperty.ADD)
+    @Permission(permissionName = "mdmbase:AddAssetHouse")
+    @LogParam(moduleName = "资产模块", operationName = "新增资产库", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object AddAssetHouse(@Validated @RequestBody AddAssetHouseParam pa) {
         assetService.addAssetHouse(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
@@ -199,9 +200,9 @@ public class AssetController {
      * @apiParam (请求体) {String}  [exValue] 额外属性,Json字符串
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:UpdateAssetHouse
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:UpdateAssetHouse")
     @LogParam(moduleName = "资产模块", operationName = "更新资产库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateAssetHouse(@Validated @RequestBody UpdateAssetHouseParam pa) {
@@ -211,7 +212,7 @@ public class AssetController {
 
     /**
      * @api {post} /DeleteAssetHouse 删除资产库
-     * @apiDescription 删除资产库, 资产库下有资产时，不允许删除
+     * @apiDescription 删除资产库, 级联删除库存及出入库记录
      * @apiVersion 1.0.0
      * @apiGroup 资产模块
      * @apiName DeleteAssetHouse
@@ -219,9 +220,9 @@ public class AssetController {
      * @apiParam (请求体) {Int[]} houseIDList 资产库ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DeleteAssetHouse
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DeleteAssetHouse")
     @LogParam(moduleName = "资产模块", operationName = "删除资产库", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object DeleteAssetHouse(@Validated @RequestBody DeleteAssetHouseParam pa) {
@@ -246,9 +247,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String}  [list.contactNumber] 备注
      * @apiSuccess (返回结果) {String}  [list.exValue] 备注
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAssetHouse
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAssetHouse")
     @RequestMapping(value = "QueryAssetHouseList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetHouseList(@Validated @RequestBody QueryAssetHouseListParam pa) {
         return assetService.queryAssetHouseList(pa.getCompanyID());
@@ -275,9 +276,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String}  [currentPageData.contactNumber] 备注
      * @apiSuccess (返回结果) {String}  [currentPageData.exValue] 备注
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAssetHouse
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAssetHouse")
     @RequestMapping(value = "QueryAssetHousePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetHousePage(@Validated @RequestBody QueryAssetHousePageParam pa) {
         return assetService.queryAssetHousePage(pa);
@@ -297,9 +298,9 @@ public class AssetController {
      * @apiParam (请求体) {String}  [comment] 备注
      * @apiSuccess (返回结果) {String}   none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:IOAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:IOAsset")
     @LogParam(moduleName = "资产模块", operationName = "入库出库", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "IOAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object ioAsset(@Validated @RequestBody IOAssetParam pa) {
@@ -339,9 +340,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {Int} currentPageData.userName 人名称
      * @apiSuccess (返回结果) {String} [currentPageData.comment] 备注
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAssetLog
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAssetLog")
     @RequestMapping(value = "QueryAssetIOLogPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetIOLogPage(@Validated @RequestBody QueryAssetIOLogPageParam pa) {
         return assetService.queryAssetIOLogPage(pa);
@@ -375,9 +376,9 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} currentPageData.houseName 资产库名称
      * @apiSuccess (返回结果) {Int} currentPageData.currentValue 当前数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 系统权限 mdmbase:DescribeAsset
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeAsset")
     @RequestMapping(value = "QueryAssetWithValuePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetWithValuePage(@Validated @RequestBody QueryAssetWithValuePageParam pa) {
         return assetService.queryAssetWithValuePage(pa);

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
  * @create: 2023-09-27 17:36
  **/
 @Data
-public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
     @NotNull
     private Integer companyID;
     private Integer templateID;
@@ -92,13 +92,13 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
     }
 
     @Override
-    public Resource parameter() {
-        return new Resource(companyID.toString(), ResourceType.COMPANY);
+    public List<Resource> parameter() {
+        return list.stream().map(AddOtherDeviceItem::getProjectID).distinct().map(e -> new Resource(e.toString(), ResourceType.BASE_PROJECT)).toList();
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
+        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
     }
 
     public List<TbOtherDevice> toList(Integer subjectID) {

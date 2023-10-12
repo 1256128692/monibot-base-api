@@ -550,9 +550,9 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} nextLevelPIDList 下属设备ID列表 当前项目为level = 1时候，列表为level为0或者2，当项目level=2时候，列表为level为0或者-1
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @LogParam(moduleName = "项目管理模块", operationName = "设置项目关联关系", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "SetProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object setProjectRelation(@Validated @RequestBody SetProjectRelationParam pa) {
@@ -571,9 +571,9 @@ public class ProjectController {
      * @apiParam (请求体) {Int[]} nextLevelPIDList 下属设备ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:UpdateBaseProject
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:UpdateBaseProject")
     @LogParam(moduleName = "项目管理模块", operationName = "移除项目关联关系", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "RemoveProjectRelation", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object removeProjectRelation(@Validated @RequestBody RemoveProjectRelationParam pa) {
@@ -595,9 +595,9 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} nextLevelProjectList.level 项目等级
      * @apiSuccess (返回结果) {Json[]} availableProjectList 下级项目列表, 结构同nextLevelProjectList
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:ListBaseProject
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "QueryNextLevelProjectAndCanUsed", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryNextLevelProjectAndCanUsed(@Validated @RequestBody QueryNextLevelAndAvailableProjectParam pa) {
         return projectService.queryNextLevelProjectAndCanUsed(pa);

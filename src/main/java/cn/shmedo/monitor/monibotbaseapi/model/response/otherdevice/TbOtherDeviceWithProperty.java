@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 @Data
 public class TbOtherDeviceWithProperty extends TbOtherDevice {
     private String location;
+    private String projectName;
+    private String templateName;
     private List<PropertyWithValue> propertyList;
 
-    public static TbOtherDeviceWithProperty valueOf(TbOtherDevice tbOtherDevice, List<TbProperty> tbProperties, List<TbProjectProperty> tbProjectProperties, String location) {
+    public static TbOtherDeviceWithProperty valueOf(TbOtherDevice tbOtherDevice, List<TbProperty> tbProperties, List<TbProjectProperty> tbProjectProperties, String location, String projectName, String templateName) {
 
         TbOtherDeviceWithProperty obj = BeanUtil.copyProperties(tbOtherDevice, TbOtherDeviceWithProperty.class);
         Map<Integer, TbProjectProperty> valueMap = tbProjectProperties.stream().collect(Collectors.toMap(TbProjectProperty::getPropertyID, Function.identity()));
@@ -33,6 +35,8 @@ public class TbOtherDeviceWithProperty extends TbOtherDevice {
                 .value(valueMap.containsKey(tbProperty.getID()) ? valueMap.get(tbProperty.getID()).getValue() : null)
                 .build()).collect(Collectors.toList()));
         obj.setLocation(location);
+        obj.setProjectName(projectName);
+        obj.setTemplateName(templateName);
         return obj;
     }
 }

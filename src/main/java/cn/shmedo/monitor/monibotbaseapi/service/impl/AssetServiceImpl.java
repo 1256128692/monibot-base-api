@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbAssetLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbAssetMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbAsset;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetHouse;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetLog;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AssetType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AssetUnit;
 import cn.shmedo.monitor.monibotbaseapi.model.param.asset.*;
@@ -58,8 +59,14 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
     }
 
     @Override
+    @Transactional
     public void deleteAssetHouse(List<Integer> houseIDList) {
         tbAssetHouseMapper.deleteBatchIds(houseIDList);
+        tbAssetLogMapper.delete(new LambdaQueryWrapper<TbAssetLog>()
+                .in(TbAssetLog::getHouseID, houseIDList));
+
+        // 处理库存
+        redisService.remove(RedisKeys.ASSET_HOUSE_KEY, houseIDList.stream().map(Object::toString).toArray(String[]::new));
     }
 
     @Override

@@ -4,10 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.AddOtherDeviceBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDevicePageParam;
@@ -42,6 +39,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     private final TbPropertyMapper tbPropertyMapper;
     private final RedisService redisService;
     private final TbProjectInfoMapper tbProjectInfoMapper;
+    private final TbPropertyModelMapper tbPropertyModelMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -71,6 +69,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
         if (pa.getTbOtherDevice().getTemplateID() == null) {
             return BeanUtil.copyProperties(pa.getTbOtherDevice(), TbOtherDeviceWithProperty.class);
         }
+        TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectById(pa.getTbOtherDevice().getTemplateID());
         List<TbProperty> tbProperties = tbPropertyMapper.selectByModelIDs(List.of(pa.getTbOtherDevice().getTemplateID()));
         List<TbProjectProperty> tbProjectProperties = tbProjectPropertyMapper.selectList(
                 new LambdaQueryWrapper<TbProjectProperty>()
@@ -78,14 +77,16 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
         );
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
         String location = null;
+        String projectName = null;
         if (tbProjectInfo != null && ObjectUtil.isNotEmpty(tbProjectInfo.getLocation())) {
             RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY,
                     BeanUtil.copyProperties(tbProjectInfo, ProjectInfo.class).getLocationInfo()
                     , RegionArea.class);
             location = area != null ? area.getName() : StrUtil.EMPTY;
+            projectName = tbProjectInfo.getProjectName();
         }
 
-        return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location);
+        return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName, tbPropertyModel.getName());
     }
 
     @Override

@@ -39,11 +39,6 @@ public class DeleteAssetHouseParam implements ParameterValidator, ResourcePermis
         if (tbAssetHouses.stream().anyMatch(tbAssetHouse -> !tbAssetHouse.getCompanyID().equals(companyID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有不属于该公司的资产库");
         }
-        RedisService redisService = ContextHolder.getBean(RedisService.class);
-        Map<String, String> all = redisService.getAll(RedisKeys.ASSET_HOUSE_KEY);
-        if (houseIDList.stream().anyMatch(e -> all.containsKey(e.toString()))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有资产库下有资产");
-        }
         return null;
     }
 

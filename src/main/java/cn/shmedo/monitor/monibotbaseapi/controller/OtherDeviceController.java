@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class OtherDeviceController {
     private final IOtherDeviceService otherDeviceService;
+
     /**
      * @api {post} /AddOtherDeviceBatch 批量新增其他设备
      * @apiDescription 批量新增其他设备
@@ -43,9 +45,9 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} list.propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:AddOtherDevice
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:AddOtherDevice")
     @LogParam(moduleName = "其他设备模块", operationName = "批量新增其他设备", operationProperty = OperationProperty.ADD)
     @RequestMapping(value = "AddOtherDeviceBatch", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addOtherDeviceBatch(@Validated @RequestBody AddOtherDeviceBatchParam pa) {
@@ -72,9 +74,9 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} propertyList.value 属性值
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:UpdateOtherDevice
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:UpdateOtherDevice")
     @LogParam(moduleName = "其他设备模块", operationName = "更新其他设备", operationProperty = OperationProperty.UPDATE)
     @RequestMapping(value = "UpdateOtherDevice", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object updateOtherDevice(@Validated @RequestBody UpdateOtherDeviceParam pa) {
@@ -92,9 +94,9 @@ public class OtherDeviceController {
      * @apiParam (请求体) {Int[]} deviceIDList 设备ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:DeleteOtherDevice
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DeleteOtherDevice")
     @LogParam(moduleName = "其他设备模块", operationName = "删除其他设备", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteOtherDevice", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object deleteOtherDevice(@Validated @RequestBody DeleteOtherDeviceParam pa) {
@@ -127,9 +129,9 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {Int} currentPageData.templateID 模板ID
      * @apiSuccess (返回结果) {String} currentPageData.templateName 模板名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:DescribeOtherDevice
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeOtherDevice")
     @RequestMapping(value = "QueryOtherDevicePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryOtherDevicePage(@Validated @RequestBody QueryOtherDevicePageParam pa) {
         return otherDeviceService.queryOtherDevicePage(pa);
@@ -158,9 +160,9 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {String} propertyList.unit 属性单位
      * @apiSuccess (返回结果) {String} propertyList.value 属性值
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:XX
+     * @apiPermission 项目权限 mdmbase:DescribeOtherDevice
      */
-//    @Permission(permissionName = "mdmbase:XX")
+    @Permission(permissionName = "mdmbase:DescribeOtherDevice")
     @RequestMapping(value = "QueryOtherDeviceWithProperty", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryOtherDeviceWithProperty(@Validated @RequestBody QueryOtherDeviceWithPropertyParam pa) {
         return otherDeviceService.queryOtherDeviceWithProperty(pa);

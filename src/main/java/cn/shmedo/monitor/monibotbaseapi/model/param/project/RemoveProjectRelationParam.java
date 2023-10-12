@@ -21,7 +21,7 @@ import java.util.List;
  * @create: 2023-10-11 11:50
  **/
 @Data
-public class RemoveProjectRelationParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class RemoveProjectRelationParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
     @NotNull
     private Integer companyID;
@@ -34,6 +34,9 @@ public class RemoveProjectRelationParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper validate() {
+        if (nextLevelPIDList.contains(projectID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "nextLevelPIDList中不能包含projectID");
+        }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
         if (tbProjectInfo == null) {
@@ -49,12 +52,14 @@ public class RemoveProjectRelationParam implements ParameterValidator, ResourceP
     }
 
     @Override
-    public Resource parameter() {
-        return new Resource(companyID.toString(), ResourceType.COMPANY);
+    public List<Resource> parameter() {
+        List<Resource> list = nextLevelPIDList.stream().map(e -> new Resource(e.toString(), ResourceType.BASE_PROJECT)).toList();
+        list.add(new Resource(projectID.toString(), ResourceType.BASE_PROJECT));
+        return list;
     }
 
     @Override
     public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
+        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
     }
 }

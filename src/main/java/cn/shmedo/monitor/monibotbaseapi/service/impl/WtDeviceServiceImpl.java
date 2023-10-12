@@ -274,6 +274,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             return new PageUtil.PageWithMap<>(0, Collections.emptyList(), 0, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
         }
         allData = allData.stream().sorted(Comparator.comparingInt(SimpleDeviceV5::getDeviceID).reversed()).toList();
+        // 计算在线数量
+        long onlineCount = allData.stream().filter(e -> e.getOnlineStatus() != null && e.getOnlineStatus()).count();
         PageUtil.Page<SimpleDeviceV5> page = PageUtil.page(allData, pa.getPageSize(), pa.getCurrentPage());
         page.currentPageData().forEach(
                 item -> {
@@ -334,7 +336,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                         warnDeviceTokenList.contains(item.getDeviceSN()) ? 1 : 0
                 )
         );
-        return new PageUtil.PageWithMap<>(page.totalPage(), collect, page.totalCount(), Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
+        return new PageUtil.PageWithMap<>(page.totalPage(), collect, page.totalCount(),
+                Map.of("warnBefore", warnBefore, "normalBefore", normalBefore, "onlineCount", onlineCount));
     }
 
 
@@ -465,10 +468,12 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (CollectionUtils.isEmpty(resultList)) {
             return empty;
         }
-
+        // 统计在线数量
+        long onlineCount = resultList.stream().filter(e -> e.getOnline() != null && e.getOnline()).count();
         totalCount = Long.valueOf(resultList.size());
         List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(resultList, param.getPageSize());
-        return new PageUtil.PageWithMap<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
+        return new PageUtil.PageWithMap<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount,
+                Map.of("warnBefore", warnBefore, "normalBefore", normalBefore, "onlineCount", onlineCount));
 
     }
 
