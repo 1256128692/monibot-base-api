@@ -313,4 +313,12 @@
       </where>
       ORDER BY CreateTime DESC
     </select>
+
+  <update id="updateLevel2Unallocated">
+      update tb_project_info
+      set level = 0
+      where level > 0
+        and id not in (select upLevelID from tb_project_relation)
+        and id not in (select downLevelID from tb_project_relation)
+  </update>
 </mapper>

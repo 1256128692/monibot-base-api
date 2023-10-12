@@ -305,6 +305,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+        // 删除项目关系
+        tbProjectRelationMapper.delete(new LambdaQueryWrapper<TbProjectRelation>()
+                .in(TbProjectRelation::getUpLevelID, param.getDataIDList())
+                .or()
+                .in(TbProjectRelation::getDownLevelID, param.getDataIDList())
+        );
+        tbProjectInfoMapper.updateLevel2Unallocated();
     }
 
     @Override
