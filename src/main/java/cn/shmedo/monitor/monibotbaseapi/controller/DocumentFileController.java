@@ -37,6 +37,7 @@ public class DocumentFileController {
      * @apiDescription 查看资料文件列表
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {Int} subjectType 对象类型 （1.工程项目  2.其他设备）
+     * @apiParam (请求体) {Int} [subjectID] 对象ID
      * @apiParam (请求体) {String} [fileName] 文件名称
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
@@ -120,7 +121,7 @@ public class DocumentFileController {
      * @apiName QueryDocumentFile
      * @apiDescription 查询资料文件
      * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Int} ID ID
+     * @apiParam (请求体) {Int} fileID 文件ID
      * @apiSuccess (返回结果) {int} ID 主键ID
      * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiSuccess (返回结果) {int} subjectID  对象ID
