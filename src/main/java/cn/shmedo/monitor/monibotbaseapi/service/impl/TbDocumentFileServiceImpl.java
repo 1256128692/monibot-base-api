@@ -82,8 +82,11 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
         LambdaQueryWrapper<TbDocumentFile> queryWrapper = new QueryWrapper<TbDocumentFile>().lambda()
                 .eq(TbDocumentFile::getSubjectType, parameter.getSubjectType())
                 .eq(DocumentSubjectType.PROJECT.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getProjectID())
-                .eq(DocumentSubjectType.OTHER_DEVICE.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getSubjectID())
-                .eq(StringUtils.isNotEmpty(parameter.getFileName()), TbDocumentFile::getFileName, parameter.getFileName());
+                .eq(DocumentSubjectType.OTHER_DEVICE.getCode().equals(parameter.getSubjectType()) && Objects.nonNull(parameter.getSubjectID()),
+                        TbDocumentFile::getSubjectID, parameter.getSubjectID())
+                .like(StringUtils.isNotEmpty(parameter.getFileName()), TbDocumentFile::getFileName, parameter.getFileName())
+                .orderByDesc(Objects.isNull(parameter.getCreateTimeDesc()) || parameter.getCreateTimeDesc(), TbDocumentFile::getCreateTime)
+                .orderByAsc(Objects.nonNull(parameter.getCreateTimeDesc()) && !parameter.getCreateTimeDesc(), TbDocumentFile::getCreateTime);
         IPage<TbDocumentFile> resultPage = tbDocumentFileMapper.selectPage(queryPage, queryWrapper);
         List<DocumentFileResponse> documentFileResponseList = new ArrayList<>();
         if (Objects.nonNull(resultPage)) {
@@ -104,13 +107,13 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
             }
             // 处理filePath
             List<FileInfoResponse> fileInfoResponseList = fileService.getFileUrlList(ossKeyList, CurrentSubjectHolder.getCurrentSubject().getCompanyID());
-            if(!CollectionUtil.isNullOrEmpty(fileInfoResponseList)){
+            if (!CollectionUtil.isNullOrEmpty(fileInfoResponseList)) {
                 fileInfoResponseMap = fileInfoResponseList.stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
             }
 
             // 包装返回数据
             documentFileResponseList = CustomizeBeanUtil.copyListProperties(records, DocumentFileResponse::new);
-            for(DocumentFileResponse documentFileResponse: documentFileResponseList){
+            for (DocumentFileResponse documentFileResponse : documentFileResponseList) {
                 documentFileResponse.setCreateUserName(userIdNameMap.getOrDefault(documentFileResponse.getCreateUserId(), ""));
                 documentFileResponse.setFilePath(fileInfoResponseMap.getOrDefault(documentFileResponse.getFilePath(), ""));
             }

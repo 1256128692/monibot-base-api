@@ -39,6 +39,7 @@ public class DocumentFileController {
      * @apiParam (请求体) {Int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {Int} [subjectID] 对象ID
      * @apiParam (请求体) {String} [fileName] 文件名称
+     * @apiParam (请求体) {Bool} [createTimeDesc] 文件上传时间降序（为空或true为升序，为false降序）
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 总条数

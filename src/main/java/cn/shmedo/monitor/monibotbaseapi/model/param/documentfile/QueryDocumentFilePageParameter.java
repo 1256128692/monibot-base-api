@@ -29,6 +29,8 @@ public class QueryDocumentFilePageParameter implements ParameterValidator, Resou
 
     private String fileName;
 
+    private Boolean createTimeDesc;
+
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")
     @NotNull(message = "pageSize不能为空")
     private Integer pageSize;
