@@ -294,7 +294,7 @@ public class VideoServiceImpl implements VideoService {
 
         // 海康数据
         if (pa.getAccessPlatform() == AccessPlatformType.HAI_KANG.getValue()) {
-            String yyyyMMdd = DateUtil.format(DateUtil.date(), "yyyyMMdd");
+            String formatStar = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
             for (int i = 0; i < addVideoList.size(); i++) {
                 Integer num = i + 1;
                 HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(addVideoList.get(i).getDeviceSerial());
@@ -302,7 +302,7 @@ public class VideoServiceImpl implements VideoService {
                     return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
                 }
 
-                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + yyyyMMdd + num.toString()));
+                videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + formatStar + num.toString()));
             }
         }
         int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);

@@ -30,8 +30,8 @@ public class VideoDeviceInfo extends TbVideoDevice {
         if (data.getDeviceSerial().length() <= 30) {
             vo.setDeviceToken(data.getDeviceSerial());
         } else {
-            String yyyyMMdd = DateUtil.format(DateUtil.date(), "yyyyMMdd");
-            vo.setDeviceToken("YS" + yyyyMMdd + num);
+            String formatStr = DateUtil.format(DateUtil.date(), "yyyyMMddHHmmss");
+            vo.setDeviceToken("YS" + formatStr + num);
         }
         vo.setDeviceStatus(data.getStatus() == 1);
         vo.setAccessChannelNum(ysChannelInfoList.size() == 0 ? 1 : ysChannelInfoList.size());
