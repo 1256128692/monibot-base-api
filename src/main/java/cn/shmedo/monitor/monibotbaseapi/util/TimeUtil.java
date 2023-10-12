@@ -32,7 +32,7 @@ public class TimeUtil {
     /**
      * 萤石视频设备回放的时间格式
      */
-    public static final String YS_PLAY_BACK_TIME_FORMAT = "yyyyMMddhhmmss";
+    public static final String YS_PLAY_BACK_TIME_FORMAT = "yyyyMMddHHmmss";
     public static final long MILLI_SECOND_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     public static final long MILLI_SECOND_IN_ONE_HOUR = MILLI_SECOND_IN_ONE_DAY / 24;
     public static final int MILLI_SECOND_IN_ONE_SECOND = 1000;
