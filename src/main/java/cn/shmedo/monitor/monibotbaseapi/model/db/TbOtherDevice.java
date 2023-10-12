@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +23,7 @@ import lombok.NoArgsConstructor;
 @TableName(value = "tb_other_device")
 public class TbOtherDevice {
     @TableId(value = "ID", type = IdType.AUTO)
+    @JsonProperty(value = "ID")
     private Integer ID;
 
     @TableField(value = "CompanyID")

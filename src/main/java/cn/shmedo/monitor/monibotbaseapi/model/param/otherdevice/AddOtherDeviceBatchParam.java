@@ -75,7 +75,7 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
         if (list.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段应为JSON格式");
         }
-        if (list.stream().map(e -> e.getVendor() + e.getModel() + e.getName()).distinct().count() != list.size()) {
+        if (list.stream().map(e -> e.getVendor() + e.getModel() + e.getToken()).distinct().count() != list.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");
         }
         TbOtherDeviceMapper tbOtherDeviceMapper = ContextHolder.getBean(TbOtherDeviceMapper.class);

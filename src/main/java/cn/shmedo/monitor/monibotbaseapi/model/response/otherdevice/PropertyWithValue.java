@@ -15,5 +15,5 @@ public class PropertyWithValue {
     private String name;
     private String unit;
     private String value;
-
+    private String className;
 }

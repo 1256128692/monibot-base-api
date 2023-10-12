@@ -66,7 +66,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
                 new LambdaQueryWrapper<TbOtherDevice>()
                         .eq(TbOtherDevice::getVendor, vendor)
                         .eq(TbOtherDevice::getModel, model)
-                        .eq(TbOtherDevice::getName, name)
+                        .eq(TbOtherDevice::getToken, token)
                         .ne(TbOtherDevice::getID, ID)
         ) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一厂家同一型号下设备编号不可重复");

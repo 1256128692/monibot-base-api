@@ -78,7 +78,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
         );
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
         String location = null;
-        if (tbProjectInfo == null || ObjectUtil.isNotEmpty(tbProjectInfo.getLocation())) {
+        if (tbProjectInfo != null && ObjectUtil.isNotEmpty(tbProjectInfo.getLocation())) {
             RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY,
                     BeanUtil.copyProperties(tbProjectInfo, ProjectInfo.class).getLocationInfo()
                     , RegionArea.class);

@@ -65,7 +65,7 @@ public class UpdateAssetParam implements ParameterValidator, ResourcePermissionP
                 .ne(TbAsset::getID, ID)) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "公司下资产名称已存在");
         }
-        if (DefaultConstant.assetComparisonList.stream().noneMatch(item -> item.equals(comparison))) {
+        if (ObjectUtil.isNotEmpty(comparison) && DefaultConstant.assetComparisonList.stream().noneMatch(item -> item.equals(comparison))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "比较方式不存在");
         }
         if (ObjectUtil.isNotEmpty(exValue) && !JSONUtil.isTypeJSON(exValue)) {

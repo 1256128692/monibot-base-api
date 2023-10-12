@@ -29,6 +29,7 @@ public class TbOtherDeviceWithProperty extends TbOtherDevice {
                 .ID(tbProperty.getID())
                 .name(tbProperty.getName())
                 .unit(tbProperty.getUnit())
+                .className(tbProperty.getClassName())
                 .value(valueMap.containsKey(tbProperty.getID()) ? valueMap.get(tbProperty.getID()).getValue() : null)
                 .build()).collect(Collectors.toList()));
         obj.setLocation(location);
