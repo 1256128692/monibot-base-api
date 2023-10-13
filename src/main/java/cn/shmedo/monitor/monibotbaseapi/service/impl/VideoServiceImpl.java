@@ -332,16 +332,17 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
-    public PageUtil.Page<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa) {
+    public PageUtil.PageWithMap<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa) {
 
         Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
         IPage<VideoDevicePageInfo> pageData = videoDeviceMapper.queryPageByCondition(page, pa.getDeviceSerial(), pa.getFuzzyItem(), pa.getDeviceStatus(), pa.getAllocationStatus(),
                 pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
-            return PageUtil.Page.empty();
+            return PageUtil.PageWithMap.empty();
         }
-
+        Integer onlineCount = videoDeviceMapper.queryOnlineCount(pa.getDeviceSerial(), pa.getFuzzyItem(), pa.getDeviceStatus(), pa.getAllocationStatus(),
+                pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
         pageData.getRecords().forEach(record -> {
             record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
             record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
@@ -350,7 +351,8 @@ public class VideoServiceImpl implements VideoService {
             }
         });
 
-        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+        return new PageUtil.PageWithMap<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal(),
+                Map.of("onlineCount", onlineCount));
     }
 
     @Override

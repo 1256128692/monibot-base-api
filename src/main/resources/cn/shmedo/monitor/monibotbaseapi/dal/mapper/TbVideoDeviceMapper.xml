@@ -360,4 +360,37 @@
             WHERE ID = #{item.ID}
         </foreach>
     </update>
+
+    <select id="queryOnlineCount" resultType="java.lang.Integer">
+        select count(1)
+        from tb_video_device vd
+        <where>
+            deviceStatus = 1
+            <if test="deviceSerial != null and deviceSerial != ''">
+                and vd.`DeviceSerial` LIKE CONCAT('%',#{deviceSerial},'%')
+            </if>
+            <if test="fuzzyItem != null and fuzzyItem != ''">
+                and (vd.`DeviceSerial` LIKE CONCAT('%',#{fuzzyItem},'%')
+                or vd.`DeviceType` LIKE CONCAT('%',#{fuzzyItem},'%'))
+            </if>
+            <if test="deviceStatus != null">
+                and vd.deviceStatus = #{deviceStatus}
+            </if>
+            <if test="allocationStatus != null">
+                and vd.allocationStatus = #{allocationStatus}
+            </if>
+            <if test="ownedCompanyID != null">
+                and vd.CompanyID = #{ownedCompanyID}
+            </if>
+            <if test="projectID != null">
+                and vd.projectID = #{projectID}
+            </if>
+            <if test="begin != null">
+                AND vd.CreateTime &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                AND vd.CreateTime &lt;= #{end}
+            </if>
+        </where>
+    </select>
 </mapper>

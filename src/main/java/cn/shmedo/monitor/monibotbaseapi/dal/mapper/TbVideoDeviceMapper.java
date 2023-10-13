@@ -43,4 +43,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     List<VideoDeviceInfoV1> queryListByDeviceSerialListAndCompanyID(List<String> deviceSerialList, Integer companyID, Boolean deviceStatus);
 
     void batchUpdateDeviceStatus(List<TbVideoDevice> tbVideoDevices);
+
+    Integer queryOnlineCount(String deviceSerial, String fuzzyItem, Boolean deviceStatus, Boolean allocationStatus, Integer ownedCompanyID, Integer projectID, Date begin, Date end);
 }

@@ -29,7 +29,7 @@ public interface VideoService {
 
     ResultWrapper<Object> addVideoDeviceList(AddVideoDeviceListParam pa);
 
-    PageUtil.Page<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa);
+    PageUtil.PageWithMap<VideoDevicePageInfo> queryVideoDevicePage(QueryVideoDevicePageParam pa);
 
     VideoDeviceBaseInfoV2 queryYsVideoDeviceInfo(QueryYsVideoDeviceInfoParam param);
 
