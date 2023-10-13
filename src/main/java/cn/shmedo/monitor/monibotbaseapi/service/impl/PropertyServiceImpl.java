@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
@@ -28,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,20 +40,23 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbProperty> implements PropertyService {
-    private TbPropertyMapper tbPropertyMapper;
-    private TbProjectPropertyMapper tbProjectPropertyMapper;
-    private TbPropertyModelMapper tbPropertyModelMapper;
-    private TbPropertyModelGroupMapper tbPropertyModelGroupMapper;
+    private final TbPropertyMapper tbPropertyMapper;
+    private final TbProjectPropertyMapper tbProjectPropertyMapper;
+    private final TbPropertyModelMapper tbPropertyModelMapper;
+    private final TbPropertyModelGroupMapper tbPropertyModelGroupMapper;
+    private final FormModelCache formModelCache;
 
     @Autowired
     public PropertyServiceImpl(TbPropertyMapper tbPropertyMapper,
                                TbProjectPropertyMapper tbProjectPropertyMapper,
                                TbPropertyModelMapper tbPropertyModelMapper,
-                               TbPropertyModelGroupMapper tbPropertyModelGroupMapper) {
+                               TbPropertyModelGroupMapper tbPropertyModelGroupMapper,
+                               FormModelCache formModelCache) {
         this.tbPropertyMapper = tbPropertyMapper;
         this.tbProjectPropertyMapper = tbProjectPropertyMapper;
         this.tbPropertyModelMapper = tbPropertyModelMapper;
         this.tbPropertyModelGroupMapper = tbPropertyModelGroupMapper;
+        this.formModelCache = formModelCache;
     }
 
     @Override
@@ -74,7 +75,6 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
-
         tbProjectPropertyMapper.updateBatch(projectID, projectPropertyList);
     }
 
@@ -83,26 +83,30 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     public Integer addModel(AddModelParam param, Integer userID) {
         TbPropertyModel record = Param2DBEntityUtil.fromAddModelParam2TbPropertyModel(param, userID);
         tbPropertyModelMapper.insert(record);
-
         List<TbProperty> properties = Param2DBEntityUtil.fromAddModelParam2TbPropertyList(param, userID, record.getID());
         tbPropertyMapper.insertBatch(properties);
+
+        // 同步更新缓存
+        formModelCache.putBatch(List.of(record), properties);
         return record.getID();
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Integer copyModel(CopyModelParam param) {
-        Integer modeID = param.getModelID();
         TbPropertyModel newTbPropertyModel = BeanUtil.toBean(param.getTbPropertyModel(), TbPropertyModel.class);
         param.wrapperTbPropertyModel(newTbPropertyModel);
         tbPropertyModelMapper.insert(newTbPropertyModel);
 
-        LambdaQueryWrapper<TbProperty> queryWrapper = new QueryWrapper<TbProperty>().lambda().eq(TbProperty::getModelID, modeID);
+        LambdaQueryWrapper<TbProperty> queryWrapper = new QueryWrapper<TbProperty>().lambda().eq(TbProperty::getModelID, param.getModelID());
         List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(queryWrapper);
         if (CollectionUtil.isNotEmpty(tbPropertyList)) {
             param.wrapperTbProperty(tbPropertyList, newTbPropertyModel.getID());
+            tbPropertyMapper.insertBatchSomeColumn(tbPropertyList);
         }
-        tbPropertyMapper.insertBatchSomeColumn(tbPropertyList);
+
+        // 同步更新缓存
+        formModelCache.putBatch(List.of(newTbPropertyModel), tbPropertyList);
         return newTbPropertyModel.getID();
     }
 
@@ -115,6 +119,10 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     public Boolean transferGrouping(TransferGroupingParam param) {
         param.getTbPropertyModel().setGroupID(param.getNewGroupID());
         int row = tbPropertyModelMapper.updateById(param.getTbPropertyModel());
+
+        // 同步刷新缓存
+        List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda().eq(TbProperty::getModelID, param.getModelID()));
+        formModelCache.putBatch(List.of(param.getTbPropertyModel()), tbPropertyList);
         return 1 == row;
     }
 
@@ -153,7 +161,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         Map<Integer, String> groupMap = Maps.newHashMap();
         List<Integer> groupIdList = tbPropertyModelList.stream().filter(item -> !PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType()))
                 .map(TbPropertyModel::getGroupID).toList();
-        if(CollectionUtil.isNotEmpty(groupIdList)){
+        if (CollectionUtil.isNotEmpty(groupIdList)) {
             List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectBatchIds(groupIdList);
             groupMap = tbPropertyModelGroupList.stream().collect(Collectors.toMap(TbPropertyModelGroup::getID, TbPropertyModelGroup::getName));
         }
@@ -170,6 +178,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Boolean updateModel(UpdateModelParam param) {
+        List<TbProperty> newTbPropertyList = Lists.newArrayList();
         // 更新模板
         TbPropertyModel tbPropertyModel = param.getTbPropertyModel();
         int row = tbPropertyModelMapper.updateById(tbPropertyModel);
@@ -192,12 +201,17 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         if (CollectionUtil.isNotEmpty(param.getUpdateModelItemList())) {
             List<TbProperty> tbPropertyList = CustomizeBeanUtil.copyListProperties(param.getUpdateModelItemList(), TbProperty::new);
             updateBatchById(tbPropertyList);
+            newTbPropertyList.addAll(tbPropertyList);
         }
         // --3-- 新增属性模板
         if (CollectionUtil.isNotEmpty(param.getAddModelItemList())) {
             List<TbProperty> tbPropertyList = CustomizeBeanUtil.copyListProperties(param.getAddModelItemList(), TbProperty::new);
             tbPropertyMapper.insertBatch(tbPropertyList);
+            newTbPropertyList.addAll(tbPropertyList);
         }
+
+        // 同步刷新缓存
+        formModelCache.putBatch(List.of(tbPropertyModel), newTbPropertyList);
         return 1 == row;
     }
 
@@ -207,6 +221,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // todo 表单模板为工作流模板，删除模板时，需要校验模板是否已经被应用
         LambdaQueryWrapper<TbProperty> propertyLambdaQueryWrapper = new QueryWrapper<TbProperty>().lambda().in(TbProperty::getModelID, param.getModelIDList());
         tbPropertyMapper.delete(propertyLambdaQueryWrapper);
+
+        // 同步删除redis缓存
+        formModelCache.removeBatch(param.getModelIDList());
         return tbPropertyModelMapper.deleteBatchIds(param.getModelIDList());
     }
 }

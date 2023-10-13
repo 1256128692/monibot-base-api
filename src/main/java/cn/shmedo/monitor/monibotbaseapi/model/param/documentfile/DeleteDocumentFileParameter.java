@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.ToString;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author wuxl
@@ -24,7 +25,9 @@ import java.util.List;
 @ToString
 public class DeleteDocumentFileParameter implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    @NotNull(message = "项目ID不能为空")
+    @NotNull(message = "公司ID不能为空")
+    private Integer companyID;
+
     private Integer projectID;
 
     @NotEmpty(message = "文件ID列表不能为空")
@@ -37,6 +40,8 @@ public class DeleteDocumentFileParameter implements ParameterValidator, Resource
 
     @Override
     public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        if (Objects.nonNull(projectID))
+            return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 }

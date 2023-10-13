@@ -366,7 +366,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} dataIDList 项目ID列表
-     * @apiDescription 批量删除项目, 需要级联删除模板值，标签关系
+     * @apiDescription 批量删除项目, 需要级联删除模板值，标签关系；删除工程项目时，需要删除工程项目下对应的资料文件
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteBaseProject

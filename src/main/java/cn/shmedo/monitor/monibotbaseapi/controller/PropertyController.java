@@ -63,12 +63,13 @@ public class PropertyController {
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName UpdateModel
-     * @apiDescription 更新模板
+     * @apiDescription 更新模板（模板下属性，支持新增、更新、删除；注意，如果对于更新的属性，且属性实体字段均未修改，仍然需要将完整的实体传给后端，包括ID）
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 模板ID
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度、3-OA>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID为projectType）
+     * @apiParam (请求体) {Int} projectType 项目类型（modelType为0时，必传，其它情况统一传-1）
      * @apiParam (请求体) {String} [modelName] 模型名称
      * @apiParam (请求体) {String} [desc] 模板描述
      * @apiParam (请求体) {Object[]} [modelPropertyList] 自定义属性列表

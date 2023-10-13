@@ -51,7 +51,6 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
 
     private String modelName;
 
-    @NotNull(message = "模板类型不能为空")
     private Integer modelType;
 
     @Min(0)
@@ -59,6 +58,9 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
     private Integer modelTypeSubType;
 
     private Integer groupID;
+
+    @NotNull(message = "项目类型不能为空")
+    private Integer projectType;
 
     private String desc;
 
@@ -83,6 +85,9 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
 
     @Override
     public ResultWrapper<?> validate() {
+        modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
+        groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
+
         // 校验表单模板类型
         if (!PropertyModelType.getModelTypeValues().contains(modelType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型不合法");
@@ -128,6 +133,9 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         Map<String, List<ModelItem>> recordStateMap = modelPropertyList.stream().collect(Collectors.groupingBy(pro -> {
             if (Objects.isNull(pro.getID())) {
                 // 新增
+                pro.setCreateType(0);
+                pro.setGroupID(tbPropertyModel.getGroupID());
+                pro.setModelID(tbPropertyModel.getID());
                 return OperationProperty.ADD.name();
             } else {
                 // 修改

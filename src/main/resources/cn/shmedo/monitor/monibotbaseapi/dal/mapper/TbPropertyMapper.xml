@@ -206,7 +206,7 @@
         </foreach>
     </select>
 
-    <insert id="insertBatch">
+    <insert id="insertBatch" keyColumn="ID" keyProperty="ID" useGeneratedKeys="true">
         insert into tb_property
         (groupID, name, type, unit, required, multiselect, enumfield, createtype, classname, displayorder, modelid,
         exvalue)

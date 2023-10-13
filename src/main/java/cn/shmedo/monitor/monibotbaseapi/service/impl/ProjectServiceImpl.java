@@ -22,6 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectLevel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
@@ -86,6 +87,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
     private final TbProjectRelationMapper tbProjectRelationMapper;
+    private final TbDocumentFileMapper tbDocumentFileMapper;
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -311,6 +313,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 .or()
                 .in(TbProjectRelation::getDownLevelID, param.getDataIDList())
         );
+
+        // 删除工程项目下资料文件
+        tbDocumentFileMapper.delete(new QueryWrapper<TbDocumentFile>().lambda()
+                .eq(TbDocumentFile::getSubjectType, DocumentSubjectType.PROJECT.getCode())
+                .in(TbDocumentFile::getSubjectID, param.getDataIDList()));
         tbProjectInfoMapper.updateLevel2Unallocated();
     }
 

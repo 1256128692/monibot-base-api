@@ -24,7 +24,9 @@ import java.util.Objects;
 @ToString
 public class QueryDocumentFileParameter implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    @NotNull(message = "项目ID不能为空")
+    @NotNull(message = "公司ID不能为空")
+    private Integer companyID;
+
     private Integer projectID;
 
     @NotNull(message = "文件ID不能为空")
@@ -45,6 +47,8 @@ public class QueryDocumentFileParameter implements ParameterValidator, ResourceP
 
     @Override
     public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        if (Objects.nonNull(projectID))
+            return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 }

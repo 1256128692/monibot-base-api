@@ -35,7 +35,7 @@ public class DocumentFileController {
      * @apiGroup 资料文件模块
      * @apiName QueryDocumentPage
      * @apiDescription 查看资料文件列表
-     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {Int} [subjectID] 对象ID
      * @apiParam (请求体) {String} [fileName] 文件名称
@@ -71,9 +71,10 @@ public class DocumentFileController {
      * @apiVersion 1.0.0
      * @apiGroup 资料文件模块
      * @apiName AddDocumentFile
-     * @apiDescription 新增资料文件
+     * @apiDescription 新增资料文件（projectID非空，校验项目权限，否则以企业校验权限）
      * @apiHeader {String} Content-Type multipart/form-data
-     * @apiParam (请求体) {int} projectID  工程项目ID
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {MultipartFile} file 资产文件
      * @apiParam (请求体) {int} subjectType 对象类型 （1.工程项目  2.其他设备）
      * @apiParam (请求体) {int} subjectID  对象ID
@@ -87,7 +88,8 @@ public class DocumentFileController {
     @Permission(permissionName = "mdmbase:AddDocumentFile")
     @PostMapping("/AddDocumentFile")
     public Object addDocumentFile(
-            @RequestParam @Valid @NotNull @Positive @ResourceSymbol(ResourceType.BASE_PROJECT) Integer projectID,
+            @RequestParam(required = false) @Positive @ResourceSymbol(ResourceType.BASE_PROJECT) Integer projectID,
+            @RequestParam @Valid @NotNull @Positive @ResourceSymbol(ResourceType.COMPANY) Integer companyID,
             @RequestParam MultipartFile file,
             @RequestParam @Valid @NotNull Integer subjectType,
             @RequestParam @Valid @NotNull Integer subjectID,
@@ -102,7 +104,8 @@ public class DocumentFileController {
      * @apiGroup 资料文件模块
      * @apiName DeleteDocumentFile
      * @apiDescription 删除资料文件
-     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {Int[]} fileIDList 文件ID列表
      * @apiSuccess (返回结果) {Int} rows 删除行数
      * @apiSampleRequest off
@@ -121,7 +124,8 @@ public class DocumentFileController {
      * @apiGroup 资料文件模块
      * @apiName QueryDocumentFile
      * @apiDescription 查询资料文件
-     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} [projectID] 项目ID
      * @apiParam (请求体) {Int} fileID 文件ID
      * @apiSuccess (返回结果) {int} ID 主键ID
      * @apiSuccess (返回结果) {int} subjectType 对象类型 （1.工程项目  2.其他设备）

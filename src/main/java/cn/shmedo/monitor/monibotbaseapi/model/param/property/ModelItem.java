@@ -16,6 +16,7 @@ public class ModelItem {
     @JsonProperty("ID")
     private Integer ID;
     private Integer groupID;
+    private Integer ModelID;
     @NotBlank
     @Size(max = 20)
     private String name;
@@ -37,6 +38,22 @@ public class ModelItem {
 
     public void setID(Integer ID) {
         this.ID = ID;
+    }
+
+    public Integer getGroupID() {
+        return groupID;
+    }
+
+    public void setGroupID(Integer groupID) {
+        this.groupID = groupID;
+    }
+
+    public Integer getModelID() {
+        return ModelID;
+    }
+
+    public void setModelID(Integer modelID) {
+        ModelID = modelID;
     }
 
     public String getName() {

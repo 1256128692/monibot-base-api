@@ -30,6 +30,7 @@ import org.springframework.stereotype.Component;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -150,6 +151,9 @@ public class PermissionInterceptor {
                 break;
             } else {
                 for (Annotation annotation : array) {
+                    if(Objects.isNull(arg)){
+                        break;
+                    }
                     if (annotation instanceof ResourceSymbol symbol) {
                         permissionType = symbol.permissionType();
                         permissionParameter = ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION.equals(permissionType) ?

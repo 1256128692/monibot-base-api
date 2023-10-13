@@ -81,7 +81,7 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
         // 查询条件
         LambdaQueryWrapper<TbDocumentFile> queryWrapper = new QueryWrapper<TbDocumentFile>().lambda()
                 .eq(TbDocumentFile::getSubjectType, parameter.getSubjectType())
-                .eq(DocumentSubjectType.PROJECT.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getProjectID())
+                .eq(DocumentSubjectType.PROJECT.getCode().equals(parameter.getSubjectType()), TbDocumentFile::getSubjectID, parameter.getSubjectID())
                 .eq(DocumentSubjectType.OTHER_DEVICE.getCode().equals(parameter.getSubjectType()) && Objects.nonNull(parameter.getSubjectID()),
                         TbDocumentFile::getSubjectID, parameter.getSubjectID())
                 .like(StringUtils.isNotEmpty(parameter.getFileName()), TbDocumentFile::getFileName, parameter.getFileName())
