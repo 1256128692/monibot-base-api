@@ -336,7 +336,7 @@ public class VideoServiceImpl implements VideoService {
 
         Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
-        IPage<VideoDevicePageInfo> pageData = videoDeviceMapper.queryPageByCondition(page, pa.getDeviceSerial(), pa.getDeviceStatus(), pa.getAllocationStatus(),
+        IPage<VideoDevicePageInfo> pageData = videoDeviceMapper.queryPageByCondition(page, pa.getDeviceSerial(), pa.getFuzzyItem(), pa.getDeviceStatus(), pa.getAllocationStatus(),
                 pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();

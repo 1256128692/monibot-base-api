@@ -84,7 +84,7 @@ public class SetProjectRelationParam implements ParameterValidator, ResourcePerm
 
     @Override
     public List<Resource> parameter() {
-        List<Resource> list = nextLevelPIDList.stream().map(e -> new Resource(e.toString(), ResourceType.BASE_PROJECT)).toList();
+        List<Resource> list = new java.util.ArrayList<>(nextLevelPIDList.stream().map(e -> new Resource(e.toString(), ResourceType.BASE_PROJECT)).toList());
         list.add(new Resource(projectID.toString(), ResourceType.BASE_PROJECT));
         return list;
     }

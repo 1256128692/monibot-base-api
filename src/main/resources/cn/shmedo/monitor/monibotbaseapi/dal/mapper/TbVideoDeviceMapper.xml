@@ -197,6 +197,10 @@
             <if test="deviceSerial != null and deviceSerial != ''">
                 and vd.`DeviceSerial` LIKE CONCAT('%',#{deviceSerial},'%')
             </if>
+            <if test="fuzzyItem != null and fuzzyItem != ''">
+                and (vd.`DeviceSerial` LIKE CONCAT('%',#{fuzzyItem},'%')
+                or vd.`DeviceType` LIKE CONCAT('%',#{fuzzyItem},'%'))
+            </if>
             <if test="deviceStatus != null">
                 and vd.deviceStatus = #{deviceStatus}
             </if>
@@ -329,7 +333,8 @@
                vd.projectID,
                vd.captureStatus,
                vd.allocationStatus,
-               vd.exValue
+               vd.exValue,
+               vd.createTime
         from tb_video_device vd
         where 1 = 1
         <if test="deviceSerialList != null and deviceSerialList.size() != 0">

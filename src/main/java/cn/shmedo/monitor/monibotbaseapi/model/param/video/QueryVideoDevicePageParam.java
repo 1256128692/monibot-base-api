@@ -20,6 +20,7 @@ public class QueryVideoDevicePageParam  implements ParameterValidator, ResourceP
 
 
     private String deviceSerial;
+    private String fuzzyItem;
     private Integer ownedCompanyID;
     private Integer projectID;
     private Boolean deviceStatus;

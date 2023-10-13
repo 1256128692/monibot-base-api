@@ -28,7 +28,7 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
 
     int batchInsert(List<VideoDeviceInfo> videoDeviceInfoList);
 
-    IPage<VideoDevicePageInfo> queryPageByCondition(Page<VideoDevicePageInfo> page, String deviceSerial,
+    IPage<VideoDevicePageInfo> queryPageByCondition(Page<VideoDevicePageInfo> page, String deviceSerial, String fuzzyItem,
                                                     Boolean deviceStatus, Boolean allocationStatus,
                                                     Integer ownedCompanyID, Integer projectID,
                                                     Date begin, Date end);

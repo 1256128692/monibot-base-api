@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsChannelInfo
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -24,6 +25,7 @@ public class VideoDeviceInfoV1 {
      */
     private Integer deviceChannelNum;
     private Integer accessChannelNum;
+    private Date createTime;
 
     @JsonIgnore
     private String exValue;

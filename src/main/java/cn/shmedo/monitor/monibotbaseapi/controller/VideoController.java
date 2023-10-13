@@ -504,6 +504,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.accessPlatformStr 接入平台名称
      * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备接入平台通道号的数量(海康默认为1)
      * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 可接入通道号的总量(海康默认为1)
+     * @apiSuccess (返回结果) {DateTime} dataList.createTime 创建时间（接入时间）
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
@@ -672,6 +673,7 @@ public class VideoController {
      * @apiName QueryVideoDevicePage
      * @apiParam (请求体) {Int} companyID  当前公司ID
      * @apiParam (请求体) {String} [deviceSerial] 设备序列号,模糊查询
+     * @apiParam (请求体) {String} [fuzzyItem] 模糊查询项,可匹配序列号/标识，型号/类型
      * @apiParam (请求体) {Int} [ownedCompanyID] 所属公司ID,null查全部
      * @apiParam (请求体) {Int} [projectID] 项目ID,null查全部
      * @apiParam (请求体) {Boolean} [deviceStatus] 视频设备在线状态,null查全部
