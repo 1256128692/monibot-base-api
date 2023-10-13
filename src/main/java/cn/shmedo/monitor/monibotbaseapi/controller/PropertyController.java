@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import jakarta.validation.Valid;
@@ -31,7 +32,7 @@ public class PropertyController {
      * @apiDescription 新增模板
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
-     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度、3-OA>）
+     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID为projectType）
      * @apiParam (请求体) {Int} projectType 项目类型（modelType为0时，必传，其它情况统一传-1）
      * @apiParam (请求体) {String} modelName 模型名称
@@ -67,7 +68,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 模板ID
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
-     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度、3-OA>）
+     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID为projectType）
      * @apiParam (请求体) {Int} projectType 项目类型（modelType为0时，必传，其它情况统一传-1）
      * @apiParam (请求体) {String} [modelName] 模型名称
@@ -163,11 +164,12 @@ public class PropertyController {
      * @apiDescription 查询模板信息
      * @apiParam (请求体) {Int} [modelID] 模板ID, 优先级最高的参数
      * @apiParam (请求体) {Int} [companyID] 公司ID
-     * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {Int} [projectType] 项目类型（modelType为1或者2时，统一传-1）
      * @apiParam (请求体) {String} [name] 模板名称
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
-     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度、3-OA>）
+     * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID对应projectType）
+     * @apiParam (请求体) {String} [platform] 所属平台（冗余字段，当且仅当ModelType为2-工作流时候，有值）
      * @apiParam (请求体) {Int} [createType] 创建类型
      * @apiSuccess (返回结果) {Object[]} modelList  模板列表
      * @apiSuccess (返回结果) {Int} modelList.modelID  模板ID
@@ -231,7 +233,7 @@ public class PropertyController {
      * @apiDescription 查询指定属性所有值（去重），目前只支持模板类型为工程项目，其他类型功能暂未开放
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectID] 项目ID
-     * @apiParam (请求体) {Int} projectType 项目类型
+     * @apiParam (请求体) {Int} projectType 项目类型（modelType为0时，必传，其它情况统一传-1）
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID为projectType）
      * @apiParam (请求体) {Int} [createType] 创建类型 0-预定义 1-自定义, 默认0
