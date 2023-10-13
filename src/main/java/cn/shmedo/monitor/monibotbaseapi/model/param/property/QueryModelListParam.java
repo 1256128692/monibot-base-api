@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
@@ -22,7 +23,6 @@ import java.util.Objects;
 public class QueryModelListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     private Integer modelID;
 
-    @NotNull(message = "项目类型不能为空")
     private Integer projectType;
 
     private Integer companyID;
@@ -35,6 +35,8 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
 
     private Integer groupID;
 
+    private String platform;
+
     private Byte createType;
 
     @Override
@@ -42,11 +44,19 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
         groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
 
-        if (modelType.equals(PropertyModelType.BASE_PROJECT.getCode()) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
+        if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) &&
+                Objects.nonNull(projectType) &&
+                !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(projectType)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
         if (createType != null && !CreateType.isValid(createType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
+        }
+        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.nonNull(modelTypeSubType)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属子分类不能为空");
+        }
+        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && StringUtils.isEmpty(platform)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属平台不能为空");
         }
         return null;
     }
