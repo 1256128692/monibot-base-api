@@ -152,6 +152,7 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {String} vendor 设备厂商/品牌
      * @apiSuccess (返回结果) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} projectName 项目名称
+     * @apiSuccess (返回结果) {String} projectLocation 项目位置的json字符串
      * @apiSuccess (返回结果) {Int} templateID 模板ID
      * @apiSuccess (返回结果) {String} templateName 模板名称
      * @apiSuccess (返回结果) {Json[]} propertyList 属性列表
@@ -159,6 +160,10 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {String} propertyList.unit 属性单位
      * @apiSuccess (返回结果) {String} propertyList.value 属性值
+     * @apiSuccess (返回结果) {Integer} propertyList.type 属性类型
+     * @apiSuccess (返回结果) {Boolean} propertyList.required 属性是否必須
+     * @apiSuccess (返回结果) {String} [propertyList.enumField]  枚举的可选值
+     * @apiSuccess (返回结果) {Boolean} [propertyList.multiSelect] 是否多选
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeOtherDevice
      */

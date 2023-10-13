@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
  **/
 @Data
 public class TbOtherDeviceWithProperty extends TbOtherDevice {
-    private String location;
+    private String projectLocation;
     private String projectName;
     private String templateName;
     private List<PropertyWithValue> propertyList;
@@ -32,9 +32,13 @@ public class TbOtherDeviceWithProperty extends TbOtherDevice {
                 .name(tbProperty.getName())
                 .unit(tbProperty.getUnit())
                 .className(tbProperty.getClassName())
+                .type(tbProperty.getType())
+                .required(tbProperty.getRequired())
+                .enumField(tbProperty.getEnumField())
+                .multiSelect(tbProperty.getMultiSelect())
                 .value(valueMap.containsKey(tbProperty.getID()) ? valueMap.get(tbProperty.getID()).getValue() : null)
                 .build()).collect(Collectors.toList()));
-        obj.setLocation(location);
+        obj.setProjectLocation(location);
         obj.setProjectName(projectName);
         obj.setTemplateName(templateName);
         return obj;

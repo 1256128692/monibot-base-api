@@ -16,4 +16,8 @@ public class PropertyWithValue {
     private String unit;
     private String value;
     private String className;
+    private Byte type;
+    private Boolean required;
+    private String enumField;
+    private Boolean multiSelect;
 }
