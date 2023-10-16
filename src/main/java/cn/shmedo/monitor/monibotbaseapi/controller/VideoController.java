@@ -508,11 +508,13 @@ public class VideoController {
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
-     * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.imageCapture] 抓拍是否开启
      * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.sensorEnable] 传感器是否开启
-     * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
-     * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
+     * @apiSuccess (返回结果) {Object[]} dataList.videoDeviceCaptureList 视频通道信息列表
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceCaptureList.channelNo 通道号
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceCaptureList.enable 通道是否启用
+     * @apiSuccess (返回结果) {Boolean} [dataList.videoDeviceCaptureList.imageCapture] 抓拍是否开启
+     * @apiSuccess (返回结果) {Int} [dataList.videoDeviceCaptureList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */

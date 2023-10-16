@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDeviceSource;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
@@ -70,6 +71,8 @@ public class VideoServiceImpl implements VideoService {
     private final HkVideoService hkVideoService;
 
     private final TbVideoDeviceMapper videoDeviceMapper;
+
+    private final TbVideoDeviceSourceMapper videoDeviceSourceMapper;
 
     private final RedisCompanyInfoDao redisCompanyInfoDao;
 
@@ -305,29 +308,51 @@ public class VideoServiceImpl implements VideoService {
                 videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + formatStar + num.toString()));
             }
         }
-        int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
 
-        if (successInsertCount > 0) {
-            CreateMultipleDeviceParam iotRequest = new CreateMultipleDeviceParam();
-            iotRequest.setCompanyID(pa.getCompanyID());
 
-            if (pa.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
-                videoDeviceInfoList.forEach(v -> {
-                    iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getYsProductID(),
-                            v.getDeviceToken(), v.getDeviceToken()));
-                });
-            } else {
-                videoDeviceInfoList.forEach(v -> {
-                    iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getHkProductID(),
-                            v.getDeviceToken(), v.getDeviceName()));
-                });
-            }
-            ResultWrapper<Boolean> multipleDevice = iotService.createMultipleDevice(iotRequest,
-                    fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
-            if (!multipleDevice.apiSuccess()) {
-                return ResultWrapper.withCode(ResultCode.SUCCESS, "设备在iot服务已存在");
+        CreateMultipleDeviceParam iotRequest = new CreateMultipleDeviceParam();
+        iotRequest.setCompanyID(pa.getCompanyID());
+
+        if (pa.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+            videoDeviceInfoList.forEach(v -> {
+                iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getYsProductID(),
+                        v.getDeviceToken(), v.getDeviceToken()));
+            });
+        } else {
+            videoDeviceInfoList.forEach(v -> {
+                iotRequest.getDeviceList().add(new CreateMultipleDeviceItem(fileConfig.getHkProductID(),
+                        v.getDeviceToken(), v.getDeviceName()));
+            });
+        }
+        iotService.createMultipleDevice(iotRequest,
+                fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
+
+        // TODO:新增逻辑查询iot平台,返回uniquetoken
+        ResultWrapper<List<DeviceBaseInfo>> deviceBaseInfoWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
+                .companyID(pa.getCompanyID())
+                .deviceTokens(videoDeviceInfoList.stream().map(VideoDeviceInfo::getDeviceToken).collect(Collectors.toSet()))
+                .build());
+
+        if (deviceBaseInfoWrapper.apiSuccess() && !CollectionUtil.isNullOrEmpty(deviceBaseInfoWrapper.getData())) {
+            videoDeviceInfoList.forEach(v -> {
+                List<DeviceBaseInfo> dataList = deviceBaseInfoWrapper.getData();
+                DeviceBaseInfo deviceBaseInfo = dataList.stream().filter(d -> d.getDeviceToken().equals(v.getDeviceToken())).findFirst().orElse(null);
+                if (deviceBaseInfo != null) {
+                    v.getTbVideoDeviceSourceList().forEach(v1 -> v1.setIotUniqueToken(deviceBaseInfo.getUniqueToken()));
+                }
+            });
+
+            int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
+
+            if (successInsertCount != 0) {
+                // TODO:新增逻辑插入视频通道表
+                videoDeviceSourceMapper.batchInsert(videoDeviceInfoList.stream()
+                        .map(VideoDeviceInfo::getTbVideoDeviceSourceList)
+                        .flatMap(List::stream)
+                        .collect(Collectors.toList()));
             }
         }
+
         return ResultWrapper.successWithNothing();
     }
 
