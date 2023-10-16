@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.project;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @program: monibot-base-api
  * @author: gaoxu
@@ -18,4 +20,6 @@ public class SimpleProject {
     private String platformTypeSet;
     private Byte projectType;
     private String projectTypeStr;
+
+    private List<SimpleProject> nnLevelProjectList;
 }

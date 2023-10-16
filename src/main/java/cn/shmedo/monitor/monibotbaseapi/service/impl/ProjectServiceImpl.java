@@ -757,7 +757,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @Override
     public QueryNextLevelAndAvailableProjectResult queryNextLevelProjectAndCanUsed(QueryNextLevelAndAvailableProjectParam pa) {
         List<TbProjectInfo> nextLevelProjectList = new ArrayList<>();
-
+        /**
+         * key: 下级项目id
+         * value: 下下级项目列表
+         */
+        Map<Integer, List<TbProjectInfo>> nnMap = new HashMap<>();
         if (!pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
             List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
                     new LambdaQueryWrapper<TbProjectRelation>(
@@ -766,6 +770,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             List<Integer> nextLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
             if (ObjectUtil.isNotEmpty(nextLevelProjectIDList)) {
                 nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+            }
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel()) && ObjectUtil.isNotEmpty(nextLevelProjectList)) {
+            // 获取下下级
+            List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectRelation>(
+                    ).in(TbProjectRelation::getUpLevelID, nextLevelProjectList.stream().map(TbProjectInfo::getID).toList()));
+            List<Integer> nnLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
+            if (ObjectUtil.isNotEmpty(nnLevelProjectIDList)) {
+                List<TbProjectInfo> nnLevelProjectList = tbProjectInfoMapper.selectBatchIds(nnLevelProjectIDList);
+                Map<Integer, List<Integer>> collect = temp.stream().collect(Collectors.groupingBy(TbProjectRelation::getUpLevelID, Collectors.mapping(TbProjectRelation::getDownLevelID, Collectors.toList())));
+                collect.forEach((k, v) -> {
+                    List<TbProjectInfo> collect1 = nnLevelProjectList.stream().filter(e -> v.contains(e.getID())).collect(Collectors.toList());
+                    nnMap.put(k, collect1);
+                });
             }
         }
         LambdaQueryWrapper<TbProjectInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
@@ -797,7 +816,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
-        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList);
+        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap);
     }
 
     @Override

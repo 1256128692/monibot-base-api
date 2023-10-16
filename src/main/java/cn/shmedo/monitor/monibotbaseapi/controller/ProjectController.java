@@ -593,7 +593,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} nextLevelProjectList.id 项目ID
      * @apiSuccess (返回结果) {String} nextLevelProjectList.name 项目名称
      * @apiSuccess (返回结果) {Int} nextLevelProjectList.level 项目等级
-     * @apiSuccess (返回结果) {Json[]} availableProjectList 下级项目列表, 结构同nextLevelProjectList
+     * @apiSuccess (返回结果) {Json[]} nextLevelProjectList.nnLevelProjectList 下级项目列表, 结构同nextLevelProjectList
+     * @apiSuccess (返回结果) {Json[]} availableProjectList 下级可用项目列表, 结构同nextLevelProjectList
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseProject
      */
