@@ -6,15 +6,14 @@ import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.AddOtherDeviceBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDevicePageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDeviceWithPropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.UpdateOtherDeviceParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDeviceWithProperty;
 import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
-import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -37,7 +36,6 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     private final TbOtherDeviceMapper tbOtherDeviceMapper;
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final TbPropertyMapper tbPropertyMapper;
-    private final RedisService redisService;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbPropertyModelMapper tbPropertyModelMapper;
 
@@ -54,7 +52,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     @Transactional(rollbackFor = Exception.class)
     public void deleteOtherDevice(List<Integer> deviceIDList) {
         baseMapper.deleteBatchIds(deviceIDList);
-        tbProjectPropertyMapper.deleteProjectPropertyList(deviceIDList);
+        tbProjectPropertyMapper.deleteProjectPropertyList(deviceIDList, PropertySubjectType.OtherDevice.getType());
     }
 
     @Override
@@ -74,6 +72,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
         List<TbProjectProperty> tbProjectProperties = tbProjectPropertyMapper.selectList(
                 new LambdaQueryWrapper<TbProjectProperty>()
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
+                        .eq(TbProjectProperty::getSubjectType, PropertySubjectType.OtherDevice.getType())
         );
         TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
         String location = null;
@@ -91,7 +90,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     public void updateOtherDevice(UpdateOtherDeviceParam pa, Integer subjectID) {
         baseMapper.updateById(pa.update(subjectID));
         if (pa.getPropertyList() != null) {
-            tbProjectPropertyMapper.deleteProjectPropertyList(List.of(pa.getID()));
+            tbProjectPropertyMapper.deleteProjectPropertyList(List.of(pa.getID()), PropertySubjectType.OtherDevice.getType());
             tbProjectPropertyMapper.insertBatch(pa.toProjectPropertyList());
         }
     }

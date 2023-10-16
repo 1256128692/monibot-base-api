@@ -112,10 +112,11 @@
             </foreach>
         </trim>
         where PropertyID in
-        <foreach collection="projectPropertyList" separator="," open="(" item="item" close=")">
+        <foreach close=")" collection="projectPropertyList" item="item" open="(" separator=",">
             #{item.propertyID}
         </foreach>
         and ProjectID = #{projectID,jdbcType=INTEGER}
+        and subjectType = #{propertySubjectType}
     </update>
 
     <insert id="insertBatch">
@@ -140,6 +141,14 @@
                 <if test="projectID != null">
                     tpi.ID = #{projectID} AND
                 </if>
+                <choose>
+                    <when test="modelType == null">
+                        tpp.subjectType  = 1 and
+                    </when>
+                    <otherwise>
+                        tpp.subjectType = #{modelType} and
+                    </otherwise>
+                </choose>
                 <if test="projectType != null">
                     tpi.ProjectType = #{projectType} AND
                 </if>
@@ -165,9 +174,12 @@
                 <if test="createType != null">
                     tp.CreateType = #{createType}
                 </if>
-                <if test="list != null and list.size() > 0">
+                <if test="propertySubjectType != null">
+                   and tpp.subjectType = #{propertySubjectType}
+                </if>
+                <if test="list != null and list.size() &gt; 0">
                     AND tpp.ProjectID IN
-                    <foreach collection="list" item="item" separator="," open="(" close=")">
+                    <foreach close=")" collection="list" item="item" open="(" separator=",">
                         #{item}
                     </foreach>
                 </if>
@@ -176,8 +188,9 @@
     </select>
     <delete id="deleteProjectPropertyList" parameterType="java.lang.Integer">
         DELETE tb_project_property from tb_project_property where ProjectID in
-        <foreach collection="idList" item="item" open="(" close=")" separator=",">
+        <foreach close=")" collection="idList" item="item" open="(" separator=",">
             #{item}
         </foreach>
+        and subjectType = #{propertySubjectType}
     </delete>
 </mapper>

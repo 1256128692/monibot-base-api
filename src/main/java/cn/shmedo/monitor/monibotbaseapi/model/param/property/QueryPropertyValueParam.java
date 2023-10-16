@@ -44,6 +44,7 @@ public class QueryPropertyValueParam implements ParameterValidator, ResourcePerm
     /**
      * 模板类型
      */
+    @Range(min = 1, max = 3)
     private Integer modelType;
 
     /**

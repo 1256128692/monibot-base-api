@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonAlias;
@@ -113,6 +114,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
             tbProjectProperty.setProjectID(tbOtherDevice.getID());
             tbProjectProperty.setPropertyID(item.getID());
             tbProjectProperty.setValue(item.getValue());
+            tbProjectProperty.setSubjectType(PropertySubjectType.OtherDevice.getType());
             return tbProjectProperty;
         }).toList();
     }

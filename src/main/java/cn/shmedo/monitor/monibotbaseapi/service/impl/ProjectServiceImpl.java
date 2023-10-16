@@ -24,6 +24,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectLevel;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
@@ -76,7 +77,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbTagMapper tbTagMapper;
     private final TbProjectTypeMapper tbProjectTypeMapper;
     private final TbTagRelationMapper tbTagRelationMapper;
-    private final TbPropertyMapper tbPropertyMapper;
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final FileConfig fileConfig;
     private final PropertyService propertyService;
@@ -116,6 +116,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     tbProjectProperty.setProjectID(tbProjectInfo.getID());
                     tbProjectProperty.setPropertyID(item.getID());
                     tbProjectProperty.setValue(PropertyIDAndValueMap.get(item.getID()));
+                    tbProjectProperty.setSubjectType(PropertySubjectType.Project.getType());
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
@@ -280,7 +281,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public void deleteProjectList(ProjectIDListParam param) {
         tbProjectInfoMapper.deleteProjectInfoList(param.getDataIDList());
         tbTagRelationMapper.deleteProjectTagList(param.getDataIDList());
-        tbProjectPropertyMapper.deleteProjectPropertyList(param.getDataIDList());
+        tbProjectPropertyMapper.deleteProjectPropertyList(param.getDataIDList(), PropertySubjectType.Project.getType());
         //TODO:删除关联信息以及水利平台相关关联信息
 
         // 删除项目权限,区分水利项目与其他业务项目
@@ -328,7 +329,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         tbProjectInfoMapper.updateById(projectInfo);
         if (!CollectionUtil.isEmpty(pa.getPropertyDataList())) {
             List<TbProjectProperty> projectProperties = pa.buildPropertyDataList();
-            tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties);
+            tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties, PropertySubjectType.Project.getType());
         }
         //处理标签
         List<Integer> tagID4DBList = new ArrayList<>();
@@ -506,7 +507,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .collect(Collectors.groupingBy(TagDto::getProjectID));
             //属性
             Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
-                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), 0).stream()
+                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), 0, PropertySubjectType.Project.getType()).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
             //行政区划
             Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, locationInfoSet.stream().filter(Objects::nonNull)
@@ -543,7 +544,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ProjectInfo result = new ProjectInfo();
         BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
-        result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
+        result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null, PropertySubjectType.Project.getType()));
         if (StrUtil.isNotEmpty(result.getLocationInfo())) {
             RegionArea area = monitorRedisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
             result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
@@ -664,7 +665,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //属性字典
         Map<Integer, Map<String, String>> propMap = idSet.isEmpty() ?
                 Collections.emptyMap() :
-                tbProjectPropertyMapper.queryPropertyByProjectID(idSet, CreateType.PREDEFINED.getType().intValue())
+                tbProjectPropertyMapper.queryPropertyByProjectID(idSet, CreateType.PREDEFINED.getType().intValue(), PropertySubjectType.Project.getType())
                         .stream().collect(Collectors.groupingBy(PropertyDto::getProjectID,
                                 Collectors.toMap(PropertyDto::getName, e -> StrUtil.nullToEmpty(e.getValue()), (v1, v2) -> v1)));
         //位置字典

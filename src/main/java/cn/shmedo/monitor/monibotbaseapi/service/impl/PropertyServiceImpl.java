@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
@@ -75,7 +76,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
-        tbProjectPropertyMapper.updateBatch(projectID, projectPropertyList);
+        tbProjectPropertyMapper.updateBatch(projectID, projectPropertyList, PropertySubjectType.Project.getType());
     }
 
     @Transactional(rollbackFor = Exception.class)

@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -130,6 +131,7 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
                         item -> {
                             TbProjectProperty obj = new TbProjectProperty();
                             obj.setProjectID(e.getID());
+                            obj.setSubjectType(PropertySubjectType.OtherDevice.getType());
                             obj.setValue(item.getValue());
                             obj.setPropertyID(item.getID());
                             tbProjectProperties.add(obj);
