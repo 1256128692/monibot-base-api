@@ -32,4 +32,8 @@ public interface PropertyService extends IService<TbProperty> {
     List<Model4Web> queryModelList(QueryModelListParam param);
 
     Integer deleteModel(DeleteModelParam param);
+
+    void AddPropertyValues(AddPropertyValuesParam param);
+
+    Object queryPropertyValues(QueryPropertyValuesParam param);
 }
