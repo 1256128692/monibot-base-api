@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
@@ -17,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryPropertyValuesResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -226,5 +228,31 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 同步删除redis缓存
         formModelCache.removeBatch(param.getModelIDList());
         return tbPropertyModelMapper.deleteBatchIds(param.getModelIDList());
+    }
+
+    @Override
+    public void AddPropertyValues(AddPropertyValuesParam param) {
+        List<TbProjectProperty> tbProjectPropertyList = param.wrapperToPropertyValues();
+        tbProjectPropertyMapper.insertBatch(tbProjectPropertyList);
+    }
+
+    @Override
+    public Object queryPropertyValues(QueryPropertyValuesParam param) {
+        List<QueryPropertyValuesResponse> modelList = Lists.newArrayList();
+        // 查询模板下的属性
+        List<TbProperty> tbPropertyList = tbPropertyMapper.selectByModelIDs(param.getModeIDList());
+        List<Integer> propertyIdList = tbPropertyList.stream().map(TbProperty::getID).toList();
+        Map<Integer, List<TbProperty>> propertyGroup = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
+
+        // 查询属性下的属性值
+        List<TbProjectProperty> tbProjectPropertyList = tbProjectPropertyMapper.selectList(new QueryWrapper<TbProjectProperty>().lambda()
+//                    .eq(TbProjectProperty::getSubjectType, param.getSubjectType())
+                .eq(TbProjectProperty::getProjectID, param.getSubjectID())
+                .in(TbProjectProperty::getPropertyID, propertyIdList));
+        Assert.notEmpty(tbProjectPropertyList, "属性值不能为空");
+        Map<Integer, String> propertyValueMap = tbProjectPropertyList.stream().collect(Collectors.toMap(TbProjectProperty::getPropertyID, TbProjectProperty::getValue));
+
+        param.wrapperToPropertyValues(modelList, propertyGroup, propertyValueMap);
+        return modelList;
     }
 }

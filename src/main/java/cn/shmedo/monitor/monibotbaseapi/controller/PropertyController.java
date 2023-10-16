@@ -6,11 +6,9 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
 import jakarta.validation.Valid;
-import org.apache.ibatis.annotations.Update;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -246,6 +244,55 @@ public class PropertyController {
     @PostMapping(value = "QueryPropertyValue", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryPropertyValue(@RequestBody @Validated QueryPropertyValueParam param) {
         return propertyService.queryPropertyValue(param);
+    }
+
+    /**
+     * @api {POST} /AddPropertyValues 保存模板属性值
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName AddPropertyValues
+     * @apiDescription 保存模板属性值
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} subjectType 对象类型，1:工程 2:其他设备 3:工作流
+     * @apiParam (请求体) {Int} subjectID 对象ID
+     * @apiParam (请求体) {Object[]} propertyValueList 表单属性值列表
+     * @apiParam (请求体) {Int} propertyValueList.ID 表单属性值ID
+     * @apiParam (请求体) {String} propertyValueList.value 表单属性值
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:AddModel
+     */
+    @LogParam(moduleName = "属性管理模块", operationName = "保存模板属性值", operationProperty = OperationProperty.ADD)
+    @Permission(permissionName = "mdmbase:AddModel")
+    @PostMapping(value = "AddPropertyValues", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addPropertyValues(@RequestBody @Validated AddPropertyValuesParam param) {
+        propertyService.AddPropertyValues(param);
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /QueryPropertyValues 查询模板属性值
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName QueryPropertyValues
+     * @apiDescription 查询模板属性值，支持批量查询多个模板
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} subjectType 对象类型，1:工程 2:其他设备 3:工作流
+     * @apiParam (请求体) {Int} subjectID 对象ID
+     * @apiParam (请求体) {Int} modelIDList 模板ID列表
+     * @apiSuccess (返回结果) {Object[]} modelList 模板列表
+     * @apiSuccess (返回结果) {Int} modelList.modelID 模板ID
+     * @apiSuccess (返回结果) {Int} modelList.modelName 模板名称
+     * @apiSuccess (返回结果) {Object[]} modelList.propertyValueList 表单属性值列表
+     * @apiSuccess (返回结果) {Int} modelList.propertyValueList.ID 表单属性值ID
+     * @apiSuccess (返回结果) {String} modelList.propertyValueList.value 表单属性值
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeModel
+     */
+    @Permission(permissionName = "mdmbase:DescribeModel")
+    @PostMapping(value = "QueryPropertyValues", consumes = DefaultConstant.JSON)
+    public Object queryPropertyValues(@RequestBody @Validated QueryPropertyValuesParam param) {
+        return propertyService.queryPropertyValues(param);
     }
 
 }
