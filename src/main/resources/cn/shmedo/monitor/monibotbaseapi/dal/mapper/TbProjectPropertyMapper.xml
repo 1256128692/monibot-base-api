@@ -1,108 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper">
-    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
-        <!--@mbg.generated-->
-        <!--@Table tb_project_property-->
-        <id column="ID" jdbcType="INTEGER" property="ID"/>
-        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
-        <result column="PropertyID" jdbcType="INTEGER" property="propertyID"/>
-        <result column="Value" jdbcType="VARCHAR" property="value"/>
-    </resultMap>
-    <sql id="Base_Column_List">
-        <!--@mbg.generated-->
-        ID,
-        ProjectID,
-        PropertyID,
-        `Value`
-    </sql>
-    <sql id="Property_LIst">
-        <!--@mbg.generated-->
-        ProjectID,
-        PropertyID,
-        GroupID,
-        ClassName,
-        Name,
-        Type,
-        Required,
-        MultiSelect,
-        CreateType,
-        EnumField,
-        Unit,
-        Value,
-        ExValue
-    </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from tb_project_property
-        where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        <!--@mbg.generated-->
-        delete
-        from tb_project_property
-        where ID = #{ID,jdbcType=INTEGER}
-    </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_project_property (ProjectID, PropertyID, `Value`)
-        values (#{projectID,jdbcType=INTEGER}, #{propertyID,jdbcType=INTEGER}, #{value,jdbcType=VARCHAR})
-    </insert>
-    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_project_property
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="projectID != null">
-                ProjectID,
-            </if>
-            <if test="propertyID != null">
-                PropertyID,
-            </if>
-            <if test="value != null">
-                `Value`,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="projectID != null">
-                #{projectID,jdbcType=INTEGER},
-            </if>
-            <if test="propertyID != null">
-                #{propertyID,jdbcType=INTEGER},
-            </if>
-            <if test="value != null">
-                #{value,jdbcType=VARCHAR},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
-        <!--@mbg.generated-->
-        update tb_project_property
-        <set>
-            <if test="projectID != null">
-                ProjectID = #{projectID,jdbcType=INTEGER},
-            </if>
-            <if test="propertyID != null">
-                PropertyID = #{propertyID,jdbcType=INTEGER},
-            </if>
-            <if test="value != null">
-                `Value` = #{value,jdbcType=VARCHAR},
-            </if>
-        </set>
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
-        <!--@mbg.generated-->
-        update tb_project_property
-        set ProjectID  = #{projectID,jdbcType=INTEGER},
-            PropertyID = #{propertyID,jdbcType=INTEGER},
-            `Value`    = #{value,jdbcType=VARCHAR}
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty">
+    <!--@mbg.generated-->
+    <!--@Table tb_project_property-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="SubjectType" jdbcType="INTEGER" property="subjectType" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="PropertyID" jdbcType="INTEGER" property="propertyID" />
+    <result column="Value" jdbcType="VARCHAR" property="value" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, SubjectType, ProjectID, PropertyID, `Value`
+  </sql>
 
     <update id="updateBatch">
         update tb_project_property set
@@ -120,9 +31,9 @@
     </update>
 
     <insert id="insertBatch">
-        insert into tb_project_property(ProjectID, PropertyID, Value) value
+        insert into tb_project_property(ProjectID, PropertyID, Value, subjectType) value
         <foreach collection="list" item="item" separator=",">
-            (#{item.projectID}, #{item.propertyID}, #{item.value})
+            (#{item.projectID}, #{item.propertyID}, #{item.value}, #{item.subjectType})
         </foreach>
     </insert>
 

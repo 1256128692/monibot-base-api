@@ -9,18 +9,6 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TbProjectPropertyMapper extends BaseMapper<TbProjectProperty> {
-    int deleteByPrimaryKey(Integer ID);
-
-    int insert(TbProjectProperty record);
-
-    int insertSelective(TbProjectProperty record);
-
-    TbProjectProperty selectByPrimaryKey(Integer ID);
-
-    int updateByPrimaryKeySelective(TbProjectProperty record);
-
-    int updateByPrimaryKey(TbProjectProperty record);
-
     void updateBatch(Integer projectID, List<TbProjectProperty> projectPropertyList, Integer propertySubjectType);
 
     void insertBatch(List<TbProjectProperty> projectPropertyList);

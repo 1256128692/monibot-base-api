@@ -15,8 +15,8 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @TableName(value = "tb_project_property")
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class TbProjectProperty {
     /**
      * 主键
