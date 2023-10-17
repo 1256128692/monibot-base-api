@@ -38,7 +38,7 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
     private Integer subjectID;
 
     @NotEmpty(message = "模板ID列表不能为空")
-    private List<Integer> modeIDList;
+    private List<Integer> modelIDList;
 
     @JsonIgnore
     private List<TbPropertyModel> tbPropertyModelList;
@@ -49,9 +49,9 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
         tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
                 .eq(TbPropertyModel::getCompanyID, companyID)
                 .eq(TbPropertyModel::getModelType, subjectType)
-                .in(TbPropertyModel::getID, modeIDList));
-        if(modeIDList.size() != tbPropertyModelList.size())
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在错误的模板ID");
+                .in(TbPropertyModel::getID, modelIDList));
+        if(modelIDList.size() != tbPropertyModelList.size())
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在匹配失败的模板ID");
         return null;
     }
 

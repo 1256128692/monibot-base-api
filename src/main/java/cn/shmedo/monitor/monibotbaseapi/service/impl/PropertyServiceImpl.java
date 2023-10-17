@@ -240,13 +240,13 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     public Object queryPropertyValues(QueryPropertyValuesParam param) {
         List<QueryPropertyValuesResponse> modelList = Lists.newArrayList();
         // 查询模板下的属性
-        List<TbProperty> tbPropertyList = tbPropertyMapper.selectByModelIDs(param.getModeIDList());
+        List<TbProperty> tbPropertyList = tbPropertyMapper.selectByModelIDs(param.getModelIDList());
         List<Integer> propertyIdList = tbPropertyList.stream().map(TbProperty::getID).toList();
         Map<Integer, List<TbProperty>> propertyGroup = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
 
         // 查询属性下的属性值
         List<TbProjectProperty> tbProjectPropertyList = tbProjectPropertyMapper.selectList(new QueryWrapper<TbProjectProperty>().lambda()
-//                    .eq(TbProjectProperty::getSubjectType, param.getSubjectType())
+                .eq(TbProjectProperty::getSubjectType, param.getSubjectType())
                 .eq(TbProjectProperty::getProjectID, param.getSubjectID())
                 .in(TbProjectProperty::getPropertyID, propertyIdList));
         Assert.notEmpty(tbProjectPropertyList, "属性值不能为空");

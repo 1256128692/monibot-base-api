@@ -279,7 +279,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} subjectType 对象类型，1:工程 2:其他设备 3:工作流
      * @apiParam (请求体) {Int} subjectID 对象ID
-     * @apiParam (请求体) {Int} modelIDList 模板ID列表
+     * @apiParam (请求体) {Int[]} modelIDList 模板ID列表
      * @apiSuccess (返回结果) {Object[]} modelList 模板列表
      * @apiSuccess (返回结果) {Int} modelList.modelID 模板ID
      * @apiSuccess (返回结果) {Int} modelList.modelName 模板名称
