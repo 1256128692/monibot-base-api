@@ -249,10 +249,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(TbProjectProperty::getSubjectType, param.getSubjectType())
                 .eq(TbProjectProperty::getProjectID, param.getSubjectID())
                 .in(TbProjectProperty::getPropertyID, propertyIdList));
-        Assert.notEmpty(tbProjectPropertyList, "属性值不能为空");
-        Map<Integer, String> propertyValueMap = tbProjectPropertyList.stream().collect(Collectors.toMap(TbProjectProperty::getPropertyID, TbProjectProperty::getValue));
 
-        param.wrapperToPropertyValues(modelList, propertyGroup, propertyValueMap);
+        param.wrapperToPropertyValues(modelList, propertyGroup, tbProjectPropertyList);
         return modelList;
     }
 }

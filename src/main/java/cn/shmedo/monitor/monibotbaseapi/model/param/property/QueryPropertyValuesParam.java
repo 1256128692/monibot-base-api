@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
@@ -19,6 +20,7 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -60,10 +62,15 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
         return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 
-    public void wrapperToPropertyValues(List<QueryPropertyValuesResponse> modelList, Map<Integer, List<TbProperty>> propertyGroup, Map<Integer, String> propertyValueMap){
+    public void wrapperToPropertyValues(List<QueryPropertyValuesResponse> modelList, Map<Integer, List<TbProperty>> propertyGroup, List<TbProjectProperty> tbProjectPropertyList){
+        if(CollectionUtil.isEmpty(tbProjectPropertyList)){
+            return;
+        }
+        Map<Integer, String> propertyValueMap = tbProjectPropertyList.stream().collect(Collectors.toMap(TbProjectProperty::getPropertyID, TbProjectProperty::getValue));
         for (TbPropertyModel tbPropertyModel : tbPropertyModelList) {
             QueryPropertyValuesResponse queryPropertyValuesResponse = new QueryPropertyValuesResponse();
             queryPropertyValuesResponse.setModelID(tbPropertyModel.getID());
+            queryPropertyValuesResponse.setModelName(tbPropertyModel.getName());
             List<PropertyIdAndValue> propertyValueList = Lists.newArrayList();
             List<TbProperty> propertyList = propertyGroup.get(tbPropertyModel.getID());
             if (CollectionUtil.isNotEmpty(propertyList)) {
