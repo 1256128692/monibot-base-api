@@ -23,7 +23,7 @@ public interface ProjectService {
      * @param pa
      * @param userID
      */
-    void addProject(AddProjectParam pa, Integer userID);
+    Integer addProject(AddProjectParam pa, Integer userID);
 
     /**
      * 查询项目类型

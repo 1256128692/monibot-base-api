@@ -97,7 +97,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addProject(AddProjectParam pa, Integer userID) {
+    public Integer addProject(AddProjectParam pa, Integer userID) {
         String imgPath = "";
         if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())) {
             imgPath = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, null, pa.getCompanyID());
@@ -197,6 +197,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+
+
+        return tbProjectInfo.getID();
     }
 
     private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,

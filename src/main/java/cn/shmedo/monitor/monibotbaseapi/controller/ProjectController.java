@@ -63,7 +63,7 @@ public class ProjectController {
      * @apiParam (请求体) {Object[]} [modelValueList] 模型值列表(预定义与自定义部分的合集)
      * @apiParam (请求体) {String} modelValueList.id 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值（<=50） 可为null， 不能为空字符串
-     * @apiSuccess (返回结果) {String} none  无
+     * @apiSuccess (返回结果) {Int} id  项目ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddBaseProject
      */
@@ -71,8 +71,8 @@ public class ProjectController {
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
-        projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+
+        return projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 
     /**
