@@ -28,6 +28,7 @@
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
         <result column="VideoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
         <result column="ChannelCode" jdbcType="INTEGER" property="channelCode"/>
+        <result column="VideoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
@@ -54,7 +55,8 @@
         UpdateTime,
         UpdateUserID,
         VideoDeviceID,
-        ChannelCode
+        ChannelCode,
+        VideoDeviceSourceID
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
         <!--@mbg.generated-->
