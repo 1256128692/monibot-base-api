@@ -1078,6 +1078,72 @@ public class VideoServiceImpl implements VideoService {
         return ResultWrapper.successWithNothing();
     }
 
+    @Override
+    public List<VideoDeviceInfoV1> queryVideoDeviceListV1(QueryVideoDeviceListParam pa) {
+        List<VideoDeviceInfoV1> list = videoDeviceMapper.queryListByDeviceSerialListAndCompanyID(
+                pa.getDeviceSerialList(), pa.getCompanyID().equals(DefaultConstant.MD_ID) ? null : pa.getCompanyID(), pa.getDeviceStatus());
+
+        if (CollectionUtil.isNullOrEmpty(list)) {
+            return Collections.emptyList();
+        }
+
+        List<VideoCaptureBaseInfo> sensorInfoList = sensorMapper.queryListByDeviceSerialList(list.stream().map(VideoDeviceInfoV1::getDeviceSerial).collect(Collectors.toList()));
+
+        list.forEach(v -> {
+            v.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(v.getAccessPlatform()));
+            if (CollectionUtils.isNotEmpty(sensorInfoList)) {
+                v.setSensorList(sensorInfoList.stream().filter(s -> s.getDeviceSerial().equals(v.getDeviceSerial())).collect(Collectors.toList()));
+            }
+
+            List<VideoCaptureBaseInfo> singleVideoSensorList = new LinkedList<>();
+            // 传感器列表
+            List<VideoCaptureBaseInfo> sensorList = v.getSensorList().stream().filter(s -> s.getSensorID() != null).collect(Collectors.toList());
+            // 通道列表
+            List<VideoCaptureBaseInfo> channelList = v.getSensorList().stream().filter(s -> s.getChannelNo() != null).collect(Collectors.toList());
+            if (v.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
+
+                // 如果传感器列表为空，根据通道号数量去转换传感器
+                if (CollectionUtil.isNullOrEmpty(sensorList)) {
+                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
+                        for (int i = 0; i < channelList.size(); i++) {
+                            Integer channelNo = channelList.get(i).getChannelNo();
+                            Boolean enable = channelList.get(i).getEnable();
+                            // 添加到 singleVideoSensorList
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelNo, enable, v.getDeviceName()));
+                        }
+                    }
+                    v.setDeviceChannelNum(0);
+                } else {
+                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
+                        List<VideoCaptureBaseInfo> filteredYsChannelInfoList = channelList.stream()
+                                .filter(ys -> v.getSensorList().stream().noneMatch(sensor -> sensor.getChannelNo().equals(ys.getChannelNo())))
+                                .collect(Collectors.toList());
+                        v.setDeviceChannelNum(sensorList.size());
+
+                        for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
+                            Integer channelNo = filteredYsChannelInfoList.get(i).getChannelNo();
+                            Boolean enable = filteredYsChannelInfoList.get(i).getEnable();
+                            // 添加到 singleVideoSensorList
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelNo, enable, v.getDeviceName()));
+                        }
+                        singleVideoSensorList.addAll(v.getSensorList());
+                    }
+                }
+                v.setSensorList(singleVideoSensorList);
+
+            } else {
+                v.setDeviceChannelNum(1);
+                if (CollectionUtil.isNullOrEmpty(sensorList)) {
+                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
+                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(0).getChannelNo(), channelList.get(0).getEnable(), v.getDeviceName()));
+                        v.setSensorList(singleVideoSensorList);
+                    }
+                }
+            }
+        });
+        return list;
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {

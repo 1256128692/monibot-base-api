@@ -151,5 +151,7 @@ public class TbSensor implements Serializable {
      */
     private Integer channelCode;
 
+    private Integer videoDeviceSourceID;
+
     private static final long serialVersionUID = 1L;
 }

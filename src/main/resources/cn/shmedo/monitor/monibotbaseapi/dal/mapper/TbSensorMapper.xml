@@ -612,4 +612,26 @@
         </foreach>
         AND s.projectID = #{projectID}
     </select>
+
+    <select id="queryListByDeviceSerialList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo">
+        select s.ID          as sensorID,
+        s.`Name`      as sensorName,
+        s.projectID,
+        tvds.ID as VideoDeviceSourceID,
+        tvds.channelNo,
+        tvds.Enable,
+        tvds.DeviceSerial,
+        s.Enable      as sensorEnable,
+        s.ExValues,
+        c.CaptureInterval,
+        c.ImageCapture
+        from  tb_video_device_source tvds
+        left join tb_video_capture c on tvds.ID = c.VideoDeviceSourceID
+        left join tb_sensor s on tvds.ID = s.VideoDeviceSourceID
+        where tvds.DeviceSerial in
+        <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+            #{deviceSerial}
+        </foreach>
+    </select>
 </mapper>

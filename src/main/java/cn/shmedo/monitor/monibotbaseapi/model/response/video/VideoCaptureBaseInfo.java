@@ -18,6 +18,9 @@ public class VideoCaptureBaseInfo {
     // 可以为空
     private Integer projectID;
     private Integer channelNo;
+    private String deviceSerial;
+
+    private Boolean enable;
 
     private Boolean imageCapture;
 
@@ -56,5 +59,21 @@ public class VideoCaptureBaseInfo {
 
         return videoCaptureBaseInfo;
 
+    }
+
+    public static VideoCaptureBaseInfo fromChannelInfo(Integer channelNo, Boolean enable, String deviceName) {
+        VideoCaptureBaseInfo videoCaptureBaseInfo = new VideoCaptureBaseInfo();
+
+        // 生成传感器名称 sensorName，设备 deviceName 名称加 "@" 加 index
+        String sensorName = deviceName + "@" + channelNo;
+
+        // 设置属性
+        videoCaptureBaseInfo.setSensorName(sensorName);
+        videoCaptureBaseInfo.setChannelNo(channelNo);
+        videoCaptureBaseInfo.setEnable(enable);
+//        videoCaptureBaseInfo.setIpcSerial(ysChannelInfo.getIpcSerial());
+        // 设置其他属性，根据需要设置
+
+        return videoCaptureBaseInfo;
     }
 }
