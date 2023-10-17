@@ -7,9 +7,9 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
  * @create: 2023-10-16 10:28
  **/
 public enum PropertySubjectType {
-    Project(1, "工程"),
-    OtherDevice(2, "其他设备"),
-    Workflow(3, "工作流");
+    Project(0, "工程"),
+    OtherDevice(1, "其他设备"),
+    Workflow(2, "工作流");
 
     private Integer type;
     private String typeStr;
