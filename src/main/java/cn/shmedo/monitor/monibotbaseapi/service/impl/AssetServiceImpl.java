@@ -150,6 +150,9 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
         List<TbAsset4Web> resultAll;
         if (pa.getHouseID() != null) {
             Map map = all.get(pa.getHouseID().toString());
+            if (map == null) {
+                return new PageUtil.Page<>(0, null, 0);
+            }
             TbAssetHouse tbAssetHouse = tbAssetHouseMapper.selectById(pa.getHouseID());
             resultAll = assets.stream().filter(e -> map.containsKey(e.getID().toString())).map(
                     e -> {
