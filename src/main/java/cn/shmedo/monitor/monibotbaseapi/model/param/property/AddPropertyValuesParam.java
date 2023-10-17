@@ -37,13 +37,13 @@ public class AddPropertyValuesParam implements ParameterValidator, ResourcePermi
     private Integer subjectID;
 
     @NotEmpty(message = "模板属性值不能为空")
-    private List<PropertyIdAndValue> propertyIdAndValueList;
+    private List<PropertyIdAndValue> propertyValueList;
 
     @Override
     public ResultWrapper<?> validate() {
-        List<Integer> propertyIdList = propertyIdAndValueList.stream().map(PropertyIdAndValue::getID).toList();
+        List<Integer> propertyIdList = propertyValueList.stream().map(PropertyIdAndValue::getID).toList();
         TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
-        List<TbProperty> tbPropertyList = tbPropertyMapper.selectByModelIDs(propertyIdList);
+        List<TbProperty> tbPropertyList = tbPropertyMapper.selectBatchIds(propertyIdList);
         if(propertyIdList.size() != tbPropertyList.size())
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在错误的属性ID");
         return null;
@@ -60,10 +60,9 @@ public class AddPropertyValuesParam implements ParameterValidator, ResourcePermi
      */
     public List<TbProjectProperty> wrapperToPropertyValues() {
         List<TbProjectProperty> tbProjectPropertyList = Lists.newArrayList();
-        for(PropertyIdAndValue propertyIdAndValue : propertyIdAndValueList){
+        for(PropertyIdAndValue propertyIdAndValue : propertyValueList){
             TbProjectProperty tbProjectProperty = new TbProjectProperty();
-            // todo subjectType
-//            tbProjectProperty.setSubjectType(subjectType);
+            tbProjectProperty.setSubjectType(subjectType);
             tbProjectProperty.setProjectID(subjectID);
             tbProjectProperty.setPropertyID(propertyIdAndValue.getID());
             tbProjectProperty.setValue(propertyIdAndValue.getValue());

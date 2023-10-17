@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
@@ -19,6 +20,7 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -38,7 +40,7 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
     private Integer subjectID;
 
     @NotEmpty(message = "模板ID列表不能为空")
-    private List<Integer> modeIDList;
+    private List<Integer> modelIDList;
 
     @JsonIgnore
     private List<TbPropertyModel> tbPropertyModelList;
@@ -49,9 +51,9 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
         tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
                 .eq(TbPropertyModel::getCompanyID, companyID)
                 .eq(TbPropertyModel::getModelType, subjectType)
-                .in(TbPropertyModel::getID, modeIDList));
-        if(modeIDList.size() != tbPropertyModelList.size())
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在错误的模板ID");
+                .in(TbPropertyModel::getID, modelIDList));
+        if(modelIDList.size() != tbPropertyModelList.size())
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在匹配失败的模板ID");
         return null;
     }
 
@@ -60,10 +62,15 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
         return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 
-    public void wrapperToPropertyValues(List<QueryPropertyValuesResponse> modelList, Map<Integer, List<TbProperty>> propertyGroup, Map<Integer, String> propertyValueMap){
+    public void wrapperToPropertyValues(List<QueryPropertyValuesResponse> modelList, Map<Integer, List<TbProperty>> propertyGroup, List<TbProjectProperty> tbProjectPropertyList){
+        if(CollectionUtil.isEmpty(tbProjectPropertyList)){
+            return;
+        }
+        Map<Integer, String> propertyValueMap = tbProjectPropertyList.stream().collect(Collectors.toMap(TbProjectProperty::getPropertyID, TbProjectProperty::getValue));
         for (TbPropertyModel tbPropertyModel : tbPropertyModelList) {
             QueryPropertyValuesResponse queryPropertyValuesResponse = new QueryPropertyValuesResponse();
             queryPropertyValuesResponse.setModelID(tbPropertyModel.getID());
+            queryPropertyValuesResponse.setModelName(tbPropertyModel.getName());
             List<PropertyIdAndValue> propertyValueList = Lists.newArrayList();
             List<TbProperty> propertyList = propertyGroup.get(tbPropertyModel.getID());
             if (CollectionUtil.isNotEmpty(propertyList)) {
