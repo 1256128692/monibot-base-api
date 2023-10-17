@@ -707,7 +707,7 @@ public class VideoController {
     }
 
     /**
-     * @api {POST} /SaveVideoDeviceCaptureList 批量存储视频抓拍列表
+     * @api {POST} /SaveVideoCaptureList 批量存储视频抓拍列表(新)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量存储视频抓拍列表
@@ -723,9 +723,36 @@ public class VideoController {
      * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
      */
     @Permission(permissionName = "mdmbase:UpdateVideoDevice")
-    @RequestMapping(value = "/SaveVideoDeviceCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object saveVideoDeviceCaptureList(@Validated @RequestBody SaveVideoDeviceCaptureParam pa) {
+    @RequestMapping(value = "/SaveVideoCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object saveVideoCaptureList(@Validated @RequestBody SaveVideoDeviceCaptureParam pa) {
         return videoService.saveVideoDeviceCaptureList(pa);
+    }
+
+
+    /**
+     * @api {POST} /SaveVideoSensorList 批量存储视频传感器列表(新)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量存储视频传感器列表
+     * @apiName SaveVideoSensorList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
+     * @apiParam (请求体) {Int} list.videoDeviceID 视频设备ID
+     * @apiParam (请求体) {String} list.deviceSerial 设备序列号
+     * @apiParam (请求体) {Int} [list.projectID] 所属工程项目ID
+     * @apiParam (请求体) {Object[]} list.addSensorList 新增视频传感器(max = 100)
+     * @apiParam (请求体) {Int} [list.addSensorList.sensorID] 传感器ID,为空时进行新增,不为空时进行更新
+     * @apiParam (请求体) {String} list.addSensorList.sensorName 传感器名称
+     * @apiParam (请求体) {Boolean} [list.addSensorList.sensorEnable] 传感器是否启用
+     * @apiParam (请求体) {Int} list.addSensorList.videoDeviceSourceID 通道视频设备ID
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice")
+    @RequestMapping(value = "/SaveVideoSensorList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object saveVideoSensorList(@Validated @RequestBody SaveVideoDeviceSensorParam pa) {
+        return videoService.saveVideoSensorList(pa);
     }
 
 

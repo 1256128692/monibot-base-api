@@ -1151,6 +1151,73 @@ public class VideoServiceImpl implements VideoService {
         return ResultWrapper.successWithNothing();
     }
 
+    @Override
+    public Object saveVideoSensorList(SaveVideoDeviceSensorParam pa) {
+
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+
+        // 1. 筛选出来不同企业的视频设备,然后同步到iot进行转移
+        List<VideoDeviceInfoV4> transferVideoDeviceList = pa.getVideoDeviceList().stream().filter(i -> !i.getCompanyID().equals(pa.getCompanyID())).collect(Collectors.toList());
+        if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList)) {
+            Object o = handlerTransferDevice(transferVideoDeviceList, pa.getCompanyID());
+            if (ObjectUtil.isNotNull(o)) {
+                return o;
+            }
+        }
+
+        // 2. 直接批量修改视频设备所属公司,以及所属工程
+        videoDeviceMapper.batchUpdateCompanyAndProject(pa.getVideoDeviceList(), pa.getCompanyID());
+
+        // 3. 批量生成传感器设备,过滤出来传感器ID为空的数据,为新增数据,  不为空的数据,为批量修改数据
+        List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
+        List<SensorBaseInfoV1> updateSensorList = new LinkedList<>();
+        // 抓拍配置
+//        List<SensorBaseInfoV1> captureSensorList = new LinkedList<>();
+//        List<SensorBaseInfoV1> finalCaptureSensorList = captureSensorList;
+        pa.getList().forEach(v -> {
+            List<SensorBaseInfoV1> addSensorList = v.getAddSensorList();
+            if (!CollectionUtil.isNullOrEmpty(addSensorList)) {
+                Integer maxDisplayOrder = sensorMapper.queryMaxDisplayOrderByMonitorType(MonitorType.VIDEO.getKey());
+                for (int i = 0; i < addSensorList.size(); i++) {
+                    if (addSensorList.get(i).getSensorID() == null) {
+                        if (addSensorList.get(i).getSensorEnable()) {
+                            insertSensorList.add(SensorBaseInfoV1.createNewSensor(addSensorList.get(i),
+                                    subjectID, v, maxDisplayOrder + i + 1));
+                        }
+                    } else {
+                        updateSensorList.add(SensorBaseInfoV1.createUpdateSensor(addSensorList.get(i), subjectID, v));
+                    }
+                }
+//                finalCaptureSensorList.clear();
+//                finalCaptureSensorList.addAll(insertSensorList);
+//                finalCaptureSensorList.addAll(updateSensorList);
+            }
+        });
+        // 3.进行分流,传感器ID为空的新增,传感器ID不为空的修改
+        if (!CollectionUtil.isNullOrEmpty(insertSensorList)) {
+            sensorMapper.insertSensorList(insertSensorList);
+        }
+        if (!CollectionUtil.isNullOrEmpty(updateSensorList)) {
+            sensorMapper.updateSensorList(updateSensorList);
+        }
+
+        // 4.批量插入定时抓拍
+//        if (!CollectionUtil.isNullOrEmpty(captureSensorList)) {
+//            List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(captureSensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList()),
+//                    captureSensorList.get(0).getProjectID());
+//            captureSensorList.forEach(c -> {
+//                SensorBaseInfoV1 sensorBaseInfoV1 = sensorList.stream().filter(s -> s.getSensorName().equals(c.getSensorName())).findFirst().orElse(null);
+//                if (sensorBaseInfoV1 != null) {
+//                    c.setSensorID(sensorBaseInfoV1.getSensorID());
+//                    c.setDeviceSerial(sensorBaseInfoV1.getDeviceSerial());
+//                }
+//            });
+//            videoCaptureMapper.insertBatch(captureSensorList);
+//        }
+
+        return ResultWrapper.successWithNothing();
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {
