@@ -253,7 +253,7 @@ public class PropertyController {
      * @apiName AddPropertyValues
      * @apiDescription 保存模板属性值
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} subjectType 对象类型，1:工程 2:其他设备 3:工作流
+     * @apiParam (请求体) {Int} subjectType 对象类型，0:工程 1:其他设备 2:工作流
      * @apiParam (请求体) {Int} subjectID 对象ID
      * @apiParam (请求体) {Object[]} propertyValueList 表单属性值列表
      * @apiParam (请求体) {Int} propertyValueList.ID 表单属性值ID
@@ -277,7 +277,7 @@ public class PropertyController {
      * @apiName QueryPropertyValues
      * @apiDescription 查询模板属性值，支持批量查询多个模板
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} subjectType 对象类型，1:工程 2:其他设备 3:工作流
+     * @apiParam (请求体) {Int} subjectType 对象类型，0:工程 1:其他设备 2:工作流
      * @apiParam (请求体) {Int} subjectID 对象ID
      * @apiParam (请求体) {Int[]} modelIDList 模板ID列表
      * @apiSuccess (返回结果) {Object[]} modelList 模板列表
