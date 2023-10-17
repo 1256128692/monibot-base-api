@@ -706,6 +706,28 @@ public class VideoController {
         return videoService.saveVideoDeviceSensorList(pa);
     }
 
+    /**
+     * @api {POST} /SaveVideoDeviceCaptureList 批量存储视频抓拍列表
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量存储视频抓拍列表
+     * @apiName SaveVideoDeviceSensorList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
+     * @apiParam (请求体) {String} list.deviceSerial 设备序列号
+     * @apiParam (请求体) {Int} list.videoDeviceSourceID 通道视频设备ID
+     * @apiParam (请求体) {Boolean} list.imageCapture 是否开启抓拍
+     * @apiParam (请求体) {Int} list.captureInterval 抓拍间隔(单位:分钟)
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice")
+    @RequestMapping(value = "/SaveVideoDeviceCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object saveVideoDeviceCaptureList(@Validated @RequestBody SaveVideoDeviceCaptureParam pa) {
+        return videoService.saveVideoDeviceCaptureList(pa);
+    }
+
 
     /**
      * @api {POST} /QueryVideoDevicePage 查询视频设备列表(分页)

@@ -122,4 +122,13 @@
           captureInterval = VALUES(captureInterval)
       </foreach>
   </insert>
+
+  <insert id="insertBatchByCaptureList">
+    <foreach collection="list" item="item" separator=";">
+      insert into tb_video_capture (imageCapture, deviceSerial, captureInterval, videoDeviceSourceID)
+      VALUES (#{item.imageCapture}, #{item.deviceSerial}, #{item.captureInterval}, #{item.videoDeviceSourceID})
+      ON DUPLICATE KEY UPDATE
+      captureInterval = VALUES(captureInterval)
+    </foreach>
+  </insert>
 </mapper>

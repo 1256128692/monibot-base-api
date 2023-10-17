@@ -1144,6 +1144,13 @@ public class VideoServiceImpl implements VideoService {
         return list;
     }
 
+    @Override
+    public Object saveVideoDeviceCaptureList(SaveVideoDeviceCaptureParam pa) {
+
+        videoCaptureMapper.insertBatchByCaptureList(pa.getList());
+        return ResultWrapper.successWithNothing();
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {
