@@ -321,4 +321,8 @@
         and id not in (select upLevelID from tb_project_relation)
         and id not in (select downLevelID from tb_project_relation)
   </update>
+
+  <select id="selectAll" resultMap="BaseResultMap">
+    select * from tb_project_info
+    </select>
 </mapper>

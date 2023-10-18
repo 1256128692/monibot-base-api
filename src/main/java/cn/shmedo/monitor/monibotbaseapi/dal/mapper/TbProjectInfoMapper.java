@@ -56,4 +56,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<ProjectInfo> getProjectList(QueryProjectListRequest pa);
 
     void updateLevel2Unallocated();
+
+    List<TbProjectInfo> selectAll();
 }
