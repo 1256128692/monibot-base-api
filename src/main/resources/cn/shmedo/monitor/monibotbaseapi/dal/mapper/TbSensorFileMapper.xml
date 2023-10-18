@@ -290,4 +290,8 @@
             AND UploadTime &lt;= #{end}
         </if>
     </select>
+
+    <select id="queryCaptureDate" resultType="java.util.Date">
+        select UploadTime from tb_sensor_file where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
+    </select>
 </mapper>

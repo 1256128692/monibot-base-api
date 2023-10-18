@@ -1218,6 +1218,19 @@ public class VideoServiceImpl implements VideoService {
         return ResultWrapper.successWithNothing();
     }
 
+    @Override
+    public Object queryCaptureDate(QueryCaptureParam pa) {
+
+        List<Date> captureDateList = sensorFileMapper.queryCaptureDate(pa);
+        // 对列表中的日期进行格式化
+        List<String> formattedDateList = captureDateList.stream()
+                .map(date -> DateUtil.format(date, "yyyy-MM-dd"))
+                .collect(Collectors.toList());
+
+        // 对格式化后的列表进行去重
+        return CollUtil.distinct(formattedDateList);
+    }
+
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {
         return monitorPointDetails.stream()
                 .map(detail -> {

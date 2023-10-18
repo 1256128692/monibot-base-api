@@ -2,8 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.CaptureInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryCaptureParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TbVideoCaptureMapper {
@@ -54,4 +56,6 @@ public interface TbVideoCaptureMapper {
     void insertBatch(List<SensorBaseInfoV1> captureSensorList);
 
     void insertBatchByCaptureList(List<CaptureInfo> list);
+
+    List<Date> queryCaptureDate(QueryCaptureParam pa);
 }

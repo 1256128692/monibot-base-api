@@ -66,4 +66,6 @@ public interface VideoService {
     Object saveVideoDeviceCaptureList(SaveVideoDeviceCaptureParam pa);
 
     Object saveVideoSensorList(SaveVideoDeviceSensorParam pa);
+
+    Object queryCaptureDate(QueryCaptureParam pa);
 }

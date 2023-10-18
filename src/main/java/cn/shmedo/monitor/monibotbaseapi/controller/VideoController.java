@@ -867,6 +867,25 @@ public class VideoController {
         return videoService.queryCaptureList(pa);
     }
 
+    /**
+     * @api {POST} /QueryCaptureDate 查询抓拍数据时间
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询抓拍列表
+     * @apiName QueryCaptureList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
+     * @apiSuccess (返回结果) {Date} dataList.uploadTime 上传时间
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryCaptureDate", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryCaptureDate(@Validated @RequestBody QueryCaptureParam pa) {
+        return videoService.queryCaptureDate(pa);
+    }
+
 
     /**
      * @api {POST} /BatchUpdateVideoDeviceStatus 批量更新视频设备在线离线状态

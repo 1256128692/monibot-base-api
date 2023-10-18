@@ -32,4 +32,6 @@ public interface TbSensorFileMapper  extends BasicMapper<TbSensorFile>{
     IPage<VideoSensorFileInfo> queryPageByCondition(Page<VideoDevicePageInfo> page, Integer videoDeviceSourceID, Date begin, Date end);
 
     List<VideoSensorFileInfo> selectListBySensorIDAndTime(QueryCaptureParam pa);
+
+    List<Date> queryCaptureDate(QueryCaptureParam pa);
 }
