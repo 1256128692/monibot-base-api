@@ -167,4 +167,13 @@
            #{item.closeTime,jdbcType=TIMESTAMP})
       </foreach>;
   </insert>
+
+  <delete id="deleteByDeviceSerialList">
+      delete
+      from tb_video_device_source
+      where DeviceSerial in
+      <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+          #{deviceSerial}
+      </foreach>
+  </delete>
 </mapper>

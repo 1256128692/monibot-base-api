@@ -57,5 +57,4 @@ public interface TbVideoCaptureMapper {
 
     void insertBatchByCaptureList(List<CaptureInfo> list);
 
-    List<Date> queryCaptureDate(QueryCaptureParam pa);
 }

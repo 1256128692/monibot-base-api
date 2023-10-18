@@ -48,4 +48,6 @@ public interface TbVideoDeviceSourceMapper {
     int updateByPrimaryKey(TbVideoDeviceSource record);
 
     void batchInsert(List<TbVideoDeviceSource> deviceSourceList);
+
+    void deleteByDeviceSerialList(List<String> deviceSerialList);
 }

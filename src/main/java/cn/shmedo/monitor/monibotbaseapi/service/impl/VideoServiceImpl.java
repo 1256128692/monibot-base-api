@@ -525,6 +525,9 @@ public class VideoServiceImpl implements VideoService {
         // 3. 删除抓拍配置
         videoCaptureMapper.deleteByVedioIDList(pa.getDeviceSerialList());
 
+        // 删除通道视频设备
+        videoDeviceSourceMapper.deleteByDeviceSerialList(pa.getDeviceSerialList());
+
         // 4. 删除物联网平台设备
         ResultWrapper<List<DeviceBaseInfo>> listResultWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
                 .companyID(pa.getCompanyID())
@@ -1106,10 +1109,8 @@ public class VideoServiceImpl implements VideoService {
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
                     if (!CollectionUtil.isNullOrEmpty(channelList)) {
                         for (int i = 0; i < channelList.size(); i++) {
-                            Integer channelNo = channelList.get(i).getChannelNo();
-                            Boolean enable = channelList.get(i).getEnable();
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelNo, enable, v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
                         }
                     }
                     v.setDeviceChannelNum(0);
@@ -1121,10 +1122,8 @@ public class VideoServiceImpl implements VideoService {
                         v.setDeviceChannelNum(sensorList.size());
 
                         for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
-                            Integer channelNo = filteredYsChannelInfoList.get(i).getChannelNo();
-                            Boolean enable = filteredYsChannelInfoList.get(i).getEnable();
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelNo, enable, v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
                         }
                         singleVideoSensorList.addAll(v.getSensorList());
                     }
@@ -1135,7 +1134,7 @@ public class VideoServiceImpl implements VideoService {
                 v.setDeviceChannelNum(1);
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
                     if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(0).getChannelNo(), channelList.get(0).getEnable(), v.getDeviceName()));
+                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(0), v.getDeviceName()));
                         v.setSensorList(singleVideoSensorList);
                     }
                 }
