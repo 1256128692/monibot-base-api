@@ -815,7 +815,8 @@ public class VideoController {
      * @apiDescription 查询抓拍列表
      * @apiName QueryCapturePage
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {DateTime} [begin] 开始时间
      * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -846,7 +847,8 @@ public class VideoController {
      * @apiDescription 查询抓拍列表
      * @apiName QueryCaptureList
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {DateTime} [begin] 开始时间
      * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据

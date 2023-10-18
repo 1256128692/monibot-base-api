@@ -807,7 +807,7 @@ public class VideoServiceImpl implements VideoService {
 
         Page<VideoDevicePageInfo> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
-        IPage<VideoSensorFileInfo> pageData = sensorFileMapper.queryPageByCondition(page, pa.getSensorID(),
+        IPage<VideoSensorFileInfo> pageData = sensorFileMapper.queryPageByCondition(page, pa.getVideoDeviceSourceID(),
                 pa.getBegin(), pa.getEnd());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();

@@ -14,6 +14,7 @@ public class QueryCaptureParam implements ParameterValidator, ResourcePermission
     @NotNull(message = "公司不能为空")
     private Integer companyID;
 
+    private Integer videoDeviceSourceID;
     private Integer sensorID;
     private Date begin;
     private Date end;
