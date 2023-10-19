@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
+import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
@@ -120,13 +121,15 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
     @Override
     public Boolean transferGrouping(TransferGroupingParam param) {
-        param.getTbPropertyModel().setGroupID(param.getNewGroupID());
-        int row = tbPropertyModelMapper.updateById(param.getTbPropertyModel());
+        List<TbPropertyModel> tbPropertyModelList = param.getTbPropertyModelList();
+        tbPropertyModelList.forEach(model -> model.setGroupID(param.getNewGroupID()));
+        tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
 
         // 同步刷新缓存
-        List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda().eq(TbProperty::getModelID, param.getModelID()));
-        formModelCache.putBatch(List.of(param.getTbPropertyModel()), tbPropertyList);
-        return 1 == row;
+        List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda()
+                .in(TbProperty::getModelID, param.getModelIDList()));
+        formModelCache.putBatch(tbPropertyModelList, tbPropertyList);
+        return Boolean.TRUE;
     }
 
     @Override
@@ -161,18 +164,31 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         Map<Integer, List<TbProperty>> propertyMap = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
 
         // 处理组名
-        Map<Integer, String> groupMap = Maps.newHashMap();
-        List<Integer> groupIdList = tbPropertyModelList.stream().filter(item -> !PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType()))
-                .map(TbPropertyModel::getGroupID).toList();
-        if (CollectionUtil.isNotEmpty(groupIdList)) {
+        Map<Integer, List<TbPropertyModel>> modelGroup = tbPropertyModelList.stream()
+                .collect(Collectors.groupingBy(model -> {
+                    if (PropertyModelType.BASE_PROJECT.getCode().equals(model.getModelType())) {
+                        return PropertyModelType.BASE_PROJECT.getCode();
+                    } else {
+                        return PropertyModelType.UN_BASE_PROJECT.getCode();
+                    }
+                }));
+
+        // 非工程项目
+        Map<Integer, String> unProjectGroupMap = Maps.newHashMap();
+        if (modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
+            List<Integer> groupIdList = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).toList();
             List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectBatchIds(groupIdList);
-            groupMap = tbPropertyModelGroupList.stream().collect(Collectors.toMap(TbPropertyModelGroup::getID, TbPropertyModelGroup::getName));
+            unProjectGroupMap = tbPropertyModelGroupList.stream().collect(Collectors.toMap(TbPropertyModelGroup::getID, TbPropertyModelGroup::getName));
         }
-        Map<Integer, String> finalGroupMap = groupMap;
+        Map<Integer, String> finalGroupMap = unProjectGroupMap;
         model4WebList.forEach(
-                (item) -> {
+                item -> {
                     item.setPropertyList(propertyMap.get(item.getID()));
-                    item.setGroupName(finalGroupMap.getOrDefault(item.getGroupID(), ""));
+                    if(PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())){
+                        item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
+                    }else {
+                        item.setGroupName(finalGroupMap.getOrDefault(item.getGroupID(), "默认"));
+                    }
                 }
         );
         return model4WebList;

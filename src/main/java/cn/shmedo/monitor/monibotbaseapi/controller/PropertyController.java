@@ -120,7 +120,7 @@ public class PropertyController {
      * @apiName TransferGrouping
      * @apiDescription 转移分组，此功能目前为设备模板/工作流模板使用
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} modelID 模板ID
+     * @apiParam (请求体) {Int[]} modelIDList 模板ID列表
      * @apiParam (请求体) {Int} modelType 模板类型
      * @apiParam (请求体) {Int} newGroupID 转移后的分组ID
      * @apiSuccess (返回结果) {Bool} data 更新结果状态

@@ -14,6 +14,8 @@ import java.util.Set;
  * @Version 1.0
  */
 public enum PropertyModelType {
+    /** 非工程项目 **/
+    UN_BASE_PROJECT(-1, "非工程项目"),
     /** 工程项目 **/
     BASE_PROJECT(0, "工程项目"),
     /** 其他设备 **/

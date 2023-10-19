@@ -131,7 +131,8 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
         long fileSize = file.getSize();
         TbDocumentFile tbDocumentFile = tbDocumentFileMapper.selectOne(new QueryWrapper<TbDocumentFile>().lambda()
                 .eq(TbDocumentFile::getFileName, fileName)
-                .eq(TbDocumentFile::getSubjectType, subjectType));
+                .eq(TbDocumentFile::getSubjectType, subjectType)
+                .eq(TbDocumentFile::getSubjectID, subjectID));
         if (Objects.nonNull(tbDocumentFile)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "资料文件名称不能重复");
         }

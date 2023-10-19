@@ -9,10 +9,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,8 +31,8 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    @NotNull(message = "模板不能为空")
-    private Integer modelID;
+    @NotEmpty(message = "模板ID列表不能为空")
+    private List<Integer> modelIDList;
 
     @NotNull(message = "模板类型不能为空")
     private Integer modelType;
@@ -39,7 +41,7 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
     private Integer newGroupID;
 
     @JsonIgnore
-    private TbPropertyModel tbPropertyModel;
+    private List<TbPropertyModel> tbPropertyModelList;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -49,9 +51,9 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
         }
 
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
-        tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
-        if (Objects.isNull(tbPropertyModel)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应模板");
+        tbPropertyModelList = tbPropertyModelMapper.selectBatchIds(modelIDList);
+        if (modelIDList.size() != tbPropertyModelList.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在未知的模板ID");
         }
 
         // 只支持设备模板和工作流模板转移分组
