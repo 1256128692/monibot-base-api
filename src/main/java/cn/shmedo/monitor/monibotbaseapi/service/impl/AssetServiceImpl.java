@@ -159,6 +159,9 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                         TbAsset4Web tbAsset4Web = BeanUtil.copyProperties(e, TbAsset4Web.class);
                         tbAsset4Web.setHouseName(tbAssetHouse.getName());
                         tbAsset4Web.setHouseID(tbAssetHouse.getID());
+                        tbAsset4Web.setHouseCode(tbAssetHouse.getCode());
+                        tbAsset4Web.setHouseAddress(tbAssetHouse.getAddress());
+                        tbAsset4Web.setHouseComment(tbAssetHouse.getComment());
                         tbAsset4Web.setCurrentValue((Integer) map.get(e.getID().toString()));
                         tbAsset4Web.setIsWarn(isWarn(tbAsset4Web));
                         return tbAsset4Web;
@@ -179,6 +182,9 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                                             TbAsset4Web tbAsset4Web = BeanUtil.copyProperties(e, TbAsset4Web.class);
                                             tbAsset4Web.setHouseName(tbAssetHouse.getName());
                                             tbAsset4Web.setHouseID(tbAssetHouse.getID());
+                                            tbAsset4Web.setHouseCode(tbAssetHouse.getCode());
+                                            tbAsset4Web.setHouseAddress(tbAssetHouse.getAddress());
+                                            tbAsset4Web.setHouseComment(tbAssetHouse.getComment());
                                             tbAsset4Web.setCurrentValue((Integer) aMap.get(e.getID().toString()));
                                             tbAsset4Web.setIsWarn(isWarn(tbAsset4Web));
                                             return tbAsset4Web;
@@ -197,6 +203,9 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
                 Comparator.comparing(TbAsset4Web::getID).reversed()
                         .thenComparing(TbAsset4Web::getHouseID).reversed()
         ).toList();
+        resultAll.forEach(
+                e -> e.setUnitStr(AssetUnit.getStrByCode(e.getUnit())
+                ));
         return PageUtil.page(resultAll, pa.getPageSize(), pa.getCurrentPage());
     }
 

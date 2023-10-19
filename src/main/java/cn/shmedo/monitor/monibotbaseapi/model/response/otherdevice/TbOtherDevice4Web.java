@@ -12,4 +12,5 @@ import lombok.Data;
 public class TbOtherDevice4Web extends TbOtherDevice {
     private String projectName;
     private String templateName;
+    private String templateGroupName;
 }

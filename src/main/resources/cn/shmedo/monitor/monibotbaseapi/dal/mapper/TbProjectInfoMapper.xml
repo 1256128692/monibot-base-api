@@ -325,4 +325,12 @@
   <select id="selectAll" resultMap="BaseResultMap">
     select * from tb_project_info
     </select>
+
+  <update id="updateLevel2Unallocatedwhennorealtion">
+        update tb_project_info
+        set level = 0
+        where level > 0
+            and id not in (select upLevelID from tb_project_relation)
+            and id not in (select downLevelID from tb_project_relation)
+    </update>
 </mapper>

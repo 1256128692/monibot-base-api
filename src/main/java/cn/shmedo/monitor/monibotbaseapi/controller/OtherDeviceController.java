@@ -128,6 +128,7 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {String} currentPageData.projectName 项目名称
      * @apiSuccess (返回结果) {Int} currentPageData.templateID 模板ID
      * @apiSuccess (返回结果) {String} currentPageData.templateName 模板名称
+     * @apiSuccess (返回结果) {String} currentPageData.templateGroupName 模板分组名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeOtherDevice
      */

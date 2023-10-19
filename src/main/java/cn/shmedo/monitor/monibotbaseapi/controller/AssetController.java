@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class AssetController {
     private final IAssetService assetService;
+
     /**
      * @api {post} /AddAsset 新增资产
      * @apiDescription 新增资产
@@ -61,7 +62,7 @@ public class AssetController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} ID 资产ID
      * @apiParam (请求体) {String} name 名称型号
-     *  @apiParam (请求体) {Int}   unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
+     * @apiParam (请求体) {Int}   unit 单位12345678， 对应件、台、个、组、毫克、克、千克、吨
      * @apiParam (请求体) {String} vendor 厂商品牌
      * @apiParam (请求体) {Int} [warnValue]  预警值
      * @apiParam (请求体) {String} [comparison] 比较方式< ,> , =, <=,  >=
@@ -88,7 +89,7 @@ public class AssetController {
      * @apiParam (请求体) {Int[]} assetIDList 资产ID列表
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:DeleteAsset	
+     * @apiPermission 系统权限 mdmbase:DeleteAsset
      */
     @Permission(permissionName = "mdmbase:DeleteAsse")
     @RequestMapping(value = "DeleteAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
@@ -333,8 +334,12 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} currentPageData.assetVendor 资产厂商品牌
      * @apiSuccess (返回结果) {Int} currentPageData.assetType 资产类型
      * @apiSuccess (返回结果) {Int} currentPageData.assetUnit 资产单位
+     * @apiSuccess (返回结果) {String} currentPageData.unitStr 资产单位描述
      * @apiSuccess (返回结果) {Int} currentPageData.houseID 资产库ID
      * @apiSuccess (返回结果) {String} currentPageData.houseName 资产库名称
+     * @apiSuccess (返回结果) {String} currentPageData.houseCode 资产库编码
+     * @apiSuccess (返回结果) {String} currentPageData.houseAddress 资产库地址
+     * @apiSuccess (返回结果) {String} [currentPageData.houseComment] 资产库备注
      * @apiSuccess (返回结果) {Int} currentPageData.value 数量
      * @apiSuccess (返回结果) {Int} currentPageData.userID 人ID
      * @apiSuccess (返回结果) {Int} currentPageData.userName 人名称
@@ -370,10 +375,14 @@ public class AssetController {
      * @apiSuccess (返回结果) {String} currentPageData.vendor 资产厂商品牌
      * @apiSuccess (返回结果) {Int} currentPageData.type 资产类型
      * @apiSuccess (返回结果) {Int} currentPageData.unit 资产单位
+     * @apiSuccess (返回结果) {Str} currentPageData.unitStr 资产单位描述
      * @apiSuccess (返回结果) {Int} currentPageData.warnValue  预警值
      * @apiSuccess (返回结果) {String} currentPageData.comparison 比较方式< ,> , =, <=,  >=
      * @apiSuccess (返回结果) {Int} currentPageData.houseID 资产库ID
      * @apiSuccess (返回结果) {String} currentPageData.houseName 资产库名称
+     * @apiSuccess (返回结果) {String} currentPageData.houseCode 资产库编码
+     * @apiSuccess (返回结果) {String} currentPageData.houseAddress 资产库地址
+     * @apiSuccess (返回结果) {String} [currentPageData.houseComment] 资产库备注
      * @apiSuccess (返回结果) {Int} currentPageData.currentValue 当前数量
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeAsset

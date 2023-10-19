@@ -434,9 +434,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         temTwoIDList.addAll(twoList.stream().map(TbProjectInfo::getID).toList());
         temTwoIDList = new ArrayList<>(temTwoIDList.stream().distinct().toList());
 
-        List<ProjectInfo> finalTwoList1 = twoList;
+        List<Integer> finalTemTwoIDList = temTwoIDList;
         List<Integer> temOneIDList = new ArrayList<>(relationList.stream().filter(
-                e -> finalTwoList1.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
+                e -> finalTemTwoIDList.stream().anyMatch(item -> item.equals(e.getDownLevelID()))
         ).map(TbProjectRelation::getUpLevelID).toList());
         temOneIDList.addAll(oneList.stream().map(TbProjectInfo::getID).toList());
         if (temOneIDList.isEmpty()) {
@@ -840,12 +840,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                         .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
                         .in(TbProjectRelation::getDownLevelID, pa.getNextLevelPIDList())
         );
-        if (tbProjectRelationMapper.selectCount(
-                new LambdaQueryWrapper<TbProjectRelation>()
-                        .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
-                        .or().eq(TbProjectRelation::getDownLevelID, pa.getProjectID())
-        ) == 0) {
-            tbProjectInfoMapper.updateLevel(ProjectLevel.Unallocated.getLevel(), List.of(pa.getProjectID()), subjectID, new Date());
-        }
+        // 将没有绑定关系的项目设置为未分配
+        tbProjectInfoMapper.updateLevel2Unallocatedwhennorealtion();
     }
 }

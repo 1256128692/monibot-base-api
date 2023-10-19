@@ -58,4 +58,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     void updateLevel2Unallocated();
 
     List<TbProjectInfo> selectAll();
+
+    void updateLevel2Unallocatedwhennorealtion();
 }

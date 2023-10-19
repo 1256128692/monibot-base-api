@@ -48,7 +48,7 @@ public class DeleteAssetParam implements ParameterValidator, ResourcePermissionP
         );
         tbAssetLogs.stream().collect(Collectors.groupingBy(TbAssetLog::getAssetID)).forEach((k, v) -> {
             if (v.stream().mapToInt(TbAssetLog::getValue).sum() != 0) {
-                throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "有资产有入出库记录");
+                throw new CustomBaseException(ResultCode.INVALID_PARAMETER.toInt(), "物资点下存在物资，无法被删除");
             }
         });
         return null;

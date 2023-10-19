@@ -17,4 +17,7 @@ public class TbAssetLog4Web extends TbAssetLog {
     private Byte assetUnit;
     private String assetUnitStr;
     private String houseName;
+    private String houseCode;
+    private String houseAddress;
+    private String houseComment;
 }
