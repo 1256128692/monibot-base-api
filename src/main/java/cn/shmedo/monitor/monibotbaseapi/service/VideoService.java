@@ -68,4 +68,6 @@ public interface VideoService {
     Object saveVideoSensorList(SaveVideoDeviceSensorParam pa);
 
     Object queryCaptureDate(QueryCaptureParam pa);
+
+    VideoDeviceDetailInfo QueryVideoDeviceDetail(QueryVideoDeviceDetailParam pa);
 }

@@ -8,15 +8,19 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
+import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDeviceSource;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoPresetPoint;
@@ -37,6 +41,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -47,6 +52,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.netty.util.internal.StringUtil;
+import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -82,6 +88,9 @@ public class VideoServiceImpl implements VideoService {
     private final TbSensorMapper sensorMapper;
 
     private final TbVideoCaptureMapper videoCaptureMapper;
+
+    @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
+    private RedisService monitorRedisService;
 
 //    /**
 //     * @see YsCapacityInfo
@@ -1228,6 +1237,39 @@ public class VideoServiceImpl implements VideoService {
 
         // 对格式化后的列表进行去重
         return CollUtil.distinct(formattedDateList);
+    }
+
+    @Override
+    public VideoDeviceDetailInfo QueryVideoDeviceDetail(QueryVideoDeviceDetailParam pa) {
+
+        VideoDeviceDetailInfo info = videoDeviceMapper.queryDeviceDetail(
+                pa.getDeviceSerial(), pa.getCompanyID().equals(DefaultConstant.MD_ID) ? null : pa.getCompanyID());
+
+        List<VideoCaptureBaseInfoV2> videoDeviceSourceList = videoDeviceSourceMapper.selectByDeviceSerial(pa.getDeviceSerial());
+
+        info.setVideoDeviceSourceList(videoDeviceSourceList);
+        info.setAccessPlatformStr(AccessPlatformType.getByValue(info.getAccessPlatform()).getDescription());
+        if (!CollectionUtil.isNullOrEmpty(videoDeviceSourceList)) {
+            long count = videoDeviceSourceList.stream().filter(v -> v.getSensorID() != null).count();
+            info.setDeviceChannelNum(Math.toIntExact(count));
+
+            Collection<Object> areas = videoDeviceSourceList.stream().filter(e -> StrUtil.isNotEmpty(e.getLocation())).map(e -> {
+                JSONObject json = JSONUtil.parseObj(e.getLocation());
+                e.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                return e.getLocation();
+            }).filter(Objects::nonNull).collect(Collectors.toSet());
+            Map<String, String> areaMap = areas.isEmpty() ?
+                    Collections.emptyMap() :
+                    monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                            .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+            videoDeviceSourceList.forEach(item -> {
+                if (!StringUtil.isNullOrEmpty(item.getLocation())) {
+                    String location = areaMap.getOrDefault(item.getLocation(), null);
+                    item.setLocationInfo(location);
+                }
+            });
+        }
+        return info;
     }
 
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {

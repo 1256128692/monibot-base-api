@@ -907,27 +907,27 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} deviceChannelNum 设备接入平台通道号的数量(海康默认为1)
      * @apiSuccess (返回结果) {Int} accessChannelNum 可接入通道号的总量(海康默认为1)
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间（接入时间）
-     * @apiSuccess (返回结果) {Object[]} sensorList 通道视频列表
-     * @apiSuccess (返回结果) {Int} sensorList.channelNo 通道号
-     * @apiSuccess (返回结果) {Boolean} sensorList.enable 通道是否启用
-     * @apiSuccess (返回结果) {Int} [.sensorList.sensorID] 传感器ID
-     * @apiSuccess (返回结果) {String} sensorList.sensorName 传感器名称
-     * @apiSuccess (返回结果) {Boolean} [sensorList.sensorEnable] 传感器是否开启
-     * @apiSuccess (返回结果) {Int} [sensorList.projectID] 所属工程ID
-     * @apiSuccess (返回结果) {Int} [sensorList.monitorPointID] 监测点ID
-     * @apiSuccess (返回结果) {Int} [sensorList.monitorItemID] 监测项目ID
-     * @apiSuccess (返回结果) {String} [sensorList.monitorPointName] 监测点名称
-     * @apiSuccess (返回结果) {String} [sensorList.monitorItemName] 监测项目名称
-     * @apiSuccess (返回结果) {String} [sensorList.gpsLocation] 监测点位置
-     * @apiSuccess (返回结果) {String} [sensorList.location] 行政区划
+     * @apiSuccess (返回结果) {Object[]} videoDeviceSourceList 通道视频列表
+     * @apiSuccess (返回结果) {Int} videoDeviceSourceList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} videoDeviceSourceList.channelNo 通道号
+     * @apiSuccess (返回结果) {Boolean} videoDeviceSourceList.enable 通道是否启用
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.sensorID] 传感器ID
+     * @apiSuccess (返回结果) {String} videoDeviceSourceList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {Boolean} [videoDeviceSourceList.sensorEnable] 传感器是否开启
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.projectID] 所属工程ID
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorPointName] 监测点名称
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorItemName] 监测项目名称
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.gpsLocation] 监测点位置
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.location] 行政区划
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
     @Permission(permissionName = "mdmbase:DescribeBaseVideo")
     @RequestMapping(value = "/QueryVideoDeviceDetail", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryVideoDeviceDetail(@Validated @RequestBody QueryVideoDeviceDetailParam pa) {
-//        return videoService.QueryVideoDeviceDetail(pa);
-        return null;
+        return videoService.QueryVideoDeviceDetail(pa);
     }
 
 
