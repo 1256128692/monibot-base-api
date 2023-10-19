@@ -39,6 +39,9 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     @NotNull(message = "currentPage不能为空")
     private Integer currentPage;
 
+
+    private Boolean creatTimeAsc;
+
     private String queryCode;
 
     private String projectName;

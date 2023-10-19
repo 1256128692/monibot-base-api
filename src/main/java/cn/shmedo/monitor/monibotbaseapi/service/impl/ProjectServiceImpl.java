@@ -476,7 +476,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 ).toList();
         oneList = new ArrayList<>(oneList);
         // 分页及填充downLevelProjectList
-        oneList.sort(Comparator.comparing(ProjectInfo::getID).reversed());
+        Comparator<ProjectInfo> comparator = Comparator.comparing(ProjectInfo::getCreateTime);
+        if (pa.getCreatTimeAsc() != null && pa.getCreatTimeAsc()) {
+        } else {
+            comparator = comparator.reversed();
+        }
+        oneList.sort(comparator);
+        twoList.sort(comparator);
+        threeList.sort(comparator);
         PageUtil.Page<ProjectInfo> pageData = PageUtil.page(oneList, pa.getPageSize(), pa.getCurrentPage());
         List<ProjectInfo> finalThreeList1 = threeList;
         Set<Integer> pidAllSet = new HashSet<>();
@@ -488,7 +495,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             companyIDAllSet.add(item.getCompanyID());
             locationInfoSet.add(item.getLocationInfo());
             List<Integer> list = relationList.stream().filter(e -> e.getUpLevelID().equals(item.getID())).map(TbProjectRelation::getDownLevelID).toList();
-            item.setDownLevelProjectList(finalTwoList2.stream().filter(e -> list.contains(e.getID())).toList());
+            item.setDownLevelProjectList(finalTwoList2.stream().filter(e -> list.contains(e.getID()))
+                    .toList());
             pidAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getID).toList());
             companyIDAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getCompanyID).toList());
             locationInfoSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getLocationInfo).toList());
@@ -833,6 +841,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (tbProjectRelationMapper.selectCount(
                 new LambdaQueryWrapper<TbProjectRelation>()
                         .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+                        .or().eq(TbProjectRelation::getDownLevelID, pa.getProjectID())
         ) == 0) {
             tbProjectInfoMapper.updateLevel(ProjectLevel.Unallocated.getLevel(), List.of(pa.getProjectID()), subjectID, new Date());
         }

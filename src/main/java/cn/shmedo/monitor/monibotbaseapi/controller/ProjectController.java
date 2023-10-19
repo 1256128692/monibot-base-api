@@ -118,6 +118,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} propertyEntity.name 属性名称
      * @apiParam (请求体) {String} [propertyEntity.value] 属性值，仅字符串类型支持模糊查询
      * @apiParam (请求体) {Bool} [property] 是否带出属性信息，默认false
+     * @apiParam (请求体) {Boolean} [creatTimeAsc] 创建时间升序， 默认倒序
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -270,6 +271,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} projectName 项目名称(<=50)
      * @apiParam (请求体) {String} shortName 项目简称(<=10)
+     * @apiParam (请求体) {Int} level 可选参数为-1,0,1,2  当该项目已经处于关联状态，无法进行修改
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
      * @apiParam (请求体) {Bool} enable 项目状态,true:启用，false:停用
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)

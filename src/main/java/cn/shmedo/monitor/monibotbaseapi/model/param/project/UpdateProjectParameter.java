@@ -9,10 +9,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -42,6 +44,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     private String projectName;
     @Size(max = 10, message = "项目简称限制10个字符")
     private String shortName;
+    @NotNull
+    @Range(min = -1, max = 2)
+    private Byte level;
     @Size(max = 50, message = "直管单位限制50个字符")
     @NotBlank(message = "直管单位不允许为空")
     private String directManageUnit;
@@ -89,6 +94,17 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         }
         if (projectInfoMapper.countByNameExcludeID(projectName,projectID) >0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称已存在");
+        }
+        if (!projectInfo.getLevel().equals(level)) {
+            TbProjectRelationMapper tbProjectRelationMapper = ContextHolder.getBean(TbProjectRelationMapper.class);
+            if (tbProjectRelationMapper.selectCount(
+                    new LambdaQueryWrapper<TbProjectRelation>()
+                            .eq(TbProjectRelation::getUpLevelID, projectID)
+                            .or()
+                            .eq(TbProjectRelation::getDownLevelID, projectID)
+            ) > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该项目已经已经与其他项目关联，不允许修改级别");
+            }
         }
         if (newCompanyID!=null){
             if (projectInfo.getCompanyID().equals(newCompanyID)) {
