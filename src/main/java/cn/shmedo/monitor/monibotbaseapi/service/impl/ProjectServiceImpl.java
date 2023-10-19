@@ -475,6 +475,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                         BeanUtil.copyProperties(e, ProjectInfo.class)
                 ).toList();
         oneList = new ArrayList<>(oneList);
+        twoList = new ArrayList<>(twoList);
+        threeList = new ArrayList<>(threeList);
         // 分页及填充downLevelProjectList
         Comparator<ProjectInfo> comparator = Comparator.comparing(ProjectInfo::getCreateTime);
         if (pa.getCreatTimeAsc() != null && pa.getCreatTimeAsc()) {
