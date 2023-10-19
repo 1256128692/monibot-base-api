@@ -185,6 +185,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         if (newRetireDate !=null){
             projectInfo.setExpiryDate(newRetireDate);
         }
+        projectInfo.setLevel(level);
         return projectInfo;
     }
 
