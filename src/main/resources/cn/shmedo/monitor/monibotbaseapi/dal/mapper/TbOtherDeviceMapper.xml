@@ -29,7 +29,7 @@
       from tb_other_device as tod
                left join tb_property_model as tpm on tod.TemplateID = tpm.ID
                 left join tb_project_info as tp on tod.ProjectID = tp.ID
-                left join tb_property_model_group as tpmg on tpm.ID = tpmg.PropertyModelID
+                left join tb_property_model_group as tpmg on tpm.groupID = tpmg.ID
       where tod.CompanyID = #{pa.companyID}
       <if test="pa.projectID != null">
           and tod.ProjectID = #{pa.projectID}
