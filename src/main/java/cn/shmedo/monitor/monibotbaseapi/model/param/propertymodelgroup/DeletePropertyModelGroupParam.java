@@ -1,10 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.propertymodelgroup;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -33,6 +36,13 @@ public class DeletePropertyModelGroupParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper<?> validate() {
+        // 针对工程项目类型，如果其分组下存在模板，提示不允许删除
+        TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
+        List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
+                .eq(TbPropertyModel::getModelType, PropertyModelType.BASE_PROJECT.getCode())
+                .in(TbPropertyModel::getGroupID, IDList));
+        if(CollectionUtil.isNotEmpty(tbPropertyModelList))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工程项目，其下存在模板，不允许删除");
         return null;
     }
 

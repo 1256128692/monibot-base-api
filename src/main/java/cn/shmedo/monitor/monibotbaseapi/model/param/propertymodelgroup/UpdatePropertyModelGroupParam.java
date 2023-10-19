@@ -64,9 +64,10 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
 
         // 校验名称是否重复
         TbPropertyModelGroup tbPropertyModelGroup1 = tbPropertyModelGroupMapper.selectOne(new QueryWrapper<TbPropertyModelGroup>().lambda()
-                .eq(TbPropertyModelGroup::getID, this.ID)
+                .ne(TbPropertyModelGroup::getID, this.ID)
                 .eq(TbPropertyModelGroup::getCompanyID, this.companyID)
-                .ne(TbPropertyModelGroup::getName, this.name));
+                .eq(Objects.nonNull(groupType), TbPropertyModelGroup::getGroupType, groupType)
+                .eq(TbPropertyModelGroup::getName, this.name));
         if (Objects.nonNull(tbPropertyModelGroup1)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组名称不能重复");
         }

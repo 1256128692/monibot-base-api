@@ -94,7 +94,7 @@ public class PropertyModelGroupController {
      * @apiSuccess (返回结果) {String} name 属性模板组名称
      * @apiSuccess (返回结果) {String} [desc] 模板描述
      * @apiSuccess (返回结果) {String} [exValue] 扩展字段
-     * @apiSuccess (返回结果) {Date} [createTime] 创建时间
+     * @apiSuccess (返回结果) {String} createTime 创建时间
      * @apiSuccess (返回结果) {Int} [createUserID] 创建人ID
      * @apiSuccess (返回结果) {String} [createUserName] 创建人名称
      * @apiSampleRequest off
@@ -136,11 +136,16 @@ public class PropertyModelGroupController {
      * @apiParam (请求体) {String} [groupName] 属性模板组名称
      * @apiSuccess (返回结果) {Object[]} groupList 属性模板组列表
      * @apiSuccess (返回结果) {Int} groupList.ID 属性模板组ID
-     * @apiSuccess (返回结果) {Int} groupList.groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiSuccess (返回结果) {Int} groupList.companyID 公司ID
-     * @apiSuccess (返回结果) {String} groupList.groupName 属性模板组名称
+     * @apiSuccess (返回结果) {String} groupList.name 属性模板组名称
+     * @apiSuccess (返回结果) {String} groupList.platform 所属平台
+     * @apiSuccess (返回结果) {Int} groupList.groupType 属性模板组类型（0-工程项目（默认值）；1-设备；2-工作流）
+     * @apiSuccess (返回结果) {Int} [groupList.groupTypeSubType] 模板组类型子分类
      * @apiSuccess (返回结果) {String} [groupList.desc] 模板描述
      * @apiSuccess (返回结果) {String} [groupList.exValue] 扩展字段
+     * @apiSuccess (返回结果) {String} createTime 创建时间
+     * @apiSuccess (返回结果) {Int} [createUserID] 创建人ID
+     * @apiSuccess (返回结果) {String} [createUserName] 创建人名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:QueryPropertyModelGroupList
      */

@@ -51,7 +51,7 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper<?> validate() {
-        if(PropertyModelType.WORK_FLOW.getCode().equals(groupType))
+        if(PropertyModelType.WORK_FLOW.getCode().equals(groupType) && Objects.isNull(platform))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型为工作流时，所属平台不能为空");
 
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);

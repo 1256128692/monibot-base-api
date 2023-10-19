@@ -5,7 +5,10 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.propertymodelgroup.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.response.propertymodelgroup.PropertyModelGroupResponse;
@@ -20,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -41,6 +45,9 @@ import java.util.stream.Collectors;
 public class PropertyModelGroupServiceImpl implements PropertyModelGroupService, InitializingBean {
     private String appKey = null;
     private String appSecret = null;
+
+    @Autowired
+    private TbPropertyModelMapper tbPropertyModelMapper;
 
     @Autowired
     private TbPropertyModelGroupMapper tbPropertyModelGroupMapper;
@@ -89,8 +96,16 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
         return propertyModelGroupResponse;
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Object deletePropertyModelGroup(DeletePropertyModelGroupParam deletePropertyModelGroupParam) {
+        // 删除其他设备、工作流分组时候，分组下模板不删除，会将模板对应分组ID转为-1（默认分组）
+        List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
+                .in(TbPropertyModel::getModelType, List.of(PropertyModelType.DEVICE.getCode(), PropertyModelType.WORK_FLOW.getCode()))
+                .in(TbPropertyModel::getGroupID, deletePropertyModelGroupParam.getIDList()));
+        tbPropertyModelList.forEach(model -> model.setGroupID(-1));
+        tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
+
         return tbPropertyModelGroupMapper.deleteBatchIds(deletePropertyModelGroupParam.getIDList());
     }
 

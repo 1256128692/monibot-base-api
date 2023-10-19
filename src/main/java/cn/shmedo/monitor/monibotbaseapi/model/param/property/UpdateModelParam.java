@@ -131,11 +131,11 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         // 校验模板下属性名称是否重复（数据库已经存在的名称是否重复）
         TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
         Map<String, List<ModelItem>> recordStateMap = modelPropertyList.stream().collect(Collectors.groupingBy(pro -> {
+            pro.setModelID(tbPropertyModel.getID());
             if (Objects.isNull(pro.getID())) {
                 // 新增
                 pro.setCreateType(0);
                 pro.setGroupID(tbPropertyModel.getGroupID());
-                pro.setModelID(tbPropertyModel.getID());
                 return OperationProperty.ADD.name();
             } else {
                 // 修改
