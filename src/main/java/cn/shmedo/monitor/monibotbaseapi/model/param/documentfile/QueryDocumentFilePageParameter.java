@@ -2,6 +2,11 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.documentfile;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -44,8 +49,24 @@ public class QueryDocumentFilePageParameter implements ParameterValidator, Resou
 
     @Override
     public ResultWrapper<?> validate() {
-        if(DocumentSubjectType.PROJECT.getCode().equals(subjectType) && Objects.isNull(subjectID))
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "对象类型为项目时，对象ID不能为空");
+        if(DocumentSubjectType.PROJECT.getCode().equals(subjectType)){
+            if(Objects.isNull(subjectID)){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "对象类型为项目时，对象ID不能为空");
+            }
+            TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+            TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(subjectID);
+            if(Objects.isNull(tbProjectInfo)){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未找到对应项目");
+            }
+        }else {
+            if(Objects.nonNull(subjectID)){
+                TbOtherDeviceMapper tbOtherDeviceMapper = ContextHolder.getBean(TbOtherDeviceMapper.class);
+                TbOtherDevice tbOtherDevice = tbOtherDeviceMapper.selectById(subjectID);
+                if ((Objects.isNull(tbOtherDevice))){
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未找到对应其他设备");
+                }
+            }
+        }
         return null;
     }
 

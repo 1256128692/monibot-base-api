@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import feign.Param;
 
 import java.util.List;
 
@@ -18,4 +19,6 @@ public interface TbPropertyModelMapper extends BaseMapper<TbPropertyModel> {
 
     @Deprecated
     int countByName(String modelName);
+
+    void updateBatchById(@Param("list") List<TbPropertyModel> tbPropertyModelList);
 }

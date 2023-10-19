@@ -14,10 +14,10 @@ import java.util.Set;
  * @Version 1.0
  */
 public enum PropertyModelType {
-    /** 监测项目 **/
-    BASE_PROJECT(0, "监测项目"),
-    /** 设备 **/
-    DEVICE(1, "设备"),
+    /** 工程项目 **/
+    BASE_PROJECT(0, "工程项目"),
+    /** 其他设备 **/
+    DEVICE(1, "其他设备"),
     /** 工作流 **/
     WORK_FLOW(2, "工作流");
 
