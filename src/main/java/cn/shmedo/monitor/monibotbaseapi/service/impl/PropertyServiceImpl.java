@@ -147,13 +147,14 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 模糊查询
-        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda().eq(TbPropertyModel::getModelType, param.getModelType());
-        queryWrapper.like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName());
-        queryWrapper.eq(TbPropertyModel::getModelType, param.getModelType());
-        queryWrapper.eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType());
-        queryWrapper.eq(Objects.nonNull(param.getGroupID()), TbPropertyModel::getGroupID, param.getGroupID());
-        queryWrapper.eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType());
-        queryWrapper.eq(TbPropertyModel::getCompanyID, param.getCompanyID());
+        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
+                .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
+                .eq(TbPropertyModel::getModelType, param.getModelType())
+                .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
+                .eq(Objects.nonNull(param.getGroupID()), TbPropertyModel::getGroupID, param.getGroupID())
+                .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
+                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform())
+                .eq(TbPropertyModel::getCompanyID, param.getCompanyID());
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         if (ObjectUtil.isEmpty(tbPropertyModelList)) {
             return List.of();

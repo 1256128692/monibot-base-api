@@ -44,19 +44,21 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
         groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
 
-        if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) &&
-                Objects.nonNull(projectType) &&
-                !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(projectType)))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
-        }
-        if (createType != null && !CreateType.isValid(createType)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
-        }
-        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.isNull(modelTypeSubType)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属子分类不能为空");
-        }
-        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && StringUtils.isEmpty(platform)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属平台不能为空");
+        if(Objects.isNull(modelID)){
+            if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) &&
+                    Objects.nonNull(projectType) &&
+                    !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(projectType)))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
+            }
+            if (createType != null && !CreateType.isValid(createType)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
+            }
+            if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.isNull(modelTypeSubType)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属子分类不能为空");
+            }
+            if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && StringUtils.isEmpty(platform)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属平台不能为空");
+            }
         }
         return null;
     }
