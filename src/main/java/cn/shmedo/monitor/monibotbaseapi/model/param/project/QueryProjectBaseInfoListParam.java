@@ -12,6 +12,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResp
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -27,6 +29,8 @@ public class QueryProjectBaseInfoListParam implements ParameterValidator, Resour
     private Integer companyID;
 
     private String monitorItemName;
+    @Valid
+    private List<@NotBlank String> platformTypeSet;
 
     @JsonIgnore
     private Collection<Integer> projectIDs;
@@ -49,7 +53,7 @@ public class QueryProjectBaseInfoListParam implements ParameterValidator, Resour
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
         // 1.根据有权限的工程ID,查询工程信息列表
-        projectInfoResponseList = tbProjectInfoMapper.selectListByCompanyIDAndMonitorItemName(companyID, monitorItemName);
+        projectInfoResponseList = tbProjectInfoMapper.selectListByCompanyIDAndMonitorItemName(companyID, monitorItemName, platformTypeSet);
 
         List<Integer> projectIDList = projectInfoResponseList.stream().map(QueryProjectBaseInfoResponse::getProjectID).collect(Collectors.toList());
         if (CollectionUtil.isNullOrEmpty(projectIDList)) {

@@ -131,8 +131,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} currentPageData.level 项目等级
      * @apiSuccess (返回结果) {String} currentPageData.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} currentPageData.projectMainTypeName 项目主类型名称
-     * @apiSuccess (返回结果) {Int} currentPageData.platformType 平台类型
-     * @apiSuccess (返回结果) {Int} currentPageData.platformTypeName 平台名称
+     * @apiSuccess (返回结果) {Int} currentPageData.platformType 平台类型(废弃)
+     * @apiSuccess (返回结果) {Striing} currentPageData.platformTypeSet 平台类型集合
      * @apiSuccess (返回结果) {String} currentPageData.directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} currentPageData.expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} currentPageData.enable 是否有效
@@ -205,7 +205,8 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} level 项目等级
      * @apiSuccess (返回结果) {String} projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} projectMainTypeName 项目主类型名称
-     * @apiSuccess (返回结果) {Byte} platformType 平台类型
+     * @apiSuccess (返回结果) {Byte} platformType （废弃）平台类型
+     * @apiSuccess (返回结果) {String} platformTypeSet 平台类型集合
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} enable 是否有效
@@ -412,7 +413,8 @@ public class ProjectController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
-     * @apiParam (请求体) {Int} [platformType] 平台类型 1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {Int} [platformType] (废弃)平台类型 1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
+     * @apiParam (请求体) {String[]} [platformTypeSet] 平台类型集合
      * @apiParam (请求体) {Int[]} [projectIDList] 项目ID列表
      * @apiSuccess (返回结果) {Object[]} data 项目信息列表
      * @apiSuccess (返回结果) {Int} data.id 项目id
@@ -441,6 +443,7 @@ public class ProjectController {
      * @apiName QueryProjectBaseInfoList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String} monitorItemName 监测项目名称
+     * @apiParam (请求体) {String[]} platformTypeSet 平台类型集合
      * @apiSuccess (返回结果) {Object[]} data 信息
      * @apiSuccess (响应结果) {Int} data.projectID      工程ID
      * @apiSuccess (响应结果) {Int} data.projectType     工程类型

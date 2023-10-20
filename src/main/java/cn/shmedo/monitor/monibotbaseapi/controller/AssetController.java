@@ -362,7 +362,7 @@ public class AssetController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [fuzzyItem] 模糊查询资产型号/名称， 厂商品牌，
      * @apiParam (请求体) {Int} [type] 资产类型
-     * @apiParam (请求体) {Int} [assetID] 资产库ID
+     * @apiParam (请求体) {Int} [assetID] 资产ID
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [isWarn] 是否预警
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -391,5 +391,24 @@ public class AssetController {
     @RequestMapping(value = "QueryAssetWithValuePage", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryAssetWithValuePage(@Validated @RequestBody QueryAssetWithValuePageParam pa) {
         return assetService.queryAssetWithValuePage(pa);
+    }
+
+    /**
+     * @api {post} /QueryAssetCurrentValue 查询资产当前数量
+     * @apiDescription 查询资产在某个资产库的当前数量
+     * @apiVersion 1.0.0
+     * @apiGroup 资产模块
+     * @apiName QueryAssetCurrentValue
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} assetID 资产ID
+     * @apiParam (请求体) {Int} houseID 资产库ID
+     * @apiSuccess (返回结果) {Int} currentValue 当前数量
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeAsset
+     */
+    @Permission(permissionName = "mdmbase:DescribeAsset")
+    @RequestMapping(value = "QueryAssetCurrentValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryAssetCurrentValue(@Validated @RequestBody QueryAssetCurrentValueParam pa) {
+        return assetService.queryAssetCurrentValue(pa);
     }
 }

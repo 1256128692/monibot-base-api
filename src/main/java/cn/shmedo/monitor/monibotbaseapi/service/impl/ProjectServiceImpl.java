@@ -580,6 +580,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (pa.getProjectType() != null) {
             wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
         }
+        if (ObjectUtil.isNotEmpty(pa.getPlatformTypeSet())) {
+            String sql = pa.getPlatformTypeSet().stream().map(
+                    e -> "Find_in_set('" + e + "',platformTypeSet)"
+            ).collect(Collectors.joining(" or "));
+            wrapper.apply(sql);
+        }
         if (pa.getPlatformType() != null) {
             wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformType().intValue());
         }

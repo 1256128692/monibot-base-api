@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseI
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import jakarta.validation.Valid;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -39,7 +40,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(Integer companyID, List<Integer> projectIDList);
 
-    List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName);
+    List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName, List<String> platformTypeSet);
 
     List<ConfigBaseResponse> selectMonitorPointRelateSensorConfig(@Param("monitorPointID") Integer monitorPointID,
                                                                   @Param("monitorType") Integer monitorType,

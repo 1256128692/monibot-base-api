@@ -223,6 +223,18 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
         return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
     }
 
+    @Override
+    public Integer queryAssetCurrentValue(QueryAssetCurrentValueParam pa) {
+        // 获取缓存
+        Map<String, Map> all = redisService.getAll(RedisKeys.ASSET_HOUSE_KEY, String.class, Map.class);
+        Map map = all.get(pa.getHouseID().toString());
+        if (map == null || !map.containsKey(pa.getAssetID().toString())) {
+            return 0;
+        }
+
+        return (Integer) map.get(pa.getAssetID().toString());
+    }
+
     /**
      * 比较是否超限
      *

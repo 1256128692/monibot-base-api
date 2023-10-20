@@ -34,4 +34,6 @@ public interface IAssetService extends IService<TbAsset> {
     PageUtil.Page<TbAssetHouse> queryAssetHousePage(QueryAssetHousePageParam pa);
 
     PageUtil.Page<TbAsset> queryAssetPage(QueryAssetPageParam pa);
+
+    Integer queryAssetCurrentValue(QueryAssetCurrentValueParam pa);
 }

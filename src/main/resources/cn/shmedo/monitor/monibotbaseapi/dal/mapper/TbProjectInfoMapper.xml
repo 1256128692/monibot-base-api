@@ -206,6 +206,12 @@
                  left join tb_monitor_item mi on mi.projectID = pi.ID
         where mi.CompanyID = #{companyID,jdbcType=INTEGER}
           and mi.Alias = #{monitorItemName}
+        <if test="platformTypeSet != null and platformTypeSet.size() != 0">
+            and
+            <foreach  collection="platformTypeSet" item="item"  separator="or" open="(" close=")">
+                FIND_IN_SET(#{item}, platformTypeSet)
+            </foreach>
+        </if>
     </select>
     <select id="selectMonitorPointRelateSensorConfig" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
         SELECT

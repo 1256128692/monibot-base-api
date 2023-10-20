@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
@@ -11,9 +13,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.AddOtherDeviceBa
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDevicePageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDeviceWithPropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.UpdateOtherDeviceParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDeviceWithProperty;
 import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -23,7 +28,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: monibot-base-api
@@ -38,6 +45,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     private final TbPropertyMapper tbPropertyMapper;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbPropertyModelMapper tbPropertyModelMapper;
+    private final RedisService redisService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -64,8 +72,25 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
 
     @Override
     public TbOtherDeviceWithProperty queryOtherDeviceWithProperty(QueryOtherDeviceWithPropertyParam pa) {
+        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
+        String location = null;
+        String projectName = null;
+        if (tbProjectInfo != null) {
+            projectName = tbProjectInfo.getProjectName();
+            if (ObjectUtil.isNotEmpty(tbProjectInfo.getLocation()) && JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {
+                JSONObject jsonObject = JSONUtil.parseObj(tbProjectInfo.getLocation());
+                Collection<Object> values = jsonObject.values();
+                List<RegionArea> regionAreas = redisService.multiGet(RedisKeys.REGION_AREA_KEY, values, RegionArea.class);
+                location = regionAreas.stream().map(RegionArea::getName).distinct().collect(Collectors.joining(StrUtil.EMPTY));
+
+            }
+
+        }
         if (pa.getTbOtherDevice().getTemplateID() == null) {
-            return BeanUtil.copyProperties(pa.getTbOtherDevice(), TbOtherDeviceWithProperty.class);
+            TbOtherDeviceWithProperty obj = BeanUtil.copyProperties(pa.getTbOtherDevice(), TbOtherDeviceWithProperty.class);
+            obj.setProjectLocation(location);
+            obj.setProjectName(projectName);
+            return obj;
         }
         TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectById(pa.getTbOtherDevice().getTemplateID());
         List<TbProperty> tbProperties = tbPropertyMapper.selectByModelIDs(List.of(pa.getTbOtherDevice().getTemplateID()));
@@ -74,13 +99,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
                         .eq(TbProjectProperty::getSubjectType, PropertySubjectType.OtherDevice.getType())
         );
-        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(pa.getTbOtherDevice().getProjectID());
-        String location = null;
-        String projectName = null;
-        if (tbProjectInfo != null) {
-            location = tbProjectInfo.getLocation();
-            projectName = tbProjectInfo.getProjectName();
-        }
+
 
         return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName, tbPropertyModel.getName());
     }
