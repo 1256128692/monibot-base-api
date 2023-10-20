@@ -250,4 +250,40 @@ public class WtWarnController {
         return ResultWrapper.successWithNothing();
     }
 
+    /**
+     * @api {POST} /QueryWtWarnList 查询报警列表
+     * @apiVersion 1.0.0
+     * @apiGroup 警报规则引擎模块
+     * @apiName QueryWtWarnList
+     * @apiDescription 查询报警列表
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
+     * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
+     * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
+     * @apiParam (请求参数) {Int} [warnType] 报警类型 1.在线监测报警记录; 2.视频/摄像头报警记录; 3.智能终端报警记录; 4.江河洪水预警; 5.险情预警; 6.暴雨预警
+     * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间
+     * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间
+     * @apiSuccess (返回结果) {Object[]} data 数据集
+     * @apiSuccess (返回结果) {Int} currentPageData.warnID 报警记录ID
+     * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
+     * @apiSuccess (返回结果) {String} currentPageData.projectName 工程名称
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorTypeID 监测类型ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {String} currentPageData.monitorTypeAlias 监测类型别称
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
+     * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警时间
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseWarn
+     */
+    @Permission(permissionName = "mdmbase:ListBaseWarn")
+    @PostMapping(value = "/QueryWtWarnList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryWtWarnList() {
+        return ResultWrapper.successWithNothing();
+    }
 }
