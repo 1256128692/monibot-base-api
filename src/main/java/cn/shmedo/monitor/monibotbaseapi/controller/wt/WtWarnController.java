@@ -3,10 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warn.AddWarnLogBindWarnOrderParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -228,7 +225,7 @@ public class WtWarnController {
      * @api {POST} /AddWarnLogBindWarnOrder 警报规则绑定工单
      * @apiVersion 1.0.0
      * @apiGroup 警报规则引擎模块
-     * @apiName QueryWtWarnInfoDetail
+     * @apiName AddWarnLogBindWarnOrder
      * @apiDescription 警报规则绑定工单
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectID] 工程ID
@@ -257,6 +254,7 @@ public class WtWarnController {
      * @apiName QueryWtWarnList
      * @apiDescription 查询报警列表
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
      * @apiParam (请求参数) {Int} [monitorTypeID] 监测类型ID
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
@@ -264,26 +262,28 @@ public class WtWarnController {
      * @apiParam (请求参数) {Int} [warnType] 报警类型 1.在线监测报警记录; 2.视频/摄像头报警记录; 3.智能终端报警记录; 4.江河洪水预警; 5.险情预警; 6.暴雨预警
      * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间
-     * @apiSuccess (返回结果) {Object[]} data 数据集
-     * @apiSuccess (返回结果) {Int} currentPageData.warnID 报警记录ID
-     * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
-     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
-     * @apiSuccess (返回结果) {String} currentPageData.projectName 工程名称
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorTypeID 监测类型ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorTypeName 监测类型名称
-     * @apiSuccess (返回结果) {String} currentPageData.monitorTypeAlias 监测类型别称
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorItemID 监测项目ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorItemName 监测项目名称
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
-     * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警时间
+     * @apiSuccess (返回结果) {Object} data 数据集
+     * @apiSuccess (返回结果) {Object} data.statistic 统计
+     * @apiSuccess (返回结果) {Object[]} data.list 数据集
+     * @apiSuccess (返回结果) {Int} data.list.warnID 报警记录ID
+     * @apiSuccess (返回结果) {String} data.list.warnName 报警名称
+     * @apiSuccess (返回结果) {Int} data.list.projectID 工程ID
+     * @apiSuccess (返回结果) {String} data.list.projectName 工程名称
+     * @apiSuccess (返回结果) {Int} data.list.monitorTypeID 监测类型ID
+     * @apiSuccess (返回结果) {String} data.list.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {String} data.list.monitorTypeAlias 监测类型别称
+     * @apiSuccess (返回结果) {Int} data.list.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} data.list.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {Int} data.list.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} data.list.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} data.list.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
+     * @apiSuccess (返回结果) {DateTime} data.list.warnTime 报警时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
     @Permission(permissionName = "mdmbase:ListBaseWarn")
     @PostMapping(value = "/QueryWtWarnList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWtWarnList() {
-        return ResultWrapper.successWithNothing();
+    public Object queryWtWarnList(@Valid @RequestBody QueryWtWarnListParam param) {
+        return tbWarnLogService.queryBaseList(param);
     }
 }

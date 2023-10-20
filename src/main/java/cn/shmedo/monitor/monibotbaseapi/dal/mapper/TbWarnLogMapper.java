@@ -2,12 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtWarnLogPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderWarnDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnDetailInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warn.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.workorder.WtWorkOrderWarnDetail;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -62,4 +60,6 @@ public interface TbWarnLogMapper extends BaseMapper<TbWarnLog> {
     WtTerminalWarnDetailInfo queryTerminalWarnDetail(Integer warnID);
 
     void updateByIdAndWorkOrderID(Integer warnID, int workOrderID);
+
+    List<WtWarnLogBase> queryBaseList(QueryWtWarnListParam pa);
 }

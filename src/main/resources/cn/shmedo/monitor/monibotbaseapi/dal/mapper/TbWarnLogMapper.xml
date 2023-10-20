@@ -502,4 +502,61 @@
         </set>
         where ID = #{warnID,jdbcType=INTEGER}
     </update>
+
+    <select id="queryBaseList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogBase">
+        SELECT twl.`ID`        warnID,
+               twl.WarnType    warnType,
+               twl.`Name`      warnName,
+               twl.WarnLevel   warnLevel,
+               twl.WarnTime    warnTime,
+               tpi.`ID`        projectID,
+               tpi.ProjectName projectName,
+               tmi.`ID`        monitorItemID,
+               tmi.`Name`      monitorItemName,
+               tmp.`ID`        monitorPointID,
+               tmp.`Name`      monitorPointName,
+               tmt.MonitorType monitorTypeID,
+               tmt.TypeName    monitorTypeName,
+               tmt.TypeAlias   monitorTypeAlias
+        FROM tb_warn_log twl
+                 LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+                 LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+                 LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+                 LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+        <where>
+            <trim prefixOverrides="AND">
+                <if test="projectIDList != null and projectIDList.size() != 0">
+                    <foreach collection="projectIDList" item="item" index="index" open="AND twl.ProjectID IN (" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="warnType != null">
+                    AND twl.WarnType = #{warnType.code}
+                </if>
+                <if test="monitorTypeID != null">
+                    AND twl.monitorType=#{monitorTypeID}
+                </if>
+                <if test="monitorItemID != null">
+                    AND twl.monitorItemID=#{monitorItemID}
+                </if>
+                <if test="warnLevel != null">
+                    AND twl.warnLevel=#{warnLevel}
+                </if>
+                <if test="beginTime != null">
+                    AND twl.WarnTime &gt;= #{beginTime}
+                </if>
+                <if test="endTime != null">
+                    AND twl.WarnTime &lt;= #{endTime}
+                </if>
+            </trim>
+        </where>
+        <choose>
+            <when test="orderType == null or orderType == 1">
+                ORDER BY twl.WarnTime DESC
+            </when>
+            <when test="orderType == 2">
+                ORDER BY twl.WarnTime ASC
+            </when>
+        </choose>
+    </select>
 </mapper>
