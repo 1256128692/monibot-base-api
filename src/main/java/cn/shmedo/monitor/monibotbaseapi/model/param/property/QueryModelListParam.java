@@ -52,7 +52,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
         if (createType != null && !CreateType.isValid(createType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "创建类型不合法");
         }
-        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.nonNull(modelTypeSubType)) {
+        if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.isNull(modelTypeSubType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属子分类不能为空");
         }
         if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && StringUtils.isEmpty(platform)) {

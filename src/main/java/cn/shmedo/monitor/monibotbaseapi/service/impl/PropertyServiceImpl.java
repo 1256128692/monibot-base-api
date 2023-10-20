@@ -4,6 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
@@ -184,9 +186,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         model4WebList.forEach(
                 item -> {
                     item.setPropertyList(propertyMap.get(item.getID()));
-                    if(PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())){
+                    if (PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())) {
                         item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
-                    }else {
+                    } else {
                         item.setGroupName(finalGroupMap.getOrDefault(item.getGroupID(), "默认"));
                     }
                 }
@@ -257,8 +259,11 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         List<QueryPropertyValuesResponse> modelList = Lists.newArrayList();
         // 查询模板下的属性
         List<TbProperty> tbPropertyList = tbPropertyMapper.selectByModelIDs(param.getModelIDList());
-        List<Integer> propertyIdList = tbPropertyList.stream().map(TbProperty::getID).toList();
+        if (CollectionUtil.isEmpty(tbPropertyList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板下属性为空");
+        }
         Map<Integer, List<TbProperty>> propertyGroup = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
+        List<Integer> propertyIdList = tbPropertyList.stream().map(TbProperty::getID).toList();
 
         // 查询属性下的属性值
         List<TbProjectProperty> tbProjectPropertyList = tbProjectPropertyMapper.selectList(new QueryWrapper<TbProjectProperty>().lambda()
