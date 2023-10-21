@@ -4,10 +4,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -15,6 +17,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +36,7 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    private String platform;
+    private Integer platform;
 
     @NotNull(message = "模板组类型不能为空")
     private Integer groupType;
@@ -49,10 +52,17 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
 
     private String exValue;
 
+    @JsonIgnore
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
+
     @Override
     public ResultWrapper<?> validate() {
-        if(PropertyModelType.WORK_FLOW.getCode().equals(groupType) && Objects.isNull(platform))
+        if(PropertyModelType.WORK_FLOW.getCode().equals(groupType) && Objects.isNull(platform)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型为工作流时，所属平台不能为空");
+        }
+        if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
+        }
 
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
         // 校验名称是否重复

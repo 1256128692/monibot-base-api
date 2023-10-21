@@ -29,7 +29,7 @@ public class PropertyModelGroupResponse {
 
     private Integer companyID;
 
-    private String platform;
+    private Integer platform;
 
     private Integer groupType;
 

@@ -45,6 +45,8 @@ public class DefaultConstant {
 
     /** 默认属性模板组 **/
     public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
+
+    public static final String REDIS_KEY_MD_AUTH_SERVICE = "cn.shmedo.mdauth.service";
     /** ================================项目表单end================================ **/
 
     /**

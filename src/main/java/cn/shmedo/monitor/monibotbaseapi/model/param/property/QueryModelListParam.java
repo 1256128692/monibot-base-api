@@ -4,12 +4,16 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
 
@@ -35,9 +39,12 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
 
     private Integer groupID;
 
-    private String platform;
+    private Integer platform;
 
     private Byte createType;
+
+    @JsonIgnore
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
 
     @Override
     public ResultWrapper<?> validate() {
@@ -56,8 +63,11 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
             if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.isNull(modelTypeSubType)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属子分类不能为空");
             }
-            if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && StringUtils.isEmpty(platform)) {
+            if (PropertyModelType.WORK_FLOW.getCode().equals(modelType) && Objects.isNull(platform)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型为工作流时，所属平台不能为空");
+            }
+            if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
             }
         }
         return null;

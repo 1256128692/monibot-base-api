@@ -7,16 +7,19 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
 import java.util.Objects;
@@ -46,13 +49,16 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
 
     private Integer groupID;
 
-    private String platform;
+    private Integer platform;
 
     private String desc;
 
     @NotEmpty
     @Valid
     private List<@NotNull ModelItem> modelPropertyList;
+
+    @JsonIgnore
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
 
     @Override
     public ResultWrapper<?> validate() {
@@ -67,6 +73,10 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
         // 如果表单模板类型为项目表单模板，需要校验项目类型
         if (PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && !ProjectTypeCache.projectTypeMap.containsKey(Byte.valueOf(String.valueOf(groupID)))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
+        }
+
+        if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
         }
 
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);

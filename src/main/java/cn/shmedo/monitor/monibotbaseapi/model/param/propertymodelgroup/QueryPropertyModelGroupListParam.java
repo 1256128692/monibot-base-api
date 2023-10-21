@@ -26,6 +26,10 @@ public class QueryPropertyModelGroupListParam implements ParameterValidator, Res
     @NotNull(message = "groupType不能为空")
     private Integer groupType;
 
+    private Integer groupTypeSubType;
+
+    private Integer platform;
+
     private String name;
 
     @Override

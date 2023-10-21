@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.propertymodelgroup;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -15,6 +16,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
+import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.Objects;
 
@@ -36,7 +38,7 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
-    private String platform;
+    private Integer platform;
 
     private Integer groupType;
 
@@ -53,8 +55,15 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
     @JsonIgnore
     private TbPropertyModelGroup tbPropertyModelGroup;
 
+    @JsonIgnore
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
+
     @Override
     public ResultWrapper<?> validate() {
+        if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
+        }
+
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
         // 校验是否存在属性模板组
         tbPropertyModelGroup = tbPropertyModelGroupMapper.selectById(this.ID);

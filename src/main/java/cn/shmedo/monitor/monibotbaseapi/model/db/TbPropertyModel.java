@@ -39,7 +39,7 @@ public class TbPropertyModel implements Serializable {
      * 所属平台
      */
     @TableField(value = "Platform")
-    private String platform;
+    private Integer platform;
 
     /**
      * 模板类型（0-工程项目；1-设备；2-工作流）

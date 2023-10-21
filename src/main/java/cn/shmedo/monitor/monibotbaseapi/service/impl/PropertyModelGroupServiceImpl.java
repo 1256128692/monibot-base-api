@@ -26,10 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -110,11 +107,13 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
     }
 
     @Override
-    public Object queryPropertyModelGroupList(QueryPropertyModelGroupListParam queryPropertyModelGroupListParam) {
+    public Object queryPropertyModelGroupList(QueryPropertyModelGroupListParam param) {
         LambdaQueryWrapper<TbPropertyModelGroup> queryWrapper = new QueryWrapper<TbPropertyModelGroup>().lambda()
-                .eq(TbPropertyModelGroup::getCompanyID, queryPropertyModelGroupListParam.getCompanyID())
-                .eq(TbPropertyModelGroup::getGroupType, queryPropertyModelGroupListParam.getGroupType())
-                .eq(StringUtils.isNotEmpty(queryPropertyModelGroupListParam.getName()), TbPropertyModelGroup::getName, queryPropertyModelGroupListParam.getName());
+                .eq(TbPropertyModelGroup::getCompanyID, param.getCompanyID())
+                .eq(TbPropertyModelGroup::getGroupType, param.getGroupType())
+                .eq(Objects.nonNull(param.getGroupTypeSubType()), TbPropertyModelGroup::getGroupTypeSubType, param.getGroupTypeSubType())
+                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModelGroup::getPlatform, param.getPlatform())
+                .eq(StringUtils.isNotEmpty(param.getName()), TbPropertyModelGroup::getName, param.getName());
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(queryWrapper);
         if (CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
             return Collections.emptyList();
@@ -133,7 +132,16 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
                 propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIdNameMap.get(res.getCreateUserID()).getUserName()));
             }
         }
-        return propertyModelGroupResponseList;
+
+        // 添加默认分组
+        if(Objects.isNull(param.getName())){
+            PropertyModelGroupResponse propertyModelGroupResponse = new PropertyModelGroupResponse();
+            propertyModelGroupResponse.setID(-1);
+            propertyModelGroupResponse.setGroupType(param.getGroupType());
+            propertyModelGroupResponse.setName("默认");
+            propertyModelGroupResponseList.add(propertyModelGroupResponse);
+        }
+        return propertyModelGroupResponseList.stream().sorted(Comparator.comparing(PropertyModelGroupResponse::getID)).toList();
     }
 
 }
