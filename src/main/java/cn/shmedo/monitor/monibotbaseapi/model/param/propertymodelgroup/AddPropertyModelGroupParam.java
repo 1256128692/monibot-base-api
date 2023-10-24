@@ -57,6 +57,9 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper<?> validate() {
+        if(!PropertyModelType.WORK_FLOW.getCode().equals(groupType) && !PropertyModelType.DEVICE.getCode().equals(groupType)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型只支持设备和工作流");
+        }
         if(PropertyModelType.WORK_FLOW.getCode().equals(groupType) && Objects.isNull(platform)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型为工作流时，所属平台不能为空");
         }

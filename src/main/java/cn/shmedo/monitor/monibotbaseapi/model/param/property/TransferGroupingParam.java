@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
@@ -64,7 +65,8 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
         // 校验新的模板分组是否存在
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
         TbPropertyModelGroup tbPropertyModelGroup = tbPropertyModelGroupMapper.selectById(newGroupID);
-        if (Objects.isNull(tbPropertyModelGroup)) {
+        if ((PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(tbPropertyModelGroup)) ||
+                (DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP != newGroupID && !PropertyModelType.BASE_PROJECT.getCode().equals(modelType))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "转移后分组不存在");
         }
         return null;

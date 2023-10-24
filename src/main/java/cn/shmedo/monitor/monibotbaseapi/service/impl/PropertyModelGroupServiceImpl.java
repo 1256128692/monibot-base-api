@@ -134,7 +134,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
         }
 
         // 添加默认分组
-        if(Objects.isNull(param.getName())){
+        if(Objects.isNull(param.getName()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getGroupType())){
             PropertyModelGroupResponse propertyModelGroupResponse = new PropertyModelGroupResponse();
             propertyModelGroupResponse.setID(-1);
             propertyModelGroupResponse.setGroupType(param.getGroupType());

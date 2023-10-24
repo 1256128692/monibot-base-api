@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -60,7 +61,12 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper<?> validate() {
-        if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+        if (Objects.nonNull(groupType) &&
+                !PropertyModelType.WORK_FLOW.getCode().equals(groupType) &&
+                !PropertyModelType.DEVICE.getCode().equals(groupType)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板组类型只支持设备和工作流");
+        }
+        if (Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
         }
 

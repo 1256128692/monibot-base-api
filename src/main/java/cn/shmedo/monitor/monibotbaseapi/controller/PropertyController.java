@@ -80,7 +80,6 @@ public class PropertyController {
      * @apiParam (请求体) {String} modelPropertyList.enumField 枚举字段，json数组, 限制长度为10
      * @apiParam (请求体) {Boolean} modelPropertyList.multiSelect 可否多选,限定枚举
      * @apiParam (请求体) {String} modelPropertyList.className 类名称
-     * @apiParam (请求体) {Int} modelPropertyList.createType 创建类型 0-预定义 1-自定义
      * @apiParam (请求体) {Int} modelPropertyList.displayOrder 展示顺序
      * @apiParam (请求体) {String} modelPropertyList.exValue 额外属性
      * @apiSuccess (返回结果) {Bool} data 更新结果状态
