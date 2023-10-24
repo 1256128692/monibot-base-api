@@ -89,7 +89,7 @@ public class CopyModelParam implements ParameterValidator, ResourcePermissionPro
         for (TbProperty tbProperty : tbPropertyList) {
             tbProperty.setID(null);
             tbProperty.setModelID(ID);
-            tbProperty.setName(tbProperty.getName() + DefaultConstant.PROPERTY_MODEL_COPY_SUFFIX);
+            tbProperty.setName(tbProperty.getName());
         }
     }
 }

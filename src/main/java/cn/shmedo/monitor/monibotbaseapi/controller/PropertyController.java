@@ -134,6 +134,25 @@ public class PropertyController {
     }
 
     /**
+     * @api {POST} /DeleteModelCheck 删除模板校验
+     *
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName DeleteModelCheck
+     * @apiDescription 删除模板校验，返回结果为布尔型。返回true，校验通过，允许删除；返回false，校验不通过，不允许删除
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} modelIDList 模板ID集合
+     * @apiSuccess (返回结果) {Boolean} data 校验结果。返回true，校验通过，允许删除；返回false，校验不通过，不允许删除
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DeleteModel
+     */
+    @Permission(permissionName = "mdmbase:DeleteModel")
+    @RequestMapping(value = "DeleteModelCheck", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deleteModelCheck(@RequestBody @Valid DeleteModelParam param) {
+        return propertyService.deleteModelCheck(param);
+    }
+
+    /**
      * @api {POST} /DeleteModel 删除模板
      *
      * @apiVersion 1.0.0

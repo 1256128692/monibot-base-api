@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
@@ -96,12 +97,14 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Object deletePropertyModelGroup(DeletePropertyModelGroupParam deletePropertyModelGroupParam) {
-        // 删除其他设备、工作流分组时候，分组下模板不删除，会将模板对应分组ID转为-1（默认分组）
+        // 删除其他设备分组、工作流分组时候，分组下模板不删除，会将模板对应分组ID转为-1（默认分组）
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
                 .in(TbPropertyModel::getModelType, List.of(PropertyModelType.DEVICE.getCode(), PropertyModelType.WORK_FLOW.getCode()))
                 .in(TbPropertyModel::getGroupID, deletePropertyModelGroupParam.getIDList()));
-        tbPropertyModelList.forEach(model -> model.setGroupID(-1));
-        tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
+        if(!CollectionUtil.isNullOrEmpty(tbPropertyModelList)){
+            tbPropertyModelList.forEach(model -> model.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+            tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
+        }
 
         return tbPropertyModelGroupMapper.deleteBatchIds(deletePropertyModelGroupParam.getIDList());
     }
