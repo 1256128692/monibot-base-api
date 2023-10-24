@@ -226,7 +226,7 @@ public class AssetController {
     @Permission(permissionName = "mdmbase:DeleteAssetHouse")
     @LogParam(moduleName = "资产模块", operationName = "删除资产库", operationProperty = OperationProperty.DELETE)
     @RequestMapping(value = "DeleteAssetHouse", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object DeleteAssetHouse(@Validated @RequestBody DeleteAssetHouseParam pa) {
+    public Object deleteAssetHouse(@Validated @RequestBody DeleteAssetHouseParam pa) {
         assetService.deleteAssetHouse(pa.getHouseIDList());
         return ResultWrapper.successWithNothing();
     }
