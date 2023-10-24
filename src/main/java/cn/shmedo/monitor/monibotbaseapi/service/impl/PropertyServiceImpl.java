@@ -147,10 +147,10 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
     @Override
     public List<Model4Web> queryModelList(QueryModelListParam param) {
-        boolean isMdCompany = checkIsMdCompany(param.getCompanyID());
+        // 查询分组时。测试企业可需要返回米度企业的预定义模板，不能返回米度企业的自定义模板
         boolean groupParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.isNull(param.getProjectType());
         boolean selectParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
-        boolean filterParamFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
+//        boolean filterParamFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
         // 模板ID非空时，根据模板ID精确查询
         if (param.getModelID() != null) {
             TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(param.getModelID());
@@ -167,7 +167,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
                 .eq(selectParamFlag, TbPropertyModel::getGroupID, param.getGroupID())
-                // 分组只返回自定义模板
+                .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID())
                 .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
         if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
