@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
@@ -150,12 +151,16 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 模糊查询
         LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
                 .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
-                .eq(TbPropertyModel::getModelType, param.getModelType())
+                .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
-                .eq(Objects.nonNull(param.getGroupID()), TbPropertyModel::getGroupID, param.getGroupID())
-                .eq(CreateType.PREDEFINED.getType().equals(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
-                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform())
-                .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
+                .eq(PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType()) && Objects.nonNull(param.getGroupID()),
+                        TbPropertyModel::getGroupID, param.getGroupID())
+                .eq(TbPropertyModel::getCreateType, param.getCreateType())
+                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
+        if(Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType()) &&
+                (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))){
+            queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+        }
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         if (ObjectUtil.isEmpty(tbPropertyModelList)) {
             return List.of();
@@ -195,7 +200,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                     }
                 }
         );
-        return model4WebList;
+        return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
     }
 
     @Override
