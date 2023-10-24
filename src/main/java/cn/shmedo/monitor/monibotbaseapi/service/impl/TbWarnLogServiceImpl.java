@@ -85,6 +85,10 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                                 WtWarnDetailInfo::getDeviceToken,
                                 WtWarnDetailInfo::setDeviceTypeName));
                 return FieldShowUtil.dealFieldShow(cameraWarn);
+            case DANGEROUS:
+            case FLOOD:
+            case RAINSTORM:
+                return baseMapper.queryDetailByID(param.getWarnID());
         }
         return null;
     }

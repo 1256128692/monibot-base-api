@@ -61,5 +61,13 @@ public interface TbWarnLogMapper extends BaseMapper<TbWarnLog> {
 
     void updateByIdAndWorkOrderID(Integer warnID, int workOrderID);
 
+    /**
+     * 查询报警基础信息列表
+     */
     List<WtWarnLogBase> queryBaseList(QueryWtWarnListParam pa);
+
+    /**
+     * 查询报警详情，通用类型
+     */
+    WtWarnDetailInfo queryDetailByID(Integer id);
 }
