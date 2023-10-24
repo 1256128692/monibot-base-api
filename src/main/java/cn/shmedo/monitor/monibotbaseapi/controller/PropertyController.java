@@ -148,7 +148,7 @@ public class PropertyController {
      */
     @Permission(permissionName = "mdmbase:DeleteModel")
     @RequestMapping(value = "DeleteModelCheck", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteModelCheck(@RequestBody @Valid DeleteModelParam param) {
+    public Object deleteModelCheck(@RequestBody @Valid DeleteModelCheckParam param) {
         return propertyService.deleteModelCheck(param);
     }
 

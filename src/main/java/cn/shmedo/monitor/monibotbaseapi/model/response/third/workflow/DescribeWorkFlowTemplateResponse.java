@@ -78,5 +78,4 @@ public class DescribeWorkFlowTemplateResponse {
         private Integer nodeHandlerID;
         private String nodeHandlerName;
     }
-
 }

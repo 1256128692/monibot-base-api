@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
@@ -28,6 +30,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +54,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     private final TbOtherDeviceMapper tbOtherDeviceMapper;
     private final FormModelCache formModelCache;
     private final WorkFlowTemplateService workFlowTemplateService;
+    private final RedisTemplate redisTemplate;
 
     public PropertyServiceImpl(TbPropertyMapper tbPropertyMapper,
                                TbProjectPropertyMapper tbProjectPropertyMapper,
@@ -59,7 +63,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                                TbProjectInfoMapper tbProjectInfoMapper,
                                TbOtherDeviceMapper tbOtherDeviceMapper,
                                FormModelCache formModelCache,
-                               WorkFlowTemplateService workFlowTemplateService) {
+                               WorkFlowTemplateService workFlowTemplateService,
+                               RedisTemplate redisTemplate) {
         this.tbPropertyMapper = tbPropertyMapper;
         this.tbProjectPropertyMapper = tbProjectPropertyMapper;
         this.tbPropertyModelMapper = tbPropertyModelMapper;
@@ -68,6 +73,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         this.tbOtherDeviceMapper = tbOtherDeviceMapper;
         this.formModelCache = formModelCache;
         this.workFlowTemplateService = workFlowTemplateService;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -141,6 +147,10 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
     @Override
     public List<Model4Web> queryModelList(QueryModelListParam param) {
+        boolean isMdCompany = checkIsMdCompany(param.getCompanyID());
+        boolean groupParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.isNull(param.getProjectType());
+        boolean selectParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
+        boolean filterParamFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
         // 模板ID非空时，根据模板ID精确查询
         if (param.getModelID() != null) {
             TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(param.getModelID());
@@ -156,13 +166,16 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
                 .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
-                .eq(Objects.nonNull(param.getGroupID()) && PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType()),
-                        TbPropertyModel::getGroupID, param.getGroupID())
+                .eq(selectParamFlag, TbPropertyModel::getGroupID, param.getGroupID())
+                // 分组只返回自定义模板
                 .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType()) &&
-                (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))) {
-            queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
+            if(PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())){
+                queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
+            }else {
+                queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+            }
         }
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         if (ObjectUtil.isEmpty(tbPropertyModelList)) {
@@ -212,7 +225,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         );
 
         // 工程项目模板组下没有模板，也要显示
-        if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType()) && modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
+        if (groupParamFlag &&
+                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType()) &&
+                modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
             Set<Integer> groupIDList = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
             ProjectTypeCache.projectTypeMap.forEach((k, v) -> {
                 if (!groupIDList.contains(Integer.valueOf(String.valueOf(k)))) {
@@ -244,6 +259,16 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
+    }
+
+    private boolean checkIsMdCompany(Integer companyID) {
+        if(Objects.isNull(companyID)){
+            return false;
+        }
+        JSONArray jsonArray = JSONUtil.parseArray(redisTemplate.opsForHash().get(DefaultConstant.REDIS_KEY_MD_COMPANY_PARENT, companyID.toString()));
+        Object o = jsonArray.get(1);
+        JSONArray jsonArray1 = JSONUtil.parseArray(JSONUtil.toJsonStr(o));
+        return jsonArray1.size() == 0;
     }
 
     @Override
@@ -286,9 +311,13 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         return 1 == row;
     }
 
-    public Boolean deleteModelCheck(DeleteModelParam param) {
+    public Boolean deleteModelCheck(DeleteModelCheckParam param) {
         List<Integer> modelIDList;
-        Map<Integer, List<TbPropertyModel>> modelTypeGroupMap = param.getTbPropertyModelList().stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
+        List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectBatchIds(param.getModelIDList());
+        if(CollectionUtil.isEmpty(tbPropertyModelList)){
+            return Boolean.TRUE;
+        }
+        Map<Integer, List<TbPropertyModel>> modelTypeGroupMap = tbPropertyModelList.stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
         // 工程项目类型校验表单模板是否有被项目使用
         if (modelTypeGroupMap.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
             modelIDList = modelTypeGroupMap.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getID).toList();
@@ -313,7 +342,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         if (modelTypeGroupMap.containsKey(PropertyModelType.WORK_FLOW.getCode())) {
             modelIDList = modelTypeGroupMap.get(PropertyModelType.WORK_FLOW.getCode()).stream().map(TbPropertyModel::getID).toList();
             ResultWrapper<List<DescribeWorkFlowTemplateResponse>> resultWrapper = workFlowTemplateService
-                    .searchWorkFlowTemplateList(new SearchWorkFlowTemplateListParam(param.getCompanyID(), param.getModelIDList()));
+                    .searchWorkFlowTemplateList(new SearchWorkFlowTemplateListParam(param.getCompanyID(), modelIDList));
             if(resultWrapper.apiSuccess()){
                 if(CollectionUtil.isEmpty(resultWrapper.getData())){
                     return Boolean.TRUE;

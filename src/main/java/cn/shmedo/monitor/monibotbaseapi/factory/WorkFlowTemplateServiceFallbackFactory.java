@@ -1,12 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.factory;
 
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.workflow.SearchWorkFlowTemplateListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.workflow.DescribeWorkFlowTemplateResponse;
-import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.WorkFlowTemplateService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +24,7 @@ public class WorkFlowTemplateServiceFallbackFactory implements FallbackFactory<W
         return new WorkFlowTemplateService() {
             @Override
             public ResultWrapper<List<DescribeWorkFlowTemplateResponse>> searchWorkFlowTemplateList(SearchWorkFlowTemplateListParam param) {
-                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+                return null;
             }
         };
     }

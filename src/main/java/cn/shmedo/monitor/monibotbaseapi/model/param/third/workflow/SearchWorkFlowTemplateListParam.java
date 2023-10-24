@@ -22,9 +22,9 @@ import java.util.List;
  * @Version 1.0
  */
 @Data
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class SearchWorkFlowTemplateListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
