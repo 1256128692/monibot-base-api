@@ -91,7 +91,7 @@ public class AssetController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteAsset
      */
-    @Permission(permissionName = "mdmbase:DeleteAsse")
+    @Permission(permissionName = "mdmbase:DeleteAsset")
     @RequestMapping(value = "DeleteAsset", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object deleteAsset(@Validated @RequestBody DeleteAssetParam pa) {
         assetService.removeByIds(pa.getAssetIDList());
