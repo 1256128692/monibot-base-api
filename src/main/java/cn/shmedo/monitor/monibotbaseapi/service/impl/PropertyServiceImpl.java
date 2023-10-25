@@ -180,6 +180,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
             }
         }
+
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         List<Model4Web> model4WebList = Lists.newArrayList();
         Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
@@ -230,9 +231,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             );
         }
 
-
         // 工程项目模板组下没有模板，也要显示
-        if (groupParamFlag && StringUtils.isEmpty(param.getName()) &&
+        if (groupParamFlag &&
+                StringUtils.isEmpty(param.getName()) &&
                 PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
             Set<Integer> groupIDSet;
             if (modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
@@ -254,7 +255,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 非工程项目模板组下没有模板，也要显示
-        if (CollectionUtil.isNotEmpty(unProjectGroupMap) && modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
+        if (CollectionUtil.isNotEmpty(unProjectGroupMap) &&
+                StringUtils.isEmpty(param.getName()) &&
+                modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
             Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
             if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
                 modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
