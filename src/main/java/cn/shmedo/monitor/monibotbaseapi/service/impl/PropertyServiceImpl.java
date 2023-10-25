@@ -26,6 +26,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.alibaba.nacos.shaded.com.google.common.collect.Maps;
+import com.alibaba.nacos.shaded.com.google.common.collect.Sets;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -180,64 +181,78 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             }
         }
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
-        if (ObjectUtil.isEmpty(tbPropertyModelList)) {
-            return List.of();
-        }
-        // 处理模板下属性
-        List<Model4Web> model4WebList = CustomizeBeanUtil.copyListProperties(tbPropertyModelList, Model4Web::new);
-        List<Integer> modeIdList = tbPropertyModelList.stream().map(TbPropertyModel::getID).collect(Collectors.toList());
-        List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda()
-                .in(TbProperty::getModelID, modeIdList));
-        Map<Integer, List<TbProperty>> propertyMap = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
-
-        // 处理组名
-        Map<Integer, List<TbPropertyModel>> modelGroup = tbPropertyModelList.stream()
-                .collect(Collectors.groupingBy(model -> {
-                    if (PropertyModelType.BASE_PROJECT.getCode().equals(model.getModelType())) {
-                        return PropertyModelType.BASE_PROJECT.getCode();
-                    } else {
-                        return PropertyModelType.UN_BASE_PROJECT.getCode();
-                    }
-                }));
-
-        // 处理非工程项目分组
+        // 若未查到模板，仍然需要展示分组
+//        if (ObjectUtil.isEmpty(tbPropertyModelList)) {
+//            return List.of();
+//        }
+        List<Model4Web> model4WebList = Lists.newArrayList();
+        Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
         Map<Integer, TbPropertyModelGroup> unProjectGroupMap = Maps.newHashMap();
-        if (modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
-            List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(
-                    new QueryWrapper<TbPropertyModelGroup>().lambda()
-                            .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModelGroup::getCompanyID, param.getCompanyID())
-                            .eq(Objects.nonNull(param.getPlatform()), TbPropertyModelGroup::getPlatform, param.getPlatform())
-                            .in(Objects.nonNull(param.getModelType()), TbPropertyModelGroup::getGroupType, param.getModelType()));
-            unProjectGroupMap = tbPropertyModelGroupList.stream().collect(Collectors.toMap(TbPropertyModelGroup::getID, Function.identity()));
+        if(CollectionUtil.isNotEmpty(tbPropertyModelList)){
+            // 处理模板下属性
+            model4WebList = CustomizeBeanUtil.copyListProperties(tbPropertyModelList, Model4Web::new);
+            List<Integer> modeIdList = tbPropertyModelList.stream().map(TbPropertyModel::getID).collect(Collectors.toList());
+            List<TbProperty> tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda()
+                    .in(TbProperty::getModelID, modeIdList));
+            Map<Integer, List<TbProperty>> propertyMap = tbPropertyList.stream().collect(Collectors.groupingBy(TbProperty::getModelID));
+
+            // 处理组名
+            modelGroup = tbPropertyModelList.stream()
+                    .collect(Collectors.groupingBy(model -> {
+                        if (PropertyModelType.BASE_PROJECT.getCode().equals(model.getModelType())) {
+                            return PropertyModelType.BASE_PROJECT.getCode();
+                        } else {
+                            return PropertyModelType.UN_BASE_PROJECT.getCode();
+                        }
+                    }));
+
+            // 处理非工程项目分组
+            unProjectGroupMap = Maps.newHashMap();
+            if (modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
+                List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(
+                        new QueryWrapper<TbPropertyModelGroup>().lambda()
+                                .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModelGroup::getCompanyID, param.getCompanyID())
+                                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModelGroup::getPlatform, param.getPlatform())
+                                .in(Objects.nonNull(param.getModelType()), TbPropertyModelGroup::getGroupType, param.getModelType()));
+                unProjectGroupMap = tbPropertyModelGroupList.stream().collect(Collectors.toMap(TbPropertyModelGroup::getID, Function.identity()));
+            }
+
+            // 给模板复制属性和分组名称
+            Map<Integer, TbPropertyModelGroup> finalGroupMap = unProjectGroupMap;
+            model4WebList.forEach(
+                    item -> {
+                        item.setPropertyList(propertyMap.get(item.getID()));
+                        if (PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())) {
+                            // 工程项目
+                            item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
+                        } else {
+                            // 非工程项目
+                            String groupName = finalGroupMap.containsKey(item.getGroupID()) ? finalGroupMap.get(item.getGroupID()).getName() : "默认";
+                            item.setGroupName(groupName);
+                        }
+                    }
+            );
         }
 
-        Map<Integer, TbPropertyModelGroup> finalGroupMap = unProjectGroupMap;
-        model4WebList.forEach(
-                item -> {
-                    item.setPropertyList(propertyMap.get(item.getID()));
-                    if (PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())) {
-                        // 工程项目
-                        item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
-                    } else {
-                        // 非工程项目
-                        String groupName = finalGroupMap.containsKey(item.getGroupID()) ? finalGroupMap.get(item.getGroupID()).getName() : "默认";
-                        item.setGroupName(groupName);
-                    }
-                }
-        );
 
         // 工程项目模板组下没有模板，也要显示
-        if (groupParamFlag &&
-                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType()) &&
-                modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
-            Set<Integer> groupIDList = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
+        if (groupParamFlag && StringUtils.isEmpty(param.getName()) &&
+                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+            Set<Integer> groupIDSet;
+            if(modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())){
+                groupIDSet = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
+            } else {
+                groupIDSet = Sets.newHashSet();
+            }
+            List<Model4Web> finalModel4WebList = model4WebList;
             ProjectTypeCache.projectTypeMap.forEach((k, v) -> {
-                if (!groupIDList.contains(Integer.valueOf(String.valueOf(k)))) {
+                Integer projectType = Integer.valueOf(String.valueOf(k));
+                if (!groupIDSet.contains(projectType)) {
                     Model4Web model4Web = new Model4Web();
                     model4Web.setModelType(PropertyModelType.BASE_PROJECT.getCode());
-                    model4Web.setGroupID(Integer.valueOf(k));
+                    model4Web.setGroupID(projectType);
                     model4Web.setGroupName(v.getTypeName());
-                    model4WebList.add(model4Web);
+                    finalModel4WebList.add(model4Web);
                 }
             });
         }
@@ -249,13 +264,14 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
             }
             Set<Integer> groupIDList = modelStream.map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
+            List<Model4Web> finalModel4WebList = model4WebList;
             unProjectGroupMap.forEach((k, v) -> {
                 if (!groupIDList.contains(k)) {
                     Model4Web model4Web = new Model4Web();
                     model4Web.setModelType(v.getGroupType());
                     model4Web.setGroupID(k);
                     model4Web.setGroupName(v.getName());
-                    model4WebList.add(model4Web);
+                    finalModel4WebList.add(model4Web);
                 }
             });
         }

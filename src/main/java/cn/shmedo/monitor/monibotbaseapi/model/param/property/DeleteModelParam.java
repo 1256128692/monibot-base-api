@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
@@ -42,6 +43,12 @@ public class DeleteModelParam implements ParameterValidator, ResourcePermissionP
         tbPropertyModelList = tbPropertyModelMapper.selectBatchIds(modelIDList);
         if(CollectionUtil.isEmpty(tbPropertyModelList)){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未查询到对应模板");
+        }
+
+        // 预定义模板不支持删除
+        Set<Integer> createTypeSet = tbPropertyModelList.stream().map(TbPropertyModel::getCreateType).collect(Collectors.toSet());
+        if(createTypeSet.contains(Integer.valueOf(CreateType.PREDEFINED.getType()))){
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在预定义模板，预定义模板不支持删除");
         }
 
         // 设备表单和工作流支持分组管理，默认分组不可删除

@@ -142,7 +142,7 @@ public class PropertyController {
      * @apiDescription 删除模板校验，返回结果为布尔型。返回true，校验通过，允许删除；返回false，校验不通过，不允许删除
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} modelIDList 模板ID集合
-     * @apiSuccess (返回结果) {Boolean} data 校验结果。返回true，校验通过，允许删除；返回false，校验不通过，不允许删除
+     * @apiSuccess (返回结果) {Bool} data 校验结果。返回true，校验通过，允许删除；返回false，校验不通过，不允许删除
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteModel
      */
