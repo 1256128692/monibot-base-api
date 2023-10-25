@@ -46,7 +46,10 @@ public class DefaultConstant {
     /** 默认属性模板组 **/
     public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
 
+    /** 工程项目类型 **/
     public static final String REDIS_KEY_MD_AUTH_SERVICE = "cn.shmedo.mdauth.service";
+    /** 企业树 **/
+    public static final String REDIS_KEY_MD_COMPANY_PARENT = "cn.shmedo.mdauth.company.parent";
     /** ================================项目表单end================================ **/
 
     /**

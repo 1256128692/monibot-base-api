@@ -2,11 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.warn;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.iot.entity.base.SubjectType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
@@ -23,10 +21,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author Chengfs on 2023/5/4
@@ -61,15 +56,20 @@ public class QueryWtWarnListParam implements ParameterValidator, ResourcePermiss
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date endTime;
 
+    private Set<@Positive @NotNull Integer> warnIDList;
+
     @JsonIgnore
     private Collection<Integer> projectIDList;
 
     @Override
     public ResultWrapper<?> validate() {
-        this.projectIDList = projectID != null ? List.of(projectID) : null;
-        this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID, this.projectIDList);
-        if (CollUtil.isEmpty(projectIDList)) {
-            return ResultWrapper.success(PageUtil.Page.empty());
+        SubjectType subjectType = CurrentSubjectHolder.getCurrentSubject().getSubjectType();
+        if (!SubjectType.APPLICATION.equals(subjectType)) {
+            this.projectIDList = projectID != null ? List.of(projectID) : null;
+            this.projectIDList = PermissionUtil.getHavePermissionProjectList(companyID, this.projectIDList);
+            if (CollUtil.isEmpty(projectIDList)) {
+                return ResultWrapper.success(PageUtil.Page.empty());
+            }
         }
 
         Optional.ofNullable(monitorTypeID).ifPresent(monitorType -> {

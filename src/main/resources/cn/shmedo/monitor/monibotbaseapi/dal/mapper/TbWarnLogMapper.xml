@@ -525,6 +525,11 @@
                  LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
         <where>
             <trim prefixOverrides="AND">
+                <if test="warnIDList != null and warnIDList.size() != 0">
+                    <foreach collection="warnIDList" item="item" index="index" open="AND twl.ID IN (" close=")" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
                 <if test="projectIDList != null and projectIDList.size() != 0">
                     <foreach collection="projectIDList" item="item" index="index" open="AND twl.ProjectID IN (" close=")" separator=",">
                         #{item}
@@ -558,5 +563,32 @@
                 ORDER BY twl.WarnTime ASC
             </when>
         </choose>
+    </select>
+
+    <select id="queryDetailByID" resultMap="wtWarnDetailMap">
+        SELECT twl.`ID`            warnID,
+               twl.`Name`          warnName,
+               twl.WarnType        warnType,
+               tpi.`ID`            projectID,
+               tpi.ProjectName     projectName,
+               tmt.MonitorType     monitorTypeID,
+               tmt.MonitorType     monitorType,
+               tmt.TypeName        monitorTypeName,
+               tmt.TypeAlias       monitorTypeAlias,
+               tmi.`ID`            monitorItemID,
+               tmi.`Name`          monitorItemName,
+               twl.WarnLevel       warnLevel,
+               twl.WarnContent     warnContent,
+               tmp.`ID`            monitorPointID,
+               tmp.`Name`          monitorPointName,
+               tmp.GpsLocation     monitorPointLocation,
+               tmp.InstallLocation installLocation,
+               twl.WarnTime        warnTime
+        FROM `tb_warn_log` twl
+                 LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+                 LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+                 LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+                 LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+        WHERE twl.`ID` = #{warnID}
     </select>
 </mapper>

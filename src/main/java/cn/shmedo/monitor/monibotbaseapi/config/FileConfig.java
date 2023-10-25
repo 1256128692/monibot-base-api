@@ -21,6 +21,8 @@ public class FileConfig {
     private String wtReportServiceAddress;
     @Value("${service.mdInfoServiceAddress}")
     private String mdInfoServiceAddress;
+    @Value("${service.workFlowServiceAddress}")
+    private String workFlowServiceAddress;
     @Value("${service.influxAddr}")
     private String influxAddr;
     @Value("${service.influxDatabase}")
