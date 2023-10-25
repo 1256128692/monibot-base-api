@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
@@ -151,7 +152,6 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 查询分组时。测试企业可需要返回米度企业的预定义模板，不能返回米度企业的自定义模板
         boolean groupParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.isNull(param.getProjectType());
         boolean selectParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
-//        boolean filterParamFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
         // 模板ID非空时，根据模板ID精确查询
         if (param.getModelID() != null) {
             TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(param.getModelID());
@@ -169,12 +169,14 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
                 .eq(selectParamFlag, TbPropertyModel::getGroupID, param.getGroupID())
                 .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
-                .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
+        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
+            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
+        }
         if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
-            if(PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())){
+            if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
                 queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
-            }else {
+            } else {
                 queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
             }
         }
@@ -182,7 +184,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         List<Model4Web> model4WebList = Lists.newArrayList();
         Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
         Map<Integer, TbPropertyModelGroup> unProjectGroupMap = Maps.newHashMap();
-        if(CollectionUtil.isNotEmpty(tbPropertyModelList)){
+        if (CollectionUtil.isNotEmpty(tbPropertyModelList)) {
             // 处理模板下属性
             model4WebList = CustomizeBeanUtil.copyListProperties(tbPropertyModelList, Model4Web::new);
             List<Integer> modeIdList = tbPropertyModelList.stream().map(TbPropertyModel::getID).collect(Collectors.toList());
@@ -233,7 +235,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         if (groupParamFlag && StringUtils.isEmpty(param.getName()) &&
                 PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
             Set<Integer> groupIDSet;
-            if(modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())){
+            if (modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
                 groupIDSet = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
             } else {
                 groupIDSet = Sets.newHashSet();
@@ -274,7 +276,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     }
 
     private boolean checkIsMdCompany(Integer companyID) {
-        if(Objects.isNull(companyID)){
+        if (Objects.isNull(companyID)) {
             return false;
         }
         JSONArray jsonArray = JSONUtil.parseArray(redisTemplate.opsForHash().get(DefaultConstant.REDIS_KEY_MD_COMPANY_PARENT, companyID.toString()));
@@ -326,7 +328,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
     public Boolean deleteModelCheck(DeleteModelCheckParam param) {
         List<Integer> modelIDList;
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectBatchIds(param.getModelIDList());
-        if(CollectionUtil.isEmpty(tbPropertyModelList)){
+        if (CollectionUtil.isEmpty(tbPropertyModelList)) {
             return Boolean.TRUE;
         }
         Map<Integer, List<TbPropertyModel>> modelTypeGroupMap = tbPropertyModelList.stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
@@ -355,8 +357,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             modelIDList = modelTypeGroupMap.get(PropertyModelType.WORK_FLOW.getCode()).stream().map(TbPropertyModel::getID).toList();
             ResultWrapper<List<DescribeWorkFlowTemplateResponse>> resultWrapper = workFlowTemplateService
                     .searchWorkFlowTemplateList(new SearchWorkFlowTemplateListParam(param.getCompanyID(), modelIDList));
-            if(resultWrapper.apiSuccess()){
-                if(CollectionUtil.isEmpty(resultWrapper.getData())){
+            if (resultWrapper.apiSuccess()) {
+                if (CollectionUtil.isEmpty(resultWrapper.getData())) {
                     return Boolean.TRUE;
                 }
             }
