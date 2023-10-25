@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * @author Chengfs on 2023/10/20
  */
@@ -28,7 +30,7 @@ public class WtWarnLogBase {
     /**
      * 预警时间
      */
-    private String warnTime;
+    private Date warnTime;
     /**
      * 项目ID
      */
@@ -66,5 +68,8 @@ public class WtWarnLogBase {
      */
     private String monitorPointName;
 
-
+    /**
+     * 监测点位置
+     */
+    private String monitorPointLocation;
 }

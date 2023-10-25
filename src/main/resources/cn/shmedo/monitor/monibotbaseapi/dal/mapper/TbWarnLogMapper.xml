@@ -40,7 +40,7 @@
 
     <resultMap id="wtWarnDetailMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo">
         <result property="warnID" column="warnID" jdbcType="INTEGER"/>
-<!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
+        <result property="warnType" column="warnType" jdbcType="INTEGER"/>
         <result property="warnName" column="warnName" jdbcType="VARCHAR"/>
         <result property="warnLevel" column="warnLevel" jdbcType="INTEGER"/>
         <result property="warnTime" column="warnTime" jdbcType="TIMESTAMP"/>
@@ -245,6 +245,7 @@
             parameterType="java.lang.Integer">
         SELECT
             twl.`ID` warnID,
+            twl.warnType warnType,
             twl.`Name` warnName,
             twl.WarnType warnType,
             tpi.`ID` projectID,
@@ -289,6 +290,7 @@
     <select id="queryCameraDetail" resultMap="wtWarnDetailMap">
         SELECT
             twl.`ID` warnID,
+            twl.warnType warnType,
             twl.`Name` warnName,
             twl.WarnType warnType,
             twl.DeviceToken deviceToken,
@@ -515,6 +517,7 @@
                tmi.`Name`      monitorItemName,
                tmp.`ID`        monitorPointID,
                tmp.`Name`      monitorPointName,
+               tmp.GpsLocation monitorPointLocation,
                tmt.MonitorType monitorTypeID,
                tmt.TypeName    monitorTypeName,
                tmt.TypeAlias   monitorTypeAlias
@@ -567,6 +570,7 @@
 
     <select id="queryDetailByID" resultMap="wtWarnDetailMap">
         SELECT twl.`ID`            warnID,
+               twl.warnType        warnType,
                twl.`Name`          warnName,
                twl.WarnType        warnType,
                tpi.`ID`            projectID,

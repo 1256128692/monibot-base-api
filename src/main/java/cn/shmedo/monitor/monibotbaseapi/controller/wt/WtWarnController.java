@@ -76,6 +76,7 @@ public class WtWarnController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnID 报警记录ID
      * @apiSuccess (返回结果) {Int} warnID 报警记录ID
+     * @apiSuccess (返回结果) {Int} warnType 报警类型 1.在线监测报警记录; 2.视频/摄像头报警记录; 3.智能终端报警记录; 4.江河洪水预警; 5.险情预警; 6.暴雨预警
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {String} projectName 工程名称
@@ -277,6 +278,7 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} data.list.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {Int} data.list.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} data.list.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} data.list.monitorPointLocation 监测点位置
      * @apiSuccess (返回结果) {Int} data.list.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiSuccess (返回结果) {DateTime} data.list.warnTime 报警时间
      * @apiSampleRequest off

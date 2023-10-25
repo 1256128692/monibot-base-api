@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnAction;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IFieldToken;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IMonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 public class WtWarnDetailInfo implements IFieldToken, IMonitorType {
     private Integer warnID;
+    private WarnType warnType;
     private String warnName;
     private Integer projectID;
     private String projectName;
