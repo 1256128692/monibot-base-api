@@ -169,10 +169,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
                 .eq(selectParamFlag, TbPropertyModel::getGroupID, param.getGroupID())
                 .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
+                .eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        if(!selectParamFlag){
-            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
-        }
         if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
             if(PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())){
                 queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
@@ -181,10 +179,6 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             }
         }
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
-        // 若未查到模板，仍然需要展示分组
-//        if (ObjectUtil.isEmpty(tbPropertyModelList)) {
-//            return List.of();
-//        }
         List<Model4Web> model4WebList = Lists.newArrayList();
         Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
         Map<Integer, TbPropertyModelGroup> unProjectGroupMap = Maps.newHashMap();
