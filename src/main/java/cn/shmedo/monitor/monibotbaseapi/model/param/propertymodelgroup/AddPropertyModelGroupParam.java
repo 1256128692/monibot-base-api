@@ -71,7 +71,7 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
         // 校验名称是否重复
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(new QueryWrapper<TbPropertyModelGroup>().lambda()
                 .eq(TbPropertyModelGroup::getCompanyID, this.companyID)
-                .eq(TbPropertyModelGroup::getPlatform, this.platform)
+                .eq(Objects.nonNull(this.platform), TbPropertyModelGroup::getPlatform, this.platform)
                 .eq(TbPropertyModelGroup::getGroupType, this.groupType)
                 .eq(TbPropertyModelGroup::getName, this.name));
         if (CollectionUtil.isNotEmpty(tbPropertyModelGroupList)) {
