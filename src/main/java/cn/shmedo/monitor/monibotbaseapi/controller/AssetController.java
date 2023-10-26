@@ -365,8 +365,8 @@ public class AssetController {
      * @apiParam (请求体) {Int} [assetID] 资产ID
      * @apiParam (请求体) {Int} [houseID] 资产库ID
      * @apiParam (请求体) {Boolean} [isWarn] 是否预警
-     * @apiParam (请求体) {Int} pageSize 页大小
-     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParam (请求体) {Int} [pageSize] 页大小 当分页参数不传时，结果为currentPageData
+     * @apiParam (请求体) {Int} [currentPage] 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Json[]} currentPageData 当前页数据

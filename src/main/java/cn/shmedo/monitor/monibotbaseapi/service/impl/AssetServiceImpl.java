@@ -117,7 +117,7 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
     }
 
     @Override
-    public PageUtil.Page<TbAsset4Web> queryAssetWithValuePage(QueryAssetWithValuePageParam pa) {
+    public Object queryAssetWithValuePage(QueryAssetWithValuePageParam pa) {
         List<TbAsset> assets;
         if (pa.getAssetID() != null) {
             TbAsset tbAsset = this.getById(pa.getAssetID());
@@ -206,7 +206,11 @@ public class AssetServiceImpl extends ServiceImpl<TbAssetMapper, TbAsset> implem
         resultAll.forEach(
                 e -> e.setUnitStr(AssetUnit.getStrByCode(e.getUnit())
                 ));
-        return PageUtil.page(resultAll, pa.getPageSize(), pa.getCurrentPage());
+        if (ObjectUtil.isAllNotEmpty(pa.getPageSize(), pa.getCurrentPage())) {
+            return PageUtil.page(resultAll, pa.getPageSize(), pa.getCurrentPage());
+        } else {
+            return resultAll;
+        }
     }
 
     @Override

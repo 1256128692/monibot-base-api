@@ -29,7 +29,7 @@ public interface IAssetService extends IService<TbAsset> {
 
     PageUtil.Page<TbAssetLog4Web> queryAssetIOLogPage(QueryAssetIOLogPageParam pa);
 
-    PageUtil.Page<TbAsset4Web> queryAssetWithValuePage(QueryAssetWithValuePageParam pa);
+    Object queryAssetWithValuePage(QueryAssetWithValuePageParam pa);
 
     PageUtil.Page<TbAssetHouse> queryAssetHousePage(QueryAssetHousePageParam pa);
 

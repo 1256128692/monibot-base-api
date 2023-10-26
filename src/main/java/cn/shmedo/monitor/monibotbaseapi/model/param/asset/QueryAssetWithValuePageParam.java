@@ -28,10 +28,8 @@ public class QueryAssetWithValuePageParam implements ParameterValidator, Resourc
     private Boolean isWarn;
     private Integer houseID;
     private Integer assetID;
-    @NotNull
     @Positive
     private Integer currentPage;
-    @NotNull
     @Range(min = 1, max = 100)
     private Integer pageSize;
 
