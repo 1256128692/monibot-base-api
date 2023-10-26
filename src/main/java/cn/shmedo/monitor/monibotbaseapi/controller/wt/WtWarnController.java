@@ -260,12 +260,12 @@ public class WtWarnController {
      * @apiParam (请求参数) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiParam (请求参数) {Int} [orderType] 排序规则 1.按照报警时间降序排序(默认) 2.按照报警时间升序排序
-     * @apiParam (请求参数) {Int} [warnType] 报警类型 1.在线监测报警记录; 2.视频/摄像头报警记录; 3.智能终端报警记录; 4.江河洪水预警; 5.险情预警; 6.暴雨预警
+     * @apiParam (请求参数) {Int[]} [warnTypes] 报警类型集合 1.在线监测报警记录; 2.视频/摄像头报警记录; 3.智能终端报警记录; 4.江河洪水预警; 5.险情预警; 6.暴雨预警
      * @apiParam (请求参数) {Int[]} [warnIDList] 报警记录ID列表
      * @apiParam (请求参数) {DateTime} [beginTime] 报警开始时间
      * @apiParam (请求参数) {DateTime} [endTime] 报警结束时间
      * @apiSuccess (返回结果) {Object} data 数据集
-     * @apiSuccess (返回结果) {Object} data.statistic 统计
+     * @apiSuccess (返回结果) {Object} data.statistic 报警等级统计 key:报警等级 value:报警数量
      * @apiSuccess (返回结果) {Object[]} data.list 数据集
      * @apiSuccess (返回结果) {Int} data.list.warnID 报警记录ID
      * @apiSuccess (返回结果) {String} data.list.warnName 报警名称

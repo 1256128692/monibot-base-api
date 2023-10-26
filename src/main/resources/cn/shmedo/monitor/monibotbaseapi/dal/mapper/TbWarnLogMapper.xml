@@ -538,8 +538,10 @@
                         #{item}
                     </foreach>
                 </if>
-                <if test="warnType != null">
-                    AND twl.WarnType = #{warnType.code}
+                <if test="warnTypes != null and warnTypes.size() != 0">
+                    <foreach collection="warnTypes" item="item" index="index" open="AND twl.WarnType IN (" close=")" separator=",">
+                        #{item.code}
+                    </foreach>
                 </if>
                 <if test="monitorTypeID != null">
                     AND twl.monitorType=#{monitorTypeID}

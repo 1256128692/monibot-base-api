@@ -48,7 +48,7 @@ public class QueryWtWarnListParam implements ParameterValidator, ResourcePermiss
     @Range(min = 1, max = 2)
     private Integer orderType;
 
-    private WarnType warnType;
+    private Set<@NotNull WarnType> warnTypes;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date beginTime;
