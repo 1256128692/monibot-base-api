@@ -281,7 +281,7 @@ public class PropertyController {
      * @apiPermission 系统权限 mdmbase:AddModel
      */
     @LogParam(moduleName = "属性管理模块", operationName = "保存模板属性值", operationProperty = OperationProperty.ADD)
-    @Permission(permissionName = "mdmbase:AddModel")
+    @Permission(permissionName = "mdmbase:AddModel", allowApplication = true)
     @PostMapping(value = "AddPropertyValues", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addPropertyValues(@RequestBody @Validated AddPropertyValuesParam param) {
         propertyService.AddPropertyValues(param);
