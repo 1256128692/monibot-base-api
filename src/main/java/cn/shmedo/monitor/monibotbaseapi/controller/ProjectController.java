@@ -419,6 +419,7 @@ public class ProjectController {
      * @apiName QueryProjectList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [projectType] 项目类型
+     * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {Int} [platformType] (废弃)平台类型 1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
      * @apiParam (请求体) {Int[]} [serviceIDList] 服务ID列表

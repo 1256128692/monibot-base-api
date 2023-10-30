@@ -22,6 +22,8 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     private Integer companyID;
 
     private Integer projectType;
+    @Valid
+    private List<@NotNull Integer> projectTypeList;
 
     private String projectName;
 
