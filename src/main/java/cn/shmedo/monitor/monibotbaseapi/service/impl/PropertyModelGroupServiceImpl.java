@@ -94,7 +94,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(new QueryWrapper<TbPropertyModel>().lambda()
                 .in(TbPropertyModel::getModelType, List.of(PropertyModelType.DEVICE.getCode(), PropertyModelType.WORK_FLOW.getCode()))
                 .in(TbPropertyModel::getGroupID, deletePropertyModelGroupParam.getIDList()));
-        if(!CollectionUtil.isNullOrEmpty(tbPropertyModelList)){
+        if (!CollectionUtil.isNullOrEmpty(tbPropertyModelList)) {
             tbPropertyModelList.forEach(model -> model.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
             tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
         }
@@ -127,7 +127,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         }
 
         // 添加默认分组
-        if(Objects.isNull(param.getName()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getGroupType())){
+        if (Objects.isNull(param.getName()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getGroupType())) {
             PropertyModelGroupResponse propertyModelGroupResponse = new PropertyModelGroupResponse();
             propertyModelGroupResponse.setID(-1);
             propertyModelGroupResponse.setGroupType(param.getGroupType());
