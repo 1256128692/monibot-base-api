@@ -47,7 +47,7 @@ public class ProjectController {
      * @apiParam (请求体) {DateTime} expiryDate 有效日期，精度到天,需大于今日
      * @apiParam (请求体) {String} directManageUnit 直管单位(<=50)
      * @apiParam (请求体) {Int} platformType (废弃)所属平台类型  1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
-     * @apiParam (请求体) {String} platformTypeSet 所属平台类型集合(,分隔)， 可选为 流域平台，灌区平台，水库平台，MDNET,林业平台
+     * @apiParam (请求体) {Int[]} serviceIDList 所属服务ID列表
      * @apiParam (请求体) {Boolean} enable 开启状态
      * @apiParam (请求体) {String} location 四级行政区域信息(<=500)
      * @apiParam (请求体) {String} projectAddress 项目地址(<=100)
@@ -71,7 +71,6 @@ public class ProjectController {
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "AddProject", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addProject(@Validated @RequestBody AddProjectParam pa) {
-
         return projectService.addProject(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 
@@ -108,7 +107,7 @@ public class ProjectController {
      * @apiParam (请求体) {Boolean} [enable] 项目状态，null:全选，true:启用，false:停用
      * @apiParam (请求体) {Boolean} [isSonLevel]  是否为子工程，只对最外层过滤
      * @apiParam (请求体) {Int[]} [platformTypeList] （废弃）平台类型列表
-     * @apiParam (请求体) {String[]} [platformTypeSet] 平台类型集合
+     * @apiParam (请求体) {Int[]} [serviceIDList] 服务ID列表
      * @apiParam (请求体) {DateTime} [expiryDate] 有效期
      * @apiParam (请求体) {DateTime} [expiryDateBegin] 有效期开始， 有效期应大于等于当前时间
      * @apiParam (请求体) {DateTime} [expiryDateEnd] 有效期结束， 有效期应小于等于当前时间
@@ -132,7 +131,11 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} currentPageData.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} currentPageData.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Int} currentPageData.platformType 平台类型(废弃)
-     * @apiSuccess (返回结果) {Striing} currentPageData.platformTypeSet 平台类型集合
+     * @apiSuccess (返回结果) {Json[]} currentPageData.serviceList 服务列表
+     * @apiSuccess (返回结果) {Int} currentPageData.serviceList.ID 服务ID
+     * @apiSuccess (返回结果) {String} currentPageData.serviceList.serviceName 服务名称
+     * @apiSuccess (返回结果) {String} currentPageData.serviceList.serviceAlias 服务别名
+     * @apiSuccess (返回结果) {String} currentPageData.serviceList.serviceDesc 服务描述
      * @apiSuccess (返回结果) {String} currentPageData.directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} currentPageData.expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} currentPageData.enable 是否有效
@@ -206,7 +209,11 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {Byte} platformType （废弃）平台类型
-     * @apiSuccess (返回结果) {String} platformTypeSet 平台类型集合
+     * @apiSuccess (返回结果) {Json[]} serviceList 服务列表
+     * @apiSuccess (返回结果) {Int} serviceList.ID 服务ID
+     * @apiSuccess (返回结果) {String} serviceList.serviceName 服务名称
+     * @apiSuccess (返回结果) {String} serviceList.serviceAlias 服务别名
+     * @apiSuccess (返回结果) {String} serviceList.serviceDesc 服务描述
      * @apiSuccess (返回结果) {String} directManageUnit 直管单位
      * @apiSuccess (返回结果) {DateTime} expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} enable 是否有效
@@ -414,7 +421,7 @@ public class ProjectController {
      * @apiParam (请求体) {Int} [projectType] 项目类型
      * @apiParam (请求体) {String} [projectName] 项目名称,支持模糊查询
      * @apiParam (请求体) {Int} [platformType] (废弃)平台类型 1水文水利 2矿山 3国土地灾 4基建 5MD_Net3.0
-     * @apiParam (请求体) {String[]} [platformTypeSet] 平台类型集合
+     * @apiParam (请求体) {Int[]} [serviceIDList] 服务ID列表
      * @apiParam (请求体) {Int[]} [projectIDList] 项目ID列表
      * @apiSuccess (返回结果) {Object[]} data 项目信息列表
      * @apiSuccess (返回结果) {Int} data.id 项目id

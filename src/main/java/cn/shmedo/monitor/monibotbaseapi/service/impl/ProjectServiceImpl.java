@@ -31,6 +31,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRe
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
@@ -88,6 +89,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
     private final TbProjectRelationMapper tbProjectRelationMapper;
     private final TbDocumentFileMapper tbDocumentFileMapper;
+    private final TbProjectServiceRelationMapper tbProjectServiceRelationMapper;
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -176,6 +178,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
 
         }
+        // 处理和服务的关系
+        tbProjectServiceRelationMapper.insertBatchSomeColumn(
+                pa.getServiceIDList().stream().map(sid ->
+                        TbProjectServiceRelation.builder()
+                                .projectID(tbProjectInfo.getID()).serviceID(sid).build()
+                ).toList()
+        );
 
         // 新增项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
@@ -534,6 +543,40 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 //                            .filter(StrUtil::isNotEmpty).collect(Collectors.toList()), pa.getCompanyID())
 //                    .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
 
+            Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+            Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+            ;
+            temp.forEach((key, value) -> {
+                serviceMap.put(Integer.valueOf(key), value);
+            });
+            // 获取全部的项目ID
+            List<Integer> pidList = new ArrayList<>();
+            pageData.currentPageData().forEach(
+                    e -> {
+                        pidList.add(e.getID());
+                        if (ObjectUtil.isNotEmpty(e.getDownLevelProjectList())) {
+                            e.getDownLevelProjectList().forEach(
+                                    ee -> {
+                                        pidList.add(ee.getID());
+                                        if (ObjectUtil.isNotEmpty(ee.getDownLevelProjectList())) {
+                                            ee.getDownLevelProjectList().forEach(
+                                                    eee -> {
+                                                        pidList.add(eee.getID());
+                                                    }
+                                            );
+                                        }
+                                    }
+                            );
+                        }
+                    }
+            );
+            List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>()
+                            .in(TbProjectServiceRelation::getProjectID, pidList)
+            );
+            Map<Integer, List<Integer>> pidServiceListMap = tbProjectServiceRelations.stream().collect(
+                    Collectors.groupingBy(TbProjectServiceRelation::getProjectID,
+                            Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())));
             pageData.currentPageData().forEach(item -> {
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), List.of()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), List.of()));
@@ -543,6 +586,43 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     item.setImagePath(fileService.getFileUrl(item.getImagePath()));
                 });
 //                item.setImagePath(imgMap.getOrDefault(item.getImagePath(), null));
+
+                // 处理服务
+                if (pidServiceListMap.containsKey(item.getID())) {
+                    item.setServiceList(
+                            pidServiceListMap.get(item.getID()).stream().map(
+                                    serviceMap::get
+                            ).toList()
+                    );
+                }
+                if (ObjectUtil.isNotEmpty(item.getDownLevelProjectList())) {
+                    item.getDownLevelProjectList().forEach(
+                            e -> {
+                                if (pidServiceListMap.containsKey(e.getID())) {
+                                    e.setServiceList(
+                                            pidServiceListMap.get(e.getID()).stream().map(
+                                                    serviceMap::get
+                                            ).toList()
+                                    );
+                                }
+                            }
+                    );
+
+                    if (ObjectUtil.isNotEmpty(item.getDownLevelProjectList())) {
+                        item.getDownLevelProjectList().forEach(
+                                ee -> {
+                                    if (pidServiceListMap.containsKey(ee.getID())) {
+                                        ee.setServiceList(
+                                                pidServiceListMap.get(ee.getID()).stream().map(
+                                                        serviceMap::get
+                                                ).toList()
+                                        );
+                                    }
+                                }
+                        );
+                    }
+                }
+
             });
         }
         return pageData;
@@ -564,6 +644,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
 
         handlerImagePathToRealPath(result);
+        List<Integer> serviceIDList = tbProjectServiceRelationMapper.selectList(
+                new LambdaQueryWrapper<TbProjectServiceRelation>().eq(TbProjectServiceRelation::getProjectID, pa.getID())
+        ).stream().map(TbProjectServiceRelation::getServiceID).toList();
+        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+        ;
+        temp.forEach((key, value) -> {
+            serviceMap.put(Integer.valueOf(key), value);
+        });
+        ;
+        result.setServiceList(
+                serviceIDList.stream().map(
+                        serviceMap::get
+                ).toList()
+        );
         return result;
     }
 
@@ -580,11 +675,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (pa.getProjectType() != null) {
             wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
         }
-        if (ObjectUtil.isNotEmpty(pa.getPlatformTypeSet())) {
-            String sql = pa.getPlatformTypeSet().stream().map(
-                    e -> "Find_in_set('" + e + "',platformTypeSet)"
-            ).collect(Collectors.joining(" or "));
-            wrapper.apply(sql);
+        if (ObjectUtil.isNotEmpty(pa.getServiceIDList())) {
+            List<TbProjectServiceRelation> temp = tbProjectServiceRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>().in(TbProjectServiceRelation::getServiceID, pa.getServiceIDList())
+            );
+            if (ObjectUtil.isNotEmpty(temp)) {
+                wrapper.in(TbProjectInfo::getID, temp.stream().map(TbProjectServiceRelation::getProjectID).toList());
+            }
         }
         if (pa.getPlatformType() != null) {
             wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformType().intValue());

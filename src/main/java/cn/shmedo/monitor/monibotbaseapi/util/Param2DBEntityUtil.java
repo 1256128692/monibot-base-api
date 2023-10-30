@@ -55,7 +55,6 @@ public class Param2DBEntityUtil {
         obj.setUpdateTime(now);
 
         obj.setLevel(pa.getLevel() == null ? ProjectLevel.Son.getLevel() : pa.getLevel());
-        obj.setPlatformTypeSet(pa.getPlatformTypeSet());
         return obj;
     }
 

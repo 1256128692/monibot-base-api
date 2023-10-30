@@ -17,6 +17,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -25,10 +27,7 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: monibot-base-api
@@ -86,8 +85,9 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     @NotNull
     @Range(min = -1, max = 0)
     private Byte level;
-    @NotBlank
-    private String platformTypeSet;
+    @Valid
+    @NotEmpty
+    private List<@NotNull Integer> serviceIDList;
 
     @Override
     public ResultWrapper validate() {
@@ -172,11 +172,10 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             }
 
         }
-        // 校验平台集合
-        if (Arrays.stream(platformTypeSet.split(",")).anyMatch(
-                e -> !DefaultConstant.platformTypeList.contains(e)
-        )) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
+        RedisService redisService = ContextHolder.getBean(RedisService.class);
+        List<Integer> allServiceIDLIst = redisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
+        if (serviceIDList.stream().anyMatch(item -> !allServiceIDLIst.contains(item))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有服务不存在");
         }
         return null;
 

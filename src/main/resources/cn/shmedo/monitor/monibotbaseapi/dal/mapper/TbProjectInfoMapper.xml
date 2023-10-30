@@ -294,10 +294,13 @@
                       </otherwise>
                   </choose>
               </if>
-              <if test="platformTypeSet != null and platformTypeSet.size() != 0">
-                  <foreach  collection="platformTypeSet" item="item"  separator="or" open="(" close=")">
-                      FIND_IN_SET(#{item}, platformTypeSet) > 0
+              <if test="serviceIDList != null and serviceIDList.size() != 0">
+                  id in (
+                    select ProjectID from tb_project_service_relation where ServiceID in
+                  <foreach collection="serviceIDList" item="sid" separator="," open="(" close=")">
+                      #{sid}
                   </foreach>
+                  )
                   AND
               </if>
               <if test="expiryDate != null">

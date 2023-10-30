@@ -58,7 +58,7 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     private Boolean isSonLevel;
 
     private List<Byte> platformTypeList;
-    private List<String> platformTypeSet;
+    private List<Integer> serviceIDList;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expiryDate;

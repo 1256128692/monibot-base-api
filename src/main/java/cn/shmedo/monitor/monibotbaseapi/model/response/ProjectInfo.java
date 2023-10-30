@@ -63,6 +63,8 @@ public class ProjectInfo extends TbProjectInfo {
 
     private String locationInfo;
 
+    private List<AuthService> serviceList;
+
 
     private List<ProjectInfo> downLevelProjectList;
 

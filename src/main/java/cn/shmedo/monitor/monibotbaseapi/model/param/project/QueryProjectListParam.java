@@ -27,7 +27,7 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
 
     private Byte platformType;
     @Valid
-    private List<@NotBlank String> platformTypeSet;
+    private List<@NotNull Integer> serviceIDList;
 
     private Collection<Integer> projectIDList;
 
