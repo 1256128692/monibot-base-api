@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -17,6 +18,8 @@ import lombok.ToString;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @Author wuxl
@@ -54,19 +57,22 @@ public class TransferGroupingParam implements ParameterValidator, ResourcePermis
         TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
         tbPropertyModelList = tbPropertyModelMapper.selectBatchIds(modelIDList);
         if (modelIDList.size() != tbPropertyModelList.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在未知的模板ID");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在错误的模板ID");
         }
 
         // 只支持设备模板和工作流模板转移分组
-        if(!PropertyModelType.DEVICE.getCode().equals(modelType) && !PropertyModelType.WORK_FLOW.getCode().equals(modelType)){
+        if (!PropertyModelType.DEVICE.getCode().equals(modelType) && !PropertyModelType.WORK_FLOW.getCode().equals(modelType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持设备模板、工作流模板转移分组");
         }
 
         // 校验新的模板分组是否存在
         TbPropertyModelGroupMapper tbPropertyModelGroupMapper = ContextHolder.getBean(TbPropertyModelGroupMapper.class);
         TbPropertyModelGroup tbPropertyModelGroup = tbPropertyModelGroupMapper.selectById(newGroupID);
-        if ((PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(tbPropertyModelGroup)) ||
-                (DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP != newGroupID && !PropertyModelType.BASE_PROJECT.getCode().equals(modelType))) {
+        // 转移到默认分组不用校验
+        if (DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP == newGroupID) {
+            return null;
+        }
+        if (!PropertyModelType.BASE_PROJECT.getCode().equals(modelType) && Objects.isNull(tbPropertyModelGroup)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "转移后分组不存在");
         }
         return null;

@@ -40,9 +40,7 @@ import java.util.stream.Collectors;
  * @Version 1.0
  */
 @Service
-public class PropertyModelGroupServiceImpl implements PropertyModelGroupService, InitializingBean {
-    private String appKey = null;
-    private String appSecret = null;
+public class PropertyModelGroupServiceImpl implements PropertyModelGroupService {
 
     @Autowired
     private TbPropertyModelMapper tbPropertyModelMapper;
@@ -55,12 +53,6 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
 
     @Autowired
     private FileConfig fileConfig;
-
-    @Override
-    public void afterPropertiesSet() {
-        appKey = fileConfig.getAuthAppKey();
-        appSecret = fileConfig.getAuthAppSecret();
-    }
 
     @Override
     public Object addPropertyModelGroup(AddPropertyModelGroupParam addPropertyModelGroupParam) {
@@ -82,7 +74,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
         TbPropertyModelGroup tbPropertyModelGroup = queryPropertyModelGroupParam.getTbPropertyModelGroup();
         PropertyModelGroupResponse propertyModelGroupResponse = CustomizeBeanUtil.copyProperties(tbPropertyModelGroup, PropertyModelGroupResponse.class);
         QueryUserIDNameParameter queryUserIdNameParameter = new QueryUserIDNameParameter(Collections.singletonList(propertyModelGroupResponse.getCreateUserID()));
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(queryUserIdNameParameter, appKey, appSecret);
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(queryUserIdNameParameter, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (resultWrapper.apiSuccess()) {
             List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
             if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
@@ -105,7 +97,6 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
             tbPropertyModelList.forEach(model -> model.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
             tbPropertyModelMapper.updateBatchById(tbPropertyModelList);
         }
-
         return tbPropertyModelGroupMapper.deleteBatchIds(deletePropertyModelGroupParam.getIDList());
     }
 
@@ -124,7 +115,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService,
 
         List<PropertyModelGroupResponse> propertyModelGroupResponseList = new ArrayList<>();
         List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (resultWrapper.apiSuccess()) {
             // 获取CreateUserID对应的CreateUserName
             List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
