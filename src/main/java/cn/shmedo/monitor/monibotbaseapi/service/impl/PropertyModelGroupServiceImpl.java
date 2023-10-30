@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.PropertyModelGroupService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
@@ -109,21 +110,19 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModelGroup::getPlatform, param.getPlatform())
                 .eq(StringUtils.isNotEmpty(param.getName()), TbPropertyModelGroup::getName, param.getName());
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(queryWrapper);
-        if (CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
-            return Collections.emptyList();
-        }
-
-        List<PropertyModelGroupResponse> propertyModelGroupResponseList = new ArrayList<>();
-        List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
-        if (resultWrapper.apiSuccess()) {
-            // 获取CreateUserID对应的CreateUserName
-            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
-                List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
-                Map<Integer, UserIDName> userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
-                propertyModelGroupResponseList = CustomizeBeanUtil.copyListProperties(tbPropertyModelGroupList, PropertyModelGroupResponse::new);
-                propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIdNameMap.get(res.getCreateUserID()).getUserName()));
+        List<PropertyModelGroupResponse> propertyModelGroupResponseList = Lists.newArrayList();
+        if (!CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
+            List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
+            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            if (resultWrapper.apiSuccess()) {
+                // 获取CreateUserID对应的CreateUserName
+                List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+                if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
+                    List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+                    Map<Integer, UserIDName> userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
+                    propertyModelGroupResponseList = CustomizeBeanUtil.copyListProperties(tbPropertyModelGroupList, PropertyModelGroupResponse::new);
+                    propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIdNameMap.get(res.getCreateUserID()).getUserName()));
+                }
             }
         }
 
