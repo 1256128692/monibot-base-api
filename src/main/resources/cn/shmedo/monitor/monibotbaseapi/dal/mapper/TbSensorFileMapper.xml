@@ -258,13 +258,13 @@
     <select id="queryPageByCondition"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo">
         select ID,
-               SensorID,
                UploadTime,
                filePath,
                fileType,
-               fileSize
+               fileSize,
+               videoDeviceSourceID
         from tb_sensor_file
-        where sensorID = #{sensorID,jdbcType=INTEGER}
+        where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
         <if test="begin != null">
             AND UploadTime &gt;= #{begin}
         </if>
@@ -276,18 +276,22 @@
     <select id="selectListBySensorIDAndTime"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo">
         select ID,
-               SensorID,
+               videoDeviceSourceID,
                UploadTime,
                filePath,
                fileType,
                fileSize
         from tb_sensor_file
-        where sensorID = #{sensorID,jdbcType=INTEGER}
+        where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
         <if test="begin != null">
             AND UploadTime &gt;= #{begin}
         </if>
         <if test="end != null">
             AND UploadTime &lt;= #{end}
         </if>
+    </select>
+
+    <select id="queryCaptureDate" resultType="java.util.Date">
+        select UploadTime from tb_sensor_file where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
     </select>
 </mapper>

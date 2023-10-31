@@ -60,4 +60,14 @@ public interface VideoService {
     ResultWrapper<Object> deletePresetPoint(List<PresetPointWithDeviceInfo> presetPointWithDeviceInfoList);
 
     ResultWrapper<Object> movePresetPoint(PresetPointWithDeviceInfo info);
+
+    List<VideoDeviceInfoV1> queryVideoDeviceListV1(QueryVideoDeviceListParam pa);
+
+    Object saveVideoDeviceCaptureList(SaveVideoDeviceCaptureParam pa);
+
+    Object saveVideoSensorList(SaveVideoDeviceSensorParam pa);
+
+    Object queryCaptureDate(QueryCaptureParam pa);
+
+    VideoDeviceDetailInfo QueryVideoDeviceDetail(QueryVideoDeviceDetailParam pa);
 }

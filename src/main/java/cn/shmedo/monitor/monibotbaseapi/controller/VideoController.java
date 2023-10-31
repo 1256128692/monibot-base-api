@@ -508,11 +508,13 @@ public class VideoController {
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 传感器列表
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
-     * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.imageCapture] 抓拍是否开启
      * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.sensorEnable] 传感器是否开启
-     * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
-     * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
+     * @apiSuccess (返回结果) {Object[]} dataList.videoDeviceCaptureList 视频通道信息列表
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceCaptureList.channelNo 通道号
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceCaptureList.enable 通道是否启用
+     * @apiSuccess (返回结果) {Boolean} [dataList.videoDeviceCaptureList.imageCapture] 抓拍是否开启
+     * @apiSuccess (返回结果) {Int} [dataList.videoDeviceCaptureList.captureInterval] 抓拍间隔(单位分钟)
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
@@ -520,6 +522,46 @@ public class VideoController {
     @RequestMapping(value = "/QueryVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryVideoDeviceList(@Validated @RequestBody QueryVideoDeviceListParam pa) {
         return videoService.queryVideoDeviceList(pa);
+    }
+
+
+    /**
+     * @api {POST} /QueryVideoDeviceListV1 查询视频设备列表(不分页-新版)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询视频设备列表(不分页-新版)
+     * @apiName QueryVideoDeviceListV1
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {String[]} [deviceSerialList] 设备序列号/监控点唯一标识,null查询该公司下全部
+     * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
+     * @apiSuccess (返回结果) {String} dataList.deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} dataList.deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} dataList.deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} dataList.deviceStatus  设备在线状态
+     * @apiSuccess (返回结果) {Byte} dataList.accessPlatform 接入平台
+     * @apiSuccess (返回结果) {String} dataList.accessPlatformStr 接入平台名称
+     * @apiSuccess (返回结果) {Int} dataList.deviceChannelNum 设备接入平台通道号的数量(海康默认为1)
+     * @apiSuccess (返回结果) {Int} dataList.accessChannelNum 可接入通道号的总量(海康默认为1)
+     * @apiSuccess (返回结果) {DateTime} dataList.createTime 创建时间（接入时间）
+     * @apiSuccess (返回结果) {Object[]} dataList.sensorList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.channelNo 通道号
+     * @apiSuccess (返回结果) {Boolean} dataList.sensorList.enable 通道是否启用
+     * @apiSuccess (返回结果) {Int} [dataList.sensorList.sensorID] 传感器ID
+     * @apiSuccess (返回结果) {String} dataList.sensorList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.sensorEnable] 传感器是否开启
+     * @apiSuccess (返回结果) {Int} [dataList.sensorList.projectID] 所属工程ID
+     * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.imageCapture] 抓拍是否开启
+     * @apiSuccess (返回结果) {Int} [dataList.sensorList.captureInterval] 抓拍间隔(单位分钟)
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryVideoDeviceListV1", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryVideoDeviceListV1(@Validated @RequestBody QueryVideoDeviceListParam pa) {
+        return videoService.queryVideoDeviceListV1(pa);
     }
 
 
@@ -664,6 +706,56 @@ public class VideoController {
         return videoService.saveVideoDeviceSensorList(pa);
     }
 
+    /**
+     * @api {POST} /SaveVideoCaptureList 批量存储视频抓拍列表(新)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量存储视频抓拍列表
+     * @apiName SaveVideoDeviceSensorList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
+     * @apiParam (请求体) {String} list.deviceSerial 设备序列号
+     * @apiParam (请求体) {Int} list.videoDeviceSourceID 通道视频设备ID
+     * @apiParam (请求体) {Boolean} list.imageCapture 是否开启抓拍
+     * @apiParam (请求体) {Int} list.captureInterval 抓拍间隔(单位:分钟)
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice")
+    @RequestMapping(value = "/SaveVideoCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object saveVideoCaptureList(@Validated @RequestBody SaveVideoDeviceCaptureParam pa) {
+        return videoService.saveVideoDeviceCaptureList(pa);
+    }
+
+
+    /**
+     * @api {POST} /SaveVideoSensorList 批量存储视频传感器列表(新)
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量存储视频传感器列表
+     * @apiName SaveVideoSensorList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
+     * @apiParam (请求体) {Int} list.videoDeviceID 视频设备ID
+     * @apiParam (请求体) {String} list.deviceSerial 设备序列号
+     * @apiParam (请求体) {Int} [list.projectID] 所属工程项目ID
+     * @apiParam (请求体) {Object[]} list.addSensorList 新增视频传感器(max = 100)
+     * @apiParam (请求体) {Int} [list.addSensorList.sensorID] 传感器ID,为空时进行新增,不为空时进行更新
+     * @apiParam (请求体) {String} list.addSensorList.sensorName 传感器名称
+     * @apiParam (请求体) {Boolean} [list.addSensorList.sensorEnable] 传感器是否启用
+     * @apiParam (请求体) {Int} list.addSensorList.videoDeviceSourceID 通道视频设备ID
+     * @apiParam (请求体) {Int} list.addSensorList.channelCode 通道号
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice")
+    @RequestMapping(value = "/SaveVideoSensorList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object saveVideoSensorList(@Validated @RequestBody SaveVideoDeviceSensorParam pa) {
+        return videoService.saveVideoSensorList(pa);
+    }
+
 
     /**
      * @api {POST} /QueryVideoDevicePage 查询视频设备列表(分页)
@@ -724,7 +816,8 @@ public class VideoController {
      * @apiDescription 查询抓拍列表
      * @apiName QueryCapturePage
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {DateTime} [begin] 开始时间
      * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiParam (请求体) {Int} pageSize 页大小
@@ -755,7 +848,8 @@ public class VideoController {
      * @apiDescription 查询抓拍列表
      * @apiName QueryCaptureList
      * @apiParam (请求体) {Int} companyID  公司ID
-     * @apiParam (请求体) {Int} sensorID 传感器ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiParam (请求体) {Int} [sensorID] 传感器ID
      * @apiParam (请求体) {DateTime} [begin] 开始时间
      * @apiParam (请求体) {DateTime} [end] 结束时间
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
@@ -772,6 +866,68 @@ public class VideoController {
     @RequestMapping(value = "/QueryCaptureList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryCaptureList(@Validated @RequestBody QueryCaptureParam pa) {
         return videoService.queryCaptureList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryCaptureDate 查询抓拍数据时间
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询抓拍列表
+     * @apiName QueryCaptureList
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
+     * @apiSuccess (返回结果) {Date} dataList.uploadTime 上传时间
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryCaptureDate", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryCaptureDate(@Validated @RequestBody QueryCaptureParam pa) {
+        return videoService.queryCaptureDate(pa);
+    }
+
+
+    /**
+     * @api {POST} /QueryVideoDeviceDetail 查询视频设备详情
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询视频设备详情
+     * @apiName QueryVideoDeviceDetail
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {String} deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {Int} videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {Int} companyID 视频设备ID
+     * @apiSuccess (返回结果) {String} deviceSerial 设备序列号/监控点唯一标识
+     * @apiSuccess (返回结果) {String} deviceType 视频设备类型
+     * @apiSuccess (返回结果) {String} deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} deviceStatus  设备在线状态
+     * @apiSuccess (返回结果) {Byte} accessPlatform 接入平台
+     * @apiSuccess (返回结果) {String} accessPlatformStr 接入平台名称
+     * @apiSuccess (返回结果) {Int} deviceChannelNum 设备接入平台通道号的数量(海康默认为1)
+     * @apiSuccess (返回结果) {Int} accessChannelNum 可接入通道号的总量(海康默认为1)
+     * @apiSuccess (返回结果) {DateTime} createTime 创建时间（接入时间）
+     * @apiSuccess (返回结果) {Object[]} videoDeviceSourceList 通道视频列表
+     * @apiSuccess (返回结果) {Int} videoDeviceSourceList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} videoDeviceSourceList.channelNo 通道号
+     * @apiSuccess (返回结果) {Boolean} videoDeviceSourceList.enable 通道是否启用
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.sensorID] 传感器ID
+     * @apiSuccess (返回结果) {String} videoDeviceSourceList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {Boolean} [videoDeviceSourceList.sensorEnable] 传感器是否开启
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.projectID] 所属工程ID
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Int} [videoDeviceSourceList.monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorPointName] 监测点名称
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorItemName] 监测项目名称
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.gpsLocation] 监测点位置
+     * @apiSuccess (返回结果) {String} [videoDeviceSourceList.location] 行政区划
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseVideo")
+    @RequestMapping(value = "/QueryVideoDeviceDetail", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryVideoDeviceDetail(@Validated @RequestBody QueryVideoDeviceDetailParam pa) {
+        return videoService.QueryVideoDeviceDetail(pa);
     }
 
 

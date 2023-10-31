@@ -1,33 +1,33 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
-import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import com.alibaba.nacos.shaded.org.checkerframework.checker.units.qual.C;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
-import java.util.Date;
+import java.util.List;
 
 @Data
-public class QueryCaptureParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class SaveVideoDeviceCaptureParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
-    @NotNull(message = "公司不能为空")
+    @NotNull
     private Integer companyID;
 
-    private Integer videoDeviceSourceID;
-    private Integer sensorID;
-    private Date begin;
-    private Date end;
+
+    @NotEmpty
+    private List<CaptureInfo> list;
 
     @Override
     public ResultWrapper validate() {
-        if (begin != null && end != null) {
-            if (begin.after(end)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
-            }
-        }
         return null;
     }
+
 
     @Override
     public Resource parameter() {
@@ -38,4 +38,6 @@ public class QueryCaptureParam implements ParameterValidator, ResourcePermission
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
+
+
 }

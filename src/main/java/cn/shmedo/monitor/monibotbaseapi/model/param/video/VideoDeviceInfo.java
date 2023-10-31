@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDeviceSource;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsChannelInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.YsDeviceInfo;
@@ -11,11 +12,14 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class VideoDeviceInfo extends TbVideoDevice {
+
+    private List<TbVideoDeviceSource> tbVideoDeviceSourceList;
 
 
     public static VideoDeviceInfo ysToNewValue(YsDeviceInfo data,
@@ -23,7 +27,7 @@ public class VideoDeviceInfo extends TbVideoDevice {
                                                VideoDeviceBaseInfo a,
                                                AddVideoDeviceListParam pa, int num) {
         VideoDeviceInfo vo = new VideoDeviceInfo();
-
+        List<TbVideoDeviceSource> sourceList = new LinkedList<>();
         vo.setDeviceName(data.getDeviceSerial());
         vo.setDeviceType(data.getModel());
         vo.setDeviceSerial(data.getDeviceSerial());
@@ -38,7 +42,18 @@ public class VideoDeviceInfo extends TbVideoDevice {
         vo.setAccessPlatform(a.getAccessPlatform());
         vo.setAccessProtocol(a.getAccessProtocol());
         if (!CollectionUtil.isNullOrEmpty(ysChannelInfoList)) {
-            vo.setExValue(JSONUtil.toJsonStr(ysChannelInfoList));
+            ysChannelInfoList.forEach(y -> {
+                TbVideoDeviceSource videoDeviceSource = new TbVideoDeviceSource();
+                videoDeviceSource.setCompanyID(pa.getCompanyID());
+                videoDeviceSource.setDeviceSerial(data.getDeviceSerial());
+                videoDeviceSource.setAccessPlatform(a.getAccessPlatform());
+                videoDeviceSource.setChannelNo(y.getChannelNo());
+                videoDeviceSource.setCreateUserID(pa.getCurrentSubject().getSubjectID());
+                videoDeviceSource.setCreateTime(DateUtil.date());
+                videoDeviceSource.setEnable(true);
+                sourceList.add(videoDeviceSource);
+            });
+            vo.setTbVideoDeviceSourceList(sourceList);
         }
         vo.setCreateTime(DateUtil.date());
         vo.setUpdateTime(DateUtil.date());
@@ -70,9 +85,18 @@ public class VideoDeviceInfo extends TbVideoDevice {
         vo.setAccessChannelNum(1);
         vo.setAccessPlatform(a.getAccessPlatform());
         vo.setAccessProtocol(a.getAccessProtocol());
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("channelNo", Integer.parseInt(hkDeviceInfo.getChannelNo()));
-        vo.setExValue(jsonObject.toString());
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("channelNo", Integer.parseInt(hkDeviceInfo.getChannelNo()));
+//        vo.setExValue(jsonObject.toString());
+        TbVideoDeviceSource videoDeviceSource = new TbVideoDeviceSource();
+        videoDeviceSource.setCompanyID(pa.getCompanyID());
+        videoDeviceSource.setDeviceSerial(a.getDeviceSerial());
+        videoDeviceSource.setAccessPlatform(a.getAccessPlatform());
+        videoDeviceSource.setChannelNo(Integer.parseInt(hkDeviceInfo.getChannelNo()));
+        videoDeviceSource.setCreateUserID(pa.getCurrentSubject().getSubjectID());
+        videoDeviceSource.setCreateTime(DateUtil.date());
+        videoDeviceSource.setEnable(true);
+        vo.setTbVideoDeviceSourceList(List.of(videoDeviceSource));
         vo.setCreateTime(DateUtil.date());
         vo.setUpdateTime(DateUtil.date());
         // 第一次添加设备,都是未分配工程状态

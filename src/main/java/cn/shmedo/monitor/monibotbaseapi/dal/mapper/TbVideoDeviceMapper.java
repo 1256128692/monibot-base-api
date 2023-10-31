@@ -2,11 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -45,4 +41,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     void batchUpdateDeviceStatus(List<TbVideoDevice> tbVideoDevices);
 
     Integer queryOnlineCount(String deviceSerial, String fuzzyItem, Boolean deviceStatus, Boolean allocationStatus, Integer ownedCompanyID, Integer projectID, Date begin, Date end);
+
+    VideoDeviceDetailInfo queryDeviceDetail(String deviceSerial, Integer companyID);
 }

@@ -10,9 +10,8 @@ public class VideoSensorFileInfo {
 
 
     private Integer ID;
-    private Integer sensorID;
     private Date uploadTime;
-
+    private Integer videoDeviceSourceID;
     @JsonIgnore
     private String filePath;
     private String path;

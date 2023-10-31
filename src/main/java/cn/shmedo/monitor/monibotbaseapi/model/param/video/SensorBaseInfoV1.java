@@ -24,6 +24,8 @@ public class SensorBaseInfoV1 {
 
     private Integer captureInterval;
 
+    private Integer videoDeviceSourceID;
+
     @JsonIgnore
     private Integer videoDeviceID;
 
@@ -68,14 +70,14 @@ public class SensorBaseInfoV1 {
         SensorBaseInfoV1 newSensor = new SensorBaseInfoV1();
 
         // 复制输入对象的属性到新对象
-        newSensor.setProjectID(videoDeviceID.getProjectID());
+        newSensor.setProjectID(videoDeviceID.getProjectID()==null ? -1 : videoDeviceID.getProjectID());
         newSensor.setSensorName(inputSensor.getSensorName());
         newSensor.setSensorEnable(inputSensor.getSensorEnable());
-        newSensor.setChannelCode(inputSensor.getChannelCode());
+//        newSensor.setChannelCode(inputSensor.getChannelCode());
         newSensor.setCaptureInterval(inputSensor.getCaptureInterval());
 
         // 设置默认值
-        newSensor.setVideoDeviceID(videoDeviceID.getVideoDeviceID());
+//        newSensor.setVideoDeviceID(videoDeviceID.getVideoDeviceID());
         newSensor.setTemplateID(-1);
         newSensor.setDataSourceComposeType(1);
         newSensor.setMonitorType(MonitorType.VIDEO.getKey());
@@ -88,14 +90,16 @@ public class SensorBaseInfoV1 {
         // 设置 JSON 对象的字段
         jsonObject.put(DefaultConstant.VIDEO_DEVICE_SN, videoDeviceID.getDeviceSerial());
         jsonObject.put(DefaultConstant.VIDEO_CHANNEL, inputSensor.getChannelCode());
-        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
-        jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
+//        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
+//        jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
 
         newSensor.setExValues(jsonObject.toString());
         newSensor.setCreateTime(new Date());
         newSensor.setCreateUserID(subjectID);
         newSensor.setUpdateTime(new Date());
         newSensor.setUpdateUserID(subjectID);
+
+        newSensor.setVideoDeviceSourceID(inputSensor.getVideoDeviceSourceID());
 
         return newSensor;
     }
@@ -107,12 +111,12 @@ public class SensorBaseInfoV1 {
         SensorBaseInfoV1 newSensor = new SensorBaseInfoV1();
 
         // 复制输入对象的属性到新对象
-        newSensor.setProjectID(videoDeviceInfoV3.getProjectID());
+        newSensor.setProjectID(videoDeviceInfoV3.getProjectID()==null ? -1 : videoDeviceInfoV3.getProjectID());
         newSensor.setSensorID(inputSensor.getSensorID());
         newSensor.setSensorName(inputSensor.getSensorName());
         newSensor.setSensorEnable(inputSensor.getSensorEnable());
-        newSensor.setChannelCode(inputSensor.getChannelCode());
-        newSensor.setCaptureInterval(inputSensor.getCaptureInterval());
+//        newSensor.setChannelCode(inputSensor.getChannelCode());
+//        newSensor.setCaptureInterval(inputSensor.getCaptureInterval());
 
         // 创建一个 JSON 对象
         JSONObject jsonObject = new JSONObject();
@@ -120,8 +124,8 @@ public class SensorBaseInfoV1 {
         // 设置 JSON 对象的字段
         jsonObject.put(DefaultConstant.VIDEO_DEVICE_SN, videoDeviceInfoV3.getDeviceSerial());
         jsonObject.put(DefaultConstant.VIDEO_CHANNEL, inputSensor.getChannelCode());
-        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
-        jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
+//        jsonObject.put(DefaultConstant.VIDEO_IMAGECAPTURE, inputSensor.getImageCapture());
+//        jsonObject.put(DefaultConstant.VIDEO_CAPTUREINTERVAL, inputSensor.getCaptureInterval() != null ? inputSensor.getCaptureInterval() : 0);
 
         newSensor.setExValues(jsonObject.toString());
         newSensor.setUpdateTime(new Date());

@@ -393,4 +393,30 @@
             </if>
         </where>
     </select>
+
+    <select id="queryDeviceDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceDetailInfo">
+        select vd.ID as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.exValue,
+               vd.createTime
+        from tb_video_device vd
+        where 1 = 1
+          and (
+            vd.deviceSerial = #{deviceSerial}
+            )
+        <if test="companyID != null">
+            and vd.CompanyID = #{companyID}
+        </if>
+    </select>
 </mapper>
