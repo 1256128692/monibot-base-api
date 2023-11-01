@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
@@ -16,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -72,6 +74,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
 
     private Integer newCompanyID;
     private Date newRetireDate;
+
+    @Valid
+    private List<@NotNull Integer> serviceIDList;
 
     @Size(max = 100)
     private String fileName;
@@ -165,6 +170,14 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
             int count = tbTagMapper.countByCIDAndIDs(companyID, null);
             if (count + tagList.size() > 100) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前公司下标签数量为：" + count + " ,新增会导致超过100");
+            }
+        }
+
+        if (ObjectUtil.isNotEmpty(serviceIDList)) {
+            RedisService redisService = ContextHolder.getBean(RedisService.class);
+            List<Integer> allServiceIDLIst = redisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
+            if (serviceIDList.stream().anyMatch(item -> !allServiceIDLIst.contains(item))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有服务不存在");
             }
         }
         return null;

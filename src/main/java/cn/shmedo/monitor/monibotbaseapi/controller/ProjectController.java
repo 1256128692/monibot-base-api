@@ -299,6 +299,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} [imageSuffix] 图片格式
      * @apiParam (请求体) {Int} [newCompanyID] 新公司, 转移公司用
      * @apiParam (请求体) {Date}  [newRetireDate] 新有效期
+     * @apiParam (请求体) {Int[]}  [serviceIDList] 服务ID列表,该项存在则进行修改
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateBaseProject
