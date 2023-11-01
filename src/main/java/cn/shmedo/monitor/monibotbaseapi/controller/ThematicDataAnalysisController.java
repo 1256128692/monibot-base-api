@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
@@ -24,6 +25,7 @@ public class ThematicDataAnalysisController {
     private final IThematicDataAnalysisService thematicDataAnalysisService;
 
     /**
+     * @apiIgnore
      * @api {POST} /QueryStGroupRealData 浸润线专题
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
@@ -62,12 +64,13 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限
      */
 //    @Permission(permissionName = "")
-    @PostMapping(value = "/QueryStGroupRealData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryStGroupRealData(@Valid @RequestBody QueryStDataParam param) {
-        return thematicDataAnalysisService.queryStGroupRealData(param);
-    }
+//    @PostMapping(value = "/QueryStGroupRealData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryStGroupRealData(@Valid @RequestBody QueryStDataParam param) {
+//        return thematicDataAnalysisService.queryStGroupRealData(param);
+//    }
 
     /**
+     * @apiIgnore
      * @api {POST} /QueryStGroupRealDataPage 浸润线专题分页 TODO
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
@@ -79,12 +82,13 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限
      */
 //    @Permission(permissionName = "")
-    @PostMapping(value = "/QueryStGroupRealDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryStGroupRealDataPage(@Valid @RequestBody Object param) {
-        return null;
-    }
+//    @PostMapping(value = "/QueryStGroupRealDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryStGroupRealDataPage(@Valid @RequestBody Object param) {
+//        return null;
+//    }
 
     /**
+     * @apiIgnore
      * @api {POST} /QueryDmAnalysisData 内部变形专题
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
@@ -113,12 +117,13 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限
      */
 //    @Permission(permissionName = "")
-    @PostMapping(value = "/QueryDmAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDmAnalysisData(@Valid @RequestBody QueryDmDataParam param) {
-        return thematicDataAnalysisService.queryDmAnalysisData(param);
-    }
+//    @PostMapping(value = "/QueryDmAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryDmAnalysisData(@Valid @RequestBody QueryDmDataParam param) {
+//        return thematicDataAnalysisService.queryDmAnalysisData(param);
+//    }
 
     /**
+     * @apiIgnore
      * @api {POST} /QueryDmAnalysisDataPage 内部变形专题分页
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
@@ -148,12 +153,13 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限
      */
 //    @Permission(permissionName = "")
-    @PostMapping(value = "/QueryDmAnalysisDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDmAnalysisDataPage(@Valid @RequestBody QueryDmDataPageParam param) {
-        return thematicDataAnalysisService.queryDmAnalysisDataPage(param);
-    }
+//    @PostMapping(value = "/QueryDmAnalysisDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryDmAnalysisDataPage(@Valid @RequestBody QueryDmDataPageParam param) {
+//        return thematicDataAnalysisService.queryDmAnalysisDataPage(param);
+//    }
 
     /**
+     * @apiIgnore
      * @api {POST} /QueryDmPageDataList 内部变形专题数据列表
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
@@ -170,10 +176,10 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限
      */
     //    @Permission(permissionName = "")
-    @PostMapping(value = "/QueryDmPageDataList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDmPageDataList(@Valid @RequestBody QueryDmDataParam param) {
-        return thematicDataAnalysisService.queryDmPageDataList(param);
-    }
+//    @PostMapping(value = "/QueryDmPageDataList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+//    public Object queryDmPageDataList(@Valid @RequestBody QueryDmDataParam param) {
+//        return thematicDataAnalysisService.queryDmPageDataList(param);
+//    }
 
     /**
      * @api {POST} /QueryThematicMonitorPoint 查询专题分析监测点位
