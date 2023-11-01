@@ -245,4 +245,27 @@ public class WtMonitorGroupDataController {
     }
 
 
+    /**
+     * @api {POST} /DeleteBatchDataEvent 删除大事件
+     * @apiVersion 1.0.0
+     * @apiGroup 监测组别数据数据模块
+     * @apiName DeleteBatchDataEvent
+     * @apiDescription 删除大事件
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} eventIDList 大事件名称
+     * @apiParamExample 请求体示例
+     * {"companyID":138,"projectID":1,"eventIDList":[1]}
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/DeleteBatchDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object deleteBatchDataEvent(@Validated @RequestBody Object pa) {
+//        return wtMonitorService.queryMonitorPointList(pa);
+        return ResultWrapper.successWithNothing();
+    }
+
+
 }
