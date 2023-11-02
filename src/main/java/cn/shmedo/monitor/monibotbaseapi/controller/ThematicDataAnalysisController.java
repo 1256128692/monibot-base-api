@@ -68,7 +68,7 @@ public class ThematicDataAnalysisController {
 
     /**
      * @apiIgnore
-     * @api {POST} /QueryStGroupRealDataPage 浸润线专题分页 TODO
+     * @api {POST} /QueryStGroupRealDataPage 浸润线专题分页(未完成)
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryStGroupRealDataPage
@@ -223,6 +223,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.monitorPointEnable 监测点是否启用
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.sensorID 传感器ID
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -240,6 +241,7 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryTransverseList
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
      * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
@@ -254,13 +256,15 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {DateTime} dataList.time 时间
      * @apiSuccess (返回结果) {Object} [dataList.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
      * @apiSuccess (返回结果) {Int} dataList.datumPointData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} dataList.datumPointData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Double} dataList.datumPointData.value 值
      * @apiSuccess (返回结果) {Double} dataList.datumPointData.upper 波动区间上限
      * @apiSuccess (返回结果) {Double} dataList.datumPointData.lower 波动区间下限
      * @apiSuccess (返回结果) {Object[]} dataList.monitorPointList 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Double} dataList.monitorPointList.value 值
-     * @apiSuccess (返回结果) {Double} [dataList.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置时才有该项;<br>为0时表示该点的值正常,为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
+     * @apiSuccess (返回结果) {Double} [dataList.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置且当前值为异常值时才有该项;<br>为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -277,6 +281,7 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryTransversePage
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
      * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
@@ -295,13 +300,15 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
      * @apiSuccess (返回结果) {Object} [currentPageData.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
      * @apiSuccess (返回结果) {Int} currentPageData.datumPointData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.datumPointData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.value 值
      * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.upper 波动区间上限
      * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.lower 波动区间下限
      * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点数据列表
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Double} currentPageData.monitorPointList.value 值
-     * @apiSuccess (返回结果) {Double} [currentPageData.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置时才有该项;<br>为0时表示该点的值正常,为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
+     * @apiSuccess (返回结果) {Double} [currentPageData.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置且当前值为异常值时才有该项;<br>为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -318,9 +325,12 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryLongitudinalList
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
      * @apiParam (请求体) {Object} [cutoffWallConfig] 防渗墙配置
      * @apiParam (请求体) {Double} cutoffWallConfig.value 阈值
      * @apiParam (请求体) {Int[]} cutoffWallConfig.monitorPointIDList 防渗墙两侧监测点IDList<br>monitorPointIDList必定是monitorPointIDList的一个子列。如果不是,则说明该监测点已经从监测点组中删除,此时需要重新配置防渗效果监测的数据
@@ -329,12 +339,12 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Object[]} dataList.pipeDataList 管道数据列表
      * @apiSuccess (返回结果) {Double} dataList.pipeDataList.emptyPipe 空管距离(m)
      * @apiSuccess (返回结果) {Object} dataList.pipeDataList.distanceElevation 水位高程
-     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.value 值值(m)
-     * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'时才有该项<br>为正值时表示正常,为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.value 值(m)
+     * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'且该值小于等于0时才有该项<br>为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
      * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.eigenValue] 特征值数据 配置有'特征值'时才有该项,优先选取最大的'特征值'
      * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.eigenValueID 特征值ID 配置有'特征值'时才有该项,优先选取最大的'特征值'
      * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.eigenValueName 特征值名称
-     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.value 特征值异常值 为0时表示正常,为正值时表示水位高程超过该特征值
+     * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.eigenValue.value] 特征值异常值 为正值时表示水位高程超过该特征值
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -351,9 +361,12 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryLongitudinalPage
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiParam (请求体) {Object} [cutoffWallConfig] 防渗墙配置
@@ -367,11 +380,11 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.emptyPipe 空管距离(m)
      * @apiSuccess (返回结果) {Object} currentPageData.pipeDataList.distanceElevation 水位高程
      * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.value 值(m)
-     * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'时才有该项<br>为正值时表示正常,为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
+     * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'且该值小于等于0时才有该项<br>为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
      * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.eigenValue] 特征值数据 配置有'特征值'时才有该项,优先选取最大的'特征值'
      * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.eigenValueID 特征值ID
      * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.eigenValueName 特征值名称
-     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.value 特征值异常值 为0时表示正常,为正值时表示水位高程超过该特征值
+     * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.eigenValue.value] 特征值异常值 为正值时表示水位高程超过该特征值
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -404,20 +417,22 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} [dataList.volumeFlowInput] 入库流量(m³/s)
      * @apiSuccess (返回结果) {Double} [dataList.volumeFlowOutput] 出库流量(m³/s)
      * @apiSuccess (返回结果) {Object[]} maxDataList 最大数据列表
-     * @apiSuccess (返回结果) {String} maxDataList.key 标识符 rainfall降雨量(mm),distance库水位(m),volumeFlowInput入库流量(m³/s),volumeFlowOutput出库流量(m³/s)
+     * @apiSuccess (返回结果) {Int} maxDataList.key 标识枚举 1.降雨量(mm) 2.distance库水位(m) 3.volumeFlowInput入库流量(m³/s) 4.volumeFlowOutput出库流量(m³/s)
      * @apiSuccess (返回结果) {Double} maxDataList.value 值
      * @apiSuccess (返回结果) {DateTime} maxDataList.time 时间
      * @apiSuccess (返回结果) {Object[]} [eigenvalueDataList] 特征值数据列表
      * @apiSuccess (返回结果) {Int} eigenvalueDataList.eigenValueID 特征值ID
+     * @apiSuccess (返回结果) {String} eigenvalueDataList.eigenValueName 特征值名称
      * @apiSuccess (返回结果) {Double} eigenvalueDataList.value 值
      * @apiSuccess (返回结果) {String} eigenvalueDataList.engUnit 单位英文名称
      * @apiSuccess (返回结果) {String} eigenvalueDataList.chnUnit 单位中文名称
      * @apiSuccess (返回结果) {Object[]} [dataEventDataList] 大事件数据列表
      * @apiSuccess (返回结果) {Int} dataEventDataList.eventID 大事件ID
+     * @apiSuccess (返回结果) {String} dataEventDataList.eventName 大事件名称
      * @apiSuccess (返回结果) {String} dataEventDataList.timeRange 时间范围
      * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
-     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":1.0,"distance":1.0,"volumeFlowInput":1.0,"volumeFlowOutput":1.0}],"maxDataList":[{"key":"distance","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"rainfall","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"volumeFlowInput","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"volumeFlowOutput","value":1.0,"time":"2023-11-01 00:00:00"}],"eigenvalueDataList":[{"eigenValueID":1,"value":1.0,"engUnit":"m","chnUnit":"米"}],"dataEventDataList":[{"eventID":1,"timeRange":""}]}
+     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":1.0,"distance":1.0,"volumeFlowInput":1.0,"volumeFlowOutput":1.0}],"maxDataList":[{"key":1,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":2,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":3,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":4,"value":1.0,"time":"2023-11-01 00:00:00"}],"eigenvalueDataList":[{"eigenValueID":1,"value":1.0,"engUnit":"m","chnUnit":"米"}],"dataEventDataList":[{"eventID":1,"timeRange":""}]}
      * @apiPermission 项目权限 mdmbase:
      */
     //@Permission(permissionName = "")
@@ -459,14 +474,12 @@ public class ThematicDataAnalysisController {
         return null;
     }
 
-    //TODO 数据比测
-
     /**
-     * @api {POST} /QueryDryBeachData 干滩分析
+     * @api {POST} /QueryDryBeachDataPage 干滩分析(分页)
      * @apiDescription 干滩分析
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
-     * @apiName QueryDryBeachData
+     * @apiName QueryDryBeachDataPage
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
      * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
@@ -483,10 +496,64 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} currentPageData.rainfall 降雨量(mm)
      * @apiSuccess (返回结果) {Object} currentPageData.dryBeach 干滩数据
      * @apiSuccess (返回结果) {Double} currentPageData.dryBeach.value 滩长(m)
-     * @apiSuccess (返回结果) {Double} [currentPageData.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'时才有该项<br>为0时表示该点的值正常,为负值时表示该点值超出最小干滩长度
+     * @apiSuccess (返回结果) {Double} [currentPageData.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'且当前值为异常值时才有该项<br>为负值时表示该点值超出最小干滩长度
      * @apiSuccess (返回结果) {Object} currentPageData.distance 库水位数据
      * @apiSuccess (返回结果) {Double} currentPageData.distance.value 库水位(m)
-     * @apiSuccess (返回结果) {Double} [currentPageData.distance.abnormalValue] 异常值 配置了特征值'设计洪水位'时才有该项<br>为0时表示该点的值正常,为正值时表示该点值超出设计洪水位
+     * @apiSuccess (返回结果) {Double} [currentPageData.distance.abnormalValue] 异常值 配置了特征值'设计洪水位'且当前值为异常值时才有该项<br>为正值时表示该点值超出设计洪水位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryDryBeachDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryDryBeachDataPage(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryDryBeachDataList 干滩分析(不分页)
+     * @apiDescription 干滩分析
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryDryBeachDataList
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
+     * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
+     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
+     * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
+     * @apiSuccess (返回结果) {Objcet[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Double} dataList.slopeRratio 坡度比
+     * @apiSuccess (返回结果) {Double} dataList.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Object} dataList.dryBeach 干滩数据
+     * @apiSuccess (返回结果) {Double} dataList.dryBeach.value 滩长(m)
+     * @apiSuccess (返回结果) {Double} [dataList.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'且当前值为异常值时才有该项<br>为负值时表示该点值超出最小干滩长度
+     * @apiSuccess (返回结果) {Object} dataList.distance 库水位数据
+     * @apiSuccess (返回结果) {Double} dataList.distance.value 库水位(m)
+     * @apiSuccess (返回结果) {Double} [dataList.distance.abnormalValue] 异常值 配置了特征值'设计洪水位'且当前值为异常值时才有该项<br>为正值时表示该点值超出设计洪水位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryDryBeachDataList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryDryBeachDataList(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryDryBeachData 干滩分析-最新数据
+     * @apiDescription 干滩分析
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryDryBeachData
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
+     * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
+     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiSuccess (返回结果) {Double} slopeRratio 坡度比
+     * @apiSuccess (返回结果) {Double} rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} dryBeachValue 滩长(m)
+     * @apiSuccess (返回结果) {Double} distanceValue 库水位(m)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -504,14 +571,10 @@ public class ThematicDataAnalysisController {
      * @apiName AddManualDataBatch
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Object[]} dataList 数据列表
-     * @apiParam (请求体) {Int} dataList.monitorType 监测类型
      * @apiParam (请求体) {Int} dataList.sensorID 传感器ID
-     * @apiParam (请求体) {Object[]} dataList.sensorDataList 传感器数据列表
-     * @apiParam (请求体) {DateTime} dataList.sensorDataList.time 时间
-     * @apiParam (请求体) {Object[]} dataList.sensorDataList.fieldList 属性列表
-     * @apiParam (请求体) {String} dataList.sensorDataList.fieldList.fieldToken 属性标识
-     * @apiParam (请求体) {String} dataList.sensorDataList.fieldList.value 值字符串,将根据匹配到的属性字段类型解析成对应的值
-     * @apiParam (请求体) {Int} dataList.sensorDataList.fieldList.unitID 单位ID
+     * @apiParam (请求体) {DateTime} dataList.time 时间
+     * @apiParam (请求体) {String} dataList.fieldToken 属性标识
+     * @apiParam (请求体) {String} dataList.value 值字符串,将根据匹配到的属性字段类型解析成对应的值
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
@@ -523,32 +586,30 @@ public class ThematicDataAnalysisController {
     }
 
     /**
-     * @api {POST} /QueryCompareAnalysisData 查询数据比测
-     * @apiDescription 查询数据比测
+     * @api {POST} /QueryCompareAnalysisData 查询数据比测人工数据
+     * @apiDescription 查询数据比测人工数据
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryCompareAnalysisData
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {String} fieldToken 属性标识
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
      * @apiParam (请求体) {Int} autoSensorID 自动传感器ID
      * @apiParam (请求体) {Int} manualSensorID 手动传感器ID
-     * @apiParam (请求体) {Double} errorRange 对应的误差范围值
      * @apiSuccess (返回结果) {Int} autoCount 自动化记录数
      * @apiSuccess (返回结果) {Int} manualCount 人工记录数
      * @apiSuccess (返回结果) {Int} abnormalCount 异常自动化记录数
      * @apiSuccess (返回结果) {Double} abnormalRatio 误差率
-     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Object[]} dataList 人工数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.autoTime 自动化数据时间
      * @apiSuccess (返回结果) {DateTime} dataList.manualTime 人工数据时间
      * @apiSuccess (返回结果) {Boolean} dataList.normal 是否正常 true正常|false异常
      * @apiSuccess (返回结果) {Double} dataList.autoData 自动化传感器数据
-     * @apiSuccess (返回结果) {Double} [dataList.manualData] 人工传感器数据
-     * @apiSuccess (返回结果) {Double} [dataList.abnormalValue] 超限值
+     * @apiSuccess (返回结果) {Double} dataList.manualData 人工传感器数据
      * @apiSuccess (返回结果) {String} dataList.chnUnit 中文单位
      * @apiSuccess (返回结果) {String} dataList.engUnit 英文单位
+     * @apiSuccess (返回结果) {Double} [dataList.abnormalValue] 超限值
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */

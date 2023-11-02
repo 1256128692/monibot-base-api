@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -533,5 +534,25 @@ public class SensorController {
     @RequestMapping(value = "/QueryAllSensorID", method = RequestMethod.GET, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateSensorStatusAndMonitorBeginTime() {
         return sensorService.queryAllSensorID();
+    }
+
+    /**
+     * @api {POST} /QueryManualSensorListByMonitor 根据监测类型查询工程下所有人工传感器
+     * @apiDescription 根据监测类型查询工程下所有人工传感器
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QueryManualSensorListByMonitor
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Name} dataList.sensorName 传感器名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryManualSensorListByMonitor", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryManualSensorListByMonitor(@Valid @RequestBody Object param) {
+        return null;
     }
 }
