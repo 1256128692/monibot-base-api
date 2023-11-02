@@ -696,6 +696,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             );
             if (ObjectUtil.isNotEmpty(temp)) {
                 wrapper.in(TbProjectInfo::getID, temp.stream().map(TbProjectServiceRelation::getProjectID).toList());
+            } else {
+                return Collections.emptyList();
             }
         }
         if (pa.getPlatformType() != null) {

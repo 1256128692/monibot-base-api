@@ -46,16 +46,20 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {Date} data.time  数据采集时间
      * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
      * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorDataList       传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {Int} data.sensorDataList.sensorID         传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Bool} data.multiSensor        是否为关联多传感器
+     * @apiSuccess (响应结果) {Object} data.sensorData       单传感器数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
+     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID        传感器ID
+     * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
+     * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器数据
+     * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} data.multiSensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {T} data.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -116,21 +120,13 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {DateTime} data.begin 开始时间
-     * @apiSuccess (响应结果) {DateTime} data.end   结束时间
-     * @apiSuccess (响应结果) {Int} data.densityType 密度,(0:全部 1:小时 2:日 3:周 4:月 5:年)
-     * @apiSuccess (响应结果) {Int} data.statisticsType 统计方式,(0:最新一条 1:平均值 2:阶段累积 3:阶段变化)
-     * @apiSuccess (响应结果) {String} data.densityTypeStr 密度,(0:全部 1:小时 2:日 3:周 4:月 5:年)
-     * @apiSuccess (响应结果) {String} data.statisticsTypeStr 统计方式,(0:最新一条 1:平均值 2:阶段累积 3:阶段变化)
      * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
      * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器id
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorFilterDataList 传感器数据最大最小值过滤列表
-     * @apiSuccess (响应结果) {Boolean} data.sensorFilterDataList.flag 标识,最大值:true 最小值:false
-     * @apiSuccess (响应结果) {Int} data.sensorFilterDataList.sensorID 传感器ID
-     * @apiSuccess (响应结果) {T} data.sensorFilterData.data 传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Boolean} data.sensorList.flag 标识,最大值:true 最小值:false
+     * @apiSuccess (响应结果) {T} data.sensorList.data 传感器数据(动态值)，参考监测项目属性字段列表
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -307,6 +303,7 @@ public class WtMonitorGroupDataController {
      * @apiDescription 查询数据特征值列表
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiParamExample 请求体示例
      * {"projectID":1}
      * @apiSuccess (响应结果) {Object[]} eigenvalueList 特征值列表
@@ -405,6 +402,7 @@ public class WtMonitorGroupDataController {
      * @apiDescription 查询大事件列表
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 项目ID
+     * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiParamExample 请求体示例
      * {"projectID":1,"name":"1","monitorItemID":1}
      * @apiSuccess (返回结果) {Object[]} dataList 大事件ID
