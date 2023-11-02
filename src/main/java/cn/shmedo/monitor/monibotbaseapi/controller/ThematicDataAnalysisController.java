@@ -1,12 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,14 +28,14 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryStGroupRealData
      * @apiDescription 浸润线专题
-     * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorGroupID 监测组ID
-     * @apiParam (请求参数) {Int} [density] 密度 1.日平均; 2.月平均; 3.年平均
-     * @apiParam (请求参数) {String} group 监测点自定义配置信息group
-     * @apiParam (请求参数) {String} key 监测点自定义配置信息key
-     * @apiParam (请求参数) {String} upperName 浸润线规则警戒值的upperName
-     * @apiParam (请求参数) {DateTime} [startTime] 查询时段开始时间
-     * @apiParam (请求参数) {DateTime} [endTime] 查询时段结束时间
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测组ID
+     * @apiParam (请求体) {Int} [density] 密度 1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求体) {String} group 监测点自定义配置信息group
+     * @apiParam (请求体) {String} key 监测点自定义配置信息key
+     * @apiParam (请求体) {String} upperName 浸润线规则警戒值的upperName
+     * @apiParam (请求体) {DateTime} [startTime] 查询时段开始时间
+     * @apiParam (请求体) {DateTime} [endTime] 查询时段结束时间
      * @apiSuccess (返回结果) {Int} monitorPointGroupID 监测组ID
      * @apiSuccess (返回结果) {String} monitorPointGroupName 监测组名称
      * @apiSuccess (返回结果) {String} groupImage 底图路径
@@ -76,7 +73,7 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryStGroupRealDataPage
      * @apiDescription 浸润线专题分页
-     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {String} [avgData.dataList.pointConfig] 监测点配置,包含管高、管宽、渲染样式等
      * @apiSampleRequest off
      * @apiPermission 项目权限
@@ -94,14 +91,14 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryDmAnalysisData
      * @apiDescription 内部变形专题
-     * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
-     * @apiParam (请求参数) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
-     * @apiParam (请求参数) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
-     * @apiParam (请求参数) {String} group 传感器自定义配置信息group
-     * @apiParam (请求参数) {String} key 传感器自定义配置信息key
-     * @apiParam (请求参数) {DateTime} startTime 查询时段开始时间
-     * @apiParam (请求参数) {DateTime} endTime 查询时段结束时间
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
+     * @apiParam (请求体) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求体) {String} group 传感器自定义配置信息group
+     * @apiParam (请求体) {String} key 传感器自定义配置信息key
+     * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
+     * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
      * @apiSuccess (返回结果) {Int} monitorPointGroupID 监测组ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测组名称
      * @apiSuccess (返回结果) {Object[]} historyData 历史内部变形数据
@@ -129,15 +126,15 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryDmAnalysisData
      * @apiDescription 内部变形专题分页
-     * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
-     * @apiParam (请求参数) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
-     * @apiParam (请求参数) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
-     * @apiParam (请求参数) {String} group 传感器自定义配置信息group
-     * @apiParam (请求参数) {String} key 传感器自定义配置信息key
-     * @apiParam (请求参数) {DateTime} startTime 查询时段开始时间
-     * @apiParam (请求参数) {DateTime} endTime 查询时段结束时间
-     * @apiParam (请求参数) {DateTime[]} [dataList] 数据列表中选中的时间
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
+     * @apiParam (请求体) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求体) {String} group 传感器自定义配置信息group
+     * @apiParam (请求体) {String} key 传感器自定义配置信息key
+     * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
+     * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
+     * @apiParam (请求体) {DateTime[]} [dataList] 数据列表中选中的时间
      * @apiSuccess (返回结果) {Int} monitorPointGroupID 监测组ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测组名称
      * @apiSuccess (返回结果) {Object[]} historyData 历史内部变形数据
@@ -165,17 +162,17 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryDmPageDataList
      * @apiDescription 内部变形专题查询用户可选的数据列表
-     * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {Int} monitorPointID 监测点ID
-     * @apiParam (请求参数) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
-     * @apiParam (请求参数) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
-     * @apiParam (请求参数) {DateTime} startTime 查询时段开始时间
-     * @apiParam (请求参数) {DateTime} endTime 查询时段结束时间
+     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiParam (请求体) {Int} [fieldToken] 数据轴token,默认是id最小的fieldToken
+     * @apiParam (请求体) {Int} density 密度 0.全部;1.日平均; 2.月平均; 3.年平均
+     * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
+     * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
      * @apiSuccess (返回结果) {DateTime[]} dataList 用户可选的数据列表
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    //    @Permission(permissionName = "")
+//    @Permission(permissionName = "")
 //    @PostMapping(value = "/QueryDmPageDataList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
 //    public Object queryDmPageDataList(@Valid @RequestBody QueryDmDataParam param) {
 //        return thematicDataAnalysisService.queryDmPageDataList(param);
@@ -187,7 +184,7 @@ public class ThematicDataAnalysisController {
      * @apiGroup 专题模块
      * @apiName QueryThematicMonitorPoint
      * @apiDescription 查询专题分析监测点位
-     * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} projectID 项目ID
      * @apiSuccess (返回结果) {Object[]} data 数据
      * @apiSuccess (返回结果) {Int} data.thematicType 主题类型枚举1.水雨情; 2.浸润线; 3.内部变形
      * @apiSuccess (返回结果) {Object[]} data.thematicDataList 主题类型数据
@@ -199,9 +196,365 @@ public class ThematicDataAnalysisController {
      * @apiSampleRequest off
      * @apiPermission 项目权限
      */
-    //    @Permission(permissionName = "")
+    //@Permission(permissionName = "")
     @PostMapping(value = "/QueryThematicMonitorPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryThematicMonitorPoint(@Valid @RequestBody QueryMonitorItemPointListParam param) {
         return thematicDataAnalysisService.queryThematicMonitorPointByProjectID(param.getProjectID());
+    }
+
+    /**
+     * @api {POST} /QueryThematicGroupPointList 查询专题分析监测点组和监测点数据
+     * @apiDescription 查询专题分析监测点组和监测点数据
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryThematicGroupPointList
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} [thematicType] 专题类型 1.浸润线 默认1.浸润线
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测点组ID
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupName 监测点组名称
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupImagePath 监测点组底图路径
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupConfig 监测点组自定义配置
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupEnable 监测点组是否启用
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList 监测点数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointConfig 监测点配置
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.monitorPointEnable 监测点是否启用
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryThematicGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryThematicGroupPointList(@Valid @RequestBody Object param) {
+        //(group,key,value) - (monitorGroup,原始key::123,value)
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryTransverseList 浸润线分析-横剖面(不分页)
+     * @apiDescription 浸润线分析-横剖面(不分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryTransverseList
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
+     * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Object} [datumPoint] 基准点配置
+     * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
+     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
+     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {DateTime} dataList.time 时间
+     * @apiSuccess (返回结果) {Object} [dataList.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
+     * @apiSuccess (返回结果) {Int} dataList.datumPointData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Double} dataList.datumPointData.value 值
+     * @apiSuccess (返回结果) {Double} dataList.datumPointData.upper 波动区间上限
+     * @apiSuccess (返回结果) {Double} dataList.datumPointData.lower 波动区间下限
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointList 监测点数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Double} dataList.monitorPointList.value 值
+     * @apiSuccess (返回结果) {Double} [dataList.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置时才有该项;<br>为0时表示该点的值正常,为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryTransverseList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryTransverseList(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryTransversePage 浸润线分析-横剖面(分页)
+     * @apiDescription 浸润线分析-横剖面(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryTransversePage
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
+     * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParam (请求体) {Object} [datumPoint] 基准点配置
+     * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
+     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
+     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
+     * @apiSuccess (返回结果) {Object} [currentPageData.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
+     * @apiSuccess (返回结果) {Int} currentPageData.datumPointData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.value 值
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.upper 波动区间上限
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.lower 波动区间下限
+     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点数据列表
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Double} currentPageData.monitorPointList.value 值
+     * @apiSuccess (返回结果) {Double} [currentPageData.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置时才有该项;<br>为0时表示该点的值正常,为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryTransversePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryTransversePage(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryLongitudinalList 浸润线分析-纵剖面(不分页)
+     * @apiDescription 浸润线分析-纵剖面(不分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryLongitudinalList
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Object} [cutoffWallConfig] 防渗墙配置
+     * @apiParam (请求体) {Double} cutoffWallConfig.value 阈值
+     * @apiParam (请求体) {Int[]} cutoffWallConfig.monitorPointIDList 防渗墙两侧监测点IDList<br>monitorPointIDList必定是monitorPointIDList的一个子列。如果不是,则说明该监测点已经从监测点组中删除,此时需要重新配置防渗效果监测的数据
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {DateTime} dataList.time 时间
+     * @apiSuccess (返回结果) {Object[]} dataList.pipeDataList 管道数据列表
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.emptyPipe 空管距离(m)
+     * @apiSuccess (返回结果) {Object} dataList.pipeDataList.distanceElevation 水位高程
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.value 值值(m)
+     * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'时才有该项<br>为正值时表示正常,为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
+     * @apiSuccess (返回结果) {Double} [dataList.pipeDataList.distanceElevation.eigenValue] 特征值数据 配置有'特征值'时才有该项,优先选取最大的'特征值'
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.eigenValueID 特征值ID 配置有'特征值'时才有该项,优先选取最大的'特征值'
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.eigenValueName 特征值名称
+     * @apiSuccess (返回结果) {Double} dataList.pipeDataList.distanceElevation.eigenValue.value 特征值异常值 为0时表示正常,为正值时表示水位高程超过该特征值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryLongitudinalList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryLongitudinalList(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryLongitudinalPage 浸润线分析-纵剖面(分页)
+     * @apiDescription 浸润线分析-纵剖面(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryLongitudinalPage
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParam (请求体) {Object} [cutoffWallConfig] 防渗墙配置
+     * @apiParam (请求体) {Double} cutoffWallConfig.value 阈值
+     * @apiParam (请求体) {Int[]} cutoffWallConfig.monitorPointIDList 防渗墙两侧监测点IDList<br>monitorPointIDList必定是monitorPointIDList的一个子列。如果不是,则说明该监测点已经从监测点组中删除,此时需要重新配置防渗效果监测的数据
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
+     * @apiSuccess (返回结果) {Object[]} currentPageData.pipeDataList 管道数据列表
+     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.emptyPipe 空管距离(m)
+     * @apiSuccess (返回结果) {Object} currentPageData.pipeDataList.distanceElevation 水位高程
+     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.value 值(m)
+     * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.osmoticValue] '渗压管高程差'减去'阈值'的结果 配置有'阈值'时才有该项<br>为正值时表示正常,为0时表示两侧渗压管水位高程差等于阈值,为负值时表示两侧渗压管水位高程差小于阈值
+     * @apiSuccess (返回结果) {Double} [currentPageData.pipeDataList.distanceElevation.eigenValue] 特征值数据 配置有'特征值'时才有该项,优先选取最大的'特征值'
+     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.eigenValueID 特征值ID
+     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.eigenValueName 特征值名称
+     * @apiSuccess (返回结果) {Double} currentPageData.pipeDataList.distanceElevation.eigenValue.value 特征值异常值 为0时表示正常,为正值时表示水位高程超过该特征值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryLongitudinalPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryLongitudinalPage(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryRainWaterData 水雨情分析
+     * @apiDescription 水雨情分析
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryRainWaterData
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
+     * @apiParam (请求体) {Int} [volumeFlowInputMonitorPointID] 入库流量监测点ID
+     * @apiParam (请求体) {Int} [volumeFlowOutputMonitorPointID] 出库流量监测点ID
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {Int[]} [eigenvalueIDList] 特征值IDList
+     * @apiParam (请求体) {Int[]} [dataEventIDList] 大事件IDList
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {DateTime} dataList.time 时间
+     * @apiSuccess (返回结果) {Double} dataList.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} dataList.distance 库水位(m)
+     * @apiSuccess (返回结果) {Double} [dataList.volumeFlowInput] 入库流量(m³/s)
+     * @apiSuccess (返回结果) {Double} [dataList.volumeFlowOutput] 出库流量(m³/s)
+     * @apiSuccess (返回结果) {Object[]} maxDataList 最大数据列表
+     * @apiSuccess (返回结果) {String} maxDataList.key 标识符 rainfall降雨量(mm),distance库水位(m),volumeFlowInput入库流量(m³/s),volumeFlowOutput出库流量(m³/s)
+     * @apiSuccess (返回结果) {Double} maxDataList.value 值
+     * @apiSuccess (返回结果) {DateTime} maxDataList.time 时间
+     * @apiSuccess (返回结果) {Object[]} [eigenvalueDataList] 特征值数据列表
+     * @apiSuccess (返回结果) {Int} eigenvalueDataList.eigenValueID 特征值ID
+     * @apiSuccess (返回结果) {Double} eigenvalueDataList.value 值
+     * @apiSuccess (返回结果) {String} eigenvalueDataList.engUnit 单位英文名称
+     * @apiSuccess (返回结果) {String} eigenvalueDataList.chnUnit 单位中文名称
+     * @apiSuccess (返回结果) {Object[]} [dataEventDataList] 大事件数据列表
+     * @apiSuccess (返回结果) {Int} dataEventDataList.eventID 大事件ID
+     * @apiSuccess (返回结果) {String} dataEventDataList.timeRange 时间范围
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 响应结果示例
+     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":1.0,"distance":1.0,"volumeFlowInput":1.0,"volumeFlowOutput":1.0}],"maxDataList":[{"key":"distance","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"rainfall","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"volumeFlowInput","value":1.0,"time":"2023-11-01 00:00:00"},{"key":"volumeFlowOutput","value":1.0,"time":"2023-11-01 00:00:00"}],"eigenvalueDataList":[{"eigenValueID":1,"value":1.0,"engUnit":"m","chnUnit":"米"}],"dataEventDataList":[{"eventID":1,"timeRange":""}]}
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryRainWaterData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryRainWaterData(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryRainWaterPageData 水雨情分析-列表数据(分页)
+     * @apiDescription 水雨情分析-列表数据(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryRainWaterPageData
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
+     * @apiParam (请求体) {Int} volumeFlowInputMonitorPointID 入库流量监测点ID
+     * @apiParam (请求体) {Int} volumeFlowOutputMonitorPointID 出库流量监测点ID
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
+     * @apiSuccess (返回结果) {Double} currentPageData.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} currentPageData.distance 库水位(m)
+     * @apiSuccess (返回结果) {Double} [currentPageData.volumeFlowInput] 入库流量(m³/s)
+     * @apiSuccess (返回结果) {Double} [currentPageData.volumeFlowOutput] 出库流量(m³/s)
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryRainWaterPageData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryRainWaterPageData(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    //TODO 数据比测
+
+    /**
+     * @api {POST} /QueryDryBeachData 干滩分析
+     * @apiDescription 干滩分析
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryDryBeachData
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
+     * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
+     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} displayDensity 显示密度 0.全部 1.小时 2.日 3.周 4.月 5.年
+     * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
+     * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Double} currentPageData.slopeRratio 坡度比
+     * @apiSuccess (返回结果) {Double} currentPageData.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Object} currentPageData.dryBeach 干滩数据
+     * @apiSuccess (返回结果) {Double} currentPageData.dryBeach.value 滩长(m)
+     * @apiSuccess (返回结果) {Double} [currentPageData.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'时才有该项<br>为0时表示该点的值正常,为负值时表示该点值超出最小干滩长度
+     * @apiSuccess (返回结果) {Object} currentPageData.distance 库水位数据
+     * @apiSuccess (返回结果) {Double} currentPageData.distance.value 库水位(m)
+     * @apiSuccess (返回结果) {Double} [currentPageData.distance.abnormalValue] 异常值 配置了特征值'设计洪水位'时才有该项<br>为0时表示该点的值正常,为正值时表示该点值超出设计洪水位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryDryBeachData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryDryBeachData(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /AddManualDataBatch 数据比测-批量人工录入
+     * @apiDescription 数据比测-批量人工录入
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName AddManualDataBatch
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Object[]} dataList 数据列表
+     * @apiParam (请求体) {Int} dataList.monitorType 监测类型
+     * @apiParam (请求体) {Int} dataList.sensorID 传感器ID
+     * @apiParam (请求体) {Object[]} dataList.sensorDataList 传感器数据列表
+     * @apiParam (请求体) {DateTime} dataList.sensorDataList.time 时间
+     * @apiParam (请求体) {Object[]} dataList.sensorDataList.fieldList 属性列表
+     * @apiParam (请求体) {String} dataList.sensorDataList.fieldList.fieldToken 属性标识
+     * @apiParam (请求体) {String} dataList.sensorDataList.fieldList.value 值字符串,将根据匹配到的属性字段类型解析成对应的值
+     * @apiParam (请求体) {Int} dataList.sensorDataList.fieldList.unitID 单位ID
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/AddManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addManualDataBatch(@Valid @RequestBody Object param) {
+        return null;
+    }
+
+    /**
+     * @api {POST} /QueryCompareAnalysisData 查询数据比测
+     * @apiDescription 查询数据比测
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryCompareAnalysisData
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {String} fieldToken 属性标识
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} autoSensorID 自动传感器ID
+     * @apiParam (请求体) {Int} manualSensorID 手动传感器ID
+     * @apiParam (请求体) {Double} errorRange 对应的误差范围值
+     * @apiSuccess (返回结果) {Int} autoCount 自动化记录数
+     * @apiSuccess (返回结果) {Int} manualCount 人工记录数
+     * @apiSuccess (返回结果) {Int} abnormalCount 异常自动化记录数
+     * @apiSuccess (返回结果) {Double} abnormalRatio 误差率
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {DateTime} dataList.autoTime 自动化数据时间
+     * @apiSuccess (返回结果) {DateTime} dataList.manualTime 人工数据时间
+     * @apiSuccess (返回结果) {Boolean} dataList.normal 是否正常 true正常|false异常
+     * @apiSuccess (返回结果) {Double} dataList.autoData 自动化传感器数据
+     * @apiSuccess (返回结果) {Double} [dataList.manualData] 人工传感器数据
+     * @apiSuccess (返回结果) {Double} [dataList.abnormalValue] 超限值
+     * @apiSuccess (返回结果) {String} dataList.chnUnit 中文单位
+     * @apiSuccess (返回结果) {String} dataList.engUnit 英文单位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryCompareAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryCompareAnalysisData(@Valid @RequestBody Object param) {
+        return null;
     }
 }
