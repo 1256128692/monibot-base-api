@@ -372,7 +372,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
-
+        // 处理服务
+        if (ObjectUtil.isNotEmpty(pa.getServiceIDList())) {
+            tbProjectServiceRelationMapper.delete(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>()
+                            .eq(TbProjectServiceRelation::getProjectID, pa.getProjectID())
+            );
+            tbProjectServiceRelationMapper.insertBatchSomeColumn(
+                    pa.getServiceIDList().stream().map(sid ->
+                            TbProjectServiceRelation.builder()
+                                    .projectID(pa.getProjectID()).serviceID(sid).build()
+                    ).toList()
+            );
+        }
         // 更新成功后,并且修改项目资源的描述
         if (projectInfo != null) {
             resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, projectInfo.getID().toString(), projectInfo.getProjectName()));
