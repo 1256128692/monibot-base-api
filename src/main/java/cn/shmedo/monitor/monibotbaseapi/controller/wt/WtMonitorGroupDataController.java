@@ -125,8 +125,12 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Boolean} data.sensorList.flag 标识,最大值:true 最小值:false
-     * @apiSuccess (响应结果) {T} data.sensorList.data 传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.maxSensorDataList 传感器最大数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.time       数据采集时间
+     * @apiSuccess (响应结果) {T} data.sensorList.maxSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.time       数据采集时间
+     * @apiSuccess (响应结果) {T} data.sensorList.minSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
