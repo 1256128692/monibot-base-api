@@ -39,7 +39,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31"}
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0}
      * @apiSuccess (响应结果) {Object[]} data                 结果列表
      * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
@@ -113,7 +113,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {Int} statisticsType 统计方式,(0:最新一条 1:平均值 2:阶段累积 3:阶段变化)
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31"}
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":2,"statisticsType":0}
      * @apiSuccess (响应结果) {Object[]} data                 结果列表
      * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
      * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
@@ -408,7 +408,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {Int} [monitorItemID] 项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":1,"name":"1","monitorItemID":1}
+     * {"projectID":1,"monitorItemID":1}
      * @apiSuccess (返回结果) {Object[]} dataList 大事件ID
      * @apiSuccess (返回结果) {Int} dataList.id 大事件ID
      * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
@@ -481,7 +481,6 @@ public class WtMonitorGroupDataController {
      * {"projectID":1,"monitorPointIDList":[1,2],"begin":"2023-10-18 16:02:52","end":"2023-10-18 16:02:52","density":1}
      * @apiSuccess (返回结果) {Object} data 结果
      * @apiSuccess (返回结果) {String[]} data.dataList 监测点有数据列表，日格式:yyyy-MM-dd,月格式:yyyy-MM,年格式:yyyy
-     * @apiSuccess (返回结果) {Int} data.density 密度,(0:全部 2:日 3:周 4:月 5:年)
      * @apiSampleRequest off
      * @apiPermission 项目权限:mdmbase:DescribeBaseProject
      */
@@ -499,16 +498,18 @@ public class WtMonitorGroupDataController {
      * @apiGroup 监测通用数据模块
      * @apiName QueryMonitorTypeConfiguration
      * @apiDescription 查询监测类型的预定义密度与统计方式
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParamExample 请求体示例
-     * {"monitorType":1}
+     * {"companyID":1,"monitorType":1}
      * @apiSuccess (返回结果) {Int} monitorType 监测类型标识
      * @apiSuccess (返回结果) {String} typeName 监测类型名称
-     * @apiSuccess (返回结果) {String} exValues 预定义密度与统计方式
+     * @apiSuccess (返回结果) {Int[]} displayDensity 预定义密度,(全部:0 小时:1 日:2 周:3 月:4 年:5)
+     * @apiSuccess (返回结果) {Int[]} statisticalMethods 统计方式,(最新一条:0 平均:1 阶段累积:2 阶段变化:3)
      * @apiSampleRequest off
-     * @apiPermission 登录权限
+     * @apiPermission 系统权限:mdmbase:DescribeBaseProject
      */
-    @Permission(permissionScope = PermissionScope.LOGGED)
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryMonitorTypeConfiguration", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeConfiguration(@Valid @RequestBody Object pa) {
