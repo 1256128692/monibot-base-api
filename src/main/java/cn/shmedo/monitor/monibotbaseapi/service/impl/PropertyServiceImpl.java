@@ -166,8 +166,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
                 .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
-//                .eq(Objects.nonNull(param.getGroupID()) && selectParamFlag, TbPropertyModel::getGroupID, param.getGroupID())
-                .eq(Objects.nonNull(param.getCreateType()), TbPropertyModel::getCreateType, param.getCreateType())
+                // 分组和下拉框需要展示预定义模板
+                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && ! selectParamFlag,
+                        TbPropertyModel::getCreateType, param.getCreateType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
         if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
             queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
