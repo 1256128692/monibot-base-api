@@ -394,7 +394,7 @@ public class VideoServiceImpl implements VideoService {
         final String ysToken = getYsToken();
         final TbVideoDevice device = param.getTbVideoDevice();
         final String deviceSerial = device.getDeviceSerial();
-        final String channelNo = JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(DefaultConstant.VIDEO_CHANNEL);
+        final String channelNo = param.channelNo();
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         build.setBaseUrl(YsUtil.getEzOpenAddress(deviceSerial, false, channelNo));
         build.setHdUrl(YsUtil.getEzOpenAddress(deviceSerial, true, channelNo));
@@ -423,7 +423,7 @@ public class VideoServiceImpl implements VideoService {
     public Map<String, String> queryYsVideoPlayBack(QueryYsVideoPlayBackParam param) {
         String ysToken = getYsToken();
         TbVideoDevice device = param.getTbVideoDevice();
-        String channelNo = JSONUtil.parseObj(param.getTbSensor().getExValues()).getStr(DefaultConstant.VIDEO_CHANNEL);
+        String channelNo = param.channelNo();
 //        String startTime = DateUtil.format(param.getBeginTime(), "yyyy-MM-dd HH:mm:ss");
 //        String stopTime = DateUtil.format(param.getEndTime(), "yyyy-MM-dd HH:mm:ss");
 //        YsResultWrapper<YsStreamUrlInfo> streamInfo = ysService.getStreamInfo(ysToken, device.getDeviceSerial(), channelNo,

@@ -231,6 +231,7 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/QueryThematicGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryThematicGroupPointList(@Valid @RequestBody Object param) {
         //(group,key,value) - (monitorGroup,原始key::123,value)
+        //TODO 添加特征值(纵剖面-临界浸润线)
         return null;
     }
 

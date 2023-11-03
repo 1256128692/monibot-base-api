@@ -95,17 +95,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
             liveInfos.forEach(pojo -> {
                 if (accessPlatform.equals(AccessPlatformType.YING_SHI.getValue())) {
-                    String exValues = pojo.getExValues();
-                    Dict dict = JSONUtil.toBean(exValues, Dict.class);
-                    if (dict.get("protocol") != null) {
-                        pojo.setProtocol(dict.get("protocol").toString());
-                    }
-                    if (dict.get("seqNo") != null) {
-                        pojo.setSeqNo(dict.get("seqNo").toString());
-                    }
-                    if (dict.get(DefaultConstant.VIDEO_CHANNEL) != null) {
-                        pojo.setYsChannelNo(dict.get(DefaultConstant.VIDEO_CHANNEL).toString());
-                    }
+                    pojo.setSeqNo(withSensorIDInfo.getDeviceSerial());
+                    pojo.setYsChannelNo(String.valueOf(withSensorIDInfo.getChannelNo()));
                 }
             });
         } else {

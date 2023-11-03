@@ -73,8 +73,9 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
     public ResultWrapper<Map<String, String>> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param) {
         String beginTime = DateUtil.format(param.getBeginTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
         String endTime = DateUtil.format(param.getEndTime(), TimeUtil.HIK_PLAY_BACK_TIME_FORMAT);
+        String deviceSerial = param.getTbVideoDevice().getDeviceSerial();
         try {
-            Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(param.getTbVideoDevice().getDeviceSerial(), param.getRecordLocation().toString(),
+            Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(deviceSerial, param.getRecordLocation().toString(),
                     DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, beginTime, endTime, param.getUuid(), null, null, null);
             Map<String, String> res = new HashMap<>() {
                 {
@@ -88,12 +89,12 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
                 return ResultWrapper.success(res);
             } else {
                 log.error("运管中心请求错误,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n运管中心返回信息:{}",
-                        param.getTbVideoDevice().getDeviceSerial(), beginTime, endTime, param.getRecordLocation(), res.get("responseBody"));
+                        deviceSerial, beginTime, endTime, param.getRecordLocation(), res.get("responseBody"));
             }
         } catch (Exception e) {
             //如果catch到异常，说明运管中心报错
             log.error("运管中心请求错误,请求参数 - 设备SN号:{},\t开始时间:{},\t结束时间:{},\t存储类型:{}。\n报错信息:{}",
-                    param.getTbVideoDevice().getDeviceSerial(), beginTime, endTime, param.getRecordLocation(), e.getMessage());
+                    deviceSerial, beginTime, endTime, param.getRecordLocation(), e.getMessage());
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该时段内暂无录像");
     }

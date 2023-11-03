@@ -15,5 +15,4 @@ public class PresetPointWithDeviceInfo {
     private Integer videoDeviceID;
     private String deviceSerial;
     private Integer accessPlatform;
-    private String exValue;
 }

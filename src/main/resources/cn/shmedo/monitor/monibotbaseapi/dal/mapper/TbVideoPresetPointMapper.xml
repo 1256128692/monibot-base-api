@@ -10,8 +10,7 @@
             tvpp.`ChannelNo` channelNo,
             tvd.ID videoDeviceID,
             tvd.DeviceSerial deviceSerial,
-            tvd.AccessPlatform accessPlatform,
-            tvd.ExValue exValue
+            tvd.AccessPlatform accessPlatform
         FROM tb_video_preset_point tvpp
             LEFT JOIN tb_video_device tvd ON tvpp.VideoDeviceID = tvd.ID
         WHERE tvpp.ID IN

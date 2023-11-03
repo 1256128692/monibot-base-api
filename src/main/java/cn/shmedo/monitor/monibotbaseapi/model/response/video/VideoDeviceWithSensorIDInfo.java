@@ -12,4 +12,5 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class VideoDeviceWithSensorIDInfo extends TbVideoDevice {
     private Integer sensorID;
+    private Integer channelNo;
 }
