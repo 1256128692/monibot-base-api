@@ -111,7 +111,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
     public List<TbProjectProperty> toProjectPropertyList() {
         return propertyList.stream().map(item -> {
             TbProjectProperty tbProjectProperty = new TbProjectProperty();
-            tbProjectProperty.setProjectID(tbOtherDevice.getID());
+            tbProjectProperty.setProjectID(Long.valueOf(tbOtherDevice.getID()));
             tbProjectProperty.setPropertyID(item.getID());
             tbProjectProperty.setValue(item.getValue());
             tbProjectProperty.setSubjectType(PropertySubjectType.OtherDevice.getType());

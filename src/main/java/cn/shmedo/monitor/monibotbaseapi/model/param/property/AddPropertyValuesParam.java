@@ -34,7 +34,7 @@ public class AddPropertyValuesParam implements ParameterValidator, ResourcePermi
     private Integer subjectType;
 
     @NotNull(message = "对象ID不能为空")
-    private Integer subjectID;
+    private Long subjectID;
 
     @NotEmpty(message = "模板属性值不能为空")
     private List<PropertyIdAndValue> propertyValueList;
