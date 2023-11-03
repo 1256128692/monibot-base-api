@@ -343,12 +343,12 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Object[]} data.monitorGroupList.childGroupList 子监测组列表,信息同上
      * @apiSuccess (返回结果) {Object[]} list.monitorPointList 监测点列表
      * @apiSuccess (返回结果) {Int} list.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Int} list.monitorPointList.groupID 监测组ID
      * @apiSuccess (返回结果) {String} list.monitorPointList.name 监测点名称
      * @apiSuccess (返回结果) {Bool} list.monitorPointList.enable 是否启用
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
-
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorGroupPointList(@Validated @RequestBody Object pa) {
