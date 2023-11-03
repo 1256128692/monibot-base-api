@@ -207,8 +207,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Assert.notNull(sensor, "传感器不存在");
 
         TbVideoDevice videoDevice = null;
-        if (sensor.getVideoDeviceID() != null) {
-             videoDevice = videoDeviceMapper.selectById(sensor.getVideoDeviceID());
+        if (sensor.getVideoDeviceSourceID() != null) {
+             videoDevice = videoDeviceMapper.selectByVideoDeviceSourceID(sensor.getVideoDeviceSourceID());
         }
 
         SensorInfoResponse response = SensorInfoResponse.valueOf(sensor, videoDevice);

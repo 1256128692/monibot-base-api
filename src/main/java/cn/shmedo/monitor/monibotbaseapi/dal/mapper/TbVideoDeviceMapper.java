@@ -43,4 +43,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     Integer queryOnlineCount(String deviceSerial, String fuzzyItem, Boolean deviceStatus, Boolean allocationStatus, Integer ownedCompanyID, Integer projectID, Date begin, Date end);
 
     VideoDeviceDetailInfo queryDeviceDetail(String deviceSerial, Integer companyID);
+
+    TbVideoDevice selectByVideoDeviceSourceID(Integer videoDeviceSourceID);
 }
