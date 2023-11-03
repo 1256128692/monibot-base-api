@@ -307,7 +307,7 @@ public class PropertyController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeModel
      */
-    @Permission(permissionName = "mdmbase:DescribeModel")
+    @Permission(permissionName = "mdmbase:DescribeModel", allowApplication = true)
     @PostMapping(value = "QueryPropertyValues", consumes = DefaultConstant.JSON)
     public Object queryPropertyValues(@RequestBody @Validated QueryPropertyValuesParam param) {
         return propertyService.queryPropertyValues(param);
