@@ -423,4 +423,24 @@
             and vd.CompanyID = #{companyID}
         </if>
     </select>
+
+    <select id="selectByVideoDeviceSourceID" resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5">
+        select vd.ID,
+        vd.deviceSerial,
+        vd.deviceType,
+        vd.deviceName,
+        vd.companyID,
+        vd.deviceStatus,
+        vd.accessChannelNum,
+        vd.accessPlatform,
+        vd.accessProtocol,
+        vd.projectID,
+        vd.captureStatus,
+        vd.allocationStatus,
+        vd.exValue,
+        vd.createTime
+        from tb_video_device vd
+        where
+        vd.deviceSerial = (select deviceSerial from tb_video_device_source where ID = #{videoDeviceSourceID})
+    </select>
 </mapper>

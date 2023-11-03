@@ -37,7 +37,7 @@ public class QueryPropertyValuesParam implements ParameterValidator, ResourcePer
     private Integer subjectType;
 
     @NotNull(message = "对象ID不能为空")
-    private Integer subjectID;
+    private Long subjectID;
 
     @NotEmpty(message = "模板ID列表不能为空")
     private List<Integer> modelIDList;

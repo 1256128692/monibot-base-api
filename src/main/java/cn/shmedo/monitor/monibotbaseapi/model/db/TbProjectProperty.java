@@ -34,7 +34,7 @@ public class TbProjectProperty {
      * 项目编号
      */
     @TableField(value = "ProjectID")
-    private Integer projectID;
+    private Long projectID;
 
     /**
      * 属性ID
