@@ -921,6 +921,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
         LambdaQueryWrapper<TbProjectInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(TbProjectInfo::getCompanyID, pa.getCompanyID());
         if (ObjectUtil.isNotEmpty(nextLevelProjectList)) {
             lambdaQueryWrapper.notIn(TbProjectInfo::getID, nextLevelProjectList.stream().map(TbProjectInfo::getID).toList());
         }
