@@ -221,13 +221,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                         item.setPropertyList(propertyMap.get(item.getID()));
                         if (PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())) {
                             // 工程项目
-                            // 预定义模板统一放到默认分组下
-                            if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(item.getCreateType())) {
-                                item.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP);
-                                item.setGroupName("默认");
-                            } else {
-                                item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
-                            }
+                            item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
                         } else {
                             // 非工程项目
                             String groupName = finalGroupMap.containsKey(item.getGroupID()) ? finalGroupMap.get(item.getGroupID()).getName() : "默认";
