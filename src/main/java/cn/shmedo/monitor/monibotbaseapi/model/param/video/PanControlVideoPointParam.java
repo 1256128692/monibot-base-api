@@ -52,10 +52,10 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                 .eq(TbProjectMonitorClass::getMonitorClass, MonitorQueryType.VIDEO.getValue())
                 .eq(TbProjectMonitorClass::getEnable, true);
         // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
-        TbProjectMonitorClass projectMonitorClass = projectMonitorClassMapper.selectOne(wrapper);
-        if (projectMonitorClass == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
-        }
+//        TbProjectMonitorClass projectMonitorClass = projectMonitorClassMapper.selectOne(wrapper);
+//        if (projectMonitorClass == null) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
+//        }
 
         liveInfos = tbMonitorPointMapper.selectListByIDList(Arrays.asList(monitorPointID));
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {

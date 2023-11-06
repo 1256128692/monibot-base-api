@@ -364,7 +364,7 @@ public class HkVideoServiceImpl implements HkVideoService {
                     .map(JSONUtil::parseObj).map(u -> u.getStr(HIK_STREAM_URL))
                     .orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
-            throw new RuntimeException("海康接口调用失败!");
+            throw new RuntimeException(e.getMessage());
         }
     }
 }

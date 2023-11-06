@@ -40,15 +40,23 @@ public class DefaultConstant {
     public static final List<Integer> MDWT_PROJECT_TYPE_LIST = Arrays.asList(1, 2, 3, 4);
 
     /** ================================项目表单start================================ **/
-    /** 表单复制时，填充后缀 **/
+    /**
+     * 表单复制时，填充后缀
+     **/
     public static final String PROPERTY_MODEL_COPY_SUFFIX = "_副本";
 
-    /** 默认属性模板组 **/
+    /**
+     * 默认属性模板组
+     **/
     public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
 
-    /** 工程项目类型 **/
+    /**
+     * 工程项目类型
+     **/
     public static final String REDIS_KEY_MD_AUTH_SERVICE = "cn.shmedo.mdauth.service";
-    /** 企业树 **/
+    /**
+     * 企业树
+     **/
     public static final String REDIS_KEY_MD_COMPANY_PARENT = "cn.shmedo.mdauth.company.parent";
     /** ================================项目表单end================================ **/
 
@@ -201,5 +209,12 @@ public class DefaultConstant {
          */
         Integer HIK_PTZ_ACTION_START = 0;
         Integer HIK_PTZ_ACTION_END = 1;
+    }
+
+    public interface HikVideoErrorCode {
+        /**
+         * 设备不支持语音对讲
+         */
+        String NO_ASSOCIATED_TALK_CHANNEL = "0x0283003f";
     }
 }
