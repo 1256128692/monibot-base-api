@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceSourceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -39,8 +40,7 @@ public class QueryPresetPointListParam implements ParameterValidator, ResourcePe
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在");
         }
         tbVideoDevice = tbVideoDeviceList.get(0);
-        String exValue = tbVideoDevice.getExValue();
-        if (!exValue.contains("\"channelNo\":" + channelNo)) {
+        if(ContextHolder.getBean(TbVideoDeviceSourceMapper.class).selectByDeviceSerial(tbVideoDevice.getDeviceSerial()).stream().noneMatch(u -> channelNo.equals(u.getChannelNo()))){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该视频设备没有通道号为" + channelNo + "的通道");
         }
         return null;

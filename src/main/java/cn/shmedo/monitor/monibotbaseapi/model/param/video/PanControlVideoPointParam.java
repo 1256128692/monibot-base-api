@@ -1,13 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
@@ -28,7 +25,6 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 public class PanControlVideoPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -56,10 +52,10 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
                 .eq(TbProjectMonitorClass::getMonitorClass, MonitorQueryType.VIDEO.getValue())
                 .eq(TbProjectMonitorClass::getEnable, true);
         // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
-        TbProjectMonitorClass projectMonitorClass = projectMonitorClassMapper.selectOne(wrapper);
-        if (projectMonitorClass == null) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
-        }
+//        TbProjectMonitorClass projectMonitorClass = projectMonitorClassMapper.selectOne(wrapper);
+//        if (projectMonitorClass == null) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
+//        }
 
         liveInfos = tbMonitorPointMapper.selectListByIDList(Arrays.asList(monitorPointID));
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
@@ -95,17 +91,8 @@ public class PanControlVideoPointParam implements ParameterValidator, ResourcePe
 
             liveInfos.forEach(pojo -> {
                 if (accessPlatform.equals(AccessPlatformType.YING_SHI.getValue())) {
-                    String exValues = pojo.getExValues();
-                    Dict dict = JSONUtil.toBean(exValues, Dict.class);
-                    if (dict.get("protocol") != null) {
-                        pojo.setProtocol(dict.get("protocol").toString());
-                    }
-                    if (dict.get("seqNo") != null) {
-                        pojo.setSeqNo(dict.get("seqNo").toString());
-                    }
-                    if (dict.get(DefaultConstant.VIDEO_CHANNEL) != null) {
-                        pojo.setYsChannelNo(dict.get(DefaultConstant.VIDEO_CHANNEL).toString());
-                    }
+                    pojo.setSeqNo(withSensorIDInfo.getDeviceSerial());
+                    pojo.setYsChannelNo(String.valueOf(withSensorIDInfo.getChannelNo()));
                 }
             });
         } else {

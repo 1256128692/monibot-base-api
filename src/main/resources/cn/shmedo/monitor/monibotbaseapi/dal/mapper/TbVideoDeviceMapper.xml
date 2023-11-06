@@ -20,7 +20,7 @@
                     <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
                     <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
                     <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
-                    <result column="channelDesc" jdbcType="VARCHAR" property="channelDesc"/>
+                    <result column="channelNo" jdbcType="INTEGER" property="channelNo"/>
                     <result column="videoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
                     <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
                     <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
@@ -53,12 +53,13 @@
             tvd.`CompanyID` companyID,
             tvd.`ProjectID` projectID,
             tvd.`StorageType` storageType,
-            tvd.`CaptureStatus` captureStatus,
+            tvc.`ImageCapture` captureStatus,
             tvd.`AllocationStatus` allocationStatus,
-            GROUP_CONCAT( TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo") ) ) channelDesc
+            GROUP_CONCAT(tvds.ChannelNo) channelDesc
         FROM
             tb_video_device tvd
-            LEFT JOIN tb_sensor ts ON tvd.`ID` = ts.`VideoDeviceID`
+            LEFT JOIN tb_video_device_source tvds ON tvds.DeviceSerial = tvd.DeviceSerial
+            LEFT JOIN tb_video_capture tvc ON tvc.VideoDeviceSourceID = tvds.ID
         WHERE tvd.`CompanyID` = #{param.companyID}
         <if test="param.deviceSerial != null and param.deviceSerial != ''">
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
@@ -89,7 +90,7 @@
             ts.ID sensorID,
             ts.`Name` sensorName,
             ts.Alias sensorAlias,
-            TRIM(BOTH '"' FROM JSON_EXTRACT(ts.ExValues,"$.channelNo")) channelDesc,
+            tvds.ChannelNo channelNo,
             tvd.ID videoDeviceID,
             tvd.DeviceStatus,
             tvd.DeviceSerial,
@@ -108,7 +109,8 @@
             LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorGroupID = tmg2.ID
             LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID AND ts.`Enable` IS TRUE
-            LEFT JOIN tb_video_device tvd ON tvd.ID = ts.videoDeviceID
+            LEFT JOIN tb_video_device_source tvds ON tvds.ID = ts.VideoDeviceSourceID
+            LEFT JOIN tb_video_device tvd ON tvd.DeviceSerial = tvds.DeviceSerial
         WHERE tmg1.`Enable` IS TRUE AND ts.ID IS NOT NULL AND tmp.MonitorType=40 AND tmg1.`ProjectID`=#{param.projectID}
         <if test="param.deviceSerial != null and param.deviceSerial != ''">
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
@@ -242,8 +244,11 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo">
         SELECT
             tvd.*,
-            ts.`ID` sensorID
-        FROM tb_video_device tvd LEFT JOIN tb_sensor ts ON ts.`VideoDeviceID`=tvd.`ID`
+            ts.`ID` sensorID,
+            tvds.`ChannelNo` channelNo
+        FROM tb_video_device tvd
+            LEFT JOIN tb_video_device_source tvds ON tvds.DeviceSerial = tvd.DeviceSerial
+            LEFT JOIN tb_sensor ts ON ts.`VideoDeviceSourceID` = tvds.`ID`
         WHERE ts.`ID` IN
         <foreach collection="sensorList" separator="," open="(" close=")" item="item" index="index">
             #{item}
@@ -418,5 +423,25 @@
         <if test="companyID != null">
             and vd.CompanyID = #{companyID}
         </if>
+    </select>
+
+    <select id="selectByVideoDeviceSourceID" resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5">
+        select vd.ID,
+        vd.deviceSerial,
+        vd.deviceType,
+        vd.deviceName,
+        vd.companyID,
+        vd.deviceStatus,
+        vd.accessChannelNum,
+        vd.accessPlatform,
+        vd.accessProtocol,
+        vd.projectID,
+        vd.captureStatus,
+        vd.allocationStatus,
+        vd.exValue,
+        vd.createTime
+        from tb_video_device vd
+        where
+        vd.deviceSerial = (select deviceSerial from tb_video_device_source where ID = #{videoDeviceSourceID})
     </select>
 </mapper>

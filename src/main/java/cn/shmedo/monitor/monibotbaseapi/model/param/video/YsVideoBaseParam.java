@@ -1,30 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONException;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IVideoCameraCheck;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -52,63 +40,13 @@ public class YsVideoBaseParam implements ParameterValidator, IVideoCameraCheck {
         if (!valid()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备通道、传感器ID、监测点ID三组数据要求仅有一组不为空!");
         }
-        final TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-        if (Objects.nonNull(this.monitorPointID)) {
-            ResultWrapper<List<TbSensor>> resultWrapper = checkMonitorPoint();
-            if (!resultWrapper.apiSuccess()) {
-                return resultWrapper;
-            }
-            tbSensor = resultWrapper.getData().get(0);
-            this.sensorID = tbSensor.getID();
+        ResultWrapper<Void> checkPointAndSensor = checkPointAndSensor();
+        if (!checkPointAndSensor.apiSuccess()) {
+            return checkPointAndSensor;
         }
-        if (Objects.nonNull(this.sensorID)) {
-            if (Objects.isNull(tbSensor)) {
-                List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getID, this.sensorID));
-                if (CollUtil.isEmpty(sensorList)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器不存在!");
-                }
-                tbSensor = sensorList.get(0);
-            }
-            this.videoDeviceID = tbSensor.getVideoDeviceID();
-            final String exValues = tbSensor.getExValues();
-            if (Objects.isNull(this.videoDeviceID)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器未关联视频设备!");
-            }
-            if (ObjectUtil.isEmpty(exValues)) {
-                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "该视频设备未配置通道信息!");
-            }
-        }
-        List<TbVideoDevice> tbVideoDeviceList = ContextHolder.getBean(TbVideoDeviceMapper.class)
-                .selectList(new LambdaQueryWrapper<TbVideoDevice>().eq(TbVideoDevice::getID, this.videoDeviceID));
-        if (CollUtil.isEmpty(tbVideoDeviceList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不存在!");
-        }
-        tbVideoDevice = tbVideoDeviceList.get(0);
-        final Byte accessPlatform = tbVideoDevice.getAccessPlatform();
-        if (!accessPlatform.equals(AccessPlatformType.YING_SHI.getValue())) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备不是萤石设备!");
-        }
-        if (Objects.isNull(tbSensor)) {
-            List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getVideoDeviceID, this.videoDeviceID));
-            if (CollUtil.isEmpty(sensorList)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "视频设备未关联传感器!");
-            }
-            try {
-                // {@code exValueList} might be empty,for setting {@code ExValue} mistakenly which is occurred in table `tb_sensor`.
-                tbSensor = sensorList.stream().filter(u -> Objects.nonNull(u.getExValues())).filter(u -> this
-                        .deviceChannel.equals(Integer.parseInt(JSONUtil.parseObj(u.getExValues())
-                                .getStr(DefaultConstant.VIDEO_CHANNEL)))).findAny().orElse(null);
-                if (Objects.isNull(tbSensor)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备通道号不存在!");
-                }
-            } catch (JSONException e) {
-                log.error("解析视频设备关联的传感器ExValue失败,exValue list: {}", JSONUtil.toJsonStr(sensorList.stream()
-                        .map(TbSensor::getExValues).filter(ObjectUtil::isNotEmpty).toList()));
-                return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "服务端解析视频设备通道号失败!");
-            }
-        }
-        if (!tbSensor.getMonitorType().equals(MonitorType.VIDEO.getKey())) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器不是视频传感器!");
+        ResultWrapper<Void> resultWrapper = checkVideoDevice(AccessPlatformType.YING_SHI);
+        if (!resultWrapper.apiSuccess()) {
+            return resultWrapper;
         }
         return null;
     }
@@ -121,5 +59,9 @@ public class YsVideoBaseParam implements ParameterValidator, IVideoCameraCheck {
         Optional.ofNullable(this.sensorID).ifPresent(u -> wrapper.setValue(v -> v - 2));
         Optional.ofNullable(this.monitorPointID).ifPresent(u -> wrapper.setValue(v -> v - 2));
         return wrapper.get() == 1;
+    }
+
+    public String channelNo() {
+        return this.deviceChannel.toString();
     }
 }

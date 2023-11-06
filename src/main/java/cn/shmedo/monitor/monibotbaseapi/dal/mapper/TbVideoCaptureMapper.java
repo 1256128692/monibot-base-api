@@ -37,6 +37,8 @@ public interface TbVideoCaptureMapper {
      */
     TbVideoCapture selectByPrimaryKey(Integer ID);
 
+    TbVideoCapture selectByDeviceSerial(String deviceSerial);
+
     /**
      * update record selective
      * @param record the updated record

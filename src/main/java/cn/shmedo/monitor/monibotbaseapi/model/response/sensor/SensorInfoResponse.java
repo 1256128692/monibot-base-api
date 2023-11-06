@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.sensor;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -89,7 +90,7 @@ public class SensorInfoResponse extends TbSensor {
         }
     }
 
-    public static SensorInfoResponse valueOf(TbSensor sensor, TbVideoDevice videoDevice) {
+    public static SensorInfoResponse valueOf(TbSensor sensor, VideoDeviceInfoV5 videoDevice) {
         SensorInfoResponse response = new SensorInfoResponse();
         response.setID(sensor.getID());
         response.setProjectID(sensor.getProjectID());
@@ -115,13 +116,14 @@ public class SensorInfoResponse extends TbSensor {
         response.setUpdateUserID(sensor.getUpdateUserID());
         response.setChannelCode(sensor.getChannelCode());
         response.setVideoDeviceID(sensor.getVideoDeviceID());
+        response.setVideoDeviceSourceID(sensor.getVideoDeviceSourceID());
         if (videoDevice != null ) {
             response.setDeviceSerial(videoDevice.getDeviceSerial());
             response.setDeviceType(videoDevice.getDeviceType());
             response.setAccessPlatform(videoDevice.getAccessPlatform());
             response.setAccessPlatformStr(AccessPlatformType.getByValue(response.getAccessPlatform()).getDescription());
             response.setVideoDeviceSource("视频设备/" + videoDevice.getDeviceType() + "/"
-                    +  videoDevice.getDeviceSerial() + "/" + sensor.getChannelCode());
+                    +  videoDevice.getDeviceSerial() + "/" + videoDevice.getChannelCode());
         }
         return response;
     }

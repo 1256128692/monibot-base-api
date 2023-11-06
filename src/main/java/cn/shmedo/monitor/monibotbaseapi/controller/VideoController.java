@@ -2,11 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class VideoController {
     private final VideoService videoService;
     private final ITbVideoDeviceService tbVideoDeviceService;
-    private final HkVideoService hkVideoService;
 
     /**
      * @api {POST} /QueryVideoMonitorPointLiveInfo 查询视频类型监测点直播地址信息

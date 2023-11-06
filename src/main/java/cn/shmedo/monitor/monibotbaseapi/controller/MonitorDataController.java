@@ -1,7 +1,6 @@
-package cn.shmedo.monitor.monibotbaseapi.controller.wt;
+package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.api.PermissionScope;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-public class WtMonitorGroupDataController {
+public class MonitorDataController {
 
     private WtMonitorService wtMonitorService;
 
@@ -46,12 +45,12 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
+     * @apiSuccess (响应结果) {Object[]} [data.sensorList]      传感器信息
      * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Bool} data.multiSensor        是否为关联多传感器
+     * @apiSuccess (响应结果) {Bool} [data.multiSensor]        是否为关联多传感器
      * @apiSuccess (响应结果) {Object} data.sensorData       单传感器数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
      * @apiSuccess (响应结果) {Int} data.sensorData.sensorID        传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
@@ -68,24 +67,24 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
      * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.id] 特征值列表
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.projectID] 工程ID
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.scope] 使用范围,0:专题分析 1:历史数据
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
      * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.monitorItemID] 监测项目ID
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.monitorTypeFieldID] 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.monitorTypeFieldName] 属性名称
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.name] 特征值
-     * @apiSuccess (响应结果) {Double} [data.eigenvalueList.value] 数值
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.unitID] 单位ID
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.engUnit] 单位英文描述
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.chnUnit] 单位中文描述
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
+     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
-     * @apiSuccess (响应结果) {Int} [data.eventList.id] 大事记id
-     * @apiSuccess (响应结果) {String} [data.eventList.eventName] 大事记名称
-     * @apiSuccess (响应结果) {Int} [data.eventList.frequency] 频率
-     * @apiSuccess (响应结果) {String} [data.eventList.frequencyStr] 频率描述
-     * @apiSuccess (响应结果) {String} [data.eventList.timeRange] 时间范围
+     * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
+     * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
+     * @apiSuccess (响应结果) {Int} data.eventList.frequency 频率
+     * @apiSuccess (响应结果) {String} data.eventList.frequencyStr 频率描述
+     * @apiSuccess (响应结果) {String} data.eventList.timeRange 时间范围
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
@@ -189,24 +188,24 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
      * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.id] 特征值列表
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.projectID] 工程ID
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.scope] 使用范围,0:专题分析 1:历史数据
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
      * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.monitorItemID] 监测项目ID
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.monitorTypeFieldID] 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.monitorTypeFieldName] 属性名称
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.name] 特征值
-     * @apiSuccess (响应结果) {Double} [data.eigenvalueList.value] 数值
-     * @apiSuccess (响应结果) {Int} [data.eigenvalueList.unitID] 单位ID
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.engUnit] 单位英文描述
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.chnUnit] 单位中文描述
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
+     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
+     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
+     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
-     * @apiSuccess (响应结果) {Int} [data.eventList.id] 大事记id
-     * @apiSuccess (响应结果) {String} [data.eventList.eventName] 大事记名称
-     * @apiSuccess (响应结果) {Int} [data.eventList.frequency] 频率
-     * @apiSuccess (响应结果) {String} [data.eventList.frequencyStr] 频率描述
-     * @apiSuccess (响应结果) {String} [data.eventList.timeRange] 时间范围
+     * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
+     * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
+     * @apiSuccess (响应结果) {Int} data.eventList.frequency 频率
+     * @apiSuccess (响应结果) {String} data.eventList.frequencyStr 频率描述
+     * @apiSuccess (响应结果) {String} data.eventList.timeRange 时间范围
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
@@ -233,7 +232,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {String} name 特征值名称
      * @apiParam (请求体) {Double} value 数值
      * @apiParam (请求体) {Int} unitID 单位ID
-     * @apiParam (请求体) {String} [exValue] 备注
+     * @apiParam (请求体) {String} [exValue] 拓展属性
      * @apiParamExample 请求体示例
      * {"projectID":1,"scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
      * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"}
@@ -264,7 +263,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {String} name 特征值名称
      * @apiParam (请求体) {Double} value 数值
      * @apiParam (请求体) {Int} unitID 单位ID
-     * @apiParam (请求体) {String} [exValue] 备注
+     * @apiParam (请求体) {String} [exValue] 拓展属性
      * @apiParamExample 请求体示例
      * {"eigenValueID":1,"projectID":1,"scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
      * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"}
@@ -323,7 +322,7 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.unitID 单位ID
      * @apiSuccess (响应结果) {String} eigenvalueList.engUnit 单位英文描述
      * @apiSuccess (响应结果) {String} eigenvalueList.chnUnit 单位中文描述
-     * @apiSuccess (响应结果) {String} [eigenvalueList.exValue] 备注
+     * @apiSuccess (响应结果) {String} [eigenvalueList.exValue] 拓展属性
      * @apiSuccess (响应结果) {Int} eigenvalueList.createUserID 创建人ID
      * @apiSuccess (响应结果) {Int} eigenvalueList.updateUserID 修改人ID
      * @apiSuccess (响应结果) {Date} eigenvalueList.createTime 创建时间
@@ -349,7 +348,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {String} name 大事件名称
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
-     * @apiParam (请求体) {String} [exValue] 备注
+     * @apiParam (请求体) {String} [exValue] 拓展属性
      * @apiParamExample 请求体示例
      * {"projectID":1,"name":"1","frequency":1,
      * "timeRange": [
@@ -415,7 +414,7 @@ public class WtMonitorGroupDataController {
      * @apiSuccess (返回结果) {String} dataList.name 大事件名称
      * @apiSuccess (返回结果) {Int} dataList.frequency 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
-     * @apiSuccess (返回结果) {String} [dataList.exValue] 备注
+     * @apiSuccess (返回结果) {String} [dataList.exValue] 拓展属性
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
@@ -437,7 +436,7 @@ public class WtMonitorGroupDataController {
      * @apiParam (请求体) {String} name 大事件名称
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
-     * @apiParam (请求体) {String} [exValue] 备注
+     * @apiParam (请求体) {String} [exValue] 拓展属性
      * @apiParamExample 请求体示例
      * {"projectID":1,"id":1,"name":"1","frequency":1,
      * "timeRange": [

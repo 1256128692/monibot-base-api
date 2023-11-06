@@ -115,7 +115,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectProperty> projectPropertyList = pa.getProperties().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
-                    tbProjectProperty.setProjectID(tbProjectInfo.getID());
+                    tbProjectProperty.setProjectID(Long.valueOf(tbProjectInfo.getID()));
                     tbProjectProperty.setPropertyID(item.getID());
                     tbProjectProperty.setValue(PropertyIDAndValueMap.get(item.getID()));
                     tbProjectProperty.setSubjectType(PropertySubjectType.Project.getType());

@@ -24,6 +24,14 @@ public class TbVideoCapture implements Serializable {
     * 传感器ID
     */
     private Integer sensorID;
+    /**
+     * 通道视频ID
+     */
+    private Integer videoDeviceSourceID;
+    /**
+     * 抓拍是否开启
+     */
+    private Boolean imageCapture;
 
     /**
     * 抓拍间隔

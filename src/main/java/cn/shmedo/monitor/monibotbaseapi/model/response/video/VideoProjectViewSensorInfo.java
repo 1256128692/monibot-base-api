@@ -27,5 +27,5 @@ public class VideoProjectViewSensorInfo {
     private Boolean captureStatus;
     private Boolean allocationStatus;
     @JsonIgnore
-    private String channelDesc;
+    private Integer channelNo;
 }

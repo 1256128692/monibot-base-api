@@ -130,7 +130,7 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
                 (e, list) -> list.forEach(
                         item -> {
                             TbProjectProperty obj = new TbProjectProperty();
-                            obj.setProjectID(e.getID());
+                            obj.setProjectID(Long.valueOf(e.getID()));
                             obj.setSubjectType(PropertySubjectType.OtherDevice.getType());
                             obj.setValue(item.getValue());
                             obj.setPropertyID(item.getID());

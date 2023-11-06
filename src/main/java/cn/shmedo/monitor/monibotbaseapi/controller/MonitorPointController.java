@@ -319,4 +319,39 @@ public class MonitorPointController {
     public Object queryMonitorPointBaseInfoList(@Validated @RequestBody QueryMonitorPointBaseInfoListParam pa) {
         return reservoirMonitorService.queryMonitorPointBaseInfoList(pa);
     }
+
+
+    /**
+     * @api {POST} /QueryMonitorGroupPointList 查询监测项目下监测组别的监测点列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorGroupPointList
+     * @apiDescription 查询监测项目下监测点列表
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {Object[]} list
+     * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} list.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} list.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {String} list.monitorTypeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Object[]} list.monitorGroupList 监测组信息
+     * @apiSuccess (返回结果) {Int} list.monitorGroupList.groupID 监测组ID
+     * @apiSuccess (返回结果) {String} list.monitorGroupList.groupName 监测组名称
+     * @apiSuccess (返回结果) {Boolean} list.monitorGroupList.enable 是否启用
+     * @apiSuccess (返回结果) {Object[]} data.monitorGroupList.childGroupList 子监测组列表,信息同上
+     * @apiSuccess (返回结果) {Object[]} list.monitorPointList 监测点列表
+     * @apiSuccess (返回结果) {Int} list.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Int} list.monitorPointList.groupID 监测组ID
+     * @apiSuccess (返回结果) {String} list.monitorPointList.name 监测点名称
+     * @apiSuccess (返回结果) {Bool} list.monitorPointList.enable 是否启用
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @PostMapping(value = "/QueryMonitorGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorGroupPointList(@Validated @RequestBody Object pa) {
+        return null;
+    }
 }
