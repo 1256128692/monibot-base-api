@@ -675,4 +675,15 @@
           AND tmi.ProjectID = #{projectID}
           AND tmi.MonitorClass = #{monitorClass}
     </select>
+
+    <select id="selectPointListByMonitorItemIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1">
+        select tmp.ID as monitorPointID, tmp.monitorItemID, tmp.name, tmp.enable, mgp.MonitorGroupID as groupID
+        FROM tb_monitor_point tmp
+        LEFT JOIN tb_monitor_group_point mgp ON tmp.ID = mgp.MonitorPointID
+        where tmp.monitorItemID in
+        <foreach collection="monitorItemIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>

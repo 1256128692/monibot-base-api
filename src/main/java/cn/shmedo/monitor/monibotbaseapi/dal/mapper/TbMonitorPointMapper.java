@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
@@ -56,4 +57,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
                                                                    @Param("monitorTypeList") List<Integer> monitorTypeList);
 
     List<TbMonitorPoint> selectListByProjectIDAndMonitorClass(Integer projectID, Integer monitorClass);
+
+    List<MonitorPointBaseInfoV1> selectPointListByMonitorItemIDList(List<Integer> monitorItemIDList);
 }

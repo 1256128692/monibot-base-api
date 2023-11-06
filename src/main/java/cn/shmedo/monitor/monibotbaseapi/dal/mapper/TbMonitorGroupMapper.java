@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.thematicDataAnalysis.StRelateRuleDto;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.QueryMonitorGroupItemNameListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.QueryProjectGroupInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorGroupBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.ProjectGroupPlainInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo;
@@ -45,4 +46,6 @@ public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
     List<StRelateRuleDto> selectWettingLineGroupUpperLimit(@Param("monitorGroupID") Integer monitorGroupID,
                                                            @Param("monitorType") Integer monitorType,
                                                            @Param("upperName") String upperName);
+
+    List<MonitorGroupBaseInfoV1> selectGroupInfoByItemIDs(List<Integer> monitorItemIDList);
 }

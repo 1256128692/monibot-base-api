@@ -480,4 +480,20 @@
         and pi.CompanyID = #{companyID}
         and mi.ProjectID in (select ProjectID from tb_project_monitor_class where MonitorClass = #{monitorClassType})
   </select>
+
+  <select id="queryListByProjectIDAndMonitorItemID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1">
+      select mi.ID        as monitorItemID,
+             mi.Name      as monitorItemName,
+             mi.Alias     as monitorItemAlias,
+             mi.monitorType,
+             mt.TypeName  as monitorTypeName,
+             mt.TypeAlias as monitorTypeAlias
+      from tb_monitor_item mi
+               left join tb_monitor_type mt on mi.MonitorType = mt.MonitorType
+      where mi.projectID = #{projectID}
+      <if test="monitorItemID != null">
+          and mi.ID = #{monitorItemID}
+      </if>
+  </select>
 </mapper>

@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectLocationInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemNameFullInfo;
@@ -58,4 +59,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     List<TbMonitorItem> selectListBySensorIDsAndProjectIDs(List<Integer> sensorIDList, List<Integer> projectIDList);
 
     List<ProjectLocationInfo> getProjectLocation(Integer companyID, Integer monitorType, Integer monitorClassType);
+
+    List<MonitorPointAllInfoV1> queryListByProjectIDAndMonitorItemID(Integer projectID, Integer monitorItemID);
 }

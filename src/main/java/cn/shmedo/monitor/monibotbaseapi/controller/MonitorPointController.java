@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
@@ -351,7 +352,7 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorGroupPointList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorGroupPointList(@Validated @RequestBody QueryMonitorGroupPointParam pa) {
+        return monitorPointService.queryMonitorGroupPointList(pa);
     }
 }
