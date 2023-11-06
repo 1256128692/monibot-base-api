@@ -4,16 +4,18 @@
   <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture">
     <!--@mbg.generated-->
     <!--@Table tb_video_capture-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial" />
-    <result column="SensorID" jdbcType="INTEGER" property="sensorID" />
-    <result column="CaptureInterval" jdbcType="INTEGER" property="captureInterval" />
-    <result column="LastCaptureTime" jdbcType="TIMESTAMP" property="lastCaptureTime" />
-    <result column="NextCaptureTime" jdbcType="TIMESTAMP" property="nextCaptureTime" />
+    <id column="ID" jdbcType="INTEGER" property="ID"/>
+    <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
+    <result column="SensorID" jdbcType="INTEGER" property="sensorID"/>
+    <result column="VideoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
+    <result column="ImageCapture" jdbcType="BIT" property="imageCapture"/>
+    <result column="CaptureInterval" jdbcType="INTEGER" property="captureInterval"/>
+    <result column="LastCaptureTime" jdbcType="TIMESTAMP" property="lastCaptureTime"/>
+    <result column="NextCaptureTime" jdbcType="TIMESTAMP" property="nextCaptureTime"/>
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, DeviceSerial, SensorID, CaptureInterval, LastCaptureTime, NextCaptureTime
+    ID, DeviceSerial, SensorID, VideoDeviceSourceID, ImageCapture, CaptureInterval, LastCaptureTime, NextCaptureTime
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
@@ -22,7 +24,12 @@
     from tb_video_capture
     where ID = #{ID,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <select id="selectByDeviceSerial" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List" />
+        FROM `tb_video_capture` WHERE DeviceSerial=#{deviceSerial,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     <!--@mbg.generated-->
     delete from tb_video_capture
     where ID = #{ID,jdbcType=INTEGER}

@@ -5,7 +5,9 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoCaptureMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
@@ -30,6 +32,7 @@ import java.util.*;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, TbVideoDevice> implements ITbVideoDeviceService {
     private final HkVideoService hkVideoService;
+    private final TbVideoCaptureMapper tbVideoCaptureMapper;
 
     @Override
     public List<VideoCompanyViewBaseInfo> queryVideoCompanyViewBaseInfo(QueryVideoCompanyViewBaseInfoParam param) {
@@ -58,6 +61,7 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         TbVideoDevice device = param.getTbVideoDevice();
         VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         final String deviceSerial = device.getDeviceSerial();
+        Optional.of(deviceSerial).map(tbVideoCaptureMapper::selectByDeviceSerial).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
         final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
         final HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(deviceSerial);
         Optional.ofNullable(url).filter(ObjectUtil::isNotEmpty).ifPresent(build::setBaseUrl);

@@ -53,12 +53,13 @@
             tvd.`CompanyID` companyID,
             tvd.`ProjectID` projectID,
             tvd.`StorageType` storageType,
-            tvd.`CaptureStatus` captureStatus,
+            tvc.`ImageCapture` captureStatus,
             tvd.`AllocationStatus` allocationStatus,
             GROUP_CONCAT(tvds.ChannelNo) channelDesc
         FROM
             tb_video_device tvd
             LEFT JOIN tb_video_device_source tvds ON tvds.DeviceSerial = tvd.DeviceSerial
+            LEFT JOIN tb_video_capture tvc ON tvc.VideoDeviceSourceID = tvds.ID
         WHERE tvd.`CompanyID` = #{param.companyID}
         <if test="param.deviceSerial != null and param.deviceSerial != ''">
             AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')

@@ -1,13 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
@@ -28,7 +25,6 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Data
 public class PanControlVideoPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
