@@ -167,7 +167,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
                 // 分组和下拉框需要展示预定义模板
-                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && ! selectParamFlag,
+                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag,
                         TbPropertyModel::getCreateType, param.getCreateType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
         if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
@@ -221,7 +221,13 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                         item.setPropertyList(propertyMap.get(item.getID()));
                         if (PropertyModelType.BASE_PROJECT.getCode().equals(item.getModelType())) {
                             // 工程项目
-                            item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
+                            // 预定义模板统一放到默认分组下
+                            if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(item.getCreateType())) {
+                                item.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP);
+                                item.setGroupName("默认");
+                            } else {
+                                item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
+                            }
                         } else {
                             // 非工程项目
                             String groupName = finalGroupMap.containsKey(item.getGroupID()) ? finalGroupMap.get(item.getGroupID()).getName() : "默认";
@@ -232,9 +238,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 工程项目模板组下没有模板，也要显示
-        if (groupParamFlag &&
-                StringUtils.isEmpty(param.getName()) &&
-                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+        if (groupParamFlag && StringUtils.isEmpty(param.getName()) && PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
             Set<Integer> groupIDSet;
             if (modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
                 groupIDSet = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
@@ -274,7 +278,6 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 }
             });
         }
-
         return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
     }
 

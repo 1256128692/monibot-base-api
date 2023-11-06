@@ -145,7 +145,7 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         // -- 模板下属性新增校验
         addModelItemList = recordStateMap.get(OperationProperty.ADD.name());
         if (CollectionUtil.isNotEmpty(addModelItemList)) {
-            // 查询模板下是否已经有相同模板名称
+            // 查询模板下是否已经有相同模板属性名称
             LambdaQueryWrapper<TbProperty> addCheckNameQueryWrapper = new QueryWrapper<TbProperty>().lambda()
                     .in(TbProperty::getName, addModelItemList.stream().map(ModelItem::getName).collect(Collectors.toList()))
                     .eq(TbProperty::getModelID, this.ID);
