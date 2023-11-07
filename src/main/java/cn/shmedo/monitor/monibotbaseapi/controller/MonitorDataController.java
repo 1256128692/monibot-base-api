@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
@@ -333,8 +334,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryEigenValueList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryEigenValueList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryEigenValueList(@Validated @RequestBody QueryEigenValueParam pa) {
+        return monitorDataService.queryEigenValueList(pa);
     }
 
 

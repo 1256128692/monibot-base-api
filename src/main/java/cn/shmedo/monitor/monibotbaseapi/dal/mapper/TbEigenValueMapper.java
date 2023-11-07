@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
+import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
+
+import java.util.List;
 
 public interface TbEigenValueMapper {
     /**
@@ -46,4 +49,6 @@ public interface TbEigenValueMapper {
     int updateByPrimaryKey(TbEigenValue record);
 
     Integer selectCountByProjectIDAndItemIDAndFiledIDAndName(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name);
+
+    List<EigenValueInfoV1> selectListByCondition(Integer monitorItemID, Integer projectID, List<Integer> monitorPointIDList);
 }
