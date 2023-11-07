@@ -393,7 +393,8 @@ public class VideoServiceImpl implements VideoService {
         final String deviceSerial = device.getDeviceSerial();
         final String channelNo = param.channelNo();
         final VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
-        Optional.of(deviceSerial).map(videoCaptureMapper::selectByDeviceSerial).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
+        Optional.of(deviceSerial).map(videoCaptureMapper::selectByDeviceSerial).filter(CollUtil::isNotEmpty)
+                .map(u -> u.get(0)).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
         build.setBaseUrl(YsUtil.getEzOpenAddress(deviceSerial, false, channelNo));
         build.setHdUrl(YsUtil.getEzOpenAddress(deviceSerial, true, channelNo));
         build.setYsToken(ysToken);
