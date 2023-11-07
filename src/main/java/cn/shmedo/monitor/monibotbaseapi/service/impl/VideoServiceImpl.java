@@ -527,9 +527,6 @@ public class VideoServiceImpl implements VideoService {
                 .map(TbVideoDevice::getID).collect(Collectors.toList());
         videoDeviceMapper.deleteBatchIds(videoIDList);
 
-        // 2. 删除关联的传感器
-        sensorMapper.deleteByVedioIDList(videoIDList);
-
         // 3. 删除抓拍配置
         videoCaptureMapper.deleteByVedioIDList(pa.getDeviceSerialList());
 

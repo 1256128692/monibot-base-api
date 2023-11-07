@@ -558,15 +558,6 @@
         </foreach>
     </select>
 
-    <delete id="deleteByVedioIDList">
-        delete
-        from tb_sensor
-        where VideoDeviceID in
-        <foreach collection="videoIDList" item="videoID" separator="," open="(" close=")">
-            #{videoID}
-        </foreach>
-    </delete>
-
     <select id="queryMaxDisplayOrderByMonitorType" resultType="java.lang.Integer">
         select Max(DisplayOrder)
         from tb_sensor
