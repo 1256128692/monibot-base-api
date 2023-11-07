@@ -173,7 +173,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
      * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.图片
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.单行文本,6.图片上传,7.文件上传,8.地图选点,9.实时定位
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
@@ -250,7 +250,7 @@ public class ProjectController {
      * @apiSuccess (返回结果) {Int} propertyList.projectID 工程项目ID
      * @apiSuccess (返回结果) {Int} propertyList.propertyID 项目属性ID
      * @apiSuccess (返回结果) {Int} propertyList.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.图片
+     * @apiSuccess (返回结果) {Int} propertyList.type 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.单行文本,6.图片上传,7.文件上传,8.地图选点,9.实时定位
      * @apiSuccess (返回结果) {String} propertyList.className 结构名称
      * @apiSuccess (返回结果) {String} propertyList.name 属性名称
      * @apiSuccess (返回结果) {Bool} propertyList.required 是否必填
