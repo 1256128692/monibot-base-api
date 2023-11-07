@@ -59,4 +59,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<TbMonitorPoint> selectListByProjectIDAndMonitorClass(Integer projectID, Integer monitorClass);
 
     List<MonitorPointBaseInfoV1> selectPointListByMonitorItemIDList(List<Integer> monitorItemIDList);
+
+    List<TbMonitorPoint> selectPointListByIDList(List<Integer> monitorPointIDList);
 }

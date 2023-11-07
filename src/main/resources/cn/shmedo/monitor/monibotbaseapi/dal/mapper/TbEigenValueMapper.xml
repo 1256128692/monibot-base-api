@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
+    <!--@mbg.generated-->
+    <!--@Table tb_eigen_value-->
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="Scope" jdbcType="INTEGER" property="scope" />
+    <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID" />
+    <result column="MonitorTypeFieldID" jdbcType="INTEGER" property="monitorTypeFieldID" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Value" jdbcType="DOUBLE" property="value" />
+    <result column="UnitID" jdbcType="INTEGER" property="unitID" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, ProjectID, `Scope`, MonitorItemID, MonitorTypeFieldID, `Name`, `Value`, UnitID, 
+    ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_eigen_value
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_eigen_value
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_eigen_value (ProjectID, `Scope`, MonitorItemID, 
+      MonitorTypeFieldID, `Name`, `Value`, 
+      UnitID, ExValue, CreateUserID, 
+      CreateTime, UpdateUserID, UpdateTime
+      )
+    values (#{projectID,jdbcType=INTEGER}, #{scope,jdbcType=INTEGER}, #{monitorItemID,jdbcType=INTEGER}, 
+      #{monitorTypeFieldID,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=DOUBLE}, 
+      #{unitID,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}, #{createUserID,jdbcType=INTEGER}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <insert id="insertSelective" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue" useGeneratedKeys="true">
+    insert into tb_eigen_value
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="projectID != null">
+        ProjectID,
+      </if>
+      <if test="scope != null">
+        `Scope`,
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID,
+      </if>
+      <if test="monitorTypeFieldID != null">
+        MonitorTypeFieldID,
+      </if>
+      <if test="name != null">
+        `Name`,
+      </if>
+      <if test="value != null">
+        `Value`,
+      </if>
+      <if test="unitID != null">
+        UnitID,
+      </if>
+      <if test="exValue != null">
+        ExValue,
+      </if>
+      <if test="createUserID != null">
+        CreateUserID,
+      </if>
+      <if test="createTime != null">
+        CreateTime,
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID,
+      </if>
+      <if test="updateTime != null">
+        UpdateTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="projectID != null">
+        #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="scope != null">
+        #{scope,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorTypeFieldID != null">
+        #{monitorTypeFieldID,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        #{value,jdbcType=DOUBLE},
+      </if>
+      <if test="unitID != null">
+        #{unitID,jdbcType=INTEGER},
+      </if>
+      <if test="exValue != null">
+        #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserID != null">
+        #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        #{updateUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
+    <!--@mbg.generated-->
+    update tb_eigen_value
+    <set>
+      <if test="projectID != null">
+        ProjectID = #{projectID,jdbcType=INTEGER},
+      </if>
+      <if test="scope != null">
+        `Scope` = #{scope,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorTypeFieldID != null">
+        MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        `Name` = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="value != null">
+        `Value` = #{value,jdbcType=DOUBLE},
+      </if>
+      <if test="unitID != null">
+        UnitID = #{unitID,jdbcType=INTEGER},
+      </if>
+      <if test="exValue != null">
+        ExValue = #{exValue,jdbcType=VARCHAR},
+      </if>
+      <if test="createUserID != null">
+        CreateUserID = #{createUserID,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null">
+        CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateUserID != null">
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null">
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
+    <!--@mbg.generated-->
+    update tb_eigen_value
+    set ProjectID = #{projectID,jdbcType=INTEGER},
+      `Scope` = #{scope,jdbcType=INTEGER},
+      MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
+      `Name` = #{name,jdbcType=VARCHAR},
+      `Value` = #{value,jdbcType=DOUBLE},
+      UnitID = #{unitID,jdbcType=INTEGER},
+      ExValue = #{exValue,jdbcType=VARCHAR},
+      CreateUserID = #{createUserID,jdbcType=INTEGER},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+      UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+
+  <select id="selectCountByProjectIDAndItemIDAndFiledIDAndName" resultType="java.lang.Integer">
+    select count(1) from tb_eigen_value
+    where  ProjectID = #{projectID,jdbcType=INTEGER}
+    and MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
+    and MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
+    and `Name` = #{name,jdbcType=VARCHAR}
+  </select>
+</mapper>

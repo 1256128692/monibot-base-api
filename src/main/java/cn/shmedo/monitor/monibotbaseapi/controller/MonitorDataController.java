@@ -4,8 +4,9 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
-import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MonitorDataController {
 
-    private WtMonitorService wtMonitorService;
+    private MonitorDataService monitorDataService;
 
     /**
      * @api {POST} /QueryMonitorPointDataList 查询监测点数据列表
@@ -242,8 +243,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:AddEigenValue")
     @RequestMapping(value = "/AddEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addEigenValue(@Validated @RequestBody Object pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
+    public Object addEigenValue(@Validated @RequestBody AddEigenValueParam pa) {
+        monitorDataService.addEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 

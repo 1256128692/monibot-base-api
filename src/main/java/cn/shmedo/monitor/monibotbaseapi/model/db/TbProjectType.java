@@ -32,9 +32,4 @@ public class TbProjectType {
     @TableField(value = "MainType")
     private String mainType;
 
-    /**
-     * 平台类型集
-     */
-    @TableField(value = "PlatformTypeSet")
-    private String platformTypeSet;
 }
