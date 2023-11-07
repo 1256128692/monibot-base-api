@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.config.MonitorItemDefaultCheckedConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -198,7 +200,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     }
 
     @Override
-    public List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa) {
+    public List<MonitorItemWithDefaultChecked> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa) {
         LambdaQueryWrapper<TbMonitorItem> queryWrapper = new QueryWrapper<TbMonitorItem>().lambda();
         if (pa.getCreateType() != null) {
             queryWrapper.eq(TbMonitorItem::getCreateType, pa.getCreateType());
@@ -223,9 +225,21 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         queryWrapper.orderByDesc(TbMonitorItem::getID);
         Optional.ofNullable(pa.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> queryWrapper
                 .and(wrapper -> wrapper.like(TbMonitorItem::getAlias, e).or().like(TbMonitorItem::getName, e)));
-        return tbMonitorItemMapper.selectList(
+        List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(
                 queryWrapper
         );
+        List<MonitorItemWithDefaultChecked> list = tbMonitorItems.stream().map(
+                e -> {
+                    MonitorItemWithDefaultChecked obj = BeanUtil.copyProperties(e, MonitorItemWithDefaultChecked.class);
+                    if (obj.getCreateType().equals(CreateType.PREDEFINED.getType()) && MonitorItemDefaultCheckedConfig.idDefault(pa.getProjectType(), e.getName())) {
+                        obj.setDefaultChecked(true);
+                    } else {
+                        obj.setDefaultChecked(false);
+                    }
+                    return obj;
+                }
+        ).toList();
+        return list;
     }
 
     @Override

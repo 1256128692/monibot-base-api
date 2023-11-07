@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.CompanyMonitorItemNameInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemWithDefaultChecked;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.List;
@@ -28,7 +29,7 @@ public interface MonitorItemService {
 
     List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa);
 
-    List<TbMonitorItem> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa);
+    List<MonitorItemWithDefaultChecked> querySuperMonitorItemList(QuerySuperMonitorItemListParam pa);
 
     List<CompanyMonitorItemNameInfo> queryMonitorItemNameList(QueryWorkOrderStatisticsParam pa);
 }
