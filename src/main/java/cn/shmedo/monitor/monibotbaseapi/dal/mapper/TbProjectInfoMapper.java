@@ -7,17 +7,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseI
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import jakarta.validation.Valid;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-@Mapper
+
 public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
-
-
     void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);

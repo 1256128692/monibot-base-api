@@ -12,8 +12,6 @@
     <result column="ProjectType" jdbcType="TINYINT" property="projectType" />
     <result column="ExpiryDate" jdbcType="TIMESTAMP" property="expiryDate" />
     <result column="DirectManageUnit" jdbcType="VARCHAR" property="directManageUnit" />
-    <result column="PlatformType" jdbcType="TINYINT" property="platformType" />
-    <result column="PlatformTypeSet" jdbcType="VARCHAR" property="platformTypeSet" />
     <result column="Enable" jdbcType="BIT" property="enable" />
     <result column="Location" jdbcType="VARCHAR" property="location" />
     <result column="ProjectAddress" jdbcType="VARCHAR" property="projectAddress" />
@@ -30,8 +28,8 @@
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     ID, CompanyID, `Level`, ProjectName, ShortName, ProjectType, ExpiryDate, DirectManageUnit, 
-    PlatformType, PlatformTypeSet, `Enable`, `Location`, ProjectAddress, Latitude, Longitude, 
-    ImagePath, ProjectDesc, ModelID, CreateTime, CreateUserID, UpdateTime, UpdateUserID
+    `Enable`, `Location`, ProjectAddress, Latitude, Longitude, ImagePath, ProjectDesc, 
+    ModelID, CreateTime, CreateUserID, UpdateTime, UpdateUserID
   </sql>
     <delete id="deleteProjectInfoList" parameterType="java.lang.Integer">
         DELETE tb_project_info from tb_project_info where ID in
@@ -206,12 +204,7 @@
                  left join tb_monitor_item mi on mi.projectID = pi.ID
         where mi.CompanyID = #{companyID,jdbcType=INTEGER}
           and mi.Alias = #{monitorItemName}
-        <if test="platformTypeSet != null and platformTypeSet.size() != 0">
-            and
-            <foreach  collection="platformTypeSet" item="item"  separator="or" open="(" close=")">
-                FIND_IN_SET(#{item}, platformTypeSet)
-            </foreach>
-        </if>
+
     </select>
     <select id="selectMonitorPointRelateSensorConfig" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
         SELECT
@@ -248,7 +241,7 @@
       set level = #{level},
       updateTime = #{date},
       updateUserID = #{userID}
-      where ID in <foreach collection="pidList" item="id" separator="," open="(" close=")">
+      where ID in <foreach close=")" collection="pidList" item="id" open="(" separator=",">
       #{id}
   </foreach>
     </update>
@@ -297,7 +290,7 @@
               <if test="serviceIDList != null and serviceIDList.size() != 0">
                   id in (
                     select ProjectID from tb_project_service_relation where ServiceID in
-                  <foreach collection="serviceIDList" item="sid" separator="," open="(" close=")">
+                  <foreach close=")" collection="serviceIDList" item="sid" open="(" separator=",">
                       #{sid}
                   </foreach>
                   )
@@ -326,7 +319,7 @@
   <update id="updateLevel2Unallocated">
       update tb_project_info
       set level = 0
-      where level > 0
+      where level &gt; 0
         and id not in (select upLevelID from tb_project_relation)
         and id not in (select downLevelID from tb_project_relation)
   </update>
@@ -338,7 +331,7 @@
   <update id="updateLevel2Unallocatedwhennorealtion">
         update tb_project_info
         set level = 0
-        where level > 0
+        where level &gt; 0
             and id not in (select upLevelID from tb_project_relation)
             and id not in (select downLevelID from tb_project_relation)
     </update>
