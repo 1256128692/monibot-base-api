@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
@@ -414,6 +415,7 @@ public class MonitorDataController {
      * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
      * @apiSuccess (返回结果) {String} dataList.name 大事件名称
      * @apiSuccess (返回结果) {Int} dataList.frequency 频率,0:单次  1:每年
+     * @apiSuccess (返回结果) {String} dataList.frequencyStr 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
      * @apiSuccess (返回结果) {String} [dataList.exValue] 拓展属性
      * @apiSampleRequest off
@@ -421,8 +423,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryDataEventList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryDataEventList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDataEventList(@Validated @RequestBody QueryDataEventParam pa) {
+        return monitorDataService.queryDataEventList(pa);
     }
 
 

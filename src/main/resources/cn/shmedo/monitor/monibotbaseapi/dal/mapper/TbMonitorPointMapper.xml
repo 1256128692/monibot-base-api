@@ -695,4 +695,11 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectItemIDsByIDs" resultType="java.lang.Integer">
+        select distinct MonitorItemID from tb_monitor_point where ID in
+        <foreach collection="monitorPointIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
