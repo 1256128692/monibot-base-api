@@ -678,7 +678,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 );
             }
         });
-        List<String> ossAllList = result.getPropertyList().stream().flatMap(
+        List<String> ossAllList = result.getPropertyList().stream()
+                .filter(e -> ObjectUtil.isNotEmpty(e.getOssList()))
+                .flatMap(
                 e -> e.getOssList().stream()
         ).toList();
         if (ObjectUtil.isNotEmpty(ossAllList)) {
@@ -725,9 +727,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             } else {
                 return Collections.emptyList();
             }
-        }
-        if (pa.getPlatformType() != null) {
-            wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformType().intValue());
         }
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNotEmpty(tbProjectInfos)) {

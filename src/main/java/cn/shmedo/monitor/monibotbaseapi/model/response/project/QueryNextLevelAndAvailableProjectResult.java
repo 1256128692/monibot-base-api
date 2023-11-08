@@ -23,13 +23,11 @@ public class QueryNextLevelAndAvailableProjectResult {
                 nextLevelProjectList.stream().map(e ->
                         SimpleProject.builder()
                                 .id(e.getID()).name(e.getProjectName()).level(e.getLevel())
-                                .platformTypeSet(e.getPlatformTypeSet())
                                 .projectType(e.getProjectType())
                                 .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getMainType())
                                 .nnLevelProjectList(nnMap.getOrDefault(e.getID(), List.of()).stream()
                                         .map(nn -> SimpleProject.builder()
                                                 .id(nn.getID()).name(nn.getProjectName()).level(nn.getLevel())
-                                                .platformTypeSet(nn.getPlatformTypeSet())
                                                 .projectType(nn.getProjectType())
                                                 .projectTypeStr(ProjectTypeCache.projectTypeMap.get(nn.getProjectType()).getMainType())
                                                 .build()
@@ -42,7 +40,6 @@ public class QueryNextLevelAndAvailableProjectResult {
                 canUsedProjctList.stream().map(e ->
                         SimpleProject.builder()
                                 .id(e.getID()).name(e.getProjectName()).level(e.getLevel())
-                                .platformTypeSet(e.getPlatformTypeSet())
                                 .projectType(e.getProjectType())
                                 .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getMainType())
                                 .build()

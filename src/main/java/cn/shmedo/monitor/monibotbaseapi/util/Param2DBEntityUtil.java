@@ -40,7 +40,6 @@ public class Param2DBEntityUtil {
         obj.setProjectType(pa.getProjectType());
         obj.setExpiryDate(pa.getExpiryDate());
         obj.setDirectManageUnit(pa.getDirectManageUnit());
-        obj.setPlatformType(pa.getPlatformType());
         obj.setEnable(pa.getEnable());
         obj.setLocation(pa.getLocation());
         obj.setProjectAddress(pa.getProjectAddress());
