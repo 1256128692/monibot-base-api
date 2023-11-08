@@ -78,6 +78,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<@NotNull TagKeyAndValue> tagList;
     @Valid
     private List<@NotNull Integer> monitorItemIDList;
+    @NotNull
     private Integer modelID;
     @Valid
     @NotEmpty
@@ -104,7 +105,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (tbProjectInfoMapper.countByNameExcludeID(projectName, null) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在系统中已存在");
         }
-        if (modelID != null) {
 
             TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
             TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
@@ -117,16 +117,13 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             if (!tbPropertyModel.getGroupID().equals(projectType.intValue())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
-        }
         if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
         }
-        properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType));
+        TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+        properties = tbPropertyMapper.queryByMID(modelID);
 
-        if (modelID != null) {
-            TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
-            properties.addAll(tbPropertyMapper.queryByMID(modelID));
-        }
+
         ResultWrapper temp = PropertyUtil.validPropertyValue(modelValueList, properties, true);
         if (temp != null) {
             return temp;

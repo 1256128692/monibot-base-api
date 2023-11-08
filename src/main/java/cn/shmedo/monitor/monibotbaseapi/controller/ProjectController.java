@@ -59,7 +59,7 @@ public class ProjectController {
      * @apiParam (请求体) {String} tagList.key 标签键
      * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目列表
-     * @apiParam (请求体) {Int} [modelID] 自定义模型ID
+     * @apiParam (请求体) {Int} modelID 模型ID
      * @apiParam (请求体) {Object[]} [modelValueList] 模型值列表(预定义与自定义部分的合集)
      * @apiParam (请求体) {String} modelValueList.id 属性ID
      * @apiParam (请求体) {String} [modelValueList.value] 属性值（<=50） 可为null， 不能为空字符串
