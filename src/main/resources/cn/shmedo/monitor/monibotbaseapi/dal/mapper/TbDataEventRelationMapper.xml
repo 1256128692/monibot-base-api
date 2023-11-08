@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventRelationMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation">
+    <!--@mbg.generated-->
+    <!--@Table tb_data_event_relation-->
+    <id column="ID" jdbcType="INTEGER" property="id" />
+    <result column="EventID" jdbcType="INTEGER" property="eventID" />
+    <result column="MonitorItemID" jdbcType="INTEGER" property="monitorItemID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, EventID, MonitorItemID
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    <!--@mbg.generated-->
+    select 
+    <include refid="Base_Column_List" />
+    from tb_data_event_relation
+    where ID = #{ID,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    <!--@mbg.generated-->
+    delete from tb_data_event_relation
+    where ID = #{ID,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_data_event_relation (EventID, MonitorItemID)
+    values (#{eventID,jdbcType=INTEGER}, #{monitorItemID,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation" useGeneratedKeys="true">
+    <!--@mbg.generated-->
+    insert into tb_data_event_relation
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="eventID != null">
+        EventID,
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="eventID != null">
+        #{eventID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        #{monitorItemID,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation">
+    <!--@mbg.generated-->
+    update tb_data_event_relation
+    <set>
+      <if test="eventID != null">
+        EventID = #{eventID,jdbcType=INTEGER},
+      </if>
+      <if test="monitorItemID != null">
+        MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
+      </if>
+    </set>
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation">
+    <!--@mbg.generated-->
+    update tb_data_event_relation
+    set EventID = #{eventID,jdbcType=INTEGER},
+      MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
+    where ID = #{ID,jdbcType=INTEGER}
+  </update>
+
+  <insert id="insertBatch">
+      INSERT INTO tb_data_event_relation (MonitorItemID, EventID)
+      VALUES
+      <foreach collection="monitorItemIDList" item="monitorItemID" index="index" separator=",">
+          (#{monitorItemID}, #{id})
+      </foreach>
+  </insert>
+</mapper>

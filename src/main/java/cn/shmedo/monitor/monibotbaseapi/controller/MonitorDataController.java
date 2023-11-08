@@ -4,8 +4,13 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
-import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MonitorDataController {
 
-    private WtMonitorService wtMonitorService;
+    private MonitorDataService monitorDataService;
 
     /**
      * @api {POST} /QueryMonitorPointDataList 查询监测点数据列表
@@ -101,7 +106,7 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryMonitorPointFilterDataList
-     * @apiDescription 查询监测点过滤值列表,包含传感器每个属性在一段时间内的最大值,最小值统计
+     * @apiDescription 查询监测点过滤值列表, 包含传感器每个属性在一段时间内的最大值, 最小值统计
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} monitorItemID 监测项目ID
@@ -217,7 +222,6 @@ public class MonitorDataController {
     }
 
 
-
     /**
      * @api {POST} /AddEigenValue 新增数据特征值
      * @apiVersion 1.0.0
@@ -242,8 +246,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:AddEigenValue")
     @RequestMapping(value = "/AddEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addEigenValue(@Validated @RequestBody Object pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
+    public Object addEigenValue(@Validated @RequestBody AddEigenValueParam pa) {
+        monitorDataService.addEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -253,7 +257,7 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName UpdateEigenValue
-     * @apiDescription 新增数据特征值
+     * @apiDescription 更新数据特征值
      * @apiParam (请求体) {Int} eigenValueID 特征ID
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} scope 作用范围,0:专题分析 1:历史数据
@@ -273,7 +277,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:UpdateEigenValue")
     @RequestMapping(value = "/UpdateEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateEigenValue(@Validated @RequestBody Object pa) {
+    public Object updateEigenValue(@Validated @RequestBody UpdateEigenValueParam pa) {
+        monitorDataService.updateEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -290,11 +295,12 @@ public class MonitorDataController {
      * {"projectID":1,"eigenValueIDList":[1,2]}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseProject
+     * @apiPermission 项目权限 mdmbase:DeleteEigenValue
      */
     @Permission(permissionName = "mdmbase:DeleteEigenValue")
     @RequestMapping(value = "/DeleteBatchEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteBatchEigenValue(@Validated @RequestBody Object pa) {
+    public Object deleteBatchEigenValue(@Validated @RequestBody DeleteBatchEigenValueParam pa) {
+        monitorDataService.deleteBatchEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -332,10 +338,9 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryEigenValueList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryEigenValueList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryEigenValueList(@Validated @RequestBody QueryEigenValueParam pa) {
+        return monitorDataService.queryEigenValueList(pa);
     }
-
 
 
     /**
@@ -349,29 +354,25 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性
+     * @apiParam (请求体) {Int[]} monitorItemIDList 监测项目ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":1,"name":"1","frequency":1,
-     * "timeRange": [
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     }
-     *   ]}
+     * {
+     * "projectID": 623,
+     * "name": "台风事件",
+     * "frequency": 1,
+     * "monitorItemIDList": [
+     * 12702
+     * ],
+     * "timeRange": "[{\"startTime\": \"2023-10-18 16:02:52\", \"endTime\": \"2023-10-18 16:02:52\"}, {\"startTime\": \"2023-11-18 16:02:52\", \"endTime\": \"2023-11-18 16:02:52\"}, {\"startTime\": \"2023-12-18 16:02:52\", \"endTime\": \"2023-12-18 16:02:52\"}]"
+     * }
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddDataEvent
      */
     @Permission(permissionName = "mdmbase:AddDataEvent")
     @RequestMapping(value = "/AddDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addDataEvent(@Validated @RequestBody Object pa) {
+    public Object addDataEvent(@Validated @RequestBody AddDataEventParam pa) {
+        monitorDataService.addDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -437,22 +438,10 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性
+     * @apiParam (请求体) {Int[]} monitorItemIDList 监测项目ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":1,"id":1,"name":"1","frequency":1,
-     * "timeRange": [
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     }
-     *   ]}
+     * {"projectID":1,"id":1,"name":"1","frequency":1,"monitorItemIDList":[1,2],
+     * "timeRange": "[{\"startTime\": \"2023-10-18 16:02:52\", \"endTime\": \"2023-10-18 16:02:52\"}, {\"startTime\": \"2023-11-18 16:02:52\", \"endTime\": \"2023-11-18 16:02:52\"}, {\"startTime\": \"2023-12-18 16:02:52\", \"endTime\": \"2023-12-18 16:02:52\"}]"}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateDataEvent
@@ -464,13 +453,12 @@ public class MonitorDataController {
     }
 
 
-
     /**
      * @api {POST} /QueryMonitorPointHasDataCount 查询监测点有无数据日期时间列表
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryMonitorPointHasDataCount
-     * @apiDescription 查询监测点有无数据日期时间列表,最低支持到日
+     * @apiDescription 查询监测点有无数据日期时间列表, 最低支持到日
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100],必须为同一种监测类型
      * @apiParam (请求体) {DateTime} begin 开始时间

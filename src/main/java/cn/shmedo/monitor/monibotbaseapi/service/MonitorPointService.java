@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
@@ -32,4 +33,6 @@ public interface MonitorPointService {
     void addMonitorPointBatch(AddMonitorPointBatchParam pa, Integer userID);
 
     void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID);
+
+    Object queryMonitorGroupPointList(QueryMonitorGroupPointParam pa);
 }
