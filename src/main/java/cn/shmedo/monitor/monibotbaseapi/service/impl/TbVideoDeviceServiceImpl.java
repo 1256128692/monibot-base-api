@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -61,7 +62,8 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         TbVideoDevice device = param.getTbVideoDevice();
         VideoDeviceBaseInfoV2 build = VideoDeviceBaseInfoV2.build(device);
         final String deviceSerial = device.getDeviceSerial();
-        Optional.of(deviceSerial).map(tbVideoCaptureMapper::selectByDeviceSerial).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
+        Optional.of(deviceSerial).map(tbVideoCaptureMapper::selectByDeviceSerial).filter(CollUtil::isNotEmpty)
+                .map(u -> u.get(0)).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
         final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
         final HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(deviceSerial);
         Optional.ofNullable(url).filter(ObjectUtil::isNotEmpty).ifPresent(build::setBaseUrl);

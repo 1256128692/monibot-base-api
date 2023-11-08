@@ -224,7 +224,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                             item.setGroupName(ProjectTypeCache.projectTypeMap.get(Byte.valueOf(String.valueOf(item.getGroupID()))).getTypeName());
                         } else {
                             // 非工程项目
-                            String groupName = finalGroupMap.containsKey(item.getGroupID()) ? finalGroupMap.get(item.getGroupID()).getName() : "默认";
+                            String groupName = finalGroupMap.containsKey(item.getGroupID()) ?
+                                    finalGroupMap.get(item.getGroupID()).getName() : DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME;
                             item.setGroupName(groupName);
                         }
                     }
@@ -253,36 +254,33 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 非工程项目模板组下没有模板，也要显示
-        if (CollectionUtil.isNotEmpty(unProjectGroupMap) &&
-                StringUtils.isEmpty(param.getName()) &&
-                modelGroup.containsKey(PropertyModelType.UN_BASE_PROJECT.getCode())) {
-            Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
-            if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
-                modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
-            }
-            Set<Integer> groupIDList = modelStream.map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
-            List<Model4Web> finalModel4WebList = model4WebList;
-            unProjectGroupMap.forEach((k, v) -> {
-                if (!groupIDList.contains(k)) {
-                    Model4Web model4Web = new Model4Web();
-                    model4Web.setModelType(v.getGroupType());
-                    model4Web.setGroupID(k);
-                    model4Web.setGroupName(v.getName());
-                    finalModel4WebList.add(model4Web);
+        if (StringUtils.isEmpty(param.getName()) &&
+                (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))) {
+            if (CollectionUtil.isEmpty(unProjectGroupMap)) {
+                Model4Web model4Web = new Model4Web();
+                model4Web.setModelType(param.getModelType());
+                model4Web.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP);
+                model4Web.setGroupName(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME);
+                model4WebList.add(model4Web);
+            } else {
+                Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
+                if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+                    modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
                 }
-            });
+                Set<Integer> groupIDList = modelStream.map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
+                List<Model4Web> finalModel4WebList = model4WebList;
+                unProjectGroupMap.forEach((k, v) -> {
+                    if (!groupIDList.contains(k)) {
+                        Model4Web model4Web = new Model4Web();
+                        model4Web.setModelType(v.getGroupType());
+                        model4Web.setGroupID(k);
+                        model4Web.setGroupName(v.getName());
+                        finalModel4WebList.add(model4Web);
+                    }
+                });
+            }
         }
         return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
-    }
-
-    private boolean checkIsMdCompany(Integer companyID) {
-        if (Objects.isNull(companyID)) {
-            return false;
-        }
-        JSONArray jsonArray = JSONUtil.parseArray(redisTemplate.opsForHash().get(DefaultConstant.REDIS_KEY_MD_COMPANY_PARENT, companyID.toString()));
-        Object o = jsonArray.get(1);
-        JSONArray jsonArray1 = JSONUtil.parseArray(JSONUtil.toJsonStr(o));
-        return jsonArray1.size() == 0;
     }
 
     @Override

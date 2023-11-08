@@ -193,7 +193,8 @@
                COUNT(ts.ID) AS sensorNum
         from tb_video_device vd
                  left join tb_project_info pi on pi.ID = vd.projectID
-                 left join tb_sensor ts on vd.ID = ts.VideoDeviceID
+                 left join tb_video_device_source vds on vds.deviceSerial = vd.deviceSerial
+                 left join tb_sensor ts on vds.ID = ts.VideoDeviceSourceID
         <where>
             1 = 1
             <if test="deviceSerial != null and deviceSerial != ''">

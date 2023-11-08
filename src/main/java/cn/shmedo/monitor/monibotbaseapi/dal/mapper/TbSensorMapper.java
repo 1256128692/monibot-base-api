@@ -63,8 +63,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     List<VideoCaptureBaseInfo> queryListByDeviceSerialList(List<String> deviceSerialList);
 
-    void deleteByVedioIDList(List<Integer> videoIDList);
-
     Integer queryMaxDisplayOrderByMonitorType(Integer key);
 
     void insertSensorList(List<SensorBaseInfoV1> insertSensorList);

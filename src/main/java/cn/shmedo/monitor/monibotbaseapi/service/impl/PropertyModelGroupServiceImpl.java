@@ -129,9 +129,9 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         // 添加默认分组
         if (Objects.isNull(param.getName()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getGroupType())) {
             PropertyModelGroupResponse propertyModelGroupResponse = new PropertyModelGroupResponse();
-            propertyModelGroupResponse.setID(-1);
+            propertyModelGroupResponse.setID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP);
             propertyModelGroupResponse.setGroupType(param.getGroupType());
-            propertyModelGroupResponse.setName("默认");
+            propertyModelGroupResponse.setName(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME);
             propertyModelGroupResponseList.add(propertyModelGroupResponse);
         }
         return propertyModelGroupResponseList.stream().sorted(Comparator.comparing(PropertyModelGroupResponse::getID)).toList();

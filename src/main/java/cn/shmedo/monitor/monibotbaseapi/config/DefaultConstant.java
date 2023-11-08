@@ -49,6 +49,7 @@ public class DefaultConstant {
      * 默认属性模板组
      **/
     public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
+    public static final String PROPERTY_MODEL_DEFAULT_GROUP_NAME = "默认";
 
     /**
      * 工程项目类型

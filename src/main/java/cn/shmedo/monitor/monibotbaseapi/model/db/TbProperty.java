@@ -26,7 +26,7 @@ public class TbProperty {
     private String name;
 
     /**
-     * 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.图片
+     * 属性类型:1.数值,2.字符串,3.枚举,4.日期时间,5.单行文本,6.图片上传,7.文件上传,8.地图选点,9.实时定位
      */
     @TableField("Type")
     private Byte type;
