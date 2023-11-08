@@ -165,6 +165,10 @@ public class OtherDeviceController {
      * @apiSuccess (返回结果) {Boolean} propertyList.required 属性是否必須
      * @apiSuccess (返回结果) {String} [propertyList.enumField]  枚举的可选值
      * @apiSuccess (返回结果) {Boolean} [propertyList.multiSelect] 是否多选
+     * @apiSuccess (返回结果) {Json[]} [propertyList.fileList]  当为图片或文件时候的文件列表
+     * @apiSuccess (返回结果) {String} propertyList.fileList.fileName  文件名称
+     * @apiSuccess (返回结果) {String} propertyList.fileList.filePath  文件token
+     * @apiSuccess (返回结果) {String} propertyList.fileList.absolutePath  文件绝对路径
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeOtherDevice
      */

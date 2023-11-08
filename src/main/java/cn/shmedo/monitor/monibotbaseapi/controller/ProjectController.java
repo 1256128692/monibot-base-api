@@ -261,6 +261,10 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} [propertyList.value] 属性值
      * @apiSuccess (返回结果) {String} [propertyList.exValue] 属性拓展信息
      * @apiSuccess (返回结果) {Int} [propertyList.displayOrder] 排序字段
+     * @apiSuccess (返回结果) {Json[]} [propertyList.fileList]  当为图片或文件时候的文件列表
+     * @apiSuccess (返回结果) {String} propertyList.fileList.fileName  文件名称
+     * @apiSuccess (返回结果) {String} propertyList.fileList.filePath  文件token
+     * @apiSuccess (返回结果) {String} propertyList.fileList.absolutePath  文件绝对路径
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */

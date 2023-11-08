@@ -21,10 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectLevel;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
@@ -63,6 +60,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -671,6 +669,34 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                         serviceMap::get
                 ).toList()
         );
+        // 处理为文件或者图片的属性
+        result.getPropertyList().forEach(e -> {
+            if (FormPropertyType.FILE.getCode().equals(e.getType().intValue())
+                    || FormPropertyType.PICTURE.getCode().equals(e.getType().intValue())) {
+                e.setOssList(
+                        Arrays.stream(e.getValue().split(",")).toList()
+                );
+            }
+        });
+        List<String> ossAllList = result.getPropertyList().stream().flatMap(
+                e -> e.getOssList().stream()
+        ).toList();
+        if (ObjectUtil.isNotEmpty(ossAllList)) {
+            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(ossAllList, result.getCompanyID());
+            Map<String, FileInfoResponse> fileMap = fileUrlList.stream().collect(Collectors.toMap(
+                    FileInfoResponse::getFilePath, Function.identity()
+            ));
+            result.getPropertyList().forEach(
+                    e -> {
+                        if (ObjectUtil.isNotEmpty(e.getOssList())) {
+                            e.setFileList(
+                                    e.getOssList().stream().map(
+                                            fileMap::get
+                                    ).toList());
+                        }
+                    }
+            );
+        }
         return result;
     }
 

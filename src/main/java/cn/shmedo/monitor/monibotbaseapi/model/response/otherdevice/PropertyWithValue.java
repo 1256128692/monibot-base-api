@@ -1,7 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice;
 
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @program: monibot-base-api
@@ -20,4 +23,7 @@ public class PropertyWithValue {
     private Boolean required;
     private String enumField;
     private Boolean multiSelect;
+
+    private List<String> ossList;
+    private List<FileInfoResponse> fileList;
 }

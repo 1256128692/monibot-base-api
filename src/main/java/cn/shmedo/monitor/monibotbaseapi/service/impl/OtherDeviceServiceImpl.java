@@ -8,15 +8,18 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.FormPropertyType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.AddOtherDeviceBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDevicePageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.QueryOtherDeviceWithPropertyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.otherdevice.UpdateOtherDeviceParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDeviceWithProperty;
 import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -28,8 +31,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -46,6 +52,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbPropertyModelMapper tbPropertyModelMapper;
     private final RedisService redisService;
+    private final FileService fileService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -99,9 +106,37 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
                         .eq(TbProjectProperty::getSubjectType, PropertySubjectType.OtherDevice.getType())
         );
+        TbOtherDeviceWithProperty obj = TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName, tbPropertyModel.getName());
 
-
-        return TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName, tbPropertyModel.getName());
+        // 处理为文件或者图片的属性
+        obj.getPropertyList().forEach(e -> {
+            if (FormPropertyType.FILE.getCode().equals(e.getType().intValue())
+                    || FormPropertyType.PICTURE.getCode().equals(e.getType().intValue())) {
+                e.setOssList(
+                        Arrays.stream(e.getValue().split(",")).toList()
+                );
+            }
+        });
+        List<String> ossAllList = obj.getPropertyList().stream().flatMap(
+                e -> e.getOssList().stream()
+        ).toList();
+        if (ObjectUtil.isNotEmpty(ossAllList)) {
+            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(ossAllList, pa.getCompanyID());
+            Map<String, FileInfoResponse> fileMap = fileUrlList.stream().collect(Collectors.toMap(
+                    FileInfoResponse::getFilePath, Function.identity()
+            ));
+            obj.getPropertyList().forEach(
+                    e -> {
+                        if (ObjectUtil.isNotEmpty(e.getOssList())) {
+                            e.setFileList(
+                                    e.getOssList().stream().map(
+                                            fileMap::get
+                                    ).toList());
+                        }
+                    }
+            );
+        }
+        return obj;
     }
 
     @Override
