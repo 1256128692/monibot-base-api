@@ -49,5 +49,5 @@ public interface TbEigenValueRelationMapper {
 
     void insertBatch(List<Integer> monitorPointIDList, Integer eigenValueID);
 
-    void deleteByEigenValueID(Integer eigenValueID);
+    void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
 }

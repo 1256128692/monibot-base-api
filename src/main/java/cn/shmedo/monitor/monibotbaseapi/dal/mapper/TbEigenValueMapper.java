@@ -53,4 +53,6 @@ public interface TbEigenValueMapper {
     List<EigenValueInfoV1> selectListByCondition(Integer monitorItemID, Integer projectID, List<Integer> monitorPointIDList);
 
     Integer selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name, Integer eigenValueID);
+
+    void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
 }

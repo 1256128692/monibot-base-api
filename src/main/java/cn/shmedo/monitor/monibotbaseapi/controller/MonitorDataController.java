@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
@@ -294,11 +295,12 @@ public class MonitorDataController {
      * {"projectID":1,"eigenValueIDList":[1,2]}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseProject
+     * @apiPermission 项目权限 mdmbase:DeleteEigenValue
      */
     @Permission(permissionName = "mdmbase:DeleteEigenValue")
     @RequestMapping(value = "/DeleteBatchEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteBatchEigenValue(@Validated @RequestBody Object pa) {
+    public Object deleteBatchEigenValue(@Validated @RequestBody DeleteBatchEigenValueParam pa) {
+        monitorDataService.deleteBatchEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 

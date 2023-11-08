@@ -78,9 +78,12 @@
       </foreach>
   </insert>
 
-  <delete id="deleteByEigenValueID">
-      delete
-      from tb_eigen_value_relation
-      where EigenValueID = #{eigenValueID,jdbcType=INTEGER}
+  <delete id="deleteByEigenValueIDList">
+    delete
+    from tb_eigen_value_relation
+    where EigenValueID in
+    <foreach collection="eigenValueIDList" item="eigenValueID" separator="," index="index" open="(" close=")">
+      #{eigenValueID}
+    </foreach>
   </delete>
 </mapper>

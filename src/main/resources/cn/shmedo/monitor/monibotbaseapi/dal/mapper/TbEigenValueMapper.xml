@@ -240,4 +240,13 @@
     and `Name` = #{name,jdbcType=VARCHAR}
     and ID != #{eigenValueID}
   </select>
+
+  <delete id="deleteByEigenValueIDList">
+      delete
+      from tb_eigen_value
+      where ID in
+      <foreach collection="eigenValueIDList" item="eigenValueID" separator="," index="index" open="(" close=")">
+          #{eigenValueID}
+      </foreach>
+  </delete>
 </mapper>

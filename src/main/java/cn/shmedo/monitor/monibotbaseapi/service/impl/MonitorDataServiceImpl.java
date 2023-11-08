@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
@@ -55,13 +56,22 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateEigenValue(UpdateEigenValueParam pa) {
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         TbEigenValue tbEigenValue = UpdateEigenValueParam.toNewVo(pa, subjectID);
         tbEigenValueMapper.updateByPrimaryKeySelective(tbEigenValue);
 
         // 删除之前关系,重新绑定
-        tbEigenValueRelationMapper.deleteByEigenValueID(pa.getEigenValueID());
+        tbEigenValueRelationMapper.deleteByEigenValueIDList(List.of(pa.getEigenValueID()));
         tbEigenValueRelationMapper.insertBatch(pa.getMonitorPointIDList(), pa.getEigenValueID());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBatchEigenValue(DeleteBatchEigenValueParam pa) {
+
+        tbEigenValueMapper.deleteByEigenValueIDList(pa.getEigenValueIDList());
+        tbEigenValueRelationMapper.deleteByEigenValueIDList(pa.getEigenValueIDList());
     }
 }
