@@ -43,7 +43,7 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
             setStorageType(info.getStorageType());
             setCaptureStatus(info.getCaptureStatus());
             setAllocationStatus(info.getAllocationStatus());
-            setDeviceChannel(u.stream().map(VideoProjectViewSensorInfo::getChannelNo).filter(ObjectUtil::isNotEmpty).toList());
+            setDeviceChannel(u.stream().map(VideoProjectViewSensorInfo::getChannelNo).filter(ObjectUtil::isNotEmpty).sorted().toList());
         });
     }
 }

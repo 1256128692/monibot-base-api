@@ -256,26 +256,28 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 非工程项目模板组下没有模板，也要显示
         if (StringUtils.isEmpty(param.getName()) &&
                 (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))) {
-            if (CollectionUtil.isEmpty(unProjectGroupMap)) {
+            Set<Integer> groupIDSet = model4WebList.stream().map(Model4Web::getGroupID).collect(Collectors.toSet());
+            if (!groupIDSet.contains(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP)) {
                 Model4Web model4Web = new Model4Web();
                 model4Web.setModelType(param.getModelType());
                 model4Web.setGroupID(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP);
                 model4Web.setGroupName(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME);
                 model4WebList.add(model4Web);
-            } else {
+            }
+            if(CollectionUtil.isNotEmpty(unProjectGroupMap)) {
                 Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
                 if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
                     modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
                 }
                 Set<Integer> groupIDList = modelStream.map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
-                List<Model4Web> finalModel4WebList = model4WebList;
+                List<Model4Web> finalModel4WebList1 = model4WebList;
                 unProjectGroupMap.forEach((k, v) -> {
                     if (!groupIDList.contains(k)) {
                         Model4Web model4Web = new Model4Web();
                         model4Web.setModelType(v.getGroupType());
                         model4Web.setGroupID(k);
                         model4Web.setGroupName(v.getName());
-                        finalModel4WebList.add(model4Web);
+                        finalModel4WebList1.add(model4Web);
                     }
                 });
             }
