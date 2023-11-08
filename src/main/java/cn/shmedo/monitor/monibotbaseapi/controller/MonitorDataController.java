@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
@@ -255,7 +256,7 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName UpdateEigenValue
-     * @apiDescription 新增数据特征值
+     * @apiDescription 更新数据特征值
      * @apiParam (请求体) {Int} eigenValueID 特征ID
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} scope 作用范围,0:专题分析 1:历史数据
@@ -275,7 +276,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:UpdateEigenValue")
     @RequestMapping(value = "/UpdateEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateEigenValue(@Validated @RequestBody Object pa) {
+    public Object updateEigenValue(@Validated @RequestBody UpdateEigenValueParam pa) {
+        monitorDataService.updateEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 

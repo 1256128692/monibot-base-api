@@ -168,7 +168,7 @@
         UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
-    where ID = #{ID,jdbcType=INTEGER}
+    where ID = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
     <!--@mbg.generated-->
@@ -230,5 +230,14 @@
           </foreach>
           )
       </if>
+  </select>
+
+  <select id="selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID" resultType="java.lang.Integer">
+    select count(1) from tb_eigen_value
+    where  ProjectID = #{projectID,jdbcType=INTEGER}
+    and MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
+    and MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
+    and `Name` = #{name,jdbcType=VARCHAR}
+    and ID != #{eigenValueID}
   </select>
 </mapper>

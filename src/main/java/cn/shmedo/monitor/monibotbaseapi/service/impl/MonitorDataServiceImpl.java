@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -51,5 +52,16 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         });
 
         return eigenValueInfoV1List;
+    }
+
+    @Override
+    public void updateEigenValue(UpdateEigenValueParam pa) {
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        TbEigenValue tbEigenValue = UpdateEigenValueParam.toNewVo(pa, subjectID);
+        tbEigenValueMapper.updateByPrimaryKeySelective(tbEigenValue);
+
+        // 删除之前关系,重新绑定
+        tbEigenValueRelationMapper.deleteByEigenValueID(pa.getEigenValueID());
+        tbEigenValueRelationMapper.insertBatch(pa.getMonitorPointIDList(), pa.getEigenValueID());
     }
 }

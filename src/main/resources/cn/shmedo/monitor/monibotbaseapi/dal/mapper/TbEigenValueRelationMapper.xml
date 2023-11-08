@@ -77,4 +77,10 @@
           (#{monitorPointID}, #{eigenValueID})
       </foreach>
   </insert>
+
+  <delete id="deleteByEigenValueID">
+      delete
+      from tb_eigen_value_relation
+      where EigenValueID = #{eigenValueID,jdbcType=INTEGER}
+  </delete>
 </mapper>
