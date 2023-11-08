@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warn;
 
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.util.Date;
@@ -72,4 +73,10 @@ public class WtWarnLogBase {
      * 监测点位置
      */
     private String monitorPointLocation;
+
+    /**
+     * 项目所在行政区划(json)
+     */
+    @JsonIgnore
+    private String projectArea;
 }
