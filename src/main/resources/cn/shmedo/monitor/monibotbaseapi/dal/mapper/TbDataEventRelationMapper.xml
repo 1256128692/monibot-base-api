@@ -69,4 +69,12 @@
       MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <insert id="insertBatch">
+      INSERT INTO tb_data_event_relation (MonitorItemID, EventID)
+      VALUES
+      <foreach collection="monitorItemIDList" item="monitorItemID" index="index" separator=",">
+          (#{monitorItemID}, #{id})
+      </foreach>
+  </insert>
 </mapper>

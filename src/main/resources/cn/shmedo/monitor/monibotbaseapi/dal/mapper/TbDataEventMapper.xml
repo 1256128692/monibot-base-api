@@ -43,8 +43,7 @@
       #{createTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}
       )
   </insert>
-  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent" useGeneratedKeys="true">
-    <!--@mbg.generated-->
+  <insert id="insertSelective" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent" useGeneratedKeys="true">
     insert into tb_data_event
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="projectID != null">

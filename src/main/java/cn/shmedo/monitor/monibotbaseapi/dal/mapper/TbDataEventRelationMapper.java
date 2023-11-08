@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEventRelation;
 
+import java.util.List;
+
 public interface TbDataEventRelationMapper {
     /**
      * delete by primary key
@@ -44,4 +46,6 @@ public interface TbDataEventRelationMapper {
      * @return update count
      */
     int updateByPrimaryKey(TbDataEventRelation record);
+
+    void insertBatch(List<Integer> monitorItemIDList, Integer id);
 }

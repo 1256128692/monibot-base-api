@@ -1,10 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueRelationMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
@@ -28,6 +32,10 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     private final TbEigenValueMapper tbEigenValueMapper;
 
     private final TbEigenValueRelationMapper tbEigenValueRelationMapper;
+
+    private final TbDataEventMapper tbDataEventMapper;
+
+    private final TbDataEventRelationMapper tbDataEventRelationMapper;
 
 
     @Override
@@ -73,5 +81,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
         tbEigenValueMapper.deleteByEigenValueIDList(pa.getEigenValueIDList());
         tbEigenValueRelationMapper.deleteByEigenValueIDList(pa.getEigenValueIDList());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addDataEvent(AddDataEventParam pa) {
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        TbDataEvent record = AddDataEventParam.toNewVo(pa, subjectID);
+        tbDataEventMapper.insertSelective(record);
+        tbDataEventRelationMapper.insertBatch(pa.getMonitorItemIDList(), record.getId());
     }
 }
