@@ -12,7 +12,8 @@ public enum MonitoringItem {
     WIND_SPEED(8, "风速"),
     SOIL_MOISTURE(9, "土壤含水量"),
     SAND_CONTENT(10, "含沙量"),
-    RIVER_WATER_QUALITY(11, "河道水质");
+    RIVER_WATER_QUALITY(11, "河道水质"),
+    WET_LINE(-1, "浸润线");
 
     private final int key;
     private final String value;

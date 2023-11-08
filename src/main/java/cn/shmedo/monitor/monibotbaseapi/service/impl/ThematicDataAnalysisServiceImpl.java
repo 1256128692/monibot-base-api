@@ -22,6 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.ThematicPlainMonitorItemEnum
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
@@ -159,6 +160,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                 .stream().map(s -> Map.of("monitorPointID", s.getMonitorPointID(), "monitorPointName",
                                         s.getMonitorPointName(), "monitorType", s.getMonitorType())).toList()))
                         .toList()).build()).toList();
+    }
+
+    @Override
+    public List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param) {
+        //(group,key,value) - (monitorGroup,原始key::123,value)
+        return tbMonitorPointMapper.selectThematicGroupPointList(param);
     }
 
     /**

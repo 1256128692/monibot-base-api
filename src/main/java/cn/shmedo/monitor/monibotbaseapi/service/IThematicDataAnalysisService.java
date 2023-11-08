@@ -3,10 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.Date;
@@ -30,4 +28,6 @@ public interface IThematicDataAnalysisService {
     List<Date> queryDmPageDataList(QueryDmDataParam param);
 
     List<ThematicMonitorPointInfo> queryThematicMonitorPointByProjectID(Integer projectID);
+
+    List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param);
 }

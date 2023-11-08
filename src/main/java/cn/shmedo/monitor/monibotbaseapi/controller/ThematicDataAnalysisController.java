@@ -224,15 +224,19 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList.eigenValueDataList 特征值数据
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.eigenValueDataList.eigenValueID 特征值ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.eigenValueName 特征值名称
+     * @apiSuccess (返回结果) {Double} dataList.monitorPointDataList.eigenValueDataList.eigenValue 特征值
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.chnUnit 特征值中文单位
+     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.engUnit 特征值英文单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryThematicGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryThematicGroupPointList(@Valid @RequestBody Object param) {
-        //(group,key,value) - (monitorGroup,原始key::123,value)
-        //TODO 添加特征值(纵剖面-临界浸润线)
-        return null;
+    public Object queryThematicGroupPointList(@Valid @RequestBody QueryThematicGroupPointListParam param) {
+        return thematicDataAnalysisService.queryThematicGroupPointList(param);
     }
 
     /**
