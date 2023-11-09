@@ -986,10 +986,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
-        List<Integer> projectIDList = Stream.of(nextLevelProjectList, canUsedProjctList)
+        List<Integer> projectIDList = new ArrayList<>(Stream.of(nextLevelProjectList, canUsedProjctList)
                 .flatMap(List::stream)
                 .map(TbProjectInfo::getID)
-                .toList();
+                .toList());
+        projectIDList.addAll(nnMap.values().stream().flatMap(List::stream).map(TbProjectInfo::getID).toList());
         List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
                 new LambdaQueryWrapper<TbProjectServiceRelation>()
                         .in(TbProjectServiceRelation::getProjectID, projectIDList)

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.project;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
@@ -31,7 +32,7 @@ public class QueryNextLevelAndAvailableProjectResult {
                                         .map(nn -> SimpleProject.builder()
                                                 .id(nn.getID()).name(nn.getProjectName()).level(nn.getLevel())
                                                 .projectType(nn.getProjectType())
-                                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(nn.getProjectType()).getMainType())
+                                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(nn.getProjectType()).getTypeName())
                                                 .build()
                                         ).toList()
                                 )
@@ -43,6 +44,15 @@ public class QueryNextLevelAndAvailableProjectResult {
                     List<Integer> serviceIDList = pidServiceIDListMap.getOrDefault(e.getId(), List.of());
                     e.setServiceIDList(serviceIDList);
                     e.setServiceList(serviceIDList.stream().map(serviceMap::get).toList());
+                    if (ObjectUtil.isNotEmpty(e.getNnLevelProjectList())) {
+                        e.getNnLevelProjectList().forEach(
+                                nn -> {
+                                    List<Integer> nnServiceIDList = pidServiceIDListMap.getOrDefault(nn.getId(), List.of());
+                                    nn.setServiceIDList(nnServiceIDList);
+                                    nn.setServiceList(nnServiceIDList.stream().map(serviceMap::get).toList());
+                                }
+                        );
+                    }
                 }
         );
         result.setAvailableProjectList(
