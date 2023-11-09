@@ -617,6 +617,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                                             ).toList()
                                     );
                                 }
+                                if (ObjectUtil.isNotEmpty(e.getDownLevelProjectList())) {
+                                    e.getDownLevelProjectList().forEach(
+                                            ee -> {
+                                                if (pidServiceListMap.containsKey(ee.getID())) {
+                                                    ee.setServiceList(
+                                                            pidServiceListMap.get(ee.getID()).stream().map(
+                                                                    serviceMap::get
+                                                            ).toList()
+                                                    );
+                                                }
+                                            }
+                                    );
+                                }
                             }
                     );
 
