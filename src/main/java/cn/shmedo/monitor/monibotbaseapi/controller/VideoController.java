@@ -708,7 +708,7 @@ public class VideoController {
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量存储视频抓拍列表
-     * @apiName SaveVideoDeviceSensorList
+     * @apiName SaveVideoCaptureList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
      * @apiParam (请求体) {String} list.deviceSerial 设备序列号
@@ -870,7 +870,7 @@ public class VideoController {
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询抓拍列表
-     * @apiName QueryCaptureList
+     * @apiName QueryCaptureDate
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
