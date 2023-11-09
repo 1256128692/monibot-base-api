@@ -275,8 +275,8 @@ public class ThematicDataAnalysisController {
      */
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryTransverseList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryTransverseList(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryTransverseList(@Valid @RequestBody QueryTransverseListParam param) {
+        return thematicDataAnalysisService.queryTransverseList(param);
     }
 
     /**
@@ -319,8 +319,8 @@ public class ThematicDataAnalysisController {
      */
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryTransversePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryTransversePage(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryTransversePage(@Valid @RequestBody QueryTransversePageParam param) {
+        return thematicDataAnalysisService.queryTransversePage(param);
     }
 
     /**

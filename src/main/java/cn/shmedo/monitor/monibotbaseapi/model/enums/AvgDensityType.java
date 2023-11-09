@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 public enum AvgDensityType {
 
     ALL(0),
@@ -24,6 +27,11 @@ public enum AvgDensityType {
             }
         }
         return false;
+    }
+
+    public static AvgDensityType getByValue(final Integer value) {
+        return Arrays.stream(values()).filter(u -> Objects.equals(u.getValue(), value)).findAny()
+                .orElseThrow(() -> new RuntimeException("Illegal avg density type value,value:" + value));
     }
 
 }

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -169,7 +170,7 @@ public class TimeUtil {
         return Timestamp.valueOf(timeStr);
     }
 
-    public static Date getDate(LocalDateTime localDateTime){
+    public static Date getDate(LocalDateTime localDateTime) {
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         Instant instant2 = zonedDateTime.toInstant();
         return Date.from(instant2);
@@ -536,6 +537,24 @@ public class TimeUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public interface AvgFormatter {
+        SimpleDateFormat DAILY_FORMATTER = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
+        SimpleDateFormat MONTHLY_FORMATTER = new SimpleDateFormat("yyyy-MM");
+        SimpleDateFormat YEARLY_FORMATTER = new SimpleDateFormat("yyyy");
+
+        static SimpleDateFormat getFormatter(AvgDensityType avgDensityType) {
+            SimpleDateFormat formatter;
+            switch (avgDensityType) {
+                case ALL -> formatter = TimeUtil.getDefaultFormatter();
+                case DAILY -> formatter = DAILY_FORMATTER;
+                case MONTHLY -> formatter = MONTHLY_FORMATTER;
+                case YEARLY -> formatter = YEARLY_FORMATTER;
+                default -> throw new RuntimeException("无法处理的展示密度,密度:" + avgDensityType.name());
+            }
+            return formatter;
         }
     }
 }

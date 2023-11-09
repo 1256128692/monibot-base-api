@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
@@ -10,19 +11,14 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectConfigMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectConfig;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.thematicDataAnalysis.DmParamDto;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethodEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ThematicPlainMonitorItemEnum;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
@@ -41,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
@@ -58,6 +55,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbProjectConfigMapper tbProjectConfigMapper;
     private final TbMonitorPointMapper tbMonitorPointMapper;
+    private final TbSensorMapper tbSensorMapper;
+    private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final MdInfoService mdInfoService;
     private final static String DISTANCE_FIELD_TOKEN = "distance";
 
@@ -166,6 +165,61 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     public List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param) {
         //(group,key,value) - (monitorGroup,原始key::123,value)
         return tbMonitorPointMapper.selectThematicGroupPointList(param);
+    }
+
+    @Override
+    public List<ThematicQueryTransverseInfo> queryTransverseList(QueryTransverseListParam param) {
+        List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getInspectedPointIDList()));
+        if (CollUtil.isEmpty(sensorList)) {
+            return List.of();
+        }
+        Integer datumPointID = Optional.ofNullable(param.getDatumPoint()).map(DatumPointConfig::getMonitorPointID).orElse(null);
+        Integer upper = Optional.ofNullable(param.getDatumPoint()).map(DatumPointConfig::getUpper).orElse(null);
+        Integer lower = Optional.ofNullable(param.getDatumPoint()).map(DatumPointConfig::getLower).orElse(null);
+
+        Map<Integer, String> pointIDNameMap = tbMonitorPointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
+                .in(TbMonitorPoint::getID, param.getInspectedPointIDList())).stream().collect(Collectors.toMap(TbMonitorPoint::getID, TbMonitorPoint::getName));
+        Map<Integer, Tuple<Integer, String>> sensorPointInfoMap = sensorList.stream().collect(Collectors.toMap(TbSensor::getID, u -> new Tuple<>(u.getMonitorPointID(), pointIDNameMap.get(u.getMonitorPointID()))));
+        AvgDensityType avgDensityType = AvgDensityType.getByValue(param.getDisplayDensity());
+        List<Map<String, Object>> dataList = queryPointDataList(sensorList, avgDensityType, StatisticalMethodEnum.getByCode(param.getStatisticalMethod()),
+                param.getStartTime(), param.getEndTime());
+        SimpleDateFormat formatter = TimeUtil.AvgFormatter.getFormatter(avgDensityType);
+//        dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD))
+//                .collect(Collectors.groupingBy(u -> formatter.format(DateUtil.parse(u.get(DbConstant.TIME_FIELD).toString(),
+//                        TimeUtil.getDefaultFormatter())))).entrySet().stream().map(u -> {
+//                    try {
+//                        ThematicQueryTransverseInfo.ThematicQueryTransverseInfoBuilder builder = ThematicQueryTransverseInfo.builder().time(formatter.parse(u.getKey()));
+//                        if (Objects.nonNull(datumPointID)) {
+//                            u.getValue().stream().filter(w -> w.containsKey(DbConstant.SENSOR_ID_TAG)).filter(w ->
+//                                            datumPointID.equals(sensorPointInfoMap.get(Integer.parseInt(w.get(DbConstant.SENSOR_ID_TAG).toString())).getItem1()))
+//                                    .findAny().ifPresent(w -> {
+//                                        Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Integer.parseInt(
+//                                                w.get(DbConstant.SENSOR_ID_TAG).toString()));
+//                                        double value = Double.parseDouble(w.get("").toString());    //TODO get fieldToken
+//                                        builder.datumPointData(DatumPointData.builder().monitorPointID(pointInfo.getItem1())
+//                                                .monitorPointName(pointInfo.getItem2()).value(value).upper(value + upper)
+//                                                .lower(value - lower).build());
+//                                    });
+//                        }
+//
+//                        u.getValue().stream().filter(w -> )
+//
+//                        return builder.build();
+//                    } catch (ParseException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                }).map()
+
+
+        //pointID -> List
+
+
+        return null;
+    }
+
+    @Override
+    public PageUtil.Page<ThematicQueryTransverseInfo> queryTransversePage(QueryTransversePageParam param) {
+        return PageUtil.page(this.queryTransverseList(param), param.getPageSize(), param.getCurrentPage());
     }
 
     /**
@@ -470,5 +524,42 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 .map(u -> DmThematicAnalysisPageInfo.pageParentBuilder().parent(u).monitorPointID(monitorPointID)
                         .monitorPointName(monitorPointName).build()).sorted((o1, o2) ->
                         (int) (o1.getTime().getTime() - o2.getTime().getTime())).toList();
+    }
+
+    private List<Map<String, Object>> queryPointDataList(List<TbSensor> tbSensorList, AvgDensityType displayType,
+                                                         StatisticalMethodEnum method, Date startTime, Date endTime) {
+        return Optional.of(tbSensorList).filter(CollUtil::isNotEmpty).map(u -> {
+            List<Map<String, Object>> res = new ArrayList<>();
+            Map<Integer, List<Integer>> monitorSensorIDMap = u.stream().collect(Collectors.groupingBy(TbSensor::getMonitorType))
+                    .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, p -> p.getValue().stream().map(TbSensor::getID).toList()));
+            Map<Integer, List<TbMonitorTypeField>> monitorTypeFieldMap = tbMonitorTypeFieldMapper.selectList(
+                            new LambdaQueryWrapper<TbMonitorTypeField>().in(TbMonitorTypeField::getMonitorType, monitorSensorIDMap.keySet()))
+                    .stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
+            for (Map.Entry<Integer, List<Integer>> entry : monitorSensorIDMap.entrySet()) {
+                Integer monitorType = entry.getKey();
+                if (monitorTypeFieldMap.containsKey(monitorType)) {
+                    List<FieldSelectInfo> fieldSelectInfos = combineFieldSelectInfoList(monitorTypeFieldMap.get(monitorType));
+                    List<Integer> sensorIDList1 = entry.getValue();
+                    //TODO query dataList according by {@code MonitorType} and {@code SensorID}
+                    List<Map<String, Object>> dataList = List.of();
+                    res.addAll(dataList);
+                }
+            }
+            return res;
+        }).orElse(List.of());
+    }
+
+    private List<FieldSelectInfo> combineFieldSelectInfoList(final List<TbMonitorTypeField> fieldList) {
+        List<FieldSelectInfo> fieldSelectInfos = fieldList.stream().map(TbMonitorTypeField::getFieldToken)
+                .map(this::buildFieldSelectInfo).collect(Collectors.toList());
+        fieldSelectInfos.add(buildFieldSelectInfo(DbConstant.SENSOR_ID_TAG));
+        fieldSelectInfos.add(buildFieldSelectInfo(DbConstant.TIME_FIELD));
+        return fieldSelectInfos;
+    }
+
+    private FieldSelectInfo buildFieldSelectInfo(final String fieldToken) {
+        FieldSelectInfo info = new FieldSelectInfo();
+        info.setFieldToken(fieldToken);
+        return info;
     }
 }

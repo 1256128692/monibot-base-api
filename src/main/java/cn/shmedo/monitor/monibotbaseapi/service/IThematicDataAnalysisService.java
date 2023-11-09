@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
@@ -30,4 +27,8 @@ public interface IThematicDataAnalysisService {
     List<ThematicMonitorPointInfo> queryThematicMonitorPointByProjectID(Integer projectID);
 
     List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param);
+
+    List<ThematicQueryTransverseInfo> queryTransverseList(QueryTransverseListParam param);
+
+    PageUtil.Page<ThematicQueryTransverseInfo> queryTransversePage(QueryTransversePageParam param);
 }

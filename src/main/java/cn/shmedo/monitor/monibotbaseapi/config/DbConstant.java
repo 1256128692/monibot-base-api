@@ -29,4 +29,13 @@ public class DbConstant {
     public static final String CURRENT_RAIN_FALL = "currentRainfall";
 
     public static final String DAILY_RAINFALL = "dailyRainfall";
+
+    /**
+     * 统计方式key
+     */
+    public static final String STATISTICAL_METHODS = "StatisticalMethods";
+    /**
+     * 显示密度key
+     */
+    public static final String DISPLAY_DENSITY = "displayDensity";
 }
