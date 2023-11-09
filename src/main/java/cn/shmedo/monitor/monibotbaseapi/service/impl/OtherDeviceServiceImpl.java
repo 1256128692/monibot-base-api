@@ -147,7 +147,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     @Transactional(rollbackFor = Exception.class)
     public void updateOtherDevice(UpdateOtherDeviceParam pa, Integer subjectID) {
         baseMapper.updateById(pa.update(subjectID));
-        if (pa.getPropertyList() != null) {
+        if (ObjectUtil.isNotEmpty(pa.getPropertyList())) {
             tbProjectPropertyMapper.deleteProjectPropertyList(List.of(pa.getID()), PropertySubjectType.OtherDevice.getType());
             tbProjectPropertyMapper.insertBatch(pa.toProjectPropertyList());
         }
