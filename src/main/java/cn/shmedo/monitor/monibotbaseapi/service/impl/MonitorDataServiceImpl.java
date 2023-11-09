@@ -1,10 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventRelationMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbEigenValueRelationMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
@@ -17,12 +16,16 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValuePara
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +46,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
     private final TbDataEventRelationMapper tbDataEventRelationMapper;
 
+    private final TbMonitorTypeMapper tbMonitorTypeMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -130,5 +134,33 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
         tbDataEventMapper.deleteByEventIDList(pa.getEventIDList());
         tbDataEventRelationMapper.deleteByEventIDList(pa.getEventIDList());
+    }
+
+    @Override
+    public Object queryMonitorTypeConfiguration(QueryMonitorTypeConfigurationParam pa) {
+
+        List<MonitorTypeBaseInfoV1> list = null;
+
+        if (pa.getMonitorType() != null) {
+            list = tbMonitorTypeMapper.selectByMonitorTypeList(List.of(pa.getMonitorType()));
+        } else {
+            list = tbMonitorTypeMapper.selectAllMonitorTypeBaseInfoV1();
+        }
+
+
+        if (CollectionUtil.isNullOrEmpty(list)) {
+            return Collections.emptyList();
+        }
+        list.forEach(i -> {
+            if (StringUtils.isNotBlank(i.getExValues())) {
+                MonitorTypeConfigV1 monitorTypeConfigV1 = JSONUtil.toBean(i.getExValues(), MonitorTypeConfigV1.class);
+                if (ObjectUtil.isNotNull(monitorTypeConfigV1)) {
+                    i.setDisplayDensity(monitorTypeConfigV1.getDisplayDensity());
+                    i.setStatisticalMethods(monitorTypeConfigV1.getStatisticalMethods());
+                }
+            }
+        });
+
+        return list;
     }
 }
