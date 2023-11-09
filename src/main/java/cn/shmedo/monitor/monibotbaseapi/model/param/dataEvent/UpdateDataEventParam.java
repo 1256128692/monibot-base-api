@@ -15,11 +15,13 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AddDataEventParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class UpdateDataEventParam  implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
-    @NotBlank(message = "大事件名称Name不能为空")
+    @NotNull(message = "大事件id不能为空")
+    private Integer id;
+    @NotBlank(message = "大事件名称name不能为空")
     private String name;
     @NotNull(message = "频率frequency不能为空")
     private Integer frequency;
@@ -29,17 +31,16 @@ public class AddDataEventParam implements ParameterValidator, ResourcePermission
     @NotEmpty
     private List<@NotNull Integer> monitorItemIDList;
 
-    public static TbDataEvent toNewVo(AddDataEventParam pa, Integer subjectID) {
+    public static TbDataEvent toNewVo(UpdateDataEventParam pa, Integer subjectID) {
         DateTime date = DateUtil.date();
         TbDataEvent vo = new TbDataEvent();
+        vo.setId(pa.getId());
         vo.setProjectID(pa.getProjectID());
         vo.setName(pa.getName());
         vo.setTimeRange(pa.getTimeRange());
         vo.setFrequency(pa.getFrequency());
         vo.setExValue(pa.getExValue());
-        vo.setCreateUserID(subjectID);
         vo.setUpdateUserID(subjectID);
-        vo.setCreateTime(date);
         vo.setUpdateTime(date);
         return vo;
     }
@@ -62,5 +63,4 @@ public class AddDataEventParam implements ParameterValidator, ResourcePermission
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
-
 }

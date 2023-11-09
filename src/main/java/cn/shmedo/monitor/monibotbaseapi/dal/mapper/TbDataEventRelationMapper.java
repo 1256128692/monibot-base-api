@@ -48,4 +48,6 @@ public interface TbDataEventRelationMapper {
     int updateByPrimaryKey(TbDataEventRelation record);
 
     void insertBatch(List<Integer> monitorItemIDList, Integer id);
+
+    void deleteByEventIDList(List<Integer> eventIDList);
 }

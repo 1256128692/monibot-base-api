@@ -1,169 +1,187 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
-    <!--@mbg.generated-->
-    <!--@Table tb_data_event-->
-    <id column="ID" jdbcType="INTEGER" property="id" />
-    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
-    <result column="Name" jdbcType="VARCHAR" property="name" />
-    <result column="Frequency" jdbcType="INTEGER" property="frequency" />
-    <result column="TimeRange" jdbcType="VARCHAR" property="timeRange" />
-    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
-    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, ProjectID, `Name`, Frequency, TimeRange, ExValue, CreateUserID, CreateTime, UpdateUserID, 
-    UpdateTime
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from tb_data_event
-    where ID = #{ID,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    <!--@mbg.generated-->
-    delete from tb_data_event
-    where ID = #{ID,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_data_event (ProjectID, `Name`, Frequency, 
-      TimeRange, ExValue, CreateUserID, 
-      CreateTime, UpdateUserID, UpdateTime
-      )
-    values (#{projectID,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{frequency,jdbcType=INTEGER}, 
-      #{timeRange,jdbcType=VARCHAR}, #{exValue,jdbcType=VARCHAR}, #{createUserID,jdbcType=INTEGER}, 
-      #{createTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}
-      )
-  </insert>
-  <insert id="insertSelective" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent" useGeneratedKeys="true">
-    insert into tb_data_event
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="projectID != null">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
+        <!--@mbg.generated-->
+        <!--@Table tb_data_event-->
+        <id column="ID" jdbcType="INTEGER" property="id"/>
+        <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="Name" jdbcType="VARCHAR" property="name"/>
+        <result column="Frequency" jdbcType="INTEGER" property="frequency"/>
+        <result column="TimeRange" jdbcType="VARCHAR" property="timeRange"/>
+        <result column="ExValue" jdbcType="VARCHAR" property="exValue"/>
+        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
         ProjectID,
-      </if>
-      <if test="name != null">
         `Name`,
-      </if>
-      <if test="frequency != null">
         Frequency,
-      </if>
-      <if test="timeRange != null">
         TimeRange,
-      </if>
-      <if test="exValue != null">
         ExValue,
-      </if>
-      <if test="createUserID != null">
         CreateUserID,
-      </if>
-      <if test="createTime != null">
         CreateTime,
-      </if>
-      <if test="updateUserID != null">
         UpdateUserID,
-      </if>
-      <if test="updateTime != null">
-        UpdateTime,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="projectID != null">
-        #{projectID,jdbcType=INTEGER},
-      </if>
-      <if test="name != null">
-        #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="frequency != null">
-        #{frequency,jdbcType=INTEGER},
-      </if>
-      <if test="timeRange != null">
-        #{timeRange,jdbcType=VARCHAR},
-      </if>
-      <if test="exValue != null">
-        #{exValue,jdbcType=VARCHAR},
-      </if>
-      <if test="createUserID != null">
-        #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        #{updateUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
-    <!--@mbg.generated-->
-    update tb_data_event
-    <set>
-      <if test="projectID != null">
-        ProjectID = #{projectID,jdbcType=INTEGER},
-      </if>
-      <if test="name != null">
-        `Name` = #{name,jdbcType=VARCHAR},
-      </if>
-      <if test="frequency != null">
-        Frequency = #{frequency,jdbcType=INTEGER},
-      </if>
-      <if test="timeRange != null">
-        TimeRange = #{timeRange,jdbcType=VARCHAR},
-      </if>
-      <if test="exValue != null">
-        ExValue = #{exValue,jdbcType=VARCHAR},
-      </if>
-      <if test="createUserID != null">
-        CreateUserID = #{createUserID,jdbcType=INTEGER},
-      </if>
-      <if test="createTime != null">
-        CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="updateUserID != null">
-        UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      </if>
-      <if test="updateTime != null">
-        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-      </if>
-    </set>
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
-    <!--@mbg.generated-->
-    update tb_data_event
-    set ProjectID = #{projectID,jdbcType=INTEGER},
-      `Name` = #{name,jdbcType=VARCHAR},
-      Frequency = #{frequency,jdbcType=INTEGER},
-      TimeRange = #{timeRange,jdbcType=VARCHAR},
-      ExValue = #{exValue,jdbcType=VARCHAR},
-      CreateUserID = #{createUserID,jdbcType=INTEGER},
-      CreateTime = #{createTime,jdbcType=TIMESTAMP},
-      UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-      UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
+        UpdateTime
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_data_event
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete
+        from tb_data_event
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_data_event (ProjectID, `Name`, Frequency,
+                                   TimeRange, ExValue, CreateUserID,
+                                   CreateTime, UpdateUserID, UpdateTime)
+        values (#{projectID,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{frequency,jdbcType=INTEGER},
+                #{timeRange,jdbcType=VARCHAR}, #{exValue,jdbcType=VARCHAR}, #{createUserID,jdbcType=INTEGER},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertSelective" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent"
+            useGeneratedKeys="true">
+        insert into tb_data_event
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                ProjectID,
+            </if>
+            <if test="name != null">
+                `Name`,
+            </if>
+            <if test="frequency != null">
+                Frequency,
+            </if>
+            <if test="timeRange != null">
+                TimeRange,
+            </if>
+            <if test="exValue != null">
+                ExValue,
+            </if>
+            <if test="createUserID != null">
+                CreateUserID,
+            </if>
+            <if test="createTime != null">
+                CreateTime,
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID,
+            </if>
+            <if test="updateTime != null">
+                UpdateTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="frequency != null">
+                #{frequency,jdbcType=INTEGER},
+            </if>
+            <if test="timeRange != null">
+                #{timeRange,jdbcType=VARCHAR},
+            </if>
+            <if test="exValue != null">
+                #{exValue,jdbcType=VARCHAR},
+            </if>
+            <if test="createUserID != null">
+                #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                #{updateUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
+        update tb_data_event
+        <set>
+            <if test="projectID != null">
+                ProjectID = #{projectID,jdbcType=INTEGER},
+            </if>
+            <if test="name != null">
+                `Name` = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="frequency != null">
+                Frequency = #{frequency,jdbcType=INTEGER},
+            </if>
+            <if test="timeRange != null">
+                TimeRange = #{timeRange,jdbcType=VARCHAR},
+            </if>
+            <if test="exValue != null">
+                ExValue = #{exValue,jdbcType=VARCHAR},
+            </if>
+            <if test="createUserID != null">
+                CreateUserID = #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                CreateTime = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent">
+        <!--@mbg.generated-->
+        update tb_data_event
+        set ProjectID    = #{projectID,jdbcType=INTEGER},
+            `Name`       = #{name,jdbcType=VARCHAR},
+            Frequency    = #{frequency,jdbcType=INTEGER},
+            TimeRange    = #{timeRange,jdbcType=VARCHAR},
+            ExValue      = #{exValue,jdbcType=VARCHAR},
+            CreateUserID = #{createUserID,jdbcType=INTEGER},
+            CreateTime   = #{createTime,jdbcType=TIMESTAMP},
+            UpdateUserID = #{updateUserID,jdbcType=INTEGER},
+            UpdateTime   = #{updateTime,jdbcType=TIMESTAMP}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
 
-  <select id="selectListByProjectIDAndItemIDs"
+    <select id="selectListByProjectIDAndItemIDs"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo">
-      select ID, ProjectID, `Name`, Frequency, TimeRange, ExValue
-      from tb_data_event
-      where ProjectID = #{projectID}
-      <if test="monitorItemIDList != null">
-        and ID in (select EventID from tb_data_event_relation where MonitorItemID in
-        <foreach collection="monitorItemIDList" item="item" separator="," index="index" open="(" close=")">
-          #{item}
+        select ID, ProjectID, `Name`, Frequency, TimeRange, ExValue
+        from tb_data_event
+        where ProjectID = #{projectID}
+        <if test="monitorItemIDList != null">
+            and ID in (select EventID
+                       from tb_data_event_relation where MonitorItemID in
+            <foreach collection="monitorItemIDList" item="item" separator="," index="index" open="(" close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <delete id="deleteByEventIDList">
+        delete
+        from tb_data_event
+        where ID in
+        <foreach collection="eventIDList" item="eventID" separator="," index="index" open="(" close=")">
+            #{eventID}
         </foreach>
-        )
-      </if>
-  </select>
+    </delete>
 </mapper>
