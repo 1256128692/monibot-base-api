@@ -118,6 +118,9 @@
         <if test="param.deviceStatus != null">
             AND tvd.`DeviceStatus` =#{param.deviceStatus}
         </if>
+        <if test="param.queryCode != null and param.queryCode != ''">
+            AND (tmg2.`Name` LIKE CONCAT('%',#{param.queryCode},'%') OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
+        </if>
     </select>
 
 
