@@ -35,6 +35,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryNextLevelAndAvailableProjectResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.SimpleProject;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -62,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -958,11 +960,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             );
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Two.getLevel())) {
-            lambdaQueryWrapper.and(e ->
-                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel())
-                            .or()
-                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
-            );
+            lambdaQueryWrapper.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel());
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
             lambdaQueryWrapper.and(e ->
@@ -975,7 +973,24 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
-        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap);
+        List<Integer> projectIDList = Stream.of(nextLevelProjectList, canUsedProjctList)
+                .flatMap(List::stream)
+                .map(TbProjectInfo::getID)
+                .toList();
+        List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
+                new LambdaQueryWrapper<TbProjectServiceRelation>()
+                        .in(TbProjectServiceRelation::getProjectID, projectIDList)
+        );
+        Map<Integer, List<Integer>> pidServiceIDListMap = tbProjectServiceRelations.stream().collect(Collectors.groupingBy(
+                TbProjectServiceRelation::getProjectID,
+                Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())
+        ));
+        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+        temp.forEach((key, value) -> {
+            serviceMap.put(Integer.valueOf(key), value);
+        });
+        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap, pidServiceIDListMap, serviceMap);
     }
 
     @Override

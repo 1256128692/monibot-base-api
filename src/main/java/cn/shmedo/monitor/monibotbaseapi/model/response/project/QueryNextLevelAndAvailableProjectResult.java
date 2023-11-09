@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.project;
 
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import lombok.Data;
 
 import java.util.List;
@@ -17,7 +18,8 @@ public class QueryNextLevelAndAvailableProjectResult {
     private List<SimpleProject> nextLevelProjectList;
     private List<SimpleProject> availableProjectList;
 
-    public static QueryNextLevelAndAvailableProjectResult valueOf(List<TbProjectInfo> nextLevelProjectList, List<TbProjectInfo> canUsedProjctList, Map<Integer, List<TbProjectInfo>> nnMap) {
+    public static QueryNextLevelAndAvailableProjectResult valueOf(List<TbProjectInfo> nextLevelProjectList, List<TbProjectInfo> canUsedProjctList,
+                                                                  Map<Integer, List<TbProjectInfo>> nnMap, Map<Integer, List<Integer>> pidServiceIDListMap, Map<Integer, AuthService> serviceMap) {
         QueryNextLevelAndAvailableProjectResult result = new QueryNextLevelAndAvailableProjectResult();
         result.setNextLevelProjectList(
                 nextLevelProjectList.stream().map(e ->
@@ -36,6 +38,13 @@ public class QueryNextLevelAndAvailableProjectResult {
                                 .build()
                 ).toList()
         );
+        result.getNextLevelProjectList().forEach(
+                e -> {
+                    List<Integer> serviceIDList = pidServiceIDListMap.getOrDefault(e.getId(), List.of());
+                    e.setServiceIDList(serviceIDList);
+                    e.setServiceList(serviceIDList.stream().map(serviceMap::get).toList());
+                }
+        );
         result.setAvailableProjectList(
                 canUsedProjctList.stream().map(e ->
                         SimpleProject.builder()
@@ -45,6 +54,12 @@ public class QueryNextLevelAndAvailableProjectResult {
                                 .build()
                 ).toList()
         );
+        result.getAvailableProjectList().forEach(
+                e -> {
+                    List<Integer> serviceIDList = pidServiceIDListMap.getOrDefault(e.getId(), List.of());
+                    e.setServiceIDList(serviceIDList);
+                    e.setServiceList(serviceIDList.stream().map(serviceMap::get).toList());
+                });
         return result;
     }
 }
