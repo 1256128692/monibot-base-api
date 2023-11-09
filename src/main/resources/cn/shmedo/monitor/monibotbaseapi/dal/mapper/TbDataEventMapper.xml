@@ -152,4 +152,18 @@
       UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
     where ID = #{ID,jdbcType=INTEGER}
   </update>
+
+  <select id="selectListByProjectIDAndItemIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo">
+      select ID, ProjectID, `Name`, Frequency, TimeRange, ExValue
+      from tb_data_event
+      where ProjectID = #{projectID}
+      <if test="monitorItemIDList != null">
+        and ID in (select EventID from tb_data_event_relation where MonitorItemID in
+        <foreach collection="monitorItemIDList" item="item" separator="," index="index" open="(" close=")">
+          #{item}
+        </foreach>
+        )
+      </if>
+  </select>
 </mapper>

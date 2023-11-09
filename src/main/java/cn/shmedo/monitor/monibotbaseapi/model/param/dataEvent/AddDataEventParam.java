@@ -2,13 +2,11 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent;
 
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -48,6 +46,9 @@ public class AddDataEventParam implements ParameterValidator, ResourcePermission
 
     @Override
     public ResultWrapper validate() {
+        if (FrequencyEnum.isValid(frequency)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数:frequency字段值是非法频次类型");
+        }
         return null;
     }
 
