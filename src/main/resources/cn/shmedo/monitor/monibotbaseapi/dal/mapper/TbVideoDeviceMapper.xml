@@ -445,4 +445,13 @@
         where
         vd.deviceSerial = (select deviceSerial from tb_video_device_source where ID = #{videoDeviceSourceID})
     </select>
+
+    <select id="selectListByCompanyID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoBaseInfo">
+        select ID as videoDeviceID, projectID, deviceSerial, deviceName, deviceStatus
+        from tb_video_device
+        where CompanyID = #{companyID}
+        <if test="deviceStatus != null">
+            and deviceStatus = #{deviceStatus}
+        </if>
+    </select>
 </mapper>

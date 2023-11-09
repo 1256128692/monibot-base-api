@@ -86,6 +86,8 @@ public class VideoServiceImpl implements VideoService {
 
     private final TbVideoCaptureMapper videoCaptureMapper;
 
+    private final TbProjectInfoMapper projectInfoMapper;
+
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
 
@@ -1266,6 +1268,35 @@ public class VideoServiceImpl implements VideoService {
             });
         }
         return info;
+    }
+
+    @Override
+    public Object queryVideoDeviceListV2(QueryVideoDeviceListParam pa) {
+        List<VideoBaseInfo> videoInfoList = videoDeviceMapper.selectListByCompanyID(pa.getCompanyID(), pa.getDeviceStatus());
+        if (CollectionUtil.isNullOrEmpty(videoInfoList)) {
+            return Collections.emptyList();
+        }
+
+        List<VideoDeviceSourceBaseInfo> videoSourceInfoList = videoDeviceSourceMapper.selectByDeviceSerialList(videoInfoList.stream().map(VideoBaseInfo::getDeviceSerial).collect(Collectors.toList()));
+        List<ProjectVideoInfo> list = new LinkedList<ProjectVideoInfo>();
+        ProjectVideoInfo notAllocatedProject = new ProjectVideoInfo();
+        notAllocatedProject.setProjectID(-1);
+        notAllocatedProject.setProjectName("未分配工程");
+        videoInfoList.forEach(videoInfo -> {
+            if (videoInfo.getProjectID() == null) {
+                videoInfo.setProjectID(-1);
+            }
+            if (!CollectionUtil.isNullOrEmpty(videoSourceInfoList)) {
+                videoInfo.setVideoSourceInfoList(videoSourceInfoList.stream().filter(videoSourceInfo -> videoSourceInfo.getDeviceSerial().equals(videoInfo.getDeviceSerial())).collect(Collectors.toList()));
+            }
+        });
+
+        list.addAll(projectInfoMapper.selectListByIDs(videoInfoList.stream().map(VideoBaseInfo::getProjectID).distinct().collect(Collectors.toList())));
+        list.add(notAllocatedProject);
+        list.forEach(i -> {
+            i.setVideoInfoList(videoInfoList.stream().filter(v -> v.getProjectID().equals(i.getProjectID())).collect(Collectors.toList()));
+        });
+        return list;
     }
 
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {

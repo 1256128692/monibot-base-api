@@ -70,4 +70,6 @@ public interface VideoService {
     Object queryCaptureDate(QueryCaptureParam pa);
 
     VideoDeviceDetailInfo QueryVideoDeviceDetail(QueryVideoDeviceDetailParam pa);
+
+    Object queryVideoDeviceListV2(QueryVideoDeviceListParam pa);
 }

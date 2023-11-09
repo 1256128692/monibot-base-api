@@ -561,6 +561,33 @@ public class VideoController {
         return videoService.queryVideoDeviceListV1(pa);
     }
 
+    /**
+     * @api {POST} /QueryVideoDeviceListV2 查询监测工程下视频设备列表
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询监测工程下视频设备列表
+     * @apiName QueryVideoDeviceListV2
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
+     * @apiSuccess (返回结果) {Object[]} dataList 工程下视频设备信息列表
+     * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
+     * @apiSuccess (返回结果) {String} dataList.projectName 工程名称
+     * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList 工程下视频设备信息列表
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {String} dataList.videoInfoList.deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} dataList.videoInfoList.deviceStatus  设备在线状态
+     * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoSourceInfoList.channelCode 通道号
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryVideoDeviceListV2", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryVideoDeviceListV2(@Validated @RequestBody QueryVideoDeviceListParam pa) {
+        return videoService.queryVideoDeviceListV2(pa);
+    }
+
 
     /**
      * @api {POST} /QueryYsVideoDeviceList 查询萤石云视频分页列表

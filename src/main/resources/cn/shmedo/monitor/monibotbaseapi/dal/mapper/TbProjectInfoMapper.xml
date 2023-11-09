@@ -335,4 +335,12 @@
             and id not in (select upLevelID from tb_project_relation)
             and id not in (select downLevelID from tb_project_relation)
     </update>
+
+  <select id="selectListByIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo">
+      select ID as projectID, projectName
+      from tb_project_info where ID in
+      <foreach close=")" collection="projectIDs" item="item" open="(" separator=",">
+          #{item}
+      </foreach>
+  </select>
 </mapper>
