@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
@@ -109,5 +110,17 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         });
 
         return queryDataEventInfos;
+    }
+
+    @Override
+    public void updateDataEvent(UpdateDataEventParam pa) {
+
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        TbDataEvent tbDataEvent = UpdateDataEventParam.toNewVo(pa, subjectID);
+        tbDataEventMapper.updateByPrimaryKeySelective(tbDataEvent);
+
+        // 删除之前关系,重新绑定
+        tbDataEventRelationMapper.deleteByEventIDList(List.of(pa.getId()));
+        tbDataEventRelationMapper.insertBatch(pa.getMonitorItemIDList(), pa.getId());
     }
 }

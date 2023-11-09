@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
@@ -450,7 +451,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:UpdateDataEvent")
     @RequestMapping(value = "/UpdateDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateDataEvent(@Validated @RequestBody Object pa) {
+    public Object updateDataEvent(@Validated @RequestBody UpdateDataEventParam pa) {
+        monitorDataService.updateDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -488,13 +490,14 @@ public class MonitorDataController {
      * @apiName QueryMonitorTypeConfiguration
      * @apiDescription 查询监测类型的预定义密度与统计方式
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParamExample 请求体示例
      * {"companyID":1,"monitorType":1}
-     * @apiSuccess (返回结果) {Int} monitorType 监测类型标识
-     * @apiSuccess (返回结果) {String} typeName 监测类型名称
-     * @apiSuccess (返回结果) {Int[]} displayDensity 预定义密度,(全部:0 小时:1 日:2 周:3 月:4 年:5)
-     * @apiSuccess (返回结果) {Int[]} statisticalMethods 统计方式,(最新一条:0 平均:1 阶段累积:2 阶段变化:3)
+     * @apiSuccess (返回结果) {Object[]} data 监测类型标识
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型标识
+     * @apiSuccess (返回结果) {String} data.typeName 监测类型名称
+     * @apiSuccess (返回结果) {Int[]} [data.displayDensity] 预定义密度,(全部:0 小时:1 日:2 周:3 月:4 年:5)
+     * @apiSuccess (返回结果) {Int[]} [data.statisticalMethods] 统计方式,(最新一条:0 平均:1 阶段累积:2 阶段变化:3)
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:DescribeBaseProject
      */

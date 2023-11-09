@@ -77,4 +77,13 @@
           (#{monitorItemID}, #{id})
       </foreach>
   </insert>
+
+  <delete id="deleteByEventIDList">
+      delete
+      from tb_data_event_relation
+      where EventID in
+      <foreach collection="eventIDList" item="eventID" separator="," index="index" open="(" close=")">
+          #{eventID}
+      </foreach>
+  </delete>
 </mapper>
