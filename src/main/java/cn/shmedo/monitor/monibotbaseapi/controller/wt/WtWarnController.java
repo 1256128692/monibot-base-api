@@ -103,9 +103,9 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {String} ruleName 规则名称，仅视频/摄像头报警
      * @apiSuccess (返回结果) {String} [workOrderSolution] 解决方案
      * @apiSuccess (返回结果) {String} [issueUnit] 预警发布单位(仅warnType=6时存在)
-     * @apiSucess (返回结果) {String} [warnAreaCode] 预警区域行政区划码 (仅warnType=6时存在,例: 330200)
-     * @apiSucess (返回结果) {String} [warnArea] 预警区域 (仅warnType=6时存在,例: 余姚市)
-     * @apiSucess (返回结果) {String} [warnAreaLocation] 预警区域经纬度 (仅warnType=6时存在,例: 121.14621,30.04454)
+     * @apiSuccess (返回结果) {Int} [warnAreaCode] 预警区域行政区划码 (仅warnType=6时存在,例: 330200)
+     * @apiSuccess (返回结果) {String} [warnArea] 预警区域 (仅warnType=6时存在,例: 余姚市)
+     * @apiSuccess (返回结果) {String} [warnAreaLocation] 预警区域经纬度 (仅warnType=6时存在,例: 121.14621,30.04454)
      * @apiSuccess (返回结果) {Object[]} [actionList] 动作描述list
      * @apiSuccess (返回结果) {Int} actionList.ID 动作ID
      * @apiSuccess (返回结果) {Int} actionList.triggerID 触发报警ID
@@ -286,9 +286,9 @@ public class WtWarnController {
      * @apiSuccess (返回结果) {Int} data.list.warnLevel 报警等级 1.Ⅰ级 2.Ⅱ级 3.Ⅲ级 4.Ⅳ级
      * @apiSuccess (返回结果) {DateTime} data.list.warnTime 报警时间
      * @apiSuccess (返回结果) {String} [data.list.issueUnit] 预警发布单位(仅warnType=6时存在)
-     * @apiSucess (返回结果) {String} [data.list.warnAreaCode] 预警区域行政区划码 (仅warnType=6时存在，例: 330200)
-     * @apiSucess (返回结果) {String} [data.list.warnArea] 预警区域 (仅warnType=6时存在，例: 余姚市)
-     * @apiSucess (返回结果) {String} [data.list.warnAreaLocation] 预警区域经纬度(仅warnType=6时存在，例: 121.14621,30.04454)
+     * @apiSuccess (返回结果) {Int} [data.list.warnAreaCode] 预警区域行政区划码 (仅warnType=6时存在，例: 330200)
+     * @apiSuccess (返回结果) {String} [data.list.warnArea] 预警区域 (仅warnType=6时存在，例: 余姚市)
+     * @apiSuccess (返回结果) {String} [data.list.warnAreaLocation] 预警区域经纬度(仅warnType=6时存在，例: 121.14621,30.04454)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseWarn
      */
