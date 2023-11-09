@@ -187,6 +187,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID对应projectType）
      * @apiParam (请求体) {String} [platform] 所属平台（冗余字段，当且仅当ModelType为2-工作流时候，有值）
      * @apiParam (请求体) {Int} [createType] 创建类型
+     * @apiParam (请求体) {Boolean} [excludeFileProperty] 排除包含文件属性（6图片， 7 文件）的模板
      * @apiSuccess (返回结果) {Object[]} modelList  模板列表
      * @apiSuccess (返回结果) {Int} modelList.modelID  模板ID
      * @apiSuccess (返回结果) {Int} modelList.companyID  公司ID

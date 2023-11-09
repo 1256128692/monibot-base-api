@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -12,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.FormPropertyType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
@@ -281,6 +283,16 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                     }
                 });
             }
+        }
+        if (param.getExcludeFileProperty() != null && param.getExcludeFileProperty()) {
+            model4WebList = model4WebList.stream().filter(
+                    e -> {
+                        if (ObjectUtil.isEmpty(e.getPropertyList()))
+                            return true;
+                        return e.getPropertyList().stream().noneMatch(
+                                p -> FormPropertyType.FILE.getCode().equals(p.getType().intValue()) || FormPropertyType.PICTURE.getCode().equals(p.getType().intValue()));
+                    }
+            ).toList();
         }
         return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
     }
