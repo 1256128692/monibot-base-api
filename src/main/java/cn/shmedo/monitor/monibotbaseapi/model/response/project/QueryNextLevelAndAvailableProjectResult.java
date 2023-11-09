@@ -26,7 +26,7 @@ public class QueryNextLevelAndAvailableProjectResult {
                         SimpleProject.builder()
                                 .id(e.getID()).name(e.getProjectName()).level(e.getLevel())
                                 .projectType(e.getProjectType())
-                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getMainType())
+                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getTypeName())
                                 .nnLevelProjectList(nnMap.getOrDefault(e.getID(), List.of()).stream()
                                         .map(nn -> SimpleProject.builder()
                                                 .id(nn.getID()).name(nn.getProjectName()).level(nn.getLevel())
@@ -50,7 +50,7 @@ public class QueryNextLevelAndAvailableProjectResult {
                         SimpleProject.builder()
                                 .id(e.getID()).name(e.getProjectName()).level(e.getLevel())
                                 .projectType(e.getProjectType())
-                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getMainType())
+                                .projectTypeStr(ProjectTypeCache.projectTypeMap.get(e.getProjectType()).getTypeName())
                                 .build()
                 ).toList()
         );
