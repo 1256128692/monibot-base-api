@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
@@ -395,7 +396,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:DeleteDataEvent")
     @RequestMapping(value = "/DeleteBatchDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteBatchDataEvent(@Validated @RequestBody Object pa) {
+    public Object deleteBatchDataEvent(@Validated @RequestBody DeleteBatchDataEventParam pa) {
+        monitorDataService.deleteBatchDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
 

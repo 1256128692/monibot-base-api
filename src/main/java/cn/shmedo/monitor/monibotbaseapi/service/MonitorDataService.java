@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
@@ -22,4 +23,6 @@ public interface MonitorDataService {
     Object queryDataEventList(QueryDataEventParam pa);
 
     void updateDataEvent(UpdateDataEventParam pa);
+
+    void deleteBatchDataEvent(DeleteBatchDataEventParam pa);
 }

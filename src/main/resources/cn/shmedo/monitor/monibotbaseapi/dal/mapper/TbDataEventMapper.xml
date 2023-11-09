@@ -175,4 +175,13 @@
             )
         </if>
     </select>
+
+    <delete id="deleteByEventIDList">
+        delete
+        from tb_data_event
+        where ID in
+        <foreach collection="eventIDList" item="eventID" separator="," index="index" open="(" close=")">
+            #{eventID}
+        </foreach>
+    </delete>
 </mapper>

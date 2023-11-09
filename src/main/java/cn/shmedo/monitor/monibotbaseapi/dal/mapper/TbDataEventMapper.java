@@ -49,4 +49,6 @@ public interface TbDataEventMapper {
     int updateByPrimaryKey(TbDataEvent record);
 
     List<QueryDataEventInfo> selectListByProjectIDAndItemIDs(Integer projectID, List<Integer> monitorItemIDList);
+
+    void deleteByEventIDList(List<Integer> eventIDList);
 }

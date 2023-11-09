@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
@@ -122,5 +123,12 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         // 删除之前关系,重新绑定
         tbDataEventRelationMapper.deleteByEventIDList(List.of(pa.getId()));
         tbDataEventRelationMapper.insertBatch(pa.getMonitorItemIDList(), pa.getId());
+    }
+
+    @Override
+    public void deleteBatchDataEvent(DeleteBatchDataEventParam pa) {
+
+        tbDataEventMapper.deleteByEventIDList(pa.getEventIDList());
+        tbDataEventRelationMapper.deleteByEventIDList(pa.getEventIDList());
     }
 }
