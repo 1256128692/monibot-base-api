@@ -576,6 +576,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} dataList.projectName 工程名称
      * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList 工程下视频设备信息列表
      * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {String} dataList.videoInfoList.accessPlatformStr 平台
      * @apiSuccess (返回结果) {String} dataList.videoInfoList.deviceName 视频设备名称
      * @apiSuccess (返回结果) {Boolean} dataList.videoInfoList.deviceStatus  设备在线状态
      * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList.videoSourceInfoList 通道视频列表

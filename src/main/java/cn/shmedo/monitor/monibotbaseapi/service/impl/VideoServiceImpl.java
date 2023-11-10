@@ -1286,6 +1286,7 @@ public class VideoServiceImpl implements VideoService {
             if (videoInfo.getProjectID() == null) {
                 videoInfo.setProjectID(-1);
             }
+            videoInfo.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(videoInfo.getAccessPlatform()));
             if (!CollectionUtil.isNullOrEmpty(videoSourceInfoList)) {
                 videoInfo.setVideoSourceInfoList(videoSourceInfoList.stream().filter(videoSourceInfo -> videoSourceInfo.getDeviceSerial().equals(videoInfo.getDeviceSerial())).collect(Collectors.toList()));
             }

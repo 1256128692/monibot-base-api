@@ -450,7 +450,7 @@
     </select>
 
     <select id="selectListByCompanyID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoBaseInfo">
-        select ID as videoDeviceID, projectID, deviceSerial, deviceName, deviceStatus
+        select ID as videoDeviceID, projectID, deviceSerial, deviceName, deviceStatus, accessPlatform
         from tb_video_device
         where CompanyID = #{companyID}
         <if test="deviceStatus != null">
