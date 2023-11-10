@@ -1178,8 +1178,6 @@ public class VideoServiceImpl implements VideoService {
         List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
         List<SensorBaseInfoV1> updateSensorList = new LinkedList<>();
         // 抓拍配置
-//        List<SensorBaseInfoV1> captureSensorList = new LinkedList<>();
-//        List<SensorBaseInfoV1> finalCaptureSensorList = captureSensorList;
         pa.getList().forEach(v -> {
             List<SensorBaseInfoV1> addSensorList = v.getAddSensorList();
             if (!CollectionUtil.isNullOrEmpty(addSensorList)) {
@@ -1194,9 +1192,6 @@ public class VideoServiceImpl implements VideoService {
                         updateSensorList.add(SensorBaseInfoV1.createUpdateSensor(addSensorList.get(i), subjectID, v));
                     }
                 }
-//                finalCaptureSensorList.clear();
-//                finalCaptureSensorList.addAll(insertSensorList);
-//                finalCaptureSensorList.addAll(updateSensorList);
             }
         });
         // 3.进行分流,传感器ID为空的新增,传感器ID不为空的修改
@@ -1206,20 +1201,6 @@ public class VideoServiceImpl implements VideoService {
         if (!CollectionUtil.isNullOrEmpty(updateSensorList)) {
             sensorMapper.updateSensorList(updateSensorList);
         }
-
-        // 4.批量插入定时抓拍
-//        if (!CollectionUtil.isNullOrEmpty(captureSensorList)) {
-//            List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(captureSensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList()),
-//                    captureSensorList.get(0).getProjectID());
-//            captureSensorList.forEach(c -> {
-//                SensorBaseInfoV1 sensorBaseInfoV1 = sensorList.stream().filter(s -> s.getSensorName().equals(c.getSensorName())).findFirst().orElse(null);
-//                if (sensorBaseInfoV1 != null) {
-//                    c.setSensorID(sensorBaseInfoV1.getSensorID());
-//                    c.setDeviceSerial(sensorBaseInfoV1.getDeviceSerial());
-//                }
-//            });
-//            videoCaptureMapper.insertBatch(captureSensorList);
-//        }
 
         return ResultWrapper.successWithNothing();
     }
@@ -1272,7 +1253,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     public Object queryVideoDeviceListV2(QueryVideoDeviceListParam pa) {
-        List<VideoBaseInfo> videoInfoList = videoDeviceMapper.selectListByCompanyID(pa.getCompanyID(), pa.getDeviceStatus());
+        List<VideoBaseInfo> videoInfoList = videoDeviceMapper.selectListByCompanyID(pa.getCompanyID(), pa.getDeviceStatus(), pa.getQueryContent());
         if (CollectionUtil.isNullOrEmpty(videoInfoList)) {
             return Collections.emptyList();
         }

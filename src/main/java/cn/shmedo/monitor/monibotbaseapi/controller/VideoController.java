@@ -571,6 +571,7 @@ public class VideoController {
      * @apiName QueryVideoDeviceListV2
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
+     * @apiParam (请求体) {String} [queryContent]  超级搜索,设备序列号或者名称
      * @apiSuccess (返回结果) {Object[]} dataList 工程下视频设备信息列表
      * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
      * @apiSuccess (返回结果) {String} dataList.projectName 工程名称
