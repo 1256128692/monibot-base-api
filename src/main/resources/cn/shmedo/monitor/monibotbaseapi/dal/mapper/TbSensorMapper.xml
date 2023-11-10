@@ -626,4 +626,19 @@
             #{deviceSerial}
         </foreach>
     </select>
+
+
+    <select id="selectListByDeviceSerialList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6">
+        select s.projectID, s.monitorPointID, s.videoDeviceSourceID, c.deviceSerial
+        from tb_sensor s
+                 left join tb_video_device_source c on s.videoDeviceSourceID = c.ID
+        where s.videoDeviceSourceID in
+        (select ID
+         from tb_video_device_source where deviceSerial in
+        <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+            #{deviceSerial}
+        </foreach>
+        )
+    </select>
 </mapper>

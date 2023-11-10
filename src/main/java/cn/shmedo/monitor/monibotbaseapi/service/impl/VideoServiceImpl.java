@@ -335,7 +335,6 @@ public class VideoServiceImpl implements VideoService {
         iotService.createMultipleDevice(iotRequest,
                 fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
 
-        // TODO:新增逻辑查询iot平台,返回uniquetoken
         ResultWrapper<List<DeviceBaseInfo>> deviceBaseInfoWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
                 .companyID(pa.getCompanyID())
                 .deviceTokens(videoDeviceInfoList.stream().map(VideoDeviceInfo::getDeviceToken).collect(Collectors.toSet()))
@@ -353,7 +352,6 @@ public class VideoServiceImpl implements VideoService {
             int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
 
             if (successInsertCount != 0) {
-                // TODO:新增逻辑插入视频通道表
                 videoDeviceSourceMapper.batchInsert(videoDeviceInfoList.stream()
                         .map(VideoDeviceInfo::getTbVideoDeviceSourceList)
                         .flatMap(List::stream)
@@ -1177,7 +1175,6 @@ public class VideoServiceImpl implements VideoService {
         // 3. 批量生成传感器设备,过滤出来传感器ID为空的数据,为新增数据,  不为空的数据,为批量修改数据
         List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
         List<SensorBaseInfoV1> updateSensorList = new LinkedList<>();
-        // 抓拍配置
         pa.getList().forEach(v -> {
             List<SensorBaseInfoV1> addSensorList = v.getAddSensorList();
             if (!CollectionUtil.isNullOrEmpty(addSensorList)) {
