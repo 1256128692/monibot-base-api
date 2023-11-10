@@ -288,12 +288,12 @@ public class VideoServiceImpl implements VideoService {
                     deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData()) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                     }
                 } else {
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData()) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                     }
                 }
 
@@ -310,7 +310,7 @@ public class VideoServiceImpl implements VideoService {
                 Integer num = i + 1;
                 HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(addVideoList.get(i).getDeviceSerial());
                 if (hkDeviceInfo == null) {
-                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                 }
 
                 videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + formatStar + num.toString()));
