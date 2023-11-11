@@ -540,7 +540,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .collect(Collectors.groupingBy(TagDto::getProjectID));
             //属性
             Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
-                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), 0, PropertySubjectType.Project.getType()).stream()
+                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), null, PropertySubjectType.Project.getType()).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
             //行政区划
             Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, locationInfoSet.stream().filter(Objects::nonNull)
