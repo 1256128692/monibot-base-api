@@ -46,6 +46,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} [modelPropertyList.className] 类名称
      * @apiParam (请求体) {Int} [modelPropertyList.displayOrder] 展示顺序
      * @apiParam (请求体) {String} [modelPropertyList.exValue] 额外属性
+     * @apiParam (请求体) {Int} [modelPropertyList.createType] 创建类型 0:预定义 1:自定义
      * @apiSuccess (返回结果) {Int} ID ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddModel
