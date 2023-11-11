@@ -68,7 +68,7 @@
                ProjectID
         FROM tb_project_property tpp
                  LEFT JOIN tb_property tp ON tp.ID = tpp.PropertyID
-        WHERE tp.CreateType = 0
+        WHERE 1 = 1
         <foreach close=")" collection="list" item="item" open="AND (" separator="OR">
                 tp.`Name` = #{item.name}
             <if test="item.values != null and item.values.size() != 0">
