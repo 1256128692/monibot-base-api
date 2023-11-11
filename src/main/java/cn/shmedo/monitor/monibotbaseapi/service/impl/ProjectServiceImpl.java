@@ -35,7 +35,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryNextLevelAndAvailableProjectResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.SimpleProject;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -688,9 +687,12 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         result.getPropertyList().forEach(e -> {
             if (FormPropertyType.FILE.getCode().equals(e.getType().intValue())
                     || FormPropertyType.PICTURE.getCode().equals(e.getType().intValue())) {
-                e.setOssList(
-                        Arrays.stream(e.getValue().split(",")).toList()
-                );
+                if (StrUtil.isNotEmpty(e.getValue())) {
+                    e.setOssList(
+                            Arrays.stream(e.getValue().split(",")).toList()
+                    );
+                }
+
             }
         });
         List<String> ossAllList = result.getPropertyList().stream()
