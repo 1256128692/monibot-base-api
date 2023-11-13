@@ -291,7 +291,7 @@ public class PropertyController {
     }
 
     /**
-     * @api {POST} /DeletePropertyValues 删除模板属性值-暂时只对表单模板为工作流类型时开放
+     * @api {POST} /DeletePropertyValues 删除模板属性值 - 暂时只对表单模板为工作流类型时开放
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName DeletePropertyValues
