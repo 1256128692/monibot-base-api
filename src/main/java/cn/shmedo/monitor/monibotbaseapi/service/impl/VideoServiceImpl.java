@@ -1125,13 +1125,11 @@ public class VideoServiceImpl implements VideoService {
                 } else {
                     if (!CollectionUtil.isNullOrEmpty(notGenerateSensorList)) {
                         v.setDeviceChannelNum(sensorList.size());
-
+                        singleVideoSensorList.addAll(sensorList);
                         for (int i = 0; i < notGenerateSensorList.size(); i++) {
                             // 添加到 singleVideoSensorList
                             singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(notGenerateSensorList.get(i), v.getDeviceName()));
                         }
-                        singleVideoSensorList.addAll(sensorList);
-                        singleVideoSensorList.addAll(notGenerateSensorList);
                     }
                 }
                 v.setSensorList(singleVideoSensorList);
