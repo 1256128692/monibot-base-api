@@ -21,6 +21,7 @@
                     <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
                     <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
                     <result column="channelNo" jdbcType="INTEGER" property="channelNo"/>
+                    <result column="videoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
                     <result column="videoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
                     <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
                     <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
@@ -90,6 +91,7 @@
             ts.ID sensorID,
             ts.`Name` sensorName,
             ts.Alias sensorAlias,
+            tvds.ID videoDeviceSourceID,
             tvds.ChannelNo channelNo,
             tvd.ID videoDeviceID,
             tvd.DeviceStatus,
