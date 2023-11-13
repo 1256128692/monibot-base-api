@@ -38,4 +38,6 @@ public interface PropertyService extends IService<TbProperty> {
     void AddPropertyValues(AddPropertyValuesParam param);
 
     Object queryPropertyValues(QueryPropertyValuesParam param);
+
+    int deletePropertyValues(DeletePropertyValuesParam param);
 }
