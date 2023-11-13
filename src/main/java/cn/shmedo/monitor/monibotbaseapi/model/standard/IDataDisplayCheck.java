@@ -27,6 +27,8 @@ public interface IDataDisplayCheck {
 
     List<Integer> getInspectedPointIDList();
 
+    void setTbMonitorPointList(final List<TbMonitorPoint> tbMonitorPointList);
+
     /**
      * 校验显示密度{@code displayDensity},统计方式{@code StatisticalMethods}和待检查的监测点IDList{@code inspectedPointIDList}。<br>
      * 同时会校验这些待检查的监测点是否存在。
@@ -51,6 +53,7 @@ public interface IDataDisplayCheck {
         if (pointList.size() != pointIDList.size()) {
             throw new IllegalArgumentException("有部分监测点不存在!");
         }
+        setTbMonitorPointList(pointList);
         Set<String> exValuesList = ContextHolder.getBean(TbMonitorTypeMapper.class).selectList(
                         new LambdaQueryWrapper<TbMonitorType>().in(TbMonitorType::getMonitorType, pointList.stream()
                                 .map(TbMonitorPoint::getMonitorType).collect(Collectors.toSet()))).stream()

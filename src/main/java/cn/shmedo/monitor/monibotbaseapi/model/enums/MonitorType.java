@@ -30,7 +30,8 @@ public enum MonitorType {
     VALVE(46, "阀门"),
     NPK_CONTENT(47, "氮磷钾含量"),
     SOLAR_RADIATION(48, "太阳辐射"),
-    SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY(49, "土壤盐分电导率");
+    SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY(49, "土壤盐分电导率"),
+    WET_LINE(-1, "浸润线");
 
     private final int key;
     private final String value;

@@ -1,6 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitoringItem;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -21,12 +21,12 @@ public class QueryThematicGroupPointListParam implements ParameterValidator, Res
     @Range(max = 1, min = 1, message = "专题类型 1.浸润线 默认1.浸润线")
     private Integer thematicType;
     @JsonIgnore
-    private String monitorItemName;
+    private Integer monitorType;
 
     @Override
     public ResultWrapper validate() {
         // 目前只有一个'浸润线'，因此直接在这里设置;否则需要通过{@code thematicType}来确认
-        monitorItemName = MonitoringItem.WET_LINE.getValue();
+        monitorType = MonitorType.WET_LINE.getKey();
         return null;
     }
 

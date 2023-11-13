@@ -740,18 +740,18 @@
             tdu.`EngUnit` engUnit
         FROM
             tb_monitor_group tmg
-            LEFT JOIN tb_project_config tpc_group ON tpc_group.`ProjectID` = tmg.`ProjectID` AND tpc_group.`Group` = "monitorGroup" AND tpc_group.`Key` = CONCAT('stConfig::', tmg.`ID`)
+            LEFT JOIN tb_project_config tpc_group ON tpc_group.`ProjectID` = tmg.`ProjectID` AND tpc_group.`Group` = 'monitorGroup' AND tpc_group.`Key` = CONCAT('stConfig::', tmg.`ID`)
             LEFT JOIN tb_monitor_group_point tmgp ON tmgp.`MonitorGroupID` = tmg.`ID`
             LEFT JOIN tb_monitor_point tmp ON tmp.`ID` = tmgp.`MonitorPointID`
             LEFT JOIN tb_monitor_item tmi ON tmi.`ID` = tmp.`MonitorItemID`
-            LEFT JOIN tb_project_config tpc_point ON tpc_point.`ProjectID` = tmp.`ProjectID` AND tpc_point.`Group` = "monitorPoint" AND tpc_point.`Key` = CONCAT('stConfig::', tmp.`ID`)
+            LEFT JOIN tb_project_config tpc_point ON tpc_point.`ProjectID` = tmp.`ProjectID` AND tpc_point.`Group` = 'monitorPoint' AND tpc_point.`Key` = CONCAT('stConfig::', tmp.`ID`)
             LEFT JOIN tb_sensor ts ON ts.`MonitorPointID` = tmp.`ID`
             LEFT JOIN tb_eigen_value_relation tevr ON tevr.`MonitorPointID` = tmp.`ID`
             LEFT JOIN tb_eigen_value tev ON tev.`ID` = tevr.`EigenValueID` AND tev.`Scope` = 0
             LEFT JOIN tb_data_unit tdu ON tdu.`ID` = tev.`UnitID`
         WHERE tmg.`ProjectID` =#{param.projectID}
-        <if test="param.monitorItemName != null and param.monitorItemName != ''">
-            AND tmi.`Name` LIKE CONCAT('%',#{param.monitorItemName},'%')
+        <if test="param.monitorType != null">
+            AND tmi.`MonitorType` =#{param.monitorType}
         </if>
     </select>
 

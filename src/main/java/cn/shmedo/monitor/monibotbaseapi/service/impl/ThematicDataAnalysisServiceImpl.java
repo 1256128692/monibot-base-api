@@ -31,6 +31,8 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,44 +179,48 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Integer upper = Optional.ofNullable(param.getDatumPoint()).map(DatumPointConfig::getUpper).orElse(null);
         Integer lower = Optional.ofNullable(param.getDatumPoint()).map(DatumPointConfig::getLower).orElse(null);
 
-        Map<Integer, String> pointIDNameMap = tbMonitorPointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
-                .in(TbMonitorPoint::getID, param.getInspectedPointIDList())).stream().collect(Collectors.toMap(TbMonitorPoint::getID, TbMonitorPoint::getName));
-        Map<Integer, Tuple<Integer, String>> sensorPointInfoMap = sensorList.stream().collect(Collectors.toMap(TbSensor::getID, u -> new Tuple<>(u.getMonitorPointID(), pointIDNameMap.get(u.getMonitorPointID()))));
+        Map<Integer, String> pointIDNameMap = param.getTbMonitorPointList().stream().collect(Collectors.toMap(
+                TbMonitorPoint::getID, TbMonitorPoint::getName));
+        Map<Integer, Tuple<Integer, String>> sensorPointInfoMap = sensorList.stream().collect(Collectors.toMap(
+                TbSensor::getID, u -> new Tuple<>(u.getMonitorPointID(), pointIDNameMap.get(u.getMonitorPointID()))));
         AvgDensityType avgDensityType = AvgDensityType.getByValue(param.getDisplayDensity());
         List<Map<String, Object>> dataList = queryPointDataList(sensorList, avgDensityType, StatisticalMethodEnum.getByCode(param.getStatisticalMethod()),
                 param.getStartTime(), param.getEndTime());
         SimpleDateFormat formatter = TimeUtil.AvgFormatter.getFormatter(avgDensityType);
-//        dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD))
-//                .collect(Collectors.groupingBy(u -> formatter.format(DateUtil.parse(u.get(DbConstant.TIME_FIELD).toString(),
-//                        TimeUtil.getDefaultFormatter())))).entrySet().stream().map(u -> {
-//                    try {
-//                        ThematicQueryTransverseInfo.ThematicQueryTransverseInfoBuilder builder = ThematicQueryTransverseInfo.builder().time(formatter.parse(u.getKey()));
-//                        if (Objects.nonNull(datumPointID)) {
-//                            u.getValue().stream().filter(w -> w.containsKey(DbConstant.SENSOR_ID_TAG)).filter(w ->
-//                                            datumPointID.equals(sensorPointInfoMap.get(Integer.parseInt(w.get(DbConstant.SENSOR_ID_TAG).toString())).getItem1()))
-//                                    .findAny().ifPresent(w -> {
-//                                        Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Integer.parseInt(
-//                                                w.get(DbConstant.SENSOR_ID_TAG).toString()));
-//                                        double value = Double.parseDouble(w.get("").toString());    //TODO get fieldToken
-//                                        builder.datumPointData(DatumPointData.builder().monitorPointID(pointInfo.getItem1())
-//                                                .monitorPointName(pointInfo.getItem2()).value(value).upper(value + upper)
-//                                                .lower(value - lower).build());
-//                                    });
-//                        }
-//
-//                        u.getValue().stream().filter(w -> )
-//
-//                        return builder.build();
-//                    } catch (ParseException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }).map()
-
-
-        //pointID -> List
-
-
-        return null;
+        return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD))
+                .collect(Collectors.groupingBy(u -> formatter.format(DateUtil.parse(u.get(DbConstant.TIME_FIELD).toString(),
+                        TimeUtil.getDefaultFormatter())))).entrySet().stream().map(u -> {
+                    try {
+                        ThematicQueryTransverseInfo.ThematicQueryTransverseInfoBuilder builder = ThematicQueryTransverseInfo
+                                .builder().time(formatter.parse(u.getKey()));
+                        Tuple<Double, Double> limitInfo = new Tuple<>();
+                        if (Objects.nonNull(datumPointID)) {
+                            u.getValue().stream().filter(w -> w.containsKey(DbConstant.SENSOR_ID_TAG)).filter(w ->
+                                            datumPointID.equals(sensorPointInfoMap.get(Integer.parseInt(w.get(DbConstant.SENSOR_ID_TAG).toString())).getItem1()))
+                                    .findAny().ifPresent(w -> {
+                                        Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Integer.parseInt(
+                                                w.get(DbConstant.SENSOR_ID_TAG).toString()));
+                                        double value = Double.parseDouble(w.get("").toString());    //TODO get fieldToken
+                                        limitInfo.setItem1(value + upper);
+                                        limitInfo.setItem2(value - lower);
+                                        builder.datumPointData(DatumPointData.builder().monitorPointID(pointInfo.getItem1())
+                                                .monitorPointName(pointInfo.getItem2()).value(value).upper(value + upper)
+                                                .lower(value - lower).build());
+                                    });
+                        }
+                        builder.monitorPointList(u.getValue().stream().filter(w -> Objects.isNull(datumPointID)
+                                || !datumPointID.equals(sensorPointInfoMap.get(Integer.parseInt(w.get(
+                                DbConstant.SENSOR_ID_TAG).toString())).getItem1())).map(w -> {
+                            double value = Double.parseDouble(w.get("").toString());    //TODO get fieldToken
+                            Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Integer.parseInt(w.get(DbConstant.SENSOR_ID_TAG).toString()));
+                            return ThematicMonitorPointValueInfo.builder().abnormalValue(getAbnormalValue(limitInfo, value))
+                                    .monitorPointID(pointInfo.getItem1()).monitorPointName(pointInfo.getItem2()).value(value).build();
+                        }).toList());
+                        return builder.build();
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                }).toList();
     }
 
     @Override
@@ -539,7 +545,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 Integer monitorType = entry.getKey();
                 if (monitorTypeFieldMap.containsKey(monitorType)) {
                     List<FieldSelectInfo> fieldSelectInfos = combineFieldSelectInfoList(monitorTypeFieldMap.get(monitorType));
-                    List<Integer> sensorIDList1 = entry.getValue();
+                    List<Integer> sensorIDList = entry.getValue();
                     //TODO query dataList according by {@code MonitorType} and {@code SensorID}
                     List<Map<String, Object>> dataList = List.of();
                     res.addAll(dataList);
@@ -561,5 +567,17 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         FieldSelectInfo info = new FieldSelectInfo();
         info.setFieldToken(fieldToken);
         return info;
+    }
+
+    private @Nullable Double getAbnormalValue(final Tuple<Double, Double> limitInfo, @NotNull double value) {
+        Double curUpper = limitInfo.getItem1();
+        Double curLower = limitInfo.getItem2();
+        Double abnormalValue = null;
+        if (Objects.nonNull(curUpper) && value > curUpper) {
+            abnormalValue = value - curUpper;
+        } else if (Objects.nonNull(curLower) && value < curLower) {
+            abnormalValue = value - curLower;
+        }
+        return abnormalValue;
     }
 }

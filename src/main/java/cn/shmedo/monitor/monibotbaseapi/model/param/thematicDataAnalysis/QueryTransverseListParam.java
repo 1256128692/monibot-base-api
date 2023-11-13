@@ -6,8 +6,10 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IDataDisplayCheck;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -49,9 +51,15 @@ public class QueryTransverseListParam implements IDataDisplayCheck, ParameterVal
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
     private DatumPointConfig datumPoint;
+    @JsonIgnore
+    private String fieldToken;
+    @JsonIgnore
+    private List<TbMonitorPoint> tbMonitorPointList;
 
     @Override
     public ResultWrapper<?> validate() {
+        //TODO get field token
+
         if (!ContextHolder.getBean(TbMonitorGroupMapper.class).exists(new LambdaQueryWrapper<TbMonitorGroup>()
                 .eq(TbMonitorGroup::getID, monitorGroupID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点组不存在!");
