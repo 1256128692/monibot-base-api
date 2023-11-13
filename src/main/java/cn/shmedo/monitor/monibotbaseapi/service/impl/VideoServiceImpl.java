@@ -527,6 +527,9 @@ public class VideoServiceImpl implements VideoService {
                 .map(TbVideoDevice::getID).collect(Collectors.toList());
         videoDeviceMapper.deleteBatchIds(videoIDList);
 
+        // 2.删除传感器
+        sensorMapper.deleteBatchByDeviceSerialList(pa.getDeviceSerialList());
+
         // 3. 删除抓拍配置
         videoCaptureMapper.deleteByVedioIDList(pa.getDeviceSerialList());
 
@@ -1107,30 +1110,28 @@ public class VideoServiceImpl implements VideoService {
             // 传感器列表
             List<VideoCaptureBaseInfo> sensorList = v.getSensorList().stream().filter(s -> s.getSensorID() != null).collect(Collectors.toList());
             // 通道列表
-            List<VideoCaptureBaseInfo> channelList = v.getSensorList().stream().filter(s -> s.getChannelNo() != null).collect(Collectors.toList());
+            List<VideoCaptureBaseInfo> notGenerateSensorList = v.getSensorList().stream().filter(s -> s.getSensorID() == null).collect(Collectors.toList());
             if (v.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
 
                 // 如果传感器列表为空，根据通道号数量去转换传感器
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        for (int i = 0; i < channelList.size(); i++) {
+                    if (!CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        for (int i = 0; i < v.getSensorList().size(); i++) {
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(v.getSensorList().get(i), v.getDeviceName()));
                         }
                     }
                     v.setDeviceChannelNum(0);
                 } else {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        List<VideoCaptureBaseInfo> filteredYsChannelInfoList = channelList.stream()
-                                .filter(ys -> v.getSensorList().stream().noneMatch(sensor -> sensor.getChannelNo().equals(ys.getChannelNo())))
-                                .collect(Collectors.toList());
+                    if (!CollectionUtil.isNullOrEmpty(notGenerateSensorList)) {
                         v.setDeviceChannelNum(sensorList.size());
 
-                        for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
+                        for (int i = 0; i < notGenerateSensorList.size(); i++) {
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(notGenerateSensorList.get(i), v.getDeviceName()));
                         }
-                        singleVideoSensorList.addAll(v.getSensorList());
+                        singleVideoSensorList.addAll(sensorList);
+                        singleVideoSensorList.addAll(notGenerateSensorList);
                     }
                 }
                 v.setSensorList(singleVideoSensorList);
@@ -1138,8 +1139,8 @@ public class VideoServiceImpl implements VideoService {
             } else {
                 v.setDeviceChannelNum(1);
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(0), v.getDeviceName()));
+                    if (!CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(v.getSensorList().get(0), v.getDeviceName()));
                         v.setSensorList(singleVideoSensorList);
                     }
                 }

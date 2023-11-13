@@ -73,4 +73,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorBaseInfoV1> selectListByNameAndProjectID(List<String> sensorNameList, Integer projectID);
 
     List<VideoDeviceInfoV6> selectListByDeviceSerialList(List<String> deviceSerialList);
+
+    void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
 }
