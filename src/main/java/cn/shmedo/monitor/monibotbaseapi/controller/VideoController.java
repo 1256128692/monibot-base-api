@@ -171,6 +171,7 @@ public class VideoController {
     }
 
     /**
+     * @apiDeprecated use now (#视频模块:QueryVideoDeviceListV2).
      * @api {POST} /QueryVideoCompanyViewBaseInfo 查询视频实时预览基础信息(企业级)
      * @apiDescription 查询视频实时预览基础信息(企业级)
      * @apiVersion 1.0.0
@@ -243,7 +244,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
-     * @apiSuccess (返回结果) {Int[]} dataList.monitorGroupDataList.monitorPointDataList.deviceChannel 通道号列表
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList.channelCode 通道号
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
@@ -290,7 +293,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
-     * @apiSuccess (返回结果) {Int[]} dataList.monitorPointDataList.deviceChannel 通道号列表
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.videoSourceInfoList.channelCode 通道号
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
