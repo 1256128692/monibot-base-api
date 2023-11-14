@@ -58,4 +58,39 @@ public interface IotService {
      */
     @RequestLine("POST /QueryDeviceExpandNewState")
     ResultWrapper<DeviceStateResponse> queryDeviceExpandState(QueryDeviceStateParam param);
+
+
+    /**
+     * 批量创建设备
+     * @return {@link ResultWrapper<Boolean>}
+     */
+    @RequestLine("POST /CreateMultipleDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}", "Authorization: Bearer {accessToken}"})
+    ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
+                                                @Param("appKey") String appKey,
+                                                @Param("appSecret") String appSecret,
+                                                @Param("accessToken") String accessToken);
+
+
+    /**
+     * 批量删除设备
+     * @return {@link ResultWrapper<Boolean>}
+     */
+    @RequestLine("POST /DeleteDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
+                                        @Param("appKey") String appKey,
+                                        @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /UpdateDeviceInfoBatch")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
+                                                 @Param("appKey") String appKey,
+                                                 @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /TransferDevice")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
+                                           @Param("appKey") String appKey,
+                                           @Param("appSecret") String appSecret);
 }

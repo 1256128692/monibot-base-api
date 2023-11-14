@@ -50,6 +50,30 @@ public class MonitorTypeUtil {
             fieldList.add(vo);
         }
 
+
+        // 土壤PH
+        if (monitorType.equals(MonitorType.SOIL_PH.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("soilphQuality");
+            vo.setFieldName("土壤酸碱度");
+            vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
+            vo.setFieldExValue("18");
+            fieldList.add(vo);
+        }
+
+
+        // 土壤盐分电导率
+        if (monitorType.equals(MonitorType.SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY.getKey())){
+            FieldSelectInfo vo = new FieldSelectInfo();
+            vo.setFieldToken("soilconductivityQuality");
+            vo.setFieldName("土壤类型");
+            vo.setFieldOrder(0);
+            vo.setFieldStatisticsType("1");
+            vo.setFieldExValue("18");
+            fieldList.add(vo);
+        }
+
         return fieldList;
     }
 

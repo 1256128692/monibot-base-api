@@ -217,9 +217,9 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} dataUnitList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} dataUnitList.unitDesc  单位类型描述
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseSensorData
+     * @apiPermission 项目权限+应用权限 mdmbase:ListBaseSensorData
      */
-    @Permission(permissionName = "mdmbase:ListBaseSensorData")
+    @Permission(permissionName = "mdmbase:ListBaseSensorData", allowApplication = true)
     @RequestMapping(value = "/QuerySingleMonitorPointNewData", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object querySingleMonitorPointNewData(@Validated @RequestBody QueryMonitorPointDescribeParam pa) {
         return wtMonitorService.querySingleMonitorPointNewData(pa);
@@ -233,7 +233,7 @@ public class WtMonitorDataController {
      * @apiDescription 查询统计当前公司下的监测点类型数量以及项目状态数量
      * @apiName StatisticsMonitorPointType
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)
+     * @apiParam (请求体) {Int} queryType 查询类型(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测 5:水情监测 6:雨晴监测 7:农情监测 8:工情监测)
      * @apiSuccess (响应结果) {Object[]} typeInfoList          监测类型统计信息
      * @apiSuccess (响应结果) {Int} typeInfoList.monitorType   监测类型
      * @apiSuccess (响应结果) {String} typeInfoList.monitorTypeName   监测类型名称
@@ -245,6 +245,10 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.name   监测项目名称
      * @apiSuccess (响应结果) {String} typeInfoList.monitorItemList.alias   监测项目别名
      * @apiSuccess (响应结果) {Object} typeInfoList.warnInfo          监测点预警统计信息
+     * @apiSuccess (响应结果) {Object[]} typeInfoList.projectLocationInfoList   监测类型
+     * @apiSuccess (响应结果) {Int} typeInfoList.projectLocationInfoList.projectID   工程ID
+     * @apiSuccess (响应结果) {String} typeInfoList.projectLocationInfoList.location   区域代码
+     * @apiSuccess (响应结果) {String} typeInfoList.projectLocationInfoList.locationInfo  区域名称
      * @apiSuccess (响应结果) {Int} warnInfo.normalCount         正常数量
      * @apiSuccess (响应结果) {Int} warnInfo.noDataCount         无数据数量
      * @apiSuccess (响应结果) {Int} warnInfo.levelOneCount   一级警报数量
@@ -262,6 +266,30 @@ public class WtMonitorDataController {
         return wtMonitorService.queryMonitorPointTypeStatistics(pa);
     }
 
+
+    /**
+     * @api {POST} /QueryProjectLocation 查询工程区域信息
+     * @apiVersion 1.0.0
+     * @apiGroup 水利监测点数据模块
+     * @apiDescription 根据公司ID和监测类型去查询工程区域信息
+     * @apiName QueryProjectLocation
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} monitorClassType 监测类别
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (响应结果) {Object[]} dataList 统计信息
+     * @apiSuccess (响应结果) {String} dataList.location   区域代码
+     * @apiSuccess (响应结果) {String} dataList.key   区域code
+     * @apiSuccess (响应结果) {String} dataList.locationInfo  区域名称
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListCompanySensorData
+     */
+    @Permission(permissionName = "mdmbase:ListCompanySensorData")
+    @RequestMapping(value = "/QueryProjectLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectLocation(@Validated @RequestBody QueryProjectLocationParam pa) {
+        return wtMonitorService.queryProjectLocation(pa);
+    }
+
+
     /**
      * @api {POST} /QueryMonitorPointHistoryDataList 查询监测点历史数据列表
      * @apiVersion 1.0.0
@@ -273,6 +301,7 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度  30m:30分钟一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParam (请求体) {Int} [queryType] 查询方式,(0:平均值,1:后置瞬时值[取后置数据第一条]),不传的时候默认为平均值
      * @apiParamExample 请求体示例
      * {"monitorPointID":9182,"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":5861}
      * @apiSuccess (响应结果) {Object} monitorPoint 监测点信息

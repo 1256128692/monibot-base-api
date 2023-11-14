@@ -9,22 +9,25 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * @program: monibot-base-api
@@ -33,11 +36,15 @@ import java.util.List;
  **/
 @Data
 public class AddProjectParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+    @JsonIgnore
+    List<TbProperty> properties;
+    @JsonIgnore
+    List<TbMonitorItem> monitorItems;
     @NotNull
     private Integer companyID;
     @NotBlank
     @Size(max = 50)
-    @Pattern(regexp = "^[\\u4e00-\\u9fa5A-Za-z0-9]+$" , message = "只允许数字字母和中文")
+    @Pattern(regexp = "^[\\u4e00-\\u9fa5A-Za-z0-9]+$", message = "只允许数字字母和中文")
     private String projectName;
     @Size(max = 10)
     private String shortName;
@@ -71,14 +78,17 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<@NotNull TagKeyAndValue> tagList;
     @Valid
     private List<@NotNull Integer> monitorItemIDList;
+    @NotNull
     private Integer modelID;
     @Valid
     @NotEmpty
     private List<@NotNull PropertyIdAndValue> modelValueList;
-    @JsonIgnore
-    List<TbProperty> properties;
-    @JsonIgnore
-    List<TbMonitorItem> monitorItems;
+    @NotNull
+    @Range(min = -1, max = 0)
+    private Byte level;
+    @Valid
+    @NotEmpty
+    private List<@NotNull Integer> serviceIDList;
 
     @Override
     public ResultWrapper validate() {
@@ -89,36 +99,33 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (DateUtil.between(DateUtil.date(), expiryDate, DateUnit.DAY, false) <= 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有效日期不能小于1日");
         }
-        if (!PlatformType.validate(platformType)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台类型不合法");
-        }
+
 
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
         if (tbProjectInfoMapper.countByNameExcludeID(projectName, null) > 0) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该名称在系统中已存在");
         }
-        if (modelID != null) {
 
             TbPropertyModelMapper tbPropertyModelMapper = ContextHolder.getBean(TbPropertyModelMapper.class);
             TbPropertyModel tbPropertyModel = tbPropertyModelMapper.selectByPrimaryKey(modelID);
             if (tbPropertyModel == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不存在");
             }
-            if (!tbPropertyModel.getProjectType().equals(projectType)) {
+            if(!PropertyModelType.BASE_PROJECT.getCode().equals(tbPropertyModel.getModelType())){
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板不是项目模板");
+            }
+            if (!tbPropertyModel.getGroupID().equals(projectType.intValue())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板与项目不适配");
             }
-        }
-        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)){
+        if (!PredefinedModelProperTyCache.projectTypeAndPropertyListMap.containsKey(projectType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "系统无此项目类型的预定义模板");
         }
-        properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectType));
+        TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
+        properties = tbPropertyMapper.queryByMID(modelID);
 
-        if (modelID != null) {
-            TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
-            properties.addAll(tbPropertyMapper.queryByMID(modelID));
-        }
+
         ResultWrapper temp = PropertyUtil.validPropertyValue(modelValueList, properties, true);
-        if (temp!=null){
+        if (temp != null) {
             return temp;
         }
         //校验标签
@@ -136,7 +143,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
         if (ObjectUtil.isNotEmpty(tagList)) {
             if (tagList.stream().map(
                     item -> item.getKey() + (ObjectUtil.isEmpty(item.getValue()) ? "_" : item.getKey())
-            ).distinct().count() !=tagList.size()) {
+            ).distinct().count() != tagList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "新增的标签中存在重复");
             }
             if (tbTagMapper.countByCIDAndTags(companyID, tagList) > 0) {
@@ -162,6 +169,11 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             }
 
         }
+        RedisService redisService = ContextHolder.getBean(RedisService.class);
+        List<Integer> allServiceIDLIst = redisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
+        if (serviceIDList.stream().anyMatch(item -> !allServiceIDLIst.contains(item))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有服务不存在");
+        }
         return null;
 
 
@@ -176,9 +188,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     public ResourcePermissionType resourcePermissionType() {
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
-
-
-
 
 
 }

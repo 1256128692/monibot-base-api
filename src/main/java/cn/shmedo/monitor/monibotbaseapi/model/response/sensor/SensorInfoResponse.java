@@ -1,9 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.sensor;
 
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorDataSource;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,6 +37,30 @@ public class SensorInfoResponse extends TbSensor {
      */
     private List<TbParameter> paramFields;
 
+
+    private Byte accessPlatform;
+
+
+    /**
+     * 视频平台名称
+     */
+    private String accessPlatformStr;
+
+    /**
+     * 视频设备序列号
+     */
+    private String deviceSerial;
+
+    /**
+     * 视频设备类型
+     */
+    private String deviceType;
+
+    /**
+     * 视频设备数据来源
+     */
+    private String videoDeviceSource;
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class ExField extends TbMonitorTypeField {
@@ -67,7 +90,7 @@ public class SensorInfoResponse extends TbSensor {
         }
     }
 
-    public static SensorInfoResponse valueOf(TbSensor sensor) {
+    public static SensorInfoResponse valueOf(TbSensor sensor, VideoDeviceInfoV5 videoDevice) {
         SensorInfoResponse response = new SensorInfoResponse();
         response.setID(sensor.getID());
         response.setProjectID(sensor.getProjectID());
@@ -91,6 +114,17 @@ public class SensorInfoResponse extends TbSensor {
         response.setUpdateTime(sensor.getUpdateTime());
         response.setCreateUserID(sensor.getCreateUserID());
         response.setUpdateUserID(sensor.getUpdateUserID());
+        response.setVideoDeviceSourceID(sensor.getVideoDeviceSourceID());
+        if (videoDevice != null ) {
+            response.setChannelCode(videoDevice.getChannelCode());
+            response.setVideoDeviceID(videoDevice.getID());
+            response.setDeviceSerial(videoDevice.getDeviceSerial());
+            response.setDeviceType(videoDevice.getDeviceType());
+            response.setAccessPlatform(videoDevice.getAccessPlatform());
+            response.setAccessPlatformStr(AccessPlatformType.getByValue(response.getAccessPlatform()).getDescription());
+            response.setVideoDeviceSource("视频设备/" + videoDevice.getDeviceType() + "/"
+                    +  videoDevice.getDeviceSerial() + "/" + videoDevice.getChannelCode());
+        }
         return response;
     }
 }

@@ -6,10 +6,13 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.base.SubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Data
@@ -19,10 +22,14 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
     private Integer companyID;
 
     private Integer projectType;
+    @Valid
+    private List<@NotNull Integer> projectTypeList;
 
     private String projectName;
 
     private Byte platformType;
+    @Valid
+    private List<@NotNull Integer> serviceIDList;
 
     private Collection<Integer> projectIDList;
 

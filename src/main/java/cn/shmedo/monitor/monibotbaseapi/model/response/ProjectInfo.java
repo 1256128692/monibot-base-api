@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @Data
@@ -62,6 +63,11 @@ public class ProjectInfo extends TbProjectInfo {
 
     private String locationInfo;
 
+    private List<AuthService> serviceList;
+
+
+    private List<ProjectInfo> downLevelProjectList;
+
     @Override
     public void setProjectType(Byte projectType) {
         TbProjectType type = ProjectTypeCache.projectTypeMap.getOrDefault(projectType, null);
@@ -73,19 +79,26 @@ public class ProjectInfo extends TbProjectInfo {
     }
 
     @Override
-    public void setPlatformType(Byte platformType) {
-        PlatformType type = PlatformType.getPlatformType(platformType);
-        if (platformType != null) {
-            this.platformTypeName = type.getTypeStr();
-        }
-        super.setPlatformType(platformType);
-    }
-    @Override
     public void setLocation(String location) {
         super.setLocation(location);
         if (JSONUtil.isTypeJSON(location)) {
             JSONObject json = JSONUtil.parseObj(location);
             this.setLocationInfo(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
         }
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ProjectInfo that = (ProjectInfo) o;
+        return Objects.equals(super.getID(), that.getID());
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }

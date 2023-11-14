@@ -1,10 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
@@ -31,11 +32,13 @@ import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.sensor.SensorDataUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.soli.SoliUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.waterQuality.WaterQualityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.windPower.WindPowerUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -350,6 +353,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                             }
                             snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), currentSensorData, snd.getProjectTypeID()));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
+                            snd.setMultiSensorData(List.of(handleSpecialType(tbSensor.getMonitorType(), currentSensorData, snd.getProjectTypeID())));
                         }
                     }
                 }
@@ -391,43 +395,47 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 水质
         if (monitorType.equals(MonitorType.WATER_QUALITY.getKey())) {
-            if (projectTypeID == null) {
-                Object phosphorusTotal = currentSensorData.get("phosphorusTotal");
-                Object temperature = currentSensorData.get("temperature");
-                if (ObjectUtil.isNotNull(phosphorusTotal)) {
-                    // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                    int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
-                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-                    int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
-                    int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
-                    int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
-                    List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
-                    int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
-                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
 
-                } else if (ObjectUtil.isNotNull(temperature)) {
-                    // 水库水位,校验水质规则 ,含溶解氧(v3)
-                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
-                }
-            } else {
-                if (projectTypeID == 1) {
-                    // 水库水位,校验水质规则 ,含溶解氧(v3)
-                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
-                }
-                if (projectTypeID == 2) {
-                    // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
-                    int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
-                    int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
-                    int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
-                    int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
-                    int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
-                    List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
-                    int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
-                    currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
-                }
+            if (projectTypeID == 1) {
+                // 水库水位,校验水质规则 ,含溶解氧(v3)
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(v3));
             }
+            if (projectTypeID == 2) {
+                // 河道水位,校验水质规则,[PH、溶解氧、高锰酸盐指数、氨氮、总磷](v1,v3,v6,v7,v8),抉择出水质等级最差的
+                int v1 = WaterQualityUtil.getV1Category((Double) currentSensorData.get("ph"));
+                int v3 = WaterQualityUtil.getV3Category((Double) currentSensorData.get("dissolvedOxygen"));
+                int v6 = WaterQualityUtil.getV6Category((Double) currentSensorData.get("homomethylateIndex"));
+                int v7 = WaterQualityUtil.getV7Category((Double) currentSensorData.get("ammoniaNitrogen"));
+                int v8 = WaterQualityUtil.getV8Category((Double) currentSensorData.get("phosphorusTotal"));
+                List<Integer> levelList = new LinkedList<>(List.of(v1, v3, v6, v7, v8));
+                int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
+            }
+            if (projectTypeID == 9) {
+                // 地下水质校验,校验水质规则,[浑浊度,ph,总硬度,溶解性固体]
+                int turbidity = WaterQualityUtil.getGqTurbidityCategory((Double) currentSensorData.get("turbidity"));
+                int ph = WaterQualityUtil.getGqPhCategory((Double) currentSensorData.get("ph"));
+                int hardness = WaterQualityUtil.getGqHardnessCategory((Double) currentSensorData.get("hardness"));
+                int dissolved = WaterQualityUtil.getGqDissolvedCategory((Double) currentSensorData.get("dissolved"));
+                List<Integer> levelList = new LinkedList<>(List.of(turbidity, ph, hardness, dissolved));
+                int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
+            }
+            if (projectTypeID == 10) {
+                // 灌区水质校验,校验水质规则,[水温,悬浮物,化学需氧量,氯化物,硫化物,全盐量]
+                int temperature = WaterQualityUtil.getDxTemperatureCategory((Double) currentSensorData.get("temperature"));
+                int suspendedsolids = WaterQualityUtil.getDxSuspendedsolidsCategory((Double) currentSensorData.get("suspendedsolids"));
+                int oxygendemand = WaterQualityUtil.getDxOxygendemandCategory((Double) currentSensorData.get("oxygendemand"));
+                int chloride = WaterQualityUtil.getDxChlorideCategory((Double) currentSensorData.get("chloride"));
+                int sulfide = WaterQualityUtil.getDxSulfideCategory((Double) currentSensorData.get("sulfide"));
+                int totalsalt = WaterQualityUtil.getDxTotalsaltCategory((Double) currentSensorData.get("totalsalt"));
+                List<Integer> levelList = new LinkedList<>(List.of(temperature, suspendedsolids, oxygendemand,
+                        chloride, sulfide, totalsalt));
+                int maxCategory = WaterQualityUtil.getMaxCategory(levelList);
+                currentSensorData.put("waterQuality", WaterQuality.getValueByKey(maxCategory));
+            }
+
         } else if (monitorType.equals(MonitorType.WIND_SPEED.getKey())) {
             // 风力
             int v1 = WindPowerUtil.getV1Category((Double) currentSensorData.get("windSpeed"));
@@ -441,6 +449,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         } else if (monitorType.equals(MonitorType.LEVEL.getKey())) {
             // 水位变化
             currentSensorData.put("levelChange", 0.0);
+        } else if (monitorType.equals(MonitorType.SOIL_PH.getKey())) {
+            // 土壤PH值
+            currentSensorData.put("soilphQuality", SoliUtil.getV1Category((Double) currentSensorData.get("soilph")));
+        } else if (monitorType.equals(MonitorType.SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY.getKey())) {
+            // 土壤盐分电导率
+            currentSensorData.put("soilconductivityQuality", SoliUtil.getV2Category((Double) currentSensorData.get("soilconductivity")));
         }
         return currentSensorData;
     }
@@ -629,13 +643,14 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), pa.getQueryType());
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {
             maps.forEach(map -> {
                 // 如果当前数据为风力,水质,则进行单独处理
-                Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(), map, null);
+                Map<String, Object> stringObjectMap = handleSpecialType(pa.getTbMonitorPoint().getMonitorType(),
+                        map, pa.getTbProjectInfo().getProjectType());
                 resultMaps.add(stringObjectMap);
             });
         }
@@ -694,7 +709,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -784,7 +799,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         Double dailyRainfall = 0.0;
         List<Map<String, Object>> resultList = null;
@@ -805,9 +820,9 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             dailyRainfallList = handleDailyRainfallList(sensorIDList, pa.getBegin(), pa.getEnd());
             if (!CollectionUtil.isNullOrEmpty(dailyRainfallList)) {
                 // 转换为 LocalDateTime
-                LocalDateTime beginDateTime = pa.getBegin().toLocalDateTime();
+                LocalDateTime end = pa.getEnd().toLocalDateTime();
                 // 当天凌晨零点零分零秒
-                LocalDateTime targetDateTime = LocalDateTime.of(beginDateTime.toLocalDate(), LocalTime.MIDNIGHT);
+                LocalDateTime targetDateTime = LocalDateTime.of(end.toLocalDate(), LocalTime.MIDNIGHT);
                 // 时间格式化器
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -954,12 +969,13 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getMonitorType());
+                fieldList, false, pa.getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         maps.forEach(map -> {
             // 如果当前数据为风力,水质,则进行单独处理
-            Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(), map, null);
+            Map<String, Object> stringObjectMap = handleSpecialType(pa.getMonitorType(),
+                    map, pa.getTbProjectInfo().getProjectType());
             resultMaps.add(stringObjectMap);
         });
 
@@ -1011,7 +1027,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getTbMonitorPoint().getMonitorType());
+                fieldList, false, pa.getTbMonitorPoint().getMonitorType(), null);
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         if (!CollectionUtil.isNullOrEmpty(maps)) {
@@ -1445,6 +1461,31 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         PageUtil.Page<SensorHistoryAvgDataResponse> page = PageUtil.page(responses, pa.getPageSize(), pa.getCurrentPage());
         return new PageUtil.PageWithMap<SensorHistoryAvgDataResponse>(page.totalPage(), page.currentPageData(), page.totalCount(), null);
+    }
+
+    @Override
+    public Object queryProjectLocation(QueryProjectLocationParam pa) {
+        List<ProjectLocationInfo> projectLocationInfoList = tbMonitorItemMapper.getProjectLocation(pa.getCompanyID(),
+                pa.getMonitorType(), pa.getMonitorClassType());
+
+        projectLocationInfoList.forEach(p -> {
+            if (StringUtils.isNotBlank(p.getLocation())){
+                if (JSONUtil.isTypeJSON(p.getLocation())) {
+                    JSONObject json = JSONUtil.parseObj(p.getLocation());
+                    p.setKey(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                }
+            }
+        });
+
+        Collection<Object> areas = projectLocationInfoList
+                .stream().map(ProjectLocationInfo::getKey).filter(Objects::nonNull).collect(Collectors.toSet());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        areas.clear();
+        projectLocationInfoList.forEach(i -> {
+            i.setLocationInfo(areaMap.getOrDefault(i.getKey(), null));
+        });
+        return projectLocationInfoList;
     }
 
 

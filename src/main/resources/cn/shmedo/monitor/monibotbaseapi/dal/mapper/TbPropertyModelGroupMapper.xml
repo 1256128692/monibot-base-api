@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper">
+
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup">
+            <id property="ID" column="ID" jdbcType="INTEGER"/>
+            <result property="companyID" column="CompanyID" jdbcType="INTEGER"/>
+            <result property="platform" column="Platform" jdbcType="VARCHAR"/>
+            <result property="groupType" column="ModelType" jdbcType="TINYINT"/>
+            <result property="groupTypeSubType" column="ModelTypeSubType" jdbcType="TINYINT"/>
+            <result property="name" column="Name" jdbcType="VARCHAR"/>
+            <result property="desc" column="Desc" jdbcType="VARCHAR"/>
+            <result property="exValue" column="ExValue" jdbcType="VARCHAR"/>
+            <result property="createTime" column="CreateTime" jdbcType="TIMESTAMP"/>
+            <result property="createUserID" column="CreateUserID" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        ID,CompanyID,Platform,
+        GroupType,GroupTypeSubType,Name,
+        Desc,ExValue,CreateTime,
+        CreateUserID
+    </sql>
+</mapper>

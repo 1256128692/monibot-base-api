@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper">
+    <resultMap id="ProjectViewMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewBaseInfo">
+        <id column="monitorGroupParentID" jdbcType="INTEGER" property="monitorGroupParentID"/>
+        <result column="monitorGroupParentName" jdbcType="VARCHAR" property="monitorGroupParentName"/>
+        <result column="parentDisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+        <collection property="monitorGroupDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewSubGroupInfo">
+            <id column="monitorGroupID" jdbcType="INTEGER" property="monitorGroupID"/>
+            <result column="monitorGroupName" jdbcType="VARCHAR" property="monitorGroupName"/>
+            <result column="displayOrder" jdbcType="INTEGER" property="displayOrder"/>
+            <collection property="monitorPointDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewPointInfo">
+                <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+                <result column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+                <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+                <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+                <result column="pointDisplayOrder" jdbcType="INTEGER" property="displayOrder"/>
+                <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+                <collection property="sensorInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoProjectViewSensorInfo">
+                    <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+                    <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
+                    <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
+                    <result column="channelNo" jdbcType="INTEGER" property="channelNo"/>
+                    <result column="videoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
+                    <result column="videoDeviceID" jdbcType="INTEGER" property="videoDeviceID"/>
+                    <result column="DeviceStatus" jdbcType="BIT" property="deviceStatus"/>
+                    <result column="DeviceSerial" jdbcType="VARCHAR" property="deviceSerial"/>
+                    <result column="DeviceToken" jdbcType="VARCHAR" property="deviceToken"/>
+                    <result column="DeviceName" jdbcType="VARCHAR" property="deviceName"/>
+                    <result column="DeviceType" jdbcType="VARCHAR" property="deviceType"/>
+                    <result column="AccessChannelNum" jdbcType="INTEGER" property="accessChannelNum"/>
+                    <result column="AccessPlatform" jdbcType="TINYINT" property="accessPlatform"/>
+                    <result column="AccessProtocol" jdbcType="TINYINT" property="accessProtocol"/>
+                    <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
+                    <result column="StorageType" jdbcType="TINYINT" property="storageType"/>
+                    <result column="CaptureStatus" jdbcType="BIT" property="captureStatus"/>
+                    <result column="AllocationStatus" jdbcType="BIT" property="allocationStatus"/>
+                </collection>
+            </collection>
+        </collection>
+    </resultMap>
+    <select id="selectVideoCompanyViewBaseInfo"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCompanyViewBaseInfo"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoCompanyViewBaseInfoParam">
+        SELECT
+            tvd.`ID` videoDeviceID,
+            tvd.`DeviceStatus` deviceStatus,
+            tvd.`DeviceSerial` deviceSerial,
+            tvd.`DeviceName` deviceName,
+            tvd.`DeviceType` deviceType,
+            tvd.`AccessChannelNum` accessChannelNum,
+            tvd.`AccessPlatform` accessPlatform,
+            tvd.`AccessProtocol` accessProtocol,
+            tvd.`CompanyID` companyID,
+            tvd.`ProjectID` projectID,
+            tvd.`StorageType` storageType,
+            tvc.`ImageCapture` captureStatus,
+            tvd.`AllocationStatus` allocationStatus,
+            GROUP_CONCAT(tvds.ChannelNo) channelDesc
+        FROM
+            tb_video_device tvd
+            LEFT JOIN tb_video_device_source tvds ON tvds.DeviceSerial = tvd.DeviceSerial
+            LEFT JOIN tb_video_capture tvc ON tvc.VideoDeviceSourceID = tvds.ID
+        WHERE tvd.`CompanyID` = #{param.companyID}
+        <if test="param.deviceSerial != null and param.deviceSerial != ''">
+            AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
+        </if>
+        <if test="param.deviceStatus != null">
+            AND tvd.`DeviceStatus` = #{param.deviceStatus}
+        </if>
+        <if test="param.videoDeviceID != null">
+            AND tvd.ID = #{param.videoDeviceID}
+        </if>
+        GROUP BY tvd.`ID`
+    </select>
+    <select id="selectVideoProjectViewBaseInfo" resultMap="ProjectViewMap"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.QueryVideoProjectViewBaseInfo">
+        SELECT
+            tmg1.ID monitorGroupParentID,
+            tmg1.`Name` monitorGroupParentName,
+            tmg1.DisplayOrder parentDisplayOrder,
+            tmg2.ID monitorGroupID,
+            tmg2.`Name` monitorGroupName,
+            tmg2.DisplayOrder displayOrder,
+            tmp.ID monitorPointID,
+            tmg1.ProjectID,
+            tmp.MonitorItemID monitorItemID,
+            tmp.MonitorType monitorType,
+            tmp.DisplayOrder pointDisplayOrder,
+            tmp.`Name` monitorPointName,
+            ts.ID sensorID,
+            ts.`Name` sensorName,
+            ts.Alias sensorAlias,
+            tvds.ID videoDeviceSourceID,
+            tvds.ChannelNo channelNo,
+            tvd.ID videoDeviceID,
+            tvd.DeviceStatus,
+            tvd.DeviceSerial,
+            tvd.DeviceName,
+            tvd.DeviceType,
+            tvd.AccessChannelNum,
+            tvd.AccessPlatform,
+            tvd.AccessProtocol,
+            tvd.CompanyID,
+            tvd.StorageType,
+            tvd.CaptureStatus,
+            tvd.AllocationStatus
+        FROM
+            tb_monitor_group tmg1
+            LEFT JOIN tb_monitor_group tmg2 ON tmg1.ID = tmg2.ParentID AND tmg2.`Enable` IS TRUE
+            LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorGroupID = tmg2.ID
+            LEFT JOIN tb_monitor_point tmp ON tmp.ID = tmgp.MonitorPointID
+            LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID AND ts.`Enable` IS TRUE
+            LEFT JOIN tb_video_device_source tvds ON tvds.ID = ts.VideoDeviceSourceID
+            LEFT JOIN tb_video_device tvd ON tvd.DeviceSerial = tvds.DeviceSerial
+        WHERE tmg1.`Enable` IS TRUE AND ts.ID IS NOT NULL AND tmp.MonitorType=40 AND tmg1.`ProjectID`=#{param.projectID}
+        <if test="param.deviceSerial != null and param.deviceSerial != ''">
+            AND tvd.`DeviceSerial` LIKE CONCAT('%',#{param.deviceSerial},'%')
+        </if>
+        <if test="param.deviceStatus != null">
+            AND tvd.`DeviceStatus` =#{param.deviceStatus}
+        </if>
+        <if test="param.queryCode != null and param.queryCode != ''">
+            AND (tmg2.`Name` LIKE CONCAT('%',#{param.queryCode},'%') OR tmp.`Name` LIKE CONCAT('%',#{param.queryCode},'%'))
+        </if>
+    </select>
+
+
+    <insert id="batchInsert" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfo">
+        INSERT INTO tb_video_device (deviceName,
+        deviceType,
+        companyID,
+        deviceSerial,
+        deviceStatus,
+        accessChannelNum,
+        accessPlatform,
+        accessProtocol,
+        projectID,
+        storageType,
+        captureStatus,
+        allocationStatus,
+        deviceToken,
+        createUserID,
+        createTime,
+        updateUserID,
+        updateTime,
+        exValue,
+        s1,
+        s2)
+        VALUES
+        <foreach collection="videoDeviceInfoList" item="item" separator=",">
+            (#{item.deviceName},
+            #{item.deviceType},
+            #{item.companyID},
+            #{item.deviceSerial},
+            #{item.deviceStatus},
+            #{item.accessChannelNum},
+            #{item.accessPlatform},
+            #{item.accessProtocol},
+            #{item.projectID},
+            #{item.storageType},
+            #{item.captureStatus},
+            #{item.allocationStatus},
+            #{item.deviceToken},
+            #{item.createUserID},
+            #{item.createTime},
+            #{item.updateUserID},
+            #{item.updateTime},
+            #{item.exValue},
+            #{item.s1},
+            #{item.s2})
+        </foreach>;
+        <!-- 获取插入记录数量 -->
+        <selectKey keyProperty="insertCount" order="AFTER" resultType="int">
+            SELECT ROW_COUNT() AS insertCount;
+        </selectKey>
+    </insert>
+
+    <select id="queryPageByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDevicePageInfo">
+        select vd.ID        as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.createUserID,
+               vd.createTime,
+               vd.updateUserID,
+               vd.updateTime,
+               pi.ProjectName,
+               COUNT(ts.ID) AS sensorNum
+        from tb_video_device vd
+                 left join tb_project_info pi on pi.ID = vd.projectID
+                 left join tb_video_device_source vds on vds.deviceSerial = vd.deviceSerial
+                 left join tb_sensor ts on vds.ID = ts.VideoDeviceSourceID
+        <where>
+            1 = 1
+            <if test="deviceSerial != null and deviceSerial != ''">
+                and vd.`DeviceSerial` LIKE CONCAT('%',#{deviceSerial},'%')
+            </if>
+            <if test="fuzzyItem != null and fuzzyItem != ''">
+                and (vd.`DeviceSerial` LIKE CONCAT('%',#{fuzzyItem},'%')
+                or vd.`DeviceType` LIKE CONCAT('%',#{fuzzyItem},'%'))
+            </if>
+            <if test="deviceStatus != null">
+                and vd.deviceStatus = #{deviceStatus}
+            </if>
+            <if test="allocationStatus != null">
+                and vd.allocationStatus = #{allocationStatus}
+            </if>
+            <if test="ownedCompanyID != null">
+                and vd.CompanyID = #{ownedCompanyID}
+            </if>
+            <if test="projectID != null">
+                and vd.projectID = #{projectID}
+            </if>
+            <if test="begin != null">
+                AND vd.CreateTime &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                AND vd.CreateTime &lt;= #{end}
+            </if>
+        </where>
+        group by vd.ID,
+                 vd.deviceSerial,
+                 vd.deviceType,
+                 vd.companyID,
+                 vd.deviceStatus,
+                 vd.accessChannelNum,
+                 vd.accessPlatform,
+                 vd.projectID,
+                 vd.captureStatus,
+                 vd.allocationStatus,
+                 vd.createUserID,
+                 vd.createTime,
+                 vd.updateUserID,
+                 vd.updateTime,
+                 pi.ProjectName
+        order by vd.id desc
+    </select>
+
+    <select id="selectListWithSensorIDBySensorIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceWithSensorIDInfo">
+        SELECT
+            tvd.*,
+            ts.`ID` sensorID,
+            tvds.`ChannelNo` channelNo
+        FROM tb_video_device tvd
+            LEFT JOIN tb_video_device_source tvds ON tvds.DeviceSerial = tvd.DeviceSerial
+            LEFT JOIN tb_sensor ts ON ts.`VideoDeviceSourceID` = tvds.`ID`
+        WHERE ts.`ID` IN
+        <foreach collection="sensorList" separator="," open="(" close=")" item="item" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryListByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1">
+        select vd.ID as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.exValue
+        from tb_video_device vd
+        where vd.deviceSerial in
+        <foreach collection="deviceSerialList" separator="," open="(" item="deviceSerial" close=")">
+            #{deviceSerial}
+        </foreach>
+    </select>
+
+    <update id="batchUpdate" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2">
+        <foreach collection="updateVideoList" item="item" separator=";">
+            UPDATE tb_video_device
+            SET deviceName = #{item.deviceName}
+            WHERE deviceSerial = #{item.deviceSerial}
+        </foreach>
+    </update>
+
+    <select id="selectByIdList" resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV4">
+        select vd.ID as videoDeviceID,
+               vd.deviceToken,
+               vd.companyID,
+               vd.projectID
+        from tb_video_device vd
+        where vd.ID in
+        <foreach collection="videoIDList" separator="," open="(" item="videoID" close=")">
+            #{videoID}
+        </foreach>
+    </select>
+
+    <update id="batchUpdateCompanyAndProject" >
+        <foreach collection="videoDeviceInfoV4List" item="item" separator=";">
+            UPDATE tb_video_device
+            SET
+            projectID =
+            <choose>
+                <when test="item.projectID != null">
+                    #{item.projectID}
+                </when>
+                <otherwise>
+                    projectID
+                </otherwise>
+            </choose>,
+            companyID = #{companyID},
+            AllocationStatus =
+            <choose>
+                <when test="item.projectID != null and item.projectID != -1">
+                    true
+                </when>
+                <otherwise>
+                    false
+                </otherwise>
+            </choose>
+            WHERE ID = #{item.videoDeviceID}
+        </foreach>
+    </update>
+
+    <select id="queryListByDeviceSerialListAndCompanyID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceInfoV1">
+        select vd.ID as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.exValue,
+               vd.createTime
+        from tb_video_device vd
+        where 1 = 1
+        <if test="deviceSerialList != null and deviceSerialList.size() != 0">
+            and (
+            <foreach collection="deviceSerialList" separator="OR" item="deviceSerial">
+                vd.deviceSerial LIKE CONCAT('%', #{deviceSerial}, '%')
+            </foreach>
+            )
+        </if>
+        <if test="deviceStatus != null">
+            and vd.deviceStatus = #{deviceStatus}
+        </if>
+        <if test="companyID != null">
+            and vd.CompanyID = #{companyID}
+        </if>
+    </select>
+
+    <update id="batchUpdateDeviceStatus">
+        <foreach collection="tbVideoDevices" item="item" separator=";">
+            UPDATE tb_video_device
+            SET
+            deviceStatus = #{item.deviceStatus}
+            WHERE ID = #{item.ID}
+        </foreach>
+    </update>
+
+    <select id="queryOnlineCount" resultType="java.lang.Integer">
+        select count(1)
+        from tb_video_device vd
+        <where>
+            deviceStatus = 1
+            <if test="deviceSerial != null and deviceSerial != ''">
+                and vd.`DeviceSerial` LIKE CONCAT('%',#{deviceSerial},'%')
+            </if>
+            <if test="fuzzyItem != null and fuzzyItem != ''">
+                and (vd.`DeviceSerial` LIKE CONCAT('%',#{fuzzyItem},'%')
+                or vd.`DeviceType` LIKE CONCAT('%',#{fuzzyItem},'%'))
+            </if>
+            <if test="deviceStatus != null">
+                and vd.deviceStatus = #{deviceStatus}
+            </if>
+            <if test="allocationStatus != null">
+                and vd.allocationStatus = #{allocationStatus}
+            </if>
+            <if test="ownedCompanyID != null">
+                and vd.CompanyID = #{ownedCompanyID}
+            </if>
+            <if test="projectID != null">
+                and vd.projectID = #{projectID}
+            </if>
+            <if test="begin != null">
+                AND vd.CreateTime &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                AND vd.CreateTime &lt;= #{end}
+            </if>
+        </where>
+    </select>
+
+    <select id="queryDeviceDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceDetailInfo">
+        select vd.ID as videoDeviceID,
+               vd.deviceSerial,
+               vd.deviceType,
+               vd.deviceName,
+               vd.companyID,
+               vd.deviceStatus,
+               vd.accessChannelNum,
+               vd.accessPlatform,
+               vd.accessProtocol,
+               vd.projectID,
+               vd.captureStatus,
+               vd.allocationStatus,
+               vd.exValue,
+               vd.createTime
+        from tb_video_device vd
+        where 1 = 1
+          and (
+            vd.deviceSerial = #{deviceSerial}
+            )
+        <if test="companyID != null">
+            and vd.CompanyID = #{companyID}
+        </if>
+    </select>
+
+    <select id="selectByVideoDeviceSourceID" resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5">
+        select vd.ID,
+        vd.deviceSerial,
+        vd.deviceType,
+        vd.deviceName,
+        vd.companyID,
+        vd.deviceStatus,
+        vd.accessChannelNum,
+        vd.accessPlatform,
+        vd.accessProtocol,
+        vd.projectID,
+        vd.captureStatus,
+        vd.allocationStatus,
+        vd.exValue,
+        vd.createTime
+        from tb_video_device vd
+        where
+        vd.deviceSerial = (select deviceSerial from tb_video_device_source where ID = #{videoDeviceSourceID})
+    </select>
+
+    <select id="selectListByCompanyID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoBaseInfo">
+        select ID as videoDeviceID, projectID, deviceSerial, deviceName, deviceStatus, accessPlatform
+        from tb_video_device
+        where CompanyID = #{companyID}
+        <if test="deviceStatus != null">
+            and deviceStatus = #{deviceStatus}
+        </if>
+        <if test="queryContent != null">
+            and deviceSerial like concat('%', #{queryContent}, '%') or deviceName like concat('%', #{queryContent}, '%')
+        </if>
+    </select>
+</mapper>

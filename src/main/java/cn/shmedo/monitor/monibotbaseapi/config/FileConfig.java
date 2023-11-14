@@ -21,6 +21,8 @@ public class FileConfig {
     private String wtReportServiceAddress;
     @Value("${service.mdInfoServiceAddress}")
     private String mdInfoServiceAddress;
+    @Value("${service.workFlowServiceAddress}")
+    private String workFlowServiceAddress;
     @Value("${service.influxAddr}")
     private String influxAddr;
     @Value("${service.influxDatabase}")
@@ -39,4 +41,21 @@ public class FileConfig {
     private Integer ysMaxCount;
     @Value("${service.ysFlowCheckSeconds}")
     private Integer ysFlowCheckSeconds;
+
+    @Value("${ArtemisConfig.host}")
+    private String hkHost;
+
+    @Value("${ArtemisConfig.appKey}")
+    private String hkAppKey;
+
+    @Value("${ArtemisConfig.appSecret}")
+    private String hkAppSecret;
+
+
+    @Value("${iot.hkProductID}")
+    private Integer hkProductID;
+
+
+    @Value("${iot.ysProductID}")
+    private Integer ysProductID;
 }

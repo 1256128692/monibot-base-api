@@ -46,7 +46,7 @@ public class UploadMonitorGroupImageParam implements ParameterValidator, Resourc
         }
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
 
-        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
         if (tbProjectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前项目不存在");
         }

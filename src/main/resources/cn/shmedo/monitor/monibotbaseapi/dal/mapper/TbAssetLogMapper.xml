@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbAssetLogMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbAssetLog">
+    <!--@mbg.generated-->
+    <!--@Table tb_asset_log-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="HouseID" jdbcType="INTEGER" property="houseID" />
+    <result column="AssetID" jdbcType="INTEGER" property="assetID" />
+    <result column="Value" jdbcType="INTEGER" property="value" />
+    <result column="Comment" jdbcType="VARCHAR" property="comment" />
+    <result column="Time" jdbcType="TIMESTAMP" property="time" />
+    <result column="UserID" jdbcType="INTEGER" property="userID" />
+    <result column="UserName" jdbcType="VARCHAR" property="userName" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, HouseID, AssetID, `Value`, `Comment`, `Time`, UserID, UserName
+  </sql>
+
+  <select id="queryAssetIOLogPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.asset.TbAssetLog4Web">
+select log.*, a.name as assetName, a.vendor as assetVendor, a.type as assetType, a.unit as assetUnit,
+    ah.name as houseName, ah.address as houseAddress, ah.code as houseCode ,    ah.comment as houseComment
+  from tb_asset_log as log
+    left join tb_asset as a on log.AssetID = a.ID
+    left join tb_asset_house as ah on log.HouseID = ah.ID
+  where a.companyID = #{pa.companyID}
+    and ah.companyID = #{pa.companyID}
+    <if test="pa.type !=null">
+      and a.type = #{pa.type}
+    </if>
+    <if test="pa.houseID !=null">
+      and log.houseID = #{pa.houseID}
+    </if>
+    <if test="pa.inOrOut != null">
+      <choose>
+        <when test="pa.inOrOut ">
+          and log.value > 0
+        </when>
+        <otherwise>
+          and log.value &lt; 0
+        </otherwise>
+      </choose>
+    </if>
+    <if test="pa.fuzzyItem != null and pa.fuzzyItem != ''">
+      and (a.name like concat('%', #{pa.fuzzyItem}, '%') or a.vendor like concat('%', #{pa.fuzzyItem}, '%'))
+    </if>
+    <if test="pa.begin !=null">
+      and log.time >= #{pa.begin}
+    </if>
+    <if test="pa.end !=null">
+      and log.time &lt;= #{pa.end}
+    </if>
+    order by log.id desc
+  </select>
+</mapper>

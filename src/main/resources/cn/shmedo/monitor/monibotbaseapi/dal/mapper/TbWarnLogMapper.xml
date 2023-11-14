@@ -40,7 +40,7 @@
 
     <resultMap id="wtWarnDetailMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnDetailInfo">
         <result property="warnID" column="warnID" jdbcType="INTEGER"/>
-        <!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
+        <result property="warnType" column="warnType" jdbcType="INTEGER"/>
         <result property="warnName" column="warnName" jdbcType="VARCHAR"/>
         <result property="warnLevel" column="warnLevel" jdbcType="INTEGER"/>
         <result property="warnTime" column="warnTime" jdbcType="TIMESTAMP"/>
@@ -78,7 +78,7 @@
     <resultMap id="wtTerminalWarnDetaiMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnDetailInfo">
         <result property="warnID" column="warnID" jdbcType="INTEGER"/>
         <result property="warnName" column="warnName" jdbcType="VARCHAR"/>
-        <!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
+<!--        <result property="warnType" column="warnType" jdbcType="INTEGER"/>-->
         <result property="deviceToken" column="deviceToken" jdbcType="VARCHAR"/>
         <result property="warnLevel" column="warnLevel" jdbcType="INTEGER"/>
         <result property="warnContent" column="warnContent" jdbcType="VARCHAR"/>
@@ -105,32 +105,32 @@
 
     <select id="queryMonitorWarnPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT
-        twl.`ID` warnID,
-        twl.WarnType warnType,
-        twl.`Name` warnName,
-        twl.WarnLevel warnLevel,
-        twl.WarnTime warnTime,
-        twl.WarnContent warnContent,
-        tpi.`ID` projectID,
-        tpi.ProjectName projectName,
-        tmi.`ID` monitorItemID,
-        tmi.`Name` monitorItemName,
-        tmp.`ID` monitorPointID,
-        tmp.`Name` monitorPointName,
-        tmt.MonitorType monitorTypeID,
-        tmt.TypeName monitorTypeName,
-        tmt.TypeAlias monitorTypeAlias,
-        two.`ID` workOrderID,
-        two.OrderCode orderCode,
-        two.`Status` orderStatus
+            twl.`ID` warnID,
+            twl.WarnType warnType,
+            twl.`Name` warnName,
+            twl.WarnLevel warnLevel,
+            twl.WarnTime warnTime,
+            twl.WarnContent warnContent,
+            tpi.`ID` projectID,
+            tpi.ProjectName projectName,
+            tmi.`ID` monitorItemID,
+            tmi.`Name` monitorItemName,
+            tmp.`ID` monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmt.MonitorType monitorTypeID,
+            tmt.TypeName monitorTypeName,
+            tmt.TypeAlias monitorTypeAlias,
+            two.`ID` workOrderID,
+            two.OrderCode orderCode,
+            two.`Status` orderStatus
         FROM
-        tb_warn_log twl
-        LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-        LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-        LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-        LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-        LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-        LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log WHERE WarnType = 1 GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
+            tb_warn_log twl
+            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+            LEFT JOIN ( SELECT MAX( WarnTime ) latest_time, MonitorPointID FROM tb_warn_log WHERE WarnType = 1 GROUP BY MonitorPointID ) twl1 ON twl.MonitorPointID = twl1.MonitorPointID
         <where>
             <choose>
                 <when test="param.queryType == null or param.queryType == 2">
@@ -147,7 +147,7 @@
             AND twl.WarnType = 1
             <if test="param.queryCode != null and param.queryCode != ''">
                 AND (twl.`Name` LIKE CONCAT('%', #{param.queryCode}, '%')
-                OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%'))
+                 OR twl.WarnContent LIKE CONCAT('%', #{param.queryCode}, '%'))
             </if>
             <if test="param.monitorTypeID != null">
                 AND twl.monitorType=#{param.monitorTypeID}
@@ -276,13 +276,13 @@
             twa.enable actionEnable,
             twa.desc actionDesc
         FROM `tb_warn_log` twl
-                 LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-                 LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-                 LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-                 LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-                 LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
-                 LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
-                 LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
+            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN tb_work_order two ON twl.WorkOrderID = two.ID
+            LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
         WHERE twl.`ID`=#{warnID}
     </select>
 
@@ -358,32 +358,32 @@
             twr.`Name` ruleName
         FROM
             tb_warn_log twl
-                LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
-                LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
-                LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
-                LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
-                LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
-                LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
+            LEFT JOIN tb_project_info tpi ON twl.ProjectID = tpi.ID
+            LEFT JOIN tb_monitor_item tmi ON twl.MonitorItemID = tmi.ID
+            LEFT JOIN tb_monitor_type tmt ON twl.MonitorType = tmt.MonitorType
+            LEFT JOIN tb_monitor_point tmp ON twl.MonitorPointID = tmp.ID
+            LEFT JOIN tb_warn_trigger twt ON twl.triggerID = twt.ID
+            LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
         WHERE
             twl.WorkOrderID =#{param.workOrderID}
     </select>
 
     <select id="queryTerminalWarnList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtWarnLogInfo">
         SELECT twl.`ID`        warnID,
-        twl.WarnType    warnType,
-        twl.`Name`      warnName,
-        twl.WarnLevel   warnLevel,
-        twl.WarnTime    warnTime,
-        twl.WarnContent warnContent,
-        twl.DeviceToken deviceToken,
-        two.`ID`        workOrderID,
-        two.OrderCode   orderCode,
-        two.`Status`    orderStatus
+               twl.WarnType    warnType,
+               twl.`Name`      warnName,
+               twl.WarnLevel   warnLevel,
+               twl.WarnTime    warnTime,
+               twl.WarnContent warnContent,
+               twl.DeviceToken deviceToken,
+               two.`ID`        workOrderID,
+               two.OrderCode   orderCode,
+               two.`Status`    orderStatus
         FROM `tb_warn_log` twl
-        LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
-        LEFT JOIN (SELECT MAX(WarnTime) latest_time, DeviceToken
-        FROM tb_warn_log  WHERE WarnType = 3 GROUP BY DeviceToken) twl1
-        ON twl.DeviceToken = twl1.DeviceToken
+                 LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
+                 LEFT JOIN (SELECT MAX(WarnTime) latest_time, DeviceToken
+                            FROM tb_warn_log  WHERE WarnType = 3 GROUP BY DeviceToken) twl1
+                           ON twl.DeviceToken = twl1.DeviceToken
         <where>
             <choose>
                 <when test="param.queryType == null or param.queryType == 2">
@@ -423,26 +423,26 @@
 
     <select id="queryTerminalWarnListByUniqueToken" resultMap="terminalWarnLogMap">
         SELECT
-        tpi.`ID` projectID,
-        tpi.ProjectName projectName,
-        tpi.Location regionArea,
-        tmi.`ID` monitorItemID,
-        tmi.`Name` monitorItemName,
-        tmp.`ID` monitorPointID,
-        tmp.`Name` monitorPointName,
-        tmp.GpsLocation monitorPointLocation,
-        tmp.InstallLocation installLocation,
-        tmt.ID monitorTypeID,
-        tmt.TypeName monitorTypeName,
-        tmt.TypeAlias monitorTypeAlias,
-        LEFT(tsds.DataSourceToken,32) uniqueToken
+            tpi.`ID` projectID,
+            tpi.ProjectName projectName,
+            tpi.Location regionArea,
+            tmi.`ID` monitorItemID,
+            tmi.`Name` monitorItemName,
+            tmp.`ID` monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmp.GpsLocation monitorPointLocation,
+            tmp.InstallLocation installLocation,
+            tmt.ID monitorTypeID,
+            tmt.TypeName monitorTypeName,
+            tmt.TypeAlias monitorTypeAlias,
+            LEFT(tsds.DataSourceToken,32) uniqueToken
         FROM
-        `tb_sensor` ts
-        INNER JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
-        INNER JOIN `tb_project_info` tpi ON ts.ProjectID = tpi.ID
-        INNER JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
-        INNER JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
-        INNER JOIN `tb_monitor_item` tmi ON tmp.MonitorItemID = tmi.ID
+            `tb_sensor` ts
+                INNER JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
+                INNER JOIN `tb_project_info` tpi ON ts.ProjectID = tpi.ID
+                INNER JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+                INNER JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
+                INNER JOIN `tb_monitor_item` tmi ON tmp.MonitorItemID = tmi.ID
         <where>
             <foreach collection="uniqueTokens" open="(" close=")" item="item" separator="OR">
                 tsds.DataSourceToken LIKE CONCAT(#{item}, '%')
@@ -484,10 +484,10 @@
             twa.enable       actionEnable,
             twa.desc         actionDesc
         FROM tb_warn_log twl
-                 LEFT JOIN `tb_warn_trigger` twt ON twl.triggerID = twt.ID
-                 LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
-                 LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
-                 LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
+             LEFT JOIN `tb_warn_trigger` twt ON twl.triggerID = twt.ID
+             LEFT JOIN `tb_work_order` two ON twl.WorkOrderID = two.ID
+             LEFT JOIN `tb_warn_rule` twr ON twr.`ID` = twt.`RuleID`
+             LEFT JOIN tb_warn_action twa ON twl.triggerID = twa.triggerID
         WHERE twl.`ID` = #{warnID}
     </select>
 

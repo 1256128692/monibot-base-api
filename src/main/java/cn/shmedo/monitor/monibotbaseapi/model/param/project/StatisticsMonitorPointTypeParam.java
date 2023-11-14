@@ -33,7 +33,8 @@ public class StatisticsMonitorPointTypeParam implements ParameterValidator, Reso
         }
         this.projectIDList = permissionProjectList.stream().toList();
         if (!MonitorQueryType.contains(queryType)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询类型仅仅包含(0:环境监测, 1:安全监测, 2:工情监测 3:防洪调度指挥监测 4:视频监测)");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询类型仅仅包含(0:环境监测, 1:安全监测, " +
+                    "2:工情监测 3:防洪调度指挥监测 4:视频监测 5:水情监测 6:雨晴监测 7:农情监测 8:工情监测)");
         }
         return null;
     }

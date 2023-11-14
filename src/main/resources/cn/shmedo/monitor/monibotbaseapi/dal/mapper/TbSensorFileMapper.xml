@@ -1,240 +1,297 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorFileMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
-    <!--@mbg.generated-->
-    <!--@Table tb_sensor_file-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="SensorID" jdbcType="INTEGER" property="sensorID" />
-    <result column="Time" jdbcType="TIMESTAMP" property="time" />
-    <result column="UploadTime" jdbcType="TIMESTAMP" property="uploadTime" />
-    <result column="FilePath" jdbcType="VARCHAR" property="filePath" />
-    <result column="FileType" jdbcType="VARCHAR" property="fileType" />
-    <result column="FileSize" jdbcType="INTEGER" property="fileSize" />
-    <result column="StorageType" jdbcType="INTEGER" property="storageType" />
-    <result column="S1" jdbcType="VARCHAR" property="s1" />
-    <result column="S2" jdbcType="VARCHAR" property="s2" />
-    <result column="S3" jdbcType="VARCHAR" property="s3" />
-    <result column="S4" jdbcType="VARCHAR" property="s4" />
-    <result column="I1" jdbcType="INTEGER" property="i1" />
-    <result column="I2" jdbcType="INTEGER" property="i2" />
-    <result column="I3" jdbcType="INTEGER" property="i3" />
-    <result column="I4" jdbcType="INTEGER" property="i4" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, SensorID, `Time`, UploadTime, FilePath, FileType, FileSize, StorageType, S1, 
-    S2, S3, S4, I1, I2, I3, I4
-  </sql>
-  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    <!--@mbg.generated-->
-    select 
-    <include refid="Base_Column_List" />
-    from tb_sensor_file
-    where ID = #{ID,jdbcType=INTEGER}
-  </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    <!--@mbg.generated-->
-    delete from tb_sensor_file
-    where ID = #{ID,jdbcType=INTEGER}
-  </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_sensor_file (SensorID, `Time`, UploadTime, 
-      FilePath, FileType, FileSize, 
-      StorageType, S1, S2, 
-      S3, S4, I1, I2, 
-      I3, I4)
-    values (#{sensorID,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, #{uploadTime,jdbcType=TIMESTAMP}, 
-      #{filePath,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR}, #{fileSize,jdbcType=INTEGER}, 
-      #{storageType,jdbcType=INTEGER}, #{s1,jdbcType=VARCHAR}, #{s2,jdbcType=VARCHAR}, 
-      #{s3,jdbcType=VARCHAR}, #{s4,jdbcType=VARCHAR}, #{i1,jdbcType=INTEGER}, #{i2,jdbcType=INTEGER}, 
-      #{i3,jdbcType=INTEGER}, #{i4,jdbcType=INTEGER})
-  </insert>
-  <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_sensor_file
-    <trim prefix="(" suffix=")" suffixOverrides=",">
-      <if test="sensorID != null">
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
+        <!--@mbg.generated-->
+        <!--@Table tb_sensor_file-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="SensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="Time" jdbcType="TIMESTAMP" property="time"/>
+        <result column="UploadTime" jdbcType="TIMESTAMP" property="uploadTime"/>
+        <result column="FilePath" jdbcType="VARCHAR" property="filePath"/>
+        <result column="FileType" jdbcType="VARCHAR" property="fileType"/>
+        <result column="FileSize" jdbcType="INTEGER" property="fileSize"/>
+        <result column="StorageType" jdbcType="INTEGER" property="storageType"/>
+        <result column="S1" jdbcType="VARCHAR" property="s1"/>
+        <result column="S2" jdbcType="VARCHAR" property="s2"/>
+        <result column="S3" jdbcType="VARCHAR" property="s3"/>
+        <result column="S4" jdbcType="VARCHAR" property="s4"/>
+        <result column="I1" jdbcType="INTEGER" property="i1"/>
+        <result column="I2" jdbcType="INTEGER" property="i2"/>
+        <result column="I3" jdbcType="INTEGER" property="i3"/>
+        <result column="I4" jdbcType="INTEGER" property="i4"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
         SensorID,
-      </if>
-      <if test="time != null">
         `Time`,
-      </if>
-      <if test="uploadTime != null">
         UploadTime,
-      </if>
-      <if test="filePath != null">
         FilePath,
-      </if>
-      <if test="fileType != null">
         FileType,
-      </if>
-      <if test="fileSize != null">
         FileSize,
-      </if>
-      <if test="storageType != null">
         StorageType,
-      </if>
-      <if test="s1 != null">
         S1,
-      </if>
-      <if test="s2 != null">
         S2,
-      </if>
-      <if test="s3 != null">
         S3,
-      </if>
-      <if test="s4 != null">
         S4,
-      </if>
-      <if test="i1 != null">
         I1,
-      </if>
-      <if test="i2 != null">
         I2,
-      </if>
-      <if test="i3 != null">
         I3,
-      </if>
-      <if test="i4 != null">
-        I4,
-      </if>
-    </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides=",">
-      <if test="sensorID != null">
-        #{sensorID,jdbcType=INTEGER},
-      </if>
-      <if test="time != null">
-        #{time,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uploadTime != null">
-        #{uploadTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="filePath != null">
-        #{filePath,jdbcType=VARCHAR},
-      </if>
-      <if test="fileType != null">
-        #{fileType,jdbcType=VARCHAR},
-      </if>
-      <if test="fileSize != null">
-        #{fileSize,jdbcType=INTEGER},
-      </if>
-      <if test="storageType != null">
-        #{storageType,jdbcType=INTEGER},
-      </if>
-      <if test="s1 != null">
-        #{s1,jdbcType=VARCHAR},
-      </if>
-      <if test="s2 != null">
-        #{s2,jdbcType=VARCHAR},
-      </if>
-      <if test="s3 != null">
-        #{s3,jdbcType=VARCHAR},
-      </if>
-      <if test="s4 != null">
-        #{s4,jdbcType=VARCHAR},
-      </if>
-      <if test="i1 != null">
-        #{i1,jdbcType=INTEGER},
-      </if>
-      <if test="i2 != null">
-        #{i2,jdbcType=INTEGER},
-      </if>
-      <if test="i3 != null">
-        #{i3,jdbcType=INTEGER},
-      </if>
-      <if test="i4 != null">
-        #{i4,jdbcType=INTEGER},
-      </if>
-    </trim>
-  </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
-    <!--@mbg.generated-->
-    update tb_sensor_file
-    <set>
-      <if test="sensorID != null">
-        SensorID = #{sensorID,jdbcType=INTEGER},
-      </if>
-      <if test="time != null">
-        `Time` = #{time,jdbcType=TIMESTAMP},
-      </if>
-      <if test="uploadTime != null">
-        UploadTime = #{uploadTime,jdbcType=TIMESTAMP},
-      </if>
-      <if test="filePath != null">
-        FilePath = #{filePath,jdbcType=VARCHAR},
-      </if>
-      <if test="fileType != null">
-        FileType = #{fileType,jdbcType=VARCHAR},
-      </if>
-      <if test="fileSize != null">
-        FileSize = #{fileSize,jdbcType=INTEGER},
-      </if>
-      <if test="storageType != null">
-        StorageType = #{storageType,jdbcType=INTEGER},
-      </if>
-      <if test="s1 != null">
-        S1 = #{s1,jdbcType=VARCHAR},
-      </if>
-      <if test="s2 != null">
-        S2 = #{s2,jdbcType=VARCHAR},
-      </if>
-      <if test="s3 != null">
-        S3 = #{s3,jdbcType=VARCHAR},
-      </if>
-      <if test="s4 != null">
-        S4 = #{s4,jdbcType=VARCHAR},
-      </if>
-      <if test="i1 != null">
-        I1 = #{i1,jdbcType=INTEGER},
-      </if>
-      <if test="i2 != null">
-        I2 = #{i2,jdbcType=INTEGER},
-      </if>
-      <if test="i3 != null">
-        I3 = #{i3,jdbcType=INTEGER},
-      </if>
-      <if test="i4 != null">
-        I4 = #{i4,jdbcType=INTEGER},
-      </if>
-    </set>
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
-    <!--@mbg.generated-->
-    update tb_sensor_file
-    set SensorID = #{sensorID,jdbcType=INTEGER},
-      `Time` = #{time,jdbcType=TIMESTAMP},
-      UploadTime = #{uploadTime,jdbcType=TIMESTAMP},
-      FilePath = #{filePath,jdbcType=VARCHAR},
-      FileType = #{fileType,jdbcType=VARCHAR},
-      FileSize = #{fileSize,jdbcType=INTEGER},
-      StorageType = #{storageType,jdbcType=INTEGER},
-      S1 = #{s1,jdbcType=VARCHAR},
-      S2 = #{s2,jdbcType=VARCHAR},
-      S3 = #{s3,jdbcType=VARCHAR},
-      S4 = #{s4,jdbcType=VARCHAR},
-      I1 = #{i1,jdbcType=INTEGER},
-      I2 = #{i2,jdbcType=INTEGER},
-      I3 = #{i3,jdbcType=INTEGER},
-      I4 = #{i4,jdbcType=INTEGER}
-    where ID = #{ID,jdbcType=INTEGER}
-  </update>
+        I4
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        <!--@mbg.generated-->
+        select
+        <include refid="Base_Column_List"/>
+        from tb_sensor_file
+        where ID = #{ID,jdbcType=INTEGER}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        <!--@mbg.generated-->
+        delete
+        from tb_sensor_file
+        where ID = #{ID,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_sensor_file (SensorID, `Time`, UploadTime,
+                                    FilePath, FileType, FileSize,
+                                    StorageType, S1, S2,
+                                    S3, S4, I1, I2,
+                                    I3, I4)
+        values (#{sensorID,jdbcType=INTEGER}, #{time,jdbcType=TIMESTAMP}, #{uploadTime,jdbcType=TIMESTAMP},
+                #{filePath,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR}, #{fileSize,jdbcType=INTEGER},
+                #{storageType,jdbcType=INTEGER}, #{s1,jdbcType=VARCHAR}, #{s2,jdbcType=VARCHAR},
+                #{s3,jdbcType=VARCHAR}, #{s4,jdbcType=VARCHAR}, #{i1,jdbcType=INTEGER}, #{i2,jdbcType=INTEGER},
+                #{i3,jdbcType=INTEGER}, #{i4,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile" useGeneratedKeys="true">
+        <!--@mbg.generated-->
+        insert into tb_sensor_file
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sensorID != null">
+                SensorID,
+            </if>
+            <if test="time != null">
+                `Time`,
+            </if>
+            <if test="uploadTime != null">
+                UploadTime,
+            </if>
+            <if test="filePath != null">
+                FilePath,
+            </if>
+            <if test="fileType != null">
+                FileType,
+            </if>
+            <if test="fileSize != null">
+                FileSize,
+            </if>
+            <if test="storageType != null">
+                StorageType,
+            </if>
+            <if test="s1 != null">
+                S1,
+            </if>
+            <if test="s2 != null">
+                S2,
+            </if>
+            <if test="s3 != null">
+                S3,
+            </if>
+            <if test="s4 != null">
+                S4,
+            </if>
+            <if test="i1 != null">
+                I1,
+            </if>
+            <if test="i2 != null">
+                I2,
+            </if>
+            <if test="i3 != null">
+                I3,
+            </if>
+            <if test="i4 != null">
+                I4,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sensorID != null">
+                #{sensorID,jdbcType=INTEGER},
+            </if>
+            <if test="time != null">
+                #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uploadTime != null">
+                #{uploadTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="filePath != null">
+                #{filePath,jdbcType=VARCHAR},
+            </if>
+            <if test="fileType != null">
+                #{fileType,jdbcType=VARCHAR},
+            </if>
+            <if test="fileSize != null">
+                #{fileSize,jdbcType=INTEGER},
+            </if>
+            <if test="storageType != null">
+                #{storageType,jdbcType=INTEGER},
+            </if>
+            <if test="s1 != null">
+                #{s1,jdbcType=VARCHAR},
+            </if>
+            <if test="s2 != null">
+                #{s2,jdbcType=VARCHAR},
+            </if>
+            <if test="s3 != null">
+                #{s3,jdbcType=VARCHAR},
+            </if>
+            <if test="s4 != null">
+                #{s4,jdbcType=VARCHAR},
+            </if>
+            <if test="i1 != null">
+                #{i1,jdbcType=INTEGER},
+            </if>
+            <if test="i2 != null">
+                #{i2,jdbcType=INTEGER},
+            </if>
+            <if test="i3 != null">
+                #{i3,jdbcType=INTEGER},
+            </if>
+            <if test="i4 != null">
+                #{i4,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
+        <!--@mbg.generated-->
+        update tb_sensor_file
+        <set>
+            <if test="sensorID != null">
+                SensorID = #{sensorID,jdbcType=INTEGER},
+            </if>
+            <if test="time != null">
+                `Time` = #{time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="uploadTime != null">
+                UploadTime = #{uploadTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="filePath != null">
+                FilePath = #{filePath,jdbcType=VARCHAR},
+            </if>
+            <if test="fileType != null">
+                FileType = #{fileType,jdbcType=VARCHAR},
+            </if>
+            <if test="fileSize != null">
+                FileSize = #{fileSize,jdbcType=INTEGER},
+            </if>
+            <if test="storageType != null">
+                StorageType = #{storageType,jdbcType=INTEGER},
+            </if>
+            <if test="s1 != null">
+                S1 = #{s1,jdbcType=VARCHAR},
+            </if>
+            <if test="s2 != null">
+                S2 = #{s2,jdbcType=VARCHAR},
+            </if>
+            <if test="s3 != null">
+                S3 = #{s3,jdbcType=VARCHAR},
+            </if>
+            <if test="s4 != null">
+                S4 = #{s4,jdbcType=VARCHAR},
+            </if>
+            <if test="i1 != null">
+                I1 = #{i1,jdbcType=INTEGER},
+            </if>
+            <if test="i2 != null">
+                I2 = #{i2,jdbcType=INTEGER},
+            </if>
+            <if test="i3 != null">
+                I3 = #{i3,jdbcType=INTEGER},
+            </if>
+            <if test="i4 != null">
+                I4 = #{i4,jdbcType=INTEGER},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbSensorFile">
+        <!--@mbg.generated-->
+        update tb_sensor_file
+        set SensorID    = #{sensorID,jdbcType=INTEGER},
+            `Time`      = #{time,jdbcType=TIMESTAMP},
+            UploadTime  = #{uploadTime,jdbcType=TIMESTAMP},
+            FilePath    = #{filePath,jdbcType=VARCHAR},
+            FileType    = #{fileType,jdbcType=VARCHAR},
+            FileSize    = #{fileSize,jdbcType=INTEGER},
+            StorageType = #{storageType,jdbcType=INTEGER},
+            S1          = #{s1,jdbcType=VARCHAR},
+            S2          = #{s2,jdbcType=VARCHAR},
+            S3          = #{s3,jdbcType=VARCHAR},
+            S4          = #{s4,jdbcType=VARCHAR},
+            I1          = #{i1,jdbcType=INTEGER},
+            I2          = #{i2,jdbcType=INTEGER},
+            I3          = #{i3,jdbcType=INTEGER},
+            I4          = #{i4,jdbcType=INTEGER}
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
 
 
+    <select id="selectListByIDAndTime"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo">
+        select UploadTime,
+               filePath,
+               SensorID
+        from tb_sensor_file
+        where sensorID = #{sensorID,jdbcType=INTEGER}
+        <if test="beginTime != null">
+            AND UploadTime &gt;= #{beginTime}
+        </if>
+        <if test="endTime != null">
+            AND UploadTime &lt;= #{endTime}
+        </if>
+    </select>
 
-  <select id="selectListByIDAndTime"  resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointPictureInfo">
-      select UploadTime,
-             filePath,
-             SensorID
-      from tb_sensor_file
-      where sensorID = #{sensorID,jdbcType=INTEGER}
-      <if test="beginTime != null">
-          AND UploadTime &gt;= #{beginTime}
-      </if>
-      <if test="endTime != null">
-          AND UploadTime &lt;= #{endTime}
-      </if>
-  </select>
+    <select id="queryPageByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo">
+        select ID,
+               UploadTime,
+               filePath,
+               fileType,
+               fileSize,
+               videoDeviceSourceID
+        from tb_sensor_file
+        where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
+        <if test="begin != null">
+            AND UploadTime &gt;= #{begin}
+        </if>
+        <if test="end != null">
+            AND UploadTime &lt;= #{end}
+        </if>
+    </select>
+
+    <select id="selectListBySensorIDAndTime"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoSensorFileInfo">
+        select ID,
+               videoDeviceSourceID,
+               UploadTime,
+               filePath,
+               fileType,
+               fileSize
+        from tb_sensor_file
+        where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
+        <if test="begin != null">
+            AND UploadTime &gt;= #{begin}
+        </if>
+        <if test="end != null">
+            AND UploadTime &lt;= #{end}
+        </if>
+    </select>
+
+    <select id="queryCaptureDate" resultType="java.util.Date">
+        select UploadTime from tb_sensor_file where videoDeviceSourceID = #{videoDeviceSourceID,jdbcType=INTEGER}
+    </select>
 </mapper>

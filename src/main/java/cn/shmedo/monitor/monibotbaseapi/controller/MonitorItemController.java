@@ -252,6 +252,7 @@ public class MonitorItemController {
      * @apiParam (请求参数) {String} [keyword] 模糊检索关键字，支持: 监测项目名称、监测项目别名
      * @apiSuccess (返回结果) {Object[]} list 监测项目列表
      * @apiSuccess (返回结果) {Int} list.id 监测项目ID
+     * @apiSuccess (返回结果) {Int} list.defaultChecked 是否默认选中
      * @apiSuccess (返回结果) {String} list.name 监测项目名称
      * @apiSuccess (返回结果) {String} list.alias 监测项目别名
      * @apiSuccess (返回结果) {Boolean} list.enable 是否开启

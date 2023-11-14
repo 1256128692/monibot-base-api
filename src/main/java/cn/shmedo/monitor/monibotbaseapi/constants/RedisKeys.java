@@ -49,6 +49,20 @@ public class RedisKeys {
      * key:value  带过期时间
      */
     public static final String FILE_PATH_KEY_TEMPLATE = "cn.shmedo.mdnet.fileCache:";
+
+    public static final String COMPANY_ID_KEY = "cn.shmedo.mdauth.companyInfo";
+
+    /**
+     * 工程类型缓存
+     */
+    public static final String PROJECT_TYPE_KEY = "cn.shmedo.mdmbse.projectTypeCache";
+
+    /**
+     * 表单模板缓存
+     */
+    public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";
+
+    public static final String ASSET_HOUSE_KEY = "cn.shmedo.monitor.assetHouse";
 }
 
     

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectServiceRelationMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectServiceRelation">
+    <!--@mbg.generated-->
+    <!--@Table tb_project_service_relation-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="ServiceID" jdbcType="INTEGER" property="serviceID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, ProjectID, ServiceID
+  </sql>
+</mapper>

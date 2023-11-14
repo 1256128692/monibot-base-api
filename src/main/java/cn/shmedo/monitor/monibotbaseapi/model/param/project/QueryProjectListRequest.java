@@ -38,6 +38,9 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
     @NotNull(message = "currentPage不能为空")
     private Integer currentPage;
 
+
+    private Boolean creatTimeAsc;
+
     private String queryCode;
 
     private String projectName;
@@ -51,7 +54,10 @@ public class QueryProjectListRequest implements ParameterValidator, ResourcePerm
 
     private Boolean enable;
 
+    private Boolean isSonLevel;
+
     private List<Byte> platformTypeList;
+    private List<Integer> serviceIDList;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date expiryDate;

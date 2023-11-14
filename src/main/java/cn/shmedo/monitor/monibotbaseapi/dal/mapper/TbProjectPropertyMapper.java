@@ -9,25 +9,16 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface TbProjectPropertyMapper extends BaseMapper<TbProjectProperty> {
-    int deleteByPrimaryKey(Integer ID);
-
-    int insert(TbProjectProperty record);
-
-    int insertSelective(TbProjectProperty record);
-
-    TbProjectProperty selectByPrimaryKey(Integer ID);
-
-    int updateByPrimaryKeySelective(TbProjectProperty record);
-
-    int updateByPrimaryKey(TbProjectProperty record);
-
-    void updateBatch(Integer projectID, List<TbProjectProperty> projectPropertyList);
+    void updateBatch(Integer projectID, List<TbProjectProperty> projectPropertyList, Integer propertySubjectType);
 
     void insertBatch(List<TbProjectProperty> projectPropertyList);
 
     List<String> getPropertyValue(QueryPropertyValueParam param);
 
     List<PropertyDto> queryPropertyByProjectID(@Param("list") List<Integer> list,
-                                               @Param("createType") Integer createType);
-    int deleteProjectPropertyList(List idList);
+                                               @Param("createType") Integer createType,
+                                               @Param("propertySubjectType") Integer propertySubjectType
+    );
+
+    int deleteProjectPropertyList(List idList, Integer propertySubjectType);
 }

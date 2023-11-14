@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -293,6 +294,12 @@ public class SensorController {
      * @apiSuccess (响应结果) {Boolean} data.warnNoData 是否无数据报警
      * @apiSuccess (响应结果) {DateTime} data.monitorBeginTime 监测开始时间
      * @apiSuccess (响应结果) {String} data.imagePath 传感器图片路径
+     * @apiSuccess (响应结果) {Int} [data.videoDeviceID] 视频设备ID
+     * @apiSuccess (响应结果) {Byte} [data.accessPlatform] 视频设备平台类型
+     * @apiSuccess (响应结果) {String} [data.accessPlatformStr] 视频设备平台类型名称
+     * @apiSuccess (响应结果) {String} [data.deviceSerial] 视频设备序列号
+     * @apiSuccess (响应结果) {Int} [data.channelCode] 通道号
+     * @apiSuccess (响应结果) {String} [data.videoDeviceSource] 视频设备来源
      * @apiSuccess (响应结果) {Boolean} [enable] 是否启用, 不启用将不会接收数据
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
      * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID
@@ -527,5 +534,25 @@ public class SensorController {
     @RequestMapping(value = "/QueryAllSensorID", method = RequestMethod.GET, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateSensorStatusAndMonitorBeginTime() {
         return sensorService.queryAllSensorID();
+    }
+
+    /**
+     * @api {POST} /QueryManualSensorListByMonitor 根据监测类型查询工程下所有人工传感器
+     * @apiDescription 根据监测类型查询工程下所有人工传感器
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QueryManualSensorListByMonitor
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {Name} dataList.sensorName 传感器名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryManualSensorListByMonitor", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryManualSensorListByMonitor(@Valid @RequestBody Object param) {
+        return null;
     }
 }

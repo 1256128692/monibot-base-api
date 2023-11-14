@@ -21,16 +21,18 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.TagDto;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.QueryFileInfoRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryNextLevelAndAvailableProjectResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
@@ -46,9 +48,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
@@ -60,7 +60,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -75,7 +77,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbTagMapper tbTagMapper;
     private final TbProjectTypeMapper tbProjectTypeMapper;
     private final TbTagRelationMapper tbTagRelationMapper;
-    private final TbPropertyMapper tbPropertyMapper;
     private final TbProjectPropertyMapper tbProjectPropertyMapper;
     private final FileConfig fileConfig;
     private final PropertyService propertyService;
@@ -85,6 +86,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbMonitorItemMapper tbMonitorItemMapper;
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
+    private final TbProjectRelationMapper tbProjectRelationMapper;
+    private final TbDocumentFileMapper tbDocumentFileMapper;
+    private final TbProjectServiceRelationMapper tbProjectServiceRelationMapper;
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -94,7 +98,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addProject(AddProjectParam pa, Integer userID) {
+    public Integer addProject(AddProjectParam pa, Integer userID) {
         String imgPath = "";
         if (StringUtils.isNotBlank(pa.getImageContent()) && StringUtils.isNotBlank(pa.getImageSuffix())) {
             imgPath = handlerImagePath(pa.getImageContent(), pa.getImageSuffix(), userID, null, pa.getCompanyID());
@@ -110,9 +114,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectProperty> projectPropertyList = pa.getProperties().stream().map(
                 item -> {
                     TbProjectProperty tbProjectProperty = new TbProjectProperty();
-                    tbProjectProperty.setProjectID(tbProjectInfo.getID());
+                    tbProjectProperty.setProjectID(Long.valueOf(tbProjectInfo.getID()));
                     tbProjectProperty.setPropertyID(item.getID());
                     tbProjectProperty.setValue(PropertyIDAndValueMap.get(item.getID()));
+                    tbProjectProperty.setSubjectType(PropertySubjectType.Project.getType());
                     return tbProjectProperty;
                 }
         ).collect(Collectors.toList());
@@ -157,7 +162,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             });
             tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
             // 根据监测项目处理监测类别
-            List<Byte> monitorClassList = pa.getMonitorItems().stream().map(TbMonitorItem::getMonitorClass).filter(Objects::nonNull).toList();
+            List<Byte> monitorClassList = pa.getMonitorItems().stream().map(TbMonitorItem::getMonitorClass).filter(Objects::nonNull).distinct().toList();
             if (CollectionUtils.isNotEmpty(monitorClassList)) {
                 List<TbProjectMonitorClass> tempList = monitorClassList.stream().map(e -> {
                     TbProjectMonitorClass obj = new TbProjectMonitorClass();
@@ -172,6 +177,13 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
 
         }
+        // 处理和服务的关系
+        tbProjectServiceRelationMapper.insertBatchSomeColumn(
+                pa.getServiceIDList().stream().map(sid ->
+                        TbProjectServiceRelation.builder()
+                                .projectID(tbProjectInfo.getID()).serviceID(sid).build()
+                ).toList()
+        );
 
         // 新增项目权限
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
@@ -193,6 +205,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+
+
+        return tbProjectInfo.getID();
     }
 
     private String handlerImagePath(String imageContent, String imageSuffix, Integer userID, String fileName,
@@ -277,7 +292,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public void deleteProjectList(ProjectIDListParam param) {
         tbProjectInfoMapper.deleteProjectInfoList(param.getDataIDList());
         tbTagRelationMapper.deleteProjectTagList(param.getDataIDList());
-        tbProjectPropertyMapper.deleteProjectPropertyList(param.getDataIDList());
+        tbProjectPropertyMapper.deleteProjectPropertyList(param.getDataIDList(), PropertySubjectType.Project.getType());
         //TODO:删除关联信息以及水利平台相关关联信息
 
         // 删除项目权限,区分水利项目与其他业务项目
@@ -304,16 +319,28 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+        // 删除项目关系
+        tbProjectRelationMapper.delete(new LambdaQueryWrapper<TbProjectRelation>()
+                .in(TbProjectRelation::getUpLevelID, param.getDataIDList())
+                .or()
+                .in(TbProjectRelation::getDownLevelID, param.getDataIDList())
+        );
+
+        // 删除工程项目下资料文件
+        tbDocumentFileMapper.delete(new QueryWrapper<TbDocumentFile>().lambda()
+                .eq(TbDocumentFile::getSubjectType, DocumentSubjectType.PROJECT.getCode())
+                .in(TbDocumentFile::getSubjectID, param.getDataIDList()));
+        tbProjectInfoMapper.updateLevel2Unallocated();
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateProject(UpdateProjectParameter pa, Integer userID) {
         TbProjectInfo projectInfo = pa.buildProject(userID);
-        tbProjectInfoMapper.updateByPrimaryKey(projectInfo);
+        tbProjectInfoMapper.updateById(projectInfo);
         if (!CollectionUtil.isEmpty(pa.getPropertyDataList())) {
             List<TbProjectProperty> projectProperties = pa.buildPropertyDataList();
-            tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties);
+            tbProjectPropertyMapper.updateBatch(pa.getProjectID(), projectProperties, PropertySubjectType.Project.getType());
         }
         //处理标签
         List<Integer> tagID4DBList = new ArrayList<>();
@@ -344,7 +371,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         }
         PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
         List<ResourceItemV3> resourceItemV3s = new LinkedList<ResourceItemV3>();
-
+        // 处理服务
+        if (ObjectUtil.isNotEmpty(pa.getServiceIDList())) {
+            tbProjectServiceRelationMapper.delete(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>()
+                            .eq(TbProjectServiceRelation::getProjectID, pa.getProjectID())
+            );
+            tbProjectServiceRelationMapper.insertBatchSomeColumn(
+                    pa.getServiceIDList().stream().map(sid ->
+                            TbProjectServiceRelation.builder()
+                                    .projectID(pa.getProjectID()).serviceID(sid).build()
+                    ).toList()
+            );
+        }
         // 更新成功后,并且修改项目资源的描述
         if (projectInfo != null) {
             resourceItemV3s.add(new ResourceItemV3(DefaultConstant.AUTH_RESOURSE, projectInfo.getID().toString(), projectInfo.getProjectName()));
@@ -382,31 +421,174 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (pa.getProjectIDList().isEmpty()) {
             return PageUtil.Page.empty();
         }
-        IPage<ProjectInfo> pageData = tbProjectInfoMapper.getProjectList(new Page<>(pa.getCurrentPage(), pa.getPageSize()), pa);
-        if (!pageData.getRecords().isEmpty()) {
-            List<Integer> ids = pageData.getRecords().stream().map(TbProjectInfo::getID).toList();
+        List<ProjectInfo> allList = tbProjectInfoMapper.getProjectList(pa);
+        // 进行分层处理
+        // 获取公司下项目的级联关系
+        List<TbProjectRelation> relationList = tbProjectRelationMapper.queryByCompanyID(pa.getCompanyID());
+        List<ProjectInfo> oneList =
+                allList.stream().filter(
+                        e -> {
+                            if (e.getLevel().equals(ProjectLevel.One.getLevel()) || e.getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+                                return true;
+                            }
+                            if (e.getLevel().equals(ProjectLevel.Two.getLevel()) && relationList.stream().noneMatch(item -> item.getDownLevelID().equals(e.getID()))) {
+                                return true;
+                            }
+                            if (e.getLevel().equals(ProjectLevel.Son.getLevel()) && relationList.stream().noneMatch(item -> item.getDownLevelID().equals(e.getID()))) {
+                                return true;
+                            }
+                            return false;
+                        }
+                ).toList();
+        // 需要重写equals方法,仅根据id判断
+        List<ProjectInfo> finalOneList = oneList;
+        allList = allList.stream().filter(e -> !finalOneList.contains(e)).toList();
+        List<ProjectInfo> twoList = allList.stream().filter(e -> e.getLevel().equals(ProjectLevel.Two.getLevel())).toList();
+        List<ProjectInfo> threeList = allList.stream().filter(e -> e.getLevel().equals(ProjectLevel.Son.getLevel())).toList();
+        // 进行填充
+        // 先从下往上填充
+        List<ProjectInfo> finalThreeList = threeList;
+        List<Integer> temTwoIDList = new ArrayList<>(relationList.stream().filter(
+                e -> finalThreeList.stream().anyMatch(item -> item.getID().equals(e.getDownLevelID()))
+        ).map(TbProjectRelation::getUpLevelID).toList());
+        temTwoIDList.addAll(twoList.stream().map(TbProjectInfo::getID).toList());
+        temTwoIDList = new ArrayList<>(temTwoIDList.stream().distinct().toList());
+
+        List<Integer> finalTemTwoIDList = temTwoIDList;
+        List<Integer> temOneIDList = new ArrayList<>(relationList.stream().filter(
+                e -> finalTemTwoIDList.stream().anyMatch(item -> item.equals(e.getDownLevelID()))
+        ).map(TbProjectRelation::getUpLevelID).toList());
+        temOneIDList.addAll(oneList.stream().map(TbProjectInfo::getID).toList());
+        if (temOneIDList.isEmpty()) {
+            return PageUtil.Page.empty();
+        }
+        // 过滤
+        oneList = tbProjectInfoMapper.selectBatchIds(temOneIDList)
+                .stream().map(e ->
+                        BeanUtil.copyProperties(e, ProjectInfo.class)
+                ).toList();
+        if (pa.getIsSonLevel() != null) {
+            oneList = oneList.stream().filter(e ->
+                    pa.getIsSonLevel() == e.getLevel().equals(ProjectLevel.Son.getLevel())
+
+            ).toList();
+        }
+        // 再从上往下填充
+        List<ProjectInfo> finalOneList1 = oneList;
+        List<Integer> tttow = relationList.stream().filter(
+                e -> finalOneList1.stream().anyMatch(item -> item.getID().equals(e.getUpLevelID()))
+        ).map(TbProjectRelation::getDownLevelID).toList();
+        temTwoIDList.addAll(tttow);
+        twoList = ObjectUtil.isEmpty(temTwoIDList) ? new ArrayList<>() : tbProjectInfoMapper.selectBatchIds(temTwoIDList)
+                .stream().map(e ->
+                        BeanUtil.copyProperties(e, ProjectInfo.class)
+                ).toList();
+
+
+        List<ProjectInfo> finalTwoList = twoList;
+        List<Integer> ttthree = new ArrayList<>(relationList.stream().filter(
+                e -> finalTwoList.stream().anyMatch(item -> item.getID().equals(e.getUpLevelID()))
+        ).map(TbProjectRelation::getDownLevelID).toList());
+        ttthree.addAll(threeList.stream().map(TbProjectInfo::getID).toList());
+        threeList = ObjectUtil.isEmpty(ttthree) ? new ArrayList<>() : tbProjectInfoMapper.selectBatchIds(ttthree)
+                .stream().map(e ->
+                        BeanUtil.copyProperties(e, ProjectInfo.class)
+                ).toList();
+        oneList = new ArrayList<>(oneList);
+        twoList = new ArrayList<>(twoList);
+        threeList = new ArrayList<>(threeList);
+        // 分页及填充downLevelProjectList
+        Comparator<ProjectInfo> comparator = Comparator.comparing(ProjectInfo::getCreateTime);
+        if (pa.getCreatTimeAsc() != null && pa.getCreatTimeAsc()) {
+        } else {
+            comparator = comparator.reversed();
+        }
+        oneList.sort(comparator);
+        twoList.sort(comparator);
+        threeList.sort(comparator);
+        PageUtil.Page<ProjectInfo> pageData = PageUtil.page(oneList, pa.getPageSize(), pa.getCurrentPage());
+        List<ProjectInfo> finalThreeList1 = threeList;
+        Set<Integer> pidAllSet = new HashSet<>();
+        Set<Integer> companyIDAllSet = new HashSet<>();
+        Set<String> locationInfoSet = new HashSet<>();
+        List<ProjectInfo> finalTwoList2 = twoList;
+        pageData.currentPageData().forEach(item -> {
+            pidAllSet.add(item.getID());
+            companyIDAllSet.add(item.getCompanyID());
+            locationInfoSet.add(item.getLocationInfo());
+            List<Integer> list = relationList.stream().filter(e -> e.getUpLevelID().equals(item.getID())).map(TbProjectRelation::getDownLevelID).toList();
+            item.setDownLevelProjectList(finalTwoList2.stream().filter(e -> list.contains(e.getID()))
+                    .toList());
+            pidAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getID).toList());
+            companyIDAllSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getCompanyID).toList());
+            locationInfoSet.addAll(item.getDownLevelProjectList().stream().map(ProjectInfo::getLocationInfo).toList());
+            if (ObjectUtil.isNotEmpty(item.getDownLevelProjectList())) {
+                item.getDownLevelProjectList().forEach(
+                        e -> {
+                            List<Integer> list1 = relationList.stream().filter(ee -> ee.getUpLevelID().equals(e.getID())).map(TbProjectRelation::getDownLevelID).toList();
+                            e.setDownLevelProjectList(finalThreeList1.stream().filter(ee -> list1.contains(ee.getID())).toList());
+                            pidAllSet.addAll(e.getDownLevelProjectList().stream().map(ProjectInfo::getID).toList());
+                            companyIDAllSet.addAll(e.getDownLevelProjectList().stream().map(ProjectInfo::getCompanyID).toList());
+                            locationInfoSet.addAll(e.getDownLevelProjectList().stream().map(ProjectInfo::getLocationInfo).toList());
+                        }
+                );
+            }
+        });
+        if (!pageData.currentPageData().isEmpty()) {
             //标签
-            Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(ids).stream()
+            Map<Integer, List<TagDto>> tagGroup = tbTagMapper.queryTagByProjectID(new ArrayList<>(pidAllSet)).stream()
                     .collect(Collectors.groupingBy(TagDto::getProjectID));
             //属性
             Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
-                    .queryPropertyByProjectID(ids, 0).stream()
+                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), null, PropertySubjectType.Project.getType()).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
             //行政区划
-            Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, pageData.getRecords()
-                            .stream().map(ProjectInfo::getLocationInfo).filter(Objects::nonNull)
+            Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, locationInfoSet.stream().filter(Objects::nonNull)
                             .collect(Collectors.toSet()), RegionArea.class)
                     .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
             //公司信息
-            Map<Integer, Company> companyMap = iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, pageData.getRecords()
-                            .stream().map(s -> s.getCompanyID().toString()).collect(Collectors.toSet()), Company.class)
+            Map<Integer, Company> companyMap = iotRedisService.multiGet(RedisKeys.IOT_COMPANY_INFO_KEY, new ArrayList<>(companyIDAllSet.stream().map(String::valueOf).toList()), Company.class)
                     .stream().collect(Collectors.toMap(Company::getId, e -> e));
             //图片 TODO 任意文件不存在会返回null，故无法批量获取
 //            Map<String, String> imgMap = fileService.getFileUrlList(pageData.getRecords().stream().map(ProjectInfo::getImagePath)
 //                            .filter(StrUtil::isNotEmpty).collect(Collectors.toList()), pa.getCompanyID())
 //                    .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
 
-            pageData.getRecords().forEach(item -> {
+            Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+            Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+            ;
+            temp.forEach((key, value) -> {
+                serviceMap.put(Integer.valueOf(key), value);
+            });
+            // 获取全部的项目ID
+            List<Integer> pidList = new ArrayList<>();
+            pageData.currentPageData().forEach(
+                    e -> {
+                        pidList.add(e.getID());
+                        if (ObjectUtil.isNotEmpty(e.getDownLevelProjectList())) {
+                            e.getDownLevelProjectList().forEach(
+                                    ee -> {
+                                        pidList.add(ee.getID());
+                                        if (ObjectUtil.isNotEmpty(ee.getDownLevelProjectList())) {
+                                            ee.getDownLevelProjectList().forEach(
+                                                    eee -> {
+                                                        pidList.add(eee.getID());
+                                                    }
+                                            );
+                                        }
+                                    }
+                            );
+                        }
+                    }
+            );
+            List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>()
+                            .in(TbProjectServiceRelation::getProjectID, pidList)
+            );
+            Map<Integer, List<Integer>> pidServiceListMap = tbProjectServiceRelations.stream().collect(
+                    Collectors.groupingBy(TbProjectServiceRelation::getProjectID,
+                            Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())));
+            pageData.currentPageData().forEach(item -> {
                 item.setTagInfo(tagGroup.getOrDefault(item.getID(), List.of()));
                 item.setPropertyList(propMap.getOrDefault(item.getID(), List.of()));
                 item.setCompany(companyMap.get(item.getCompanyID()));
@@ -415,9 +597,59 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     item.setImagePath(fileService.getFileUrl(item.getImagePath()));
                 });
 //                item.setImagePath(imgMap.getOrDefault(item.getImagePath(), null));
+
+                // 处理服务
+                if (pidServiceListMap.containsKey(item.getID())) {
+                    item.setServiceList(
+                            pidServiceListMap.get(item.getID()).stream().map(
+                                    serviceMap::get
+                            ).toList()
+                    );
+                }
+                if (ObjectUtil.isNotEmpty(item.getDownLevelProjectList())) {
+                    item.getDownLevelProjectList().forEach(
+                            e -> {
+                                if (pidServiceListMap.containsKey(e.getID())) {
+                                    e.setServiceList(
+                                            pidServiceListMap.get(e.getID()).stream().map(
+                                                    serviceMap::get
+                                            ).toList()
+                                    );
+                                }
+                                if (ObjectUtil.isNotEmpty(e.getDownLevelProjectList())) {
+                                    e.getDownLevelProjectList().forEach(
+                                            ee -> {
+                                                if (pidServiceListMap.containsKey(ee.getID())) {
+                                                    ee.setServiceList(
+                                                            pidServiceListMap.get(ee.getID()).stream().map(
+                                                                    serviceMap::get
+                                                            ).toList()
+                                                    );
+                                                }
+                                            }
+                                    );
+                                }
+                            }
+                    );
+
+                    if (ObjectUtil.isNotEmpty(item.getDownLevelProjectList())) {
+                        item.getDownLevelProjectList().forEach(
+                                ee -> {
+                                    if (pidServiceListMap.containsKey(ee.getID())) {
+                                        ee.setServiceList(
+                                                pidServiceListMap.get(ee.getID()).stream().map(
+                                                        serviceMap::get
+                                                ).toList()
+                                        );
+                                    }
+                                }
+                        );
+                    }
+                }
+
             });
         }
-        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+        return pageData;
     }
 
     @Override
@@ -429,13 +661,61 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ProjectInfo result = new ProjectInfo();
         BeanUtil.copyProperties(projectInfo, result);
         result.setTagInfo(tbTagMapper.queryTagByProjectID(List.of(pa.getID())));
-        result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null));
+        result.setPropertyList(tbProjectPropertyMapper.queryPropertyByProjectID(List.of(pa.getID()), null, PropertySubjectType.Project.getType()));
         if (StrUtil.isNotEmpty(result.getLocationInfo())) {
             RegionArea area = monitorRedisService.get(RedisKeys.REGION_AREA_KEY, result.getLocationInfo(), RegionArea.class);
             result.setLocationInfo(area != null ? area.getName() : StrUtil.EMPTY);
         }
 
         handlerImagePathToRealPath(result);
+        List<Integer> serviceIDList = tbProjectServiceRelationMapper.selectList(
+                new LambdaQueryWrapper<TbProjectServiceRelation>().eq(TbProjectServiceRelation::getProjectID, pa.getID())
+        ).stream().map(TbProjectServiceRelation::getServiceID).toList();
+        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+        ;
+        temp.forEach((key, value) -> {
+            serviceMap.put(Integer.valueOf(key), value);
+        });
+        ;
+        result.setServiceList(
+                serviceIDList.stream().map(
+                        serviceMap::get
+                ).toList()
+        );
+        // 处理为文件或者图片的属性
+        result.getPropertyList().forEach(e -> {
+            if (FormPropertyType.FILE.getCode().equals(e.getType().intValue())
+                    || FormPropertyType.PICTURE.getCode().equals(e.getType().intValue())) {
+                if (StrUtil.isNotEmpty(e.getValue())) {
+                    e.setOssList(
+                            Arrays.stream(e.getValue().split(",")).toList()
+                    );
+                }
+
+            }
+        });
+        List<String> ossAllList = result.getPropertyList().stream()
+                .filter(e -> ObjectUtil.isNotEmpty(e.getOssList()))
+                .flatMap(
+                e -> e.getOssList().stream()
+        ).toList();
+        if (ObjectUtil.isNotEmpty(ossAllList)) {
+            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(ossAllList, result.getCompanyID());
+            Map<String, FileInfoResponse> fileMap = fileUrlList.stream().collect(Collectors.toMap(
+                    FileInfoResponse::getFilePath, Function.identity()
+            ));
+            result.getPropertyList().forEach(
+                    e -> {
+                        if (ObjectUtil.isNotEmpty(e.getOssList())) {
+                            e.setFileList(
+                                    e.getOssList().stream().map(
+                                            fileMap::get
+                                    ).toList());
+                        }
+                    }
+            );
+        }
         return result;
     }
 
@@ -452,8 +732,18 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (pa.getProjectType() != null) {
             wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
         }
-        if (pa.getPlatformType() != null) {
-            wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformType().intValue());
+        if (ObjectUtil.isNotEmpty(pa.getProjectTypeList())) {
+            wrapper.in(TbProjectInfo::getProjectType, pa.getProjectTypeList());
+        }
+        if (ObjectUtil.isNotEmpty(pa.getServiceIDList())) {
+            List<TbProjectServiceRelation> temp = tbProjectServiceRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectServiceRelation>().in(TbProjectServiceRelation::getServiceID, pa.getServiceIDList())
+            );
+            if (ObjectUtil.isNotEmpty(temp)) {
+                wrapper.in(TbProjectInfo::getID, temp.stream().map(TbProjectServiceRelation::getProjectID).toList());
+            } else {
+                return Collections.emptyList();
+            }
         }
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
@@ -550,7 +840,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //属性字典
         Map<Integer, Map<String, String>> propMap = idSet.isEmpty() ?
                 Collections.emptyMap() :
-                tbProjectPropertyMapper.queryPropertyByProjectID(idSet, CreateType.PREDEFINED.getType().intValue())
+                tbProjectPropertyMapper.queryPropertyByProjectID(idSet, CreateType.PREDEFINED.getType().intValue(), PropertySubjectType.Project.getType())
                         .stream().collect(Collectors.groupingBy(PropertyDto::getProjectID,
                                 Collectors.toMap(PropertyDto::getName, e -> StrUtil.nullToEmpty(e.getValue()), (v1, v2) -> v1)));
         //位置字典
@@ -618,5 +908,116 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                         .eq(TbProjectInfo::getProjectName, pa.getProjectName())
         ) == 0
                 ;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void setProjectRelation(SetProjectRelationParam pa, Integer subjectID) {
+        tbProjectRelationMapper.delete(
+                new LambdaQueryWrapper<TbProjectRelation>(
+                ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+        );
+        tbProjectRelationMapper.insertBatch(
+                pa.getProjectID(), pa.getNextLevelPIDList(), pa.getRaltionType()
+        );
+        // 下一级的level
+        Byte nextLevel = pa.getRaltionType().equals(ProjectLevel.One.getLevel()) ? ProjectLevel.Two.getLevel() : ProjectLevel.Son.getLevel();
+        Date now = new Date();
+        // 更新下一级项目的level
+        tbProjectInfoMapper.updateLevel(nextLevel, pa.getNextLevelPIDList(), subjectID, now);
+        // 更新当前项目的level
+        tbProjectInfoMapper.updateLevel(pa.getRaltionType(), List.of(pa.getProjectID()), subjectID, now);
+    }
+
+    @Override
+    public QueryNextLevelAndAvailableProjectResult queryNextLevelProjectAndCanUsed(QueryNextLevelAndAvailableProjectParam pa) {
+        List<TbProjectInfo> nextLevelProjectList = new ArrayList<>();
+        /**
+         * key: 下级项目id
+         * value: 下下级项目列表
+         */
+        Map<Integer, List<TbProjectInfo>> nnMap = new HashMap<>();
+        if (!pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+            List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectRelation>(
+                    ).eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+            );
+            List<Integer> nextLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
+            if (ObjectUtil.isNotEmpty(nextLevelProjectIDList)) {
+                nextLevelProjectList = tbProjectInfoMapper.selectBatchIds(nextLevelProjectIDList);
+            }
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel()) && ObjectUtil.isNotEmpty(nextLevelProjectList)) {
+            // 获取下下级
+            List<TbProjectRelation> temp = tbProjectRelationMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectRelation>(
+                    ).in(TbProjectRelation::getUpLevelID, nextLevelProjectList.stream().map(TbProjectInfo::getID).toList()));
+            List<Integer> nnLevelProjectIDList = temp.stream().map(TbProjectRelation::getDownLevelID).toList();
+            if (ObjectUtil.isNotEmpty(nnLevelProjectIDList)) {
+                List<TbProjectInfo> nnLevelProjectList = tbProjectInfoMapper.selectBatchIds(nnLevelProjectIDList);
+                Map<Integer, List<Integer>> collect = temp.stream().collect(Collectors.groupingBy(TbProjectRelation::getUpLevelID, Collectors.mapping(TbProjectRelation::getDownLevelID, Collectors.toList())));
+                collect.forEach((k, v) -> {
+                    List<TbProjectInfo> collect1 = nnLevelProjectList.stream().filter(e -> v.contains(e.getID())).collect(Collectors.toList());
+                    nnMap.put(k, collect1);
+                });
+            }
+        }
+        LambdaQueryWrapper<TbProjectInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.eq(TbProjectInfo::getCompanyID, pa.getCompanyID());
+        if (ObjectUtil.isNotEmpty(nextLevelProjectList)) {
+            lambdaQueryWrapper.notIn(TbProjectInfo::getID, nextLevelProjectList.stream().map(TbProjectInfo::getID).toList());
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.One.getLevel())) {
+            lambdaQueryWrapper.and(e ->
+                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Two.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
+            );
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Two.getLevel())) {
+            lambdaQueryWrapper.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel());
+        }
+        if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
+            lambdaQueryWrapper.and(e ->
+                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Two.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel())
+                            .or()
+                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
+            );
+            lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
+        }
+        List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
+        List<Integer> projectIDList = new ArrayList<>(Stream.of(nextLevelProjectList, canUsedProjctList)
+                .flatMap(List::stream)
+                .map(TbProjectInfo::getID)
+                .toList());
+        projectIDList.addAll(nnMap.values().stream().flatMap(List::stream).map(TbProjectInfo::getID).toList());
+        List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
+                new LambdaQueryWrapper<TbProjectServiceRelation>()
+                        .in(TbProjectServiceRelation::getProjectID, projectIDList)
+        );
+        Map<Integer, List<Integer>> pidServiceIDListMap = tbProjectServiceRelations.stream().collect(Collectors.groupingBy(
+                TbProjectServiceRelation::getProjectID,
+                Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())
+        ));
+        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+        temp.forEach((key, value) -> {
+            serviceMap.put(Integer.valueOf(key), value);
+        });
+        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap, pidServiceIDListMap, serviceMap);
+    }
+
+    @Override
+    @Transactional
+    public void removeProjectRelation(RemoveProjectRelationParam pa, Integer subjectID) {
+        tbProjectRelationMapper.delete(
+                new LambdaQueryWrapper<TbProjectRelation>()
+                        .eq(TbProjectRelation::getUpLevelID, pa.getProjectID())
+                        .in(TbProjectRelation::getDownLevelID, pa.getNextLevelPIDList())
+        );
+        // 将没有绑定关系的项目设置为未分配
+        tbProjectInfoMapper.updateLevel2Unallocatedwhennorealtion();
     }
 }

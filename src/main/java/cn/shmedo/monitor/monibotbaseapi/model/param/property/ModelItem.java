@@ -1,15 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.property;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.ToString;
 
 /**
  * @program: monibot-base-api
  * @author: gaoxu
  * @create: 2023-02-24 13:34
  **/
+@ToString
 public class ModelItem {
+    @JsonProperty("ID")
+    private Integer ID;
+    private Integer groupID;
+    private Integer ModelID;
     @NotBlank
     @Size(max = 20)
     private String name;
@@ -21,9 +28,33 @@ public class ModelItem {
     private String enumField;
     private Boolean multiSelect;
     private String className;
+    private Integer createType;
     private Integer displayOrder;
     private String exValue;
 
+    public Integer getID() {
+        return ID;
+    }
+
+    public void setID(Integer ID) {
+        this.ID = ID;
+    }
+
+    public Integer getGroupID() {
+        return groupID;
+    }
+
+    public void setGroupID(Integer groupID) {
+        this.groupID = groupID;
+    }
+
+    public Integer getModelID() {
+        return ModelID;
+    }
+
+    public void setModelID(Integer modelID) {
+        ModelID = modelID;
+    }
 
     public String getName() {
         return name;
@@ -81,6 +112,14 @@ public class ModelItem {
         this.className = className;
     }
 
+    public Integer getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(Integer createType) {
+        this.createType = createType;
+    }
+
     public Integer getDisplayOrder() {
         return displayOrder;
     }
@@ -97,18 +136,4 @@ public class ModelItem {
         this.exValue = exValue;
     }
 
-    @Override
-    public String toString() {
-        return "ModelItem{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                ", unit='" + unit + '\'' +
-                ", required=" + required +
-                ", enumField='" + enumField + '\'' +
-                ", multiSelect=" + multiSelect +
-                ", className='" + className + '\'' +
-                ", displayOrder=" + displayOrder +
-                ", exValue='" + exValue + '\'' +
-                '}';
-    }
 }

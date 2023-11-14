@@ -139,5 +139,19 @@ public class TbSensor implements Serializable {
      */
     private Integer updateUserID;
 
+
+    /**
+     * 视频设备ID
+     */
+    private Integer videoDeviceID;
+
+
+    /**
+     * 视频设备通道号
+     */
+    private Integer channelCode;
+
+    private Integer videoDeviceSourceID;
+
     private static final long serialVersionUID = 1L;
 }

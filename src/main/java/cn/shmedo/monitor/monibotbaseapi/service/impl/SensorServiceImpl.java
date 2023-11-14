@@ -31,6 +31,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
@@ -83,6 +84,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     private RedisService monitorRedisService;
     @Resource
     private FileService fileService;
+
+    @Resource
+    private TbVideoDeviceMapper videoDeviceMapper;
+
+    @Resource
+    private TbVideoDeviceSourceMapper videoDeviceSourceMapper;
 
 
     @Override
@@ -203,7 +210,16 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         TbSensor sensor = baseMapper.selectById(request.getSensorID());
         Assert.notNull(sensor, "传感器不存在");
 
-        SensorInfoResponse response = SensorInfoResponse.valueOf(sensor);
+        VideoDeviceInfoV5 videoDevice = null;
+        if (sensor.getVideoDeviceSourceID() != null) {
+            videoDevice = videoDeviceMapper.selectByVideoDeviceSourceID(sensor.getVideoDeviceSourceID());
+            TbVideoDeviceSource videoDeviceSource = videoDeviceSourceMapper.selectByPrimaryKey(sensor.getVideoDeviceSourceID());
+            if (videoDeviceSource != null) {
+                videoDevice.setChannelCode(videoDeviceSource.getChannelNo());
+            }
+        }
+
+        SensorInfoResponse response = SensorInfoResponse.valueOf(sensor, videoDevice);
         //图片
         response.setImagePath(fileService.getFileUrl(sensor.getImagePath()));
         //扩展配置

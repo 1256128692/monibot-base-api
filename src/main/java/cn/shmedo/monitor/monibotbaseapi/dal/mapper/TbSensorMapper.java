@@ -3,9 +3,12 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
@@ -56,4 +59,20 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorHistoryAvgDataResponse> selectListByMonitorPointIDsAndProjectIDs(List<Integer> monitorPointIDList, List<Integer> projectIDList);
 
     List<SensorHistoryAvgDataResponse> selectListBySensorIDsAndProjectIDs(List<Integer> sensorIDList, List<Integer> projectIDList);
+
+    List<VideoCaptureBaseInfo> queryListByCondition(List<Integer> videoIDList);
+
+    List<VideoCaptureBaseInfo> queryListByDeviceSerialList(List<String> deviceSerialList);
+
+    Integer queryMaxDisplayOrderByMonitorType(Integer key);
+
+    void insertSensorList(List<SensorBaseInfoV1> insertSensorList);
+
+    void updateSensorList(List<SensorBaseInfoV1> updateSensorList);
+
+    List<SensorBaseInfoV1> selectListByNameAndProjectID(List<String> sensorNameList, Integer projectID);
+
+    List<VideoDeviceInfoV6> selectListByDeviceSerialList(List<String> deviceSerialList);
+
+    void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
 }

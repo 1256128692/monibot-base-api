@@ -170,7 +170,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
-        Map<Integer, TbProjectInfo> projectInfoMap = pa.getProjectInfos().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectAll().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         if (pa.getMonitorItemID() != null) {
             allData = allData.stream().filter(
                     item -> {
@@ -274,6 +274,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
             return new PageUtil.PageWithMap<>(0, Collections.emptyList(), 0, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
         }
         allData = allData.stream().sorted(Comparator.comparingInt(SimpleDeviceV5::getDeviceID).reversed()).toList();
+        // 计算在线数量
+        long onlineCount = allData.stream().filter(e -> e.getOnlineStatus() != null && e.getOnlineStatus()).count();
         PageUtil.Page<SimpleDeviceV5> page = PageUtil.page(allData, pa.getPageSize(), pa.getCurrentPage());
         page.currentPageData().forEach(
                 item -> {
@@ -294,12 +296,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .deviceID(item.getDeviceID())
                     .build();
             device4Web.setProjectList(
-                    item.getProjectIDList().stream().map(
+                    item.getProjectIDList().stream().filter(projectInfoMap::containsKey).map(
                             projectID -> {
                                 TbProjectInfo tbProjectInfo = projectInfoMap.get(projectID);
-                                if (tbProjectInfo == null) {
-                                    return null;
-                                }
                                 return Device4Web.Porject.builder().projectID(tbProjectInfo.getID())
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())
@@ -334,7 +333,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                         warnDeviceTokenList.contains(item.getDeviceSN()) ? 1 : 0
                 )
         );
-        return new PageUtil.PageWithMap<>(page.totalPage(), collect, page.totalCount(), Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
+        return new PageUtil.PageWithMap<>(page.totalPage(), collect, page.totalCount(),
+                Map.of("warnBefore", warnBefore, "normalBefore", normalBefore, "onlineCount", onlineCount));
     }
 
 
@@ -465,10 +465,12 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         if (CollectionUtils.isEmpty(resultList)) {
             return empty;
         }
-
+        // 统计在线数量
+        long onlineCount = resultList.stream().filter(e -> e.getOnline() != null && e.getOnline()).count();
         totalCount = Long.valueOf(resultList.size());
         List<List<WtVideoPageInfo>> lists = CollectionUtil.seperatorList(resultList, param.getPageSize());
-        return new PageUtil.PageWithMap<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount, Map.of("warnBefore", warnBefore, "normalBefore", normalBefore));
+        return new PageUtil.PageWithMap<WtVideoPageInfo>(totalCount / pageSize + 1, lists.get(param.getCurrentPage() - 1), totalCount,
+                Map.of("warnBefore", warnBefore, "normalBefore", normalBefore, "onlineCount", onlineCount));
 
     }
 
@@ -577,7 +579,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         List<SensorWithMore> sensorWithMores = tbSensorMapper.querySensorWithMoreBy(uniqueTokens, pa.getCompanyID(), projectIDList, null);
         Map<String, List<SensorWithMore>> map = sensorWithMores.stream().collect(Collectors.groupingBy(SensorWithMore::getUniqueToken));
-        Map<Integer, TbProjectInfo> projectInfoMap = pa.getProjectInfos().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        Map<Integer, TbProjectInfo> projectInfoMap = tbProjectInfoMapper.selectAll().stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         if (pa.getMonitorItemID() != null) {
             allData = allData.stream().filter(
                     item -> {
@@ -663,12 +665,9 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                     .deviceID(item.getDeviceID())
                     .build();
             device4Web.setProjectList(
-                    item.getProjectIDList().stream().map(
+                    item.getProjectIDList().stream().filter(projectInfoMap::containsKey).map(
                             projectID -> {
                                 TbProjectInfo tbProjectInfo = projectInfoMap.get(projectID);
-                                if (tbProjectInfo == null) {
-                                    return null;
-                                }
                                 return Device4Web.Porject.builder().projectID(tbProjectInfo.getID())
                                         .projectName(tbProjectInfo.getProjectName())
                                         .projectShortName(tbProjectInfo.getShortName())

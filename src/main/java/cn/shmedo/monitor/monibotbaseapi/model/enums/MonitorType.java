@@ -20,7 +20,17 @@ public enum MonitorType {
     INTERNAL_TRIAXIAL_DISPLACEMENT(20, "内部三轴位移"),
 
     WT_RAINFALL(31, "降雨量"),
-    VIDEO(40, "视频");
+    VIDEO(40, "视频"),
+
+    EVAPORATION(41, "蒸发量"),
+    SOIL_PH(42, "土壤PH"),
+    ATMOSPHERIC_PRESSURE(43, "大气气压"),
+    GATE(44, "水闸"),
+    PUMPING_STATION(45, "泵站"),
+    VALVE(46, "阀门"),
+    NPK_CONTENT(47, "氮磷钾含量"),
+    SOLAR_RADIATION(48, "太阳辐射"),
+    SOIL_SALINITY_ELECTRICAL_CONDUCTIVITY(49, "土壤盐分电导率");
 
     private final int key;
     private final String value;

@@ -44,7 +44,7 @@ public class QueryMonitorItemPageListParam implements ParameterValidator, Resour
     public ResultWrapper validate() {
         if (projectID != null && projectID != -1) {
             TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-            var tbProjectInfo = tbProjectInfoMapper.selectByPrimaryKey(projectID);
+            var tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
             if (tbProjectInfo == null) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程项目不存在");
             }

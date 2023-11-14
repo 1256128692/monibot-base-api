@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.WorkFlowTemplateService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,6 +44,7 @@ public class FeignBeans {
     private final WtReportServiceFallbackFactory wtReportServiceFallbackFactory;
     private final YsServiceFallbackFactory ysServiceFallbackFactory;
     private final MdInfoFileServiceFallbackFactory mdInfoFileServiceFallbackFactory;
+    private final WorkFlowTemplateServiceFallbackFactory workFlowTemplateServiceFallbackFactory;
 
     @Bean
     @Primary
@@ -106,9 +108,34 @@ public class FeignBeans {
     @Bean
     @Primary
     public YsService ysService() {
+        // 萤石新增预置点接口延时在1s以上，所以这里修改了延时配置
+        SetterFactory ysTimeoutCommandKey = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(YsService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(30000));
         return FeignFactory.hystrixClient(YsService.class, config.getYsUrl(),
                 ysServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
-                        .decoder(new JacksonDecoder(objectMapper)));
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(ysTimeoutCommandKey)
+                        .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
+        );
+    }
+
+    @Bean
+    public WorkFlowTemplateService workFlowTemplateService() {
+        SetterFactory timeoutCommandKey = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(WorkFlowTemplateService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter().withExecutionTimeoutInMilliseconds(30000));
+        return FeignFactory.hystrixClient(WorkFlowTemplateService.class, config.getWorkFlowServiceAddress(),
+                workFlowTemplateServiceFallbackFactory, value -> value.encoder(new JacksonEncoder(objectMapper))
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(timeoutCommandKey)
+                        .options(new Request.Options(10, TimeUnit.SECONDS, 20, TimeUnit.SECONDS, true))
+                        .requestInterceptor(template -> template
+                                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                                .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
+                                .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
     }
 }
 

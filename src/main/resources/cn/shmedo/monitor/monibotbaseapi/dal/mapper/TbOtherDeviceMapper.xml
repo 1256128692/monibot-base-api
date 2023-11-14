@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice">
+    <!--@mbg.generated-->
+    <!--@Table tb_other_device-->
+    <id column="ID" jdbcType="INTEGER" property="ID" />
+    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
+    <result column="ProjectID" jdbcType="INTEGER" property="projectID" />
+    <result column="Name" jdbcType="VARCHAR" property="name" />
+    <result column="Token" jdbcType="VARCHAR" property="token" />
+    <result column="Model" jdbcType="VARCHAR" property="model" />
+    <result column="Vendor" jdbcType="VARCHAR" property="vendor" />
+    <result column="TemplateID" jdbcType="INTEGER" property="templateID" />
+    <result column="ExValue" jdbcType="VARCHAR" property="exValue" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    ID, CompanyID, ProjectID, `Name`, Token, Model, Vendor, TemplateID, ExValue, CreateTime, 
+    CreateUserID, UpdateTime, UpdateUserID
+  </sql>
+
+  <select id="queryOtherDevicePage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.TbOtherDevice4Web">
+      select tod.* , tpm.Name as templateName, tp.projectName, tpmg.name as templateGroupName
+      from tb_other_device as tod
+               left join tb_property_model as tpm on tod.TemplateID = tpm.ID
+                left join tb_project_info as tp on tod.ProjectID = tp.ID
+                left join tb_property_model_group as tpmg on tpm.groupID = tpmg.ID
+      where tod.CompanyID = #{pa.companyID}
+      <if test="pa.projectID != null">
+          and tod.ProjectID = #{pa.projectID}
+      </if>
+      <if test="pa.templateID != null">
+          and tod.TemplateID = #{pa.templateID}
+      </if>
+      <if test="pa.fuzzyItem != null and pa.fuzzyItem != ''">
+          and (tod.Name like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.token like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.Model like concat('%', #{pa.fuzzyItem}, '%')
+              or tod.Vendor like concat('%', #{pa.fuzzyItem}, '%')
+              )
+      </if>
+      order by tod.id desc
+  </select>
+
+  <select id="countExist" resultType="int">
+      select count(1)
+      from tb_other_device
+      where
+      <foreach collection="list" item="item" separator="or">
+          (vendor = #{item.vendor} and model = #{item.model} and token = #{item.token})
+      </foreach>
+  </select>
+</mapper>

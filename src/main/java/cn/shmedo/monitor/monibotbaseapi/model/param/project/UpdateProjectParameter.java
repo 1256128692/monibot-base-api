@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
@@ -8,12 +7,16 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTagMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -42,6 +45,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     private String projectName;
     @Size(max = 10, message = "项目简称限制10个字符")
     private String shortName;
+    @NotNull
+    @Range(min = -1, max = 2)
+    private Byte level;
     @Size(max = 50, message = "直管单位限制50个字符")
     @NotBlank(message = "直管单位不允许为空")
     private String directManageUnit;
@@ -68,6 +74,9 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     private Integer newCompanyID;
     private Date newRetireDate;
 
+    @Valid
+    private List<@NotNull Integer> serviceIDList;
+
     @Size(max = 100)
     private String fileName;
     private String imageContent;
@@ -83,12 +92,23 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
     @Override
     public ResultWrapper validate() {
         TbProjectInfoMapper projectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        projectInfo = projectInfoMapper.selectByPrimaryKey(projectID);
+        projectInfo = projectInfoMapper.selectById(projectID);
         if (projectInfo == null) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "找不到对应的工程项目");
         }
         if (projectInfoMapper.countByNameExcludeID(projectName,projectID) >0){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称已存在");
+        }
+        if (!projectInfo.getLevel().equals(level)) {
+            TbProjectRelationMapper tbProjectRelationMapper = ContextHolder.getBean(TbProjectRelationMapper.class);
+            if (tbProjectRelationMapper.selectCount(
+                    new LambdaQueryWrapper<TbProjectRelation>()
+                            .eq(TbProjectRelation::getUpLevelID, projectID)
+                            .or()
+                            .eq(TbProjectRelation::getDownLevelID, projectID)
+            ) > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该项目已经已经与其他项目关联，不允许修改级别");
+            }
         }
         if (newCompanyID!=null){
             if (projectInfo.getCompanyID().equals(newCompanyID)) {
@@ -115,7 +135,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         }
         if (ObjectUtil.isNotEmpty(propertyList)){
              properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType()));
-            if (projectInfo.getModelID() != null) {
+            if (projectInfo.getModelID() != null && !projectInfo.getModelID().equals(properties.get(0).getModelID())) {
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(projectInfo.getModelID()));
             }
@@ -151,6 +171,14 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前公司下标签数量为：" + count + " ,新增会导致超过100");
             }
         }
+
+        if (ObjectUtil.isNotEmpty(serviceIDList)) {
+            RedisService redisService = ContextHolder.getBean(RedisService.class);
+            List<Integer> allServiceIDLIst = redisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
+            if (serviceIDList.stream().anyMatch(item -> !allServiceIDLIst.contains(item))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有服务不存在");
+            }
+        }
         return null;
     }
 
@@ -169,6 +197,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         if (newRetireDate !=null){
             projectInfo.setExpiryDate(newRetireDate);
         }
+        projectInfo.setLevel(level);
         return projectInfo;
     }
 

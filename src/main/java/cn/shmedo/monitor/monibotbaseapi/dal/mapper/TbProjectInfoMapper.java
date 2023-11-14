@@ -5,29 +5,16 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequ
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
-@Mapper
 public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
-    int deleteByPrimaryKey(Integer ID);
-
-    int insert(TbProjectInfo record);
-
-    int insertSelective(TbProjectInfo record);
-
-    TbProjectInfo selectByPrimaryKey(Integer ID);
-
-    int updateByPrimaryKeySelective(TbProjectInfo record);
-
-    int updateByPrimaryKey(TbProjectInfo record);
-
     void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
@@ -37,7 +24,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<Integer> getProjectIDByProperty(@Param("list") List<QueryProjectListRequest.Property> propertyEntity,
                                          @Param("projectIDList") Collection<Integer> projectIDList);
 
-    IPage<ProjectInfo> getProjectList(IPage<ProjectInfo> page,
+    IPage<ProjectInfo> getProjectPage(IPage<ProjectInfo> page,
                                       @Param("pa") QueryProjectListRequest pa);
 
     int countByNameExcludeID(String projectName, Integer projectID);
@@ -50,7 +37,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(Integer companyID, List<Integer> projectIDList);
 
-    List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName);
+    List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName, List<String> platformTypeSet);
 
     List<ConfigBaseResponse> selectMonitorPointRelateSensorConfig(@Param("monitorPointID") Integer monitorPointID,
                                                                   @Param("monitorType") Integer monitorType,
@@ -62,5 +49,15 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
                                                                  @Param("groupName") String group,
                                                                  @Param("keyName") String key);
 
-;
+    void updateLevel(Byte level, List<Integer> pidList, Integer userID, Date date);
+
+    List<ProjectInfo> getProjectList(QueryProjectListRequest pa);
+
+    void updateLevel2Unallocated();
+
+    List<TbProjectInfo> selectAll();
+
+    void updateLevel2Unallocatedwhennorealtion();
+
+    List<ProjectVideoInfo> selectListByIDs(List<Integer> projectIDs);
 }

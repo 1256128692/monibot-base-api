@@ -63,6 +63,33 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
             public ResultWrapper<DeviceStateResponse> queryDeviceExpandState(QueryDeviceStateParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
+
+            @Override
+            public ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
+                                                               String appKey,
+                                                               String appSecret,
+                                                               String accessToken) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
+                                                       String appKey,
+                                                       String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
+                                                                String appKey,
+                                                                String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<Boolean> transferDevice(TransferDeviceParam param, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
         };
     }
 
