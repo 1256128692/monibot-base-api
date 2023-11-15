@@ -604,14 +604,14 @@ public class SensorDataDaoImpl implements SensorDataDao {
             selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
             selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
         });
-        selectFieldBuilder.append(DbConstant.TIME_FIELD).append(",");
-        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
+        selectFieldBuilder.append(DbConstant.TIME_FIELD);
+//        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
 
-        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where " + sidOrString +
-                " and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY time("+DisplayDensity.fromValue(densityType).getName()+"), sid"
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+")"
                 + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
@@ -629,14 +629,14 @@ public class SensorDataDaoImpl implements SensorDataDao {
             selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
             selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
         });
-        selectFieldBuilder.append(DbConstant.TIME_FIELD).append(",");
-        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
+//        selectFieldBuilder.append(DbConstant.TIME_FIELD).append(",");
+//        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
 
-        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where " + sidOrString +
-                " and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY time("+DisplayDensity.fromValue(densityType).getName()+"), sid"
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+")"
                 + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
