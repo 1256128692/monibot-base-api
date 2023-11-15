@@ -3,13 +3,16 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.PredefinedModelProperTyCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
+import cn.shmedo.monitor.monibotbaseapi.config.CommonBeans;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
@@ -22,6 +25,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.PropertyUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -169,8 +173,8 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             }
 
         }
-        RedisService redisService = ContextHolder.getBean(RedisService.class);
-        List<Integer> allServiceIDLIst = redisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
+        RedisService authRedisService = SpringUtil.getBean(RedisConstant.AUTH_REDIS_SERVICE, RedisService.class);
+        List<Integer> allServiceIDLIst = authRedisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();
         if (serviceIDList.stream().anyMatch(item -> !allServiceIDLIst.contains(item))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有服务不存在");
         }

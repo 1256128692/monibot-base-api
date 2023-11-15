@@ -95,6 +95,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.IOT_REDIS_SERVICE)
     private RedisService iotRedisService;
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.AUTH_REDIS_SERVICE)
+    private RedisService authRedisService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -554,7 +557,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 //                            .filter(StrUtil::isNotEmpty).collect(Collectors.toList()), pa.getCompanyID())
 //                    .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
 
-            Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+            Map<String, AuthService> temp = authRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
             Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
             ;
             temp.forEach((key, value) -> {
@@ -671,7 +674,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<Integer> serviceIDList = tbProjectServiceRelationMapper.selectList(
                 new LambdaQueryWrapper<TbProjectServiceRelation>().eq(TbProjectServiceRelation::getProjectID, pa.getID())
         ).stream().map(TbProjectServiceRelation::getServiceID).toList();
-        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<String, AuthService> temp = authRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
         Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
         ;
         temp.forEach((key, value) -> {
@@ -1001,7 +1004,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 TbProjectServiceRelation::getProjectID,
                 Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())
         ));
-        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<String, AuthService> temp = authRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
         Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
         temp.forEach((key, value) -> {
             serviceMap.put(Integer.valueOf(key), value);
