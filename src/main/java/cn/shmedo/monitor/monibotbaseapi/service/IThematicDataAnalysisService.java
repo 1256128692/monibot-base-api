@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -30,5 +31,13 @@ public interface IThematicDataAnalysisService {
 
     List<ThematicQueryTransverseInfo> queryTransverseList(QueryTransverseListParam param);
 
-    PageUtil.Page<ThematicQueryTransverseInfo> queryTransversePage(QueryTransversePageParam param);
+    List<Map<String, Object>> queryLongitudinalList(QueryLongitudinalListParam param);
+
+    ThematicRainWaterAnalysisInfo queryRainWaterData(QueryRainWaterDataParam param);
+
+    PageUtil.Page<ThematicRainWaterDataInfo> queryRainWaterPageData(QueryRainWaterDataPageParam param);
+
+    List<ThematicDryBeachInfo> queryDryBeachDataList(QueryDryBeachDataListParam param);
+
+    DryBeachDataInfo queryDryBeachData(QueryDryBeachDataParam param);
 }

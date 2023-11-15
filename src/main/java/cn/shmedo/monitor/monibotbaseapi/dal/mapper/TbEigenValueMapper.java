@@ -2,6 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueInfo;
 
 import java.util.List;
 
@@ -55,4 +57,8 @@ public interface TbEigenValueMapper {
     Integer selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name, Integer eigenValueID);
 
     void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
+
+    List<ThematicEigenValueData> selectBaseInfoByIDList(List<Integer> eigenValueIDList);
+
+    List<ThematicEigenValueInfo> selectFieldInfoByPointIDList(List<Integer> monitorPointIDList);
 }

@@ -175,6 +175,12 @@
             )
         </if>
     </select>
+    <select id="selectBaseInfoByIDList" resultType="java.util.Map">
+        SELECT `ID` eventID,`Name` eventName, `TimeRange` timeRange FROM tb_data_event WHERE ID IN
+        <foreach collection="eventIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
 
     <delete id="deleteByEventIDList">
         delete

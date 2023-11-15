@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TbDataEventMapper {
     /**
@@ -51,4 +52,7 @@ public interface TbDataEventMapper {
     List<QueryDataEventInfo> selectListByProjectIDAndItemIDs(Integer projectID, List<Integer> monitorItemIDList);
 
     void deleteByEventIDList(List<Integer> eventIDList);
+
+    @SuppressWarnings("MybatisXMapperMethodInspection")
+    List<Map<String, Object>> selectBaseInfoByIDList(List<Integer> eventIDList);
 }

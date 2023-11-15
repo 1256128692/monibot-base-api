@@ -240,6 +240,34 @@
     and `Name` = #{name,jdbcType=VARCHAR}
     and ID != #{eigenValueID}
   </select>
+  <select id="selectBaseInfoByIDList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData">
+    SELECT ev.`ID` eigenValueID,ev.`Name` eigenValueName,`Value` eigenValue,du.`ChnUnit` chnUnit,du.`EngUnit` engUnit FROM tb_eigen_value ev LEFT JOIN tb_data_unit du ON du.`ID` = ev.`UnitID` WHERE ev.ID IN
+    <foreach collection="eigenValueIDList" item="item" open="(" close=")" index="index" separator=",">
+        #{item}
+    </foreach>
+  </select>
+  <select id="selectFieldInfoByPointIDList"
+          resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueInfo">
+    SELECT
+        ev.ProjectID projectID,
+        ev.MonitorItemID monitorItemID,
+        evr.MonitorPointID monitorPointID,
+        mtf.MonitorType monitorType,
+        mtf.FieldToken fieldToken,
+        ev.ID eigenValueID,
+        ev.`Name` eigenValueName,
+        ev.`Value` eigenValue,
+        du.ChnUnit chnUnit,
+        du.EngUnit engUnit
+    FROM tb_eigen_value_relation evr
+        LEFT JOIN tb_eigen_value ev ON ev.ID = evr.EigenValueID
+        LEFT JOIN tb_data_unit du ON du.ID = ev.UnitID
+        LEFT JOIN tb_monitor_type_field mtf ON mtf.ID = ev.MonitorTypeFieldID
+    WHERE evr.MonitorPointID IN
+    <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
+        #{item}
+    </foreach>
+  </select>
 
   <delete id="deleteByEigenValueIDList">
       delete

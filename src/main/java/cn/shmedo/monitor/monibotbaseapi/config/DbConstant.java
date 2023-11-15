@@ -33,7 +33,7 @@ public class DbConstant {
     /**
      * 统计方式key
      */
-    public static final String STATISTICAL_METHODS = "StatisticalMethods";
+    public static final String STATISTICAL_METHODS = "statisticalMethods";
     /**
      * 显示密度key
      */

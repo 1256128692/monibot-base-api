@@ -753,11 +753,23 @@
         <if test="param.monitorType != null">
             AND tmi.`MonitorType` =#{param.monitorType}
         </if>
+        <if test="param.monitorGroupIDList != null and param.monitorGroupIDList.size != 0">
+            AND tmg.`ID` IN
+            <foreach collection="param.monitorGroupIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <select id="selectItemIDsByIDs" resultType="java.lang.Integer">
         select distinct MonitorItemID from tb_monitor_point where ID in
         <foreach collection="monitorPointIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectMonitorTypeExValuesByPointIDList" resultType="java.util.Map">
+        SELECT tmp.ID monitorPointID,tmt.ExValues exValues FROM tb_monitor_point tmp LEFT JOIN tb_monitor_type tmt ON tmp.MonitorType = tmt.MonitorType WHERE WHERE tmp.ID IN
+        <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
     </select>

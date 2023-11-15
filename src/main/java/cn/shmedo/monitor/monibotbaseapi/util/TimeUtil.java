@@ -1,11 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -15,7 +14,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created 2015/12/15
@@ -540,19 +538,24 @@ public class TimeUtil {
         }
     }
 
-    public interface AvgFormatter {
+    /**
+     * 展示密度formatter
+     */
+    public interface DestinyFormatter {
+        SimpleDateFormat HOUR_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
         SimpleDateFormat DAILY_FORMATTER = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
         SimpleDateFormat MONTHLY_FORMATTER = new SimpleDateFormat("yyyy-MM");
         SimpleDateFormat YEARLY_FORMATTER = new SimpleDateFormat("yyyy");
 
-        static SimpleDateFormat getFormatter(AvgDensityType avgDensityType) {
+        static SimpleDateFormat getFormatter(DisplayDensity densityType) {
             SimpleDateFormat formatter;
-            switch (avgDensityType) {
+            switch (densityType) {
                 case ALL -> formatter = TimeUtil.getDefaultFormatter();
-                case DAILY -> formatter = DAILY_FORMATTER;
-                case MONTHLY -> formatter = MONTHLY_FORMATTER;
-                case YEARLY -> formatter = YEARLY_FORMATTER;
-                default -> throw new RuntimeException("无法处理的展示密度,密度:" + avgDensityType.name());
+                case HOUR -> formatter = HOUR_FORMATTER;
+                case DAY, WEEK -> formatter = DAILY_FORMATTER;
+                case MONTH -> formatter = MONTHLY_FORMATTER;
+                case YEAR -> formatter = YEARLY_FORMATTER;
+                default -> throw new RuntimeException("无法处理的展示密度,密度:" + densityType.name());
             }
             return formatter;
         }

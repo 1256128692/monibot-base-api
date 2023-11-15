@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.standard;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONException;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
@@ -42,7 +43,7 @@ public interface IDataDisplayCheck {
      * @throws IllegalArgumentException 部分监测点不存在
      */
     default boolean valid() throws JSONException, IllegalArgumentException {
-        final List<Integer> pointIDList = getInspectedPointIDList();
+        final List<Integer> pointIDList = getInspectedPointIDList().stream().distinct().toList();
         if (CollUtil.isEmpty(pointIDList)) {
             return false;
         }
@@ -58,11 +59,18 @@ public interface IDataDisplayCheck {
                         new LambdaQueryWrapper<TbMonitorType>().in(TbMonitorType::getMonitorType, pointList.stream()
                                 .map(TbMonitorPoint::getMonitorType).collect(Collectors.toSet()))).stream()
                 .map(TbMonitorType::getExValues).collect(Collectors.toSet());
-        // Stream#allMath always return {@code true} while the collection is empty.
-        return exValuesList.stream().filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj).allMatch(u ->
-                (!u.containsKey(DbConstant.DISPLAY_DENSITY) || (u.containsKey(DbConstant.DISPLAY_DENSITY)
-                        && JSONUtil.parseArray(u.get(DbConstant.DISPLAY_DENSITY)).contains(displayDensity)))
-                        && (!u.containsKey(DbConstant.STATISTICAL_METHODS) || (u.containsKey(DbConstant.STATISTICAL_METHODS)
-                        && JSONUtil.parseArray(u.get(DbConstant.STATISTICAL_METHODS)).contains(statisticalMethod))));
+        // Stream#nonMatch always return {@code true} while the collection is empty.
+        return exValuesList.stream().filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj).noneMatch(u ->
+                notMatchConfig(u, DbConstant.DISPLAY_DENSITY, displayDensity) || notMatchConfig(u, DbConstant.STATISTICAL_METHODS, statisticalMethod));
+    }
+
+    /**
+     * true 筛选条件不合法
+     *
+     * @param key       配置json的key
+     * @param queryCode 筛选条件
+     */
+    default boolean notMatchConfig(JSONObject json, String key, Integer queryCode) {
+        return json.containsKey(key) && !JSONUtil.parseArray(json.get(key)).contains(queryCode);
     }
 }

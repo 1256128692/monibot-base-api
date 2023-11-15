@@ -218,4 +218,52 @@ public class DefaultConstant {
          */
         String NO_ASSOCIATED_TALK_CHANNEL = "0x0283003f";
     }
+
+    /**
+     * 专题分析里数据源的fieldToken
+     */
+    public interface ThematicFieldToken {
+        /**
+         * 管内水位高程
+         */
+        String LEVEL_ELEVATION = "levelElevation";
+        /**
+         * 空管距离
+         */
+        String EMPTY_PIPE_DISTANCE = "emptyPipedistance";
+        /**
+         * 水位
+         */
+        String DISTANCE = "distance";
+        /**
+         * 降雨量<br>
+         * TODO 根据原始数据来定到底是哪个雨量
+         */
+        String s4 = "";
+        /**
+         * 流量
+         */
+        String VOLUME_FLOW = "volumeFlow";
+        /**
+         * 干滩长度
+         */
+        String DRY_BEACH = "dryBeach";
+        /**
+         * 坡度比
+         */
+        String SLOPE_RATIO = "slopeRratio";
+    }
+
+    /**
+     * 专题分析里预定义的一些特征值名称
+     */
+    public interface ThematicEigenValueName {
+        String CRITICAL_WETTING_LINE = "临界浸润线";
+        String CONTROL_WETTING_LINE = "控制浸润线";
+        String MIN_DRY_BEACH = "最小干滩长度";
+        String DESIGN_FLOOD_DISTANCE = "设计洪水位";
+        String START_FLOOD_DISTANCE = "调洪起始洪水位";
+        String BEACH_TOP_ELEVATION = "滩顶高程";
+        String END_FLOOD_DISTANCE = "汛末控制水位";
+    }
 }

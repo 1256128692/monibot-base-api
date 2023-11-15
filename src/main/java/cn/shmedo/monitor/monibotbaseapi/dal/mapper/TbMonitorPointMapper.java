@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     int deleteByPrimaryKey(Integer ID);
@@ -67,4 +68,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<ThematicGroupPointListInfo> selectThematicGroupPointList(QueryThematicGroupPointListParam param);
 
     List<Integer> selectItemIDsByIDs(List<Integer> monitorPointIDList);
+
+    @SuppressWarnings("MybatisXMapperMethodInspection")
+    List<Map<String,Object>> selectMonitorTypeExValuesByPointIDList(List<Integer> monitorPointIDList);
 }

@@ -9,6 +9,8 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.List;
+
 /**
  * @author youxian.kong@shmedo.cn
  * @date 2023-11-08 15:09
@@ -20,6 +22,7 @@ public class QueryThematicGroupPointListParam implements ParameterValidator, Res
     private Integer projectID;
     @Range(max = 1, min = 1, message = "专题类型 1.浸润线 默认1.浸润线")
     private Integer thematicType;
+    private List<Integer> monitorGroupIDList;
     @JsonIgnore
     private Integer monitorType;
 
