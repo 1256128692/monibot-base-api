@@ -99,11 +99,11 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
         }
         build = build();
         List<TbProjectConfig> addList = build.stream().filter(u -> Objects.isNull(u.getID())).toList();
-        return CollectionUtil.isNotEmpty(addList) && ContextHolder.getBean(TbProjectConfigMapper.class).selectCount(
-                new LambdaQueryWrapper<TbProjectConfig>().or(r -> addList.stream().peek(u -> r.or(s -> s.eq(
-                        TbProjectConfig::getGroup, u.getGroup()).eq(TbProjectConfig::getProjectID, projectID).eq(
-                        TbProjectConfig::getKey, u.getKey()))).toList())) == 0 ? null : ResultWrapper.withCode(
-                ResultCode.INVALID_PARAMETER, "有新增的配置项已被配置");
+        return CollectionUtil.isEmpty(addList) || (CollectionUtil.isNotEmpty(addList) && ContextHolder.getBean(
+                TbProjectConfigMapper.class).selectCount(new LambdaQueryWrapper<TbProjectConfig>().or(r ->
+                addList.stream().peek(u -> r.or(s -> s.eq(TbProjectConfig::getGroup, u.getGroup()).eq(
+                        TbProjectConfig::getProjectID, projectID).eq(TbProjectConfig::getKey, u.getKey()))).toList())) == 0)
+                ? null : ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有新增的配置项已被配置");
     }
 
     @Override
