@@ -2,10 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
 public enum StatisticalMethods {
 
-    LATEST(1, "最新一条"),
-    AVERAGE(2, "平均"),
-    CUMULATIVE(3, "阶段累积"),
-    CHANGE(4, "阶段变化");
+    LATEST(1, "last"),
+    AVERAGE(2, "mean"),
+    CUMULATIVE(3, "sum"),
+    CHANGE(4, "diff");
 
     private int value;
     private String name;

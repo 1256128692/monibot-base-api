@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.util;
 
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 
 import java.util.Collections;
 import java.util.List;
@@ -188,6 +190,27 @@ public class MonitorTypeUtil {
             vo2.setFieldExValue("1");
             fieldList.addAll(List.of(vo,vo1,vo2));
         }
+
+    }
+
+    public static String getMeasurementByStatisticsTypeAndDensityType(Integer monitorType, Integer statisticsType,
+                                                                      Integer densityType) {
+        StringBuilder result = new StringBuilder();
+        result.append("tb_");
+        result.append(monitorType);
+        result.append("_data");
+        // 查询最新数据的时候查原始表即可
+        if (statisticsType != StatisticalMethods.LATEST.getValue()) {
+            // 查询小时的时候也查询原始表即可
+            if (densityType != DisplayDensity.HOUR.getValue() && densityType != DisplayDensity.TWO_HOUR.getValue() &&
+                    densityType != DisplayDensity.FOUR_HOUR.getValue() && densityType != DisplayDensity.SIX_HOUR.getValue() &&
+                    densityType != DisplayDensity.TWELVE_HOUR.getValue()) {
+                result.append("_");
+                result.append(StatisticalMethods.fromValue(statisticsType).getName());
+            }
+        }
+        return result.toString();
+
 
     }
 }

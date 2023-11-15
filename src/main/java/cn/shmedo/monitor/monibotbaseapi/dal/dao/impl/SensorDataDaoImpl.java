@@ -11,10 +11,8 @@ import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.QueryType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -538,6 +536,111 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    @Override
+    public List<Map<String, Object>> queryCommonSensorDataList(List<Integer> sensorIDList,
+                                                               Date begin, Date end, Integer densityType,
+                                                               Integer statisticsType, List<FieldBaseInfo> fieldList,
+                                                               Integer monitorType) {
+
+        String beginString = TimeUtil.formatInfluxTimeString(new Timestamp(begin.getTime()));
+        String endString = TimeUtil.formatInfluxTimeString(new Timestamp(end.getTime()));
+
+        String measurement = MonitorTypeUtil.getMeasurementByStatisticsTypeAndDensityType(monitorType, statisticsType, densityType);
+        List<String> selectField = new LinkedList<>();
+        fieldList.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
+
+        String sql = null;
+        switch (densityType) {
+            case 1:
+                sql = getAllSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
+                break;
+            case 2:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+                sql = getHourSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField, statisticsType, densityType);
+                break;
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+                sql = getDaySensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField, statisticsType, densityType);
+                break;
+        }
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
+
+
+    /**
+     * 查询全部传感器的最新值
+     */
+    private String getAllSensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString, String measurement, List<String> selectField) {
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
+        String fieldString = String.join(",", selectField);
+        StringBuilder sqlBuilder = new StringBuilder();
+        sensorIDList.forEach(sid -> {
+            String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString() + "' " +
+                    "and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 1 tz('Asia/Shanghai') ; ";
+            sqlBuilder.append(sidSql);
+        });
+        return sqlBuilder.toString();
+    }
+
+    /**
+     * 查询全部传感器的根据小时密度的统计方式
+     * 查询的是tb_data表,而不是后缀_avg,_diff等表
+     */
+    private String getHourSensorCommonDataSql(List<Integer> sensorIDList, String beginString,
+                                              String endString, String measurement, List<String> selectField,
+                                              Integer statisticsType, Integer densityType) {
+
+        StringBuilder selectFieldBuilder = new StringBuilder();
+        selectField.forEach(s -> {
+            selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
+            selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+        });
+        selectFieldBuilder.append(DbConstant.TIME_FIELD);
+//        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+")"
+                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        return sidSql;
+    }
+
+
+    /**
+     * 查询全部传感器的根据小时密度的统计方式
+     * 查询的是tb_data_avg,或者_diff等等,带后缀的特殊表
+     */
+    private String getDaySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString,
+                                             String measurement, List<String> selectField, Integer statisticsType,
+                                             Integer densityType) {
+        StringBuilder selectFieldBuilder = new StringBuilder();
+        selectField.forEach(s -> {
+            selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
+            selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+        });
+//        selectFieldBuilder.append(DbConstant.TIME_FIELD).append(",");
+//        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+")"
+                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        return sidSql;
+    }
+
 
     private String getAvgSensorDataSql(String sensorIDOrString, String beginString,
                                        String endString, String measurement,
@@ -594,7 +697,6 @@ public class SensorDataDaoImpl implements SensorDataDao {
         sqlBuilder.append(" tz('Asia/Shanghai') ");
         return sqlBuilder.toString();
     }
-
 
 
 }

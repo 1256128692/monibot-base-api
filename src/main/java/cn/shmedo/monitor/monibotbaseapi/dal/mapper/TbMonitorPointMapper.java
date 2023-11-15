@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -70,5 +71,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<Integer> selectItemIDsByIDs(List<Integer> monitorPointIDList);
 
     @SuppressWarnings("MybatisXMapperMethodInspection")
-    List<Map<String,Object>> selectMonitorTypeExValuesByPointIDList(List<Integer> monitorPointIDList);
+    List<Map<String, Object>> selectMonitorTypeExValuesByPointIDList(List<Integer> monitorPointIDList);
+
+    List<MonitorPointDataInfo> selectMonitorPointDataInfoListByIDList(List<Integer> monitorPointIDList);
 }

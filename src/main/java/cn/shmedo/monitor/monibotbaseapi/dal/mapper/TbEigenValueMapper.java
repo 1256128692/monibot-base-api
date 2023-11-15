@@ -4,12 +4,14 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
 
 import java.util.List;
 
 public interface TbEigenValueMapper {
     /**
      * delete by primary key
+     *
      * @param ID primaryKey
      * @return deleteCount
      */
@@ -17,6 +19,7 @@ public interface TbEigenValueMapper {
 
     /**
      * insert record to table
+     *
      * @param record the record
      * @return insert count
      */
@@ -24,6 +27,7 @@ public interface TbEigenValueMapper {
 
     /**
      * insert record to table selective
+     *
      * @param record the record
      * @return insert count
      */
@@ -31,6 +35,7 @@ public interface TbEigenValueMapper {
 
     /**
      * select by primary key
+     *
      * @param ID primary key
      * @return object by primary key
      */
@@ -38,6 +43,7 @@ public interface TbEigenValueMapper {
 
     /**
      * update record selective
+     *
      * @param record the updated record
      * @return update count
      */
@@ -45,6 +51,7 @@ public interface TbEigenValueMapper {
 
     /**
      * update record
+     *
      * @param record the updated record
      * @return update count
      */
@@ -61,4 +68,6 @@ public interface TbEigenValueMapper {
     List<ThematicEigenValueData> selectBaseInfoByIDList(List<Integer> eigenValueIDList);
 
     List<ThematicEigenValueInfo> selectFieldInfoByPointIDList(List<Integer> monitorPointIDList);
+
+    List<EigenBaseInfo> selectByIDs(List<Integer> eigenvalueIDList);
 }

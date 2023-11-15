@@ -474,7 +474,13 @@
 
     <select id="selectListBymonitorPointIDList" parameterType="java.lang.Integer"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse">
-        select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
+        select ID     as sensorID,
+               `Name` as sensorName,
+               Alias  as sensorAlias,
+               monitorPointID,
+               projectID,
+               configFieldValue,
+               monitorType
         from tb_sensor
         where MonitorPointID in
         <foreach collection="monitorPointIDList" item="id" separator="," open="(" close=")">
@@ -567,7 +573,7 @@
     <insert id="insertSensorList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         INSERT INTO tb_sensor (name, alias, enable, channelCode, projectID, videoDeviceID, templateID,
                                dataSourceComposeType, monitorType, kind, displayOrder, exValues, createTime,
-                               createUserID,updateTime, updateUserID, VideoDeviceSourceID)
+                               createUserID, updateTime, updateUserID, VideoDeviceSourceID)
         VALUES
         <foreach collection="insertSensorList" item="item" separator=",">
             (#{item.sensorName}, #{item.sensorName}, #{item.sensorEnable}, #{item.channelCode}, #{item.projectID},
@@ -580,15 +586,14 @@
     <update id="updateSensorList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         <foreach collection="updateSensorList" item="item" separator=";">
             UPDATE tb_sensor
-            SET
-            name = #{item.sensorName},
-            alias = #{item.sensorName},
-            enable = #{item.sensorEnable},
-            projectID = #{item.projectID},
-            channelCode = #{item.channelCode},
-            exValues = #{item.exValues},
-            updateTime = #{item.updateTime},
-            updateUserID = #{item.updateUserID}
+            SET name         = #{item.sensorName},
+                alias        = #{item.sensorName},
+                enable       = #{item.sensorEnable},
+                projectID    = #{item.projectID},
+                channelCode  = #{item.channelCode},
+                exValues     = #{item.exValues},
+                updateTime   = #{item.updateTime},
+                updateUserID = #{item.updateUserID}
             WHERE ID = #{item.sensorID}
         </foreach>
     </update>
@@ -597,7 +602,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         SELECT s.ID as sensorID, vd.deviceSerial, s.name as sensorName
         FROM tb_sensor as s
-        LEFT JOIN tb_video_device vd on vd.ID = s.VideoDeviceID
+                 LEFT JOIN tb_video_device vd on vd.ID = s.VideoDeviceID
         WHERE s.name IN
         <foreach item="sensorName" collection="sensorNameList" open="(" close=")" separator=",">
             #{sensorName}
@@ -607,20 +612,20 @@
 
     <select id="queryListByDeviceSerialList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo">
-        select s.ID          as sensorID,
-        s.`Name`      as sensorName,
-        s.projectID,
-        tvds.ID as VideoDeviceSourceID,
-        tvds.channelNo,
-        tvds.Enable,
-        tvds.DeviceSerial,
-        s.Enable      as sensorEnable,
-        s.ExValues,
-        c.CaptureInterval,
-        c.ImageCapture
-        from  tb_video_device_source tvds
-        left join tb_video_capture c on tvds.ID = c.VideoDeviceSourceID
-        left join tb_sensor s on tvds.ID = s.VideoDeviceSourceID
+        select s.ID     as sensorID,
+               s.`Name` as sensorName,
+               s.projectID,
+               tvds.ID  as VideoDeviceSourceID,
+               tvds.channelNo,
+               tvds.Enable,
+               tvds.DeviceSerial,
+               s.Enable as sensorEnable,
+               s.ExValues,
+               c.CaptureInterval,
+               c.ImageCapture
+        from tb_video_device_source tvds
+                 left join tb_video_capture c on tvds.ID = c.VideoDeviceSourceID
+                 left join tb_sensor s on tvds.ID = s.VideoDeviceSourceID
         where tvds.DeviceSerial in
         <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
             #{deviceSerial}

@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValuePara
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
@@ -55,19 +56,15 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
      * @apiSuccess (响应结果) {Object[]} [data.sensorList]      传感器信息
-     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
+     * @apiSuccess (响应结果) {Int} data.sensorList.sensorID    传感器ID
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
-     * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Bool} [data.multiSensor]        是否为关联多传感器
-     * @apiSuccess (响应结果) {Object} data.sensorData       单传感器数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID        传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器数据
-     * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.multiSensorData.time  数据采集时间
-     * @apiSuccess (响应结果) {T} data.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {String} data.sensorList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.multiSensorData   多传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorList.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.multiSensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {T} data.sensorList.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Bool} [data.multiSensor]   是否为关联多传感器
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -75,19 +72,19 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} data.fieldList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
-     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
+     * @apiSuccess (响应结果) {Object[]} [data.eigenValueList] 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.id 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.scope 使用范围,0:专题分析 1:历史数据
+     * @apiSuccess (响应结果) {String} [data.eigenValueList.scopeStr] 使用范围描述
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} data.eigenValueList.monitorTypeFieldName 属性名称
+     * @apiSuccess (响应结果) {String} data.eigenValueList.name 特征值名称
+     * @apiSuccess (响应结果) {Double} data.eigenValueList.value 数值
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.fieldUnitID 单位ID
+     * @apiSuccess (响应结果) {String} data.eigenValueList.engUnit 单位英文描述
+     * @apiSuccess (响应结果) {String} data.eigenValueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
      * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
      * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
@@ -99,9 +96,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    public Object queryMonitorPointDataList(@Validated @RequestBody QueryMonitorPointDataParam pa) {
+        return monitorDataService.queryMonitorPointDataList(pa);
     }
 
 
@@ -196,19 +192,19 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} data.fieldList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
-     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
+     * @apiSuccess (响应结果) {Object[]} [data.eigenValueList] 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.id 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.scope 使用范围,0:专题分析 1:历史数据
+     * @apiSuccess (响应结果) {String} [data.eigenValueList.scopeStr] 使用范围描述
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} data.eigenValueList.monitorTypeFieldName 属性名称
+     * @apiSuccess (响应结果) {String} data.eigenValueList.name 特征值名称
+     * @apiSuccess (响应结果) {Double} data.eigenValueList.value 数值
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.fieldUnitID 单位ID
+     * @apiSuccess (响应结果) {String} data.eigenValueList.engUnit 单位英文描述
+     * @apiSuccess (响应结果) {String} data.eigenValueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
      * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
      * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称

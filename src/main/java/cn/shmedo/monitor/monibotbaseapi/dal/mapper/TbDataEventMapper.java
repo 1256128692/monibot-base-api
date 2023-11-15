@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.Map;
 public interface TbDataEventMapper {
     /**
      * delete by primary key
+     *
      * @param ID primaryKey
      * @return deleteCount
      */
@@ -16,6 +18,7 @@ public interface TbDataEventMapper {
 
     /**
      * insert record to table
+     *
      * @param record the record
      * @return insert count
      */
@@ -23,6 +26,7 @@ public interface TbDataEventMapper {
 
     /**
      * insert record to table selective
+     *
      * @param record the record
      * @return insert count
      */
@@ -30,6 +34,7 @@ public interface TbDataEventMapper {
 
     /**
      * select by primary key
+     *
      * @param ID primary key
      * @return object by primary key
      */
@@ -37,6 +42,7 @@ public interface TbDataEventMapper {
 
     /**
      * update record selective
+     *
      * @param record the updated record
      * @return update count
      */
@@ -44,6 +50,7 @@ public interface TbDataEventMapper {
 
     /**
      * update record
+     *
      * @param record the updated record
      * @return update count
      */
@@ -55,4 +62,6 @@ public interface TbDataEventMapper {
 
     @SuppressWarnings("MybatisXMapperMethodInspection")
     List<Map<String, Object>> selectBaseInfoByIDList(List<Integer> eventIDList);
+
+    List<EventBaseInfo> selectByIDs(List<Integer> eventIDList);
 }
