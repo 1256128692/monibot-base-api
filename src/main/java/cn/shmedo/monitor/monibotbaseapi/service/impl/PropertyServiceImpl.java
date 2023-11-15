@@ -415,4 +415,11 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         param.wrapperToPropertyValues(modelList, propertyGroup, tbProjectPropertyList);
         return modelList;
     }
+
+    @Override
+    public int deletePropertyValues(DeletePropertyValuesParam param) {
+        return tbProjectPropertyMapper.delete(new QueryWrapper<TbProjectProperty>().lambda()
+                .eq(TbProjectProperty::getSubjectType, param.getSubjectType())
+                .in(TbProjectProperty::getProjectID, param.getSubjectIDList()));
+    }
 }

@@ -291,6 +291,26 @@ public class PropertyController {
     }
 
     /**
+     * @api {POST} /DeletePropertyValues 删除模板属性值 - 暂时只对表单模板为工作流类型时开放
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName DeletePropertyValues
+     * @apiDescription 删除模板属性值
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} subjectType 对象类型，0:工程 1:其他设备 2:工作流
+     * @apiParam (请求体) {Int[]} subjectIDList 对象ID列表
+     * @apiSuccess (返回结果) {Int} data 删除行数
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DeleteModel
+     */
+    @LogParam(moduleName = "属性管理模块", operationName = "删除模板属性值", operationProperty = OperationProperty.DELETE)
+    @Permission(permissionName = "mdmbase:DeleteModel", allowApplication = true)
+    @PostMapping(value = "DeletePropertyValues", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deletePropertyValues(@RequestBody @Validated DeletePropertyValuesParam param) {
+        return propertyService.deletePropertyValues(param);
+    }
+
+    /**
      * @api {POST} /QueryPropertyValues 查询模板属性值
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块

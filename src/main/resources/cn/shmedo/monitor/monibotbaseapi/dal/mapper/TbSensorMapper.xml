@@ -641,4 +641,16 @@
         </foreach>
         )
     </select>
+
+    <delete id="deleteBatchByDeviceSerialList">
+        delete
+        from tb_sensor
+        where VideoDeviceSourceID in (
+        select ID
+        from tb_video_device_source where deviceSerial in
+        <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+            #{deviceSerial}
+        </foreach>
+        )
+    </delete>
 </mapper>

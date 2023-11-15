@@ -57,6 +57,7 @@ public class VideoCaptureBaseInfo {
         // 设置属性
         videoCaptureBaseInfo.setSensorName(sensorName);
         videoCaptureBaseInfo.setChannelNo(hkChannelInfo.getChannelNo());
+        videoCaptureBaseInfo.setSensorEnable(false);
 
         return videoCaptureBaseInfo;
 
@@ -70,10 +71,9 @@ public class VideoCaptureBaseInfo {
 
         // 设置属性
         pa.setSensorName(deviceName + "@" + pa.getChannelNo());
+        pa.setSensorEnable(false);
 //        videoCaptureBaseInfo.setChannelNo(channelNo);
-//        videoCaptureBaseInfo.setEnable(enable);
 //        videoCaptureBaseInfo.setIpcSerial(ysChannelInfo.getIpcSerial());
-        // 设置其他属性，根据需要设置
 
         return pa;
     }
