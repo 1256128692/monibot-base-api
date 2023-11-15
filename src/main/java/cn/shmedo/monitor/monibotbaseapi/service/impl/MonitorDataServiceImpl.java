@@ -1,12 +1,20 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
@@ -16,11 +24,17 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValuePara
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.AllArgsConstructor;
@@ -29,9 +43,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -47,6 +61,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     private final TbDataEventRelationMapper tbDataEventRelationMapper;
 
     private final TbMonitorTypeMapper tbMonitorTypeMapper;
+
+    private final TbMonitorPointMapper tbMonitorPointMapper;
+
+    private final TbSensorMapper tbSensorMapper;
+
+    private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
+
+    private SensorDataDao sensorDataDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -162,5 +184,85 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         });
 
         return list;
+    }
+
+    @Override
+    public List<MonitorPointDataInfo> queryMonitorPointDataList(QueryMonitorPointDataParam pa) {
+
+        // 点信息列表
+        List<MonitorPointDataInfo> monitorPointDataInfoList = tbMonitorPointMapper.selectMonitorPointDataInfoListByIDList(pa.getMonitorPointIDList());
+
+        if (CollectionUtil.isNullOrEmpty(monitorPointDataInfoList)) {
+            return Collections.emptyList();
+        }
+
+        // 全部传感器信息
+        List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
+
+        // 监测项目与监测子字段类型关系表
+        List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
+
+        if (!CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
+            List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
+                    pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
+
+            allSensorInfoList.forEach(sensorInfo -> {
+                if (!CollectionUtil.isNullOrEmpty(sensorDataList)) {
+                    List<Map<String, Object>> result = new LinkedList<>();
+                    sensorDataList.forEach(da -> {
+                        if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
+                            if (da.get(fieldList.get(0).getFieldToken()) != null) {
+                                result.add(da);
+                            }
+                        }
+                    });
+                    if (sensorInfo.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
+                        result.forEach(r -> {
+                            SensorBaseInfoResponse sInfo = allSensorInfoList.stream()
+                                    .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
+                                    .findFirst().orElse(null);
+                            if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
+                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                            }
+                        });
+                    }
+                    sensorInfo.setMultiSensorData(result);
+                }
+            });
+
+            monitorPointDataInfoList.forEach(m -> {
+                m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
+                m.setFieldList(fieldList);
+            });
+        }
+
+        // 特征值列表
+        if (!CollectionUtil.isNullOrEmpty(pa.getEigenValueIDList())) {
+            List<EigenBaseInfo> eigenValueList = tbEigenValueMapper.selectByIDs(pa.getEigenValueIDList());
+            List<TbEigenValueRelation> eigenValueRelations = tbEigenValueRelationMapper.selectByIDs(pa.getEigenValueIDList());
+
+            if (!CollectionUtil.isNullOrEmpty(eigenValueRelations) && !CollectionUtil.isNullOrEmpty(eigenValueList)) {
+                monitorPointDataInfoList.forEach(m -> {
+                    List<Integer> eigenValueIDList = eigenValueRelations.stream().filter(e -> e.getMonitorPointID().equals(m.getMonitorPointID()))
+                            .map(TbEigenValueRelation::getEigenValueID).collect(Collectors.toList());
+                    if (!CollectionUtil.isNullOrEmpty(eigenValueIDList)) {
+                        m.setEigenValueList(eigenValueList.stream().filter(ev -> eigenValueIDList.contains(ev.getId())).collect(Collectors.toList()));
+                    }
+                });
+            }
+        }
+
+        // 大事记列表
+        if (!CollectionUtil.isNullOrEmpty(pa.getEventIDList())) {
+            List<EventBaseInfo> eventBaseInfoList = tbDataEventMapper.selectByIDs(pa.getEventIDList());
+            if (!CollectionUtil.isNullOrEmpty(eventBaseInfoList)) {
+                monitorPointDataInfoList.forEach(m -> {
+                    m.setEventList(eventBaseInfoList);
+                });
+            }
+        }
+
+        return monitorPointDataInfoList;
     }
 }

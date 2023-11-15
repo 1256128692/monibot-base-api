@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
 
 import java.util.List;
 
@@ -51,4 +52,6 @@ public interface TbDataEventMapper {
     List<QueryDataEventInfo> selectListByProjectIDAndItemIDs(Integer projectID, List<Integer> monitorItemIDList);
 
     void deleteByEventIDList(List<Integer> eventIDList);
+
+    List<EventBaseInfo> selectByIDs(List<Integer> eventIDList);
 }

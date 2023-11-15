@@ -2,12 +2,21 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
 public enum DisplayDensity {
 
-    ALL(1, "全部"),
-    HOUR(2, "小时"),
-    DAY(3, "日"),
-    WEEK(4, "周"),
-    MONTH(5, "月"),
-    YEAR(6, "年");
+    ALL(1, "all"),
+    HOUR(2, "1h"),
+    DAY(3, "1d"),
+    WEEK(4, "1w"),
+    MONTH(5, "30d"),
+    YEAR(6, "1y"),
+
+    TWO_HOUR(7, "2h"),
+
+    FOUR_HOUR(8, "4h"),
+
+    SIX_HOUR(9, "6h"),
+
+    TWELVE_HOUR(10, "12h");
+
 
     private int value;
     private String name;

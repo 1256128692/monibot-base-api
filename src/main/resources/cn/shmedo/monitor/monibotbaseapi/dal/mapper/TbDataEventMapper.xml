@@ -184,4 +184,15 @@
             #{eventID}
         </foreach>
     </delete>
+
+
+    <select id="selectByIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo">
+        select ID as id, `Name` as eventName, Frequency, TimeRange
+        from tb_data_event
+        where ID
+        <foreach collection="eventIDList" item="eventID" separator="," index="index" open="(" close=")">
+            #{eventID}
+        </foreach>
+    </select>
 </mapper>

@@ -50,4 +50,6 @@ public interface TbEigenValueRelationMapper {
     void insertBatch(List<Integer> monitorPointIDList, Integer eigenValueID);
 
     void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
+
+    List<TbEigenValueRelation> selectByIDs(List<Integer> eigenValueIDList);
 }

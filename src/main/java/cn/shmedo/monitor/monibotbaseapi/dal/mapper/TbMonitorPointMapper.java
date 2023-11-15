@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -63,4 +64,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<TbMonitorPoint> selectPointListByIDList(List<Integer> monitorPointIDList);
 
     List<Integer> selectItemIDsByIDs(List<Integer> monitorPointIDList);
+
+    List<MonitorPointDataInfo> selectMonitorPointDataInfoListByIDList(List<Integer> monitorPointIDList);
 }
