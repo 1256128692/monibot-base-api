@@ -6,6 +6,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoCaptureMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoCapture;
@@ -34,6 +35,7 @@ import java.util.*;
 public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, TbVideoDevice> implements ITbVideoDeviceService {
     private final HkVideoService hkVideoService;
     private final TbVideoCaptureMapper tbVideoCaptureMapper;
+    private final FileConfig fileConfig;
 
     @Override
     public List<VideoCompanyViewBaseInfo> queryVideoCompanyViewBaseInfo(QueryVideoCompanyViewBaseInfoParam param) {
@@ -64,7 +66,7 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         final String deviceSerial = device.getDeviceSerial();
         Optional.of(deviceSerial).map(tbVideoCaptureMapper::selectByDeviceSerial).filter(CollUtil::isNotEmpty)
                 .map(u -> u.get(0)).map(TbVideoCapture::getImageCapture).ifPresent(build::setCaptureStatus);
-        final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
+        final String url = hkVideoService.getStreamUrl(deviceSerial, param.getStreamType(), fileConfig.getStreamProtocol(), null, null, null);
         final HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(deviceSerial);
         Optional.ofNullable(url).filter(ObjectUtil::isNotEmpty).ifPresent(build::setBaseUrl);
         Optional.ofNullable(hkDeviceInfo).map(HkDeviceInfo::getCapabilitySet).filter(ObjectUtil::isNotEmpty)
@@ -82,7 +84,7 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
         String deviceSerial = param.getTbVideoDevice().getDeviceSerial();
         try {
             Map<String, Object> streamInfo = hkVideoService.getPlayBackStreamInfo(deviceSerial, param.getRecordLocation().toString(),
-                    DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, beginTime, endTime, param.getUuid(), null, null, null);
+                    fileConfig.getStreamProtocol(), null, beginTime, endTime, param.getUuid(), null, null, null);
             Map<String, String> res = new HashMap<>() {
                 {
                     Optional.ofNullable(streamInfo).filter(u -> u.containsKey(DefaultConstant.HikVideoParamKeys.HIK_STREAM_URL))
@@ -109,7 +111,7 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
     public ResultWrapper<Object> queryHikVideoTalk(QueryHikVideoTalkParam param) {
         try {
             return ResultWrapper.success(hkVideoService.getTalkStreamInfo(param.getTbVideoDevice().getDeviceSerial(),
-                    DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null));
+                    fileConfig.getStreamProtocol(), null, null, null));
         } catch (RuntimeException e) {
             return Optional.of(e).map(Throwable::getMessage).filter(ObjectUtil::isNotEmpty)
                     .filter(u -> u.contains(DefaultConstant.HikVideoErrorCode.NO_ASSOCIATED_TALK_CHANNEL))

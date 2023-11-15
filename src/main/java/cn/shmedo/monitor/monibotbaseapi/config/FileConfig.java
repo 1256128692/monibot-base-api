@@ -51,6 +51,8 @@ public class FileConfig {
     @Value("${ArtemisConfig.appSecret}")
     private String hkAppSecret;
 
+    @Value("${ArtemisConfig.streamProtocol}")
+    private String streamProtocol;
 
     @Value("${iot.hkProductID}")
     private Integer hkProductID;
