@@ -112,7 +112,7 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         List<TbPropertyModelGroup> tbPropertyModelGroupList = tbPropertyModelGroupMapper.selectList(queryWrapper);
         List<PropertyModelGroupResponse> propertyModelGroupResponseList = Lists.newArrayList();
         if (!CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
-            List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).collect(Collectors.toList());
+            List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).distinct().collect(Collectors.toList());
             ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
             if (resultWrapper.apiSuccess()) {
                 // 获取CreateUserID对应的CreateUserName

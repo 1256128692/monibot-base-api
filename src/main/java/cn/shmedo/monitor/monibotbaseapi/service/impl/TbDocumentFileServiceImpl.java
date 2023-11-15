@@ -93,7 +93,7 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
             Map<Integer, String> userIdNameMap = Maps.newHashMap();
             Map<String, String> fileInfoResponseMap = Maps.newHashMap();
             List<TbDocumentFile> records = resultPage.getRecords();
-            List<Integer> userIdList = records.stream().map(TbDocumentFile::getCreateUserID).collect(Collectors.toList());
+            List<Integer> userIdList = records.stream().map(TbDocumentFile::getCreateUserID).distinct().collect(Collectors.toList());
             List<String> ossKeyList = records.stream().map(TbDocumentFile::getFilePath).collect(Collectors.toList());
 
             // 获取CreateUserID对应的CreateUserName

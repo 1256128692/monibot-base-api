@@ -54,7 +54,8 @@ public interface UserService {
                                                              @Param("accessToken") String accessToken);
 
     /**
-     * 批量查询用户名称
+     * 批量查询用户名称<br>
+     * list item上限100条
      */
     @RequestLine("POST /QueryUserIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
