@@ -39,6 +39,10 @@ public class RedisConstant {
      * 物联网平台redisService
      */
     public static final String IOT_REDIS_SERVICE = "iotRedisService";
+    /**
+     * 权限平台redisService
+     */
+    public static final String AUTH_REDIS_SERVICE = "authRedisService";
 }
 
     
