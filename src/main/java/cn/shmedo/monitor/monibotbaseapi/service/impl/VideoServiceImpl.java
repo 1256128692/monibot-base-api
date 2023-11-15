@@ -28,19 +28,24 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
+import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
@@ -52,6 +57,7 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -87,6 +93,8 @@ public class VideoServiceImpl implements VideoService {
     private final TbVideoCaptureMapper videoCaptureMapper;
 
     private final TbProjectInfoMapper projectInfoMapper;
+
+    private UserService userService;
 
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -374,11 +382,22 @@ public class VideoServiceImpl implements VideoService {
         }
         Integer onlineCount = videoDeviceMapper.queryOnlineCount(pa.getDeviceSerial(), pa.getFuzzyItem(), pa.getDeviceStatus(), pa.getAllocationStatus(),
                 pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
+
+        CompanyIDListParam param = new CompanyIDListParam();
+        param.setCompanyIDList(pageData.getRecords().stream().map(VideoDevicePageInfo::getCompanyID).distinct().collect(Collectors.toList()));
+        ResultWrapper<List<CompanyIDAndNameV2>> resultWrapper = userService.listCompanyIDName(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        List<CompanyIDAndNameV2> companyInfoList;
+        if (resultWrapper.apiSuccess()) {
+            companyInfoList = resultWrapper.getData();
+        } else {
+            companyInfoList = null;
+        }
+
         pageData.getRecords().forEach(record -> {
             record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
             record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
-            if (redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()) != null) {
-                record.setCompanyName(redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()).getFullName());
+            if (!CollectionUtil.isNullOrEmpty(companyInfoList)) {
+                record.setCompanyName(Objects.requireNonNull(companyInfoList.stream().filter(c -> c.getCompanyID().equals(record.getCompanyID())).findFirst().orElse(null)).getCompanyName());
             }
         });
 
