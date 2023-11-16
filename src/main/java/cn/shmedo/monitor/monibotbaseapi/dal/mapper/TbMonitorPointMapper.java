@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryWetLineConfigParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
@@ -11,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.WetLineConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -74,4 +76,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<Map<String, Object>> selectMonitorTypeExValuesByPointIDList(List<Integer> monitorPointIDList);
 
     List<MonitorPointDataInfo> selectMonitorPointDataInfoListByIDList(List<Integer> monitorPointIDList);
+
+    WetLineConfigInfo selectWetLineConfig(QueryWetLineConfigParam param);
 }

@@ -1,18 +1,24 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.core.annotation.ResourceSymbol;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -216,23 +222,14 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测点组ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupName 监测点组名称
-     * @apiSuccess (返回结果) {String} dataList.monitorGroupImagePath 监测点组底图路径
-     * @apiSuccess (返回结果) {String} dataList.monitorGroupConfig 监测点组自定义配置
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupEnable 监测点组是否启用
      * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointConfig 监测点配置
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.monitorPointEnable 监测点是否启用
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.sensorID 传感器ID
-     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList.eigenValueDataList 特征值数据
-     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.eigenValueDataList.eigenValueID 特征值ID
-     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.eigenValueName 特征值名称
-     * @apiSuccess (返回结果) {Double} dataList.monitorPointDataList.eigenValueDataList.eigenValue 特征值
-     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.chnUnit 特征值中文单位
-     * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.eigenValueDataList.engUnit 特征值英文单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
@@ -280,6 +277,54 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/QueryTransverseList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryTransverseList(@Valid @RequestBody QueryTransverseListParam param) {
         return thematicDataAnalysisService.queryTransverseList(param);
+    }
+
+    /**
+     * @api {POST} /QueryWetLineConfig 查询浸润线纵剖面配置
+     * @apiDescription 查询浸润线纵剖面配置
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryWetLineConfig
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiSuccess (返回结果) {Int} monitorGroupID 监测点组ID
+     * @apiSuccess (返回结果) {String} monitorGroupName 监测点组名称
+     * @apiSuccess (返回结果) {Boolean} monitorGroupEnable 监测点组是否启用
+     * @apiSuccess (返回结果) {String} monitorGroupImagePath 监测点组底图配置
+     * @apiSuccess (返回结果) {Object[]} monitorGroupConfigList 监测点组自定义配置列表
+     * @apiSuccess (返回结果) {Int} monitorGroupConfigList.configID 配置ID
+     * @apiSuccess (返回结果) {String} monitorGroupConfigList.group 分组
+     * @apiSuccess (返回结果) {String} monitorGroupConfigList.key key
+     * @apiSuccess (返回结果) {String} monitorGroupConfigList.value value
+     * @apiSuccess (返回结果) {Object[]} monitorPointList 监测点数据列表
+     * @apiSuccess (返回结果) {Int} monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Boolean} monitorPointList.monitorPointEnable 监测是否启用
+     * @apiSuccess (返回结果) {Int} monitorPointList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} monitorPointList.sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} monitorPointList.sensorExValues 传感器拓展信息(e.g. {"安装高程":200})
+     * @apiSuccess (返回结果) {Double} monitorPointList.emptyPipeDistance 空管距离
+     * @apiSuccess (返回结果) {Double} monitorPointList.levelElevation 水位高程
+     * @apiSuccess (返回结果) {Double} monitorPointList.nozzleElevation 管口高程
+     * @apiSuccess (返回结果) {Object[]} monitorPointList.monitorPointConfigList 监测点自定义配置列表
+     * @apiSuccess (返回结果) {Int} monitorPointList.monitorPointConfigList.configID 配置ID
+     * @apiSuccess (返回结果) {String} monitorPointList.monitorPointConfigList.group 分组
+     * @apiSuccess (返回结果) {String} monitorPointList.monitorPointConfigList.key key
+     * @apiSuccess (返回结果) {String} monitorPointList.monitorPointConfigList.value value
+     * @apiSuccess (返回结果) {Object[]} monitorPointList.eigenValueList 监测点关联特征值列表
+     * @apiSuccess (返回结果) {Int} monitorPointList.eigenValueList.eigenValueID 特征值ID
+     * @apiSuccess (返回结果) {String} monitorPointList.eigenValueList.eigenValueName 特征值名称
+     * @apiSuccess (返回结果) {Double} monitorPointList.eigenValueList.eigenValue 特征值
+     * @apiSuccess (返回结果) {String} monitorPointList.eigenValueList.chnUnit 中文单位
+     * @apiSuccess (返回结果) {String} monitorPointList.eigenValueList.engUnit 英文单位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    @PostMapping(value = "/QueryWetLineConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryWetLineConfig(@Valid @RequestBody QueryWetLineConfigParam param) {
+        return thematicDataAnalysisService.queryWetLineConfig(param);
     }
 
     /**
@@ -598,8 +643,47 @@ public class ThematicDataAnalysisController {
      */
     //@Permission(permissionName = "")
     @PostMapping(value = "/AddManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addManualDataBatch(@Valid @RequestBody Object param) {
-        return null;
+    public Object addManualDataBatch(@Valid @RequestBody AddManualDataBatchParam param) {
+        thematicDataAnalysisService.addManualDataBatch(param);
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /GetImportManualTemplate 数据比测-获取批量导入模板
+     * @apiDescription 数据比测-获取批量导入模板
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName GetImportManualTemplate
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {Blob} file 文件流
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/GetImportManualTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public void getImportManualTemplate(@Valid @RequestBody GetImportManualTemplateParam param, HttpServletResponse response) {
+        thematicDataAnalysisService.getImportManualTemplate(param,response);
+    }
+
+    /**
+     * @api {POST} /ImportManualDataBatch 数据比测-批量导入
+     * @apiDescription 数据比测-批量导入
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName ImportManualDataBatch
+     * @apiParam (请求参数) {MultipartFile} file 导入文件
+     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/ImportManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object importManualDataBatch(@Valid @ResourceSymbol(ResourceType.BASE_PROJECT) @Positive(message = "工程ID不能小于1")
+                                        @RequestParam("projectID") Integer projectID,
+                                        @RequestParam MultipartFile file) {
+        return thematicDataAnalysisService.importManualDataBatch(projectID, file);
     }
 
     /**

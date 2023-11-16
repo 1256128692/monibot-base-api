@@ -12,8 +12,6 @@ import java.util.List;
 public class ThematicGroupPointListInfo {
     private Integer monitorGroupID;
     private String monitorGroupName;
-    private String monitorGroupImagePath;
-    private String monitorGroupConfig;
     private Boolean monitorGroupEnable;
     private List<ThematicPointListInfo> monitorPointDataList;
 }

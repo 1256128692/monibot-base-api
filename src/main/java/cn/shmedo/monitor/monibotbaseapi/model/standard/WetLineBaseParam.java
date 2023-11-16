@@ -2,14 +2,12 @@ package cn.shmedo.monitor.monibotbaseapi.model.standard;
 
 import cn.hutool.json.JSONException;
 import cn.shmedo.iot.entity.api.*;
-import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryWetLineConfigParam;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.*;
@@ -20,15 +18,8 @@ import java.util.*;
  */
 
 @Data
-public abstract class WetLineBaseParam implements IDataDisplayCheck, ParameterValidator, ResourcePermissionProvider<Resource> {
-    @Positive(message = "工程ID必须大于0")
-    @NotNull(message = "工程ID不能为空")
-    private Integer projectID;
-    @Positive(message = "监测点组ID必须大于0")
-    @NotNull(message = "监测点组ID不能为空")
-    private Integer monitorGroupID;
-    @NotEmpty(message = "监测点ID列表不能为空")
-    private List<Integer> monitorPointIDList;
+@EqualsAndHashCode(callSuper = true)
+public abstract class WetLineBaseParam extends QueryWetLineConfigParam implements IDataDisplayCheck {
     @NotNull(message = "开始时间不能为空")
     private Date startTime;
     @NotNull(message = "结束时间不能为空")
@@ -44,13 +35,9 @@ public abstract class WetLineBaseParam implements IDataDisplayCheck, ParameterVa
 
     @Override
     public ResultWrapper validate() {
-        if (!ContextHolder.getBean(TbMonitorGroupMapper.class).exists(new LambdaQueryWrapper<TbMonitorGroup>().eq(TbMonitorGroup::getID, monitorGroupID))) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点组不存在!");
-        }
-        if (ContextHolder.getBean(TbMonitorGroupPointMapper.class).selectCount(new LambdaQueryWrapper<TbMonitorGroupPoint>()
-                .eq(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupID)
-                .in(TbMonitorGroupPoint::getMonitorPointID, monitorPointIDList)) != monitorPointIDList.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有部分监测点不属于该监测点组!");
+        ResultWrapper<?> superValidate = super.validate();
+        if (Objects.nonNull(superValidate)) {
+            return superValidate;
         }
         try {
             if (!valid()) {
@@ -62,10 +49,5 @@ public abstract class WetLineBaseParam implements IDataDisplayCheck, ParameterVa
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有部分监测点不存在!");
         }
         return null;
-    }
-
-    @Override
-    public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
     }
 }

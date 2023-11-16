@@ -7,7 +7,12 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.poi.excel.ExcelReader;
+import cn.hutool.poi.excel.ExcelUtil;
+import cn.hutool.poi.excel.ExcelWriter;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
@@ -29,12 +34,16 @@ import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Nullable;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -166,14 +175,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     @Override
     public List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param) {
         //(group,key,value) - (monitorGroup,原始key::123,value)
-        List<ThematicGroupPointListInfo> dataList = tbMonitorPointMapper.selectThematicGroupPointList(param);
-        Map<String, String> ossKeyFilePath = getAbsulatePathMap(dataList.stream().map(ThematicGroupPointListInfo::getMonitorGroupImagePath).toList());
-        return dataList.stream().peek(u -> {
-            String imagePath = u.getMonitorGroupImagePath();
-            if (ObjectUtil.isNotEmpty(imagePath) && ossKeyFilePath.containsKey(imagePath)) {
-                u.setMonitorGroupImagePath(ossKeyFilePath.get(imagePath));
-            }
-        }).toList();
+        return tbMonitorPointMapper.selectThematicGroupPointList(param);
     }
 
     @Override
@@ -228,6 +230,31 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         throw new RuntimeException(e);
                     }
                 }).toList();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public WetLineConfigInfo queryWetLineConfig(QueryWetLineConfigParam param) {
+        WetLineConfigInfo res = tbMonitorPointMapper.selectWetLineConfig(param);
+        Optional.ofNullable(res.getMonitorGroupImagePath()).filter(ObjectUtil::isNotEmpty).map(fileService::getFileUrl)
+                .ifPresent(res::setMonitorGroupImagePath);
+        List<Integer> sensorIDList = res.getMonitorPointList().stream().map(ThematicPointListInfo::getSensorID)
+                .filter(Objects::nonNull).distinct().toList();
+
+        Map<Integer, Tuple<Double, Double>> dataMap = Optional.of(sensorIDList).filter(CollUtil::isNotEmpty).map(u ->
+                sensorDataDao.querySensorNewData(u, List.of(buildFieldSelectInfo(LEVEL_ELEVATION), buildFieldSelectInfo(EMPTY_PIPE_DISTANCE),
+                                buildFieldSelectInfo(DbConstant.TIME_FIELD), buildFieldSelectInfo(DbConstant.SENSOR_ID_TAG)),
+                        false, MonitorType.WET_LINE.getKey()).stream().collect(Collectors.toMap(
+                        k -> Convert.toInt(k.get(DbConstant.SENSOR_ID_TAG)),
+                        v -> new Tuple<>(Convert.toDouble(v.get(LEVEL_ELEVATION)), Convert.toDouble(v.get(EMPTY_PIPE_DISTANCE)))))).orElse(Map.of());
+        if (CollUtil.isNotEmpty(dataMap)) {
+            res.getMonitorPointList().stream().peek(u -> Optional.ofNullable(u.getSensorID()).filter(dataMap::containsKey)
+                    .map(dataMap::get).ifPresent(w -> {
+                        u.setLevelElevation(w.getItem1());
+                        u.setEmptyPipeDistance(w.getItem2());
+                    })).toList();
+        }
+        return res;
     }
 
     @Override
@@ -386,6 +413,20 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             }
         }
         return builder.build();
+    }
+
+    @Override
+    public void addManualDataBatch(AddManualDataBatchParam param) {
+        //TODO
+    }
+
+    @Override
+    public void getImportManualTemplate(GetImportManualTemplateParam param, HttpServletResponse response) {
+    }
+
+    @Override
+    public ResultWrapper<Object> importManualDataBatch(Integer projectID, MultipartFile file) {
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -792,12 +833,6 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     private void queryNewDryBeachData(final Integer sensorID, final Integer monitorType, final String fieldToken, Consumer<? super Double> action) {
         sensorDataDao.querySensorNewData(List.of(sensorID), List.of(buildFieldSelectInfo(fieldToken), buildFieldSelectInfo(DbConstant.TIME_FIELD), buildFieldSelectInfo(DbConstant.SENSOR_ID_TAG)), false, monitorType)
                 .stream().filter(w -> w.containsKey(fieldToken)).findFirst().map(w -> w.get(fieldToken)).map(Convert::toDouble).ifPresent(action);
-    }
-
-    private Map<String, String> getAbsulatePathMap(final List<String> ossKeyList) {
-        Integer companyID = CurrentSubjectHolder.getCurrentSubject().getCompanyID();
-        return Optional.of(ossKeyList).filter(CollUtil::isNotEmpty).map(u -> fileService.getFileUrlList(u, companyID)
-                .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath))).orElse(Map.of());
     }
 
     private @Nullable ThematicLongitudinalEigenValueData getMaxEigenValueData(final Double value, final List<ThematicEigenValueInfo> eigenValueList) {

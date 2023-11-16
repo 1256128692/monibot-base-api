@@ -325,4 +325,32 @@
                  left join tb_monitor_item_field mif on mtf.ID = mif.MonitorTypeFieldID
         where mif.MonitorItemID = (select MonitorItemID from tb_monitor_point where ID = #{monitorPointID})
     </select>
+    <select id="queryByMonitorTypesV2" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.MonitorTypeFieldV2">
+        SELECT
+            mt.TypeName monitorTypeName,
+            mtf.ID 'ID',
+            mtf.FieldToken fieldToken,
+            mtf.FieldName fieldName,
+            mtf.FieldDataType fieldDataType,
+            mtf.FieldClass fieldClass,
+            mtf.FieldDesc fieldDesc,
+            mtf.FieldUnitID fieldUnitID,
+            mtf.ParentID parentID,
+            mtf.CreateType createType,
+            mtf.ExValues exValues,
+            mtf.DisplayOrder displayOrder,
+            du.ChnUnit chnUnit,
+            du.EngUnit engUnit
+        FROM
+            tb_monitor_type_field mtf
+            LEFT JOIN tb_monitor_type mt ON mt.MonitorType = mtf.MonitorType
+            LEFT JOIN tb_data_unit du ON du.ID = mtf.FieldUnitID
+        WHERE mtf.MonitorType in
+        <foreach collection="monitorTypes" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        <if test="allFiled == null || allFiled == false">
+            and mtf.FieldClass != 3
+        </if>
+    </select>
 </mapper>

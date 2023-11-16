@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
@@ -31,6 +34,8 @@ public interface IThematicDataAnalysisService {
 
     List<ThematicQueryTransverseInfo> queryTransverseList(QueryTransverseListParam param);
 
+    WetLineConfigInfo queryWetLineConfig(QueryWetLineConfigParam param);
+
     List<Map<String, Object>> queryLongitudinalList(QueryLongitudinalListParam param);
 
     ThematicRainWaterAnalysisInfo queryRainWaterData(QueryRainWaterDataParam param);
@@ -40,4 +45,10 @@ public interface IThematicDataAnalysisService {
     List<ThematicDryBeachInfo> queryDryBeachDataList(QueryDryBeachDataListParam param);
 
     DryBeachDataInfo queryDryBeachData(QueryDryBeachDataParam param);
+
+    void addManualDataBatch(AddManualDataBatchParam param);
+
+    void getImportManualTemplate(GetImportManualTemplateParam param, HttpServletResponse response);
+
+    ResultWrapper<Object> importManualDataBatch(Integer projectID, MultipartFile file);
 }
