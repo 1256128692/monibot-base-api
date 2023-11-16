@@ -171,6 +171,7 @@ public class VideoController {
     }
 
     /**
+     * @apiDeprecated use now (#视频模块:QueryVideoDeviceListV2).
      * @api {POST} /QueryVideoCompanyViewBaseInfo 查询视频实时预览基础信息(企业级)
      * @apiDescription 查询视频实时预览基础信息(企业级)
      * @apiVersion 1.0.0
@@ -212,6 +213,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
+     * @apiParam (请求体) {String} [queryCode] 模糊匹配,可模糊匹配监测点组名称、监测点名称
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupParentID 监测组别ID
      * @apiSuccess (返回结果) {String} dataList.monitorGroupParentName 监测组别名称
@@ -242,7 +244,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} dataList.monitorGroupDataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
-     * @apiSuccess (返回结果) {Int[]} dataList.monitorGroupDataList.monitorPointDataList.deviceChannel 通道号列表
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.videoSourceInfoList.channelCode 通道号
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
@@ -261,6 +265,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
+      @apiParam (请求体) {String} [queryCode] 模糊匹配,可模糊匹配监测点组名称、监测点名称
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Object[]} dataList 监测组数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测分组ID
@@ -288,7 +293,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.storageType 存储类型 本地:0 云端:1 (暂时不用)
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.captureStatus 设备配置抓拍 true:1 false:0
      * @apiSuccess (返回结果) {Boolean} dataList.monitorPointDataList.allocationStatus 设备分配状态 true:1 false:0
-     * @apiSuccess (返回结果) {Int[]} dataList.monitorPointDataList.deviceChannel 通道号列表
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointDataList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.videoSourceInfoList.channelCode 通道号
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseVideo
      */
@@ -561,6 +568,35 @@ public class VideoController {
         return videoService.queryVideoDeviceListV1(pa);
     }
 
+    /**
+     * @api {POST} /QueryVideoDeviceListV2 查询监测工程下视频设备列表
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 查询监测工程下视频设备列表
+     * @apiName QueryVideoDeviceListV2
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
+     * @apiParam (请求体) {String} [queryContent]  超级搜索,设备序列号或者名称
+     * @apiSuccess (返回结果) {Object[]} dataList 工程下视频设备信息列表
+     * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
+     * @apiSuccess (返回结果) {String} dataList.projectName 工程名称
+     * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList 工程下视频设备信息列表
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoDeviceID 视频设备ID
+     * @apiSuccess (返回结果) {String} dataList.videoInfoList.accessPlatformStr 平台
+     * @apiSuccess (返回结果) {String} dataList.videoInfoList.deviceName 视频设备名称
+     * @apiSuccess (返回结果) {Boolean} dataList.videoInfoList.deviceStatus  设备在线状态
+     * @apiSuccess (返回结果) {Object[]} dataList.videoInfoList.videoSourceInfoList 通道视频列表
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoSourceInfoList.videoDeviceSourceID 通道视频ID
+     * @apiSuccess (返回结果) {Int} dataList.videoInfoList.videoSourceInfoList.channelCode 通道号
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:ListBaseVideoDevice")
+    @RequestMapping(value = "/QueryVideoDeviceListV2", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryVideoDeviceListV2(@Validated @RequestBody QueryVideoDeviceListParam pa) {
+        return videoService.queryVideoDeviceListV2(pa);
+    }
+
 
     /**
      * @api {POST} /QueryYsVideoDeviceList 查询萤石云视频分页列表
@@ -708,7 +744,7 @@ public class VideoController {
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 批量存储视频抓拍列表
-     * @apiName SaveVideoDeviceSensorList
+     * @apiName SaveVideoCaptureList
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Object[]} list 数据列表(max = 100)
      * @apiParam (请求体) {String} list.deviceSerial 设备序列号
@@ -870,7 +906,7 @@ public class VideoController {
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
      * @apiDescription 查询抓拍列表
-     * @apiName QueryCaptureList
+     * @apiName QueryCaptureDate
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {Int} videoDeviceSourceID 通道视频ID
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据

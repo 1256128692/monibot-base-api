@@ -106,14 +106,14 @@ public class TbVideoDeviceServiceImpl extends ServiceImpl<TbVideoDeviceMapper, T
     }
 
     @Override
-    public String queryHikVideoTalk(QueryHikVideoTalkParam param) {
+    public ResultWrapper<Object> queryHikVideoTalk(QueryHikVideoTalkParam param) {
         try {
-            return hkVideoService.getTalkStreamInfo(param.getTbVideoDevice().getDeviceSerial(),
-                    DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
+            return ResultWrapper.success(hkVideoService.getTalkStreamInfo(param.getTbVideoDevice().getDeviceSerial(),
+                    DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null));
         } catch (RuntimeException e) {
             return Optional.of(e).map(Throwable::getMessage).filter(ObjectUtil::isNotEmpty)
                     .filter(u -> u.contains(DefaultConstant.HikVideoErrorCode.NO_ASSOCIATED_TALK_CHANNEL))
-                    .map(u -> "该设备不支持语音对讲功能!").orElseThrow(() -> e);
+                    .map(u -> ResultWrapper.withCode(ResultCode.SUCCESS, "该设备不支持语音对讲功能!")).orElseThrow(() -> e);
         }
     }
 }

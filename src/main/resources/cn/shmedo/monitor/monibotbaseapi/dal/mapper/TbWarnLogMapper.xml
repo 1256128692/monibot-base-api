@@ -513,6 +513,7 @@
                twl.WarnTime    warnTime,
                tpi.`ID`        projectID,
                tpi.ProjectName projectName,
+               tpi.Location    projectArea,
                tmi.`ID`        monitorItemID,
                tmi.`Name`      monitorItemName,
                tmp.`ID`        monitorPointID,

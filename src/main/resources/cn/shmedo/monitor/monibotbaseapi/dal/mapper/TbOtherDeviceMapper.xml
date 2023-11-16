@@ -52,7 +52,7 @@
       from tb_other_device
       where
       <foreach collection="list" item="item" separator="or">
-          (vendor = #{item.vendor} and model = #{item.model} and name = #{item.name})
+          (vendor = #{item.vendor} and model = #{item.model} and token = #{item.token})
       </foreach>
   </select>
 </mapper>

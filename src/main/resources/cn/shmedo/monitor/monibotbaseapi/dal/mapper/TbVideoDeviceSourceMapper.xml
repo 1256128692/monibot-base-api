@@ -200,4 +200,14 @@
                left join tb_monitor_item mi on mp.MonitorItemID = mi.ID
       where DeviceSerial = #{deviceSerial};
   </select>
+
+  <select id="selectByDeviceSerialList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceSourceBaseInfo">
+      select ID as videoDeviceSourceID, deviceSerial, ChannelNo as channelCode
+      from tb_video_device_source
+      where deviceSerial in
+      <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
+          #{deviceSerial}
+      </foreach>
+  </select>
 </mapper>

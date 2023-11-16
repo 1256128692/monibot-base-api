@@ -106,7 +106,9 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                         .eq(TbProjectProperty::getProjectID, pa.getTbOtherDevice().getID())
                         .eq(TbProjectProperty::getSubjectType, PropertySubjectType.OtherDevice.getType())
         );
-        TbOtherDeviceWithProperty obj = TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName, tbPropertyModel.getName());
+        TbOtherDeviceWithProperty obj = TbOtherDeviceWithProperty.valueOf(pa.getTbOtherDevice(), tbProperties, tbProjectProperties, location, projectName,
+                ObjectUtil.isNull(tbPropertyModel) ? null : tbPropertyModel.getName()
+        );
 
         // 处理为文件或者图片的属性
         obj.getPropertyList().forEach(e -> {
@@ -117,7 +119,9 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
                 );
             }
         });
-        List<String> ossAllList = obj.getPropertyList().stream().flatMap(
+        List<String> ossAllList = obj.getPropertyList().stream()
+                .filter(e -> ObjectUtil.isNotEmpty(e.getOssList()))
+                .flatMap(
                 e -> e.getOssList().stream()
         ).toList();
         if (ObjectUtil.isNotEmpty(ossAllList)) {
@@ -143,7 +147,7 @@ public class OtherDeviceServiceImpl extends ServiceImpl<TbOtherDeviceMapper, TbO
     @Transactional(rollbackFor = Exception.class)
     public void updateOtherDevice(UpdateOtherDeviceParam pa, Integer subjectID) {
         baseMapper.updateById(pa.update(subjectID));
-        if (pa.getPropertyList() != null) {
+        if (ObjectUtil.isNotEmpty(pa.getPropertyList())) {
             tbProjectPropertyMapper.deleteProjectPropertyList(List.of(pa.getID()), PropertySubjectType.OtherDevice.getType());
             tbProjectPropertyMapper.insertBatch(pa.toProjectPropertyList());
         }

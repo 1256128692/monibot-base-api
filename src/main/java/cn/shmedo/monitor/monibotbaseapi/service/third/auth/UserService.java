@@ -5,10 +5,14 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
+
+import java.util.List;
 
 public interface UserService {
     @RequestLine("GET /GetCurrentSubject")
@@ -56,4 +60,10 @@ public interface UserService {
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<Object> queryUserIDName(QueryUserIDNameParameter pa,
                                           @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+
+    @RequestLine("POST /ListCompanyIDName")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa,
+                                                              @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 }

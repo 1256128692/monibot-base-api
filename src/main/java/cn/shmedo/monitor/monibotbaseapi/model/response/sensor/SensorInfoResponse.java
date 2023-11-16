@@ -114,9 +114,9 @@ public class SensorInfoResponse extends TbSensor {
         response.setUpdateTime(sensor.getUpdateTime());
         response.setCreateUserID(sensor.getCreateUserID());
         response.setUpdateUserID(sensor.getUpdateUserID());
-        response.setChannelCode(sensor.getChannelCode());
         response.setVideoDeviceSourceID(sensor.getVideoDeviceSourceID());
         if (videoDevice != null ) {
+            response.setChannelCode(videoDevice.getChannelCode());
             response.setVideoDeviceID(videoDevice.getID());
             response.setDeviceSerial(videoDevice.getDeviceSerial());
             response.setDeviceType(videoDevice.getDeviceType());

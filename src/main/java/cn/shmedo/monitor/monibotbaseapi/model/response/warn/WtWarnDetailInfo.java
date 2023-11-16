@@ -47,4 +47,14 @@ public class WtWarnDetailInfo implements IFieldToken, IMonitorType {
     private String regionArea;
     private String ruleName;
     private List<TbWarnAction> actionList;
+
+    //暴雨预警 warnType: 6
+    //预警发布单位
+    private String issueUnit;
+    //预警区域行政区划码
+    private Integer warnAreaCode;
+    //预警区域名称
+    private String warnArea;
+    //预警区域经纬度
+    private String warnAreaLocation;
 }

@@ -6,6 +6,7 @@ import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWorkOrderMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
@@ -16,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warn.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.engineField.FieldShowUtil;
@@ -38,6 +40,8 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     private final RedisService redisService;
 
     private final TbWorkOrderMapper workOrderMapper;
+    private final TbProjectInfoMapper projectMapper;
+    private static final String METEOROLOGICAL_OBSERVATORY = "气象台";
 
     @Override
     public PageUtil.Page<WtWarnLogInfo> queryByPage(QueryWtWarnLogPageParam param) {
@@ -87,8 +91,20 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                 return FieldShowUtil.dealFieldShow(cameraWarn);
             case DANGEROUS:
             case FLOOD:
-            case RAINSTORM:
                 return baseMapper.queryDetailByID(param.getWarnID());
+            case RAINSTORM:
+                WtWarnDetailInfo detail = baseMapper.queryDetailByID(param.getWarnID());
+                Optional.ofNullable(projectMapper.selectById(detail.getProjectID())).ifPresent(e -> {
+                    Integer city = JsonUtil.get(e.getLocation(), "city", Integer.class);
+                    if (city != null && redisService.hasKey(RedisKeys.REGION_AREA_KEY, city.toString())) {
+                        RegionArea area = redisService.get(RedisKeys.REGION_AREA_KEY, city.toString(), RegionArea.class);
+                        detail.setWarnAreaCode(city);
+                        detail.setWarnArea(area.getName());
+                        detail.setWarnAreaLocation(area.getLng() + StrUtil.COMMA + area.getLat());
+                        detail.setIssueUnit(area.getName() + METEOROLOGICAL_OBSERVATORY);
+                    }
+                });
+                return detail;
         }
         return null;
     }
@@ -178,7 +194,33 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
     public WtWarnListResult queryBaseList(QueryWtWarnListParam pa) {
         List<WtWarnLogBase> list = baseMapper.queryBaseList(pa);
         WtWarnListResult result = new WtWarnListResult();
-        result.setList(list);
+
+        Set<Object> cityCodes = list.stream().filter(e -> e.getWarnType().equals(WarnType.RAINSTORM) &&
+                        e.getProjectID() != null && e.getProjectID() != -1)
+                .map(e -> JsonUtil.getStr(e.getProjectArea(), "city"))
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        if (!cityCodes.isEmpty()) {
+            Map<Long, RegionArea> cityCodeMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, cityCodes, RegionArea.class)
+                    .stream().collect(Collectors.toMap(RegionArea::getAreaCode, e -> e));
+
+            result.setList(list.stream().map(e -> {
+                WtWarnListResult.Item item = WtWarnListResult.Item.of(e);
+                if (WarnType.RAINSTORM.equals(e.getWarnType())) {
+                    Long city = JsonUtil.get(e.getProjectArea(), "city", Long.class);
+                    if (city !=null && cityCodeMap.containsKey(city)) {
+                        RegionArea area = cityCodeMap.get(city);
+                        item.setWarnAreaCode(city);
+                        item.setWarnArea(area.getName());
+                        item.setWarnAreaLocation(area.getLng() + StrUtil.COMMA + area.getLat());
+                        item.setIssueUnit(area.getName() + METEOROLOGICAL_OBSERVATORY);
+                    }
+                }
+                return item;
+            }).toList());
+        } else {
+            result.setList(list);
+        }
+
         result.setStatistic(list.stream()
                 .collect(Collectors.groupingBy(WtWarnLogBase::getWarnLevel, Collectors.counting())));
         return result;

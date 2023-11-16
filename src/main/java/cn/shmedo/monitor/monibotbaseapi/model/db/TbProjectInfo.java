@@ -69,18 +69,6 @@ public class TbProjectInfo {
     private String directManageUnit;
 
     /**
-     * 平台类型（废弃）
-     */
-    @TableField(value = "PlatformType")
-    private Byte platformType;
-
-    /**
-     * 平台类型集
-     */
-    @TableField(value = "PlatformTypeSet")
-    private String platformTypeSet;
-
-    /**
      * 是否可用，需要配合有效期使用
      * 1:启用，0停用
      */

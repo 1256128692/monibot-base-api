@@ -7,8 +7,10 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
@@ -16,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -36,14 +39,17 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
     @NotNull
     @JsonAlias("ID")
     private Integer ID;
-    @NotNull
+    @NotBlank
     private String name;
-    @NotNull
+    @NotBlank
     private String token;
-    @NotNull
+    @NotBlank
     private String model;
-    @NotNull
+    @NotBlank
     private String vendor;
+    @NotNull
+    private Integer projectID;
+
     @Pattern(regexp = "^.+$", message = "扩展字段应为JSON格式")
     private String exValue;
     @Valid
@@ -63,6 +69,14 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "扩展字段应为JSON格式");
 
         }
+        TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
+        TbProjectInfo tbProjectInfo = tbProjectInfoMapper.selectById(projectID);
+        if (tbProjectInfo == null) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不存在");
+        }
+        if (!tbProjectInfo.getCompanyID().equals(companyID)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目不属于该公司");
+        }
         if (tbOtherDeviceMapper.selectCount(
                 new LambdaQueryWrapper<TbOtherDevice>()
                         .eq(TbOtherDevice::getVendor, vendor)
@@ -76,7 +90,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备没有模板，不能修改属性");
         }
         if (tbOtherDevice.getTemplateID() == null && ObjectUtil.isNotEmpty(propertyList)) {
-
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备没有模板，不能修改属性");
         }
         if (ObjectUtil.isNotEmpty(propertyList)) {
             TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
@@ -105,6 +119,7 @@ public class UpdateOtherDeviceParam implements ParameterValidator, ResourcePermi
         tbOtherDevice.setModel(model);
         tbOtherDevice.setVendor(vendor);
         tbOtherDevice.setExValue(exValue);
+        tbOtherDevice.setProjectID(projectID);
         return tbOtherDevice;
     }
 

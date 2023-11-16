@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +35,6 @@ public class VideoCompanyViewBaseInfo {
     @JsonProperty("deviceChannel")
     public List<Integer> deviceChannel() {
         return Optional.ofNullable(channelDesc).filter(ObjectUtil::isNotEmpty).map(u -> u.split(",")).map(Arrays::stream)
-                .map(u -> u.filter(ObjectUtil::isNotEmpty).map(Integer::parseInt).toList()).orElse(List.of());
+                .map(u -> u.filter(ObjectUtil::isNotEmpty).map(Integer::parseInt).sorted().toList()).orElse(List.of());
     }
 }

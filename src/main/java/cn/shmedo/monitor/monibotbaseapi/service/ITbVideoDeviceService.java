@@ -17,6 +17,10 @@ import java.util.Map;
  * @date 2023-08-31 14:19
  */
 public interface ITbVideoDeviceService extends IService<TbVideoDevice> {
+    /**
+     * @see VideoService#queryVideoDeviceListV2(QueryVideoDeviceListParam)
+     */
+    @Deprecated
     List<VideoCompanyViewBaseInfo> queryVideoCompanyViewBaseInfo(QueryVideoCompanyViewBaseInfoParam param);
 
     List<VideoProjectViewBaseInfo> queryVideoProjectViewBaseInfo(QueryVideoProjectViewBaseInfo param);
@@ -25,7 +29,7 @@ public interface ITbVideoDeviceService extends IService<TbVideoDevice> {
 
     VideoDeviceBaseInfoV2 queryHikVideoDeviceInfo(QueryHikVideoDeviceInfoParam param);
 
-    ResultWrapper<Map<String,String>> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
+    ResultWrapper<Map<String, String>> queryHikVideoPlayBack(QueryHikVideoPlayBackParam param);
 
-    String queryHikVideoTalk(QueryHikVideoTalkParam param);
+    ResultWrapper<Object> queryHikVideoTalk(QueryHikVideoTalkParam param);
 }
