@@ -8,7 +8,9 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDocumentFileMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDocumentFile;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DocumentSubjectType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.DeleteDocumentFileParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.QueryDocumentFilePageParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.documentfile.QueryDocumentFileParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
@@ -21,15 +23,12 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.alibaba.nacos.shaded.com.google.common.collect.Maps;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +36,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -49,32 +47,23 @@ import java.util.stream.Collectors;
  * @Version 1.0
  */
 @Service
-public class TbDocumentFileServiceImpl implements ITbDocumentFileService, InitializingBean {
-    private String appKey = null;
-    private String appSecret = null;
-
-    @Autowired
+public class TbDocumentFileServiceImpl implements ITbDocumentFileService {
     private TbDocumentFileMapper tbDocumentFileMapper;
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private FileService fileService;
-
-    @Autowired
     private MdInfoFileService mdInfoFileService;
-
-    @Autowired
     private FileConfig fileConfig;
 
-    @Override
-    public void afterPropertiesSet() {
-        appKey = fileConfig.getAuthAppKey();
-        appSecret = fileConfig.getAuthAppSecret();
+    @Autowired
+    public TbDocumentFileServiceImpl(TbDocumentFileMapper tbDocumentFileMapper, UserService userService,
+                                     FileService fileService, MdInfoFileService mdInfoFileService, FileConfig fileConfig) {
+        this.tbDocumentFileMapper = tbDocumentFileMapper;
+        this.userService = userService;
+        this.fileService = fileService;
+        this.mdInfoFileService = mdInfoFileService;
+        this.fileConfig = fileConfig;
     }
 
-    @Override
     public PageUtil.Page<DocumentFileResponse> queryDocumentPage(QueryDocumentFilePageParameter parameter) {
         // 分页条件
         Page<TbDocumentFile> queryPage = new Page<>(parameter.getCurrentPage(), parameter.getPageSize());
@@ -97,7 +86,7 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
             List<String> ossKeyList = records.stream().map(TbDocumentFile::getFilePath).collect(Collectors.toList());
 
             // 获取CreateUserID对应的CreateUserName
-            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
+            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
             if (resultWrapper.apiSuccess()) {
                 List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
                 if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
@@ -168,7 +157,7 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService, Initia
     public DocumentFileResponse queryDocumentFile(QueryDocumentFileParameter queryDocumentFileParameter) {
         DocumentFileResponse documentFileResponse = DocumentFileResponse.getDocumentFile(queryDocumentFileParameter.getTbDocumentFile());
         List<Integer> userIdList = Collections.singletonList(documentFileResponse.getCreateUserId());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), appKey, appSecret);
+        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (resultWrapper.apiSuccess()) {
             List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
             if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
