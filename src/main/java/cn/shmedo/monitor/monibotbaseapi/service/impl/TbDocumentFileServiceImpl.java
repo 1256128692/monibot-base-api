@@ -54,7 +54,6 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService {
     private MdInfoFileService mdInfoFileService;
     private FileConfig fileConfig;
 
-    @Autowired
     public TbDocumentFileServiceImpl(TbDocumentFileMapper tbDocumentFileMapper, UserService userService,
                                      FileService fileService, MdInfoFileService mdInfoFileService, FileConfig fileConfig) {
         this.tbDocumentFileMapper = tbDocumentFileMapper;
@@ -82,20 +81,23 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService {
             Map<Integer, String> userIdNameMap = Maps.newHashMap();
             Map<String, String> fileInfoResponseMap = Maps.newHashMap();
             List<TbDocumentFile> records = resultPage.getRecords();
-            List<Integer> userIdList = records.stream().map(TbDocumentFile::getCreateUserID).distinct().collect(Collectors.toList());
-            List<String> ossKeyList = records.stream().map(TbDocumentFile::getFilePath).collect(Collectors.toList());
-
-            // 获取CreateUserID对应的CreateUserName
-            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
-            if (resultWrapper.apiSuccess()) {
-                List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-                if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
-                    List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
-                    userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
+            Set<Integer> userIdSet = records.stream().map(TbDocumentFile::getCreateUserID).collect(Collectors.toSet());
+            Set<String> ossKeySet = records.stream().map(TbDocumentFile::getFilePath).collect(Collectors.toSet());
+            List<Integer> userIdList = new ArrayList<>(userIdSet);
+            if (!CollectionUtil.isNullOrEmpty(userIdList)) {
+                // 获取CreateUserID对应的CreateUserName
+                ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                if (resultWrapper.apiSuccess()) {
+                    List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
+                    if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
+                        List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+                        userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
+                    }
                 }
             }
+
             // 处理filePath
-            List<FileInfoResponse> fileInfoResponseList = fileService.getFileUrlList(ossKeyList, CurrentSubjectHolder.getCurrentSubject().getCompanyID());
+            List<FileInfoResponse> fileInfoResponseList = fileService.getFileUrlList(new ArrayList<>(ossKeySet), CurrentSubjectHolder.getCurrentSubject().getCompanyID());
             if (!CollectionUtil.isNullOrEmpty(fileInfoResponseList)) {
                 fileInfoResponseMap = fileInfoResponseList.stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, FileInfoResponse::getAbsolutePath));
             }
