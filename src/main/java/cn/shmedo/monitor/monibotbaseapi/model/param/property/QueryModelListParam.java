@@ -42,6 +42,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     private Integer platform;
 
     private Byte createType;
+    private Boolean excludeFileProperty;
 
     @JsonIgnore
     RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);

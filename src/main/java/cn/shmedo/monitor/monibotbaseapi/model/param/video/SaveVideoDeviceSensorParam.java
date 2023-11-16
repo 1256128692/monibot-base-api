@@ -71,19 +71,18 @@ public class SaveVideoDeviceSensorParam implements ParameterValidator, ResourceP
             List<String> sensorNamesWithNullSensorID = new ArrayList<>();
             List<Integer> notNullSensorIDList = new ArrayList<>();
             TbSensorMapper sensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-            LambdaQueryWrapper<TbSensor> wrapper = new LambdaQueryWrapper<TbSensor>()
-                    .in(TbSensor::getVideoDeviceID, list.stream().map(VideoDeviceInfoV3::getVideoDeviceID).collect(Collectors.toList()));
-            // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
-            List<TbSensor> tbSensorsList = sensorMapper.selectList(wrapper);
-
-
+            List<VideoDeviceInfoV6> videoDeviceInfoV6List = sensorMapper.selectListByDeviceSerialList(list.stream().map(VideoDeviceInfoV3::getDeviceSerial).distinct().collect(Collectors.toList()));
 
             for (int i = 0; i < list.size(); i++) {
                 VideoDeviceInfoV3 videoDeviceInfo = list.get(i);
-                if (!CollectionUtil.isNullOrEmpty(tbSensorsList)) {
-                    if (!tbSensorsList.stream().map(TbSensor::getProjectID).collect(Collectors.toList())
-                            .contains(list.get(i).getProjectID())) {
-                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备转移企业前,需要删除设备下的传感器");
+                if (!CollectionUtil.isNullOrEmpty(videoDeviceInfoV6List)) {
+                    List<VideoDeviceInfoV6> includeMonitorPointSensorList = videoDeviceInfoV6List.stream()
+                            .filter(s -> s.getDeviceSerial().equals(videoDeviceInfo.getDeviceSerial()))
+                            .filter(s -> s.getMonitorPointID() != null)
+                            .filter(s -> !s.getProjectID().equals(videoDeviceInfo.getProjectID())).collect(Collectors.toList());
+
+                    if (!CollectionUtil.isNullOrEmpty(includeMonitorPointSensorList)) {
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "设备转移企业前,传感器需要先解绑监测点");
                     }
                 }
                 if (videoDeviceInfo.getAddSensorList() != null) {

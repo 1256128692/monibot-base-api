@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.interceptor;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.hutool.core.lang.Assert;
@@ -31,7 +32,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * 权限拦截器，根据 {@link Permission} 注解进行权限校验
@@ -183,14 +183,15 @@ public class PermissionInterceptor {
                 }
                 case BATCH_RESOURCE_SINGLE_PERMISSION -> {
                     List<Resource> resourceList = Convert.toList(Resource.class, permissionParameter);
-                    List<OpenAuthResourceItemV2> itemV2List = resourceList.stream().map(OpenAuthResourceItemV2::new)
-                            .collect(Collectors.toList());
-                    OpenAuthQueryHasPermissionInBatchResourceParameter batchPa =
-                            new OpenAuthQueryHasPermissionInBatchResourceParameter();
-                    batchPa.setServiceName(servicePermission.getItem1());
-                    batchPa.setPermissionToken(servicePermission.getItem2());
-                    batchPa.setResourceList(itemV2List);
-                    return userService.queryHasPermissionInBatchResource(batchPa, token);
+                    boolean allMatch = CollUtil.split(resourceList, 100).stream().allMatch(list -> {
+                        OpenAuthQueryHasPermissionInBatchResourceParameter batchPa = new OpenAuthQueryHasPermissionInBatchResourceParameter();
+                        batchPa.setServiceName(servicePermission.getItem1());
+                        batchPa.setPermissionToken(servicePermission.getItem2());
+                        batchPa.setResourceList(list.stream().map(OpenAuthResourceItemV2::new).toList());
+                        ResultWrapper<Boolean> wrapper = userService.queryHasPermissionInBatchResource(batchPa, token);
+                        return wrapper.apiSuccess() && Boolean.TRUE.equals(wrapper.getData());
+                    });
+                    return ResultWrapper.success(allMatch);
                 }
 
             }

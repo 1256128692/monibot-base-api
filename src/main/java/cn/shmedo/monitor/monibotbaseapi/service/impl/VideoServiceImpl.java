@@ -28,19 +28,24 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
+import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
@@ -52,6 +57,7 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,6 +91,10 @@ public class VideoServiceImpl implements VideoService {
     private final TbSensorMapper sensorMapper;
 
     private final TbVideoCaptureMapper videoCaptureMapper;
+
+    private final TbProjectInfoMapper projectInfoMapper;
+
+    private UserService userService;
 
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -286,12 +296,12 @@ public class VideoServiceImpl implements VideoService {
                     deviceInfoWrapper = ysService.getDeviceInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData()) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                     }
                 } else {
                     deviceChannelInfo = ysService.getDeviceChannelInfo(ysToken, addVideoList.get(i).getDeviceSerial());
                     if (null == deviceInfoWrapper.getData()) {
-                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到萤石云对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                     }
                 }
 
@@ -308,7 +318,7 @@ public class VideoServiceImpl implements VideoService {
                 Integer num = i + 1;
                 HkDeviceInfo hkDeviceInfo = hkVideoService.queryDevice(addVideoList.get(i).getDeviceSerial());
                 if (hkDeviceInfo == null) {
-                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "未查到海康对应数据,设备序列号为:" + addVideoList.get(i).getDeviceSerial());
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "设备SN号输入错误，请核实后重新输入！");
                 }
 
                 videoDeviceInfoList.add(VideoDeviceInfo.hkToNewValue(hkDeviceInfo, addVideoList.get(i), pa, "HIK" + formatStar + num.toString()));
@@ -333,7 +343,6 @@ public class VideoServiceImpl implements VideoService {
         iotService.createMultipleDevice(iotRequest,
                 fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
 
-        // TODO:新增逻辑查询iot平台,返回uniquetoken
         ResultWrapper<List<DeviceBaseInfo>> deviceBaseInfoWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
                 .companyID(pa.getCompanyID())
                 .deviceTokens(videoDeviceInfoList.stream().map(VideoDeviceInfo::getDeviceToken).collect(Collectors.toSet()))
@@ -351,7 +360,6 @@ public class VideoServiceImpl implements VideoService {
             int successInsertCount = videoDeviceMapper.batchInsert(videoDeviceInfoList);
 
             if (successInsertCount != 0) {
-                // TODO:新增逻辑插入视频通道表
                 videoDeviceSourceMapper.batchInsert(videoDeviceInfoList.stream()
                         .map(VideoDeviceInfo::getTbVideoDeviceSourceList)
                         .flatMap(List::stream)
@@ -374,11 +382,22 @@ public class VideoServiceImpl implements VideoService {
         }
         Integer onlineCount = videoDeviceMapper.queryOnlineCount(pa.getDeviceSerial(), pa.getFuzzyItem(), pa.getDeviceStatus(), pa.getAllocationStatus(),
                 pa.getOwnedCompanyID(), pa.getProjectID(), pa.getBegin(), pa.getEnd());
+
+        CompanyIDListParam param = new CompanyIDListParam();
+        param.setCompanyIDList(pageData.getRecords().stream().map(VideoDevicePageInfo::getCompanyID).distinct().collect(Collectors.toList()));
+        ResultWrapper<List<CompanyIDAndNameV2>> resultWrapper = userService.listCompanyIDName(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        List<CompanyIDAndNameV2> companyInfoList;
+        if (resultWrapper.apiSuccess()) {
+            companyInfoList = resultWrapper.getData();
+        } else {
+            companyInfoList = null;
+        }
+
         pageData.getRecords().forEach(record -> {
             record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
             record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
-            if (redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()) != null) {
-                record.setCompanyName(redisCompanyInfoDao.selectCompanyInfo(record.getCompanyID()).getFullName());
+            if (!CollectionUtil.isNullOrEmpty(companyInfoList)) {
+                record.setCompanyName(Objects.requireNonNull(companyInfoList.stream().filter(c -> c.getCompanyID().equals(record.getCompanyID())).findFirst().orElse(null)).getCompanyName());
             }
         });
 
@@ -526,6 +545,9 @@ public class VideoServiceImpl implements VideoService {
         List<Integer> videoIDList = pa.getTbVideoDevices().stream()
                 .map(TbVideoDevice::getID).collect(Collectors.toList());
         videoDeviceMapper.deleteBatchIds(videoIDList);
+
+        // 2.删除传感器
+        sensorMapper.deleteBatchByDeviceSerialList(pa.getDeviceSerialList());
 
         // 3. 删除抓拍配置
         videoCaptureMapper.deleteByVedioIDList(pa.getDeviceSerialList());
@@ -1107,39 +1129,35 @@ public class VideoServiceImpl implements VideoService {
             // 传感器列表
             List<VideoCaptureBaseInfo> sensorList = v.getSensorList().stream().filter(s -> s.getSensorID() != null).collect(Collectors.toList());
             // 通道列表
-            List<VideoCaptureBaseInfo> channelList = v.getSensorList().stream().filter(s -> s.getChannelNo() != null).collect(Collectors.toList());
+            List<VideoCaptureBaseInfo> notGenerateSensorList = v.getSensorList().stream().filter(s -> s.getSensorID() == null).collect(Collectors.toList());
             if (v.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
 
                 // 如果传感器列表为空，根据通道号数量去转换传感器
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        for (int i = 0; i < channelList.size(); i++) {
+                    if (!CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        for (int i = 0; i < v.getSensorList().size(); i++) {
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(v.getSensorList().get(i), v.getDeviceName()));
                         }
                     }
                     v.setDeviceChannelNum(0);
                 } else {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        List<VideoCaptureBaseInfo> filteredYsChannelInfoList = channelList.stream()
-                                .filter(ys -> v.getSensorList().stream().noneMatch(sensor -> sensor.getChannelNo().equals(ys.getChannelNo())))
-                                .collect(Collectors.toList());
+                    if (!CollectionUtil.isNullOrEmpty(notGenerateSensorList)) {
                         v.setDeviceChannelNum(sensorList.size());
-
-                        for (int i = 0; i < filteredYsChannelInfoList.size(); i++) {
+                        for (int i = 0; i < notGenerateSensorList.size(); i++) {
                             // 添加到 singleVideoSensorList
-                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(i), v.getDeviceName()));
+                            singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(notGenerateSensorList.get(i), v.getDeviceName()));
                         }
-                        singleVideoSensorList.addAll(v.getSensorList());
                     }
+                    singleVideoSensorList.addAll(sensorList);
                 }
                 v.setSensorList(singleVideoSensorList);
 
             } else {
                 v.setDeviceChannelNum(1);
                 if (CollectionUtil.isNullOrEmpty(sensorList)) {
-                    if (!CollectionUtil.isNullOrEmpty(channelList)) {
-                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(channelList.get(0), v.getDeviceName()));
+                    if (!CollectionUtil.isNullOrEmpty(v.getSensorList())) {
+                        singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(v.getSensorList().get(0), v.getDeviceName()));
                         v.setSensorList(singleVideoSensorList);
                     }
                 }
@@ -1175,9 +1193,6 @@ public class VideoServiceImpl implements VideoService {
         // 3. 批量生成传感器设备,过滤出来传感器ID为空的数据,为新增数据,  不为空的数据,为批量修改数据
         List<SensorBaseInfoV1> insertSensorList = new LinkedList<>();
         List<SensorBaseInfoV1> updateSensorList = new LinkedList<>();
-        // 抓拍配置
-//        List<SensorBaseInfoV1> captureSensorList = new LinkedList<>();
-//        List<SensorBaseInfoV1> finalCaptureSensorList = captureSensorList;
         pa.getList().forEach(v -> {
             List<SensorBaseInfoV1> addSensorList = v.getAddSensorList();
             if (!CollectionUtil.isNullOrEmpty(addSensorList)) {
@@ -1192,9 +1207,6 @@ public class VideoServiceImpl implements VideoService {
                         updateSensorList.add(SensorBaseInfoV1.createUpdateSensor(addSensorList.get(i), subjectID, v));
                     }
                 }
-//                finalCaptureSensorList.clear();
-//                finalCaptureSensorList.addAll(insertSensorList);
-//                finalCaptureSensorList.addAll(updateSensorList);
             }
         });
         // 3.进行分流,传感器ID为空的新增,传感器ID不为空的修改
@@ -1204,20 +1216,6 @@ public class VideoServiceImpl implements VideoService {
         if (!CollectionUtil.isNullOrEmpty(updateSensorList)) {
             sensorMapper.updateSensorList(updateSensorList);
         }
-
-        // 4.批量插入定时抓拍
-//        if (!CollectionUtil.isNullOrEmpty(captureSensorList)) {
-//            List<SensorBaseInfoV1> sensorList = sensorMapper.selectListByNameAndProjectID(captureSensorList.stream().map(SensorBaseInfoV1::getSensorName).collect(Collectors.toList()),
-//                    captureSensorList.get(0).getProjectID());
-//            captureSensorList.forEach(c -> {
-//                SensorBaseInfoV1 sensorBaseInfoV1 = sensorList.stream().filter(s -> s.getSensorName().equals(c.getSensorName())).findFirst().orElse(null);
-//                if (sensorBaseInfoV1 != null) {
-//                    c.setSensorID(sensorBaseInfoV1.getSensorID());
-//                    c.setDeviceSerial(sensorBaseInfoV1.getDeviceSerial());
-//                }
-//            });
-//            videoCaptureMapper.insertBatch(captureSensorList);
-//        }
 
         return ResultWrapper.successWithNothing();
     }
@@ -1266,6 +1264,36 @@ public class VideoServiceImpl implements VideoService {
             });
         }
         return info;
+    }
+
+    @Override
+    public Object queryVideoDeviceListV2(QueryVideoDeviceListParam pa) {
+        List<VideoBaseInfo> videoInfoList = videoDeviceMapper.selectListByCompanyID(pa.getCompanyID(), pa.getDeviceStatus(), pa.getQueryContent());
+        if (CollectionUtil.isNullOrEmpty(videoInfoList)) {
+            return Collections.emptyList();
+        }
+
+        List<VideoDeviceSourceBaseInfo> videoSourceInfoList = videoDeviceSourceMapper.selectByDeviceSerialList(videoInfoList.stream().map(VideoBaseInfo::getDeviceSerial).collect(Collectors.toList()));
+        List<ProjectVideoInfo> list = new LinkedList<ProjectVideoInfo>();
+        ProjectVideoInfo notAllocatedProject = new ProjectVideoInfo();
+        notAllocatedProject.setProjectID(-1);
+        notAllocatedProject.setProjectName("未分配工程");
+        videoInfoList.forEach(videoInfo -> {
+            if (videoInfo.getProjectID() == null) {
+                videoInfo.setProjectID(-1);
+            }
+            videoInfo.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(videoInfo.getAccessPlatform()));
+            if (!CollectionUtil.isNullOrEmpty(videoSourceInfoList)) {
+                videoInfo.setVideoSourceInfoList(videoSourceInfoList.stream().filter(videoSourceInfo -> videoSourceInfo.getDeviceSerial().equals(videoInfo.getDeviceSerial())).collect(Collectors.toList()));
+            }
+        });
+
+        list.addAll(projectInfoMapper.selectListByIDs(videoInfoList.stream().map(VideoBaseInfo::getProjectID).distinct().collect(Collectors.toList())));
+        list.add(notAllocatedProject);
+        list.forEach(i -> {
+            i.setVideoInfoList(videoInfoList.stream().filter(v -> v.getProjectID().equals(i.getProjectID())).collect(Collectors.toList()));
+        });
+        return list;
     }
 
     private List<VideoDeviceBaseInfoV1> convertMonitorPointDetailToVideoDeviceBaseInfoV1(List<HkMonitorPointInfo.MonitorPointDetail> monitorPointDetails) {

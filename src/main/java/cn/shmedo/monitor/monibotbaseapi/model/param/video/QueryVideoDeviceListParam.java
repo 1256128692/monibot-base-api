@@ -28,6 +28,8 @@ public class QueryVideoDeviceListParam implements ParameterValidator, ResourcePe
 
     private Boolean deviceStatus;
 
+    private String queryContent;
+
     @Override
     public ResultWrapper validate() {
         return null;

@@ -79,14 +79,6 @@ public class ProjectInfo extends TbProjectInfo {
     }
 
     @Override
-    public void setPlatformType(Byte platformType) {
-        PlatformType type = PlatformType.getPlatformType(platformType);
-        if (platformType != null) {
-            this.platformTypeName = type.getTypeStr();
-        }
-        super.setPlatformType(platformType);
-    }
-    @Override
     public void setLocation(String location) {
         super.setLocation(location);
         if (JSONUtil.isTypeJSON(location)) {

@@ -46,6 +46,7 @@ public class PropertyController {
      * @apiParam (请求体) {String} [modelPropertyList.className] 类名称
      * @apiParam (请求体) {Int} [modelPropertyList.displayOrder] 展示顺序
      * @apiParam (请求体) {String} [modelPropertyList.exValue] 额外属性
+     * @apiParam (请求体) {Int} [modelPropertyList.createType] 创建类型 0:预定义 1:自定义
      * @apiSuccess (返回结果) {Int} ID ID
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddModel
@@ -187,6 +188,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID对应projectType）
      * @apiParam (请求体) {String} [platform] 所属平台（冗余字段，当且仅当ModelType为2-工作流时候，有值）
      * @apiParam (请求体) {Int} [createType] 创建类型
+     * @apiParam (请求体) {Boolean} [excludeFileProperty] 排除包含文件属性（6图片， 7 文件）的模板
      * @apiSuccess (返回结果) {Object[]} modelList  模板列表
      * @apiSuccess (返回结果) {Int} modelList.modelID  模板ID
      * @apiSuccess (返回结果) {Int} modelList.companyID  公司ID
@@ -286,6 +288,26 @@ public class PropertyController {
     public Object addPropertyValues(@RequestBody @Validated AddPropertyValuesParam param) {
         propertyService.AddPropertyValues(param);
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /DeletePropertyValues 删除模板属性值 - 暂时只对表单模板为工作流类型时开放
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName DeletePropertyValues
+     * @apiDescription 删除模板属性值
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} subjectType 对象类型，0:工程 1:其他设备 2:工作流
+     * @apiParam (请求体) {Int[]} subjectIDList 对象ID列表
+     * @apiSuccess (返回结果) {Int} data 删除行数
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DeleteModel
+     */
+    @LogParam(moduleName = "属性管理模块", operationName = "删除模板属性值", operationProperty = OperationProperty.DELETE)
+    @Permission(permissionName = "mdmbase:DeleteModel", allowApplication = true)
+    @PostMapping(value = "DeletePropertyValues", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deletePropertyValues(@RequestBody @Validated DeletePropertyValuesParam param) {
+        return propertyService.deletePropertyValues(param);
     }
 
     /**

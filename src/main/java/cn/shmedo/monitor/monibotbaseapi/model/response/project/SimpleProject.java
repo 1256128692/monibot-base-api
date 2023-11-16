@@ -1,8 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.project;
 
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import lombok.Builder;
 import lombok.Data;
 
+import javax.naming.InitialContext;
 import java.util.List;
 
 /**
@@ -17,9 +19,11 @@ public class SimpleProject {
     private String name;
 
     private Byte level;
-    private String platformTypeSet;
     private Byte projectType;
     private String projectTypeStr;
+
+    private List<Integer> serviceIDList;
+    private List<AuthService> serviceList;
 
     private List<SimpleProject> nnLevelProjectList;
 }

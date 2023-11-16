@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.*;
@@ -136,7 +135,7 @@ public class UpdateProjectParameter implements ParameterValidator, ResourcePermi
         }
         if (ObjectUtil.isNotEmpty(propertyList)){
              properties = new ArrayList<>(PredefinedModelProperTyCache.projectTypeAndPropertyListMap.get(projectInfo.getProjectType()));
-            if (projectInfo.getModelID() != null) {
+            if (projectInfo.getModelID() != null && !projectInfo.getModelID().equals(properties.get(0).getModelID())) {
                 TbPropertyMapper tbPropertyMapper = ContextHolder.getBean(TbPropertyMapper.class);
                 properties.addAll(tbPropertyMapper.queryByMID(projectInfo.getModelID()));
             }

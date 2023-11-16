@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDeviceSource;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfoV2;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoDeviceSourceBaseInfo;
 
 import java.util.List;
 
@@ -54,4 +55,6 @@ public interface TbVideoDeviceSourceMapper {
     void deleteByDeviceSerialList(List<String> deviceSerialList);
 
     List<VideoCaptureBaseInfoV2> selectByDeviceSerial(String deviceSerial);
+
+    List<VideoDeviceSourceBaseInfo> selectByDeviceSerialList(List<String> deviceSerialList);
 }

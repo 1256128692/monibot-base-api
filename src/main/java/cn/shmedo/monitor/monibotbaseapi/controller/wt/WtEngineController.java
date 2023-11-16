@@ -260,7 +260,7 @@ public class WtEngineController {
      * @api {POST} /DeleteWtAction 删除动作
      * @apiVersion 1.0.0
      * @apiGroup 警报规则引擎模块
-     * @apiName DeleteWtWarnStatus
+     * @apiName DeleteWtAction
      * @apiDescription 删除动作
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int[]} actionIDList 删除的动作ID list

@@ -10,10 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.PropertyIdAndValue;
@@ -86,8 +83,12 @@ public class AddOtherDeviceBatchParam implements ParameterValidator, ResourcePer
         }
         List<Integer> projectIDList = list.stream().map(AddOtherDeviceItem::getProjectID).distinct().toList();
         TbProjectInfoMapper tbProjectInfoMapper = ContextHolder.getBean(TbProjectInfoMapper.class);
-        if (tbProjectInfoMapper.selectBatchIds(projectIDList).size() != projectIDList.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "projectID不存在");
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectBatchIds(projectIDList);
+        if (tbProjectInfos.size() != projectIDList.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有项目不存在");
+        }
+        if (tbProjectInfos.stream().anyMatch(e -> !e.getCompanyID().equals(companyID))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有项目不属于该公司");
         }
         return null;
     }

@@ -68,6 +68,7 @@ public class OtherDeviceController {
      * @apiParam (请求体) {String} token 设备编号
      * @apiParam (请求体) {String} model 设备型号
      * @apiParam (请求体) {String} vendor 设备厂商/品牌
+     * @apiParam (请求体) {Int} projectID 项目ID
      * @apiParam (请求体) {String} [exValue] 扩展字段,json字符串（500）
      * @apiParam (请求体) {Json[]} [propertyList] 属性列表
      * @apiParam (请求体) {Int} propertyList.ID 属性id

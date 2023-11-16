@@ -2,11 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.video;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -21,7 +24,7 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
     private Integer monitorType;
     private Integer displayOrder;
     private String monitorPointName;
-    private List<Integer> deviceChannel;
+    private List<Map<String, Integer>> videoSourceInfoList;
     @JsonIgnore
     private List<VideoProjectViewSensorInfo> sensorInfoList;
 
@@ -43,7 +46,9 @@ public class VideoProjectViewPointInfo extends VideoProjectViewSensorInfo {
             setStorageType(info.getStorageType());
             setCaptureStatus(info.getCaptureStatus());
             setAllocationStatus(info.getAllocationStatus());
-            setDeviceChannel(u.stream().map(VideoProjectViewSensorInfo::getChannelNo).filter(ObjectUtil::isNotEmpty).toList());
+            setVideoSourceInfoList(u.stream().filter(w -> ObjectUtil.isNotEmpty(w.getChannelNo()))
+                    .map(w -> Map.of("channelCode", w.getChannelNo(), "videoDeviceSourceID", w.getVideoDeviceSourceID()))
+                    .sorted(Comparator.comparingInt(o -> o.get("channelCode"))).toList());
         });
     }
 }

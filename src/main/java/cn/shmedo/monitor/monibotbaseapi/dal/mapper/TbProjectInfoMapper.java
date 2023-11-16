@@ -5,19 +5,16 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequ
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import jakarta.validation.Valid;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-@Mapper
+
 public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
-
-
     void updateCompanyID(Integer projectID, Integer companyID, Integer userID, Date date);
 
     void updateExpiryDate(Integer projectID, Date newExpiryDate, Integer userID, Date date);
@@ -61,4 +58,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<TbProjectInfo> selectAll();
 
     void updateLevel2Unallocatedwhennorealtion();
+
+    List<ProjectVideoInfo> selectListByIDs(List<Integer> projectIDs);
 }

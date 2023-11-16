@@ -95,6 +95,7 @@
                     </foreach>
                 </if>
             </trim>
+            order by tp.DisplayOrder
         </where>
     </select>
     <delete id="deleteProjectPropertyList" parameterType="java.lang.Integer">

@@ -62,6 +62,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -539,7 +540,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     .collect(Collectors.groupingBy(TagDto::getProjectID));
             //属性
             Map<Integer, List<PropertyDto>> propMap = tbProjectPropertyMapper
-                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), 0, PropertySubjectType.Project.getType()).stream()
+                    .queryPropertyByProjectID(new ArrayList<>(pidAllSet), null, PropertySubjectType.Project.getType()).stream()
                     .collect(Collectors.groupingBy(PropertyDto::getProjectID));
             //行政区划
             Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, locationInfoSet.stream().filter(Objects::nonNull)
@@ -615,6 +616,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                                             ).toList()
                                     );
                                 }
+                                if (ObjectUtil.isNotEmpty(e.getDownLevelProjectList())) {
+                                    e.getDownLevelProjectList().forEach(
+                                            ee -> {
+                                                if (pidServiceListMap.containsKey(ee.getID())) {
+                                                    ee.setServiceList(
+                                                            pidServiceListMap.get(ee.getID()).stream().map(
+                                                                    serviceMap::get
+                                                            ).toList()
+                                                    );
+                                                }
+                                            }
+                                    );
+                                }
                             }
                     );
 
@@ -673,12 +687,17 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         result.getPropertyList().forEach(e -> {
             if (FormPropertyType.FILE.getCode().equals(e.getType().intValue())
                     || FormPropertyType.PICTURE.getCode().equals(e.getType().intValue())) {
-                e.setOssList(
-                        Arrays.stream(e.getValue().split(",")).toList()
-                );
+                if (StrUtil.isNotEmpty(e.getValue())) {
+                    e.setOssList(
+                            Arrays.stream(e.getValue().split(",")).toList()
+                    );
+                }
+
             }
         });
-        List<String> ossAllList = result.getPropertyList().stream().flatMap(
+        List<String> ossAllList = result.getPropertyList().stream()
+                .filter(e -> ObjectUtil.isNotEmpty(e.getOssList()))
+                .flatMap(
                 e -> e.getOssList().stream()
         ).toList();
         if (ObjectUtil.isNotEmpty(ossAllList)) {
@@ -725,9 +744,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             } else {
                 return Collections.emptyList();
             }
-        }
-        if (pa.getPlatformType() != null) {
-            wrapper.in(TbProjectInfo::getPlatformType, pa.getPlatformType().intValue());
         }
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
@@ -959,11 +975,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             );
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Two.getLevel())) {
-            lambdaQueryWrapper.and(e ->
-                    e.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel())
-                            .or()
-                            .eq(TbProjectInfo::getLevel, ProjectLevel.Unallocated.getLevel())
-            );
+            lambdaQueryWrapper.eq(TbProjectInfo::getLevel, ProjectLevel.Son.getLevel());
         }
         if (pa.getTbProjectInfo().getLevel().equals(ProjectLevel.Unallocated.getLevel())) {
             lambdaQueryWrapper.and(e ->
@@ -976,7 +988,25 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             lambdaQueryWrapper.ne(TbProjectInfo::getID, pa.getProjectID());
         }
         List<TbProjectInfo> canUsedProjctList = tbProjectInfoMapper.selectList(lambdaQueryWrapper);
-        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap);
+        List<Integer> projectIDList = new ArrayList<>(Stream.of(nextLevelProjectList, canUsedProjctList)
+                .flatMap(List::stream)
+                .map(TbProjectInfo::getID)
+                .toList());
+        projectIDList.addAll(nnMap.values().stream().flatMap(List::stream).map(TbProjectInfo::getID).toList());
+        List<TbProjectServiceRelation> tbProjectServiceRelations = tbProjectServiceRelationMapper.selectList(
+                new LambdaQueryWrapper<TbProjectServiceRelation>()
+                        .in(TbProjectServiceRelation::getProjectID, projectIDList)
+        );
+        Map<Integer, List<Integer>> pidServiceIDListMap = tbProjectServiceRelations.stream().collect(Collectors.groupingBy(
+                TbProjectServiceRelation::getProjectID,
+                Collectors.mapping(TbProjectServiceRelation::getServiceID, Collectors.toList())
+        ));
+        Map<String, AuthService> temp = monitorRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, AuthService.class);
+        Map<Integer, AuthService> serviceMap = new HashMap<>(temp.size());
+        temp.forEach((key, value) -> {
+            serviceMap.put(Integer.valueOf(key), value);
+        });
+        return QueryNextLevelAndAvailableProjectResult.valueOf(nextLevelProjectList, canUsedProjctList, nnMap, pidServiceIDListMap, serviceMap);
     }
 
     @Override
