@@ -353,4 +353,24 @@
             and mtf.FieldClass != 3
         </if>
     </select>
+
+
+    <select id="selectListByMonitorItemIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo">
+        select mtf.ID as monitorTypeFieldID,
+        mtf.fieldToken,
+        mtf.fieldName,
+        mif.monitorItemID,
+        mtf.fieldUnitID,
+        du.engUnit,
+        du.chnUnit
+        from tb_monitor_type_field mtf
+        left join tb_monitor_item_field mif on mif.monitorTypeFieldID = mtf.ID
+        left join tb_data_unit du on du.ID = mtf.fieldUnitID
+        where mif.MonitorItemID in
+        <foreach collection="monitorItemIDList" item="id" separator="," close=")" open="(">
+            #{id}
+        </foreach>
+    </select>
+
 </mapper>
