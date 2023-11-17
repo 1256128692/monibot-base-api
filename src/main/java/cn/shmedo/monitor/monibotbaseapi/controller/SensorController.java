@@ -546,13 +546,14 @@ public class SensorController {
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
-     * @apiSuccess (返回结果) {Name} dataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorAlias 传感器名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
-    //@Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:ListBaseSensor")
     @PostMapping(value = "/QueryManualSensorListByMonitor", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryManualSensorListByMonitor(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryManualSensorListByMonitor(@Valid @RequestBody QueryManualSensorListByMonitorParam param) {
+        return sensorService.queryManualSensorListByMonitor(param);
     }
 }

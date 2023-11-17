@@ -6,23 +6,27 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
 import cn.hutool.poi.excel.ExcelWriter;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldDataType;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.thematicDataAnalysis.DmParamDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
@@ -44,6 +48,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,9 +56,11 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicFieldToken.*;
 import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicEigenValueName.*;
+import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicExcelExceptionDesc.FIELD_ERROR;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -246,7 +253,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                 buildFieldSelectInfo(DbConstant.TIME_FIELD), buildFieldSelectInfo(DbConstant.SENSOR_ID_TAG)),
                         false, MonitorType.WET_LINE.getKey()).stream().collect(Collectors.toMap(
                         k -> Convert.toInt(k.get(DbConstant.SENSOR_ID_TAG)),
-                        v -> new Tuple<>(Convert.toDouble(v.get(LEVEL_ELEVATION)), Convert.toDouble(v.get(EMPTY_PIPE_DISTANCE)))))).orElse(Map.of());
+                        v -> new Tuple<>(Convert.toDouble(v.get(LEVEL_ELEVATION)), Convert.toDouble(v.get(EMPTY_PIPE_DISTANCE)))))).orElse(Collections.emptyMap());
         if (CollUtil.isNotEmpty(dataMap)) {
             res.getMonitorPointList().stream().peek(u -> Optional.ofNullable(u.getSensorID()).filter(dataMap::containsKey)
                     .map(dataMap::get).ifPresent(w -> {
@@ -422,10 +429,117 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public void getImportManualTemplate(GetImportManualTemplateParam param, HttpServletResponse response) {
+        Map<FieldClass, List<MonitorTypeFieldV2>> classFieldMap = param.getClassFieldMap();
+        List<String> sheetHeader = new ArrayList<>(List.of("序号", "人工传感器", "时间"));
+        Optional.ofNullable(classFieldMap.get(FieldClass.BASIC)).map(u -> u.stream()
+                .map(w -> w.getFieldName() + "（" + w.getChnUnit() + "）").toList()).ifPresent(sheetHeader::addAll);
+        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream()
+                .map(w -> w.getFieldName() + "（" + w.getChnUnit() + "）").toList()).ifPresent(sheetHeader::addAll);
+
+        List<String> sheetDemo = new ArrayList<>(List.of("1", "示例请务必删除该行数据", "2023/10/11 10:00:00"));
+        Optional.ofNullable(classFieldMap.get(FieldClass.BASIC)).map(u -> u.stream().map(TbMonitorTypeField::getFieldDataType)
+                .map(FieldDataType::valueOfString).map(this::getSheetDemoCellData).toList()).ifPresent(sheetDemo::addAll);
+        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream().map(TbMonitorTypeField::getFieldDataType)
+                .map(FieldDataType::valueOfString).map(this::getSheetDemoCellData).toList()).ifPresent(sheetDemo::addAll);
+        String fileName = Optional.of(classFieldMap).map(Map::values).flatMap(u -> u.stream().findAny())
+                .flatMap(u -> u.stream().findAny()).map(MonitorTypeFieldV2::getMonitorTypeName).orElse("") + "_人工数据.xlsx";
+
+        try (ExcelWriter writer = ExcelUtil.getWriter(true); ServletOutputStream os = response.getOutputStream()) {
+            // response headers
+            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            response.setContentType(ExcelUtil.XLSX_CONTENT_TYPE);
+            response.setHeader(DefaultConstant.CONTENT_DISPOSITION_HEADER, writer.getDisposition(fileName, StandardCharsets.UTF_8));
+
+            // need nested by {@code List.of} cause {@code ExcelWriter} will recognize the outside {@code Iterable} as column.
+            writer.write(List.of(sheetHeader, sheetDemo)).setFreezePane(1).setRowHeight(-1, 25);
+            for (int i = 0; i < sheetHeader.size(); i++) {
+                writer.setColumnWidth(i, Math.max(sheetHeader.get(i).length() * 2, 20));
+            }
+            writer.flush(os);
+        } catch (IOException e) {
+            log.error("获取输出流失败!");
+            response.setContentType(DefaultConstant.JSON);
+            response.setHeader(DefaultConstant.CONTENT_DISPOSITION_HEADER, "");
+            throw new RuntimeException();
+        }
     }
 
     @Override
-    public ResultWrapper<Object> importManualDataBatch(Integer projectID, MultipartFile file) {
+    public ResultWrapper<Object> importManualDataBatch(Integer projectID, Integer monitorType, MultipartFile file) {
+        List<MonitorTypeFieldV2> monitorTypeFieldV2List = tbMonitorTypeFieldMapper.queryByMonitorTypesV2(List.of(monitorType), true);
+        Map<String, FieldDataType> fieldTokenDataTypeMap = monitorTypeFieldV2List.stream().collect(
+                Collectors.toMap(TbMonitorTypeField::getFieldToken, u -> FieldDataType.valueOfString(u.getFieldDataType())));
+        Map<FieldClass, List<MonitorTypeFieldV2>> classFieldMap = monitorTypeFieldV2List.stream().collect(
+                Collectors.groupingBy(u -> FieldClass.codeOf(u.getFieldClass())));
+        if (CollUtil.isEmpty(classFieldMap)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型不存在或未设置子类型,无法解析导入文件!");
+        }
+        Map<String, String> basicColFieldTokenMap = Optional.ofNullable(classFieldMap.get(FieldClass.BASIC))
+                .map(u -> u.stream().collect(Collectors.toMap(w -> w.getFieldName() + "（" + w.getChnUnit() + "）",
+                        TbMonitorTypeField::getFieldToken))).orElse(Collections.emptyMap());
+        Map<String, String> extendColFieldTokenMap = Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND))
+                .map(u -> u.stream().collect(Collectors.toMap(w -> w.getFieldName() + "（" + w.getChnUnit() + "）",
+                        TbMonitorTypeField::getFieldToken))).orElse(Collections.emptyMap());
+        Map<String, String> colNameFieldTokenMap = MapUtil.builder(new HashMap<String, String>()).putAll(basicColFieldTokenMap).putAll(extendColFieldTokenMap).build();
+        try (ExcelReader reader = ExcelUtil.getReader(file.getInputStream(), 0)) {
+            // parse the table header
+            List<Object> header = reader.readRow(0);
+            Map<Integer, String> colFieldTokenMap = IntStream.range(3, header.size())
+                    .filter(u -> colNameFieldTokenMap.containsKey(Convert.toStr(header.get(u))))
+                    .mapToObj(u -> new Tuple<>(u, colNameFieldTokenMap.get(Convert.toStr(header.get(u)))))
+                    .collect(Collectors.toMap(Tuple::getItem1, Tuple::getItem2));
+            if (colFieldTokenMap.keySet().size() != header.size() - 3) {
+                throw new ParseException("Excel表格中有列不属于该监测类型", -1);
+            }
+
+            List<List<Object>> dataList = reader.read(1);
+            if (dataList.stream().anyMatch(u -> u.size() <= 3)) {
+                throw new ParseException("Excel表格内容错误", -1);
+            }
+            // find sensors
+            List<String> manualSensorNameList = dataList.stream().map(u -> u.get(1)).map(Convert::toStr).distinct().toList();
+            Map<String, Integer> manualSensorNameIDMap = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getProjectID, projectID).eq(TbSensor::getMonitorType, monitorType)
+                    .in(TbSensor::getAlias, manualSensorNameList)).stream().collect(Collectors.toMap(TbSensor::getAlias, TbSensor::getID));
+            if (manualSensorNameList.size() != manualSensorNameIDMap.keySet().size()) {
+                throw new ParseException("导入数据中有传感器不存在", -1);
+            }
+
+            // parse records then convert to {@code AddManualDataBatchParam}
+            List<ManualDataItem> manualDataItemList = dataList.stream().map(u -> {
+                Integer orderCode = Optional.ofNullable(u.get(0)).filter(ObjectUtil::isNotEmpty).map(Convert::toInt)
+                        .orElseThrow(() -> new IllegalArgumentException("解析序号失败!"));
+                Integer sensorID = Optional.ofNullable(u.get(1)).filter(ObjectUtil::isNotEmpty).map(Convert::toStr)
+                        .map(manualSensorNameIDMap::get).orElseThrow(() ->
+                                new IllegalArgumentException(StrUtil.format(FIELD_ERROR, orderCode, "传感器名称")));
+                Date time = Optional.ofNullable(u.get(2)).filter(ObjectUtil::isNotEmpty).map(Convert::toDate).orElseThrow(() ->
+                        new IllegalArgumentException(StrUtil.format(FIELD_ERROR, orderCode, "时间")));
+                List<ManualDataItem> list = IntStream.range(3, u.size()).filter(w -> ObjectUtil.isNotEmpty(u.get(w))).mapToObj(w -> {
+                    String fieldToken = colFieldTokenMap.get(w);
+                    ManualDataItem item = new ManualDataItem();
+                    item.setSensorID(sensorID);
+                    item.setTime(time);
+                    item.setFieldToken(fieldToken);
+                    item.setValue(Convert.toStr(fieldTokenDataTypeMap.get(fieldToken).parseData(u.get(w))));
+                    return item;
+                }).toList();
+                if (CollUtil.isEmpty(list)) {
+                    throw new IllegalArgumentException(StrUtil.format("序号为:{}的行没有任何属性数据", orderCode));
+                }
+                return list;
+            }).flatMap(Collection::stream).toList();
+
+            AddManualDataBatchParam param = new AddManualDataBatchParam();
+            param.setProjectID(projectID);
+            param.setDataList(manualDataItemList);
+
+            System.out.println("------------------------\n" + JSONUtil.toJsonStr(param) + "\n------------------------");
+
+            this.addManualDataBatch(param);
+        } catch (IOException | ParseException | IllegalArgumentException e) {
+            log.error(e.getMessage());
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前表格中存在异常数据，请核实后重新导入！");
+        }
         return ResultWrapper.successWithNothing();
     }
 
@@ -869,5 +983,17 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                     getMaxEigenValueData(w, pointIDEigenValueMap.get(u.getID()))).build()).ifPresent(builder::levelElevation);
             return builder.build();
         }).ifPresent(action);
+    }
+
+    private String getSheetDemoCellData(FieldDataType type) {
+        String res;
+        switch (type) {
+            case DOUBLE -> res = "20.000";
+            case LONG -> res = "20";
+            case BOOLEAN -> res = "true";
+            case ARRAY -> res = "[]";
+            default -> res = "";
+        }
+        return res;
     }
 }

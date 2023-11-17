@@ -6,6 +6,7 @@ import java.util.List;
 
 public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
+    public static final String CONTENT_DISPOSITION_HEADER = "Content-disposition";
 
     public static final String COLON = ":";
 
@@ -265,5 +266,9 @@ public class DefaultConstant {
         String START_FLOOD_DISTANCE = "调洪起始洪水位";
         String BEACH_TOP_ELEVATION = "滩顶高程";
         String END_FLOOD_DISTANCE = "汛末控制水位";
+    }
+
+    public interface ThematicExcelExceptionDesc {
+        String FIELD_ERROR = "解析序号为:{}的{}失败!";
     }
 }

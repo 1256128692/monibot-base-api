@@ -50,5 +50,5 @@ public interface IThematicDataAnalysisService {
 
     void getImportManualTemplate(GetImportManualTemplateParam param, HttpServletResponse response);
 
-    ResultWrapper<Object> importManualDataBatch(Integer projectID, MultipartFile file);
+    ResultWrapper<Object> importManualDataBatch(Integer projectID, Integer monitorType, MultipartFile file);
 }

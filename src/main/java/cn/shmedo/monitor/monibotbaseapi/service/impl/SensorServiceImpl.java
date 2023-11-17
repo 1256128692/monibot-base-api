@@ -29,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorKindEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
@@ -169,7 +170,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setMonitorType(request.getMonitorType());
         sensor.setName(genSensorName(request.getMonitorType(), request.getProjectID()));
         sensor.setAlias(StrUtil.isBlank(request.getAlias()) ? sensor.getName() : request.getAlias());
-        sensor.setKind(ByteUtil.intToByte(3));
+        sensor.setKind(ByteUtil.intToByte(1));
         sensor.setConfigFieldValue(request.getConfigFieldValue());
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
@@ -457,6 +458,14 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     public Map<Integer, List<Integer>> queryAllSensorID() {
         List<Tuple<Integer, Integer>> temp = this.baseMapper.queryAllTypeAndID();
         return temp.stream().collect(Collectors.groupingBy(Tuple::getItem1, Collectors.mapping(Tuple::getItem2, Collectors.toList())));
+    }
+
+    @Override
+    public List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param) {
+     return this.baseMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getMonitorType, param.getMonitorType())
+             .eq(TbSensor::getProjectID,param.getProjectID()).eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
+                     .select(TbSensor::getID,TbSensor::getName,TbSensor::getAlias)).stream().map(u ->
+             SensorNameResponse.builder().sensorID(u.getID()).sensorName(u.getName()).sensorAlias(u.getAlias()).build()).toList();
     }
 
     /**

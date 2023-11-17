@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -661,9 +662,9 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限 mdmbase:
      */
     //@Permission(permissionName = "")
-    @PostMapping(value = "/GetImportManualTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/GetImportManualTemplate", consumes = DefaultConstant.JSON)
     public void getImportManualTemplate(@Valid @RequestBody GetImportManualTemplateParam param, HttpServletResponse response) {
-        thematicDataAnalysisService.getImportManualTemplate(param,response);
+        thematicDataAnalysisService.getImportManualTemplate(param, response);
     }
 
     /**
@@ -674,6 +675,7 @@ public class ThematicDataAnalysisController {
      * @apiName ImportManualDataBatch
      * @apiParam (请求参数) {MultipartFile} file 导入文件
      * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
@@ -682,8 +684,9 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/ImportManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object importManualDataBatch(@Valid @ResourceSymbol(ResourceType.BASE_PROJECT) @Positive(message = "工程ID不能小于1")
                                         @RequestParam("projectID") Integer projectID,
+                                        @Positive(message = "监测类型不能为空") @RequestParam("monitorType") Integer monitorType,
                                         @RequestParam MultipartFile file) {
-        return thematicDataAnalysisService.importManualDataBatch(projectID, file);
+        return thematicDataAnalysisService.importManualDataBatch(projectID, monitorType, file);
     }
 
     /**

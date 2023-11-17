@@ -116,4 +116,9 @@ public interface SensorService extends IService<TbSensor> {
     void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request);
 
     Map<Integer, List<Integer>> queryAllSensorID();
+
+    /**
+     * 查询监测类型下的全部人工传感器
+     */
+    List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param);
 }
