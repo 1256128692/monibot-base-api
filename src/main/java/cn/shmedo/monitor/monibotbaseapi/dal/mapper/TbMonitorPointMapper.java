@@ -80,5 +80,5 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     WetLineConfigInfo selectWetLineConfig(QueryWetLineConfigParam param);
 
-    List<MonitorPointBaseInfoV2> selectListByMonitorItemIDList(@Param("monitorItemIDList") List<Integer> monitorItemIDList);
+    List<MonitorPointBaseInfoV2> selectListByEigenValueIDList(@Param("eigenValueIDList") List<Integer> eigenValueIDList);
 }

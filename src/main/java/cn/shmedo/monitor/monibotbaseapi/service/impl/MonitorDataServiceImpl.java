@@ -90,8 +90,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
         }
-        List<Integer> monitorItemIDList = eigenValueInfoV1List.stream().map(EigenValueInfoV1::getMonitorItemID).collect(Collectors.toList());
-        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByMonitorItemIDList(monitorItemIDList);
+        List<Integer> eigenValueIDList = eigenValueInfoV1List.stream().map(EigenValueInfoV1::getId).collect(Collectors.toList());
+        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByEigenValueIDList(eigenValueIDList);
 
         eigenValueInfoV1List.forEach(item -> {
             item.setScopeStr(ScopeType.getDescriptionByCode(item.getScope()));
