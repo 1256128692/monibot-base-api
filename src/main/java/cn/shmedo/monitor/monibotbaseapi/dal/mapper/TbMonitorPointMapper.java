@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAndItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
@@ -78,4 +79,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<MonitorPointDataInfo> selectMonitorPointDataInfoListByIDList(List<Integer> monitorPointIDList);
 
     WetLineConfigInfo selectWetLineConfig(QueryWetLineConfigParam param);
+
+    List<MonitorPointBaseInfoV2> selectListByMonitorItemIDList(@Param("monitorItemIDList") List<Integer> monitorItemIDList);
 }

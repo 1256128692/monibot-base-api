@@ -30,6 +30,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventI
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
@@ -80,6 +82,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     }
 
     @Override
+    @Transactional
     public Object queryEigenValueList(QueryEigenValueParam pa) {
 
         List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(), pa.getProjectID(), pa.getMonitorPointIDList());
@@ -87,9 +90,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
         }
+        List<Integer> monitorItemIDList = eigenValueInfoV1List.stream().map(EigenValueInfoV1::getMonitorItemID).collect(Collectors.toList());
+        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByMonitorItemIDList(monitorItemIDList);
 
         eigenValueInfoV1List.forEach(item -> {
             item.setScopeStr(ScopeType.getDescriptionByCode(item.getScope()));
+            if (!CollectionUtil.isNullOrEmpty(allMonitorPointList)) {
+                item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+            }
         });
 
         return eigenValueInfoV1List;

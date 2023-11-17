@@ -848,4 +848,21 @@
             #{item}
         </foreach>
     </select>
+
+    <select id="selectListByMonitorItemIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2">
+        select mp.ID     as monitorPointID,
+               mp.name   as monitorPointName,
+               mp.Enable as monitorPointEnable,
+               mp.monitorItemID,
+               mp.monitorType
+        from tb_monitor_point as mp
+        where 1 = 1
+        <if test="monitorItemIDList != null and monitorItemIDList.size != 0">
+            and mp.MonitorItemID in
+            <foreach collection="monitorItemIDList" item="monitorItemID" index="index" open="(" close=")" separator=",">
+                #{monitorItemID}
+            </foreach>
+        </if>
+    </select>
 </mapper>
