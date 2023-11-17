@@ -72,8 +72,9 @@ public class InfluxSensorDataUtil {
             for (int i = 0; i < row.size(); i++) {
                 String columnName = columns.get(i);
                 Object value = row.get(i);
-
-                if (DbConstant.TIME_FIELD.equals(columnName)) {
+                if (DbConstant.COUNT_FIELD.equals(columnName)) {
+                    data.put(DbConstant.COUNT_FIELD, Double.parseDouble(value.toString()));
+                } else if (DbConstant.TIME_FIELD.equals(columnName)) {
                     String timeString = parseInfluxTime(value);
                     data.put(DbConstant.TIME_FIELD, timeString);
                 } else if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
@@ -133,7 +134,7 @@ public class InfluxSensorDataUtil {
         if (CollectionUtil.isNullOrEmpty(queryResult.getResults())) {
             return Collections.emptyList();
         }
-        if (CollectionUtil.isNullOrEmpty(queryResult.getResults().get(0).getSeries())){
+        if (CollectionUtil.isNullOrEmpty(queryResult.getResults().get(0).getSeries())) {
             return Collections.emptyList();
         }
 

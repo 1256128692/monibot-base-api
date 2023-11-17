@@ -23,6 +23,19 @@ public class MonitorTypeUtil {
         return result.toString();
     }
 
+    public static String getMeasurement(Integer monitorType, boolean raw, String stat) {
+        StringBuilder result = new StringBuilder();
+        result.append("tb_");
+        if (raw) {
+            result.append("raw_");
+        }
+        result.append(monitorType);
+        result.append("_data_");
+        result.append(stat);
+
+        return result.toString();
+    }
+
 
     /**
      * 处理额外的业务字段

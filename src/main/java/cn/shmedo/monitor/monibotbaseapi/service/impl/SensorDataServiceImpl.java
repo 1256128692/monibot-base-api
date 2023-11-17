@@ -1,27 +1,28 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.entity.MonitorTypeExValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatisticsType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.QuerySensorHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.StatisticsSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHasDataCountResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.AllArgsConstructor;
-import org.influxdb.dto.QueryResult;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,14 +34,20 @@ import java.util.stream.Collectors;
  **/
 @Service
 @AllArgsConstructor
+
 public class SensorDataServiceImpl implements SensorDataService {
 
     private final SensorDataDao sensorDataDao;
     private final WtMonitorService wtMonitorService;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
+    private final TbMonitorTypeMapper tbMonitorTypeMapper;
 
     @Override
     public void statisticsSensorData(StatisticsSensorDataParam pa) {
+        TbMonitorType tbMonitorType = tbMonitorTypeMapper.queryByType(pa.getMonitorType());
+        if (tbMonitorType == null) {
+            return;
+        }
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.selectList(
                 new QueryWrapper<TbMonitorTypeField>().lambda().eq(TbMonitorTypeField::getMonitorType, pa.getMonitorType())
         );
@@ -48,12 +55,28 @@ public class SensorDataServiceImpl implements SensorDataService {
         if (CollectionUtil.isEmpty(fieldSelectInfoList)) {
             return;
         }
-        List<Map<String, Object>> list = sensorDataDao.querySensorDayStatisticsData(pa.getSensorIDList(),
-                new Timestamp(pa.getBegin().getTime()),
-                new Timestamp(pa.getEnd().getTime()),
-                fieldSelectInfoList, pa.getRaw(), pa.getMonitorType());
+        List<SensorStatisticsType> statisticsTypes = new ArrayList<>();
+        String exValueStr = tbMonitorType.getExValues();
+        if (ObjectUtil.isNotEmpty(exValueStr)) {
+            MonitorTypeExValue exValue = JsonUtil.toObject(exValueStr, MonitorTypeExValue.class);
+            if (ObjectUtil.isNotEmpty(exValue.getStatisticalMethods())) {
+                statisticsTypes.addAll(exValue.getStatisticalMethods().stream().map(SensorStatisticsType::getByCode)
+                        .filter(ObjectUtil::isNotEmpty)
+                        .toList());
+            }
+        }
+        if (ObjectUtil.isEmpty(statisticsTypes)) {
+            return;
+        }
+        statisticsTypes.forEach(e -> {
+            List<Map<String, Object>> list = sensorDataDao.querySensorDayStatisticsData(pa.getSensorIDList(),
+                    new Timestamp(pa.getBegin().getTime()),
+                    new Timestamp(pa.getEnd().getTime()),
+                    fieldSelectInfoList, pa.getRaw(), pa.getMonitorType(), e);
+            sensorDataDao.insertSensorData(list, false, pa.getRaw(), fieldSelectInfoList, pa.getMonitorType(), e.getTableSuffix());
+        });
 
-        sensorDataDao.insertSensorData(list, true, pa.getRaw(), fieldSelectInfoList, pa.getMonitorType());
+
     }
 
     @Override

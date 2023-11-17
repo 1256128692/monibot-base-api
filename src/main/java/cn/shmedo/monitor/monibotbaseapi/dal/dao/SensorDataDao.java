@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.dao;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatisticsType;
 
 import java.sql.Timestamp;
 import java.util.Date;
@@ -63,7 +64,7 @@ public interface SensorDataDao {
      */
     List<Map<String, Object>> querySensorDayStatisticsData(List<Integer> sensorIDList, Timestamp begin, Timestamp end,
                                                            List<FieldSelectInfo> fieldSelectInfoList,
-                                                           boolean raw, Integer monitorType);
+                                                           boolean raw, Integer monitorType, SensorStatisticsType sensorStatisticsType);
 
     /**
      * 获取特定时间范围内的传感器最新数据
@@ -89,7 +90,7 @@ public interface SensorDataDao {
      * @param monitorType
      */
     void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw,
-                          List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType);
+                          List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType, String tableSuffix);
 
     /**
      * 删除传感器在时间点上的数据
