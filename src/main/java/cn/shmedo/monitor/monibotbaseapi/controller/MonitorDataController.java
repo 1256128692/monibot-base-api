@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenV
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
@@ -481,8 +482,8 @@ public class MonitorDataController {
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryMonitorPointHasDataCount", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointHasDataCount(@Valid @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHasDataCount(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
+        return monitorDataService.queryMonitorPointHasDataCount(pa);
     }
 
 
