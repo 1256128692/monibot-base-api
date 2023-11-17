@@ -1,6 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent;
 
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class QueryDataEventInfo {
@@ -13,5 +17,7 @@ public class QueryDataEventInfo {
     private String frequencyStr;
     private String timeRange;
     private String exValue;
+
+    private List<MonitorItemBaseInfo> monitorItemList;
 
 }

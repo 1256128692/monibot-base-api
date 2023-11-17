@@ -33,10 +33,11 @@ public class QueryDataEventParam  implements ParameterValidator, ResourcePermiss
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         if (!CollectionUtil.isNullOrEmpty(monitorPointIDList)) {
             monitorItemIDList = tbMonitorPointMapper.selectItemIDsByIDs(monitorPointIDList);
+            if (!monitorItemIDList.contains(monitorItemID)) {
+                monitorItemIDList.add(monitorItemID);
+            }
         }
-        if (!monitorItemIDList.contains(monitorItemID)) {
-            monitorItemIDList.add(monitorItemID);
-        }
+
         return null;
     }
 

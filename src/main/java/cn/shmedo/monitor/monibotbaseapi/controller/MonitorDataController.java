@@ -423,6 +423,9 @@ public class MonitorDataController {
      * @apiSuccess (返回结果) {String} dataList.frequencyStr 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
      * @apiSuccess (返回结果) {String} [dataList.exValue] 拓展属性
+     * @apiSuccess (响应结果) {Object[]} dataList.monitorItemList 监测项目列表
+     * @apiSuccess (响应结果) {Int} dataList.monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {String} dataList.monitorItemList.name 监测项目名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */

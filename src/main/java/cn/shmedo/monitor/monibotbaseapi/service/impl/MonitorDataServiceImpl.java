@@ -28,6 +28,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueP
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
@@ -73,6 +74,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     private final TbSensorMapper tbSensorMapper;
 
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
+
+    private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private SensorDataDao sensorDataDao;
 
@@ -144,8 +147,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(queryDataEventInfos)) {
             return Collections.emptyList();
         }
+        List<MonitorItemBaseInfo> allMonitorItemList = tbMonitorItemMapper.selectListByEventIDList(queryDataEventInfos.stream()
+                .map(QueryDataEventInfo::getId).collect(Collectors.toList()));
+
         queryDataEventInfos.forEach(item -> {
             item.setFrequencyStr(FrequencyEnum.getDescriptionFromValue(item.getFrequency()));
+            if (!CollectionUtil.isNullOrEmpty(allMonitorItemList)) {
+                item.setMonitorItemList(allMonitorItemList.stream().filter(a -> a.getEventID().equals(item.getId())).collect(Collectors.toList()));
+            }
         });
 
         return queryDataEventInfos;
