@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -43,6 +44,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     private TbMonitorItemMapper tbMonitorItemMapper;
     private TbMonitorGroupMapper tbMonitorGroupMapper;
     private TbMonitorGroupItemMapper tbMonitorGroupItemMapper;
+    private TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     @Override
     public void addMonitorPoint(AddMonitorPointParam pa, Integer userID) {
         TbMonitorPoint temp = Param2DBEntityUtil.fromAddMonitorPointParam2TbMonitorPoint(pa, userID);
@@ -107,8 +109,13 @@ public class MonitorPointServiceImpl implements MonitorPointService {
                             .orderByDesc("id")
             );
             Map<Integer, List<TbMonitorPoint>> map = temp.stream().collect(Collectors.groupingBy(TbMonitorPoint::getMonitorItemID));
+
+            List<MonitorTypeFieldBaseInfo> allMonitorTypeFieldList = tbMonitorTypeFieldMapper.selectListByMonitorItemIDList(list.stream().map(MonitorItemWithPoint::getMonitorItemID).collect(Collectors.toList()));
             list.forEach(item ->{
                 item.setMonitorPointList(map.get(item.getMonitorItemID()));
+                if (!CollectionUtil.isNullOrEmpty(allMonitorTypeFieldList)) {
+                    item.setMonitorTypeFieldList(allMonitorTypeFieldList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+                }
             });
         }
         return list;

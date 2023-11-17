@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenV
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
@@ -321,6 +322,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
      * @apiSuccess (响应结果) {String} eigenvalueList.scopeStr 使用范围描述
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorItemName 监测项目名称
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
      * @apiSuccess (响应结果) {String} [eigenvalueList.monitorTypeFieldName] 属性名称
      * @apiSuccess (响应结果) {String} eigenvalueList.name 特征值
@@ -333,6 +335,9 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.updateUserID 修改人ID
      * @apiSuccess (响应结果) {Date} eigenvalueList.createTime 创建时间
      * @apiSuccess (响应结果) {Date} eigenvalueList.updateTime 修改时间
+     * @apiSuccess (响应结果) {Object[]} eigenvalueList.monitorPointList 监测点ID列表
+     * @apiSuccess (响应结果) {Int} eigenvalueList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorPointList.monitorPointName 监测点名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
@@ -418,6 +423,9 @@ public class MonitorDataController {
      * @apiSuccess (返回结果) {String} dataList.frequencyStr 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
      * @apiSuccess (返回结果) {String} [dataList.exValue] 拓展属性
+     * @apiSuccess (响应结果) {Object[]} dataList.monitorItemList 监测项目列表
+     * @apiSuccess (响应结果) {Int} dataList.monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {String} dataList.monitorItemList.name 监测项目名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
@@ -466,7 +474,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100],必须为同一种监测类型
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end 结束时间
-     * @apiParam (请求体) {Int} density 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6)
+     * @apiParam (请求体) {Int} density 密度,(日:3 月:5 年:6)
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorPointIDList":[1,2],"begin":"2023-10-18 16:02:52","end":"2023-10-18 16:02:52","density":1}
      * @apiSuccess (返回结果) {Object} data 结果
@@ -477,8 +485,8 @@ public class MonitorDataController {
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryMonitorPointHasDataCount", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointHasDataCount(@Valid @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHasDataCount(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
+        return monitorDataService.queryMonitorPointHasDataCount(pa);
     }
 
 

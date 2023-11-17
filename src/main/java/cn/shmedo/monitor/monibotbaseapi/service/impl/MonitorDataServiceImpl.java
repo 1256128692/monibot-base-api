@@ -16,6 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
@@ -25,11 +26,15 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenV
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
@@ -44,6 +49,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -68,6 +75,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
 
+    private final TbMonitorItemMapper tbMonitorItemMapper;
+
     private SensorDataDao sensorDataDao;
 
     @Override
@@ -80,6 +89,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     }
 
     @Override
+    @Transactional
     public Object queryEigenValueList(QueryEigenValueParam pa) {
 
         List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(), pa.getProjectID(), pa.getMonitorPointIDList());
@@ -87,9 +97,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
         }
+        List<Integer> eigenValueIDList = eigenValueInfoV1List.stream().map(EigenValueInfoV1::getId).collect(Collectors.toList());
+        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByEigenValueIDList(eigenValueIDList);
 
         eigenValueInfoV1List.forEach(item -> {
             item.setScopeStr(ScopeType.getDescriptionByCode(item.getScope()));
+            if (!CollectionUtil.isNullOrEmpty(allMonitorPointList)) {
+                item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+            }
         });
 
         return eigenValueInfoV1List;
@@ -132,8 +147,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(queryDataEventInfos)) {
             return Collections.emptyList();
         }
+        List<MonitorItemBaseInfo> allMonitorItemList = tbMonitorItemMapper.selectListByEventIDList(queryDataEventInfos.stream()
+                .map(QueryDataEventInfo::getId).collect(Collectors.toList()));
+
         queryDataEventInfos.forEach(item -> {
             item.setFrequencyStr(FrequencyEnum.getDescriptionFromValue(item.getFrequency()));
+            if (!CollectionUtil.isNullOrEmpty(allMonitorItemList)) {
+                item.setMonitorItemList(allMonitorItemList.stream().filter(a -> a.getEventID().equals(item.getId())).collect(Collectors.toList()));
+            }
         });
 
         return queryDataEventInfos;
@@ -264,5 +285,50 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return monitorPointDataInfoList;
+    }
+
+    @Override
+    public Object queryMonitorPointHasDataCount(QueryMonitorPointHasDataCountParam pa) {
+
+        // 全部传感器信息
+        List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
+        if (CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            return Collections.emptyList();
+        }
+        // 监测项目与监测子字段类型关系表
+        List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getTbMonitorPoints().get(0).getMonitorItemID());
+
+        List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
+        List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
+                pa.getDensity(), StatisticalMethods.LATEST.getValue(), fieldList, pa.getTbMonitorPoints().get(0).getMonitorType());
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        SimpleDateFormat outputDateFormat;
+
+        switch (pa.getDensity()) {
+            case 3:
+                outputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                break;
+            case 5:
+                outputDateFormat = new SimpleDateFormat("yyyy-MM");
+                break;
+            case 6:
+                outputDateFormat = new SimpleDateFormat("yyyy");
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid density value");
+        }
+
+        return maps.stream()
+                .map(map -> {
+                    Date date = null;
+                    try {
+                        date = inputDateFormat.parse((String) map.get("time"));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return outputDateFormat.format(date);
+                })
+                .distinct()
+                .collect(Collectors.toList());
     }
 }

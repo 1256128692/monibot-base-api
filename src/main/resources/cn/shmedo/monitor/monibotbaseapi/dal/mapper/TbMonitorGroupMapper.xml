@@ -353,6 +353,12 @@
             #{ItemID}
         </foreach>
         )
+        or ParentID in (SELECT DISTINCT MonitorGroupID
+        FROM tb_monitor_group_item
+        WHERE MonitorItemID IN
+        <foreach collection="monitorItemIDList" item="ItemID" open="(" close=")" separator=",">
+            #{ItemID}
+        </foreach>)
     </select>
     <select id="queryMonitorTypeGroupPoint" resultMap="BaseGroupPointResultMap"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointBaseInfo">

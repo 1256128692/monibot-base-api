@@ -226,15 +226,17 @@
                ev.UpdateTime,
                du.ChnUnit,
                du.EngUnit,
-               mtf.FieldName as monitorTypeFieldName
+               mtf.FieldName as monitorTypeFieldName,
+               mi.Name       as MonitorItemName
         from tb_eigen_value ev
                  left join tb_data_unit du on du.ID = ev.UnitID
                  left join tb_monitor_type_field mtf on mtf.ID = ev.MonitorTypeFieldID
+                 left join tb_monitor_item mi on mi.ID = ev.MonitorItemID
         where ev.ProjectID = #{projectID}
         <if test="monitorItemID != null">
             and ev.monitorItemID = #{monitorItemID}
         </if>
-        <if test="monitorPointIDList != null">
+        <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
             and ev.ID in (
             select EigenValueID
             from tb_eigen_value_relation where MonitorPointID in

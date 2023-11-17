@@ -496,4 +496,22 @@
           and mi.ID = #{monitorItemID}
       </if>
   </select>
+
+  <select id="selectListByEventIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo">
+      select mi.ID    as monitorItemID,
+             mi.Name ,
+             mi.Alias ,
+             de.ID    as eventID
+      from tb_monitor_item mi
+               left join tb_data_event_relation der on mi.ID = der.monitorItemID
+               left join tb_data_event de on de.ID = der.eventID
+      where mi.ID in (
+      select MonitorItemID
+      from tb_data_event_relation where eventID in
+      <foreach close=")" collection="eventIDList" item="eventID" open="(" separator=",">
+          #{eventID}
+      </foreach>
+      )
+  </select>
 </mapper>
