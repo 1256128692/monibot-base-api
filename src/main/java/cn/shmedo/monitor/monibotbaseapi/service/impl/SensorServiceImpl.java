@@ -525,7 +525,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Set<String> monitorSensorNames = consumer.get();
         if (!monitorSensorNames.isEmpty()) {
             LambdaQueryWrapper<TbSensor> wrapper = new LambdaQueryWrapper<TbSensor>()
-                    .eq(TbSensor::getName, monitorSensorNames)
+                    .in(TbSensor::getName, monitorSensorNames)
                     .select(TbSensor::getName, TbSensor::getID, TbSensor::getAlias);
             return this.baseMapper.selectList(wrapper).stream().collect(Collectors.groupingBy(TbSensor::getName));
         }
