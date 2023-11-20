@@ -7,7 +7,9 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -29,6 +31,8 @@ public class QueryWetLineConfigParam implements ParameterValidator, ResourcePerm
     private Integer monitorGroupID;
     @NotEmpty(message = "监测点ID列表不能为空")
     private List<Integer> monitorPointIDList;
+    @JsonIgnore
+    private Integer monitorType = MonitorType.WET_LINE.getKey();
 
     @Override
     public ResultWrapper<?> validate() {

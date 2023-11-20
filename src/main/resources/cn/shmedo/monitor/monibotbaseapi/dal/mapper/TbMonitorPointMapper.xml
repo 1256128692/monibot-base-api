@@ -843,7 +843,7 @@
             LEFT JOIN tb_eigen_value_relation tevr ON tevr.`MonitorPointID` = tmp.`ID`
             LEFT JOIN tb_eigen_value tev ON tev.`ID` = tevr.`EigenValueID` AND tev.`Scope` = 0
             LEFT JOIN tb_data_unit tdu ON tdu.`ID` = tev.`UnitID`
-        WHERE tmg.ID={param.monitorGroupID} AND tmp.ID IN
+        WHERE tmg.ID=#{param.monitorGroupID} AND tmp.MonitorType=#{param.monitorType} AND tmp.ID IN
         <foreach collection="param.monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>

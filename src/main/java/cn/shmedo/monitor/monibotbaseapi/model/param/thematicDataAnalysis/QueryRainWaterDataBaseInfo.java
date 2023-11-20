@@ -6,7 +6,10 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -34,12 +37,14 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
     @Positive(message = "出库流量监测点ID必须大于0")
     private Integer volumeFlowOutputMonitorPointID;
     @NotNull(message = "显示密度不能为空")
-    @Range(max = 6, message = "显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年")
+    @Range(min = 1, max = 6, message = "显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年")
     private Integer displayDensity;
     @NotNull(message = "开始时间不能为空")
     private Date startTime;
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
+    @JsonIgnore
+    private String rainFallToken;
 
     @Override
     public ResultWrapper validate() {
@@ -58,6 +63,7 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
                 && !JSONUtil.parseArray(u.get(DbConstant.DISPLAY_DENSITY)).contains(displayDensity))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在监测点不支持选择的显示密度!");
         }
+        rainFallToken = DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
         return null;
     }
 

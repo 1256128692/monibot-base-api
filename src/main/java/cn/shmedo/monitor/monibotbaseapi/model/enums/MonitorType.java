@@ -15,6 +15,7 @@ public enum MonitorType {
     PRESSURE(12, "压强"),
     LEVEL(13, "物液位"),
     FLOW_CAPACITY(14, "流量"),
+    DRY_BEACH(17, "干滩"),
     THREE_DIMENSIONAL_DISPLACEMENT(19, "表面三维形变（相对）"),
     ONE_DIMENSIONAL_DISPLACEMENT(24, "表面一维形变（相对）"),
     INTERNAL_TRIAXIAL_DISPLACEMENT(20, "内部三轴位移"),

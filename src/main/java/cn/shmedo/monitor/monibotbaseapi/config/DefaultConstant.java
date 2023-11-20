@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.config;
 
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
@@ -236,11 +238,29 @@ public class DefaultConstant {
          * 水位
          */
         String DISTANCE = "distance";
+
         /**
-         * 降雨量<br>
-         * TODO 根据原始数据来定到底是哪个雨量
+         * 根据{@code density}获取降雨量token
          */
-        String s4 = "";
+        static String getRainFallToken(final DisplayDensity density) {
+            switch (density) {
+                case ALL, HOUR, TWO_HOUR, FOUR_HOUR, SIX_HOUR, TWELVE_HOUR -> {
+                    return PERIOD_RAINFALL;
+                }
+                default -> {
+                    return DAILY_RAINFALL;
+                }
+            }
+        }
+
+        /**
+         * 时段雨量
+         */
+        String PERIOD_RAINFALL = "periodRainfall";
+        /**
+         * 日降雨量
+         */
+        String DAILY_RAINFALL = "dailyRainfall";
         /**
          * 流量
          */

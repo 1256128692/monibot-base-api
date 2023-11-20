@@ -25,7 +25,7 @@ public abstract class WetLineBaseParam extends QueryWetLineConfigParam implement
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
     @NotNull(message = "显示密度不能为空")
-    @Range(max = 6, message = "显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年")
+    @Range(min = 1, max = 6, message = "显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年")
     private Integer displayDensity;
     @NotNull(message = "统计方式不能为空")
     @Range(min = 1, max = 4, message = "统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化")
