@@ -29,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValuePa
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
@@ -354,10 +355,6 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
 
-            sensorDataList.forEach(sdata -> {
-                sdata.put("flow", RandomUtil.randomDouble(1.00, 1000.00));
-            });
-
             allSensorInfoList.forEach(sensorInfo -> {
                 if (!CollectionUtil.isNullOrEmpty(sensorDataList)) {
                     List<Map<String, Object>> result = new LinkedList<>();
@@ -399,6 +396,12 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return monitorPointDataInfoList;
+    }
+
+    @Override
+    public Object queryMonitorTypeFieldList(QueryMonitorTypeFieldParam pa) {
+        // 监测项目与监测子字段类型关系表
+        return tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
     }
 
     /**

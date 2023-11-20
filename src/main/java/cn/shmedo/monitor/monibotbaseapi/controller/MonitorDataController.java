@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValuePa
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
@@ -516,5 +517,31 @@ public class MonitorDataController {
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeConfiguration(@Valid @RequestBody QueryMonitorTypeConfigurationParam pa) {
         return monitorDataService.queryMonitorTypeConfiguration(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorTypeFieldList 查询监测项目绑定的监测子类型
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorTypeFieldList
+     * @apiDescription 查询监测项目绑定的监测子类型
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorItemID":1}
+     * @apiSuccess (响应结果) {Object[]} data   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} data.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} data.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorTypeFieldList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorTypeFieldList(@Validated @RequestBody QueryMonitorTypeFieldParam pa) {
+        return monitorDataService.queryMonitorTypeFieldList(pa);
     }
 }

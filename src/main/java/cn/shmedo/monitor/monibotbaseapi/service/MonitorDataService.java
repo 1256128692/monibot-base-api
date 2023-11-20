@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValuePa
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
 
@@ -39,4 +40,6 @@ public interface MonitorDataService {
     Object queryMonitorPointHasDataCount(QueryMonitorPointHasDataCountParam pa);
 
     List<MonitorPointDataInfo> queryMonitorPointFilterDataList(QueryMonitorPointDataParam pa);
+
+    Object queryMonitorTypeFieldList(QueryMonitorTypeFieldParam pa);
 }
