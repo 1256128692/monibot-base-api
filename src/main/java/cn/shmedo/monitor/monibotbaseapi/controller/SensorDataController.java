@@ -5,7 +5,6 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.QuerySensorHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.StatisticsSensorDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHasDataCountResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

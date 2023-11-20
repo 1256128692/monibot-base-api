@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValuePa
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
@@ -130,12 +131,16 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.maxSensorDataList 传感器最大数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.maxSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.minSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList 传感器最大数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.maxSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.maxSensorDataList.fieldToken.value   数值
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.minSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.minSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.minSensorDataList.fieldToken.value   数值
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -148,9 +153,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointFilterDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointDataParam pa) {
+        return monitorDataService.queryMonitorPointFilterDataList(pa);
     }
 
 
@@ -513,5 +517,31 @@ public class MonitorDataController {
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorTypeConfiguration(@Valid @RequestBody QueryMonitorTypeConfigurationParam pa) {
         return monitorDataService.queryMonitorTypeConfiguration(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorTypeFieldList 查询监测项目绑定的监测子类型
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorTypeFieldList
+     * @apiDescription 查询监测项目绑定的监测子类型
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorItemID":1}
+     * @apiSuccess (响应结果) {Object[]} data   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} data.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} data.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorTypeFieldList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorTypeFieldList(@Validated @RequestBody QueryMonitorTypeFieldParam pa) {
+        return monitorDataService.queryMonitorTypeFieldList(pa);
     }
 }

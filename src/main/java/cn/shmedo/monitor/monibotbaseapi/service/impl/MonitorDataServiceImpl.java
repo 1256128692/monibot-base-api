@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
@@ -27,13 +29,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValuePa
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
@@ -331,4 +333,125 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                 .distinct()
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<MonitorPointDataInfo> queryMonitorPointFilterDataList(QueryMonitorPointDataParam pa) {
+
+        // 点信息列表
+        List<MonitorPointDataInfo> monitorPointDataInfoList = tbMonitorPointMapper.selectMonitorPointDataInfoListByIDList(pa.getMonitorPointIDList());
+
+        if (CollectionUtil.isNullOrEmpty(monitorPointDataInfoList)) {
+            return Collections.emptyList();
+        }
+
+        // 全部传感器信息
+        List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
+
+        // 监测项目与监测子字段类型关系表
+        List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
+
+        if (!CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
+            List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
+                    pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
+
+            allSensorInfoList.forEach(sensorInfo -> {
+                if (!CollectionUtil.isNullOrEmpty(sensorDataList)) {
+                    List<Map<String, Object>> result = new LinkedList<>();
+                    sensorDataList.forEach(da -> {
+                        if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
+                            if (da.get(fieldList.get(0).getFieldToken()) != null) {
+                                result.add(da);
+                            }
+                        }
+                    });
+                    if (sensorInfo.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
+                        result.forEach(r -> {
+                            SensorBaseInfoResponse sInfo = allSensorInfoList.stream()
+                                    .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
+                                    .findFirst().orElse(null);
+                            if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
+                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                            }
+                        });
+                    }
+
+                    sensorInfo.setMultiSensorData(result);
+                    List<Map<String, Object>> multiSensorData = sensorInfo.getMultiSensorData();
+                    Map<String, Map<String, Object>> maxData = calculateMaxData(multiSensorData);
+                    Map<String, Map<String, Object>> minData = calculateMinData(multiSensorData);
+
+                    // 将最大值和最小值信息添加到传感器信息中
+                    sensorInfo.setMaxSensorDataList(maxData);
+                    sensorInfo.setMinSensorDataList(minData);
+                }
+            });
+
+
+
+            monitorPointDataInfoList.forEach(m -> {
+                m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
+                m.setFieldList(fieldList);
+            });
+        }
+
+        return monitorPointDataInfoList;
+    }
+
+    @Override
+    public Object queryMonitorTypeFieldList(QueryMonitorTypeFieldParam pa) {
+        // 监测项目与监测子字段类型关系表
+        return tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
+    }
+
+    /**
+     * 计算单个传感器 (每个子类型字段) 的最大值,以及对应时间
+     * @param dataList
+     * @return
+     */
+    private Map<String, Map<String, Object>> calculateMaxData(List<Map<String, Object>> dataList) {
+        Map<String, Map<String, Object>> maxDataMap = new HashMap<>();
+        for (Map<String, Object> data : dataList) {
+            Integer sensorID = (Integer) data.get("sensorID");
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                String fieldToken = entry.getKey();
+                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID")) {
+                    Double value = (Double) entry.getValue();
+                    Map<String, Object> maxData = maxDataMap.computeIfAbsent(fieldToken, k -> new HashMap<>());
+                    if (!maxData.containsKey("value") || value > (Double) maxData.get("value")) {
+                        maxData.put("value", value);
+                        maxData.put("time", data.get("time"));
+                        maxData.put("sensorID", sensorID);
+                    }
+                }
+            }
+        }
+        return maxDataMap;
+    }
+
+    /**
+     * 计算单个传感器 (每个子类型字段) 的最小值,以及对应时间
+     * @param dataList
+     * @return
+     */
+    private Map<String, Map<String, Object>> calculateMinData(List<Map<String, Object>> dataList) {
+        Map<String, Map<String, Object>> minDataMap = new HashMap<>();
+        for (Map<String, Object> data : dataList) {
+            Integer sensorID = (Integer) data.get("sensorID");
+            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                String fieldToken = entry.getKey();
+                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID")) {
+                    Double value = (Double) entry.getValue();
+                    Map<String, Object> minData = minDataMap.computeIfAbsent(fieldToken, k -> new HashMap<>());
+                    if (!minData.containsKey("value") || value < (Double) minData.get("value")) {
+                        minData.put("value", value);
+                        minData.put("time", data.get("time"));
+                        minData.put("sensorID", sensorID);
+                    }
+                }
+            }
+        }
+        return minDataMap;
+    }
+
 }
