@@ -37,4 +37,6 @@ public interface MonitorDataService {
     List<MonitorPointDataInfo> queryMonitorPointDataList(QueryMonitorPointDataParam pa);
 
     Object queryMonitorPointHasDataCount(QueryMonitorPointHasDataCountParam pa);
+
+    List<MonitorPointDataInfo> queryMonitorPointFilterDataList(QueryMonitorPointDataParam pa);
 }

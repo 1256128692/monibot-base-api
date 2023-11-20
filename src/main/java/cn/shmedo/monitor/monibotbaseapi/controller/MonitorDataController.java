@@ -130,12 +130,16 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.maxSensorDataList 传感器最大数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.maxSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.minSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList 传感器最大数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.maxSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.maxSensorDataList.fieldToken.value   数值
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.minSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.minSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.minSensorDataList.fieldToken.value   数值
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -148,9 +152,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointFilterDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointDataParam pa) {
+        return monitorDataService.queryMonitorPointFilterDataList(pa);
     }
 
 
