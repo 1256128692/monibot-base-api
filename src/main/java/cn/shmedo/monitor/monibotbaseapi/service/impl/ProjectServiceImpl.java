@@ -705,6 +705,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         ).toList();
         if (ObjectUtil.isNotEmpty(ossAllList)) {
             List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(ossAllList, result.getCompanyID());
+            if (ObjectUtil.isEmpty(fileUrlList)) {
+                return result;
+            }
             Map<String, FileInfoResponse> fileMap = fileUrlList.stream().collect(Collectors.toMap(
                     FileInfoResponse::getFilePath, Function.identity()
             ));
