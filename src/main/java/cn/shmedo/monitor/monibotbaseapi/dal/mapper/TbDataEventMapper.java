@@ -64,4 +64,6 @@ public interface TbDataEventMapper {
     List<Map<String, Object>> selectBaseInfoByIDList(List<Integer> eventIDList);
 
     List<EventBaseInfo> selectByIDs(List<Integer> eventIDList);
+
+    int selectCountByName(Integer projectID, String name, Integer id);
 }

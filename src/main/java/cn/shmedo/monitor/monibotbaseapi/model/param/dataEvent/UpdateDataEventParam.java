@@ -5,6 +5,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataEventMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import jakarta.validation.constraints.NotBlank;
@@ -49,6 +51,10 @@ public class UpdateDataEventParam  implements ParameterValidator, ResourcePermis
     public ResultWrapper validate() {
         if (!FrequencyEnum.isValid(frequency)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数:frequency字段值是非法频次类型");
+        }
+        TbDataEventMapper tbDataEventMapper = ContextHolder.getBean(TbDataEventMapper.class);
+        if (tbDataEventMapper.selectCountByName(projectID, name, id) != 0) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "名称已存在");
         }
         return null;
     }
