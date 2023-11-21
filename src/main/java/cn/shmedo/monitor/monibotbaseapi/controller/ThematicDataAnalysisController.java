@@ -281,6 +281,50 @@ public class ThematicDataAnalysisController {
     }
 
     /**
+     * @api {POST} /QueryTransversePage 浸润线分析-横剖面(分页)
+     * @apiDescription 浸润线分析-横剖面(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName QueryTransversePage
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
+     * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
+     * @apiParam (请求体) {Int} displayDensity 显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年
+     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
+     * @apiParam (请求体) {DateTime} startTime 开始时间
+     * @apiParam (请求体) {DateTime} endTime 结束时间
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParam (请求体) {Object} [datumPoint] 基准点配置
+     * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
+     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
+     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
+     * @apiSuccess (返回结果) {Object} [currentPageData.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
+     * @apiSuccess (返回结果) {Int} currentPageData.datumPointData.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.datumPointData.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.value 值
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.upper 波动区间上限
+     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.lower 波动区间下限
+     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点数据列表
+     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Double} currentPageData.monitorPointList.value 值
+     * @apiSuccess (返回结果) {Double} [currentPageData.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置且当前值为异常值时才有该项;<br>为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/QueryTransversePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryTransversePage(@Valid @RequestBody QueryTransversePageParam param) {
+        return ResultWrapper.success(PageUtil.page(thematicDataAnalysisService.queryTransverseList(param), param.getPageSize(), param.getCurrentPage()));
+    }
+
+    /**
      * @api {POST} /QueryWetLineConfig 查询浸润线纵剖面配置
      * @apiDescription 查询浸润线纵剖面配置
      * @apiVersion 1.0.0
@@ -326,50 +370,6 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/QueryWetLineConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWetLineConfig(@Valid @RequestBody QueryWetLineConfigParam param) {
         return thematicDataAnalysisService.queryWetLineConfig(param);
-    }
-
-    /**
-     * @api {POST} /QueryTransversePage 浸润线分析-横剖面(分页)
-     * @apiDescription 浸润线分析-横剖面(分页)
-     * @apiVersion 1.0.0
-     * @apiGroup 专题模块
-     * @apiName QueryTransversePage
-     * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
-     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
-     * @apiParam (请求体) {Int} queryDataType 属性 1.管内水位高程 2.空管距离
-     * @apiParam (请求体) {Int} displayDensity 显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年
-     * @apiParam (请求体) {Int} statisticalMethod 统计方式 1.最新一条 2.平均值 3.阶段累计 4.阶段变化
-     * @apiParam (请求体) {DateTime} startTime 开始时间
-     * @apiParam (请求体) {DateTime} endTime 结束时间
-     * @apiParam (请求体) {Int} pageSize 页大小
-     * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiParam (请求体) {Object} [datumPoint] 基准点配置
-     * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
-     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
-     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
-     * @apiSuccess (返回结果) {Int} totalCount 总数量
-     * @apiSuccess (返回结果) {Int} totalPage 总页数
-     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
-     * @apiSuccess (返回结果) {Object} [currentPageData.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
-     * @apiSuccess (返回结果) {Int} currentPageData.datumPointData.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} currentPageData.datumPointData.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.value 值
-     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.upper 波动区间上限
-     * @apiSuccess (返回结果) {Double} currentPageData.datumPointData.lower 波动区间下限
-     * @apiSuccess (返回结果) {Object[]} currentPageData.monitorPointList 监测点数据列表
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorPointList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} currentPageData.monitorPointList.monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {Double} currentPageData.monitorPointList.value 值
-     * @apiSuccess (返回结果) {Double} [currentPageData.monitorPointList.abnormalValue] 异常值,入参有datumPoint基准点配置且当前值为异常值时才有该项;<br>为负值时表示该点值超出波动下限,为正值时表示该点超出波动上限
-     * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
-     */
-    //@Permission(permissionName = "")
-    @PostMapping(value = "/QueryTransversePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryTransversePage(@Valid @RequestBody QueryTransversePageParam param) {
-        return ResultWrapper.success(PageUtil.page(thematicDataAnalysisService.queryTransverseList(param), param.getPageSize(), param.getCurrentPage()));
     }
 
     /**

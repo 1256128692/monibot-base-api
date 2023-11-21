@@ -69,7 +69,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     List<TbMonitorPoint> selectPointListByIDList(List<Integer> monitorPointIDList);
 
-    List<ThematicGroupPointListInfo> selectThematicGroupPointList(QueryThematicGroupPointListParam param);
+    List<ThematicGroupPointListInfo> selectThematicGroupPointList(@Param("param") QueryThematicGroupPointListParam param);
 
     List<Integer> selectItemIDsByIDs(List<Integer> monitorPointIDList);
 
@@ -78,7 +78,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     List<MonitorPointDataInfo> selectMonitorPointDataInfoListByIDList(List<Integer> monitorPointIDList);
 
-    WetLineConfigInfo selectWetLineConfig(QueryWetLineConfigParam param);
+    WetLineConfigInfo selectWetLineConfig(@Param("param") QueryWetLineConfigParam param);
 
     List<MonitorPointBaseInfoV2> selectListByEigenValueIDList(@Param("eigenValueIDList") List<Integer> eigenValueIDList);
 }

@@ -212,10 +212,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                 .builder().time(formatter.parse(u.getKey()));
                         Tuple<Double, Double> limitInfo = new Tuple<>();
                         if (Objects.nonNull(datumPointID)) {
-                            u.getValue().stream().filter(w -> w.containsKey(DbConstant.SENSOR_ID_TAG)).filter(w ->
-                                            datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG))).getItem1()))
+                            u.getValue().stream().filter(w -> w.containsKey(DbConstant.SENSOR_ID_FIELD_TOKEN)).filter(w ->
+                                            datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).getItem1()))
                                     .findAny().ifPresent(w -> {
-                                        Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG)));
+                                        Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
                                         double value = Convert.toDouble(w.get(fieldToken));
                                         limitInfo.setItem1(value + upper);
                                         limitInfo.setItem2(value - lower);
@@ -225,10 +225,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                     });
                         }
                         builder.monitorPointList(u.getValue().stream().filter(w -> Objects.isNull(datumPointID)
-                                || !datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG)))
+                                || !datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
                                 .getItem1())).map(w -> {
                             double value = Convert.toDouble(w.get(fieldToken));
-                            Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG)));
+                            Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
                             return ThematicMonitorPointValueInfo.builder().abnormalValue(getAbnormalValue(limitInfo, value))
                                     .monitorPointID(pointInfo.getItem1()).monitorPointName(pointInfo.getItem2()).value(value).build();
                         }).toList());
@@ -236,7 +236,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
-                }).toList();
+                }).sorted(((o1, o2) -> DateUtil.compare(o1.getTime(), o2.getTime()))).toList();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -253,7 +253,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         Map<Integer, Tuple<Double, Double>> dataMap = Optional.of(sensorIDList).filter(CollUtil::isNotEmpty).map(u ->
                         sensorDataDao.querySensorNewData(u, fieldSelectInfoList, false, MonitorType.WET_LINE.getKey()).stream()
-                                .collect(Collectors.toMap(k -> Convert.toInt(k.get(DbConstant.SENSOR_ID_TAG)),
+                                .collect(Collectors.toMap(k -> Convert.toInt(k.get(DbConstant.SENSOR_ID_FIELD_TOKEN)),
                                         v -> new Tuple<>(Convert.toDouble(v.get(LEVEL_ELEVATION)), Convert.toDouble(v.get(EMPTY_PIPE_DISTANCE))))))
                 .orElse(Collections.emptyMap());
         if (CollUtil.isNotEmpty(dataMap)) {
@@ -286,20 +286,20 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         List<Map<String, Object>> dataList = queryPointDataList(sensorList, param.getDisplayDensity(), param.getStatisticalMethod(),
                 param.getStartTime(), param.getEndTime());
-        return dataList.stream().filter(u -> u.containsKey(DbConstant.SENSOR_ID_TAG))
-                .filter(u -> sensorPointMap.containsKey(Convert.toInt(u.get(DbConstant.SENSOR_ID_TAG))))
+        return dataList.stream().filter(u -> u.containsKey(DbConstant.SENSOR_ID_FIELD_TOKEN))
+                .filter(u -> sensorPointMap.containsKey(Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN))))
                 .collect(Collectors.groupingBy(u -> formatter.format(Convert.toDate(u.get(DbConstant.TIME_FIELD)))))
                 .entrySet().stream().map(u -> {
                     try {
                         // 非防渗墙双边点集
                         List<ThematicPipeData> nonBilateralList = u.getValue().stream().filter(w -> Optional.ofNullable(bilateralMonitorIDSet)
-                                .map(s -> !s.contains(sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG))).getID()))
+                                .map(s -> !s.contains(sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).getID()))
                                 .orElse(true)).map(w -> {
-                            TbMonitorPoint tbMonitorPoint = sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG)));
+                            TbMonitorPoint tbMonitorPoint = sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
                             Integer monitorPointID = tbMonitorPoint.getID();
                             ThematicPipeData.ThematicPipeDataBuilder builder = ThematicPipeData.builder()
                                     .monitorPointID(monitorPointID).monitorPointName(tbMonitorPoint.getName());
-                            Optional.ofNullable(w.get(EMPTY_PIPE_DISTANCE)).map(Convert::toInt).ifPresent(builder::emptyPipeDistance);
+                            Optional.ofNullable(w.get(EMPTY_PIPE_DISTANCE)).map(Convert::toDouble).ifPresent(builder::emptyPipeDistance);
                             Optional.ofNullable(w.get(LEVEL_ELEVATION)).map(Convert::toDouble).map(s ->
                                     ThematicLevelElevationInfo.builder().eigenValue(getMaxEigenValueData(s, pointIDEigenValueMap.get(monitorPointID)))
                                             .value(s).build()).ifPresent(builder::levelElevation);
@@ -307,7 +307,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         }).toList();
 
                         List<Map<String, Object>> list = u.getValue().stream().filter(w -> Optional.ofNullable(bilateralMonitorIDSet)
-                                .map(s -> s.contains(sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG))).getID()))
+                                .map(s -> s.contains(sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).getID()))
                                 .orElse(false)).toList();
 
                         // 防渗墙双边点集
@@ -319,15 +319,15 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                             Double o2Val = Optional.ofNullable(o2.get(LEVEL_ELEVATION)).map(Convert::toDouble).orElse(null);
                             Double osmoticValue = Optional.ofNullable(threshold).filter(s -> Objects.nonNull(o1Val) && Objects.nonNull(o2Val))
                                     .filter(s -> s <= Math.abs(o1Val - o2Val)).map(s -> s - Math.abs(o1Val - o2Val)).orElse(null);
-                            dealBilateralData(pointIDEigenValueMap, monitorPointSet, o1, sensorPointMap.get(Convert.toInt(o1.get(DbConstant.SENSOR_ID_TAG))), osmoticValue, res::add);
-                            dealBilateralData(pointIDEigenValueMap, monitorPointSet, o2, sensorPointMap.get(Convert.toInt(o2.get(DbConstant.SENSOR_ID_TAG))), osmoticValue, res::add);
+                            dealBilateralData(pointIDEigenValueMap, monitorPointSet, o1, sensorPointMap.get(Convert.toInt(o1.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), osmoticValue, res::add);
+                            dealBilateralData(pointIDEigenValueMap, monitorPointSet, o2, sensorPointMap.get(Convert.toInt(o2.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), osmoticValue, res::add);
                             return res;
                         }).orElse(List.of());
                         return Map.of("time", formatter.parse(u.getKey()), "pipeDataList", CollUtil.union(nonBilateralList, bilateralList));
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
-                }).toList();
+                }).sorted((o1, o2) -> DateUtil.compare(Convert.toDate(o1.get("time")), Convert.toDate(o2.get("time")))).toList();
     }
 
     @Override
@@ -397,7 +397,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     } catch (ParseException e) {
                         throw new RuntimeException(e);
                     }
-                }).toList();
+                }).sorted((o1, o2) -> DateUtil.compare(o1.getTime(), o2.getTime())).toList();
     }
 
     @Override
@@ -564,9 +564,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         final List<FieldSelectInfo> fieldSelectInfoList = param.getFieldSelectInfoList();
         List<StAnalysisData> dataList = sensorDataDao.querySensorNewData(
                 sensorIDList, fieldSelectInfoList, false, monitorType).stream().filter(u -> Objects.nonNull(
-                u.get(DbConstant.SENSOR_ID_TAG)) && Objects.nonNull(u.get(DbConstant.TIME_FIELD))
+                u.get(DbConstant.SENSOR_ID_FIELD_TOKEN)) && Objects.nonNull(u.get(DbConstant.TIME_FIELD))
                 && Objects.nonNull(u.get(DISTANCE))).map(u -> {
-            Integer monitorPointID = Optional.of(u.get(DbConstant.SENSOR_ID_TAG)).map(Convert::toInt).map(sensorIDPointIDMap::get).orElse(null);
+            Integer monitorPointID = Optional.of(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN)).map(Convert::toInt).map(sensorIDPointIDMap::get).orElse(null);
             ConfigBaseResponse config = Optional.ofNullable(monitorPointID).map(pointIDConfigMap::get)
                     .orElse(new ConfigBaseResponse());
             return StAnalysisData.builder().monitorPointID(monitorPointID).monitorPointName(config.getTargetName())
@@ -632,7 +632,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 Collectors.toMap(ConfigBaseResponse::getChildID, v -> v));
         Map<Date, List<Tuple<Integer, Double>>> sensorMap = metadataList.stream().collect(Collectors.groupingBy(
                 u -> groupFunc.apply(u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> new Tuple<>(
-                u.getKey(), u.getValue().stream().collect(Collectors.groupingBy(w -> Convert.toInt(w.get(DbConstant.SENSOR_ID_TAG))))
+                u.getKey(), u.getValue().stream().collect(Collectors.groupingBy(w -> Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))))
                 .entrySet().stream().map(w -> new Tuple<>(
                         w.getKey(), w.getValue().stream().map(s -> Convert.toDouble(s.get(DISTANCE)))
                         .reduce(Double::sum).orElse(0d) / w.getValue().size())).toList())).collect(Collectors.toMap(
@@ -814,12 +814,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                                        final String fieldToken, final Function<Object, Date> groupFunc) {
         // if influxDB metadata not contains 'sid','time' or corresponding fieldToken,think as illegal data.
         if (metadataList.stream().anyMatch(p -> Objects.isNull(p.get(DbConstant.TIME_FIELD))
-                || Objects.isNull(p.get(fieldToken)) || Objects.isNull(p.get(DbConstant.SENSOR_ID_TAG)))) {
+                || Objects.isNull(p.get(fieldToken)) || Objects.isNull(p.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))) {
             log.error("InfluxDB contains illegal data,data:\n{}", metadataList);
             throw new RuntimeException("InfluxDB contains illegal data!");
         }
         Map<Date, List<DmAnalysisData>> dataMap = metadataList.stream().map(u -> {
-                    int sensorID = Convert.toInt(u.get(DbConstant.SENSOR_ID_TAG));
+                    int sensorID = Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN));
                     ConfigBaseResponse response = configMap.get(sensorID);
                     return DmAnalysisData.builder().sensorID(sensorID).totalValue(Convert.toDouble(u.get(fieldToken)))
                             .groupTime(groupFunc.apply(u.get(DbConstant.TIME_FIELD)))
@@ -902,7 +902,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     } else if (w.containsKey(DISTANCE)) {
                         builder.distance(Convert.toDouble(w.get(DISTANCE)));
                     } else if (w.containsKey(VOLUME_FLOW)) {
-                        Optional.of(w.get(DbConstant.SENSOR_ID_TAG)).map(Convert::toInt).filter(sensorPointIDMap::containsKey)
+                        Optional.of(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)).map(Convert::toInt).filter(sensorPointIDMap::containsKey)
                                 .map(sensorPointIDMap::get).ifPresent(s -> {
                                     if (s.equals(volumeFlowInputMonitorPointID)) {
                                         builder.volumeFlowInput(Convert.toDouble(w.get(VOLUME_FLOW)));
@@ -916,7 +916,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             } catch (ParseException e) {
                 throw new RuntimeException(e);
             }
-        }).toList();
+        }).sorted((o1, o2) -> DateUtil.compare(o1.getTime(), o2.getTime())).toList();
     }
 
     private List<Map<String, Object>> queryRainWaterDataList(List<TbSensor> sensorList, Integer displayDensity, Date startTime, Date endTime) {
@@ -1040,7 +1040,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Optional.of(point).filter(u -> needDealPointSet.contains(u.getID())).map(u -> {
             ThematicPipeData.ThematicPipeDataBuilder builder = ThematicPipeData.builder().monitorPointID(u.getID()).monitorPointName(u.getName());
             Optional.of(data).filter(w -> w.containsKey(EMPTY_PIPE_DISTANCE)).map(w -> w.get(EMPTY_PIPE_DISTANCE))
-                    .map(Convert::toInt).ifPresent(builder::emptyPipeDistance);
+                    .map(Convert::toDouble).ifPresent(builder::emptyPipeDistance);
             Optional.of(data).filter(w -> w.containsKey(LEVEL_ELEVATION)).map(w -> w.get(LEVEL_ELEVATION))
                     // gradle编译插件有bug，这里如果不加这个强转会编译失败
                     .map(Convert::toDouble).map(w -> (ThematicLevelElevationInfo) ThematicLevelElevationInfo.builder()
