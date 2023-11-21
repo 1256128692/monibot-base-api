@@ -107,9 +107,13 @@ public class DefaultConstant {
         String HIK_PTZ_KEY = "ptz";
 
         /**
-         * ws 取流协议
+         * ws取流协议
          */
         String HIK_PROTOCOL_WS = "ws";
+        /**
+         * rtsp取流协议
+         */
+        String HIK_PROTOCOL_RTSP = "rtsp";
 
         /**
          * 取流地址url,5min内有效
