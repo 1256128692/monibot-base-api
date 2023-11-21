@@ -5,6 +5,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.ArtemisConfigWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.DeviceListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.HkDeviceInfo;
@@ -172,7 +173,11 @@ public class HkVideoServiceImpl implements HkVideoService {
             String responseBody = ArtemisHttpUtil.doPostStringArtemis(artemisConfigWrapper.getArtemisConfig(), path, body, null, null, contentType);
             return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
                     .map(u -> u.get(HIK_DATA)).map(JSONUtil::parseObj).map(u -> (Map<String, Object>) u).filter(ObjectUtil::isNotEmpty)
-                    .orElse(Map.of("responseBody", Optional.ofNullable(responseBody).orElse("")));
+                    .map(u -> {
+                        Optional.of(u).filter(w -> w.containsKey(HIK_STREAM_URL)).ifPresent(w ->
+                                w.put(HIK_STREAM_URL, afterHikUrlPrepare(w.get(HIK_STREAM_URL).toString(), protocol)));
+                        return u;
+                    }).orElse(Map.of("responseBody", Optional.ofNullable(responseBody).orElse("")));
 //                    .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
 //                    .map(JSONUtil::parseObj).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
@@ -362,9 +367,14 @@ public class HkVideoServiceImpl implements HkVideoService {
             return Optional.ofNullable(responseBody).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj)
                     .filter(u -> HIK_SUCCESS_CODE.equals(u.getStr(HIK_CODE, "-1"))).map(u -> u.get(HIK_DATA))
                     .map(JSONUtil::parseObj).map(u -> u.getStr(HIK_STREAM_URL))
+                    .map(u -> afterHikUrlPrepare(u, paramMap.getOrDefault(HIK_STREAM_PROTOCOL, HIK_PROTOCOL_RTSP).toString()))
                     .orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
+    }
+
+    private String afterHikUrlPrepare(final String source, final String protocol) {
+        return fileConfig.getStreamProtocol() + source.substring(protocol.length());
     }
 }
