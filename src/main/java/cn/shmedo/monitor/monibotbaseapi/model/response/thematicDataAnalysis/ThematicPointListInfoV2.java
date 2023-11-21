@@ -21,6 +21,7 @@ public class ThematicPointListInfoV2 extends ThematicPointListInfo {
     private Double levelElevation;
     private List<ThematicProjectConfigInfo> monitorPointConfigList;
     private List<ThematicEigenValueData> eigenValueList;
+    private List<ThematicSensorParamField> paramFieldList;
 
     @JsonProperty("nozzleElevation")
     private Double nozzleElevation() {

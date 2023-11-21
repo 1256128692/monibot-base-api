@@ -364,6 +364,17 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} monitorPointList.eigenValueList.eigenValue 特征值
      * @apiSuccess (返回结果) {String} monitorPointList.eigenValueList.chnUnit 中文单位
      * @apiSuccess (返回结果) {String} monitorPointList.eigenValueList.engUnit 英文单位
+     * @apiSuccess (返回结果) {Object[]} monitorPointList.paramFieldList 参数列表
+     * @apiSuccess (返回结果) {Int} monitorPointList.paramFieldList.id 参数ID
+     * @apiSuccess (返回结果) {Int} monitorPointList.paramFieldList.subjectID 参数主体ID
+     * @apiSuccess (返回结果) {Int} monitorPointList.paramFieldList.subjectType 参数主体类型
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.dataType 参数数据类型
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.token 参数标识
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.name 参数名称
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.paValue 参数默认值
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.paDesc 参数描述
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.chnUnit 参数中文单位
+     * @apiSuccess (返回结果) {String} monitorPointList.paramFieldList.engUnit 参数英文单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */

@@ -69,6 +69,18 @@
                 <id column="chnUnit" jdbcType="VARCHAR" property="chnUnit"/>
                 <id column="engUnit" jdbcType="VARCHAR" property="engUnit"/>
             </collection>
+            <collection property="paramFieldList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicSensorParamField">
+                <id column="paramFieldID" jdbcType="INTEGER" property="id"/>
+                <result column="paramFieldSubjectID" jdbcType="INTEGER" property="subjectID"/>
+                <result column="paramFieldSubjectType" jdbcType="INTEGER" property="subjectType"/>
+                <result column="paramFieldDataType" jdbcType="VARCHAR" property="dataType"/>
+                <result column="paramFieldToken" jdbcType="VARCHAR" property="token"/>
+                <result column="paramFieldName" jdbcType="VARCHAR" property="name"/>
+                <result column="paramFieldPaValue" jdbcType="VARCHAR" property="paValue"/>
+                <result column="paramFieldPaDesc" jdbcType="VARCHAR" property="paDesc"/>
+                <result column="paramFieldChnUnit" jdbcType="VARCHAR" property="chnUnit"/>
+                <result column="paramFieldEngUnit" jdbcType="VARCHAR" property="engUnit"/>
+            </collection>
         </collection>
     </resultMap>
     <sql id="Base_Column_List">
@@ -823,6 +835,16 @@
             tmp.`MonitorItemID` monitorItemID,
             ts.`ID` sensorID,
             ts.`ExValues` sensorExValues,
+            tp.`ID` paramFieldID,
+            tp.`SubjectID` paramFieldSubjectID,
+            tp.`SubjectType` paramFieldSubjectType,
+            tp.`DataType` paramFieldDataType,
+            tp.`Token` paramFieldToken,
+            tp.`Name` paramFieldName,
+            tp.`PaValue` paramFieldPaValue,
+            tp.`PaDesc` paramFieldPaDesc,
+            tdu_p.`ChnUnit` paramFieldChnUnit,
+            tdu_p.`EngUnit` paramFieldEngUnit,
             tpc_p.`ID` pConfigID,
             tpc_p.`ProjectID` pProjectID,
             tpc_p.`Group` pGroup,
@@ -840,6 +862,8 @@
             LEFT JOIN tb_monitor_point tmp ON tmp.`ID` = tmgp.`MonitorPointID`
             LEFT JOIN tb_project_config tpc_p ON tmp.ProjectID = tpc_p.ProjectID AND tpc_p.`Group` = 'monitorPoint' AND tpc_p.`Key` LIKE CONCAT( '%::', tmp.ID )
             LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
+            LEFT JOIN tb_parameter tp ON tp.SubjectID = ts.ID
+            LEFT JOIN tb_data_unit tdu_p ON tdu_p.ID = tp.PaUnitID
             LEFT JOIN tb_eigen_value_relation tevr ON tevr.`MonitorPointID` = tmp.`ID`
             LEFT JOIN tb_eigen_value tev ON tev.`ID` = tevr.`EigenValueID` AND tev.`Scope` = 0
             LEFT JOIN tb_data_unit tdu ON tdu.`ID` = tev.`UnitID`
