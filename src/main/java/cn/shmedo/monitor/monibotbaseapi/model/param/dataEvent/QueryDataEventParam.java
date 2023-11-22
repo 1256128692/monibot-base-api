@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -14,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +22,9 @@ public class QueryDataEventParam  implements ParameterValidator, ResourcePermiss
     private Integer projectID;
     private Integer monitorItemID;
     private List<Integer> monitorPointIDList;
+
+    private Date begin;
+    private Date end;
 
     @JsonIgnore
     private List<Integer> monitorItemIDList = new LinkedList<>();
@@ -38,6 +39,11 @@ public class QueryDataEventParam  implements ParameterValidator, ResourcePermiss
             }
         }
 
+        if (begin != null && end != null) {
+            if (begin.after(end)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
+            }
+        }
         return null;
     }
 

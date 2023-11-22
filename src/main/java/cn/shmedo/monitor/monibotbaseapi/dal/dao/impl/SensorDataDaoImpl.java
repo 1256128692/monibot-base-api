@@ -616,7 +616,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") fill(none) "
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
                 + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
@@ -641,7 +641,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") fill(none) "
+                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
                 + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }

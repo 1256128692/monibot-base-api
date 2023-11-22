@@ -1,20 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.math.MathUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
-import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
@@ -33,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonito
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.TimeRange;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
@@ -50,7 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -159,7 +158,53 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             }
         });
 
+        if (pa.getBegin() != null && pa.getEnd() != null) {
+            return queryDataEventInfos.stream()
+                    .filter(eventInfo -> isTimeInRange(eventInfo.getTimeRange(), pa.getBegin(), pa.getEnd(), eventInfo.getFrequency()))
+                    .collect(Collectors.toList());
+        }
+
         return queryDataEventInfos;
+    }
+
+
+    private boolean isTimeInRange(String timeRange, Date begin, Date end, Integer frequency) {
+        List<TimeRange> dateRanges = parseJsonTimeRange(timeRange);
+        return CollUtil.isNotEmpty(dateRanges) && dateRanges.stream().anyMatch(dateRange -> {
+            if (frequency == 1) {
+                // 处理每年的情况
+                int beginYear = DateUtil.year(begin);
+                int endYear = DateUtil.year(end);
+
+                Date startTime = adjustToSameYear(dateRange.getStartTime(), beginYear);
+                Date endTime = adjustToSameYear(dateRange.getEndTime(), endYear);
+
+                return DateUtil.isIn(begin, startTime, endTime) || DateUtil.isIn(end, startTime, endTime);
+            } else {
+                // 非每年的情况
+                return DateUtil.isIn(begin, dateRange.getStartTime(), dateRange.getEndTime()) ||
+                        DateUtil.isIn(end, dateRange.getStartTime(), dateRange.getEndTime());
+            }
+        });
+    }
+
+    private Date adjustToSameYear(Date date, int targetYear) {
+        // 将时间调整到目标年份
+        return DateUtil.offset(date, DateField.YEAR, targetYear - DateUtil.year(date));
+    }
+
+    private List<TimeRange> parseJsonTimeRange(String timeRange) {
+        JSONArray jsonArray = new JSONArray(timeRange);
+        List<TimeRange> timeRangeList = new ArrayList<>(jsonArray.size());
+        for (Object obj : jsonArray) {
+            if (obj instanceof JSONObject) {
+                JSONObject jsonObject = (JSONObject) obj;
+                Date startTime = jsonObject.getDate("startTime");
+                Date endTime = jsonObject.getDate("endTime");
+                timeRangeList.add(new TimeRange(startTime, endTime));
+            }
+        }
+        return timeRangeList;
     }
 
     @Override
@@ -235,9 +280,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     List<Map<String, Object>> result = new LinkedList<>();
                     sensorDataList.forEach(da -> {
                         if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
-                            if (da.get(fieldList.get(0).getFieldToken()) != null) {
-                                result.add(da);
-                            }
+                            result.add(da);
                         }
                     });
                     if (sensorInfo.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {

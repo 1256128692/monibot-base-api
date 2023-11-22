@@ -201,4 +201,13 @@
             #{eventID}
         </foreach>
     </select>
+
+    <select id="selectCountByName" resultType="int">
+        select count(1)
+        from tb_data_event where projectID = #{projectID}
+                             and Name = #{name}
+        <if test="id != null">
+            and ID != #{id,jdbcType=INTEGER}
+        </if>
+    </select>
 </mapper>

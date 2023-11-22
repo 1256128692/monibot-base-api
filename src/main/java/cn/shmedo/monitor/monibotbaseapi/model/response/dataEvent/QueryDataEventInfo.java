@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent;
 
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import lombok.Data;
 
 import java.util.List;
