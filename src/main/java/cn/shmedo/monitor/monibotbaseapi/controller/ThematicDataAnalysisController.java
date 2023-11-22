@@ -256,8 +256,8 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {DateTime} endTime 结束时间
      * @apiParam (请求体) {Object} [datumPoint] 基准点配置
      * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
-     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
-     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
+     * @apiParam (请求体) {Double} datumPoint.upper 向上波动(米)
+     * @apiParam (请求体) {Double} datumPoint.lower 向下波动(米)
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.time 时间
      * @apiSuccess (返回结果) {Object} [dataList.datumPointData] 基准点数据,入参有datumPoint基准点配置时才有该项
@@ -298,8 +298,8 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiParam (请求体) {Object} [datumPoint] 基准点配置
      * @apiParam (请求体) {Int} datumPoint.monitorPointID 基准监测点ID
-     * @apiParam (请求体) {Int} datumPoint.upper 向上波动(米)
-     * @apiParam (请求体) {Int} datumPoint.lower 向下波动(米)
+     * @apiParam (请求体) {Double} datumPoint.upper 向上波动(米)
+     * @apiParam (请求体) {Double} datumPoint.lower 向下波动(米)
      * @apiSuccess (返回结果) {Int} totalCount 总数量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据

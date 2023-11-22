@@ -46,7 +46,7 @@ public abstract class WetLineBaseParam extends QueryWetLineConfigParam implement
         } catch (JSONException e) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型配置的显示密度、统计方式错误!");
         } catch (IllegalArgumentException e) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有部分监测点不存在!");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, e.getMessage());
         }
         return null;
     }

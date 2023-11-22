@@ -542,15 +542,15 @@ public class TimeUtil {
      * 展示密度formatter
      */
     public interface DestinyFormatter {
-        SimpleDateFormat HOUR_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:00:00");
-        SimpleDateFormat DAILY_FORMATTER = new SimpleDateFormat("yyyy-MM-dd 00:00:00");
-        SimpleDateFormat MONTHLY_FORMATTER = new SimpleDateFormat("yyyy-MM");
-        SimpleDateFormat YEARLY_FORMATTER = new SimpleDateFormat("yyyy");
+        DateTimeFormatter HOUR_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+        DateTimeFormatter DAILY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
+        DateTimeFormatter MONTHLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+        DateTimeFormatter YEARLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
 
-        static SimpleDateFormat getFormatter(DisplayDensity densityType) {
-            SimpleDateFormat formatter;
+        static DateTimeFormatter getFormatter(DisplayDensity densityType) {
+            DateTimeFormatter formatter;
             switch (densityType) {
-                case ALL -> formatter = TimeUtil.getDefaultFormatter();
+                case ALL -> formatter = getDefaultDateTimeFormatter();
                 case HOUR -> formatter = HOUR_FORMATTER;
                 case DAY, WEEK -> formatter = DAILY_FORMATTER;
                 case MONTH -> formatter = MONTHLY_FORMATTER;

@@ -811,7 +811,7 @@
         </foreach>
     </select>
     <select id="selectMonitorTypeExValuesByPointIDList" resultType="java.util.Map">
-        SELECT tmp.ID monitorPointID,tmt.ExValues exValues FROM tb_monitor_point tmp LEFT JOIN tb_monitor_type tmt ON tmp.MonitorType = tmt.MonitorType WHERE WHERE tmp.ID IN
+        SELECT tmp.ID monitorPointID,tmt.ExValues exValues FROM tb_monitor_point tmp LEFT JOIN tb_monitor_type tmt ON tmp.MonitorType = tmt.MonitorType WHERE tmp.ID IN
         <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>

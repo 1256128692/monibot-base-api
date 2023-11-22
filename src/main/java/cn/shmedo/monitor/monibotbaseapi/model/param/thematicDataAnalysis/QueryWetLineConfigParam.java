@@ -5,8 +5,10 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -36,6 +38,11 @@ public class QueryWetLineConfigParam implements ParameterValidator, ResourcePerm
 
     @Override
     public ResultWrapper<?> validate() {
+        if (ContextHolder.getBean(TbMonitorPointMapper.class).selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
+                .in(TbMonitorPoint::getID, monitorPointIDList).eq(TbMonitorPoint::getMonitorType, monitorType)).intValue()
+                != monitorPointIDList.size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不是浸润线监测点!");
+        }
         if (!ContextHolder.getBean(TbMonitorGroupMapper.class).exists(new LambdaQueryWrapper<TbMonitorGroup>()
                 .eq(TbMonitorGroup::getID, monitorGroupID).eq(TbMonitorGroup::getProjectID, projectID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点组不存在!");

@@ -15,9 +15,8 @@ public class DatumPointConfig {
     private Integer monitorPointID;
     @NotNull(message = "向上波动（米）不能为空")
     @Positive(message = "向上波动（米）必须大于0")
-    private Integer upper;
+    private Double upper;
     @NotNull(message = "向下波动（米）不能为空")
     @Positive(message = "向下波动（米）必须大于0")
-    private Integer lower;
-
+    private Double lower;
 }

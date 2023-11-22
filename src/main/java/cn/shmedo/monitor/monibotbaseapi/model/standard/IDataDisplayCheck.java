@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.standard;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
@@ -11,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 
 import java.util.List;
@@ -44,15 +44,13 @@ public interface IDataDisplayCheck {
      */
     default boolean valid() throws JSONException, IllegalArgumentException {
         final List<Integer> pointIDList = getInspectedPointIDList().stream().distinct().toList();
-        if (CollUtil.isEmpty(pointIDList)) {
-            return false;
-        }
         final Integer displayDensity = getDisplayDensity();
         final Integer statisticalMethod = getStatisticalMethod();
         List<TbMonitorPoint> pointList = ContextHolder.getBean(TbMonitorPointMapper.class).selectList(
-                new LambdaQueryWrapper<TbMonitorPoint>().in(TbMonitorPoint::getID, pointIDList));
+                new LambdaQueryWrapper<TbMonitorPoint>().eq(TbMonitorPoint::getMonitorType, MonitorType.WET_LINE.getKey())
+                        .in(TbMonitorPoint::getID, pointIDList));
         if (pointList.size() != pointIDList.size()) {
-            throw new IllegalArgumentException("有部分监测点不存在!");
+            throw new IllegalArgumentException("有部分监测点不存在或不是浸润线监测点!");
         }
         setTbMonitorPointList(pointList);
         Set<String> exValuesList = ContextHolder.getBean(TbMonitorTypeMapper.class).selectList(

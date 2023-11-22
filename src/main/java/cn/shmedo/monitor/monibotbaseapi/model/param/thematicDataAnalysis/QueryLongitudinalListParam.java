@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
 import cn.shmedo.monitor.monibotbaseapi.model.standard.WetLineBaseParam;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class QueryLongitudinalListParam extends WetLineBaseParam {
+    @Valid
     private CutoffWallConfig cutoffWallConfig;
 
     @Override
