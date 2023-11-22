@@ -417,6 +417,8 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
+     * @apiParam (请求体) {DateTime} [begin] 开始时间
+     * @apiParam (请求体) {DateTime} [end]   结束时间
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorItemID":1}
      * @apiSuccess (返回结果) {Object[]} dataList 大事件ID
