@@ -629,21 +629,43 @@ public class SensorDataDaoImpl implements SensorDataDao {
     private String getDaySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString,
                                              String measurement, List<String> selectField, Integer statisticsType,
                                              Integer densityType) {
-        StringBuilder selectFieldBuilder = new StringBuilder();
-        selectField.forEach(s -> {
-            selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
-            selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
-        });
-        selectFieldBuilder.append(DbConstant.TIME_FIELD);
-//        selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG);
-        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                .collect(Collectors.joining(" or "));
+        // 如果是单日的话直接查
+        if (densityType == DisplayDensity.DAY.getValue()) {
+            StringBuilder selectFieldBuilder = new StringBuilder();
+            selectField.forEach(s -> {
+                selectFieldBuilder.append(s).append(",");
+            });
+            selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG).append(",");
+            selectFieldBuilder.append(DbConstant.TIME_FIELD);
+            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                    .collect(Collectors.joining(" or "));
 
-        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
-                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
-                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-        return sidSql;
+            String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                    + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                    + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+            return sidSql;
+        } else {
+            StringBuilder selectFieldBuilder = new StringBuilder();
+            selectField.forEach(s -> {
+                if (statisticsType == StatisticalMethods.CHANGE.getValue()) {
+                    selectFieldBuilder.append("sum(").append(s).append(")");
+                    selectFieldBuilder.append(" as ").append(s).append(",");
+                } else {
+                    selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
+                    selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+                }
+
+            });
+            selectFieldBuilder.append(DbConstant.TIME_FIELD);
+            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                    .collect(Collectors.joining(" or "));
+
+            String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                    + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                    + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
+                    + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+            return sidSql;
+        }
     }
 
 
