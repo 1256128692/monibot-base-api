@@ -494,6 +494,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} maxDataList.value 值
      * @apiSuccess (返回结果) {DateTime} maxDataList.time 时间
      * @apiSuccess (返回结果) {Object[]} [eigenvalueDataList] 特征值数据列表
+     * @apiSuccess (返回结果) {Int} eigenvalueDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} eigenvalueDataList.eigenValueID 特征值ID
      * @apiSuccess (返回结果) {String} eigenvalueDataList.eigenValueName 特征值名称
      * @apiSuccess (返回结果) {Double} eigenvalueDataList.eigenValue 值
@@ -505,7 +506,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {String} dataEventDataList.timeRange 时间范围
      * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
-     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":1.0,"distance":1.0,"volumeFlowInput":1.0,"volumeFlowOutput":1.0}],"maxDataList":[{"key":1,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":2,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":3,"value":1.0,"time":"2023-11-01 00:00:00"},{"key":4,"value":1.0,"time":"2023-11-01 00:00:00"}],"eigenvalueDataList":[{"eigenValueID":1,"eigenValueName":"设计洪水位","eigenValue":1.0,"engUnit":"m","chnUnit":"米"}],"dataEventDataList":[{"eventID":1,"eventName":"入汛","timeRange":""}]}
+     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":0.0,"distance":0.0,"volumeFlowInput":0.0,"volumeFlowOutput":0.0}],"maxDataList":[{"value":4.71,"key":1,"time":"2023-11-21 05:00:00"},{"value":10.0,"key":2,"time":"2023-11-17 16:00:00"},{"value":9.98,"key":3,"time":"2023-11-21 06:00:00"},{"value":9.96,"key":4,"time":"2023-11-21 06:00:00"}],"eigenvalueDataList":[{"monitorType":2,"eigenValueID":11,"eigenValueName":"214库水位特征值","eigenValue":5.0,"chnUnit":"毫米","engUnit":"mm"}],"dataEventDataList":[{"eventID":12,"eventName":"库水位大事件","timeRange":"[{\"startTime\": \"2023-10-18 00:00:00\", \"endTime\": \"2023-10-30 23:59:59\"}, {\"startTime\": \"2023-11-20 00:00:00\", \"endTime\": \"2023-11-21 23:59:59\"}]"}]}
      * @apiPermission 项目权限 mdmbase:
      */
     //@Permission(permissionName = "")
@@ -730,7 +731,7 @@ public class ThematicDataAnalysisController {
      */
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryCompareAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryCompareAnalysisData(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryCompareAnalysisData(@Valid @RequestBody QueryCompareAnalysisDataParam param) {
+        return thematicDataAnalysisService.queryCompareAnalysisData(param);
     }
 }

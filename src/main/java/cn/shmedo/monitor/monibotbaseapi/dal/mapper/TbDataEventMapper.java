@@ -61,7 +61,7 @@ public interface TbDataEventMapper {
     void deleteByEventIDList(List<Integer> eventIDList);
 
     @SuppressWarnings("MybatisXMapperMethodInspection")
-    List<Map<String, Object>> selectBaseInfoByIDList(List<Integer> eventIDList);
+    List<Map<String, Object>> selectBaseInfoByIDList(List<Integer> eventIDList,List<Integer> monitorItemIDList);
 
     List<EventBaseInfo> selectByIDs(List<Integer> eventIDList);
 

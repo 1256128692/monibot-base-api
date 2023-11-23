@@ -43,6 +43,8 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
     private List<TbSensor> tbSensorList;
     @JsonIgnore
     private Map<Integer, List<TbMonitorTypeField>> monitorTypeFieldMap;
+    @JsonIgnore
+    private Integer rainfallMonitorType;
 
     @Override
     public ResultWrapper validate() {
@@ -63,8 +65,11 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的干滩监测点的监测类型错误!");
             } else if (distanceMonitorPointID.equals(pointID) && !monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的库水位监测点的监测类型错误!");
-            } else if (rainfallMonitorPointID.equals(pointID) && !monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的降雨量监测点的监测类型错误!");
+            } else if (rainfallMonitorPointID.equals(pointID)) {
+                rainfallMonitorType = monitorType;
+                if (!(monitorType.equals(MonitorType.WT_RAINFALL.getKey()) || monitorType.equals(MonitorType.RAINFALL.getKey()))) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的降雨量监测点的监测类型错误!");
+                }
             }
         }
         List<Integer> monitorTypeList = tbSensorList.stream().map(TbSensor::getMonitorType).distinct().toList();

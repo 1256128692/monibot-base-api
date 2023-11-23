@@ -248,10 +248,28 @@
     </select>
 
     <select id="selectBaseInfoByIDList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData">
-      SELECT ev.`ID` eigenValueID,ev.`Name` eigenValueName,`Value` eigenValue,du.`ChnUnit` chnUnit,du.`EngUnit` engUnit FROM tb_eigen_value ev LEFT JOIN tb_data_unit du ON du.`ID` = ev.`UnitID` WHERE ev.ID IN
+      SELECT
+          mp.`MonitorType` monitorType,
+          ev.`ID` eigenValueID,
+          ev.`Name` eigenValueName,
+          ev.`Value` eigenValue,
+          du.`ChnUnit` chnUnit,
+          du.`EngUnit` engUnit
+      FROM
+          tb_eigen_value ev
+          LEFT JOIN tb_data_unit du ON du.`ID` = ev.`UnitID`
+          LEFT JOIN tb_eigen_value_relation evr ON evr.`EigenValueID` = ev.`ID`
+          LEFT JOIN tb_monitor_point mp ON mp.`ID` = evr.`MonitorPointID`
+      WHERE ev.ID IN
       <foreach collection="eigenValueIDList" item="item" open="(" close=")" index="index" separator=",">
           #{item}
       </foreach>
+      <if test="monitorPointIDList != null and monitorPointIDList.size > 0">
+          AND mp.`ID` IN
+          <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
+              #{item}
+          </foreach>
+      </if>
     </select>
     <select id="selectFieldInfoByPointIDList"
           resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueInfo">

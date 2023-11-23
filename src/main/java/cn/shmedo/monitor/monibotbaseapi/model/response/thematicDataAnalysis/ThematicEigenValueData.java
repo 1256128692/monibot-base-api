@@ -8,6 +8,7 @@ import lombok.Data;
  */
 @Data
 public class ThematicEigenValueData {
+    private Integer monitorType;
     private Integer eigenValueID;
     private String eigenValueName;
     private Double eigenValue;

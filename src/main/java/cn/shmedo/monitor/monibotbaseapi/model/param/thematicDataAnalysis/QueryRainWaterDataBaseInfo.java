@@ -45,16 +45,18 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
     private Date endTime;
     @JsonIgnore
     private String rainFallToken;
+    @JsonIgnore
+    private List<Integer> monitorIDList;
 
     @Override
     public ResultWrapper validate() {
-        List<Integer> list = new ArrayList<>();
-        list.add(rainfallMonitorPointID);
-        list.add(distanceMonitorPointID);
-        Optional.ofNullable(volumeFlowInputMonitorPointID).ifPresent(list::add);
-        Optional.ofNullable(volumeFlowOutputMonitorPointID).ifPresent(list::add);
-        List<Map<String, Object>> maps = ContextHolder.getBean(TbMonitorPointMapper.class).selectMonitorTypeExValuesByPointIDList(list);
-        if (maps.size() != list.size()) {
+        monitorIDList = new ArrayList<>();
+        monitorIDList.add(rainfallMonitorPointID);
+        monitorIDList.add(distanceMonitorPointID);
+        Optional.ofNullable(volumeFlowInputMonitorPointID).ifPresent(monitorIDList::add);
+        Optional.ofNullable(volumeFlowOutputMonitorPointID).ifPresent(monitorIDList::add);
+        List<Map<String, Object>> maps = ContextHolder.getBean(TbMonitorPointMapper.class).selectMonitorTypeExValuesByPointIDList(monitorIDList);
+        if (maps.size() != monitorIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不存在!");
         }
         List<String> exValuesList = maps.stream().map(u -> u.get("exValues")).filter(Objects::nonNull)

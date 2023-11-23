@@ -65,7 +65,7 @@ public interface TbEigenValueMapper {
 
     void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
 
-    List<ThematicEigenValueData> selectBaseInfoByIDList(List<Integer> eigenValueIDList);
+    List<ThematicEigenValueData> selectBaseInfoByIDList(List<Integer> eigenValueIDList, List<Integer> monitorPointIDList);
 
     List<ThematicEigenValueInfo> selectFieldInfoByPointIDList(List<Integer> monitorPointIDList);
 

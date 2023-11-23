@@ -254,11 +254,15 @@ public class DefaultConstant {
         }
 
         /**
-         * 时段雨量
+         * 雨量-降雨量
+         */
+        String RAINFALL = "rainfall";
+        /**
+         * 降雨量-时段雨量
          */
         String PERIOD_RAINFALL = "periodRainfall";
         /**
-         * 日降雨量
+         * 降雨量-日降雨量
          */
         String DAILY_RAINFALL = "dailyRainfall";
         /**

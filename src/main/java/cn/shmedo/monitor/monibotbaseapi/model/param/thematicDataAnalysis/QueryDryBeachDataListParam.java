@@ -5,6 +5,7 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -43,7 +44,8 @@ public class QueryDryBeachDataListParam extends QueryDryBeachDataParam {
                 .map(JSONUtil::parseArray).anyMatch(u -> !u.contains(displayDensity))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在监测点不支持选择的显示密度!");
         }
-        rainfallToken = DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
+        rainfallToken = getRainfallMonitorType().equals(MonitorType.RAINFALL.getKey()) ?
+                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
         return null;
     }
 }

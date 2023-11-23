@@ -46,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -215,18 +216,19 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                         datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).getItem1()))
                                 .findAny().ifPresent(w -> {
                                     Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
-                                    double value = Convert.toDouble(w.get(fieldToken));
-                                    limitInfo.setItem1(value + upper);
-                                    limitInfo.setItem2(value - lower);
+                                    Double value = Optional.ofNullable(w.get(fieldToken)).map(Convert::toDouble).orElse(null);
+                                    Optional.ofNullable(value).map(s -> s + upper).ifPresent(limitInfo::setItem1);
+                                    Optional.ofNullable(value).map(s -> s - upper).ifPresent(limitInfo::setItem2);
                                     builder.datumPointData(DatumPointData.builder().monitorPointID(pointInfo.getItem1())
-                                            .monitorPointName(pointInfo.getItem2()).value(value).upper(value + upper)
-                                            .lower(value - lower).build());
+                                            .monitorPointName(pointInfo.getItem2()).value(value)
+                                            .upper(Optional.ofNullable(value).map(s -> s + upper).orElse(null))
+                                            .lower(Optional.ofNullable(value).map(s -> s - lower).orElse(null)).build());
                                 });
                     }
                     builder.monitorPointList(u.getValue().stream().filter(w -> Objects.isNull(datumPointID)
                             || !datumPointID.equals(sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
                             .getItem1())).map(w -> {
-                        double value = Convert.toDouble(w.get(fieldToken));
+                        Double value = Optional.ofNullable(w.get(fieldToken)).map(Convert::toDouble).orElse(null);
                         Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
                         return ThematicMonitorPointValueInfo.builder().abnormalValue(getAbnormalValue(limitInfo, value))
                                 .monitorPointID(pointInfo.getItem1()).monitorPointName(pointInfo.getItem2()).value(value).build();
@@ -249,9 +251,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         Map<Integer, Tuple<Double, Double>> dataMap = Optional.of(sensorIDList).filter(CollUtil::isNotEmpty).map(u ->
                         sensorDataDao.querySensorNewData(u, fieldSelectInfoList, false, MonitorType.WET_LINE.getKey()).stream()
+                                .filter(w -> Objects.nonNull(w.get(LEVEL_ELEVATION)) && Objects.nonNull(w.get(EMPTY_PIPE_DISTANCE)))
                                 .collect(Collectors.toMap(k -> Convert.toInt(k.get(DbConstant.SENSOR_ID_FIELD_TOKEN)),
                                         v -> new Tuple<>(Convert.toDouble(v.get(LEVEL_ELEVATION)), Convert.toDouble(v.get(EMPTY_PIPE_DISTANCE))))))
-                .orElse(Collections.emptyMap());
+                .orElse(Map.of());
         if (CollUtil.isNotEmpty(dataMap)) {
             res.getMonitorPointList().stream().peek(u -> Optional.ofNullable(u.getSensorID()).filter(dataMap::containsKey)
                     .map(dataMap::get).ifPresent(w -> {
@@ -374,25 +377,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         List<Map<String, Object>> dataList = queryDryBeachDataList(param.getTbSensorList(), param.getMonitorTypeFieldMap(),
                 param.getDisplayDensity(), param.getStartTime(), param.getEndTime());
-
-        //TODO remove
-        log.error("\n-------------------\n" + JSONUtil.toJsonStr(dataList) + "\n-------------------");
-
         return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD))
                 .collect(Collectors.groupingBy(u -> DateUtil.format(Convert.toDate(u.get(DbConstant.TIME_FIELD)), formatter))).entrySet().stream().map(u -> {
                     ThematicDryBeachInfo.ThematicDryBeachInfoBuilder builder = ThematicDryBeachInfo.builder().time(DateUtil.parse(u.getKey(), formatter));
                     u.getValue().stream().peek(w -> {
-                        if (w.containsKey(SLOPE_RATIO)) {
-                            builder.slopeRratio(Convert.toDouble(w.get(SLOPE_RATIO)));
-                        } else if (w.containsKey(rainfallToken)) {
-                            builder.rainfall(Convert.toDouble(w.get(rainfallToken)));
-                        } else if (w.containsKey(DRY_BEACH)) {
-                            Optional.of(w.get(DRY_BEACH)).map(Convert::toDouble).ifPresent(n -> builder.dryBeach(Optional.ofNullable(design)
-                                    .filter(s -> s < n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
-                        } else if (w.containsKey(DISTANCE)) {
-                            Optional.of(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(n -> builder.distance(Optional.ofNullable(minDryBeach)
-                                    .filter(s -> s > n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
-                        }
+                        Optional.ofNullable(w.get(SLOPE_RATIO)).map(Convert::toDouble).ifPresent(builder::slopeRratio);
+                        Optional.ofNullable(w.get(rainfallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
+                        Optional.ofNullable(w.get(DRY_BEACH)).map(Convert::toDouble).ifPresent(n -> builder.dryBeach(Optional.ofNullable(design)
+                                .filter(s -> s < n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
+                        Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(n -> builder.distance(Optional.ofNullable(minDryBeach)
+                                .filter(s -> s > n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
                     }).toList();
                     return builder.build();
                 }).sorted((o1, o2) -> DateUtil.compare(o1.getTime(), o2.getTime())).toList();
@@ -422,7 +416,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 } else if (distanceMonitorPointID.equals(monitorPointID)) {
                     queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, DISTANCE, builder::distance);
                 } else if (rainfallMonitorPointID.equals(monitorPointID)) {
-                    queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, PERIOD_RAINFALL, builder::rainfall);
+                    queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, monitorType.equals(MonitorType.RAINFALL.getKey()) ? RAINFALL : PERIOD_RAINFALL, builder::rainfall);
                 }
             }
         }
@@ -430,8 +424,13 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addManualDataBatch(AddManualDataBatchParam param) {
-        //TODO
+        log.info("\n--------------------\ninsertDataList:\n{}\n--------------------", JSONUtil.toJsonStr(param.getInsertDataList()));
+        for (AddManualItem item : param.getInsertDataList()) {
+            List<FieldSelectInfo> fieldSelectInfoList = item.getFieldTokenList().stream().map(this::buildFieldSelectInfo).toList();
+//            sensorDataDao.insertSensorData(item.getDataList(), false, true, fieldSelectInfoList, item.getMonitorType());
+        }
     }
 
     @Override
@@ -440,14 +439,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         List<String> sheetHeader = new ArrayList<>(List.of("序号", "人工传感器", "时间"));
         Optional.ofNullable(classFieldMap.get(FieldClass.BASIC)).map(u -> u.stream()
                 .map(w -> w.getFieldName() + "（" + w.getChnUnit() + "）").toList()).ifPresent(sheetHeader::addAll);
-        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream()
-                .map(w -> w.getFieldName() + "（" + w.getChnUnit() + "）").toList()).ifPresent(sheetHeader::addAll);
+//        目前不允许直接导入扩展属性
+//        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream()
+//                .map(w -> w.getFieldName() + "（" + w.getChnUnit() + "）").toList()).ifPresent(sheetHeader::addAll);
 
         List<String> sheetDemo = new ArrayList<>(List.of("1", "示例请务必删除该行数据", "2023/10/11 10:00:00"));
         Optional.ofNullable(classFieldMap.get(FieldClass.BASIC)).map(u -> u.stream().map(TbMonitorTypeField::getFieldDataType)
                 .map(FieldDataType::valueOfString).map(this::getSheetDemoCellData).toList()).ifPresent(sheetDemo::addAll);
-        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream().map(TbMonitorTypeField::getFieldDataType)
-                .map(FieldDataType::valueOfString).map(this::getSheetDemoCellData).toList()).ifPresent(sheetDemo::addAll);
+//        目前不允许直接导入扩展属性
+//        Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND)).map(u -> u.stream().map(TbMonitorTypeField::getFieldDataType)
+//                .map(FieldDataType::valueOfString).map(this::getSheetDemoCellData).toList()).ifPresent(sheetDemo::addAll);
         String fileName = Optional.of(classFieldMap).map(Map::values).flatMap(u -> u.stream().findAny())
                 .flatMap(u -> u.stream().findAny()).map(MonitorTypeFieldV2::getMonitorTypeName).orElse("") + "_人工数据.xlsx";
 
@@ -484,10 +485,13 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Map<String, String> basicColFieldTokenMap = Optional.ofNullable(classFieldMap.get(FieldClass.BASIC))
                 .map(u -> u.stream().collect(Collectors.toMap(w -> w.getFieldName() + "（" + w.getChnUnit() + "）",
                         TbMonitorTypeField::getFieldToken))).orElse(Collections.emptyMap());
-        Map<String, String> extendColFieldTokenMap = Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND))
-                .map(u -> u.stream().collect(Collectors.toMap(w -> w.getFieldName() + "（" + w.getChnUnit() + "）",
-                        TbMonitorTypeField::getFieldToken))).orElse(Collections.emptyMap());
-        Map<String, String> colNameFieldTokenMap = MapUtil.builder(new HashMap<String, String>()).putAll(basicColFieldTokenMap).putAll(extendColFieldTokenMap).build();
+//        目前不允许直接导入扩展属性
+//        Map<String, String> extendColFieldTokenMap = Optional.ofNullable(classFieldMap.get(FieldClass.EXTEND))
+//                .map(u -> u.stream().collect(Collectors.toMap(w -> w.getFieldName() + "（" + w.getChnUnit() + "）",
+//                        TbMonitorTypeField::getFieldToken))).orElse(Collections.emptyMap());
+        Map<String, String> colNameFieldTokenMap = MapUtil.builder(new HashMap<String, String>()).putAll(basicColFieldTokenMap).build();
+//                .putAll(extendColFieldTokenMap).build();
+
         try (ExcelReader reader = ExcelUtil.getReader(file.getInputStream(), 0)) {
             // parse the table header
             List<Object> header = reader.readRow(0);
@@ -527,7 +531,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     item.setSensorID(sensorID);
                     item.setTime(time);
                     item.setFieldToken(fieldToken);
-                    item.setValue(Convert.toStr(fieldTokenDataTypeMap.get(fieldToken).parseData(u.get(w))));
+                    item.setValue(Optional.ofNullable(u.get(w)).map(s -> fieldTokenDataTypeMap.get(fieldToken).parseData(s)).map(Convert::toStr).orElse(null));
                     return item;
                 }).toList();
                 if (CollUtil.isEmpty(list)) {
@@ -536,18 +540,27 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 return list;
             }).flatMap(Collection::stream).toList();
 
+            log.info("\n--------------------\nmanualDataItemList:\n{}\n--------------------", JSONUtil.toJsonStr(manualDataItemList));
+
             AddManualDataBatchParam param = new AddManualDataBatchParam();
             param.setProjectID(projectID);
             param.setDataList(manualDataItemList);
-
-            System.out.println("------------------------\n" + JSONUtil.toJsonStr(param) + "\n------------------------");
-
+            if (Objects.nonNull(param.validate())) {
+                throw new IllegalArgumentException();
+            }
             this.addManualDataBatch(param);
         } catch (IOException | ParseException | IllegalArgumentException e) {
             log.error(e.getMessage());
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前表格中存在异常数据，请核实后重新导入！");
         }
         return ResultWrapper.successWithNothing();
+    }
+
+    @Override
+    public CompareAnalysisDataInfo queryCompareAnalysisData(QueryCompareAnalysisDataParam param) {
+//        sensorDataDao.querySensorData()
+        //TODO
+        return null;
     }
 
     /**
@@ -569,7 +582,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     .orElse(new ConfigBaseResponse());
             return StAnalysisData.builder().monitorPointID(monitorPointID).monitorPointName(config.getTargetName())
                     .time(Convert.toDate(u.get(DbConstant.TIME_FIELD)))
-                    .distance(Convert.toDouble(u.get(DISTANCE)))
+                    .distance(Optional.ofNullable(u.get(DISTANCE)).map(Convert::toDouble).orElse(null))
                     .upperLimit(monitorPointIDUpperLimitMap.get(monitorPointID))
                     .pointConfig(config.getConfig()).build();
         }).toList();
@@ -632,12 +645,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 u -> groupFunc.apply(u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> new Tuple<>(
                 u.getKey(), u.getValue().stream().collect(Collectors.groupingBy(w -> Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))))
                 .entrySet().stream().map(w -> new Tuple<>(
-                        w.getKey(), w.getValue().stream().map(s -> Convert.toDouble(s.get(DISTANCE)))
+                        w.getKey(), w.getValue().stream().filter(s -> Objects.nonNull(s.get(DISTANCE))).map(s -> Convert.toDouble(s.get(DISTANCE)))
                         .reduce(Double::sum).orElse(0d) / w.getValue().size())).toList())).collect(Collectors.toMap(
                 Tuple::getItem1, Tuple::getItem2));
         Map<Date, Double> damFrontMap = damFrontMetadataList.stream().collect(Collectors.groupingBy(u -> groupFunc.apply(
                 u.get(DbConstant.TIME_FIELD)))).entrySet().stream().map(u -> new Tuple<>(u.getKey(), u.getValue().stream()
-                .map(w -> Convert.toDouble(w.get(DISTANCE))).reduce(Double::sum).orElse(0d)
+                .filter(w -> Objects.nonNull(w.get(DISTANCE))).map(w -> Convert.toDouble(w.get(DISTANCE))).reduce(Double::sum).orElse(0d)
                 / u.getValue().size())).collect(Collectors.toMap(Tuple::getItem1, Tuple::getItem2));
         //TODO 在某个密度下,监测点数据和坝前水位数据部分缺失了怎么办? 如果用户忘记给某个监测点关联传感器导致一直没数据怎么办？
         //TODO 暂时做了一个过滤,专题数据必须要求该密度下一定存在【监测点水位】和【坝前水位】数据
@@ -819,7 +832,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Map<Date, List<DmAnalysisData>> dataMap = metadataList.stream().map(u -> {
                     int sensorID = Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN));
                     ConfigBaseResponse response = configMap.get(sensorID);
-                    return DmAnalysisData.builder().sensorID(sensorID).totalValue(Convert.toDouble(u.get(fieldToken)))
+                    return DmAnalysisData.builder().sensorID(sensorID).totalValue(Optional.ofNullable(u.get(fieldToken)).map(Convert::toDouble).orElse(null))
                             .groupTime(groupFunc.apply(u.get(DbConstant.TIME_FIELD)))
                             .fieldToken(fieldToken).sensorName(response.getTargetName()).config(response.getConfig()).build();
                 }).filter(u -> Objects.nonNull(u.getGroupTime())).collect(Collectors.groupingBy(DmAnalysisData::getGroupTime))
@@ -882,12 +895,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         final Integer volumeFlowInputMonitorPointID = param.getVolumeFlowInputMonitorPointID();
         final Integer volumeFlowOutputMonitorPointID = param.getVolumeFlowOutputMonitorPointID();
         final String rainFallToken = param.getRainFallToken();
-        List<Integer> monitorIDList = new ArrayList<>();
-        monitorIDList.add(param.getDistanceMonitorPointID());
-        monitorIDList.add(param.getRainfallMonitorPointID());
-        Optional.ofNullable(volumeFlowInputMonitorPointID).ifPresent(monitorIDList::add);
-        Optional.ofNullable(volumeFlowOutputMonitorPointID).ifPresent(monitorIDList::add);
-        List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, monitorIDList));
+        List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getMonitorIDList()));
         Map<Integer, Integer> sensorPointIDMap = sensorList.stream().collect(Collectors.toMap(TbSensor::getID, TbSensor::getMonitorPointID));
         List<Map<String, Object>> dataList = queryRainWaterDataList(sensorList, param.getDisplayDensity(), param.getStartTime(), param.getEndTime());
         return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD)).collect(Collectors.groupingBy(u ->
@@ -895,16 +903,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             ThematicRainWaterDataInfo.ThematicRainWaterDataInfoBuilder builder = ThematicRainWaterDataInfo.builder().time(DateUtil.parse(u.getKey(), formatter));
             u.getValue().stream().filter(w -> w.containsKey(rainFallToken) || w.containsKey(DISTANCE) || w.containsKey(VOLUME_FLOW)).peek(w -> {
                 if (w.containsKey(rainFallToken)) {
-                    builder.rainfall(Convert.toDouble(w.get(rainFallToken)));
+                    Optional.ofNullable(w.get(rainFallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
                 } else if (w.containsKey(DISTANCE)) {
-                    builder.distance(Convert.toDouble(w.get(DISTANCE)));
+                    Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(builder::distance);
                 } else if (w.containsKey(VOLUME_FLOW)) {
                     Optional.of(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)).map(Convert::toInt).filter(sensorPointIDMap::containsKey)
                             .map(sensorPointIDMap::get).ifPresent(s -> {
                                 if (s.equals(volumeFlowInputMonitorPointID)) {
-                                    builder.volumeFlowInput(Convert.toDouble(w.get(VOLUME_FLOW)));
+                                    Optional.ofNullable(w.get(VOLUME_FLOW)).map(Convert::toDouble).ifPresent(builder::volumeFlowInput);
                                 } else if (s.equals(volumeFlowOutputMonitorPointID)) {
-                                    builder.volumeFlowOutput(Convert.toDouble(w.get(VOLUME_FLOW)));
+                                    Optional.ofNullable(w.get(VOLUME_FLOW)).map(Convert::toDouble).ifPresent(builder::volumeFlowOutput);
                                 }
                             });
                 }
@@ -950,27 +958,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         for (Map.Entry<Integer, List<TbSensor>> entry : monitorTypeSensorMap.entrySet()) {
             Integer monitorType = entry.getKey();
             Integer statisticsMethods = null;
-            // 干滩、库水位：最新一条；降雨量：阶段变化
+            // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段变化'
             if (monitorType.equals(MonitorType.DRY_BEACH.getKey()) || monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
                 statisticsMethods = StatisticalMethods.LATEST.getValue();
-            } else if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
-                statisticsMethods = StatisticalMethods.CHANGE.getValue();
+            } else if (monitorType.equals(MonitorType.WT_RAINFALL.getKey()) || monitorType.equals(MonitorType.RAINFALL.getKey())) {
+                statisticsMethods = displayDensity.equals(DisplayDensity.ALL.getValue()) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CHANGE.getValue();
             }
             if (Objects.nonNull(statisticsMethods) && monitorTypeFieldMap.containsKey(monitorType)) {
                 List<Integer> sensorIDList = entry.getValue().stream().map(TbSensor::getID).toList();
                 List<FieldBaseInfo> fieldBaseInfoList = monitorTypeFieldMap.get(monitorType).stream()
                         .map(TbMonitorTypeField::getFieldToken).map(this::buildFieldBaseInfo).toList();
-
-                //TODO remove
-                log.error("\n-------------------\nsensorIDList:{}\nstartTime:{}\nendTime:{}\ndisplayDensity:{}\nstatisticsMethods:{}\nfieldBaseInfoList:{}\nmonitorType:{}\n-------------------",
-                        sensorIDList,
-                        DateUtil.format(startTime, "yyyy-MM-dd HH:mm:ss"),
-                        DateUtil.format(endTime, "yyyy-MM-dd HH:mm:ss"),
-                        displayDensity,
-                        statisticsMethods,
-                        JSONUtil.toJsonStr(fieldBaseInfoList),
-                        monitorType);
-
                 res.addAll(sensorDataDao.queryCommonSensorDataList(sensorIDList, startTime, endTime, displayDensity, statisticsMethods, fieldBaseInfoList, monitorType));
             }
         }
@@ -992,14 +989,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         return info;
     }
 
-    private @Nullable Double getAbnormalValue(final Tuple<Double, Double> limitInfo, double value) {
-        Double curUpper = limitInfo.getItem1();
-        Double curLower = limitInfo.getItem2();
+    private @Nullable Double getAbnormalValue(final Tuple<Double, Double> limitInfo, @Nullable Double value) {
         Double abnormalValue = null;
-        if (Objects.nonNull(curUpper) && value > curUpper) {
-            abnormalValue = value - curUpper;
-        } else if (Objects.nonNull(curLower) && value < curLower) {
-            abnormalValue = value - curLower;
+        if (Objects.nonNull(value)) {
+            Double curUpper = limitInfo.getItem1();
+            Double curLower = limitInfo.getItem2();
+            if (Objects.nonNull(curUpper) && value > curUpper) {
+                abnormalValue = value - curUpper;
+            } else if (Objects.nonNull(curLower) && value < curLower) {
+                abnormalValue = value - curLower;
+            }
         }
         return abnormalValue;
     }

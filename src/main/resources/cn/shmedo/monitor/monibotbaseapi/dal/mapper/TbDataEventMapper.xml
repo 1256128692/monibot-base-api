@@ -176,10 +176,23 @@
         </if>
     </select>
     <select id="selectBaseInfoByIDList" resultType="java.util.Map">
-        SELECT `ID` eventID,`Name` eventName, `TimeRange` timeRange FROM tb_data_event WHERE ID IN
+        SELECT
+            de.`ID` eventID,
+            de.`Name` eventName,
+            de.`TimeRange` timeRange
+        FROM
+            tb_data_event de
+            LEFT JOIN tb_data_event_relation der ON der.`EventID`=de.`ID`
+        WHERE de.`ID` IN
         <foreach collection="eventIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
+        <if test="monitorItemIDList != null and monitorItemIDList.size > 0">
+            AND der.`MonitorItemID` IN
+            <foreach collection="monitorItemIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
     </select>
 
     <delete id="deleteByEventIDList">
