@@ -3,7 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.enums;
 public enum StatisticalMethods {
 
     LATEST(1, "last"),
-    AVERAGE(2, "mean"),
+    AVERAGE(2, "avg"),
     CUMULATIVE(3, "sum"),
     CHANGE(4, "diff");
 
