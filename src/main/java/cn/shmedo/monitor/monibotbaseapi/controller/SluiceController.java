@@ -1,16 +1,26 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sluice.*;
+import cn.shmedo.monitor.monibotbaseapi.service.SluiceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 闸泵控制
  *
  * @author Chengfs on 2023/11/16
  */
+@RestController
+@RequiredArgsConstructor
 public class SluiceController {
+
+    private final SluiceService service;
 
     /**
      * @api {POST} /QuerySluicePage 分页查询水闸列表
@@ -29,7 +39,6 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.projectID 项目id
-     * @apiSuccess (返回结果) {Int} currentPageData.monitorID 监测点id
      * @apiSuccess (返回结果) {String} currentPageData.projectName 水闸名称
      * @apiSuccess (返回结果) {String} currentPageData.canal 所属渠道
      * @apiSuccess (返回结果) {Int} currentPageData.sluiceType 水闸类型 (进水闸、退水闸、船闸、节制闸、挡潮闸、其他)
@@ -48,11 +57,12 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Int} currentPageData.videoMonitorGroupID 视频监测组id (用于查询视频监控)
      * @apiSuccess (返回结果) {DateTime} currentPageData.lastCollectTime 最后采集时间(yyyy-MM-dd HH:mm:ss)
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:ListSluice
      */
+    @Permission(permissionName = "mdmbase:ListSluice")
     @PostMapping(value = "/QuerySluicePage", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object sluicePage(@Validated @RequestBody Void request) {
-        return null;
+    public Object sluicePage(@Validated @RequestBody QuerySluicePageRequest request) {
+        return service.sluicePage(request);
     }
 
     /**
@@ -75,11 +85,13 @@ public class SluiceController {
      * @apiParam (请求参数) {DateTime} [target.endTime] 结束时间 (5时段控制)
      * @apiParam (请求参数) {Double} [target.totalFlow] 目标累计流量 (6总量控制)
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:ControlSluice
      */
+    @Permission(permissionName = "mdmbase:ControlSluice")
     @PostMapping(value = "/SluiceControl", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object sluiceControl(@Validated @RequestBody Void request) {
-        return null;
+    public Object sluiceControl(@Validated @RequestBody SluiceControlRequest request) {
+        service.sluiceControl(request);
+        return ResultWrapper.successWithNothing();
     }
 
     /**
@@ -99,19 +111,21 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Double} gates.powerVoltage 电源电压 (V)
      * @apiSuccess (返回结果) {Int} gates.controlType 控制类型 1远程控制 2手动控制 3现地控制
      * @apiSuccess (返回结果) {Double} gates.maxOpenDegree 闸门最大开度
+     * @apiSuccess (返回结果) {Int} gates.runningState 电机运行状态 0上、1下、2停
      * @apiSuccess (返回结果) {Double} maxFlowRate 最大过闸流量
      * @apiSuccess (返回结果) {Double} maxBackWaterLevel 最大闸后水位
-     * @apiSuccess (返回结果) {Double} minBackWaterLevel 最大闸后水位
+     * @apiSuccess (返回结果) {Double} minBackWaterLevel 最小闸后水位
      * @apiSuccess (返回结果) {Double} frontWaterLevel 闸前水位(m)
      * @apiSuccess (返回结果) {Double} backWaterLevel 闸后水位(m)
      * @apiSuccess (返回结果) {Double} flowRate 瞬时流量(m³/s)
      * @apiSuccess (返回结果) {Double} flowTotal 累计流量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:DescribeSluice
      */
+    @Permission(permissionName = "mdmbase:DescribeSluice")
     @PostMapping(value = "/QuerySluiceDetail", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object sluiceDetail(@Validated @RequestBody Void request) {
-        return null;
+    public Object sluiceDetail(@Validated @RequestBody SingleSluiceRequest request) {
+        return service.sluiceSingle(request);
     }
 
     /**
@@ -131,11 +145,12 @@ public class SluiceController {
      * @apiSuccess (返回结果) {String} data.manageUnit 管理单位
      * @apiSuccess (返回结果) {Int} data.sluiceHoleNum 闸孔数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:ListSluice
      */
+    @Permission(permissionName = "mdmbase:ListSluice")
     @PostMapping(value = "/ListSluiceSimple", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object listSluiceSimple(@Validated @RequestBody Void request) {
-        return null;
+    public Object listSluiceSimple(@Validated @RequestBody ListSluiceRequest request) {
+        return service.listSluiceSimple(request);
     }
 
     /**
@@ -148,11 +163,12 @@ public class SluiceController {
      * @apiParam (请求参数) {Int} [projectID] 项目(水闸) id
      * @apiSuccess (返回结果) {String[]} data 管理单位列表
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:DescribeSluice
      */
+    @Permission(permissionName = "mdmbase:DescribeSluice")
     @PostMapping(value = "/ListSluiceManageUnit", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object listSluiceManageUnit(@Validated @RequestBody Void request) {
-        return null;
+    public Object listSluiceManageUnit(@Validated @RequestBody ListSluiceManageUnitRequest request) {
+        return service.listSluiceManageUnit(request);
     }
 
     /**
@@ -168,10 +184,11 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Int} data.id 监测传感器(闸门) id
      * @apiSuccess (返回结果) {String} data.alias 闸门名称 (监测传感器别名)
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:DescribeSluice
      */
+    @Permission(permissionName = "mdmbase:DescribeSluice")
     @PostMapping(value = "/ListSluiceGate", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object listSluiceGate(@Validated @RequestBody Void request) {
-        return null;
+    public Object listSluiceGate(@Validated @RequestBody ListSluiceGateRequest request) {
+        return service.listSluiceGate(request);
     }
 }

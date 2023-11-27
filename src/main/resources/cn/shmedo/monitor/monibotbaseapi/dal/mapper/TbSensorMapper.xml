@@ -653,4 +653,86 @@
         </foreach>
         )
     </delete>
+
+    <select id="sluicePage" resultType="java.lang.Integer">
+        SELECT ProjectID
+        FROM `tb_sensor` ts LEFT JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+        <where>
+            <trim suffixOverrides="AND">
+                <choose>
+                    <when test="param.projectList != null and param.projectList.size() != 0">
+                        <foreach collection="param.projectList" item="item" open="ProjectID IN (" close=") AND" separator=",">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        FALSE AND
+                    </otherwise>
+                </choose>
+                <choose>
+                    <when test="param.sensorList != null and param.sensorList.size() != 0">
+                        <foreach collection="param.sensorList" item="item" open="(ts.MonitorType = 60 OR ts.ID IN (" close=")) AND" separator=",">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        ts.MonitorType IN (60, 61) AND
+                    </otherwise>
+                </choose>
+                <if test="param.keyword != null and param.keyword != ''">
+                    tpi.ProjectName LIKE CONCAT('%', #{param.keyword}, '%') AND
+                </if>
+            </trim>
+        </where>
+        GROUP BY
+            ProjectID
+        ORDER BY
+            ProjectID
+    </select>
+
+    <resultMap id="sluiceMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Sluice">
+        <id column="ProjectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="ProjectName" jdbcType="VARCHAR" property="projectName"/>
+        <collection property="gates" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Gate">
+            <id column="ID" jdbcType="INTEGER" property="id"/>
+            <result column="Alias" jdbcType="VARCHAR" property="alias"/>
+            <result column="MonitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+            <result column="MonitorType" jdbcType="VARCHAR" property="monitorType"/>
+        </collection>
+    </resultMap>
+
+    <select id="listSluice" resultMap="sluiceMap">
+        SELECT ts.ID, ts.Alias, ts.MonitorPointID, ts.ProjectID, ts.MonitorType, tpi.ProjectName
+        FROM
+            tb_sensor ts
+                LEFT JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+            <where>
+                <choose>
+                    <when test="projectIDList != null and projectIDList.size() != 0">
+                        <foreach collection="projectIDList" open="ts.ProjectID IN  (" close=")" separator="," item="item">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        FALSE
+                    </otherwise>
+                </choose>
+            </where>
+    </select>
+
+    <select id="queryGateIotToken" resultType="reactor.util.function.Tuple3">
+        SELECT ts.ID                                          AS t1,
+               SUBSTRING_INDEX(tsds.DataSourceToken, '@', 1)  AS t3,
+               SUBSTRING_INDEX(tsds.DataSourceToken, '_', -1) AS t2
+        FROM `tb_sensor` ts
+                 LEFT JOIN tb_sensor_data_source tsds ON ts.DataSourceID = tsds.DataSourceID
+        WHERE ts.`DataSourceComposeType` = 1
+          AND ts.MonitorType = 61
+        <if test="projectID != null and projectID > 0">
+            AND ts.ProjectID = #{projectID}
+        </if>
+        <if test="sensorID != null and sensorID > 0">
+            AND ts.ID = #{sensorID}
+        </if>
+    </select>
 </mapper>

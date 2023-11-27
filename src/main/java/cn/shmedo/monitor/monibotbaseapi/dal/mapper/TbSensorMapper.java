@@ -3,16 +3,19 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sluice.QuerySluicePageRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Sluice;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import reactor.util.function.Tuple3;
 
 import java.util.Collection;
 import java.util.Date;
@@ -75,4 +78,16 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<VideoDeviceInfoV6> selectListByDeviceSerialList(List<String> deviceSerialList);
 
     void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
+
+    List<Sluice> listSluice(@Param("projectIDList") List<Integer> projectIDList);
+
+    IPage<Integer> sluicePage(@Param("page") IPage<Integer> page, @Param("param")QuerySluicePageRequest param);
+
+    /**
+     * 查询闸门对应的物联网设备信息
+     * @param projectID
+     * @param sensorID
+     * @return {@code List<Tuple3<Integer, String, Integer>>} 闸门ID、物联网uniqueToken、电机序号
+     */
+    List<Tuple3<Integer, String, String>> queryGateIotToken(@Param("projectID") Integer projectID, @Param("sensorID") Integer sensorID);
 }

@@ -1,0 +1,455 @@
+package cn.shmedo.monitor.monibotbaseapi.service.impl;
+
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
+import cn.hutool.core.map.MapUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultCode;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.PropWithValue;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.TokenAndMsgID;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.ControlCmd;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.SluiceData;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.SluiceStatus;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertySubjectType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sluice.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.BatchDispatchRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleByUniqueTokensParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sluice.*;
+import cn.shmedo.monitor.monibotbaseapi.service.SluiceService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.influx.SimpleQuery;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import lombok.RequiredArgsConstructor;
+import org.influxdb.InfluxDB;
+import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import reactor.util.function.Tuple2;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
+import static cn.shmedo.monitor.monibotbaseapi.constants.SluiceConstant.*;
+import static cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind.OPEN;
+
+/**
+ * @author Chengfs on 2023/11/21
+ */
+@Service
+@RequiredArgsConstructor
+public class SluiceServiceImpl implements SluiceService {
+
+    private final TbProjectPropertyMapper propertyMapper;
+    private final TbSensorMapper sensorMapper;
+    private final TbMonitorGroupPointMapper monitorGroupPointMapper;
+    private final TbProjectInfoMapper projectInfoMapper;
+    private final InfluxDB influxDb;
+    private final IotService iotService;
+
+    private final Lock controlLock = new ReentrantLock();
+
+
+    @Override
+    public PageUtil.Page<Sluice> sluicePage(QuerySluicePageRequest request) {
+
+        //渠道、水闸类型、管理单位过滤
+        List<Tuple3<Collection<String>, String, Boolean>> props = new ArrayList<>();
+        Optional.ofNullable(request.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e ->
+                props.add(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE)));
+        Optional.ofNullable(request.getSluiceType()).filter(e -> !e.isBlank()).ifPresent(e ->
+                props.add(Tuples.of(List.of(SLUICE_TYPE), request.getSluiceType(), Boolean.FALSE)));
+        Optional.ofNullable(request.getManageUnit()).filter(e -> !e.isBlank()).ifPresent(e ->
+                props.add(Tuples.of(List.of(MANAGE_UNIT), request.getManageUnit(), Boolean.FALSE)));
+        if (!request.getProjectList().isEmpty() && !props.isEmpty()) {
+            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectList(), PropertySubjectType.Project, props);
+            if (StrUtil.isNotBlank(request.getSluiceType()) || StrUtil.isNotBlank(request.getManageUnit())) {
+                request.setProjectList(result);
+            } else if (!result.isEmpty()) {
+                request.setProjectList(result);
+            }
+        }
+
+        //控制方式过滤
+        if (!request.getProjectList().isEmpty() && request.getControlType() != null) {
+            List<Integer> sids = SimpleQuery.of(SluiceStatus.TABLE_NAME)
+                    .eq(SluiceStatus.HARDWARE, request.getControlType().getDeviceCode())
+                    .column(influxDb, DbConstant.SENSOR_ID_TAG, Integer.class);
+            if (sids == null || sids.isEmpty()) {
+                return PageUtil.Page.empty();
+            }
+            request.getSensorList().addAll(sids);
+        }
+
+
+        //查询项目信息
+        IPage<Integer> page = sensorMapper.sluicePage(new Page<>(request.getCurrentPage(), request.getPageSize()), request);
+        if (page.getRecords().isEmpty()) {
+            return PageUtil.Page.empty();
+        }
+        List<Sluice> data = sensorMapper.listSluice(page.getRecords());
+
+        //查询项目属性
+        List<String> propNames = List.of(CANAL_NAME, SLUICE_TYPE, MANAGE_UNIT, SLUICE_HOLE_NUM);
+        Map<Integer, Map<String, String>> propMap = propertyMapper.queryPropByPids(data.stream()
+                        .map(Sluice::getProjectID).collect(Collectors.toSet()), PropertySubjectType.Project, propNames)
+                .stream().collect(Collectors.groupingBy(PropWithValue::getProjectID,
+                        Collectors.toMap(PropWithValue::getName, PropWithValue::getValue)));
+
+        //采集传感器（水情数据）
+        List<Gate> dataGates = data.stream().map(e -> e.getGates().stream()
+                        .filter(i -> SluiceData.MONITOR_TYPE.equals(i.getMonitorType())).findFirst().orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+        Map<Integer, SluiceData> dataMap;
+        Map<Integer, Integer> videoMGMap;
+        if (!dataGates.isEmpty()) {
+            dataMap = SimpleQuery.of(SluiceData.TABLE_NAME)
+                    .in(DbConstant.SENSOR_ID_TAG, dataGates.stream().map(e -> e.getId().toString()).distinct().toList())
+                    .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
+                    .limit(1).query(influxDb, SluiceData.class).stream().collect(Collectors.toMap(SluiceData::getSid, e -> e));
+
+            videoMGMap = monitorGroupPointMapper.selectList(Wrappers.<TbMonitorGroupPoint>lambdaQuery()
+                            .in(TbMonitorGroupPoint::getMonitorPointID, dataGates.stream().map(Gate::getMonitorPointID).distinct().toList()))
+                    .stream().collect(Collectors.toMap(TbMonitorGroupPoint::getMonitorPointID, TbMonitorGroupPoint::getMonitorGroupID));
+        } else {
+            dataMap = Map.of();
+            videoMGMap = Map.of();
+        }
+
+        //状态传感器（闸门状态）
+        List<Gate> statusGates = data.stream().flatMap(e -> e.getGates().stream())
+                .filter(e -> SluiceStatus.MONITOR_TYPE.equals(e.getMonitorType())).toList();
+        Map<Integer, SluiceStatus> statusMap;
+        if (!statusGates.isEmpty()) {
+            statusMap = SimpleQuery.of(SluiceStatus.TABLE_NAME)
+                    .in(DbConstant.SENSOR_ID_TAG, statusGates.stream().map(e -> e.getId().toString()).distinct().toList())
+                    .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
+                    .limit(1).query(influxDb, SluiceStatus.class).stream().collect(Collectors.toMap(SluiceStatus::getSid, e -> e));
+        } else {
+            statusMap = Map.of();
+        }
+
+        //组装数据
+        data.forEach(item -> {
+            item.getGates().stream().filter(e -> SluiceData.MONITOR_TYPE.equals(e.getMonitorType())).findFirst().ifPresent(sensor -> {
+                Optional.ofNullable(dataMap.get(sensor.getId())).ifPresent(s -> {
+                    item.setFrontWaterLevel(s.getFrontwater());
+                    item.setBackWaterLevel(s.getAfterwater());
+                    item.setFlowRate(s.getFlowRate());
+                    item.setLastCollectTime(s.getTime());
+                });
+                item.setCollectSensorID(sensor.getId());
+                Optional.ofNullable(videoMGMap.get(sensor.getMonitorPointID())).ifPresent(item::setVideoMonitorGroupID);
+            });
+
+            //闸门列表
+            List<Gate> list = item.getGates().stream().filter(i -> SluiceStatus.MONITOR_TYPE.equals(i.getMonitorType()))
+                    .peek(sensor -> {
+                        Optional.ofNullable(statusMap.get(sensor.getId())).ifPresent(s -> {
+                            sensor.setOpenStatus(s.getGateSta());
+                            sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
+                        });
+                    }).toList();
+            item.setGates(list);
+            item.setOpenStatus(list.stream().anyMatch(i -> i.getOpenStatus() == 1) ? 1 : 0);
+
+            Optional.ofNullable(propMap.get(item.getProjectID())).ifPresent(p -> {
+                item.setCanal(p.get("所属渠道"));
+                item.setSluiceType(p.get("水闸类型"));
+                item.setSluiceHoleNum(MapUtil.getInt(p, "闸孔数量"));
+                item.setManageUnit(p.get("管理单位"));
+            });
+        });
+        return new PageUtil.Page<>(page.getPages(), data, page.getTotal());
+    }
+
+
+    @Override
+    public void sluiceControl(SluiceControlRequest request) {
+        ControlActionKind kind = request.getActionKind();
+        ControlActionType type = request.getActionType();
+        BatchDispatchRequest dispatchRequest = new BatchDispatchRequest();
+        Map<Integer, Tuple2<String, Integer>> dict = getGateIotDeviceMap(request.getProjectID(), request.getGateID());
+        if (request.getGateID() == null) {
+            //一键控制
+            List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE_NAME)
+                    .in(DbConstant.SENSOR_ID_TAG, dict.keySet())
+                    //全开则查询当前状态为关闭的闸门，反之亦然
+                    .eq(SluiceStatus.GATE_STA, OPEN.equals(kind) ? 0 : 1)
+                    .orderByDesc(DbConstant.TIME_FIELD)
+                    .groupBy(DbConstant.SENSOR_ID_TAG).limit(1).query(influxDb, SluiceStatus.class);
+            if (!gates.isEmpty()) {
+                List<BatchDispatchRequest.RawCmd> list = gates.stream().filter(e -> dict.containsKey(e.getSid()))
+                        .map(e -> buildRawCmd(dict.get(e.getSid()), builder -> builder
+                                .type(kind.getCode())
+                                .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0))).toList();
+                dispatchRequest.setRawCmdList(list);
+            }
+        } else {
+            Assert.isTrue(dict.containsKey(request.getGateID()), "闸门不存在");
+            SluiceStatus gate = SimpleQuery.of(SluiceStatus.TABLE_NAME).eq(DbConstant.SENSOR_ID_TAG, request.getGateID().toString())
+                    .orderByDesc(DbConstant.TIME_FIELD).limit(1).row(influxDb, SluiceStatus.class);
+
+            org.springframework.util.Assert.isTrue(gate != null, "闸门不在线");
+            BatchDispatchRequest.RawCmd rawCmd = buildRawCmd(dict.get(request.getGateID()), builder -> {
+                switch (kind) {
+                    case STOP, RISE, FALL -> builder.type(kind.getDeviceCode()).motorDir(kind.getDeviceCode());
+                    case AUTO -> {
+                        builder.type(type.getDeviceCode());
+                        switch (type) {
+                            case CONSTANT_WATER_LEVEL -> builder.waterLevel(request.getTarget().getWaterLevel());
+                            case CONSTANT_FLOW -> {
+                                //TODO: 设备暂不支持此模式
+                            }
+                            case CONSTANT_SLUICE_LEVEL -> builder.crackLevel(request.getTarget().getGateDegree());
+                            case TIME_CONTROL -> builder.startTime(request.getTarget().getOpenTime())
+                                    .fixedTime(request.getTarget().getDuration());
+                            case TIME_PERIOD_CONTROL -> builder.startTime(request.getTarget().getBeginTime())
+                                    .stopTime(request.getTarget().getEndTime());
+                            case TOTAL_CONTROL -> builder.totalFlow(request.getTarget().getTotalFlow());
+                        }
+                    }
+                    case OPEN -> {
+                        Assert.isTrue(gate.getGateSta() == 1, "闸门已开启");
+                        builder.type(kind.getDeviceCode()).crackLevel(gate.getGateOpenMax());
+                    }
+                    case CLOSE -> {
+                        Assert.isTrue(gate.getGateSta() == 0, "闸门已关闭");
+                        builder.type(kind.getDeviceCode()).crackLevel(0D);
+                    }
+                }
+            });
+            dispatchRequest.setRawCmdList(List.of(rawCmd));
+        }
+        dispatchRequest.setUserID(CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        executeControl(dispatchRequest);
+    }
+
+    @Override
+    public SluiceInfo sluiceSingle(SingleSluiceRequest request) {
+        SluiceInfo result = new SluiceInfo();
+        List<TbSensor> list = sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
+                .eq(TbSensor::getProjectID, request.getProjectID())
+                .in(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE, SluiceData.MONITOR_TYPE)
+                .select(TbSensor::getID, TbSensor::getMonitorType, TbSensor::getAlias));
+
+        list.stream().filter(e -> SluiceData.MONITOR_TYPE.equals(e.getMonitorType())).findFirst().ifPresent(sensor -> {
+            //采集传感器 (水情数据)
+            SluiceData data = SimpleQuery.of(SluiceData.TABLE_NAME).eq(DbConstant.SENSOR_ID_TAG, sensor.getID().toString())
+                    .orderByDesc(DbConstant.TIME_FIELD).limit(1).row(influxDb, SluiceData.class);
+            Optional.ofNullable(data).ifPresent(d -> {
+                result.setFrontWaterLevel(d.getFrontwater());
+                result.setBackWaterLevel(d.getAfterwater());
+                result.setFlowRate(d.getFlowRate());
+                result.setFlowTotal(d.getTotalFlow());
+            });
+        });
+
+        if (list.stream().anyMatch(e -> SluiceStatus.MONITOR_TYPE.equals(e.getMonitorType()))) {
+            Map<Integer, SluiceStatus> statusMap = SimpleQuery.of(SluiceStatus.TABLE_NAME)
+                    .in(DbConstant.SENSOR_ID_TAG, list.stream().filter(e -> SluiceStatus.MONITOR_TYPE.equals(e.getMonitorType()))
+                            .map(e -> e.getID().toString()).distinct().toList())
+                    .groupBy(DbConstant.SENSOR_ID_TAG)
+                    .orderByDesc(DbConstant.TIME_FIELD).limit(1)
+                    .query(influxDb, SluiceStatus.class)
+                    .stream().collect(Collectors.toMap(SluiceStatus::getSid, e -> e));
+
+            List<GateInfo> gates = list.stream().filter(e -> statusMap.containsKey(e.getID()))
+                    .map(e -> {
+                        SluiceStatus status = statusMap.get(e.getID());
+                        GateInfo gate = new GateInfo();
+                        gate.setId(e.getID());
+                        gate.setAlias(e.getAlias());
+                        gate.setControlType(ControlType.formDeviceCode(status.getHardware()));
+                        gate.setOpenStatus(status.getGateSta());
+                        gate.setPowerStatus(status.getMotorSta());
+                        gate.setOpenDegree(status.getGateOpen());
+                        gate.setMaxOpenDegree(status.getGateOpenMax());
+                        gate.setPowerCurrent(status.getGateCurrent());
+                        gate.setPowerVoltage(status.getGateVolt());
+                        gate.setRunningState(status.getMotorSta());
+                        return gate;
+                    }).toList();
+            result.setGates(gates);
+            statusMap.clear();
+        }
+
+        List<PropWithValue> props = propertyMapper.queryPropByPids(Set.of(request.getProjectID()),
+                PropertySubjectType.Project, List.of(MAX_FLOW, MAX_WATER_LEVEL, MIN_WATER_LEVEL));
+
+        Optional.ofNullable(props).ifPresent(e -> {
+            e.forEach(p -> {
+                switch (p.getName()) {
+                    case MAX_FLOW -> result.setMaxFlowRate(Convert.toDouble(p.getValue()));
+                    case MAX_WATER_LEVEL -> result.setMaxBackWaterLevel(Convert.toDouble(p.getValue()));
+                    case MIN_WATER_LEVEL -> result.setMinBackWaterLevel(Convert.toDouble(p.getValue()));
+                    default -> {
+                    }
+                }
+            });
+        });
+        return result;
+    }
+
+    @Override
+    public List<SluiceSimple> listSluiceSimple(ListSluiceRequest request) {
+
+        LambdaQueryWrapper<TbSensor> query = Wrappers.<TbSensor>lambdaQuery()
+                .in(TbSensor::getProjectID, request.getProjectList())
+                .eq(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE)
+                .select(TbSensor::getProjectID);
+
+        if (request.getControlType() != null) {
+            List<Integer> sid = SimpleQuery.of(SluiceStatus.TABLE_NAME)
+                    .eq(SluiceStatus.HARDWARE, request.getControlType().getDeviceCode())
+                    .groupBy(DbConstant.SENSOR_ID_TAG)
+                    .orderByDesc(DbConstant.TIME_FIELD).limit(1).column(influxDb, DbConstant.SENSOR_ID_TAG, Integer.class);
+            if (sid.isEmpty()) {
+                return List.of();
+            }
+            query.in(TbSensor::getID, sid);
+        }
+
+        Collection<Integer> pidList = sensorMapper.selectList(query)
+                .stream().map(TbSensor::getProjectID).distinct().toList();
+
+        if (pidList.isEmpty()) {
+            return List.of();
+        }
+
+        //查询项目属性
+        List<String> propNames = List.of(CANAL_NAME, SLUICE_TYPE, MANAGE_UNIT, SLUICE_HOLE_NUM);
+        Map<Integer, Map<String, String>> propMap = propertyMapper.queryPropByPids(pidList, PropertySubjectType.Project, propNames)
+                .stream().collect(Collectors.groupingBy(PropWithValue::getProjectID,
+                        Collectors.toMap(PropWithValue::getName, PropWithValue::getValue)));
+
+        return projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
+                        .in(TbProjectInfo::getID, pidList)
+                        .select(TbProjectInfo::getID, TbProjectInfo::getProjectName))
+                .stream().map(e -> SluiceSimple.builder()
+                        .projectID(e.getID())
+                        .projectName(e.getProjectName())
+                        .canal(MapUtil.getStr(propMap.get(e.getID()), CANAL_NAME))
+                        .sluiceType(MapUtil.getStr(propMap.get(e.getID()), SLUICE_TYPE))
+                        .manageUnit(MapUtil.getStr(propMap.get(e.getID()), MANAGE_UNIT))
+                        .sluiceHoleNum(MapUtil.getInt(propMap.get(e.getID()), SLUICE_HOLE_NUM))
+                        .build()).toList();
+    }
+
+    @Override
+    public List<String> listSluiceManageUnit(ListSluiceManageUnitRequest request) {
+        //查询所有水闸项目ID
+        List<Integer> pidList = sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
+                .in(TbSensor::getProjectID, request.getProjectList())
+                .in(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE, SluiceData.MONITOR_TYPE)
+                .select(TbSensor::getProjectID)).stream().map(TbSensor::getProjectID).distinct().toList();
+        if (!pidList.isEmpty()) {
+            return propertyMapper.queryPropByPids(pidList, PropertySubjectType.Project, List.of("管理单位"))
+                    .stream().filter(e -> MANAGE_UNIT.equals(e.getName())).map(PropWithValue::getValue).distinct().toList();
+        }
+        return List.of();
+    }
+
+    @Override
+    public List<GateSimple> listSluiceGate(ListSluiceGateRequest request) {
+        return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
+                .in(TbSensor::getProjectID, request.getProjectList())
+                .in(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE)
+                .select(TbSensor::getID, TbSensor::getAlias)).stream().map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
+    }
+
+    /**
+     * 获取闸门和其对应物联网设备信息字典
+     *
+     * @param projectID 项目ID (水闸ID)
+     * @param sensorID  传感器ID (闸门ID)
+     * @return 结果 key: 闸门ID value: Tuple2<String, Integer> 物联网设备Token、电机序号
+     */
+    private Map<Integer, Tuple2<String, Integer>> getGateIotDeviceMap(Integer projectID, Integer sensorID) {
+        List<Tuple3<Integer, String, String>> list = sensorMapper.queryGateIotToken(projectID, sensorID);
+        if (sensorID != null) {
+            Assert.isTrue(list.size() == 1, "闸门不存在");
+        } else {
+            Assert.notEmpty(list, "闸门不存在");
+        }
+
+        ResultWrapper<List<DeviceSimple>> wrapper = iotService
+                .queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam.builder()
+                        .uniqueTokens(list.stream().map(Tuple3::getT3).collect(Collectors.toSet())).build());
+        if (wrapper.getData() != null && CollUtil.isNotEmpty(wrapper.getData())) {
+            Map<String, DeviceSimple> dict = wrapper.getData().stream()
+                    .collect(Collectors.toMap(DeviceSimple::getUniqueToken, v -> v));
+            return list.stream().filter(e -> dict.containsKey(e.getT3()))
+                    .filter(e -> NumberUtil.isInteger(e.getT2()))
+                    .map(e -> {
+                        DeviceSimple device = dict.get(e.getT3());
+                        return Map.entry(e.getT1(), Tuples.of(device.getDeviceSN(), Integer.parseInt(e.getT2())));
+                    })
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        }
+        return Map.of();
+    }
+
+    /**
+     * 加锁下发闸门控制指令<br/>
+     * TODO: 可以考虑切换为分布式锁
+     *
+     * @param request {@link BatchDispatchRequest}
+     */
+    private void executeControl(BatchDispatchRequest request) {
+        if (CollUtil.isNotEmpty(request.getRawCmdList())) {
+            try {
+                if (controlLock.tryLock(1, TimeUnit.SECONDS)) {
+                    //调用物联网接口下发指令
+                    ResultWrapper<List<TokenAndMsgID>> wrapper = iotService.batchDispatchCmd(request);
+                    //释放锁再检查结果
+                    controlLock.unlock();
+                    if (!wrapper.apiSuccess() || wrapper.getData().isEmpty()) {
+                        throw new CustomBaseException(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR.toInt(), wrapper.getMsg());
+                    }
+                }
+            } catch (InterruptedException e) {
+                throw new CustomBaseException(ResultCode.REQUEST_TIME_OUT.toInt(), "其他用户正在操作，请稍后再试");
+            }
+        }
+    }
+
+    /**
+     * 构建透传指令
+     *
+     * @param device   物联网设备信息
+     * @param consumer 指令构建器
+     * @return {@link BatchDispatchRequest.RawCmd}
+     */
+    private BatchDispatchRequest.RawCmd buildRawCmd(Tuple2<String, Integer> device,
+                                                    Consumer<ControlCmd.ControlCmdBuilder> consumer) {
+        ControlCmd.ControlCmdBuilder builder = ControlCmd.builder();
+        consumer.accept(builder);
+        return new BatchDispatchRequest.RawCmd(device.getT1(), builder.index(device.getT2()).build().toRaw());
+    }
+}
