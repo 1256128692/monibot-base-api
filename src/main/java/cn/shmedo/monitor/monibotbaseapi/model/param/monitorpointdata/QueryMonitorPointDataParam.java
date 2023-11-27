@@ -96,10 +96,10 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
             } else {
                 // 监测类型的预定义查询方式校验(历史数据)
                 if (!monitorTypeConfigV1.getDisplayDensity().contains(densityType)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数densityType不服务该监测类型的预定义配置");
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数densityType不符合该监测类型的预定义配置");
                 }
                 if (!monitorTypeConfigV1.getStatisticalMethods().contains(statisticsType)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数statisticsType不服务该监测类型的预定义配置");
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数statisticsType不符合该监测类型的预定义配置");
                 }
             }
 

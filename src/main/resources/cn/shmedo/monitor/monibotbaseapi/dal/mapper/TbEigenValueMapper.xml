@@ -333,4 +333,36 @@
             #{eigenValueID}
         </foreach>
     </select>
+
+    <insert id="insertBatchSelective">
+        insert into tb_eigen_value
+        (ID,ProjectID, `Scope`, MonitorItemID, MonitorTypeFieldID, `Name`, `Value`, UnitID, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime)
+        values
+        <foreach collection="tbEigenValues" item="item" separator=",">
+            (#{item.eigenValueID,jdbcType=INTEGER},
+            #{item.projectID,jdbcType=INTEGER},
+            #{item.scope,jdbcType=INTEGER},
+            #{item.monitorItemID,jdbcType=INTEGER},
+            #{item.monitorTypeFieldID,jdbcType=INTEGER},
+            #{item.name,jdbcType=VARCHAR},
+            #{item.value,jdbcType=DOUBLE},
+            #{item.unitID,jdbcType=INTEGER},
+            <choose>
+                <when test="item.exValue != null">
+                    #{item.exValue,jdbcType=VARCHAR},
+                </when>
+                <otherwise>
+                    NULL,
+                </otherwise>
+            </choose>
+            #{item.createUserID,jdbcType=INTEGER},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateUserID,jdbcType=INTEGER},
+            #{item.updateTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+
+    <select id="selectMaxID" resultType="java.lang.Integer">
+        select max(ID) from tb_eigen_value
+    </select>
 </mapper>

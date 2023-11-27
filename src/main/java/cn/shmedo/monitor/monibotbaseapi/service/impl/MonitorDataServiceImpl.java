@@ -22,10 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
@@ -445,6 +442,28 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     public Object queryMonitorTypeFieldList(QueryMonitorTypeFieldParam pa) {
         // 监测项目与监测子字段类型关系表
         return tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
+    }
+
+    @Override
+    public void addEigenValueList(AddEigenValueListParam pa) {
+
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+
+        Integer maxEigenValueID = tbEigenValueMapper.selectMaxID();
+        List<AddEigenValueParam> tbEigenValues = new LinkedList<AddEigenValueParam>();
+        for (int i = 0; i < pa.getDataList().size(); i++) {
+            if (maxEigenValueID != null) {
+                pa.getDataList().get(i).setEigenValueID(maxEigenValueID + i + 1);
+            } else {
+                pa.getDataList().get(i).setEigenValueID(i + 1);
+            }
+            tbEigenValues.add(AddEigenValueParam.toNewVo1(pa.getDataList().get(i), subjectID));
+        }
+
+        tbEigenValueMapper.insertBatchSelective(tbEigenValues);
+
+        tbEigenValueRelationMapper.insertBatchRelation(tbEigenValues);
+
     }
 
     /**

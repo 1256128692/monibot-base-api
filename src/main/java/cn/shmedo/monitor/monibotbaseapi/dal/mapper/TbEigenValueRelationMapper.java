@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 
 import java.util.List;
 
@@ -52,4 +53,6 @@ public interface TbEigenValueRelationMapper {
     void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
 
     List<TbEigenValueRelation> selectByIDs(List<Integer> eigenValueIDList);
+
+    void insertBatchRelation(List<AddEigenValueParam> tbEigenValues);
 }

@@ -5,7 +5,7 @@ public enum DisplayDensity {
     ALL(1, "all"),
     HOUR(2, "1h"),
     DAY(3, "1d"),
-    WEEK(4, "1w"),
+    WEEK(4, "7d"),
     MONTH(5, "30d"),
     YEAR(6, "365d"),
 
