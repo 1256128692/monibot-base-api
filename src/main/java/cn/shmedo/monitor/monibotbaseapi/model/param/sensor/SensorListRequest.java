@@ -7,6 +7,9 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.validator.constraints.Range;
+
+import java.util.Objects;
 
 /**
  * 传感器列表请求体
@@ -56,9 +59,15 @@ public class SensorListRequest implements ParameterValidator, ResourcePermission
      * 监测点ID
      */
     private Integer monitorPointID;
+    /**
+     * 数据来源关键字
+     */
+    @Range(max = 4, message = "0.全部 1.物联网数据 2.API外部数据 3.视频数据 4.人工数据")
+    private Integer dataSourceKey;
 
     @Override
     public ResultWrapper<?> validate() {
+        dataSourceKey = Objects.isNull(dataSourceKey) ? 0 : dataSourceKey;
         return null;
     }
 

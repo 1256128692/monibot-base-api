@@ -344,10 +344,12 @@
                ts.exValues       AS `exValues`,
                ts.Enable         AS `enable`,
                tmp.`Name`        AS `monitorPointName`,
-               tmt.TypeName      AS `monitorTypeName`
+               tmt.TypeName      AS `monitorTypeName`,
+               IF(tmt.MonitorType=40,'视频数据',(CASE tsds.DataSourceComposeType WHEN 1 THEN '物联网数据' WHEN 100 THEN 'API外部数据' WHEN 500 THEN '人工数据' END)) dataSourceKey
         FROM `tb_sensor` ts
                  LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                  LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+                 LEFT JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
         <where>
             <trim suffixOverrides="AND">
                 <if test="pa.keyword != null and pa.keyword != ''">
@@ -381,6 +383,22 @@
                 <if test="pa.projectID != null">
                     ts.ProjectID = #{pa.projectID} AND
                 </if>
+                <if test="pa.dataSourceKey != null">
+                    <choose>
+                        <when test="pa.dataSourceKey == 1">
+                            tsds.DataSourceComposeType=1 AND tmt.MonitorType != 40 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 2">
+                            tsds.DataSourceComposeType=100 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 3">
+                            tsds.DataSourceComposeType=500 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 4">
+                            tmt.MonitorType=40 AND
+                        </when>
+                    </choose>
+                </if>
             </trim>
         </where>
         ORDER BY ts.CreateTime DESC
@@ -404,10 +422,12 @@
                ts.exValues       AS `exValues`,
                ts.Enable         AS `enable`,
                tmp.`Name`        AS `monitorPointName`,
-               tmt.TypeName      AS `monitorTypeName`
+               tmt.TypeName      AS `monitorTypeName`,
+               IF(tmt.MonitorType=40,'视频数据',(CASE tsds.DataSourceComposeType WHEN 1 THEN '物联网数据' WHEN 100 THEN 'API外部数据' WHEN 500 THEN '人工数据' END)) dataSourceKey
         FROM `tb_sensor` ts
                  LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                  LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+                 LEFT JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
         <where>
             <trim suffixOverrides="AND">
                 <if test="pa.sensorName != null and pa.sensorName != ''">
@@ -436,6 +456,22 @@
                 </if>
                 <if test="pa.projectID != null">
                     ts.ProjectID = #{pa.projectID} AND
+                </if>
+                <if test="pa.dataSourceKey != null">
+                    <choose>
+                        <when test="pa.dataSourceKey == 1">
+                            tsds.DataSourceComposeType=1 AND tmt.MonitorType != 40 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 2">
+                            tsds.DataSourceComposeType=100 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 3">
+                            tsds.DataSourceComposeType=500 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 4">
+                            tmt.MonitorType=40 AND
+                        </when>
+                    </choose>
                 </if>
             </trim>
         </where>
