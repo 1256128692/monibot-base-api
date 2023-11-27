@@ -148,7 +148,7 @@ public class SluiceController {
      * @apiPermission 项目权限 mdmbase:ListSluice
      */
     @Permission(permissionName = "mdmbase:ListSluice")
-    @PostMapping(value = "/ListSluiceSimple", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/ListSluice", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object listSluiceSimple(@Validated @RequestBody ListSluiceRequest request) {
         return service.listSluiceSimple(request);
     }
