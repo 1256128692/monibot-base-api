@@ -8,10 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
@@ -224,6 +221,40 @@ public class MonitorDataController {
     public Object queryRainMonitorPointDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
 //        return wtMonitorService.queryMonitorPointList(pa);
         return null;
+    }
+
+    /**
+     * @api {POST} /AddEigenValueList 批量新增数据特征值
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName AddEigenValueList
+     * @apiDescription 新增数据特征值
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Object[]} dataList 参数列表
+     * @apiParam (请求体) {Int} dataList.scope 作用范围,0:专题分析 1:历史数据
+     * @apiParam (请求体) {Int} dataList.monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} dataList.monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {Int} dataList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiParam (请求体) {String} dataList.name 特征值名称
+     * @apiParam (请求体) {Double} dataList.value 数值
+     * @apiParam (请求体) {Int} dataList.unitID 单位ID
+     * @apiParam (请求体) {String} [dataList.exValue] 拓展属性
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"dataList":[
+     * {
+     *   "scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     *      * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"
+     * }
+     * ]}
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:AddEigenValue
+     */
+    @Permission(permissionName = "mdmbase:AddEigenValue")
+    @RequestMapping(value = "/AddEigenValueList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object addEigenValueList(@Validated @RequestBody AddEigenValueListParam pa) {
+        monitorDataService.addEigenValueList(pa);
+        return ResultWrapper.successWithNothing();
     }
 
 

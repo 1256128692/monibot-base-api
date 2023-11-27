@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueInfo;
@@ -70,4 +71,8 @@ public interface TbEigenValueMapper {
     List<ThematicEigenValueInfo> selectFieldInfoByPointIDList(List<Integer> monitorPointIDList);
 
     List<EigenBaseInfo> selectByIDs(List<Integer> eigenvalueIDList);
+
+    int insertBatchSelective(List<AddEigenValueParam> tbEigenValues);
+
+    Integer selectMaxID();
 }

@@ -616,7 +616,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
+                + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
                 + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
@@ -631,19 +631,36 @@ public class SensorDataDaoImpl implements SensorDataDao {
                                              Integer densityType) {
         // 如果是单日的话直接查
         if (densityType == DisplayDensity.DAY.getValue()) {
-            StringBuilder selectFieldBuilder = new StringBuilder();
-            selectField.forEach(s -> {
-                selectFieldBuilder.append(s).append(",");
-            });
-            selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG).append(",");
-            selectFieldBuilder.append(DbConstant.TIME_FIELD);
-            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                    .collect(Collectors.joining(" or "));
+            if (statisticsType == StatisticalMethods.LATEST.getValue()) {
+                StringBuilder selectFieldBuilder = new StringBuilder();
+                selectField.forEach(s -> {
+                    selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
+                    selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+                });
+                selectFieldBuilder.append(DbConstant.TIME_FIELD);
+                String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                        .collect(Collectors.joining(" or "));
 
-            String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
-                    + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                    + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-            return sidSql;
+                String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                        + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                        + "' GROUP BY sid, time(1d) "
+                        + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+                return sidSql;
+            } else {
+                StringBuilder selectFieldBuilder = new StringBuilder();
+                selectField.forEach(s -> {
+                    selectFieldBuilder.append(s).append(",");
+                });
+                selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG).append(",");
+                selectFieldBuilder.append(DbConstant.TIME_FIELD);
+                String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                        .collect(Collectors.joining(" or "));
+
+                String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                        + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                        + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+                return sidSql;
+            }
         } else {
             StringBuilder selectFieldBuilder = new StringBuilder();
             selectField.forEach(s -> {
@@ -662,7 +679,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
             String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                     + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                    + "' GROUP BY sid, time("+DisplayDensity.fromValue(densityType).getName()+") "
+                    + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
                     + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
             return sidSql;
         }

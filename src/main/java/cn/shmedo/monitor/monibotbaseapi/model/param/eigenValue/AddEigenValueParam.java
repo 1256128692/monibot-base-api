@@ -17,11 +17,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -44,10 +46,22 @@ public class AddEigenValueParam  implements ParameterValidator, ResourcePermissi
     @NotNull(message = "单位ID不能为空")
     private Integer unitID;
     private String exValue;
+    private Integer eigenValueID;
+    @JsonIgnore
+    private Date createTime;
+    @JsonIgnore
+    private Date updateTime;
+    @JsonIgnore
+    private Integer createUserID;
+    @JsonIgnore
+    private Integer updateUserID;
 
     public static TbEigenValue toNewVo(AddEigenValueParam pa, Integer subjectID) {
         DateTime date = DateUtil.date();
         TbEigenValue vo = new TbEigenValue();
+        if (pa.getEigenValueID() != null) {
+            vo.setId(pa.getEigenValueID());
+        }
         vo.setValue(pa.getValue());
         vo.setExValue(pa.getExValue());
         vo.setName(pa.getName());
@@ -60,6 +74,28 @@ public class AddEigenValueParam  implements ParameterValidator, ResourcePermissi
         vo.setProjectID(pa.getProjectID());
         vo.setCreateUserID(subjectID);
         vo.setUpdateUserID(subjectID);
+        return vo;
+    }
+
+    public static AddEigenValueParam toNewVo1(AddEigenValueParam pa, Integer subjectID) {
+        DateTime date = DateUtil.date();
+        AddEigenValueParam vo = new AddEigenValueParam();
+        if (pa.getEigenValueID() != null) {
+            vo.setEigenValueID(pa.getEigenValueID());
+        }
+        vo.setValue(pa.getValue());
+        vo.setExValue(pa.getExValue());
+        vo.setName(pa.getName());
+        vo.setScope(pa.getScope());
+        vo.setCreateTime(date);
+        vo.setUpdateTime(date);
+        vo.setMonitorItemID(pa.getMonitorItemID());
+        vo.setMonitorTypeFieldID(pa.getMonitorTypeFieldID());
+        vo.setUnitID(pa.getUnitID());
+        vo.setProjectID(pa.getProjectID());
+        vo.setCreateUserID(subjectID);
+        vo.setUpdateUserID(subjectID);
+        vo.setMonitorPointIDList(pa.getMonitorPointIDList());
         return vo;
     }
 

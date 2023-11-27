@@ -4,10 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.AddEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.DeleteBatchEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.QueryEigenValueParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.UpdateEigenValueParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
@@ -42,4 +39,6 @@ public interface MonitorDataService {
     List<MonitorPointDataInfo> queryMonitorPointFilterDataList(QueryMonitorPointDataParam pa);
 
     Object queryMonitorTypeFieldList(QueryMonitorTypeFieldParam pa);
+
+    void addEigenValueList(AddEigenValueListParam pa);
 }
