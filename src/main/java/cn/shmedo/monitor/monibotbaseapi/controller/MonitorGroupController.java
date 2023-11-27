@@ -316,6 +316,9 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Object[]} dataList.monitorPointList 监测点数据
      * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemAlias 监测项目别称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */

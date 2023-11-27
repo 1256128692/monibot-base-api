@@ -38,4 +38,8 @@ public class DbConstant {
      * 显示密度key
      */
     public static final String DISPLAY_DENSITY = "displayDensity";
+    /**
+     * mysql tb_parameter表PaValue字段为空时的字段
+     */
+    public static final String PARAM_PAVALUE_EMPTY = "empty";
 }

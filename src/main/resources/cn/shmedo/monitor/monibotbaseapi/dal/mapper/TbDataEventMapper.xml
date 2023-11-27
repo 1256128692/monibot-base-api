@@ -193,6 +193,7 @@
                 #{item}
             </foreach>
         </if>
+        GROUP BY de.`ID`
     </select>
 
     <delete id="deleteByEventIDList">

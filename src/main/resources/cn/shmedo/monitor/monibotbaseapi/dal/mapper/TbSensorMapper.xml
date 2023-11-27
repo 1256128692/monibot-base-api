@@ -30,6 +30,27 @@
         <result column="ChannelCode" jdbcType="INTEGER" property="channelCode"/>
         <result column="VideoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
     </resultMap>
+    <resultMap id="sensorIDWithFormulaBaseMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo">
+        <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+        <result column="calType" jdbcType="INTEGER" property="calType"/>
+        <collection property="formulaBaseInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.FormulaBaseInfo">
+            <id column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+            <result column="formula" jdbcType="VARCHAR" property="formula"/>
+            <result column="fieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder"/>
+        </collection>
+        <collection property="parameterList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+            <id column="fieldID" jdbcType="INTEGER" property="ID"/>
+            <result column="paramSubjectID" jdbcType="INTEGER" property="subjectID"/>
+            <result column="paramSubjectType" jdbcType="INTEGER" property="subjectType"/>
+            <result column="paramPaUnitID" jdbcType="VARCHAR" property="paUnitID"/>
+            <result column="paramDataType" jdbcType="VARCHAR" property="dataType"/>
+            <result column="paramToken" jdbcType="VARCHAR" property="token"/>
+            <result column="paramName" jdbcType="VARCHAR" property="name"/>
+            <result column="paramPaValue" jdbcType="VARCHAR" property="paValue"/>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -645,6 +666,36 @@
             #{deviceSerial}
         </foreach>
         )
+    </select>
+    <select id="selectSensorIDWithFormulaBaseInfoBySensorIDList" resultMap="sensorIDWithFormulaBaseMap"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo">
+        SELECT
+            ts.`ID` sensorID,
+            ts.`MonitorType` monitorType,
+            tmtt.`CalType` calType,
+            ttf.`Formula` formula,
+            ttf.`FieldCalOrder` fieldCalOrder,
+            tmtf.`FieldToken` fieldToken,
+            tp.`ID` paramID,
+            tp.`SubjectID` paramSubjectID,
+            tp.`SubjectType` paramSubjectType,
+            tp.`PaUnitID` paramPaUnitID,
+            tp.`DataType` paramDataType,
+            tp.`Token` paramToken,
+            tp.`Name` paramName,
+            tp.`PaValue` paramPaValue,
+            tp.`PaDesc` paramPaDesc
+        FROM
+            tb_sensor ts
+            LEFT JOIN tb_sensor_data_source tsds ON tsds.`DataSourceID` = ts.`DataSourceID`
+            LEFT JOIN tb_monitor_type_template tmtt ON tmtt.`ID` = ts.`TemplateID`
+            LEFT JOIN tb_template_formula ttf ON ttf.`TemplateID` = tmtt.`ID`
+            LEFT JOIN tb_monitor_type_field tmtf ON tmtf.`ID` = ttf.`FieldID` AND tmtf.`FieldClass` = 2
+            LEFT JOIN `tb_parameter` tp ON tp.`SubjectID` = ts.`ID` AND tp.`SubjectType` = 3
+        WHERE ts.`Kind` = 3 AND tsds.`DataSourceComposeType` = 500 AND ts.`ID` IN
+        <foreach collection="sensorIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
     <delete id="deleteBatchByDeviceSerialList">

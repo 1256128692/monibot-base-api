@@ -137,6 +137,20 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     }
 
+    @SuppressWarnings("DuplicatedCode")
+    @Override
+    public List<DataSourceCatalogResponse> manualDataSource(DataSourceCatalogRequest request) {
+        return monitorTypeTemplateMapper.dataSourceCatalog(request).stream().filter(e -> {
+            //过滤掉配置不全的模板
+            if (CalType.FORMULA.getCode() == e.getCalType()) {
+                return ObjUtil.equals(e.getFieldCount(), e.getFormulaCount());
+            } else if (CalType.SCRIPT.getCode() == e.getCalType()) {
+                return ObjUtil.equals(e.getFieldCount(), e.getScriptCount());
+            }
+            return true;
+        }).toList();
+    }
+
     @Override
     public List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request) {
         LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = Wrappers.lambdaQuery(TbMonitorTypeTemplate.class)
@@ -230,10 +244,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Dict exConfig = JSONUtil.isTypeJSON(response.getConfigFieldValue()) ?
                 JSONUtil.toBean(response.getConfigFieldValue(), Dict.class) : Dict.create();
         response.setExFields(typeFields.stream().map(e -> {
-                    SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
-                    exField.setValue(exConfig.getStr(e.getFieldToken()));
-                    return exField;
-                }).toList());
+            SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
+            exField.setValue(exConfig.getStr(e.getFieldToken()));
+            return exField;
+        }).toList());
         //参数
         Map<Integer, Map<String, TbParameter>> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
                 .or(wrapper -> wrapper
@@ -296,7 +310,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
                     .eq(TbSensor::getAlias, request.getAlias())
                     .ne(TbSensor::getProjectID, request.getProjectID()));
-            Assert.isTrue( count == null || count == 0, "名称已存在");
+            Assert.isTrue(count == null || count == 0, "名称已存在");
             request.getSensor().setAlias(request.getAlias());
         }
         request.getSensor().setUpdateUserID(subject.getSubjectID());
@@ -307,8 +321,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             parameterMapper.replaceBatch(request.getParamList());
             monitorRedisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + ParameterSubjectType.SENSOR.getCode(),
                     parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                            .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
-                            .eq(TbParameter::getSubjectID, request.getSensor().getID()))
+                                    .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
+                                    .eq(TbParameter::getSubjectID, request.getSensor().getID()))
                             .stream().collect(Collectors.groupingBy(TbParameter::getSubjectID)));
         }
         return new IdRecord(request.getSensor().getID());
@@ -377,7 +391,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     });
                 }
                 case HISTORY -> {
-                    return entry.getValue().stream().map( e-> Param.valueOf(request.getMonitorTypeCache(),e ));
+                    return entry.getValue().stream().map(e -> Param.valueOf(request.getMonitorTypeCache(), e));
                 }
                 default -> {
                     //TODO SELF、MON 待实现
@@ -462,10 +476,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     public List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param) {
-     return this.baseMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getMonitorType, param.getMonitorType())
-             .eq(TbSensor::getProjectID,param.getProjectID()).eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
-                     .select(TbSensor::getID,TbSensor::getName,TbSensor::getAlias)).stream().map(u ->
-             SensorNameResponse.builder().sensorID(u.getID()).sensorName(u.getName()).sensorAlias(u.getAlias()).build()).toList();
+        return this.baseMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getMonitorType, param.getMonitorType())
+                .eq(TbSensor::getProjectID, param.getProjectID()).eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
+                .select(TbSensor::getID, TbSensor::getName, TbSensor::getAlias)).stream().map(u ->
+                SensorNameResponse.builder().sensorID(u.getID()).sensorName(u.getName()).sensorAlias(u.getAlias()).build()).toList();
     }
 
     /**
@@ -497,18 +511,18 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             if (wrapper.apiSuccess()) {
                 List<DeviceWithSensor> data = wrapper.getData();
                 data.forEach(item -> {
-                   item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
-                           .forEach((iotSensorType, list) -> {
-                       DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
-                       temp.setSensorList(list);
-                       if (iotMap.containsKey(iotSensorType)) {
-                           List<DeviceWithSensor> val = iotMap.get(iotSensorType);
-                           val.add(temp);
-                           iotMap.put(iotSensorType, val);
-                       } else {
-                           iotMap.put(iotSensorType, CollUtil.newArrayList(temp));
-                       }
-                   });
+                    item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
+                            .forEach((iotSensorType, list) -> {
+                                DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
+                                temp.setSensorList(list);
+                                if (iotMap.containsKey(iotSensorType)) {
+                                    List<DeviceWithSensor> val = iotMap.get(iotSensorType);
+                                    val.add(temp);
+                                    iotMap.put(iotSensorType, val);
+                                } else {
+                                    iotMap.put(iotSensorType, CollUtil.newArrayList(temp));
+                                }
+                            });
                 });
             }
         }

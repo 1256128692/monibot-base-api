@@ -15,18 +15,18 @@ public enum SensorKindEnum {
     /**
      * 自动化传感器
      */
-    AUTO_KIND(1),
+    AUTO_KIND((byte) 1),
     /**
      * 融合传感器
      */
-    MERGE_KIND(2),
+    MERGE_KIND((byte) 2),
     /**
      * 人工传感器
      */
-    MANUAL_KIND(3);
-    private final Integer code;
+    MANUAL_KIND((byte) 3);
+    private final Byte code;
 
-    public static SensorKindEnum fromCode(final int code) {
+    public static SensorKindEnum fromCode(final byte code) {
         return Arrays.stream(values()).filter(u -> u.getCode().equals(code)).findAny()
                 .orElseThrow(() -> new IllegalArgumentException("未识别的传感器类型,code:" + code));
     }

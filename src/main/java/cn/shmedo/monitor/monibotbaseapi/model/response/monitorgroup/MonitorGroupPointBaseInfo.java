@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -13,8 +12,5 @@ import java.util.Map;
 public class MonitorGroupPointBaseInfo {
     private Integer monitorGroupID;
     private String monitorGroupName;
-    /**
-     * e.g. {"monitorPointID":1,"monitorPointName":"监测点1"}
-     */
-    private List<Map<String, Object>> monitorPointList;
+    private List<MonitorGroupPointItemBaseInfo> monitorPointList;
 }

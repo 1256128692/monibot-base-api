@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -75,4 +76,10 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<VideoDeviceInfoV6> selectListByDeviceSerialList(List<String> deviceSerialList);
 
     void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
+
+    /**
+     * 查询传感器id和监测类型下全部扩展属性的fieldToken、公式和公式排序<br>
+     * 仅是<b>扩展属性</b>,不是<b>全部属性</b>
+     */
+    List<SensorIDWithFormulaBaseInfo> selectSensorIDWithFormulaBaseInfoBySensorIDList(List<Integer> sensorIDList);
 }
