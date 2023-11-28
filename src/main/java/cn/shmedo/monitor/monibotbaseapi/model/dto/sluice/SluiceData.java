@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Data
 public class SluiceData {
     public static final Integer MONITOR_TYPE = 60;
-    public static final String TABLE_NAME = "tb_60_data";
+    public static final String TABLE = "tb_60_data";
     public static final String TIME = "time";
     public static final String TOTAL_FLOW = "total_flow";
     public static final String FLOW_RATE = "flow_rate";

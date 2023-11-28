@@ -16,4 +16,5 @@ public class GateInfo extends Gate {
     private Double powerVoltage;
     private Integer runningState;
     private Double maxOpenDegree;
+    private Integer limitSwSta;
 }

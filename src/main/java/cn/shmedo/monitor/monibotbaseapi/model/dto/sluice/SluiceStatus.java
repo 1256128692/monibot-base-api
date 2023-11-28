@@ -67,7 +67,7 @@ public class SluiceStatus {
     private Integer hardware;
 
     public static final Integer MONITOR_TYPE = 61;
-    public static final String TABLE_NAME = "tb_61_data";
+    public static final String TABLE = "tb_61_data";
     public static final String GATE_TEMP = "gateTemp";
     public static final String GATE_CURRENT = "gateCurrent";
     public static final String GATE_VOLT = "gateVolt";

@@ -102,10 +102,12 @@ public class SimpleQuery {
                 });
 
         Optional.ofNullable(limit).ifPresent(e -> {
-            sqlParts.add(SQLSymbol.LIMIT);
-            sqlParts.add(-1 == e.getT1() ?
-                    e.getT2().toString() :
-                    e.getT1() + SQLSymbol.COMMA + e.getT2());
+            if (e.getT2() > 0) {
+                sqlParts.add(SQLSymbol.LIMIT);
+                sqlParts.add(e.getT2().toString());
+            }
+            sqlParts.add(SQLSymbol.OFFSET);
+            sqlParts.add(e.getT1().toString());
         });
         sqlParts.add(SQLSymbol.TIME_ZONE);
         return String.join(SQLSymbol.SPACE, sqlParts);
@@ -209,7 +211,7 @@ public class SimpleQuery {
      */
     public <T> T row(@Nonnull InfluxDB client, Class<T> clazz) {
         Dict row = row(client);
-        return row !=null ? row.toBean(clazz): null;
+        return row != null ? row.toBean(clazz) : null;
     }
 
     /**
@@ -237,6 +239,22 @@ public class SimpleQuery {
         String firstColName = CollUtil.getFirst(select);
         Dict row = row(client);
         return row == null ? null : row.get(firstColName);
+    }
+
+    /**
+     * 返回指定字段数量，不存在时返回0<br/>
+     * 当字段不存在时
+     *
+     * @param client {@link InfluxDB}
+     * @param column 列名，必须为存在，不能是 *
+     * @return 数量
+     */
+    public Long count(@Nonnull InfluxDB client, @Nonnull String column) {
+        this.select.clear();
+        this.select.add(SQLSymbol.COUNT + SQLSymbol.LEFT_BRACKET + column + SQLSymbol.RIGHT_BRACKET);
+
+        Dict row = row(client);
+        return row == null || !row.containsKey(SQLSymbol.COUNT) ? 0L : row.getLong(SQLSymbol.COUNT);
     }
 
     private Object serializeValue(Object value) {
@@ -313,6 +331,7 @@ public class SimpleQuery {
      * {@code LIMIT offset, limit}
      */
     public SimpleQuery limit(@Nonnull Integer offset, @Nonnull Integer limit) {
+        assert offset >= 0 && limit > 0;
         this.limit = Tuples.of(offset, limit);
         return this;
     }
@@ -321,20 +340,26 @@ public class SimpleQuery {
      * {@code LIMIT limit}
      */
     public SimpleQuery limit(@Nonnull Integer limit) {
-        this.limit = Tuples.of(-1, limit);
+        assert limit > 0;
+        this.limit = Tuples.of(0, limit);
         return this;
     }
 
     /**
+     * 每次调用都会清空之前的查询列<br/>
      * {@code SELECT A,B,C...}
      */
     public SimpleQuery select(@Nonnull String... columns) {
         Optional.of(columns).filter(e -> e.length > 0)
-                .ifPresent(e -> select.addAll(Arrays.asList(columns)));
+                .ifPresent(e -> {
+                    select.clear();
+                    select.addAll(Arrays.asList(columns));
+                });
         return this;
     }
 
     /**
+     * 每次调用都会清空之前的查询列<br/>
      * {@code SELECT A,B,C...}
      */
     public SimpleQuery select(@Nonnull List<String> columns) {
@@ -522,6 +547,8 @@ public class SimpleQuery {
         String FROM = "FROM";
         String WHERE = "WHERE";
         String LIMIT = "LIMIT";
+        String OFFSET = "OFFSET";
         String TIME_ZONE = "tz('PRC')";
+        String COUNT = "count";
     }
 }

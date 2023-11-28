@@ -23,6 +23,45 @@ public class SluiceController {
     private final SluiceService service;
 
     /**
+     * @api {POST} /QuerySluiceControlRecordPage 分页查询水闸控制记录
+     * @apiVersion 1.0.0
+     * @apiGroup 闸泵控制模块
+     * @apiName QuerySluiceControlRecordPage
+     * @apiDescription 分页查询水闸控制记录 (内部调用接口，不允许用户调用)
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {String} [keyword] 水闸名称/渠道名称 模糊查询
+     * @apiParam (请求参数) {Int} [controlType] 控制类型 (1远程控制 2手动控制 3现地控制)
+     * @apiParam (请求参数) {DateTime} [begin] 开始时间 (yyyy-MM-dd HH:mm:ss)
+     * @apiParam (请求参数) {DateTime} [end] 结束时间 (yyyy-MM-dd HH:mm:ss)
+     * @apiParam (请求参数) {Int} currentPage 当前页(>=1)
+     * @apiParam (请求参数) {Int} pageSize 页大小(1-100)
+     * @apiSuccess (返回结果) {Int} totalCount 总条数
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (返回结果) {Int} currentPageData.id 记录id
+     * @apiSuccess (返回结果) {Int} currentPageData.companyID 公司ID
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 项目id
+     * @apiSuccess (返回结果) {String} currentPageData.projectName 项目名称 (水闸名称)
+     * @apiSuccess (返回结果) {Int} currentPageData.gateID 闸门id (监测传感器id)
+     * @apiSuccess (返回结果) {String} currentPageData.gateName 闸门名称 (监测传感器别名)
+     * @apiSuccess (返回结果) {String} currentPageData.canal 所属渠道
+     * @apiSuccess (返回结果) {String} currentPageData.sluiceType 水闸类型 (进水闸、退水闸、船闸、节制闸、挡潮闸、其他)
+     * @apiSuccess (返回结果) {String} currentPageData.mmUnit 管理单位
+     * @apiSuccess (返回结果) {Int} currentPageData.controlType 控制类型 1远程控制 2手动控制 3现地控制
+     * @apiSuccess (返回结果) {Int} [currentPageData.actionType] 操作类型 0恒定闸位(开合度)、1恒定水位、2总量控制(累计流量)、3时段控制、4时长控制、5远程手动控制（上、下、停）、6自动校准 7恒定流量(瞬时流量)
+     * @apiSuccess (返回结果) {DateTime} currentPageData.operationTime 操作时间 (yyyy-MM-dd HH:mm:ss)
+     * @apiSuccess (返回结果) {Int} currentPageData.operationUserID 操作人id
+     * @apiSuccess (返回结果) {String} currentPageData.operationUser 操作人名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:BaseSluiceControlRecord (不允许用户调用)
+     */
+    @Permission(permissionName = "mdmbase:BaseSluiceControlRecord", allowApplication = true, allowUser = false)
+    @PostMapping(value = "/QuerySluiceControlRecordPage", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object controlRecordPage(@Validated @RequestBody BaseSluiceQuery request) {
+        return service.controlRecordPage(request);
+    }
+
+    /**
      * @api {POST} /QuerySluicePage 分页查询水闸列表
      * @apiVersion 1.0.0
      * @apiGroup 闸泵控制模块
@@ -112,6 +151,7 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Int} gates.controlType 控制类型 1远程控制 2手动控制 3现地控制
      * @apiSuccess (返回结果) {Double} gates.maxOpenDegree 闸门最大开度
      * @apiSuccess (返回结果) {Int} gates.runningState 电机运行状态 0上、1下、2停
+     * @apiSuccess (返回结果) {Int} gates.limitSwSta 限位开关状态（0：上下限位均未触发；1：上限位触发；2：下限位触发；3：上下均触发）
      * @apiSuccess (返回结果) {Double} maxFlowRate 最大过闸流量
      * @apiSuccess (返回结果) {Double} maxBackWaterLevel 最大闸后水位
      * @apiSuccess (返回结果) {Double} minBackWaterLevel 最小闸后水位
@@ -141,7 +181,7 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Int} data.projectID 项目(水闸) id
      * @apiSuccess (返回结果) {String} data.projectName 项目(水闸) 名称
      * @apiSuccess (返回结果) {String} data.canal 所属渠道
-     * @apiSuccess (返回结果) {Int} data.sluiceType 水闸类型 (进水闸、退水闸、船闸、节制闸、挡潮闸、其他)
+     * @apiSuccess (返回结果) {String} data.sluiceType 水闸类型 (进水闸、退水闸、船闸、节制闸、挡潮闸、其他)
      * @apiSuccess (返回结果) {String} data.manageUnit 管理单位
      * @apiSuccess (返回结果) {Int} data.sluiceHoleNum 闸孔数量
      * @apiSampleRequest off
