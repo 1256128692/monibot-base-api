@@ -658,7 +658,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
                 String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                         + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                        + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+                        + "' GROUP BY sid, time(1d) order by time desc limit 50000 tz('Asia/Shanghai') ; ";
                 return sidSql;
             }
         } else {
