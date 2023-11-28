@@ -4,17 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ByteUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.monitor.enums.CalType;
-import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
-import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
-import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
+import cn.shmedo.iot.entity.api.monitor.enums.*;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
@@ -175,6 +171,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Transactional(rollbackFor = Exception.class)
     public IdRecord addSensor(SaveSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        boolean isManual = request.getManual();
+        // 中台传感器名称
+        String mdmbaseSensorName = genSensorName(request.getMonitorType(), request.getProjectID());
+
         //传感器
         TbSensor sensor = new TbSensor();
         sensor.setProjectID(request.getProjectID());
@@ -182,9 +182,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setDataSourceID(UUID.randomUUID().toString());
         sensor.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
         sensor.setMonitorType(request.getMonitorType());
-        sensor.setName(genSensorName(request.getMonitorType(), request.getProjectID()));
+        sensor.setName(mdmbaseSensorName);
         sensor.setAlias(StrUtil.isBlank(request.getAlias()) ? sensor.getName() : request.getAlias());
-        sensor.setKind(ByteUtil.intToByte(1));
+        sensor.setKind(isManual ? SensorKindEnum.MANUAL_KIND.getCode() : SensorKindEnum.AUTO_KIND.getCode());
         sensor.setConfigFieldValue(request.getConfigFieldValue());
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
@@ -200,9 +200,17 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 TbSensorDataSource dataSource = new TbSensorDataSource();
                 dataSource.setDataSourceID(sensor.getDataSourceID());
                 dataSource.setDataSourceType(source.getDataSourceType().getCode());
-                dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
-                dataSource.setDataSourceToken(DataSourceType.IOT_SENSOR.equals(source.getDataSourceType()) ?
-                        source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
+                // 如果是人工：
+                // - {@code templateDataSourceToken}不允许用户选择，直接使用manual_2_a；
+                // - {@code dataSourceToken}需要等于中台传感器名称（即{@code mdmbaseSensorName}），因为人工传感器没有对应的物联网平台传感器
+                dataSource.setTemplateDataSourceToken(isManual ? "manual_2_a" : source.getTemplateDataSourceToken());
+                String dataSourceToken;
+                if (DataSourceType.IOT_SENSOR.equals(source.getDataSourceType())) {
+                    dataSourceToken = isManual ? mdmbaseSensorName : source.getUniqueToken() + StrUtil.AT + source.getSensorName();
+                } else {
+                    dataSourceToken = source.getSensorName();
+                }
+                dataSource.setDataSourceToken(dataSourceToken);
                 dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
                 dataSource.setExValues(source.getExValues());
                 return dataSource;

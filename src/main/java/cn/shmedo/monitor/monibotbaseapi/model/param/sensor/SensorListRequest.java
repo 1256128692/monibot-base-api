@@ -62,7 +62,7 @@ public class SensorListRequest implements ParameterValidator, ResourcePermission
     /**
      * 数据来源关键字
      */
-    @Range(max = 4, message = "0.全部 1.物联网数据 2.API外部数据 3.视频数据 4.人工数据")
+    @Range(max = 4, message = "0.全部 1.物联网数据 2.API外部数据 3.人工数据 4.视频数据 ")
     private Integer dataSourceKey;
 
     @Override

@@ -36,7 +36,7 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorID] 传感器ID
      * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
      * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
-     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.视频数据 4.人工数据
+     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.人工数据 4.视频数据
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型 (Code)
@@ -73,7 +73,7 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorID] 传感器ID
      * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
      * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
-     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.视频数据 4.人工数据
+     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.人工数据 4.视频数据
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.totalCount 总条数
      * @apiSuccess (响应结果) {Int} data.totalPage 总页数

@@ -3,14 +3,12 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
@@ -103,6 +101,11 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
 
     @JsonIgnore
     private String configFieldValue;
+    /**
+     * 是否是人工传感器
+     */
+    @JsonIgnore
+    private Boolean manual;
 
 
     @Data
@@ -117,13 +120,11 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         /**
          * 模板数据源标识
          */
-        @NotNull(message = "模板数据源标识不能为空")
         private String templateDataSourceToken;
 
         /**
          * (监测/物联网)传感器名称
          */
-        @NotNull(message = "传感器名称不能为空")
         private String sensorName;
 
         /**
@@ -144,6 +145,8 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
 
     @Override
     public ResultWrapper<?> validate() {
+        manual = DataSourceComposeType.MANUAL_MONITOR_DATA.equals(dataSourceComposeType);
+
         //校验名称
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
         Long count = sensorMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
@@ -155,13 +158,18 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         if (dataSourceComposeType != DataSourceComposeType.API) {
             Assert.notNull(templateID, "监测类型模板ID不能为空");
             Assert.notEmpty(dataSourceList, "数据源列表不能为空");
+            // 人工传感器时：{@code dataSource}中的{@code templateDataSourceToken}不会被使用，此时允许为空；{@code sensorName}因物联网平台无对应传感器，也允许为空
+            if (!manual && dataSourceList.stream().anyMatch(u -> ObjectUtil.isEmpty(u.getTemplateDataSourceToken()) || ObjectUtil.isEmpty(u.getSensorName()))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "不为人工传感器时，物联网平台传感器名称、模板数据源标识不能为空");
+            }
         } else {
             templateID = -1;
             dataSourceList = Collections.emptyList();
         }
         dataSourceList.forEach(e -> {
             Assert.notNull(e.getDataSourceType(), "数据源类型不能为空");
-            if (e.getDataSourceType() == DataSourceType.IOT_SENSOR) {
+            // 人工传感器时，{@code uniqueToken}因物联网平台无对应设备，也允许为空
+            if (e.getDataSourceType() == DataSourceType.IOT_SENSOR && !manual) {
                 Assert.notBlank(e.getUniqueToken(), "设备传感器标识不能为空");
             }
         });
@@ -210,7 +218,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                         }
                         return exMap.containsKey(e.getID()) ? Map.entry(e.getFieldToken(), exMap.get(e.getID()).getValue()) : null;
                     }).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-            return exConfig.isEmpty()? null: JSONUtil.toJsonStr(exConfig);
+            return exConfig.isEmpty() ? null : JSONUtil.toJsonStr(exConfig);
         }
         return null;
     }
