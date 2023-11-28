@@ -11,6 +11,8 @@ public class DbConstant {
     public static final String GENE_ID_FIELD = "geneID";
     public static final String TIME_FIELD = "time";
 
+    public static final String COUNT_FIELD = "count";
+
     public static final String DENSITY_DAY = "d";
 
     public static final String DENSITY_HOUR = "h";
