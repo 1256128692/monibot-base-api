@@ -29,7 +29,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,11 +85,10 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService {
             List<Integer> userIdList = new ArrayList<>(userIdSet);
             if (!CollectionUtil.isNullOrEmpty(userIdList)) {
                 // 获取CreateUserID对应的CreateUserName
-                ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                ResultWrapper<List<UserIDName>> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
                 if (resultWrapper.apiSuccess()) {
-                    List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-                    if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
-                        List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+                    if (!CollectionUtil.isNullOrEmpty(resultWrapper.getData())) {
+                        List<UserIDName> newUserIdNameList = resultWrapper.getData();
                         userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
                     }
                 }
@@ -159,13 +157,12 @@ public class TbDocumentFileServiceImpl implements ITbDocumentFileService {
     public DocumentFileResponse queryDocumentFile(QueryDocumentFileParameter queryDocumentFileParameter) {
         DocumentFileResponse documentFileResponse = DocumentFileResponse.getDocumentFile(queryDocumentFileParameter.getTbDocumentFile());
         List<Integer> userIdList = Collections.singletonList(documentFileResponse.getCreateUserId());
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<List<UserIDName>> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (resultWrapper.apiSuccess()) {
-            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
+            if (CollectionUtil.isNullOrEmpty(resultWrapper.getData())) {
                 return documentFileResponse;
             }
-            List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
+            List<UserIDName> newUserIdNameList = resultWrapper.getData();
             documentFileResponse.setCreateUserName(newUserIdNameList.get(0).getUserName());
         }
 

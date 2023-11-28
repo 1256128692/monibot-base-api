@@ -24,7 +24,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnRuleService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnTriggerService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
-import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -140,7 +139,7 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
                 .map(u -> u.get(0)).map(ProductBaseInfo::getProductName).ifPresent(build::setProductName);
         Integer createUserID = build.getCreateUserID();
         Map<Integer, String> userIDNameMap = null;
-        ResultWrapper<Object> wrapper = Optional.ofNullable(createUserID).map(List::of).map(w -> {
+        ResultWrapper<List<UserIDName>> wrapper = Optional.ofNullable(createUserID).map(List::of).map(w -> {
             QueryUserIDNameParameter pa = new QueryUserIDNameParameter();
             pa.setUserIDList(w);
             return pa;
@@ -148,12 +147,10 @@ public class TbWarnRuleServiceImpl extends ServiceImpl<TbWarnRuleMapper, TbWarnR
         if (wrapper == null) {
             log.error("规则引擎缺少创建/修改用户ID,规则引擎ID: {}", engineID);
         } else {
-            Object wrapperData = wrapper.getData();
-            if (wrapperData == null) {
+            if (wrapper.getData() == null) {
                 log.error("第三方服务调用失败,未能获取到用户名称信息...");
             } else {
-                userIDNameMap = ((Collection<Object>) wrapperData).stream()
-                        .map(u -> JsonUtil.toObject(JsonUtil.toJson(u), UserIDName.class))
+                userIDNameMap = wrapper.getData().stream()
                         .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
             }
         }

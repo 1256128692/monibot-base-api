@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -59,8 +60,8 @@ public interface UserService {
      */
     @RequestLine("POST /QueryUserIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Object> queryUserIDName(QueryUserIDNameParameter pa,
-                                          @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+    ResultWrapper<List<UserIDName>> queryUserIDName(QueryUserIDNameParameter pa,
+                                              @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
 
     @RequestLine("POST /ListCompanyIDName")

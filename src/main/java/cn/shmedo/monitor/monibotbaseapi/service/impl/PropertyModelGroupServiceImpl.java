@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -22,7 +21,6 @@ import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -75,14 +73,12 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         TbPropertyModelGroup tbPropertyModelGroup = queryPropertyModelGroupParam.getTbPropertyModelGroup();
         PropertyModelGroupResponse propertyModelGroupResponse = CustomizeBeanUtil.copyProperties(tbPropertyModelGroup, PropertyModelGroupResponse.class);
         QueryUserIDNameParameter queryUserIdNameParameter = new QueryUserIDNameParameter(Collections.singletonList(propertyModelGroupResponse.getCreateUserID()));
-        ResultWrapper<Object> resultWrapper = userService.queryUserIDName(queryUserIdNameParameter, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<List<UserIDName>> resultWrapper = userService.queryUserIDName(queryUserIdNameParameter, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
         if (resultWrapper.apiSuccess()) {
-            List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-            if (CollectionUtil.isNullOrEmpty(userIdNameList)) {
+            if (CollectionUtil.isNullOrEmpty(resultWrapper.getData())) {
                 return propertyModelGroupResponse;
             }
-            List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
-            propertyModelGroupResponse.setCreateUserName(newUserIdNameList.get(0).getUserName());
+            propertyModelGroupResponse.setCreateUserName(resultWrapper.getData().get(0).getUserName());
         }
         return propertyModelGroupResponse;
     }
@@ -113,13 +109,11 @@ public class PropertyModelGroupServiceImpl implements PropertyModelGroupService 
         List<PropertyModelGroupResponse> propertyModelGroupResponseList = Lists.newArrayList();
         if (!CollectionUtil.isNullOrEmpty(tbPropertyModelGroupList)) {
             List<Integer> userIdList = tbPropertyModelGroupList.stream().map(TbPropertyModelGroup::getCreateUserID).distinct().collect(Collectors.toList());
-            ResultWrapper<Object> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            ResultWrapper<List<UserIDName>> resultWrapper = userService.queryUserIDName(new QueryUserIDNameParameter(userIdList), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
             if (resultWrapper.apiSuccess()) {
                 // 获取CreateUserID对应的CreateUserName
-                List<Map<String, Object>> userIdNameList = (List<Map<String, Object>>) resultWrapper.getData();
-                if (!CollectionUtil.isNullOrEmpty(userIdNameList)) {
-                    List<UserIDName> newUserIdNameList = CustomizeBeanUtil.toBeanList(userIdNameList, UserIDName.class);
-                    Map<Integer, UserIDName> userIdNameMap = newUserIdNameList.stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
+                if (!CollectionUtil.isNullOrEmpty(resultWrapper.getData())) {
+                    Map<Integer, UserIDName> userIdNameMap = resultWrapper.getData().stream().collect(Collectors.toMap(UserIDName::getUserID, Function.identity()));
                     propertyModelGroupResponseList = CustomizeBeanUtil.copyListProperties(tbPropertyModelGroupList, PropertyModelGroupResponse::new);
                     propertyModelGroupResponseList.forEach(res -> res.setCreateUserName(userIdNameMap.get(res.getCreateUserID()).getUserName()));
                 }
