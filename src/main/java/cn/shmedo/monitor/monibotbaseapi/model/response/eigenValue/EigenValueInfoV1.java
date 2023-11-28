@@ -13,6 +13,8 @@ public class EigenValueInfoV1 extends TbEigenValue {
 
     private String monitorTypeFieldName;
 
+    private String monitorTypeFieldToken;
+
     private String monitorItemName;
 
     private String engUnit;

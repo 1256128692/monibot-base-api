@@ -227,7 +227,8 @@
                du.ChnUnit,
                du.EngUnit,
                mtf.FieldName as monitorTypeFieldName,
-               mi.Name       as MonitorItemName
+               mi.Name       as MonitorItemName,
+               mtf.FieldToken as monitorTypeFieldToken
         from tb_eigen_value ev
                  left join tb_data_unit du on du.ID = ev.UnitID
                  left join tb_monitor_type_field mtf on mtf.ID = ev.MonitorTypeFieldID
@@ -235,6 +236,9 @@
         where ev.ProjectID = #{projectID}
         <if test="monitorItemID != null">
             and ev.monitorItemID = #{monitorItemID}
+        </if>
+        <if test="scope != null">
+            and ev.scope = #{scope}
         </if>
         <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
             and ev.ID in (

@@ -88,7 +88,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     @Transactional
     public Object queryEigenValueList(QueryEigenValueParam pa) {
 
-        List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(), pa.getProjectID(), pa.getMonitorPointIDList());
+        List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(),
+                pa.getProjectID(), pa.getMonitorPointIDList(), pa.getScope());
 
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
