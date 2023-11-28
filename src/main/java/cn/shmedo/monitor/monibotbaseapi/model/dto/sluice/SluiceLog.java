@@ -52,6 +52,7 @@ public class SluiceLog {
     public static final String SOFTWARE = "software";
     public static final String HARDWARE = "hardware";
     public static final String RUNNING_STA = "runningSta";
+    public static final String LOG_LEVEL = "logLevel";
     public static final String MSG = "msg";
 
 

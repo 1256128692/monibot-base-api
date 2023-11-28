@@ -660,8 +660,8 @@
         <where>
             <trim suffixOverrides="AND">
                 <choose>
-                    <when test="param.projectList != null and param.projectList.size() != 0">
-                        <foreach collection="param.projectList" item="item" open="ProjectID IN (" close=") AND" separator=",">
+                    <when test="param.projectIDs != null and param.projectIDs.size() != 0">
+                        <foreach collection="param.projectIDs" item="item" open="ProjectID IN (" close=") AND" separator=",">
                             #{item}
                         </foreach>
                     </when>

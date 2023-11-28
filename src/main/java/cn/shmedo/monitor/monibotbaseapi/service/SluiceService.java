@@ -21,4 +21,8 @@ public interface SluiceService {
     List<GateSimple> listSluiceGate(ListSluiceGateRequest request);
 
     PageUtil.Page<ControlRecord> controlRecordPage(BaseSluiceQuery request);
+
+    ControlRecord singleControlRecord(SingleControlRecordRequest request);
+
+    Long insertSluice(AddControlRecordRequest request);
 }

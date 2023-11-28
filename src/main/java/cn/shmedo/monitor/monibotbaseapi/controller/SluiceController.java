@@ -62,6 +62,60 @@ public class SluiceController {
     }
 
     /**
+     * @api {POST} /QuerySluiceControlRecord 查询水闸控制记录详情
+     * @apiVersion 1.0.0
+     * @apiGroup 闸泵控制模块
+     * @apiName QuerySluiceControlRecord
+     * @apiDescription 查询水闸控制记录详情 (内部调用接口，不允许用户调用)
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Long} id 记录id
+     * @apiSuccess (返回结果) {Int} id 记录id
+     * @apiSuccess (返回结果) {Int} companyID 公司ID
+     * @apiSuccess (返回结果) {Int} projectID 项目id
+     * @apiSuccess (返回结果) {String} projectName 项目名称 (水闸名称)
+     * @apiSuccess (返回结果) {Int} gateID 闸门id (监测传感器id)
+     * @apiSuccess (返回结果) {String} gateName 闸门名称 (监测传感器别名)
+     * @apiSuccess (返回结果) {String} canal 所属渠道
+     * @apiSuccess (返回结果) {String} sluiceType 水闸类型 (进水闸、退水闸、船闸、节制闸、挡潮闸、其他)
+     * @apiSuccess (返回结果) {String} mmUnit 管理单位
+     * @apiSuccess (返回结果) {Int} controlType 控制类型 1远程控制 2手动控制 3现地控制
+     * @apiSuccess (返回结果) {Int} [actionType] 操作类型 0恒定闸位(开合度)、1恒定水位、2总量控制(累计流量)、3时段控制、4时长控制、5远程手动控制（上、下、停）、6自动校准 7恒定流量(瞬时流量)
+     * @apiSuccess (返回结果) {DateTime} operationTime 操作时间 (yyyy-MM-dd HH:mm:ss)
+     * @apiSuccess (返回结果) {Int} operationUserID 操作人id
+     * @apiSuccess (返回结果) {String} operationUser 操作人名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:BaseSluiceControlRecord (不允许用户调用)
+     */
+    @Permission(permissionName = "mdmbase:BaseSluiceControlRecord", allowApplication = true, allowUser = false)
+    @PostMapping(value = "/QuerySluiceControlRecord", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object singleSluiceControlRecord(@Validated @RequestBody SingleControlRecordRequest request) {
+        return service.singleControlRecord(request);
+    }
+
+    /**
+     * @api {POST} /AddSluiceControlRecord 新增水闸控制记录
+     * @apiVersion 1.0.0
+     * @apiGroup 闸泵控制模块
+     * @apiName AddSluiceControlRecord
+     * @apiDescription 新增水闸控制记录 (内部调用接口，不允许用户调用)
+     * @apiParam (请求体) {Int} sid 传感器id
+     * @apiParam (请求体) {DateTime} time 时间 (yyyy-MM-dd HH:mm:ss)
+     * @apiParam (请求体) {Int} [runningSta] 运行状态
+     * @apiParam (请求体) {Int} software   软件模式
+     * @apiParam (请求体) {Int} hardware  硬件模式
+     * @apiParam (请求体) {String} [msg]   消息
+     * @apiParam (请求体) {String} [logLevel]  日志级别
+     * @apiSampleRequest off
+     * @apiSuccess (响应结果) {Int} id 记录id
+     * @apiPermission 项目权限 mdmbase:BaseSluiceControlRecord (不允许用户调用)
+     */
+    @Permission(permissionName = "mdmbase:BaseSluiceControlRecord", allowApplication = true, allowUser = false)
+    @PostMapping(value = "/AddSluiceControlRecord", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object singleSluiceControlRecord(@Validated @RequestBody AddControlRecordRequest request) {
+        return service.insertSluice(request);
+    }
+
+    /**
      * @api {POST} /QuerySluicePage 分页查询水闸列表
      * @apiVersion 1.0.0
      * @apiGroup 闸泵控制模块

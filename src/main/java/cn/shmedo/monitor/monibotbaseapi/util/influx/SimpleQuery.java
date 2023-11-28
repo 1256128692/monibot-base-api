@@ -16,6 +16,9 @@ import org.influxdb.dto.QueryResult;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -263,6 +266,12 @@ public class SimpleQuery {
         }
         if (value instanceof Date date) {
             value = DateUtil.format(date, DatePattern.NORM_DATETIME_PATTERN);
+        } else if (value instanceof LocalDateTime dateTime) {
+            value = dateTime.format(DatePattern.NORM_DATETIME_FORMATTER);
+        } else if (value instanceof LocalDate localDate) {
+            value = localDate.format(DatePattern.NORM_DATE_FORMATTER);
+        } else if (value instanceof LocalTime localTime) {
+            value = localTime.format(DatePattern.NORM_TIME_FORMATTER);
         }
         return "'" + value + "'";
     }
