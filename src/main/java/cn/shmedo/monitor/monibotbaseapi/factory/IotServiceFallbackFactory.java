@@ -3,7 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.factory;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.TokenAndMsgID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
@@ -88,6 +90,16 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
             @Override
             public ResultWrapper<Boolean> transferDevice(TransferDeviceParam param, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<TokenAndMsgID>> batchDispatchCmd(BatchDispatchRequest request) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<DeviceSimple>> queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

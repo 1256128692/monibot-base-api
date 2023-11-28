@@ -1,7 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.TokenAndMsgID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import feign.Headers;
@@ -93,4 +95,21 @@ public interface IotService {
     ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
                                            @Param("appKey") String appKey,
                                            @Param("appSecret") String appSecret);
+
+    /**
+     * 批量下发透传指令
+     *
+     * @param request {@link BatchDispatchRequest}
+     * @return {@link ResultWrapper}
+     */
+    @RequestLine("POST /BatchDispatchCmdCommon")
+    ResultWrapper<List<TokenAndMsgID>> batchDispatchCmd(BatchDispatchRequest request);
+
+    /**
+     * 根据uniqueTokens查询设备的简单信息
+     * @param param {@link QueryDeviceSimpleByUniqueTokensParam}
+     * @return {@code ResultWrapper<List<DeviceSimple>>}
+     */
+    @RequestLine("POST /GetDeviceSimpleByUniqueTokens")
+    ResultWrapper<List<DeviceSimple>> queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam param);
 }
