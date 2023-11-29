@@ -154,75 +154,6 @@ public class MonitorDataController {
         return monitorDataService.queryMonitorPointFilterDataList(pa);
     }
 
-
-    /**
-     * @api {POST} /QueryRainMonitorPointDataList 查询雨量监测点数据列表
-     * @apiVersion 1.0.0
-     * @apiGroup 监测通用数据模块
-     * @apiName QueryRainMonitorPointDataList
-     * @apiDescription 查询雨量监测点数据列表
-     * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
-     * @apiParam (请求体) {DateTime} begin 开始时间
-     * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Int} rainDensityType 密度,(0:2h 1:4h 2:6h 3:12h)
-     * @apiParamExample 请求体示例
-     * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","rainDensityType":"1"}
-     * @apiSuccess (响应结果) {Object[]} data                 结果列表
-     * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
-     * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
-     * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
-     * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {Date} data.time  数据采集时间
-     * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
-     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
-     * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorDataList       传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {Int} data.sensorDataList.sensorID         传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} data.fieldList.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} data.fieldList.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {Object[]} [data.eigenValueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.id 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.scope 使用范围,0:专题分析 1:历史数据
-     * @apiSuccess (响应结果) {String} [data.eigenValueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorTypeFieldID 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} data.eigenValueList.monitorTypeFieldName 属性名称
-     * @apiSuccess (响应结果) {String} data.eigenValueList.name 特征值名称
-     * @apiSuccess (响应结果) {Double} data.eigenValueList.value 数值
-     * @apiSuccess (响应结果) {Int} data.eigenValueList.fieldUnitID 单位ID
-     * @apiSuccess (响应结果) {String} data.eigenValueList.engUnit 单位英文描述
-     * @apiSuccess (响应结果) {String} data.eigenValueList.chnUnit 单位中文描述
-     * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
-     * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
-     * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
-     * @apiSuccess (响应结果) {Int} data.eventList.frequency 频率
-     * @apiSuccess (响应结果) {String} data.eventList.frequencyStr 频率描述
-     * @apiSuccess (响应结果) {String} data.eventList.timeRange 时间范围
-     * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
-     */
-    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
-    @RequestMapping(value = "/QueryRainMonitorPointDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainMonitorPointDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
-    }
-
     /**
      * @api {POST} /AddEigenValueList 批量新增数据特征值
      * @apiVersion 1.0.0
@@ -349,6 +280,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
+     * @apiParam (请求体) {Int} [scope] 数据范围
      * @apiParamExample 请求体示例
      * {"projectID":1}
      * @apiSuccess (响应结果) {Object[]} eigenvalueList 特征值列表
@@ -359,6 +291,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorItemID 监测项目ID
      * @apiSuccess (响应结果) {String} eigenvalueList.monitorItemName 监测项目名称
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorTypeFieldToken 属性标识
      * @apiSuccess (响应结果) {String} [eigenvalueList.monitorTypeFieldName] 属性名称
      * @apiSuccess (响应结果) {String} eigenvalueList.name 特征值
      * @apiSuccess (响应结果) {Double} eigenvalueList.value 数值
@@ -577,4 +510,5 @@ public class MonitorDataController {
     public Object queryMonitorTypeFieldList(@Validated @RequestBody QueryMonitorTypeFieldParam pa) {
         return monitorDataService.queryMonitorTypeFieldList(pa);
     }
+
 }

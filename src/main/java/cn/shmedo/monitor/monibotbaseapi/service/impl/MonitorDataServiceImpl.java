@@ -14,10 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.FrequencyEnum;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
@@ -40,6 +37,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBas
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
+import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,7 +88,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     @Transactional
     public Object queryEigenValueList(QueryEigenValueParam pa) {
 
-        List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(), pa.getProjectID(), pa.getMonitorPointIDList());
+        List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(),
+                pa.getProjectID(), pa.getMonitorPointIDList(), pa.getScope());
 
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
@@ -272,10 +271,11 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
 
+            List<Map<String, Object>> finalSensorDataList = sensorDataList;
             allSensorInfoList.forEach(sensorInfo -> {
-                if (!CollectionUtil.isNullOrEmpty(sensorDataList)) {
+                if (!CollectionUtil.isNullOrEmpty(finalSensorDataList)) {
                     List<Map<String, Object>> result = new LinkedList<>();
-                    sensorDataList.forEach(da -> {
+                    finalSensorDataList.forEach(da -> {
                         if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
                             result.add(da);
                         }
@@ -290,7 +290,14 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                             }
                         });
                     }
-                    sensorInfo.setMultiSensorData(result);
+
+                    if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
+                            pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                    } else {
+                        sensorInfo.setMultiSensorData(result);
+                    }
+
                 }
             });
 
@@ -415,8 +422,13 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                             }
                         });
                     }
+                    if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
+                            pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                    } else {
+                        sensorInfo.setMultiSensorData(result);
+                    }
 
-                    sensorInfo.setMultiSensorData(result);
                     List<Map<String, Object>> multiSensorData = sensorInfo.getMultiSensorData();
                     Map<String, Map<String, Object>> maxData = calculateMaxData(multiSensorData);
                     Map<String, Map<String, Object>> minData = calculateMinData(multiSensorData);
@@ -426,7 +438,6 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     sensorInfo.setMinSensorDataList(minData);
                 }
             });
-
 
 
             monitorPointDataInfoList.forEach(m -> {
@@ -468,6 +479,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
     /**
      * 计算单个传感器 (每个子类型字段) 的最大值,以及对应时间
+     *
      * @param dataList
      * @return
      */
@@ -493,6 +505,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
     /**
      * 计算单个传感器 (每个子类型字段) 的最小值,以及对应时间
+     *
      * @param dataList
      * @return
      */

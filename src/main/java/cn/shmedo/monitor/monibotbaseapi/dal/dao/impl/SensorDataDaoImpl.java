@@ -557,17 +557,17 @@ public class SensorDataDaoImpl implements SensorDataDao {
                 sql = getAllSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
                 break;
             case 2:
+            case 3:
             case 7:
             case 8:
             case 9:
             case 10:
                 sql = getHourSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField, statisticsType, densityType);
                 break;
-            case 3:
             case 4:
             case 5:
             case 6:
-                sql = getDaySensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField, statisticsType, densityType);
+                sql = getDaylySensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
                 break;
         }
         QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
@@ -623,66 +623,26 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
 
     /**
-     * 查询全部传感器的根据小时密度的统计方式
-     * 查询的是tb_data_avg,或者_diff等等,带后缀的特殊表
+     * 查询每日通用的传感器数据,在日统计表的基础上
+     * @return
      */
-    private String getDaySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString,
-                                             String measurement, List<String> selectField, Integer statisticsType,
-                                             Integer densityType) {
-        // 如果是单日的话直接查
-        if (densityType == DisplayDensity.DAY.getValue()) {
-            if (statisticsType == StatisticalMethods.LATEST.getValue()) {
-                StringBuilder selectFieldBuilder = new StringBuilder();
-                selectField.forEach(s -> {
-                    selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
-                    selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
-                });
-                selectFieldBuilder.append(DbConstant.TIME_FIELD);
-                String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                        .collect(Collectors.joining(" or "));
+    private String getDaylySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString, String measurement,
+                                               List<String> selectField) {
 
-                String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
-                        + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                        + "' GROUP BY sid, time(1d) "
-                        + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-                return sidSql;
-            } else {
-                StringBuilder selectFieldBuilder = new StringBuilder();
-                selectField.forEach(s -> {
-                    selectFieldBuilder.append(s).append(",");
-                });
-                selectFieldBuilder.append(DbConstant.SENSOR_ID_TAG).append(",");
-                selectFieldBuilder.append(DbConstant.TIME_FIELD);
-                String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                        .collect(Collectors.joining(" or "));
+        StringBuilder selectFieldBuilder = new StringBuilder();
+        selectField.forEach(s -> {
+            selectFieldBuilder.append(s);
+            selectFieldBuilder.append(",");
+        });
+        selectFieldBuilder.append(DbConstant.TIME_FIELD);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
 
-                String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
-                        + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                        + "' GROUP BY sid, time(1d) order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-                return sidSql;
-            }
-        } else {
-            StringBuilder selectFieldBuilder = new StringBuilder();
-            selectField.forEach(s -> {
-                if (statisticsType == StatisticalMethods.CHANGE.getValue()) {
-                    selectFieldBuilder.append("sum(").append(s).append(")");
-                    selectFieldBuilder.append(" as ").append(s).append(",");
-                } else {
-                    selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
-                    selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
-                }
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        return sidSql;
 
-            });
-            selectFieldBuilder.append(DbConstant.TIME_FIELD);
-            String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
-                    .collect(Collectors.joining(" or "));
-
-            String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
-                    + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                    + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
-                    + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-            return sidSql;
-        }
     }
 
 

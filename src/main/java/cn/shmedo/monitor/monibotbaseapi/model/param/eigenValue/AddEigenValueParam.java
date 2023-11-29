@@ -107,10 +107,13 @@ public class AddEigenValueParam  implements ParameterValidator, ResourcePermissi
         }
 
         // 重复名称校验
+        // 专题分析的话不校验重名
         TbEigenValueMapper tbEigenValueMapper = ContextHolder.getBean(TbEigenValueMapper.class);
-        Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndName(projectID, monitorItemID, monitorTypeFieldID, name);
-        if (count > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测子类型的特征值名称已存在");
+        if (scope == ScopeType.HISTORICAL_DATA.getCode()) {
+            Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndName(projectID, monitorItemID, monitorTypeFieldID, name);
+            if (count > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测子类型的特征值名称已存在");
+            }
         }
 
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
