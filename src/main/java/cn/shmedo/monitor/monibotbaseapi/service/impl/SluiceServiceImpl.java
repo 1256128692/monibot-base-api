@@ -127,7 +127,6 @@ public class SluiceServiceImpl implements SluiceService {
         BatchPoints batchPoints = BatchPoints.database(config.getInfluxDatabase()).build();
         request.getSensorIDList().forEach(item -> {
             Point.Builder builder = Point.measurement(SluiceLog.TABLE);
-            builder.addField(DbConstant.SENSOR_ID_TAG, item);
             builder.addField(DbConstant.TIME_FIELD, request.getTime().format(DatePattern.NORM_DATETIME_FORMATTER));
             builder.addField(SluiceLog.USER_ID, request.getUserID());
             Optional.ofNullable(request.getRunningSta()).ifPresent(e -> builder.addField(SluiceLog.RUNNING_STA, e));
@@ -135,7 +134,7 @@ public class SluiceServiceImpl implements SluiceService {
             Optional.ofNullable(request.getHardware()).ifPresent(e -> builder.addField(SluiceLog.HARDWARE, e));
             Optional.ofNullable(request.getMsg()).ifPresent(e -> builder.addField(SluiceLog.MSG, e));
             Optional.ofNullable(request.getLogLevel()).ifPresent(e -> builder.addField(SluiceLog.LOG_LEVEL, e));
-            batchPoints.point(builder.build());
+            batchPoints.point(builder.tag(DbConstant.SENSOR_ID_TAG, item.toString()).build());
         });
         influxDb.write(batchPoints);
         return request.getSensorIDList().stream().map(e -> Long.parseLong(request.getTime()
@@ -434,7 +433,6 @@ public class SluiceServiceImpl implements SluiceService {
                         gate.setAlias(e.getAlias());
                         gate.setControlType(ControlType.formDeviceCode(status.getHardware()));
                         gate.setOpenStatus(status.getGateSta());
-                        gate.setPowerStatus(status.getMotorSta());
                         gate.setOpenDegree(status.getGateOpen());
                         gate.setMaxOpenDegree(status.getGateOpenMax());
                         gate.setPowerCurrent(status.getGateCurrent());
