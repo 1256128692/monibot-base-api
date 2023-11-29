@@ -713,10 +713,12 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {DateTime} endTime 结束时间
      * @apiParam (请求体) {Int} autoSensorID 自动传感器ID
      * @apiParam (请求体) {Int} manualSensorID 手动传感器ID
+     * @apiParam (请求体) {Int} intervalType 分析间隔类型 1.分钟 2.小时
+     * @apiParam (请求体) {Double} intervalValue 分析间隔值。分析间隔值只能精确到毫秒，即:<br>intervalType==1，小数点后4位有效;<br>intervalType==2，小数点后6位有效
      * @apiSuccess (返回结果) {Int} autoCount 自动化记录数
      * @apiSuccess (返回结果) {Int} manualCount 人工记录数
      * @apiSuccess (返回结果) {Int} abnormalCount 异常自动化记录数
-     * @apiSuccess (返回结果) {Double} abnormalRatio 误差率
+     * @apiSuccess (返回结果) {Double} abnormalRatio 误差率（%）,为-1时表示‘人工数据0组，无法判断人工数据误差比率’
      * @apiSuccess (返回结果) {Object[]} dataList 人工数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.autoTime 自动化数据时间
      * @apiSuccess (返回结果) {DateTime} dataList.manualTime 人工数据时间

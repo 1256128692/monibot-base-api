@@ -223,7 +223,7 @@ public class DefaultConstant {
     }
 
     /**
-     * 专题分析里数据源的fieldToken
+     * 专题分析 fieldToken
      */
     public interface ThematicFieldToken {
         /**
@@ -280,7 +280,7 @@ public class DefaultConstant {
     }
 
     /**
-     * 专题分析里预定义的一些特征值名称
+     * 专题分析 预定义的一些特征值名称
      */
     public interface ThematicEigenValueName {
         String CRITICAL_WETTING_LINE = "临界浸润线";
@@ -292,7 +292,20 @@ public class DefaultConstant {
         String END_FLOOD_DISTANCE = "汛末控制水位";
     }
 
+    /**
+     * 专题分析 一些提示的格式
+     */
     public interface ThematicExcelExceptionDesc {
         String FIELD_ERROR = "解析序号为:{}的{}失败!";
+    }
+
+    /**
+     * 专题分析 误差范围配置<br>
+     * group - mistakeConfig<br>
+     * key - 监测类型<br>
+     * value :[{fieldToken1:xxx}]
+     */
+    public interface ThematicMistakeConfig {
+        String GROUP = "mistakeConfig";
     }
 }

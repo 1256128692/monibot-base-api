@@ -273,12 +273,12 @@ public class SensorController {
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} [templateID] 监测类型模板ID, 仅当dataSourceComposeType为100时不需要
-     * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API 推送
+     * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API推送<br/>      500人工传感器
      * @apiParam (请求体) {Object[]} [dataSourceList] 数据源列表, 仅当dataSourceComposeType为100时不需要
      * @apiParam (请求体) {Int} dataSourceList.dataSourceType 数据源类型 1-物联网传感器 2-监测传感器
-     * @apiParam (请求体) {String} dataSourceList.templateDataSourceToken 模板数据源标识
-     * @apiParam (请求体) {String} dataSourceList.sensorName (监测/物联网)传感器名称
-     * @apiParam (请求体) {String} dataSourceList.uniqueToken 设备传感器标识 数据源类型为1时必填
+     * @apiParam (请求体) {String} [dataSourceList.templateDataSourceToken] 模板数据源标识；人工传感器不填该项
+     * @apiParam (请求体) {String} [dataSourceList.sensorName] (监测/物联网)传感器名称；人工传感器不填该项
+     * @apiParam (请求体) {String} [dataSourceList.uniqueToken] 设备传感器标识 数据源类型为1时必填；人工传感器不填该项
      * @apiParam (请求体) {String} dataSourceList.exValues 数据源拓展信息
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID

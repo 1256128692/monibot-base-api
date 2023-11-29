@@ -9,6 +9,9 @@ import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONException;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.poi.excel.ExcelReader;
 import cn.hutool.poi.excel.ExcelUtil;
@@ -59,6 +62,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicFieldToken.*;
 import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicEigenValueName.*;
@@ -558,9 +562,73 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public CompareAnalysisDataInfo queryCompareAnalysisData(QueryCompareAnalysisDataParam param) {
-//        sensorDataDao.querySensorData()
-        //TODO
-        return null;
+        CompareAnalysisDataInfo.CompareAnalysisDataInfoBuilder builder = CompareAnalysisDataInfo.builder();
+
+        // 分析间隔 millisecond
+        Long interval = param.getInterval();
+        String fieldToken = param.getFieldToken();
+        MonitorTypeFieldV2 field = param.getMonitorTypeField();
+        FieldDataType fieldDataType = param.getFieldDataType();
+        Integer autoSensorID = param.getAutoSensorID();
+        Integer manualSensorID = param.getManualSensorID();
+        Integer monitorType = param.getMonitorType();
+
+        // 误差值
+        List<TbProjectConfig> tbProjectConfigList = tbProjectConfigMapper.selectList(new LambdaQueryWrapper<TbProjectConfig>()
+                .eq(TbProjectConfig::getProjectID, param.getProjectID()).eq(TbProjectConfig::getKey, monitorType)
+                .eq(TbProjectConfig::getGroup, DefaultConstant.ThematicMistakeConfig.GROUP));
+        Double mistakeValue = Optional.of(tbProjectConfigList).filter(CollUtil::isNotEmpty).map(u -> u.get(0))
+                .map(TbProjectConfig::getValue).map(u -> {
+                    try {
+                        JSONArray array = JSONUtil.parseArray(u);
+                        return array.stream().map(JSONUtil::parseObj).toList();
+                    } catch (JSONException e) {
+                        log.error("解析json array失败,json array:{}", u);
+                        return List.of();
+                    }
+                }).filter(CollUtil::isNotEmpty).map(u -> u.stream().filter(w ->
+                        ((JSONObject) w).containsKey(fieldToken)).findAny().map(w -> ((JSONObject) w).get(fieldToken)))
+                .map(Convert::toDouble).orElse(null);
+
+        List<Map<String, Object>> dataList = sensorDataDao.querySensorData(param.getSensorIDList(), param.getStartTime(), param.getEndTime(), null, param.getFieldSelectInfoList(), false, monitorType, null);
+        Map<Integer, Map<Long, Map<String, Object>>> collect = dataList.stream().filter(u -> u.containsKey(fieldToken))
+                .collect(Collectors.groupingBy(u -> Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN)),
+                        Collectors.toMap(w -> Convert.toDate(w.get(DbConstant.TIME_FIELD)).getTime(), Function.identity())));
+        builder.autoCount(Optional.of(autoSensorID).map(collect::get).map(Map::values)
+                .map(Collection::stream).map(Stream::count).orElse(0L).intValue());
+        builder.manualCount(Optional.of(manualSensorID).map(collect::get).map(Map::values)
+                .map(Collection::stream).map(Stream::count).orElse(0L).intValue());
+
+        // 自动化数据,目前tuple中的{@code Object}仅可以取{@code Double}和{@code Long}
+        Map<Long, Tuple<Date, Object>> autoDataMap = Optional.of(autoSensorID).map(collect::get).map(u ->
+                u.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, w -> {
+                    Map<String, Object> val = w.getValue();
+                    return new Tuple<>(Convert.toDate(val.get(DbConstant.TIME_FIELD)), fieldDataType.parseData(val.get(fieldToken)));
+                }))).orElse(Map.of());
+        List<Long> autoDataTimestampList = autoDataMap.keySet().stream().sorted().toList();
+        List<CompareAnalysisData> compareAnalysisDataList = Optional.ofNullable(collect.get(manualSensorID)).map(u -> {
+            List<CompareAnalysisData> list = u.entrySet().stream().sorted(Comparator.comparingLong(Map.Entry::getKey))
+                    .map(w -> {
+                        Double manualData = Convert.toDouble(fieldDataType.parseData(w.getValue().get(fieldToken)));
+                        CompareAnalysisData.CompareAnalysisDataBuilder dataBuilder = CompareAnalysisData.builder()
+                                .manualTime(Convert.toDate(w.getValue().get(DbConstant.TIME_FIELD))).manualData(manualData)
+                                .chnUnit(field.getChnUnit()).engUnit(field.getEngUnit()).normal(true);
+
+                        Tuple<Date, Object> closeAutoData = findCloseData(w.getKey(), interval, autoDataTimestampList, autoDataMap);
+                        Optional.ofNullable(closeAutoData).ifPresent(s -> {
+                            Double autoData = Convert.toDouble(s.getItem2());
+                            dataBuilder.autoTime(s.getItem1()).autoData(autoData);
+                            Optional.ofNullable(mistakeValue).map(n -> n * 2).filter(n -> Math.abs(manualData - autoData) > n)
+                                    .ifPresent(n -> dataBuilder.normal(false).abnormalValue(Math.abs(manualData - autoData) - n));
+                        });
+                        return dataBuilder.build();
+                    }).toList();
+            long abnormalCount = list.stream().filter(w -> !w.getNormal()).count();
+            builder.abnormalCount(Convert.toInt(abnormalCount));
+            builder.abnormalRatio(list.size() == 0 ? -1 : Convert.toDouble(abnormalCount / list.size()) * 100);
+            return list;
+        }).orElse(List.of());
+        return builder.dataList(compareAnalysisDataList).build();
     }
 
     /**
@@ -1064,5 +1132,44 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             default -> res = "";
         }
         return res;
+    }
+
+    /**
+     * 查询该时间戳的最近数据
+     *
+     * @param source        时间戳
+     * @param interval      时间间隔(ms)，超过这个时间间隔的数据都将被忽略
+     * @param timestampList 目标数据的时间戳列表(已排序)
+     * @param dataMap       key-数据时间戳,value-目标数据(目前value中的{@code object}数据仅可以取{@code Double}和{@code Long}类型的数据)
+     * @return 有两种情况会返回{@code null}，一种是自动化数据为空，另一种是超出时间间隔{@code interval}的限制了
+     */
+    private @Nullable Tuple<Date, Object> findCloseData(long source, long interval, final List<Long> timestampList,
+                                                        final Map<Long, Tuple<Date, Object>> dataMap) {
+        if (CollUtil.isEmpty(timestampList)) {
+            return null;
+        }
+        Long first = timestampList.get(0);
+        if (first > source) {
+            return source + interval >= first ? dataMap.get(first) : null;
+        }
+        Long last = timestampList.get(timestampList.size() - 1);
+        if (last < source) {
+            return source - interval <= last ? dataMap.get(last) : null;
+        }
+        for (int i = 0; i < timestampList.size() - 1; i++) {
+            Long left = timestampList.get(i);
+            Long right = timestampList.get(i + 1);
+            if (left <= source && right >= source) {
+                // 是否取了left
+                boolean getLeft = source - left <= right - source;
+                if (!((!getLeft || source - interval <= left) && (getLeft || source + interval >= right))) {
+                    return null;
+                }
+                return getLeft && source - interval <= left ? dataMap.get(left) : dataMap.get(right);
+            }
+        }
+
+        // unnecessary return
+        return null;
     }
 }
