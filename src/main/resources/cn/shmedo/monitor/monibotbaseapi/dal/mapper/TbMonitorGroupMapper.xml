@@ -17,6 +17,17 @@
         <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
     </resultMap>
+    <resultMap id="BaseGroupPointResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointBaseInfo">
+        <id column="monitorGroupID" jdbcType="INTEGER" property="monitorGroupID"/>
+        <result column="monitorGroupName" jdbcType="VARCHAR" property="monitorGroupName"/>
+        <collection property="monitorPointList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointItemBaseInfo">
+            <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+            <id column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+            <id column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+            <id column="monitorItemName" jdbcType="VARCHAR" property="monitorItemName"/>
+            <id column="monitorItemAlias" jdbcType="VARCHAR" property="monitorItemAlias"/>
+        </collection>
+    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -331,5 +342,41 @@
             tmg.ID = #{monitorGroupID}
           AND tmp.MonitorType = #{monitorType}
           AND IF(twt.ID IS NOT NULL,TRUE,TRIM( BOTH '"' FROM JSON_EXTRACT( twt.CompareRule, "$.upperName" ) ) = #{upperName})
+    </select>
+
+    <select id="selectGroupInfoByItemIDs"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorGroupBaseInfoV1">
+        SELECT ID AS groupID, ParentID AS parentID, Name AS groupName, Enable AS enable
+        FROM tb_monitor_group
+        WHERE ID IN (
+        SELECT DISTINCT MonitorGroupID
+        FROM tb_monitor_group_item
+        WHERE MonitorItemID IN
+        <foreach collection="monitorItemIDList" item="ItemID" open="(" close=")" separator=",">
+            #{ItemID}
+        </foreach>
+        )
+        or ParentID in (SELECT DISTINCT MonitorGroupID
+        FROM tb_monitor_group_item
+        WHERE MonitorItemID IN
+        <foreach collection="monitorItemIDList" item="ItemID" open="(" close=")" separator=",">
+            #{ItemID}
+        </foreach>)
+    </select>
+    <select id="queryMonitorTypeGroupPoint" resultMap="BaseGroupPointResultMap"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointBaseInfo">
+        SELECT
+            mg.`ID` monitorGroupID,
+            mg.`Name` monitorGroupName,
+            mp.`ID` monitorPointID,
+            mp.`Name` monitorPointName,
+            mi.`ID` monitorItemID,
+            mi.`Name` monitorItemName,
+            mi.`Alias` monitorItemAlias
+        FROM tb_monitor_group mg
+            LEFT JOIN tb_monitor_group_point mgp ON mgp.MonitorGroupID = mg.ID
+            LEFT JOIN tb_monitor_point mp ON mgp.MonitorPointID = mp.ID
+            LEFT JOIN tb_monitor_item mi ON mp.MonitorItemID = mi.ID
+        WHERE mp.MonitorType =#{monitorType} AND mp.ProjectID=#{projectID}
     </select>
 </mapper>

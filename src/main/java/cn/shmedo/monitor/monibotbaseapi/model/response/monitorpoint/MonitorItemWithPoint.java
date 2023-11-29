@@ -19,4 +19,6 @@ public class MonitorItemWithPoint {
     private String monitorTypeName;
     private String monitorTypeAlias;
     private List<TbMonitorPoint> monitorPointList;
+
+    private List<MonitorTypeFieldBaseInfo> monitorTypeFieldList;
 }

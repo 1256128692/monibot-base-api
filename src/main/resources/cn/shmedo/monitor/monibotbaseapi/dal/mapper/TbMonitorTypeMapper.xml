@@ -263,4 +263,23 @@
   <select id="queryByType" resultMap="BaseResultMap">
     select * from tb_monitor_type where MonitorType = #{type}
     </select>
+
+  <select id="selectByMonitorTypeList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1">
+      select monitorType, typeName, exValues
+      from tb_monitor_type
+      where 1 = 1
+      <if test="monitorTypeList != null">
+          and monitorType in
+          <foreach collection="monitorTypeList" item="monitorType" separator="," index="index" open="(" close=")">
+              #{monitorType}
+          </foreach>
+      </if>
+  </select>
+
+  <select id="selectAllMonitorTypeBaseInfoV1"
+          resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1">
+      select monitorType, typeName, exValues
+      from tb_monitor_type
+  </select>
 </mapper>

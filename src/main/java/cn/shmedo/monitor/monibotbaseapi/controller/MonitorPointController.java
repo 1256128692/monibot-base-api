@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
@@ -276,6 +277,14 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Bool} list.monitorPointList.enable 是否启用
      * @apiSuccess (返回结果) {String} [list.monitorPointList.exValues] 拓展字段
      * @apiSuccess (返回结果) {Int} [list.monitorPointList.displayOrder] 排序字段
+     * @apiSuccess (返回结果) {Object[]} list.monitorTypeFieldList 监测点列表
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.monitorTypeFieldID 监测子类型ID
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldToken 类型token
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldName 类型名称
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.fieldUnitID 监测子类型ID
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.engUnit 英文单位标识
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.chnUnit 中文单位标识
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
@@ -351,7 +360,7 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorGroupPointList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorGroupPointList(@Validated @RequestBody QueryMonitorGroupPointParam pa) {
+        return monitorPointService.queryMonitorGroupPointList(pa);
     }
 }

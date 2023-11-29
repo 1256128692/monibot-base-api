@@ -1,11 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.config;
 
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
 public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
+    public static final String CONTENT_DISPOSITION_HEADER = "Content-disposition";
 
     public static final String COLON = ":";
 
@@ -221,5 +224,92 @@ public class DefaultConstant {
          * 设备不支持语音对讲
          */
         String NO_ASSOCIATED_TALK_CHANNEL = "0x0283003f";
+    }
+
+    /**
+     * 专题分析 fieldToken
+     */
+    public interface ThematicFieldToken {
+        /**
+         * 管内水位高程
+         */
+        String LEVEL_ELEVATION = "levelElevation";
+        /**
+         * 空管距离
+         */
+        String EMPTY_PIPE_DISTANCE = "emptyPipedistance";
+        /**
+         * 水位
+         */
+        String DISTANCE = "distance";
+
+        /**
+         * 根据{@code density}获取降雨量token
+         */
+        static String getRainFallToken(final DisplayDensity density) {
+            switch (density) {
+                case ALL, HOUR, TWO_HOUR, FOUR_HOUR, SIX_HOUR, TWELVE_HOUR -> {
+                    return PERIOD_RAINFALL;
+                }
+                default -> {
+                    return DAILY_RAINFALL;
+                }
+            }
+        }
+
+        /**
+         * 雨量-降雨量
+         */
+        String RAINFALL = "rainfall";
+        /**
+         * 降雨量-时段雨量
+         */
+        String PERIOD_RAINFALL = "periodRainfall";
+        /**
+         * 降雨量-日降雨量
+         */
+        String DAILY_RAINFALL = "dailyRainfall";
+        /**
+         * 流量
+         */
+        String VOLUME_FLOW = "volumeFlow";
+        /**
+         * 干滩长度
+         */
+        String DRY_BEACH = "dryBeach";
+        /**
+         * 坡度比
+         */
+        String SLOPE_RATIO = "slopeRratio";
+    }
+
+    /**
+     * 专题分析 预定义的一些特征值名称
+     */
+    public interface ThematicEigenValueName {
+        String CRITICAL_WETTING_LINE = "临界浸润线";
+        String CONTROL_WETTING_LINE = "控制浸润线";
+        String MIN_DRY_BEACH = "最小干滩长度";
+        String DESIGN_FLOOD_DISTANCE = "设计洪水位";
+        String START_FLOOD_DISTANCE = "调洪起始洪水位";
+        String BEACH_TOP_ELEVATION = "滩顶高程";
+        String END_FLOOD_DISTANCE = "汛末控制水位";
+    }
+
+    /**
+     * 专题分析 一些提示的格式
+     */
+    public interface ThematicExcelExceptionDesc {
+        String FIELD_ERROR = "解析序号为:{}的{}失败!";
+    }
+
+    /**
+     * 专题分析 误差范围配置<br>
+     * group - mistakeConfig<br>
+     * key - 监测类型<br>
+     * value :[{fieldToken1:xxx}]
+     */
+    public interface ThematicMistakeConfig {
+        String GROUP = "mistakeConfig";
     }
 }

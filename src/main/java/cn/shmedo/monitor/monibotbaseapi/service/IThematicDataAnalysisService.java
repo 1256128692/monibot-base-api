@@ -1,16 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryDmDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryStDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.DmThematicAnalysisPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.StThematicAnalysisInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicMonitorPointInfo;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -30,4 +29,28 @@ public interface IThematicDataAnalysisService {
     List<Date> queryDmPageDataList(QueryDmDataParam param);
 
     List<ThematicMonitorPointInfo> queryThematicMonitorPointByProjectID(Integer projectID);
+
+    List<ThematicGroupPointListInfo> queryThematicGroupPointList(QueryThematicGroupPointListParam param);
+
+    List<ThematicQueryTransverseInfo> queryTransverseList(QueryTransverseListParam param);
+
+    WetLineConfigInfo queryWetLineConfig(QueryWetLineConfigParam param);
+
+    List<Map<String, Object>> queryLongitudinalList(QueryLongitudinalListParam param);
+
+    ThematicRainWaterAnalysisInfo queryRainWaterData(QueryRainWaterDataParam param);
+
+    PageUtil.Page<ThematicRainWaterDataInfo> queryRainWaterPageData(QueryRainWaterDataPageParam param);
+
+    List<ThematicDryBeachInfo> queryDryBeachDataList(QueryDryBeachDataListParam param);
+
+    DryBeachDataInfo queryDryBeachData(QueryDryBeachDataParam param);
+
+    void addManualDataBatch(AddManualDataBatchParam param);
+
+    void getImportManualTemplate(GetImportManualTemplateParam param, HttpServletResponse response);
+
+    ResultWrapper<Object> importManualDataBatch(Integer projectID, Integer monitorType, MultipartFile file);
+
+    CompareAnalysisDataInfo queryCompareAnalysisData(QueryCompareAnalysisDataParam param);
 }

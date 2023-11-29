@@ -23,4 +23,6 @@ public class MonitorItemBaseInfo {
 
     private Boolean enable;
 
+    private Integer eventID;
+
 }

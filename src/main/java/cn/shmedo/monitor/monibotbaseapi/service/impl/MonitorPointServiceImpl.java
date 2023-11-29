@@ -1,16 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorGroupBaseInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -21,9 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -38,6 +42,9 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     private TbMonitorPointMapper tbMonitorPointMapper;
     private TbSensorMapper tbSensorMapper;
     private TbMonitorItemMapper tbMonitorItemMapper;
+    private TbMonitorGroupMapper tbMonitorGroupMapper;
+    private TbMonitorGroupItemMapper tbMonitorGroupItemMapper;
+    private TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     @Override
     public void addMonitorPoint(AddMonitorPointParam pa, Integer userID) {
         TbMonitorPoint temp = Param2DBEntityUtil.fromAddMonitorPointParam2TbMonitorPoint(pa, userID);
@@ -102,8 +109,13 @@ public class MonitorPointServiceImpl implements MonitorPointService {
                             .orderByDesc("id")
             );
             Map<Integer, List<TbMonitorPoint>> map = temp.stream().collect(Collectors.groupingBy(TbMonitorPoint::getMonitorItemID));
+
+            List<MonitorTypeFieldBaseInfo> allMonitorTypeFieldList = tbMonitorTypeFieldMapper.selectListByMonitorItemIDList(list.stream().map(MonitorItemWithPoint::getMonitorItemID).collect(Collectors.toList()));
             list.forEach(item ->{
                 item.setMonitorPointList(map.get(item.getMonitorItemID()));
+                if (!CollectionUtil.isNullOrEmpty(allMonitorTypeFieldList)) {
+                    item.setMonitorTypeFieldList(allMonitorTypeFieldList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+                }
             });
         }
         return list;
@@ -120,4 +132,47 @@ public class MonitorPointServiceImpl implements MonitorPointService {
         tbMonitorPointMapper.updateBatch(pa.updateBatch(userID), pa.getSelectUpdate());
 
     }
+
+    @Override
+    public List<MonitorPointAllInfoV1> queryMonitorGroupPointList(QueryMonitorGroupPointParam pa) {
+        List<MonitorPointAllInfoV1> list = tbMonitorItemMapper.queryListByProjectIDAndMonitorItemID(pa.getProjectID(), pa.getMonitorItemID());
+
+        if (!CollectionUtil.isNullOrEmpty(list)) {
+            List<Integer> monitorItemIDList = list.stream().map(MonitorPointAllInfoV1::getMonitorItemID).collect(Collectors.toList());
+
+            List<MonitorGroupBaseInfoV1> allGroups = tbMonitorGroupMapper.selectGroupInfoByItemIDs(monitorItemIDList);
+            List<MonitorPointBaseInfoV1> monitorPointList = tbMonitorPointMapper.selectPointListByMonitorItemIDList(monitorItemIDList);
+            Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap = new HashMap<>();
+            // 将组别按照parentID分组
+            allGroups.add(new MonitorGroupBaseInfoV1(-1,null,"未分配组",true,null));
+            for (MonitorGroupBaseInfoV1 group : allGroups) {
+                groupMap.computeIfAbsent(group.getParentID(), k -> new ArrayList<>()).add(group);
+            }
+            monitorPointList.forEach(m -> {
+                if (m.getGroupID() == null) {
+                    m.setGroupID(-1);
+                }
+            });
+            // 构建组别树结构
+            for (MonitorPointAllInfoV1 item : list) {
+                item.setMonitorGroupList(buildGroupTree(groupMap, null));
+                item.setMonitorPointList(monitorPointList.stream().filter(m -> m.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+            }
+        }
+
+        return list;
+    }
+
+    private List<MonitorGroupBaseInfoV1> buildGroupTree(Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap, Integer parentID) {
+        List<MonitorGroupBaseInfoV1> result = groupMap.get(parentID);
+        if (result != null) {
+            for (MonitorGroupBaseInfoV1 group : result) {
+                group.setChildGroupList(buildGroupTree(groupMap, group.getGroupID()));
+            }
+        }
+        return result;
+    }
+
+
 }
+

@@ -4,17 +4,13 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
-import cn.hutool.core.util.ByteUtil;
 import cn.hutool.core.util.ObjUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.monitor.enums.CalType;
-import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
-import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
-import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
+import cn.shmedo.iot.entity.api.monitor.enums.*;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
@@ -29,6 +25,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorKindEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
@@ -136,6 +133,20 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     }
 
+    @SuppressWarnings("DuplicatedCode")
+    @Override
+    public List<DataSourceCatalogResponse> manualDataSource(DataSourceCatalogRequest request) {
+        return monitorTypeTemplateMapper.dataSourceCatalog(request).stream().filter(e -> {
+            //过滤掉配置不全的模板
+            if (CalType.FORMULA.getCode() == e.getCalType()) {
+                return ObjUtil.equals(e.getFieldCount(), e.getFormulaCount());
+            } else if (CalType.SCRIPT.getCode() == e.getCalType()) {
+                return ObjUtil.equals(e.getFieldCount(), e.getScriptCount());
+            }
+            return true;
+        }).toList();
+    }
+
     @Override
     public List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request) {
         LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = Wrappers.lambdaQuery(TbMonitorTypeTemplate.class)
@@ -160,6 +171,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Transactional(rollbackFor = Exception.class)
     public IdRecord addSensor(SaveSensorRequest request) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
+        boolean isManual = request.getManual();
+        // 中台传感器名称
+        String mdmbaseSensorName = genSensorName(request.getMonitorType(), request.getProjectID());
+
         //传感器
         TbSensor sensor = new TbSensor();
         sensor.setProjectID(request.getProjectID());
@@ -167,9 +182,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setDataSourceID(UUID.randomUUID().toString());
         sensor.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
         sensor.setMonitorType(request.getMonitorType());
-        sensor.setName(genSensorName(request.getMonitorType(), request.getProjectID()));
+        sensor.setName(mdmbaseSensorName);
         sensor.setAlias(StrUtil.isBlank(request.getAlias()) ? sensor.getName() : request.getAlias());
-        sensor.setKind(ByteUtil.intToByte(3));
+        sensor.setKind(isManual ? SensorKindEnum.MANUAL_KIND.getCode() : SensorKindEnum.AUTO_KIND.getCode());
         sensor.setConfigFieldValue(request.getConfigFieldValue());
         sensor.setDisplayOrder(0);
         sensor.setCreateUserID(subject.getSubjectID());
@@ -185,9 +200,17 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 TbSensorDataSource dataSource = new TbSensorDataSource();
                 dataSource.setDataSourceID(sensor.getDataSourceID());
                 dataSource.setDataSourceType(source.getDataSourceType().getCode());
-                dataSource.setTemplateDataSourceToken(source.getTemplateDataSourceToken());
-                dataSource.setDataSourceToken(DataSourceType.IOT_SENSOR.equals(source.getDataSourceType()) ?
-                        source.getUniqueToken() + StrUtil.AT + source.getSensorName() : source.getSensorName());
+                // 如果是人工：
+                // - {@code templateDataSourceToken}不允许用户选择，直接使用manual_2_a；
+                // - {@code dataSourceToken}需要等于中台传感器名称（即{@code mdmbaseSensorName}），因为人工传感器没有对应的物联网平台传感器
+                dataSource.setTemplateDataSourceToken(isManual ? "manual_2_a" : source.getTemplateDataSourceToken());
+                String dataSourceToken;
+                if (DataSourceType.IOT_SENSOR.equals(source.getDataSourceType())) {
+                    dataSourceToken = isManual ? mdmbaseSensorName : source.getUniqueToken() + StrUtil.AT + source.getSensorName();
+                } else {
+                    dataSourceToken = source.getSensorName();
+                }
+                dataSource.setDataSourceToken(dataSourceToken);
                 dataSource.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
                 dataSource.setExValues(source.getExValues());
                 return dataSource;
@@ -229,10 +252,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Dict exConfig = JSONUtil.isTypeJSON(response.getConfigFieldValue()) ?
                 JSONUtil.toBean(response.getConfigFieldValue(), Dict.class) : Dict.create();
         response.setExFields(typeFields.stream().map(e -> {
-                    SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
-                    exField.setValue(exConfig.getStr(e.getFieldToken()));
-                    return exField;
-                }).toList());
+            SensorInfoResponse.ExField exField = SensorInfoResponse.ExField.valueOf(e);
+            exField.setValue(exConfig.getStr(e.getFieldToken()));
+            return exField;
+        }).toList());
         //参数
         Map<Integer, Map<String, TbParameter>> paramMap = parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
                 .or(wrapper -> wrapper
@@ -295,7 +318,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
                     .eq(TbSensor::getAlias, request.getAlias())
                     .ne(TbSensor::getProjectID, request.getProjectID()));
-            Assert.isTrue( count == null || count == 0, "名称已存在");
+            Assert.isTrue(count == null || count == 0, "名称已存在");
             request.getSensor().setAlias(request.getAlias());
         }
         request.getSensor().setUpdateUserID(subject.getSubjectID());
@@ -306,8 +329,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             parameterMapper.replaceBatch(request.getParamList());
             monitorRedisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + ParameterSubjectType.SENSOR.getCode(),
                     parameterMapper.selectList(new LambdaQueryWrapper<TbParameter>()
-                            .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
-                            .eq(TbParameter::getSubjectID, request.getSensor().getID()))
+                                    .eq(TbParameter::getSubjectType, ParameterSubjectType.SENSOR.getCode())
+                                    .eq(TbParameter::getSubjectID, request.getSensor().getID()))
                             .stream().collect(Collectors.groupingBy(TbParameter::getSubjectID)));
         }
         return new IdRecord(request.getSensor().getID());
@@ -376,7 +399,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     });
                 }
                 case HISTORY -> {
-                    return entry.getValue().stream().map( e-> Param.valueOf(request.getMonitorTypeCache(),e ));
+                    return entry.getValue().stream().map(e -> Param.valueOf(request.getMonitorTypeCache(), e));
                 }
                 default -> {
                     //TODO SELF、MON 待实现
@@ -459,6 +482,14 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         return temp.stream().collect(Collectors.groupingBy(Tuple::getItem1, Collectors.mapping(Tuple::getItem2, Collectors.toList())));
     }
 
+    @Override
+    public List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param) {
+        return this.baseMapper.selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getMonitorType, param.getMonitorType())
+                .eq(TbSensor::getProjectID, param.getProjectID()).eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
+                .select(TbSensor::getID, TbSensor::getName, TbSensor::getAlias)).stream().map(u ->
+                SensorNameResponse.builder().sensorID(u.getID()).sensorName(u.getName()).sensorAlias(u.getAlias()).build()).toList();
+    }
+
     /**
      * 根据物联网传感器类型获取设备和传感器信息
      *
@@ -488,18 +519,18 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             if (wrapper.apiSuccess()) {
                 List<DeviceWithSensor> data = wrapper.getData();
                 data.forEach(item -> {
-                   item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
-                           .forEach((iotSensorType, list) -> {
-                       DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
-                       temp.setSensorList(list);
-                       if (iotMap.containsKey(iotSensorType)) {
-                           List<DeviceWithSensor> val = iotMap.get(iotSensorType);
-                           val.add(temp);
-                           iotMap.put(iotSensorType, val);
-                       } else {
-                           iotMap.put(iotSensorType, CollUtil.newArrayList(temp));
-                       }
-                   });
+                    item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
+                            .forEach((iotSensorType, list) -> {
+                                DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
+                                temp.setSensorList(list);
+                                if (iotMap.containsKey(iotSensorType)) {
+                                    List<DeviceWithSensor> val = iotMap.get(iotSensorType);
+                                    val.add(temp);
+                                    iotMap.put(iotSensorType, val);
+                                } else {
+                                    iotMap.put(iotSensorType, CollUtil.newArrayList(temp));
+                                }
+                            });
                 });
             }
         }
@@ -516,7 +547,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Set<String> monitorSensorNames = consumer.get();
         if (!monitorSensorNames.isEmpty()) {
             LambdaQueryWrapper<TbSensor> wrapper = new LambdaQueryWrapper<TbSensor>()
-                    .eq(TbSensor::getName, monitorSensorNames)
+                    .in(TbSensor::getName, monitorSensorNames)
                     .select(TbSensor::getName, TbSensor::getID, TbSensor::getAlias);
             return this.baseMapper.selectList(wrapper).stream().collect(Collectors.groupingBy(TbSensor::getName));
         }

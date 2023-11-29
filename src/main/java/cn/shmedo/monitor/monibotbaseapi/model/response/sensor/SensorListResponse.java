@@ -59,7 +59,7 @@ public class SensorListResponse {
      * 是否启用
      */
     private Boolean enable;
-
+    private String dataSourceKey;
 }
 
     

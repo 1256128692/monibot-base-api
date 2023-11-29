@@ -30,6 +30,27 @@
         <result column="ChannelCode" jdbcType="INTEGER" property="channelCode"/>
         <result column="VideoDeviceSourceID" jdbcType="INTEGER" property="videoDeviceSourceID"/>
     </resultMap>
+    <resultMap id="sensorIDWithFormulaBaseMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo">
+        <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+        <result column="calType" jdbcType="INTEGER" property="calType"/>
+        <collection property="formulaBaseInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.FormulaBaseInfo">
+            <id column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+            <result column="formula" jdbcType="VARCHAR" property="formula"/>
+            <result column="fieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder"/>
+        </collection>
+        <collection property="parameterList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+            <id column="fieldID" jdbcType="INTEGER" property="ID"/>
+            <result column="paramSubjectID" jdbcType="INTEGER" property="subjectID"/>
+            <result column="paramSubjectType" jdbcType="INTEGER" property="subjectType"/>
+            <result column="paramPaUnitID" jdbcType="VARCHAR" property="paUnitID"/>
+            <result column="paramDataType" jdbcType="VARCHAR" property="dataType"/>
+            <result column="paramToken" jdbcType="VARCHAR" property="token"/>
+            <result column="paramName" jdbcType="VARCHAR" property="name"/>
+            <result column="paramPaValue" jdbcType="VARCHAR" property="paValue"/>
+        </collection>
+    </resultMap>
+
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -323,10 +344,12 @@
                ts.exValues       AS `exValues`,
                ts.Enable         AS `enable`,
                tmp.`Name`        AS `monitorPointName`,
-               tmt.TypeName      AS `monitorTypeName`
+               tmt.TypeName      AS `monitorTypeName`,
+               IF(tmt.MonitorType=40,'视频数据',(CASE tsds.DataSourceComposeType WHEN 1 THEN '物联网数据' WHEN 100 THEN 'API外部数据' WHEN 500 THEN '人工数据' END)) dataSourceKey
         FROM `tb_sensor` ts
                  LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                  LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+                 LEFT JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
         <where>
             <trim suffixOverrides="AND">
                 <if test="pa.keyword != null and pa.keyword != ''">
@@ -360,6 +383,22 @@
                 <if test="pa.projectID != null">
                     ts.ProjectID = #{pa.projectID} AND
                 </if>
+                <if test="pa.dataSourceKey != null">
+                    <choose>
+                        <when test="pa.dataSourceKey == 1">
+                            tsds.DataSourceComposeType=1 AND tmt.MonitorType != 40 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 2">
+                            tsds.DataSourceComposeType=100 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 3">
+                            tsds.DataSourceComposeType=500 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 4">
+                            tmt.MonitorType=40 AND
+                        </when>
+                    </choose>
+                </if>
             </trim>
         </where>
         ORDER BY ts.CreateTime DESC
@@ -383,10 +422,12 @@
                ts.exValues       AS `exValues`,
                ts.Enable         AS `enable`,
                tmp.`Name`        AS `monitorPointName`,
-               tmt.TypeName      AS `monitorTypeName`
+               tmt.TypeName      AS `monitorTypeName`,
+               IF(tmt.MonitorType=40,'视频数据',(CASE tsds.DataSourceComposeType WHEN 1 THEN '物联网数据' WHEN 100 THEN 'API外部数据' WHEN 500 THEN '人工数据' END)) dataSourceKey
         FROM `tb_sensor` ts
                  LEFT JOIN `tb_monitor_point` tmp ON ts.MonitorPointID = tmp.ID
                  LEFT JOIN `tb_monitor_type` tmt ON ts.MonitorType = tmt.MonitorType
+                 LEFT JOIN `tb_sensor_data_source` tsds ON tsds.DataSourceID = ts.DataSourceID
         <where>
             <trim suffixOverrides="AND">
                 <if test="pa.sensorName != null and pa.sensorName != ''">
@@ -415,6 +456,22 @@
                 </if>
                 <if test="pa.projectID != null">
                     ts.ProjectID = #{pa.projectID} AND
+                </if>
+                <if test="pa.dataSourceKey != null">
+                    <choose>
+                        <when test="pa.dataSourceKey == 1">
+                            tsds.DataSourceComposeType=1 AND tmt.MonitorType != 40 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 2">
+                            tsds.DataSourceComposeType=100 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 3">
+                            tsds.DataSourceComposeType=500 AND
+                        </when>
+                        <when test="pa.dataSourceKey == 4">
+                            tmt.MonitorType=40 AND
+                        </when>
+                    </choose>
                 </if>
             </trim>
         </where>
@@ -474,7 +531,13 @@
 
     <select id="selectListBymonitorPointIDList" parameterType="java.lang.Integer"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse">
-        select ID as sensorID, `Name` as sensorName, Alias as sensorAlias, monitorPointID, projectID
+        select ID     as sensorID,
+               `Name` as sensorName,
+               Alias  as sensorAlias,
+               monitorPointID,
+               projectID,
+               configFieldValue,
+               monitorType
         from tb_sensor
         where MonitorPointID in
         <foreach collection="monitorPointIDList" item="id" separator="," open="(" close=")">
@@ -567,7 +630,7 @@
     <insert id="insertSensorList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         INSERT INTO tb_sensor (name, alias, enable, channelCode, projectID, videoDeviceID, templateID,
                                dataSourceComposeType, monitorType, kind, displayOrder, exValues, createTime,
-                               createUserID,updateTime, updateUserID, VideoDeviceSourceID)
+                               createUserID, updateTime, updateUserID, VideoDeviceSourceID)
         VALUES
         <foreach collection="insertSensorList" item="item" separator=",">
             (#{item.sensorName}, #{item.sensorName}, #{item.sensorEnable}, #{item.channelCode}, #{item.projectID},
@@ -580,15 +643,14 @@
     <update id="updateSensorList" parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         <foreach collection="updateSensorList" item="item" separator=";">
             UPDATE tb_sensor
-            SET
-            name = #{item.sensorName},
-            alias = #{item.sensorName},
-            enable = #{item.sensorEnable},
-            projectID = #{item.projectID},
-            channelCode = #{item.channelCode},
-            exValues = #{item.exValues},
-            updateTime = #{item.updateTime},
-            updateUserID = #{item.updateUserID}
+            SET name         = #{item.sensorName},
+                alias        = #{item.sensorName},
+                enable       = #{item.sensorEnable},
+                projectID    = #{item.projectID},
+                channelCode  = #{item.channelCode},
+                exValues     = #{item.exValues},
+                updateTime   = #{item.updateTime},
+                updateUserID = #{item.updateUserID}
             WHERE ID = #{item.sensorID}
         </foreach>
     </update>
@@ -597,7 +659,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1">
         SELECT s.ID as sensorID, vd.deviceSerial, s.name as sensorName
         FROM tb_sensor as s
-        LEFT JOIN tb_video_device vd on vd.ID = s.VideoDeviceID
+                 LEFT JOIN tb_video_device vd on vd.ID = s.VideoDeviceID
         WHERE s.name IN
         <foreach item="sensorName" collection="sensorNameList" open="(" close=")" separator=",">
             #{sensorName}
@@ -607,20 +669,20 @@
 
     <select id="queryListByDeviceSerialList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo">
-        select s.ID          as sensorID,
-        s.`Name`      as sensorName,
-        s.projectID,
-        tvds.ID as VideoDeviceSourceID,
-        tvds.channelNo,
-        tvds.Enable,
-        tvds.DeviceSerial,
-        s.Enable      as sensorEnable,
-        s.ExValues,
-        c.CaptureInterval,
-        c.ImageCapture
-        from  tb_video_device_source tvds
-        left join tb_video_capture c on tvds.ID = c.VideoDeviceSourceID
-        left join tb_sensor s on tvds.ID = s.VideoDeviceSourceID
+        select s.ID     as sensorID,
+               s.`Name` as sensorName,
+               s.projectID,
+               tvds.ID  as VideoDeviceSourceID,
+               tvds.channelNo,
+               tvds.Enable,
+               tvds.DeviceSerial,
+               s.Enable as sensorEnable,
+               s.ExValues,
+               c.CaptureInterval,
+               c.ImageCapture
+        from tb_video_device_source tvds
+                 left join tb_video_capture c on tvds.ID = c.VideoDeviceSourceID
+                 left join tb_sensor s on tvds.ID = s.VideoDeviceSourceID
         where tvds.DeviceSerial in
         <foreach collection="deviceSerialList" item="deviceSerial" separator="," open="(" close=")">
             #{deviceSerial}
@@ -640,6 +702,36 @@
             #{deviceSerial}
         </foreach>
         )
+    </select>
+    <select id="selectSensorIDWithFormulaBaseInfoBySensorIDList" resultMap="sensorIDWithFormulaBaseMap"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo">
+        SELECT
+            ts.`ID` sensorID,
+            ts.`MonitorType` monitorType,
+            tmtt.`CalType` calType,
+            ttf.`Formula` formula,
+            ttf.`FieldCalOrder` fieldCalOrder,
+            tmtf.`FieldToken` fieldToken,
+            tp.`ID` paramID,
+            tp.`SubjectID` paramSubjectID,
+            tp.`SubjectType` paramSubjectType,
+            tp.`PaUnitID` paramPaUnitID,
+            tp.`DataType` paramDataType,
+            tp.`Token` paramToken,
+            tp.`Name` paramName,
+            tp.`PaValue` paramPaValue,
+            tp.`PaDesc` paramPaDesc
+        FROM
+            tb_sensor ts
+            LEFT JOIN tb_sensor_data_source tsds ON tsds.`DataSourceID` = ts.`DataSourceID`
+            LEFT JOIN tb_monitor_type_template tmtt ON tmtt.`ID` = ts.`TemplateID`
+            LEFT JOIN tb_template_formula ttf ON ttf.`TemplateID` = tmtt.`ID`
+            LEFT JOIN tb_monitor_type_field tmtf ON tmtf.`ID` = ttf.`FieldID` AND tmtf.`FieldClass` = 2
+            LEFT JOIN `tb_parameter` tp ON tp.`SubjectID` = ts.`ID` AND tp.`SubjectType` = 3
+        WHERE ts.`Kind` = 3 AND tsds.`DataSourceComposeType` = 500 AND ts.`ID` IN
+        <foreach collection="sensorIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
     </select>
 
     <delete id="deleteBatchByDeviceSerialList">

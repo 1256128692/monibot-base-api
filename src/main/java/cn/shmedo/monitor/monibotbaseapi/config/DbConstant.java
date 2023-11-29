@@ -31,4 +31,17 @@ public class DbConstant {
     public static final String CURRENT_RAIN_FALL = "currentRainfall";
 
     public static final String DAILY_RAINFALL = "dailyRainfall";
+
+    /**
+     * 统计方式key
+     */
+    public static final String STATISTICAL_METHODS = "statisticalMethods";
+    /**
+     * 显示密度key
+     */
+    public static final String DISPLAY_DENSITY = "displayDensity";
+    /**
+     * mysql tb_parameter表PaValue字段为空时的字段
+     */
+    public static final String PARAM_PAVALUE_EMPTY = "empty";
 }

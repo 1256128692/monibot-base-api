@@ -480,4 +480,38 @@
         and pi.CompanyID = #{companyID}
         and mi.ProjectID in (select ProjectID from tb_project_monitor_class where MonitorClass = #{monitorClassType})
   </select>
+
+  <select id="queryListByProjectIDAndMonitorItemID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1">
+      select mi.ID        as monitorItemID,
+             mi.Name      as monitorItemName,
+             mi.Alias     as monitorItemAlias,
+             mi.monitorType,
+             mt.TypeName  as monitorTypeName,
+             mt.TypeAlias as monitorTypeAlias
+      from tb_monitor_item mi
+               left join tb_monitor_type mt on mi.MonitorType = mt.MonitorType
+      where mi.projectID = #{projectID}
+      <if test="monitorItemID != null">
+          and mi.ID = #{monitorItemID}
+      </if>
+  </select>
+
+  <select id="selectListByEventIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo">
+      select mi.ID    as monitorItemID,
+             mi.Name ,
+             mi.Alias ,
+             de.ID    as eventID
+      from tb_monitor_item mi
+               left join tb_data_event_relation der on mi.ID = der.monitorItemID
+               left join tb_data_event de on de.ID = der.eventID
+      where mi.ID in (
+      select MonitorItemID
+      from tb_data_event_relation where eventID in
+      <foreach close=")" collection="eventIDList" item="eventID" open="(" separator=",">
+          #{eventID}
+      </foreach>
+      )
+  </select>
 </mapper>

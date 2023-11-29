@@ -30,6 +30,13 @@ public interface SensorService extends IService<TbSensor> {
     List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
 
     /**
+     * 获取人工传感器数据源（参考数据源级联接口，只是人工传感器都是物联网传感器且只有物模型那一级）
+     *
+     * @see #dataSourceCatalog(DataSourceCatalogRequest)
+     */
+    List<DataSourceCatalogResponse> manualDataSource(DataSourceCatalogRequest request);
+
+    /**
      * 监测类型（下拉）目录
      *
      * @param request {@link MonitorTypeCatalogRequest}
@@ -116,4 +123,9 @@ public interface SensorService extends IService<TbSensor> {
     void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request);
 
     Map<Integer, List<Integer>> queryAllSensorID();
+
+    /**
+     * 查询监测类型下的全部人工传感器
+     */
+    List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param);
 }

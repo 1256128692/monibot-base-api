@@ -29,6 +29,7 @@ ext {
     jedisVersion = "3.7.0"
     lettuceVersion = "6.2.2.RELEASE"
     feignFormVersion = "3.8.0"
+    poiVersion = "5.2.3"
 }
 
 repositories {
@@ -64,7 +65,7 @@ dependencies {
     implementation "com.alibaba.boot:nacos-config-spring-boot-starter:$nacosConfigVersion"
     implementation "cn.shmedo.iot:entity:$iotEntityVersion"
 
-
+    implementation "org.apache.poi:poi-ooxml:$poiVersion"
     implementation "io.github.openfeign:feign-core:$openFeignVersion"
     implementation "io.github.openfeign:feign-jackson:$openFeignVersion"
     implementation "io.github.openfeign:feign-okhttp:$openFeignVersion"

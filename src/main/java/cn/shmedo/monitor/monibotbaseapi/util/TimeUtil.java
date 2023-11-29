@@ -1,10 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -14,7 +14,6 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created 2015/12/15
@@ -169,7 +168,7 @@ public class TimeUtil {
         return Timestamp.valueOf(timeStr);
     }
 
-    public static Date getDate(LocalDateTime localDateTime){
+    public static Date getDate(LocalDateTime localDateTime) {
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         Instant instant2 = zonedDateTime.toInstant();
         return Date.from(instant2);
@@ -536,6 +535,29 @@ public class TimeUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    /**
+     * 展示密度formatter
+     */
+    public interface DestinyFormatter {
+        DateTimeFormatter HOUR_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+        DateTimeFormatter DAILY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
+        DateTimeFormatter MONTHLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+        DateTimeFormatter YEARLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
+
+        static DateTimeFormatter getFormatter(DisplayDensity densityType) {
+            DateTimeFormatter formatter;
+            switch (densityType) {
+                case ALL -> formatter = getDefaultDateTimeFormatter();
+                case HOUR -> formatter = HOUR_FORMATTER;
+                case DAY, WEEK -> formatter = DAILY_FORMATTER;
+                case MONTH -> formatter = MONTHLY_FORMATTER;
+                case YEAR -> formatter = YEARLY_FORMATTER;
+                default -> throw new RuntimeException("无法处理的展示密度,密度:" + densityType.name());
+            }
+            return formatter;
         }
     }
 }

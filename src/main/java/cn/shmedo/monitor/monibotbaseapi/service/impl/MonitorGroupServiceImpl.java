@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.QueryManualSensorListByMonitorParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.AddFileUploadRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FilePathResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.*;
@@ -281,5 +282,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                                                                 .build()).orElse(null)).filter(Objects::nonNull)
                                                 .toList()).build()).orElse(null)).filter(Objects::nonNull).toList())
                         .build()).orElse(null)).filter(Objects::nonNull).toList();
+    }
+
+    @Override
+    public List<MonitorGroupPointBaseInfo> queryMonitorTypeGroupPoint(QueryManualSensorListByMonitorParam pa) {
+        return tbMonitorGroupMapper.queryMonitorTypeGroupPoint(pa);
     }
 }
