@@ -47,7 +47,7 @@ public class QueryCompareAnalysisDataParam implements ParameterValidator, Resour
     @Positive(message = "手动传感器ID不能小于1")
     private Integer manualSensorID;
     @NotNull(message = "分析间隔类型不能为空")
-    @Range(min = 1, max = 2, message = "分析间隔类型 1.分钟 2.小时")
+    @Range(min = 1, max = 2, message = "分析间隔类型 1.小时 2.天")
     private Integer intervalType;
     @NotNull(message = "分析间隔值不能为空")
     @Positive(message = "分析间隔值不能不能小于0")
@@ -61,7 +61,7 @@ public class QueryCompareAnalysisDataParam implements ParameterValidator, Resour
     @JsonIgnore
     private List<Integer> sensorIDList = List.of(autoSensorID, manualSensorID);
     @JsonIgnore
-    private Long interval = (long) (60000 * (intervalType == 1 ? intervalType : intervalValue * 60));
+    private Long interval = (long) (3600000L * (intervalType == 1 ? intervalType : intervalValue * 24));
     @JsonIgnore
     private List<FieldSelectInfo> fieldSelectInfoList;
 
