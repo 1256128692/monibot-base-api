@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -23,6 +24,8 @@ import org.hibernate.validator.constraints.Range;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Chengfs on 2023/11/21
@@ -33,9 +36,8 @@ public class AddControlRecordRequest implements ParameterValidator, ResourcePerm
     @JsonIgnore
     private Integer projectID;
 
-    @NotNull
-    @Positive
-    private Integer sid;
+    @NotEmpty
+    private Set<@NotNull Integer> sensorIDList;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -63,13 +65,15 @@ public class AddControlRecordRequest implements ParameterValidator, ResourcePerm
     public ResultWrapper<?> validate() {
 
         TbSensorMapper sensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-        TbSensor sensor = sensorMapper.selectOne(Wrappers.<TbSensor>lambdaQuery()
-                .eq(TbSensor::getID, this.sid)
+        List<TbSensor> sensors = sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
+                .in(TbSensor::getID, this.sensorIDList)
                 .eq(TbSensor::getMonitorType, SluiceLog.MONITOR_TYPE)
                 .select(TbSensor::getProjectID, TbSensor::getID));
-        Assert.notNull(sensor, "闸门不存在");
+        Assert.isTrue(sensors.size() == sensorIDList.size(), "闸门不存在");
 
-        projectID = sensor.getProjectID();
+        List<Integer> list = sensors.stream().map(TbSensor::getProjectID).distinct().toList();
+        Assert.isTrue(list.size() == 1, "闸门不属于同一项目");
+        this.projectID = list.get(0);
 
         return null;
     }

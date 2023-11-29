@@ -163,13 +163,13 @@
             <if test="projectIDList != null and projectIDList.size() != 0">
                 <foreach collection="projectIDList" item="item" index="index" separator="," open="tpp.ProjectID IN  ("
                          close=") AND">
-                    tpp.ProjectID = #{item}
+                    #{item}
                 </foreach>
             </if>
             <if test="propNames != null and propNames.size() != 0">
                 <foreach collection="propNames" item="item" index="index" separator="," open="tp.`Name` IN  ("
                          close=") AND">
-                    tp.`Name` = #{item}
+                    #{item}
                 </foreach>
             </if>
         </trim>

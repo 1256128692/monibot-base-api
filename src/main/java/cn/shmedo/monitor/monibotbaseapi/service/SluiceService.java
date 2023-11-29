@@ -24,5 +24,5 @@ public interface SluiceService {
 
     ControlRecord singleControlRecord(SingleControlRecordRequest request);
 
-    Long insertSluice(AddControlRecordRequest request);
+    List<Long> insertSluice(AddControlRecordRequest request);
 }

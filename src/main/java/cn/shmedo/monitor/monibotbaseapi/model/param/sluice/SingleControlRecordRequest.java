@@ -12,7 +12,10 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.SluiceLog;
 import cn.shmedo.monitor.monibotbaseapi.util.influx.SimpleQuery;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -20,7 +23,6 @@ import org.influxdb.InfluxDB;
 import org.springframework.util.Assert;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * @author Chengfs on 2023/11/21
@@ -33,8 +35,12 @@ public class SingleControlRecordRequest implements ParameterValidator, ResourceP
     private Integer companyID;
 
     @NotNull
-    @Positive
-    private Long id;
+    private Integer sensorID;
+
+    @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime time;
 
     @JsonIgnore
     private Integer projectID;
@@ -47,9 +53,9 @@ public class SingleControlRecordRequest implements ParameterValidator, ResourceP
     @Override
     public ResultWrapper<?> validate() {
         InfluxDB influxDb = ContextHolder.getBean(InfluxDB.class);
-        sluiceLog = SimpleQuery.of(SluiceLog.TABLE).eq(DbConstant.TIME_FIELD,
-                        LocalDateTime.ofEpochSecond(id, 0, ZoneOffset.of("+8")))
-                .limit(1).orderByDesc(DbConstant.TIME_FIELD).row(influxDb, SluiceLog.class);
+        sluiceLog = SimpleQuery.of(SluiceLog.TABLE).eq(DbConstant.TIME_FIELD, time)
+                .eq(DbConstant.SENSOR_ID_TAG, sensorID.toString()).limit(1).orderByDesc(DbConstant.TIME_FIELD)
+                .row(influxDb, SluiceLog.class);
         Assert.notNull(sluiceLog, "记录不存在");
 
         TbSensorMapper sensorMapper = ContextHolder.getBean(TbSensorMapper.class);

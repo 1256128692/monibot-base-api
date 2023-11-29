@@ -123,20 +123,23 @@ public class SluiceServiceImpl implements SluiceService {
     }
 
     @Override
-    public Long insertSluice(AddControlRecordRequest request) {
+    public List<Long> insertSluice(AddControlRecordRequest request) {
         BatchPoints batchPoints = BatchPoints.database(config.getInfluxDatabase()).build();
-        Point.Builder builder = Point.measurement(SluiceLog.TABLE);
-        builder.addField(DbConstant.SENSOR_ID_TAG, request.getSid());
-        builder.addField(DbConstant.TIME_FIELD, request.getTime().format(DatePattern.NORM_DATETIME_FORMATTER));
-        builder.addField(SluiceLog.USER_ID, request.getUserID());
-        Optional.ofNullable(request.getRunningSta()).ifPresent(e -> builder.addField(SluiceLog.RUNNING_STA, e));
-        Optional.ofNullable(request.getSoftware()).ifPresent(e -> builder.addField(SluiceLog.SOFTWARE, e));
-        Optional.ofNullable(request.getHardware()).ifPresent(e -> builder.addField(SluiceLog.HARDWARE, e));
-        Optional.ofNullable(request.getMsg()).ifPresent(e -> builder.addField(SluiceLog.MSG, e));
-        Optional.ofNullable(request.getLogLevel()).ifPresent(e -> builder.addField(SluiceLog.LOG_LEVEL, e));
-        batchPoints.point(builder.build());
+        request.getSensorIDList().forEach(item -> {
+            Point.Builder builder = Point.measurement(SluiceLog.TABLE);
+            builder.addField(DbConstant.SENSOR_ID_TAG, item);
+            builder.addField(DbConstant.TIME_FIELD, request.getTime().format(DatePattern.NORM_DATETIME_FORMATTER));
+            builder.addField(SluiceLog.USER_ID, request.getUserID());
+            Optional.ofNullable(request.getRunningSta()).ifPresent(e -> builder.addField(SluiceLog.RUNNING_STA, e));
+            Optional.ofNullable(request.getSoftware()).ifPresent(e -> builder.addField(SluiceLog.SOFTWARE, e));
+            Optional.ofNullable(request.getHardware()).ifPresent(e -> builder.addField(SluiceLog.HARDWARE, e));
+            Optional.ofNullable(request.getMsg()).ifPresent(e -> builder.addField(SluiceLog.MSG, e));
+            Optional.ofNullable(request.getLogLevel()).ifPresent(e -> builder.addField(SluiceLog.LOG_LEVEL, e));
+            batchPoints.point(builder.build());
+        });
         influxDb.write(batchPoints);
-        return request.getTime().toEpochSecond(ZoneOffset.of("+8"));
+        return request.getSensorIDList().stream().map(e -> Long.parseLong(request.getTime()
+                        .toEpochSecond(ZoneOffset.of("+8")) + StrUtil.EMPTY + e)).toList();
     }
 
     @Override
@@ -186,7 +189,9 @@ public class SluiceServiceImpl implements SluiceService {
         //处理结果
         List<ControlRecord> list = data.stream().map(e -> {
             ControlRecord record = new ControlRecord();
-            record.setId(e.getTime().toEpochSecond(ZoneOffset.of("+8")));
+            //由于 influxdb 不存在id，通过 sid 和 time 确立唯一；返回的id为 时间戳+sid
+            String id = e.getTime().toEpochSecond(ZoneOffset.of("+8")) + StrUtil.EMPTY + e.getSid();
+            record.setId(Long.parseLong(id));
             Optional.ofNullable(sensorMap.get(e.getSid())).ifPresent(s -> {
                 record.setProjectID(s.getProjectID());
                 Optional.ofNullable(projectMap.get(s.getProjectID())).ifPresent(p -> {
@@ -201,6 +206,7 @@ public class SluiceServiceImpl implements SluiceService {
                 record.setGateName(s.getAlias());
                 record.setControlType(ControlType.formDeviceCode(e.getHardware()));
                 record.setActionType(e.getSoftware());
+                record.setRunningSta(e.getRunningSta());
                 Optional.ofNullable(e.getUserID()).ifPresent(u -> {
                     record.setOperationUserID(u);
                     record.setOperationUser(userMap.get(u));
@@ -320,10 +326,10 @@ public class SluiceServiceImpl implements SluiceService {
             item.setOpenStatus(list.stream().anyMatch(i -> i.getOpenStatus() == 1) ? 1 : 0);
 
             Optional.ofNullable(propMap.get(item.getProjectID())).ifPresent(p -> {
-                item.setCanal(p.get("所属渠道"));
-                item.setSluiceType(p.get("水闸类型"));
-                item.setSluiceHoleNum(MapUtil.getInt(p, "闸孔数量"));
-                item.setManageUnit(p.get("管理单位"));
+                item.setCanal(p.get(CANAL_NAME));
+                item.setSluiceType(p.get(SLUICE_TYPE));
+                item.setManageUnit(p.get(MANAGE_UNIT));
+                item.setSluiceHoleNum(MapUtil.getInt(p, SLUICE_HOLE_NUM));
             });
         });
         return new PageUtil.Page<>(page.getPages(), data, page.getTotal());
@@ -442,14 +448,13 @@ public class SluiceServiceImpl implements SluiceService {
         }
 
         List<PropWithValue> props = propertyMapper.queryPropByPids(Set.of(request.getProjectID()),
-                PropertySubjectType.Project, List.of(MAX_FLOW, MAX_WATER_LEVEL, MIN_WATER_LEVEL));
+                PropertySubjectType.Project, List.of(MAX_FLOW, MAX_WATER_LEVEL));
 
         Optional.ofNullable(props).ifPresent(e -> {
             e.forEach(p -> {
                 switch (p.getName()) {
                     case MAX_FLOW -> result.setMaxFlowRate(Convert.toDouble(p.getValue()));
                     case MAX_WATER_LEVEL -> result.setMaxBackWaterLevel(Convert.toDouble(p.getValue()));
-                    case MIN_WATER_LEVEL -> result.setMinBackWaterLevel(Convert.toDouble(p.getValue()));
                     default -> {
                     }
                 }

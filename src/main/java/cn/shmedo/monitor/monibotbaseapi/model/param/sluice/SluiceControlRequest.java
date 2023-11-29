@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionType;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
@@ -38,6 +39,7 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
 
     private ControlActionType actionType;
 
+    @Valid
     private Target target;
 
     @Data

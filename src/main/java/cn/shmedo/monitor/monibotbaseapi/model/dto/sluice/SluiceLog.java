@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Data
 public class SluiceLog {
 
+    private Integer id;
+
     private Integer sid;
 
     private LocalDateTime time;

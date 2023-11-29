@@ -20,10 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Field;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.Param;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorKindEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
@@ -488,6 +485,21 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .eq(TbSensor::getProjectID, param.getProjectID()).eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
                 .select(TbSensor::getID, TbSensor::getName, TbSensor::getAlias)).stream().map(u ->
                 SensorNameResponse.builder().sensorID(u.getID()).sensorName(u.getName()).sensorAlias(u.getAlias()).build()).toList();
+    }
+
+    @Override
+    public List<SensorSimple> querySimpleList(QuerySensorSimpleListRequest param) {
+        LambdaQueryWrapper<TbSensor> wrapper = Wrappers.<TbSensor>lambdaQuery()
+                        .select(TbSensor::getID, TbSensor::getProjectID, TbSensor::getName, TbSensor::getAlias,
+                                TbSensor::getMonitorType, TbSensor::getKind, TbSensor::getMonitorPointID);
+        Optional.ofNullable(param.getIdList()).filter(e -> !e.isEmpty())
+                .ifPresent(e -> wrapper.in(TbSensor::getID, e));
+        Optional.ofNullable(param.getProjectIDList()).filter(e -> !e.isEmpty())
+                .ifPresent(e -> wrapper.in(TbSensor::getProjectID, e));
+        Optional.ofNullable(param.getMonitorTypeList()).filter(e -> !e.isEmpty())
+                .ifPresent(e -> wrapper.in(TbSensor::getMonitorType, e));
+
+        return this.list(wrapper).stream().map(SensorSimple::valueOf).toList();
     }
 
     /**

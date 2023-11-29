@@ -27,28 +27,44 @@ public class BatchDispatchRequest {
     /**
      * 通用指令
      */
-    public record Cmd(String deviceToken, Integer cmdID, String exValue, Collection<Param> paList) {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class  Cmd {
 
-        public Cmd(String deviceToken, Integer cmdID, Param... paList) {
-            this(deviceToken, cmdID, null, List.of(paList));
-        }
+        private String deviceToken;
+        private Integer cmdID;
+        private String exValue;
+        private Collection<Param> paList;
 
-        /**
-         * 通用指令参数
-         */
-        public record Param(Integer paID, String paValue, Integer paSetType) {
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class Param {
+
+            private Integer paID;
+            private String paValue;
+            private Integer paSetType;
 
         }
     }
-
 
 
     /**
      * 透传指令
      */
-    public record RawCmd(String deviceToken, String cmdContent) {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class RawCmd {
+
+        private String deviceToken;
+        private String cmdContent;
 
     }
+//    public record RawCmd(String deviceToken, String cmdContent) {
+//
+//    }
 
 }
 

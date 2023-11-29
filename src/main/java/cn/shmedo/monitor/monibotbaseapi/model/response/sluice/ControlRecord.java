@@ -24,6 +24,7 @@ public class ControlRecord {
     private String mmUnit;
     private ControlType controlType;
     private Integer actionType;
+    private Integer runningSta;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime operationTime;

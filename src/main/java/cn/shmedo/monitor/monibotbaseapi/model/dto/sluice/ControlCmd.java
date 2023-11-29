@@ -22,7 +22,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public class ControlCmd {
 
-    private final String CMD_NAME = "md_setgatecfg";
+    private final String CMD_NAME = "$cmd=md_setgatecfg";
     private final String INDEX = "index";
     private final String TYPE = "type";
     private final String CRACK_LEVEL = "crackLevel";

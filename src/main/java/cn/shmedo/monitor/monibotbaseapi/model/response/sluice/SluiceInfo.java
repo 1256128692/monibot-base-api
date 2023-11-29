@@ -16,11 +16,6 @@ public class SluiceInfo {
     private Double maxBackWaterLevel;
 
     /**
-     * 最小闸后水位 (项目属性)
-     */
-    private Double minBackWaterLevel;
-
-    /**
      * 最大过闸流量 (项目属性)
      */
     private Double maxFlowRate;
