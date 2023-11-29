@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -127,19 +126,18 @@ public class SluiceServiceImpl implements SluiceService {
         BatchPoints batchPoints = BatchPoints.database(config.getInfluxDatabase()).build();
         request.getSensorIDList().forEach(item -> {
             Point.Builder builder = Point.measurement(SluiceLog.TABLE);
-            builder.addField(DbConstant.SENSOR_ID_TAG, item);
-            builder.addField(DbConstant.TIME_FIELD, request.getTime().format(DatePattern.NORM_DATETIME_FORMATTER));
             builder.addField(SluiceLog.USER_ID, request.getUserID());
             Optional.ofNullable(request.getRunningSta()).ifPresent(e -> builder.addField(SluiceLog.RUNNING_STA, e));
             Optional.ofNullable(request.getSoftware()).ifPresent(e -> builder.addField(SluiceLog.SOFTWARE, e));
             Optional.ofNullable(request.getHardware()).ifPresent(e -> builder.addField(SluiceLog.HARDWARE, e));
             Optional.ofNullable(request.getMsg()).ifPresent(e -> builder.addField(SluiceLog.MSG, e));
             Optional.ofNullable(request.getLogLevel()).ifPresent(e -> builder.addField(SluiceLog.LOG_LEVEL, e));
-            batchPoints.point(builder.build());
+            batchPoints.point(builder.tag(DbConstant.SENSOR_ID_TAG, item.toString())
+                    .time(request.getTime().toEpochSecond(ZoneOffset.of("+8")), TimeUnit.SECONDS).build());
         });
         influxDb.write(batchPoints);
         return request.getSensorIDList().stream().map(e -> Long.parseLong(request.getTime()
-                        .toEpochSecond(ZoneOffset.of("+8")) + StrUtil.EMPTY + e)).toList();
+                .toEpochSecond(ZoneOffset.of("+8")) + StrUtil.EMPTY + e)).toList();
     }
 
     @Override
@@ -434,7 +432,6 @@ public class SluiceServiceImpl implements SluiceService {
                         gate.setAlias(e.getAlias());
                         gate.setControlType(ControlType.formDeviceCode(status.getHardware()));
                         gate.setOpenStatus(status.getGateSta());
-                        gate.setPowerStatus(status.getMotorSta());
                         gate.setOpenDegree(status.getGateOpen());
                         gate.setMaxOpenDegree(status.getGateOpenMax());
                         gate.setPowerCurrent(status.getGateCurrent());
@@ -607,8 +604,8 @@ public class SluiceServiceImpl implements SluiceService {
                 .stream().collect(Collectors.toMap(TbSensor::getID, e -> e));
     }
 
-    protected  <T> Map<Integer, Map<String, String>> getPropDict(Collection<T> data, Function<T, Integer> pidFunc,
-                                                                 Collection<String> propNames) {
+    protected <T> Map<Integer, Map<String, String>> getPropDict(Collection<T> data, Function<T, Integer> pidFunc,
+                                                                Collection<String> propNames) {
         return propertyMapper.queryPropByPids(data.stream()
                                 .map(pidFunc).collect(Collectors.toSet()),
                         PropertySubjectType.Project, propNames)

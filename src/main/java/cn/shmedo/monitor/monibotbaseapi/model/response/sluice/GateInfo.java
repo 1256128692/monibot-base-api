@@ -11,7 +11,6 @@ import lombok.EqualsAndHashCode;
 public class GateInfo extends Gate {
 
     private Double openDegree;
-    private Integer powerStatus;
     private Double powerCurrent;
     private Double powerVoltage;
     private Integer runningState;

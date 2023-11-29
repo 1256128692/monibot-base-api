@@ -201,7 +201,6 @@ public class SluiceController {
      * @apiSuccess (返回结果) {String} gates.alias 闸门名称 (监测传感器别名)
      * @apiSuccess (返回结果) {Int} gates.openStatus 启闭状态 0.关闭 1.开启
      * @apiSuccess (返回结果) {Double} gates.openDegree 闸门开度(m)
-     * @apiSuccess (返回结果) {Int} gates.powerStatus 电源状态 0.正常 1.异常
      * @apiSuccess (返回结果) {Double} gates.powerCurrent 电源电流 (A)
      * @apiSuccess (返回结果) {Double} gates.powerVoltage 电源电压 (V)
      * @apiSuccess (返回结果) {Int} gates.controlType 控制类型 1远程控制 2手动控制 3现地控制
