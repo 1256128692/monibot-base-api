@@ -20,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEve
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
@@ -39,6 +40,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResp
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -475,6 +477,66 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
         tbEigenValueRelationMapper.insertBatchRelation(tbEigenValues);
 
+    }
+
+    @Override
+    public Object queryMonitorPointDataPage(QueryMonitorPointDataPageParam pa) {
+
+        // 点信息列表
+        List<MonitorPointDataInfo> monitorPointDataInfoList = tbMonitorPointMapper.selectMonitorPointDataInfoListByIDList(pa.getMonitorPointIDList());
+
+        if (CollectionUtil.isNullOrEmpty(monitorPointDataInfoList)) {
+            return Collections.emptyList();
+        }
+
+        // 全部传感器信息
+        List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
+
+        // 监测项目与监测子字段类型关系表
+        List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
+
+        if (!CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
+            List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
+                    pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
+
+            List<Map<String, Object>> finalSensorDataList = sensorDataList;
+            allSensorInfoList.forEach(sensorInfo -> {
+                if (!CollectionUtil.isNullOrEmpty(finalSensorDataList)) {
+                    List<Map<String, Object>> result = new LinkedList<>();
+                    finalSensorDataList.forEach(da -> {
+                        if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
+                            result.add(da);
+                        }
+                    });
+                    if (sensorInfo.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
+                        result.forEach(r -> {
+                            SensorBaseInfoResponse sInfo = allSensorInfoList.stream()
+                                    .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
+                                    .findFirst().orElse(null);
+                            if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
+                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                            }
+                        });
+                    }
+
+                    if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
+                            pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                    } else {
+                        sensorInfo.setMultiSensorData(result);
+                    }
+
+                }
+            });
+
+            monitorPointDataInfoList.forEach(m -> {
+                m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
+                m.setFieldList(fieldList);
+            });
+        }
+
+        return PageUtil.page(allSensorInfoList, pa.getPageSize(), pa.getCurrentPage());
     }
 
     /**

@@ -9,11 +9,11 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEve
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -509,6 +509,52 @@ public class MonitorDataController {
     @RequestMapping(value = "/QueryMonitorTypeFieldList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryMonitorTypeFieldList(@Validated @RequestBody QueryMonitorTypeFieldParam pa) {
         return monitorDataService.queryMonitorTypeFieldList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorPointDataPage 查询监测点数据列表分页
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorPointDataPage
+     * @apiDescription 查询监测点数据列表
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0}
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.sensorID    传感器ID
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.projectID 项目ID
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.monitorPointID  监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.sensorList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Object[]} currentPageData.sensorList.multiSensorData   多传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} currentPageData.sensorList.multiSensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {T} currentPageData.sensorList.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} currentPageData.fieldList   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorPointDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointDataPage(@Validated @RequestBody QueryMonitorPointDataPageParam pa) {
+        return monitorDataService.queryMonitorPointDataPage(pa);
     }
 
 }
