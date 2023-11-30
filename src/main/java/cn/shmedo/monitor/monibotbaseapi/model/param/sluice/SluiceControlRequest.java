@@ -1,10 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sluice;
 
 import cn.hutool.core.lang.Assert;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind;
@@ -101,7 +98,9 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
                 //校验参数
                 Validator validator = ContextHolder.getBean(Validator.class);
                 Set<ConstraintViolation<Target>> validate = validator.validate(target, actionType.getValidGroup());
-                Assert.isTrue(validate.isEmpty(), validate.iterator().next().getMessage());
+                if (!validate.isEmpty()) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, validate.iterator().next().getMessage());
+                }
 
                 if (TIME_PERIOD_CONTROL.equals(actionType) ) {
                     Assert.isTrue(target.getBeginTime().isBefore(target.getEndTime()), "beginTime must be before endTime");

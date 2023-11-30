@@ -620,7 +620,7 @@ public class SensorController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensor
      */
-    @Permission(permissionName = "mdbase:ListBaseSensor", allowApplication = true)
+    @Permission(permissionName = "mdmbase:ListBaseSensor", allowApplication = true)
     @PostMapping(value = "/QuerySensorSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySensorSimpleList(@Valid @RequestBody QuerySensorSimpleListRequest param) {
         return sensorService.querySimpleList(param);
