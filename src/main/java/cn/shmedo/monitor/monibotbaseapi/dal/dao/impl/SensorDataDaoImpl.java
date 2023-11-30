@@ -700,6 +700,9 @@ public class SensorDataDaoImpl implements SensorDataDao {
             if (statisticsType == StatisticalMethods.CHANGE.getValue()) {
                 selectFieldBuilder.append("last(").append(s).append(") - first(").append(s);
                 selectFieldBuilder.append(") as ").append(s).append(",");
+            } else if (statisticsType == StatisticalMethods.AVERAGE.getValue()) {
+                selectFieldBuilder.append("mean");
+                selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
             } else {
                 selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
                 selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
