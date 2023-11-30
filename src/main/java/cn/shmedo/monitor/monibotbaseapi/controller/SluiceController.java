@@ -148,7 +148,10 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Double} currentPageData.frontWaterLevel 闸前水位(m)
      * @apiSuccess (返回结果) {Double} currentPageData.backWaterLevel 闸后水位(m)
      * @apiSuccess (返回结果) {Double} currentPageData.flowRate 瞬时流量(m³/s)
-     * @apiSuccess (返回结果) {Int} currentPageData.collectSensorID 采集传感器id (用于查询采集数据)
+     * @apiSuccess (返回结果) {Object[]} currentPageData.waterData 水情数据 (用于查询采集数据)
+     * @apiSuccess (返回结果) {Int} currentPageData.waterData.monitorType 水情数据监测类型
+     * @apiSuccess (返回结果) {Int} currentPageData.waterData.monitorItemID 水情数据监测项id
+     * @apiSuccess (返回结果) {Int[]} currentPageData.waterData.monitorPointIDList 水情数据监测点id列表
      * @apiSuccess (返回结果) {Int} currentPageData.videoMonitorGroupID 视频监测组id (用于查询视频监控)
      * @apiSuccess (返回结果) {DateTime} currentPageData.lastCollectTime 最后采集时间(yyyy-MM-dd HH:mm:ss)
      * @apiSampleRequest off

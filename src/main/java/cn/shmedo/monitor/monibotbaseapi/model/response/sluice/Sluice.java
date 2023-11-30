@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,9 +43,9 @@ public class Sluice extends SluiceSimple {
     private Double flowRate;
 
     /**
-     * 采集传感器ID
+     * 水情数据
      */
-    private Integer collectSensorID;
+    private WaterData waterData;
 
     /**
      * 视频监测组ID
@@ -55,7 +56,10 @@ public class Sluice extends SluiceSimple {
      * 最后采集时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-//    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime lastCollectTime;
+
+    public record WaterData(Integer monitorType, Integer monitorItemID, Collection<Integer> monitorPointIDList) {}
+
+//    public record VideoMonitor(Collection<Integer> monitorPointIDList) {}
 }

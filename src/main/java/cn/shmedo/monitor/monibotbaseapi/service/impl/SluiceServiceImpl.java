@@ -11,13 +11,8 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropWithValue;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.TokenAndMsgID;
@@ -77,6 +72,7 @@ public class SluiceServiceImpl implements SluiceService {
     private final TbSensorMapper sensorMapper;
     private final TbMonitorGroupPointMapper monitorGroupPointMapper;
     private final TbProjectInfoMapper projectInfoMapper;
+    private final TbMonitorPointMapper monitorPointMapper;
     private final InfluxDB influxDb;
     private final IotService iotService;
     private final UserService userService;
@@ -308,7 +304,15 @@ public class SluiceServiceImpl implements SluiceService {
                     item.setFlowRate(s.getFlowRate());
                     item.setLastCollectTime(s.getTime());
                 });
-                item.setCollectSensorID(sensor.getId());
+
+                TbMonitorPoint point = monitorPointMapper.selectOne(Wrappers.<TbMonitorPoint>lambdaQuery()
+                        .eq(TbMonitorPoint::getID, sensor.getMonitorPointID())
+                        .eq(TbMonitorPoint::getMonitorType, SluiceData.MONITOR_TYPE)
+                        .select(TbMonitorPoint::getMonitorItemID));
+                Optional.ofNullable(point).ifPresent(p -> {
+                    item.setWaterData(new Sluice.WaterData(SluiceData.MONITOR_TYPE,
+                            p.getMonitorItemID(), List.of(sensor.getMonitorPointID())));
+                });
                 Optional.ofNullable(videoMGMap.get(sensor.getMonitorPointID())).ifPresent(item::setVideoMonitorGroupID);
             });
 
@@ -522,9 +526,10 @@ public class SluiceServiceImpl implements SluiceService {
     @Override
     public List<GateSimple> listSluiceGate(ListSluiceGateRequest request) {
         return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
-                .in(TbSensor::getProjectID, request.getProjectList())
-                .in(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE)
-                .select(TbSensor::getID, TbSensor::getAlias)).stream().map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
+                        .in(TbSensor::getProjectID, request.getProjectList())
+                        .in(TbSensor::getMonitorType, SluiceLog.TABLE)
+                        .select(TbSensor::getID, TbSensor::getAlias)).stream()
+                .map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
     }
 
     /**
