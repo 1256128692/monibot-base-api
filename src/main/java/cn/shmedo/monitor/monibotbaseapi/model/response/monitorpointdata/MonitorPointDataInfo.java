@@ -29,5 +29,11 @@ public class MonitorPointDataInfo {
      */
     private List<EventBaseInfo> eventList;
 
+    /**
+     * 按照时间倒序排序
+     * 批量传感器的数据信息
+     */
+    private List<Map<String, Object>> multiSensorData;
+
 
 }

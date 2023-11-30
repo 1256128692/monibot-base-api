@@ -43,6 +43,7 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
     @NotNull(message = "statisticsType不能为空")
     private Integer statisticsType;
 
+    private Boolean filterEmptyData;
     /**
      * 特征值ID列表
      */
@@ -105,6 +106,9 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
 
         }
 
+        if (filterEmptyData == null) {
+            filterEmptyData = false;
+        }
 
         return null;
     }

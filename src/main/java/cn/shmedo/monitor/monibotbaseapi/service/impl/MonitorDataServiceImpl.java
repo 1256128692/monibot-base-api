@@ -279,7 +279,13 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     List<Map<String, Object>> result = new LinkedList<>();
                     finalSensorDataList.forEach(da -> {
                         if (sensorInfo.getSensorID().equals((Integer) da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))) {
-                            result.add(da);
+                            if (pa.getFilterEmptyData()) {
+                                if (da.get(fieldList.get(0).getFieldToken()) != null) {
+                                    result.add(da);
+                                }
+                            } else {
+                                result.add(da);
+                            }
                         }
                     });
                     if (sensorInfo.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
@@ -536,7 +542,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             });
         }
 
-        return PageUtil.page(allSensorInfoList, pa.getPageSize(), pa.getCurrentPage());
+        return PageUtil.page(monitorPointDataInfoList, pa.getPageSize(), pa.getCurrentPage());
     }
 
     /**

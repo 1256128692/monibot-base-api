@@ -43,6 +43,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
+     * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
      * @apiParam (请求体) {Int[]} [eigenvalueIDList] 特征值ID列表
      * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
      * @apiParamExample 请求体示例
@@ -529,10 +530,17 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0}
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0,
+     * "pageSize":10, "currentPage":1}
      * @apiSuccess (返回结果) {Int} totalCount 总数量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID       监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.monitorPointName  监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorType          监测类型
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeAlias  监测类型别名
+     * @apiSuccess (响应结果) {Object[]} [currentPageData.sensorList]      传感器信息
      * @apiSuccess (响应结果) {Int} currentPageData.sensorList.sensorID    传感器ID
      * @apiSuccess (响应结果) {Int} currentPageData.sensorList.projectID 项目ID
      * @apiSuccess (响应结果) {Int} currentPageData.sensorList.monitorPointID  监测点ID
