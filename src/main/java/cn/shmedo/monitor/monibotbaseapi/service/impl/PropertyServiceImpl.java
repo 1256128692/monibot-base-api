@@ -164,25 +164,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 模糊查询
-        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
-                .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
-                .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
-                .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
-                // 分组和下拉框需要展示预定义模板
-                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag,
-                        TbPropertyModel::getCreateType, param.getCreateType())
-                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
-            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
-        }
-        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
-            if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
-                queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
-            } else {
-                queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
-            }
-        }
-
+        LambdaQueryWrapper<TbPropertyModel> queryWrapper = getListQueryParam(param, groupParamFlag, selectParamFlag);
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         List<Model4Web> model4WebList = Lists.newArrayList();
         Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
@@ -266,7 +248,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 model4Web.setGroupName(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME);
                 model4WebList.add(model4Web);
             }
-            if(CollectionUtil.isNotEmpty(unProjectGroupMap)) {
+            if (CollectionUtil.isNotEmpty(unProjectGroupMap)) {
                 Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
                 if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
                     modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
@@ -294,7 +276,38 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                     }
             ).toList();
         }
-        return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
+        return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID).reversed()
+                .thenComparing(Model4Web::getCreateTime).reversed()).toList();
+    }
+
+    /**
+     * 组装模板查询条件
+     *
+     * @param param           参数
+     * @param groupParamFlag  是否是分组
+     * @param selectParamFlag 是否是下拉查询
+     * @return
+     */
+    private LambdaQueryWrapper<TbPropertyModel> getListQueryParam(QueryModelListParam param, boolean groupParamFlag, boolean selectParamFlag) {
+        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
+                .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
+                .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
+                .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
+                // 分组和下拉框需要展示预定义模板
+                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag,
+                        TbPropertyModel::getCreateType, param.getCreateType())
+                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
+        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
+            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
+        }
+        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
+            if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+                queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
+            } else {
+                queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+            }
+        }
+        return queryWrapper;
     }
 
     @Override
