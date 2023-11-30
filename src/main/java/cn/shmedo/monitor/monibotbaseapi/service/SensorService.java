@@ -31,13 +31,6 @@ public interface SensorService extends IService<TbSensor> {
     List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
 
     /**
-     * 获取人工传感器数据源（参考数据源级联接口，只是人工传感器都是物联网传感器且只有物模型那一级）
-     *
-     * @see #dataSourceCatalog(DataSourceCatalogRequest)
-     */
-    List<DataSourceCatalogResponse> manualDataSource(DataSourceCatalogRequest request);
-
-    /**
      * 监测类型（下拉）目录
      *
      * @param request {@link MonitorTypeCatalogRequest}

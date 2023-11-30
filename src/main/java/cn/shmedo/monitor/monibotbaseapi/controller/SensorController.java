@@ -150,44 +150,6 @@ public class SensorController {
     }
 
     /**
-     * @api {POST} /ManualDataSource 获取人工传感器数据源
-     * @apiVersion 1.0.0
-     * @apiGroup 传感器模块
-     * @apiName ManualDataSource
-     * @apiParam (请求体) {Int} projectID 项目ID
-     * @apiParam (请求体) {Int} [companyID] 公司ID， 该项为null则使用当前用户所在公司ID
-     * @apiParam (请求体) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
-     * @apiParam (请求体) {Int} [monitorType] 监测类型
-     * @apiParam (请求体) {String} [keyword] 检索关键字
-     * @apiParamExample 请求体示例
-     * {"monitorType":1,"dataSourceComposeType":"1","keyword":"11B","projectID":5411}
-     * @apiSuccess (响应结果) {Object} data
-     * @apiSuccess (响应结果) {String} data.id 监测类型模板ID
-     * @apiSuccess (响应结果) {String} data.name 监测类型模板名称
-     * @apiSuccess (响应结果) {Int} data.dataSourceComposeType 模板数据来源类型
-     * @apiSuccess (响应结果) {String} data.templateDataSourceID 监测类型模板分布式唯一ID
-     * @apiSuccess (响应结果) {Int} data.monitorType 监测类型
-     * @apiSuccess (响应结果) {Int} data.calType 计算类型 1 - 公式计算 2 - 脚本计算 3 - 外部HTTP计算 -1 不计算
-     * @apiSuccess (响应结果) {Int} data.displayOrder 显示排序字段
-     * @apiSuccess (响应结果) {String} data.exValues 拓展信息
-     * @apiSuccess (响应结果) {Int} data.createType 创建类型 0 - 系统创建 1 - 用户创建
-     * @apiSuccess (响应结果) {Int} data.companyID 公司ID
-     * @apiSuccess (响应结果) {Boolean} data.defaultTemplate 是否为默认模板
-     * @apiSuccess (响应结果) {Object[]} data.dataSourceList 数据源列表
-     * @apiSuccess (响应结果) {Int} data.dataSourceList.dataSourceType 数据源类型 1 - 物联网传感器 2 - 监测传感器 3 - 外部HTTP 4 - 脚本 5 - 公式
-     * @apiSuccess (响应结果) {String} data.dataSourceList.templateDataSourceToken 模板数据源标识
-     * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": [{"id": 0,"name": "物模型1","dataSourceComposeType": 1,"templateDataSourceID": "777d75e0-f2de-4c0b-a759-d98fe9091d05","monitorType": 1,"calType": 1,"displayOrder": 1,"exValues": "","createType": 0,"companyID": 0,"defaultTemplate": false,"dataSourceList": [{"dataSourceType": 1,"childList": [{"productID": 385,"deviceName": "test2023","deviceToken": "test2023","uniqueToken": "D8DB467AB743476CA4B6F6F909704FBB","sensorList": [{"id": 353,"sensorName": "103_1","iotSensorType": "103","alias": "103_1"}],"id": 15567}],"templateDataSourceToken": "103"},{"dataSourceType": 2,"templateDataSourceToken": "10086"}]}]}
-     * @apiPermission mdmbase:ListDataSource
-     */
-    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
-    @PostMapping(value = "/ManualDataSource", produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object manualDataSource(@RequestBody @Validated DataSourceCatalogRequest request) {
-        return sensorService.manualDataSource(request);
-    }
-
-    /**
      * @api {POST} /MonitorTypeCatalog 监测类型选择
      * @apiVersion 1.0.0
      * @apiGroup 传感器模块

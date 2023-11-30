@@ -32,6 +32,7 @@
     </resultMap>
     <resultMap id="sensorIDWithFormulaBaseMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo">
         <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="templateID" jdbcType="INTEGER" property="templateID"/>
         <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
         <result column="calType" jdbcType="INTEGER" property="calType"/>
         <collection property="formulaBaseInfoList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.FormulaBaseInfo">
@@ -39,15 +40,25 @@
             <result column="formula" jdbcType="VARCHAR" property="formula"/>
             <result column="fieldCalOrder" jdbcType="INTEGER" property="fieldCalOrder"/>
         </collection>
-        <collection property="parameterList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+        <collection property="sensorParameterList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
             <id column="fieldID" jdbcType="INTEGER" property="ID"/>
-            <result column="paramSubjectID" jdbcType="INTEGER" property="subjectID"/>
-            <result column="paramSubjectType" jdbcType="INTEGER" property="subjectType"/>
-            <result column="paramPaUnitID" jdbcType="VARCHAR" property="paUnitID"/>
-            <result column="paramDataType" jdbcType="VARCHAR" property="dataType"/>
-            <result column="paramToken" jdbcType="VARCHAR" property="token"/>
-            <result column="paramName" jdbcType="VARCHAR" property="name"/>
-            <result column="paramPaValue" jdbcType="VARCHAR" property="paValue"/>
+            <result column="sParamSubjectID" jdbcType="INTEGER" property="subjectID"/>
+            <result column="sParamSubjectType" jdbcType="INTEGER" property="subjectType"/>
+            <result column="sParamPaUnitID" jdbcType="VARCHAR" property="paUnitID"/>
+            <result column="sParamDataType" jdbcType="VARCHAR" property="dataType"/>
+            <result column="sParamToken" jdbcType="VARCHAR" property="token"/>
+            <result column="sParamName" jdbcType="VARCHAR" property="name"/>
+            <result column="sParamPaValue" jdbcType="VARCHAR" property="paValue"/>
+        </collection>
+        <collection property="templateParameterList" ofType="cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter">
+            <id column="fieldID" jdbcType="INTEGER" property="ID"/>
+            <result column="tParamSubjectID" jdbcType="INTEGER" property="subjectID"/>
+            <result column="tParamSubjectType" jdbcType="INTEGER" property="subjectType"/>
+            <result column="tParamPaUnitID" jdbcType="VARCHAR" property="paUnitID"/>
+            <result column="tParamDataType" jdbcType="VARCHAR" property="dataType"/>
+            <result column="tParamToken" jdbcType="VARCHAR" property="token"/>
+            <result column="tParamName" jdbcType="VARCHAR" property="name"/>
+            <result column="tParamPaValue" jdbcType="VARCHAR" property="paValue"/>
         </collection>
     </resultMap>
 
@@ -708,26 +719,37 @@
         SELECT
             ts.`ID` sensorID,
             ts.`MonitorType` monitorType,
+            ts.`TemplateID` templateID,
             tmtt.`CalType` calType,
             ttf.`Formula` formula,
             ttf.`FieldCalOrder` fieldCalOrder,
             tmtf.`FieldToken` fieldToken,
-            tp.`ID` paramID,
-            tp.`SubjectID` paramSubjectID,
-            tp.`SubjectType` paramSubjectType,
-            tp.`PaUnitID` paramPaUnitID,
-            tp.`DataType` paramDataType,
-            tp.`Token` paramToken,
-            tp.`Name` paramName,
-            tp.`PaValue` paramPaValue,
-            tp.`PaDesc` paramPaDesc
+            tp_s.`ID` sParamID,
+            tp_s.`SubjectID` sParamSubjectID,
+            tp_s.`SubjectType` sParamSubjectType,
+            tp_s.`PaUnitID` sParamPaUnitID,
+            tp_s.`DataType` sParamDataType,
+            tp_s.`Token` sParamToken,
+            tp_s.`Name` sParamName,
+            tp_s.`PaValue` sParamPaValue,
+            tp_s.`PaDesc` sParamPaDesc,
+            tp_t.`ID` tParamID,
+            tp_t.`SubjectID` tParamSubjectID,
+            tp_t.`SubjectType` tParamSubjectType,
+            tp_t.`PaUnitID` tParamPaUnitID,
+            tp_t.`DataType` tParamDataType,
+            tp_t.`Token` tParamToken,
+            tp_t.`Name` tParamName,
+            tp_t.`PaValue` tParamPaValue,
+            tp_t.`PaDesc` tParamPaDesc
         FROM
             tb_sensor ts
-            LEFT JOIN tb_sensor_data_source tsds ON tsds.`DataSourceID` = ts.`DataSourceID`
-            LEFT JOIN tb_monitor_type_template tmtt ON tmtt.`ID` = ts.`TemplateID`
-            LEFT JOIN tb_template_formula ttf ON ttf.`TemplateID` = tmtt.`ID`
-            LEFT JOIN tb_monitor_type_field tmtf ON tmtf.`ID` = ttf.`FieldID` AND tmtf.`FieldClass` = 2
-            LEFT JOIN `tb_parameter` tp ON tp.`SubjectID` = ts.`ID` AND tp.`SubjectType` = 3
+            LEFT JOIN `tb_sensor_data_source` tsds ON tsds.`DataSourceID` = ts.`DataSourceID`
+            LEFT JOIN `tb_parameter` tp_s ON tp_s.`SubjectID` = ts.`ID` AND tp_s.`SubjectType` = 3
+            LEFT JOIN `tb_parameter` tp_t ON tp_t.`SubjectID` = ts.`TemplateID` AND tp_s.`SubjectType` = 4
+            LEFT JOIN `tb_monitor_type_template` tmtt ON tmtt.`ID` = ts.`TemplateID`
+            LEFT JOIN `tb_template_formula` ttf ON ttf.`TemplateID` = tmtt.`ID`
+            LEFT JOIN `tb_monitor_type_field` tmtf ON tmtf.`ID` = ttf.`FieldID` AND tmtf.`FieldClass` = 2
         WHERE ts.`Kind` = 3 AND tsds.`DataSourceComposeType` = 500 AND ts.`ID` IN
         <foreach collection="sensorIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}

@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
+import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -244,5 +246,25 @@ public class InfluxDBDataUtil {
         return groupedData;
     }
 
+    /**
+     * 两者都会使用，仅返参格式不同
+     *
+     * @see #buildFieldSelectInfo(String)
+     */
+    public static FieldBaseInfo buildFieldBaseInfo(final String fieldToken) {
+        FieldBaseInfo info = new FieldBaseInfo();
+        info.setFieldToken(fieldToken);
+        return info;
+    }
 
+    /**
+     * 根据fieldToken构建查询的封装对象
+     *
+     * @param fieldToken fieldToken
+     */
+    public static FieldSelectInfo buildFieldSelectInfo(final String fieldToken) {
+        FieldSelectInfo info = new FieldSelectInfo();
+        info.setFieldToken(fieldToken);
+        return info;
+    }
 }

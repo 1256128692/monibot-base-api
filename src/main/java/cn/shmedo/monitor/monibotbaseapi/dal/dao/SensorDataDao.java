@@ -23,6 +23,19 @@ public interface SensorDataDao {
             , boolean raw, Integer monitorType);
 
     /**
+     * 查询传感器在某个时间点之前的最新数据
+     *
+     * @param sensorIDList        传感器编号列表
+     * @param end                 时间点
+     * @param fieldSelectInfoList 字段信息列表
+     * @param raw                 是否为原始数据
+     * @param monitorType         监测类型
+     * @return 监测数据列表
+     */
+    List<Map<String, Object>> querySensorNewDataBefore(List<Integer> sensorIDList, Timestamp end,
+                                                       List<FieldSelectInfo> fieldSelectInfoList, boolean raw, Integer monitorType);
+
+    /**
      * 查询传感器监测数据列表
      *
      * @param sensorIDList        传感器编号列表

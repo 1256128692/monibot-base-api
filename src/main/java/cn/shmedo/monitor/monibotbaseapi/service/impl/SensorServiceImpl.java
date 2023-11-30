@@ -130,20 +130,6 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     }
 
-    @SuppressWarnings("DuplicatedCode")
-    @Override
-    public List<DataSourceCatalogResponse> manualDataSource(DataSourceCatalogRequest request) {
-        return monitorTypeTemplateMapper.dataSourceCatalog(request).stream().filter(e -> {
-            //过滤掉配置不全的模板
-            if (CalType.FORMULA.getCode() == e.getCalType()) {
-                return ObjUtil.equals(e.getFieldCount(), e.getFormulaCount());
-            } else if (CalType.SCRIPT.getCode() == e.getCalType()) {
-                return ObjUtil.equals(e.getFieldCount(), e.getScriptCount());
-            }
-            return true;
-        }).toList();
-    }
-
     @Override
     public List<MonitorTypeCatalogResponse> monitorTypeCatalog(MonitorTypeCatalogRequest request) {
         LambdaQueryWrapper<TbMonitorTypeTemplate> wrapper = Wrappers.lambdaQuery(TbMonitorTypeTemplate.class)

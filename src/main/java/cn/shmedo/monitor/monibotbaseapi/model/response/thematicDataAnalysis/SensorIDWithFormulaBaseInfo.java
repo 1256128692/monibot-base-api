@@ -12,8 +12,10 @@ import java.util.List;
 @Data
 public class SensorIDWithFormulaBaseInfo {
     private Integer sensorID;
+    private Integer templateID;
     private Integer monitorType;
     private Integer calType;
     private List<FormulaBaseInfo> formulaBaseInfoList;
-    private List<TbParameter> parameterList;
+    private List<TbParameter> sensorParameterList;
+    private List<TbParameter> templateParameterList;
 }
