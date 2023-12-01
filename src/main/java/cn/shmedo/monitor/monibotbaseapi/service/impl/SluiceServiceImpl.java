@@ -11,11 +11,9 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectPropertyMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropWithValue;
@@ -77,6 +75,7 @@ public class SluiceServiceImpl implements SluiceService {
     private final TbSensorMapper sensorMapper;
     private final TbMonitorGroupPointMapper monitorGroupPointMapper;
     private final TbProjectInfoMapper projectInfoMapper;
+    private final TbMonitorPointMapper monitorPointMapper;
     private final InfluxDB influxDb;
     private final IotService iotService;
     private final UserService userService;
@@ -93,7 +92,7 @@ public class SluiceServiceImpl implements SluiceService {
             //获取字典
             Map<Integer, Map<String, String>> propMap = getPropDict(List.of(sensor), TbSensor::getProjectID,
                     Set.of(CANAL_NAME, SLUICE_TYPE, MANAGE_UNIT));
-            Map<Integer, String> projectMap = getProjectDIct(List.of(sensor), TbSensor::getProjectID);
+            Map<Integer, String> projectMap = getProjectDict(List.of(sensor), TbSensor::getProjectID);
             Map<Integer, String> userMap = getUserDict(List.of(log), SluiceLog::getUserID);
 
             ControlRecord record = new ControlRecord();
@@ -147,10 +146,9 @@ public class SluiceServiceImpl implements SluiceService {
         }
 
         Optional.ofNullable(request.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> {
-            List<Tuple3<Collection<String>, String, Boolean>> props = List.of(Tuples.of(List.of(CANAL_NAME),
-                    request.getKeyword(), Boolean.TRUE));
-            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectIDs(),
-                    PropertySubjectType.Project, props);
+            List<Tuple3<Collection<String>, String, Boolean>> props =
+                    List.of(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE));
+            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
             if (!result.isEmpty()) {
                 request.setProjectIDs(result);
             }
@@ -181,7 +179,7 @@ public class SluiceServiceImpl implements SluiceService {
         Map<Integer, TbSensor> sensorMap = getSensorDict(data, SluiceLog::getSid);
         Map<Integer, Map<String, String>> propMap = getPropDict(sensorMap.values(), TbSensor::getProjectID,
                 Set.of(CANAL_NAME, SLUICE_TYPE, MANAGE_UNIT));
-        Map<Integer, String> projectMap = getProjectDIct(sensorMap.values(), TbSensor::getProjectID);
+        Map<Integer, String> projectMap = getProjectDict(sensorMap.values(), TbSensor::getProjectID);
         Map<Integer, String> userMap = getUserDict(data, SluiceLog::getUserID);
 
         //处理结果
@@ -268,8 +266,7 @@ public class SluiceServiceImpl implements SluiceService {
         //采集传感器（水情数据）
         List<Gate> dataGates = data.stream().map(e -> e.getGates().stream()
                         .filter(i -> SluiceData.MONITOR_TYPE.equals(i.getMonitorType())).findFirst().orElse(null))
-                .filter(Objects::nonNull)
-                .toList();
+                .filter(Objects::nonNull).toList();
         Map<Integer, SluiceData> dataMap;
         Map<Integer, Integer> videoMGMap;
         if (!dataGates.isEmpty()) {
@@ -308,18 +305,24 @@ public class SluiceServiceImpl implements SluiceService {
                     item.setFlowRate(s.getFlowRate());
                     item.setLastCollectTime(s.getTime());
                 });
-                item.setCollectSensorID(sensor.getId());
+
+                TbMonitorPoint point = monitorPointMapper.selectOne(Wrappers.<TbMonitorPoint>lambdaQuery()
+                        .eq(TbMonitorPoint::getID, sensor.getMonitorPointID())
+                        .eq(TbMonitorPoint::getMonitorType, SluiceData.MONITOR_TYPE)
+                        .select(TbMonitorPoint::getMonitorItemID));
+                Optional.ofNullable(point).ifPresent(p ->
+                        item.setWaterData(new Sluice.WaterData(SluiceData.MONITOR_TYPE, p.getMonitorItemID(),
+                                List.of(sensor.getMonitorPointID()))));
                 Optional.ofNullable(videoMGMap.get(sensor.getMonitorPointID())).ifPresent(item::setVideoMonitorGroupID);
             });
 
             //闸门列表
-            List<Gate> list = item.getGates().stream().filter(i -> SluiceStatus.MONITOR_TYPE.equals(i.getMonitorType()))
-                    .peek(sensor -> {
-                        Optional.ofNullable(statusMap.get(sensor.getId())).ifPresent(s -> {
-                            sensor.setOpenStatus(s.getGateSta());
-                            sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
-                        });
-                    }).toList();
+            List<Gate> list = item.getGates().stream()
+                    .filter(i -> SluiceStatus.MONITOR_TYPE.equals(i.getMonitorType()))
+                    .peek(sensor -> Optional.ofNullable(statusMap.get(sensor.getId())).ifPresent(s -> {
+                        sensor.setOpenStatus(s.getGateSta());
+                        sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
+                    })).toList();
             item.setGates(list);
             item.setOpenStatus(list.stream().anyMatch(i -> i.getOpenStatus() == 1) ? 1 : 0);
 
@@ -447,16 +450,12 @@ public class SluiceServiceImpl implements SluiceService {
         List<PropWithValue> props = propertyMapper.queryPropByPids(Set.of(request.getProjectID()),
                 PropertySubjectType.Project, List.of(MAX_FLOW, MAX_WATER_LEVEL));
 
-        Optional.ofNullable(props).ifPresent(e -> {
-            e.forEach(p -> {
-                switch (p.getName()) {
-                    case MAX_FLOW -> result.setMaxFlowRate(Convert.toDouble(p.getValue()));
-                    case MAX_WATER_LEVEL -> result.setMaxBackWaterLevel(Convert.toDouble(p.getValue()));
-                    default -> {
-                    }
-                }
-            });
-        });
+        Optional.ofNullable(props).ifPresent(e -> e.forEach(p -> {
+            switch (p.getName()) {
+                case MAX_FLOW -> result.setMaxFlowRate(Convert.toDouble(p.getValue()));
+                case MAX_WATER_LEVEL -> result.setMaxBackWaterLevel(Convert.toDouble(p.getValue()));
+            }
+        }));
         return result;
     }
 
@@ -522,9 +521,10 @@ public class SluiceServiceImpl implements SluiceService {
     @Override
     public List<GateSimple> listSluiceGate(ListSluiceGateRequest request) {
         return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
-                .in(TbSensor::getProjectID, request.getProjectList())
-                .in(TbSensor::getMonitorType, SluiceStatus.MONITOR_TYPE)
-                .select(TbSensor::getID, TbSensor::getAlias)).stream().map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
+                        .in(TbSensor::getProjectID, request.getProjectList())
+                        .in(TbSensor::getMonitorType, SluiceLog.MONITOR_TYPE)
+                        .select(TbSensor::getID, TbSensor::getAlias)).stream()
+                .map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
     }
 
     /**
@@ -598,32 +598,46 @@ public class SluiceServiceImpl implements SluiceService {
     }
 
     protected <T> Map<Integer, TbSensor> getSensorDict(Collection<T> data, Function<T, Integer> sidFunc) {
-        return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
-                        .in(TbSensor::getID, data.stream().map(sidFunc).distinct().toList())
-                        .select(TbSensor::getID, TbSensor::getProjectID, TbSensor::getAlias))
-                .stream().collect(Collectors.toMap(TbSensor::getID, e -> e));
+        List<Integer> sidSet = data.stream().map(sidFunc).distinct().toList();
+        if (!sidSet.isEmpty()) {
+            return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
+                            .in(TbSensor::getID, sidSet)
+                            .select(TbSensor::getID, TbSensor::getProjectID, TbSensor::getAlias))
+                    .stream().collect(Collectors.toMap(TbSensor::getID, e -> e));
+        }
+        return Map.of();
     }
 
     protected <T> Map<Integer, Map<String, String>> getPropDict(Collection<T> data, Function<T, Integer> pidFunc,
                                                                 Collection<String> propNames) {
-        return propertyMapper.queryPropByPids(data.stream()
-                                .map(pidFunc).collect(Collectors.toSet()),
-                        PropertySubjectType.Project, propNames)
-                .stream().collect(Collectors.groupingBy(PropWithValue::getProjectID,
-                        Collectors.toMap(PropWithValue::getName, PropWithValue::getValue)));
+        Set<Integer> pidSet = data.stream().map(pidFunc).collect(Collectors.toSet());
+        if (!pidSet.isEmpty()) {
+            return propertyMapper.queryPropByPids(pidSet, PropertySubjectType.Project, propNames)
+                    .stream().collect(Collectors.groupingBy(PropWithValue::getProjectID,
+                            Collectors.toMap(PropWithValue::getName, PropWithValue::getValue)));
+        }
+        return Map.of();
     }
 
-    protected <T> Map<Integer, String> getProjectDIct(Collection<T> data, Function<T, Integer> pidFunc) {
-        return projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
-                        .in(TbProjectInfo::getID, data.stream().map(pidFunc).distinct().toList())
-                        .select(TbProjectInfo::getID, TbProjectInfo::getProjectName))
-                .stream().collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
+    protected <T> Map<Integer, String> getProjectDict(Collection<T> data, Function<T, Integer> pidFunc) {
+        List<Integer> pidSet = data.stream().map(pidFunc).filter(Objects::nonNull).distinct().toList();
+        if (!pidSet.isEmpty()) {
+            return projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
+                            .in(TbProjectInfo::getID, pidSet)
+                            .select(TbProjectInfo::getID, TbProjectInfo::getProjectName))
+                    .stream().collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
+        }
+        return Map.of();
     }
 
     protected <T> Map<Integer, String> getUserDict(Collection<T> data, Function<T, Integer> uidFunc) {
-        ResultWrapper<List<UserIDName>> wrapper = userService.queryUserIDName(new QueryUserIDNameParameter(data.stream().map(uidFunc)
-                .filter(Objects::nonNull).distinct().toList()), config.getAuthAppSecret(), config.getAuthAppKey());
-        return Optional.ofNullable(wrapper.getData()).orElse(List.of()).stream()
-                .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
+        List<Integer> uidSet = data.stream().map(uidFunc).filter(Objects::nonNull).distinct().toList();
+        if (!uidSet.isEmpty()) {
+            ResultWrapper<List<UserIDName>> wrapper = userService.queryUserIDName(new QueryUserIDNameParameter(uidSet), config.getAuthAppKey(), config.getAuthAppSecret());
+            wrapper.checkApi();
+            return Optional.ofNullable(wrapper.getData()).orElse(List.of()).stream()
+                    .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
+        }
+        return Map.of();
     }
 }

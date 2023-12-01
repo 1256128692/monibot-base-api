@@ -151,6 +151,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
         Long count = sensorMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
                 .eq(TbSensor::getProjectID, projectID)
+                .eq(TbSensor::getMonitorType, monitorType)
                 .eq(TbSensor::getAlias, alias));
         Assert.isTrue(count == 0, "传感器名称已存在");
 

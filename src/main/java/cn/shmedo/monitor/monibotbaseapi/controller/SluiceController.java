@@ -81,7 +81,7 @@ public class SluiceController {
      * @apiSuccess (返回结果) {String} mmUnit 管理单位
      * @apiSuccess (返回结果) {Int} controlType 控制类型 1远程控制 2手动控制 3现地控制
      * @apiSuccess (返回结果) {Int} [actionType] 操作类型 0恒定闸位(开合度)、1恒定水位、2总量控制(累计流量)、3时段控制、4时长控制、5远程手动控制（上、下、停）、6自动校准 7恒定流量(瞬时流量)
-     * @apiSuccess (返回结果) {Int} runningState 电机运行状态 0上、1下、2停
+     * @apiSuccess (返回结果) {Int} runningSta 电机运行状态 0上、1下、2停
      * @apiSuccess (返回结果) {DateTime} operationTime 操作时间 (yyyy-MM-dd HH:mm:ss)
      * @apiSuccess (返回结果) {Int} operationUserID 操作人id
      * @apiSuccess (返回结果) {String} operationUser 操作人名称
@@ -148,7 +148,10 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Double} currentPageData.frontWaterLevel 闸前水位(m)
      * @apiSuccess (返回结果) {Double} currentPageData.backWaterLevel 闸后水位(m)
      * @apiSuccess (返回结果) {Double} currentPageData.flowRate 瞬时流量(m³/s)
-     * @apiSuccess (返回结果) {Int} currentPageData.collectSensorID 采集传感器id (用于查询采集数据)
+     * @apiSuccess (返回结果) {Object[]} currentPageData.waterData 水情数据 (用于查询采集数据)
+     * @apiSuccess (返回结果) {Int} currentPageData.waterData.monitorType 水情数据监测类型
+     * @apiSuccess (返回结果) {Int} currentPageData.waterData.monitorItemID 水情数据监测项id
+     * @apiSuccess (返回结果) {Int[]} currentPageData.waterData.monitorPointIDList 水情数据监测点id列表
      * @apiSuccess (返回结果) {Int} currentPageData.videoMonitorGroupID 视频监测组id (用于查询视频监控)
      * @apiSuccess (返回结果) {DateTime} currentPageData.lastCollectTime 最后采集时间(yyyy-MM-dd HH:mm:ss)
      * @apiSampleRequest off
