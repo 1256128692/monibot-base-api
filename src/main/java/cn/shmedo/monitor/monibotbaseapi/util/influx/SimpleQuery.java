@@ -246,7 +246,6 @@ public class SimpleQuery {
 
     /**
      * 返回指定字段数量，不存在时返回0<br/>
-     * 当字段不存在时
      *
      * @param client {@link InfluxDB}
      * @param column 列名，必须为存在，不能是 *

@@ -113,8 +113,8 @@ public class SluiceController {
      */
     @Permission(permissionName = "mdmbase:BaseSluiceControlRecord", allowApplication = true, allowUser = false)
     @PostMapping(value = "/AddSluiceControlRecord", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object singleSluiceControlRecord(@Validated @RequestBody AddControlRecordRequest request) {
-        return service.insertSluice(request);
+    public Object addSluiceControlRecord(@Validated @RequestBody AddControlRecordRequest request) {
+        return service.addSluiceControlRecord(request);
     }
 
     /**

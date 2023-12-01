@@ -121,7 +121,12 @@ public class SluiceServiceImpl implements SluiceService {
     }
 
     @Override
-    public List<Long> insertSluice(AddControlRecordRequest request) {
+    public List<Long> addSluiceControlRecord(AddControlRecordRequest request) {
+        Long count = SimpleQuery.of(SluiceLog.TABLE).eq(DbConstant.TIME_FIELD, request.getTime())
+                .in(DbConstant.SENSOR_ID_TAG, request.getSensorIDList().stream().map(Object::toString).toList())
+                .count(influxDb, SluiceLog.HARDWARE);
+        Assert.isTrue(count <=0, "控制记录已存在");
+
         BatchPoints batchPoints = BatchPoints.database(config.getInfluxDatabase()).build();
         request.getSensorIDList().forEach(item -> {
             Point.Builder builder = Point.measurement(SluiceLog.TABLE);
