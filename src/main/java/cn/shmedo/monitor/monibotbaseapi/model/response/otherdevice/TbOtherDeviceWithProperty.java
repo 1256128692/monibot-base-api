@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbOtherDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  * @author: gaoxu
  * @create: 2023-10-07 14:00
  **/
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class TbOtherDeviceWithProperty extends TbOtherDevice {
     private String projectLocation;
