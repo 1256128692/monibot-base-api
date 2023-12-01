@@ -44,7 +44,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
      * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
-     * @apiParam (请求体) {Int[]} [eigenvalueIDList] 特征值ID列表
+     * @apiParam (请求体) {Int[]} [eigenValueIDList] 特征值ID列表
      * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],

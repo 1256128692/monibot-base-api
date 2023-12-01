@@ -559,7 +559,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             Integer sensorID = (Integer) data.get("sensorID");
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 String fieldToken = entry.getKey();
-                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID")) {
+                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID") && !fieldToken.equals("deep")) {
                     Double value = (Double) entry.getValue();
                     Map<String, Object> maxData = maxDataMap.computeIfAbsent(fieldToken, k -> new HashMap<>());
                     if (!maxData.containsKey("value") || value > (Double) maxData.get("value")) {
@@ -585,7 +585,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             Integer sensorID = (Integer) data.get("sensorID");
             for (Map.Entry<String, Object> entry : data.entrySet()) {
                 String fieldToken = entry.getKey();
-                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID")) {
+                if (!fieldToken.equals("time") && !fieldToken.equals("sensorID") && !fieldToken.equals("deep")) {
                     Double value = (Double) entry.getValue();
                     Map<String, Object> minData = minDataMap.computeIfAbsent(fieldToken, k -> new HashMap<>());
                     if (!minData.containsKey("value") || value < (Double) minData.get("value")) {
