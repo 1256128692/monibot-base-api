@@ -12,8 +12,8 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
@@ -60,7 +60,7 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
         private Double gateDegree;
 
         @NotNull(groups = {TimeControl.class}, message = "openTime must not be null")
-        @Past(groups = {TimeControl.class}, message = "openTime must be past")
+        @Future(groups = {TimeControl.class}, message = "openTime cannot be past time")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime openTime;
@@ -70,13 +70,13 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
         private Integer duration;
 
         @NotNull(groups = {TimePeriodControl.class}, message = "beginTime must not be null")
-        @Past(groups = {TimePeriodControl.class}, message = "beginTime must be past")
+        @Future(groups = {TimePeriodControl.class}, message = "beginTime cannot be past time")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime beginTime;
 
         @NotNull(groups = {TimePeriodControl.class}, message = "endTime must not be null")
-        @Past(groups = {TimePeriodControl.class}, message = "endTime must be past")
+        @Future(groups = {TimePeriodControl.class}, message = "endTime cannot be past time")
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         private LocalDateTime endTime;
