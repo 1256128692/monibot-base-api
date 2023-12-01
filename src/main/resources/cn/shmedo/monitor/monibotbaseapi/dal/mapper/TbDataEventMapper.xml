@@ -210,7 +210,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo">
         select ID as id, `Name` as eventName, Frequency, TimeRange
         from tb_data_event
-        where ID
+        where ID in
         <foreach collection="eventIDList" item="eventID" separator="," index="index" open="(" close=")">
             #{eventID}
         </foreach>

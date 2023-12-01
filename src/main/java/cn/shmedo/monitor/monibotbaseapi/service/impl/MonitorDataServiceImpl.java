@@ -321,6 +321,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             List<TbEigenValueRelation> eigenValueRelations = tbEigenValueRelationMapper.selectByIDs(pa.getEigenValueIDList());
 
             if (!CollectionUtil.isNullOrEmpty(eigenValueRelations) && !CollectionUtil.isNullOrEmpty(eigenValueList)) {
+                eigenValueList.forEach(e -> e.setScopeStr(ScopeType.getDescriptionByCode(e.getScope())));
                 monitorPointDataInfoList.forEach(m -> {
                     List<Integer> eigenValueIDList = eigenValueRelations.stream().filter(e -> e.getMonitorPointID().equals(m.getMonitorPointID()))
                             .map(TbEigenValueRelation::getEigenValueID).collect(Collectors.toList());
@@ -335,6 +336,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (!CollectionUtil.isNullOrEmpty(pa.getEventIDList())) {
             List<EventBaseInfo> eventBaseInfoList = tbDataEventMapper.selectByIDs(pa.getEventIDList());
             if (!CollectionUtil.isNullOrEmpty(eventBaseInfoList)) {
+                eventBaseInfoList.forEach(e -> e.setFrequencyStr(FrequencyEnum.getDescriptionFromValue(e.getFrequency())));
                 monitorPointDataInfoList.forEach(m -> {
                     m.setEventList(eventBaseInfoList);
                 });

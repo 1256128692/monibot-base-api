@@ -70,7 +70,7 @@ public interface TbEigenValueMapper {
 
     List<ThematicEigenValueInfo> selectFieldInfoByPointIDList(List<Integer> monitorPointIDList);
 
-    List<EigenBaseInfo> selectByIDs(List<Integer> eigenvalueIDList);
+    List<EigenBaseInfo> selectByIDs(List<Integer> eigenValueIDList);
 
     int insertBatchSelective(List<AddEigenValueParam> tbEigenValues);
 
