@@ -40,7 +40,6 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
     private Date end;
     @NotNull(message = "densityType不能为空")
     private Integer densityType;
-    @NotNull(message = "statisticsType不能为空")
     private Integer statisticsType;
 
     private Boolean filterEmptyData;
@@ -84,27 +83,34 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "没有该监测类型");
         }
 
-        if (!StringUtils.isNotBlank(monitorTypeList.get(0).getExValues())) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型没有配置预定义密度与统计方式");
-        } else {
-            MonitorTypeConfigV1 monitorTypeConfigV1 = JSONUtil.toBean(monitorTypeList.get(0).getExValues(), MonitorTypeConfigV1.class);
-            if (densityType == DisplayDensity.TWO_HOUR.getValue()
-                    || densityType == DisplayDensity.FOUR_HOUR.getValue()
-                    || densityType == DisplayDensity.SIX_HOUR.getValue()
-                    || densityType == DisplayDensity.TWELVE_HOUR.getValue()) {
-                // 实时数据不做校验
-
-            } else {
-                // 监测类型的预定义查询方式校验(历史数据)
-                if (!monitorTypeConfigV1.getDisplayDensity().contains(densityType)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数densityType不符合该监测类型的预定义配置");
-                }
-                if (!monitorTypeConfigV1.getStatisticalMethods().contains(statisticsType)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数statisticsType不符合该监测类型的预定义配置");
-                }
+        if (densityType == DisplayDensity.ALL.getValue()) {
+            if (statisticsType != null) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询密度为全部时,参数statisticsType应为null");
             }
+        } else {
+            if (!StringUtils.isNotBlank(monitorTypeList.get(0).getExValues())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型没有配置预定义密度与统计方式");
+            } else {
+                MonitorTypeConfigV1 monitorTypeConfigV1 = JSONUtil.toBean(monitorTypeList.get(0).getExValues(), MonitorTypeConfigV1.class);
+                if (densityType == DisplayDensity.TWO_HOUR.getValue()
+                        || densityType == DisplayDensity.FOUR_HOUR.getValue()
+                        || densityType == DisplayDensity.SIX_HOUR.getValue()
+                        || densityType == DisplayDensity.TWELVE_HOUR.getValue()) {
+                    // 实时数据不做校验
 
+                } else {
+                    // 监测类型的预定义查询方式校验(历史数据)
+                    if (!monitorTypeConfigV1.getDisplayDensity().contains(densityType)) {
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数densityType不符合该监测类型的预定义配置");
+                    }
+                    if (!monitorTypeConfigV1.getStatisticalMethods().contains(statisticsType)) {
+                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数statisticsType不符合该监测类型的预定义配置");
+                    }
+                }
+
+            }
         }
+
 
         if (filterEmptyData == null) {
             filterEmptyData = false;
