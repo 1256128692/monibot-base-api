@@ -8,6 +8,7 @@ import java.util.List;
 
 public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String CONTENT_DISPOSITION_HEADER = "Content-disposition";
 
     public static final String COLON = ":";

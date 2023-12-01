@@ -553,9 +553,6 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 }
                 return list;
             }).flatMap(Collection::stream).toList();
-
-            log.info("\n--------------------\nmanualDataItemList:\n{}\n--------------------", JSONUtil.toJsonStr(manualDataItemList));
-
             AddManualDataBatchParam param = new AddManualDataBatchParam();
             param.setProjectID(projectID);
             param.setDataList(manualDataItemList);

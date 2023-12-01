@@ -693,7 +693,7 @@ public class ThematicDataAnalysisController {
      * @apiPermission 项目权限 mdmbase:
      */
     //@Permission(permissionName = "")
-    @PostMapping(value = "/ImportManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/ImportManualDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.MULTIPART_FORM_DATA)
     public Object importManualDataBatch(@Valid @ResourceSymbol(ResourceType.BASE_PROJECT) @Positive(message = "工程ID不能小于1")
                                         @RequestParam("projectID") Integer projectID,
                                         @Positive(message = "监测类型不能为空") @RequestParam("monitorType") Integer monitorType,
