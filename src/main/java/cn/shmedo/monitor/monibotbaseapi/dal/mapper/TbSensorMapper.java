@@ -92,8 +92,8 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
      */
     List<Tuple3<Integer, String, String>> queryGateIotToken(@Param("projectID") Integer projectID, @Param("sensorID") Integer sensorID);
     /**
-     * 查询传感器id和监测类型下全部扩展属性的fieldToken、公式和公式排序<br>
+     * 查询人工传感器id和监测类型下全部扩展属性的fieldToken、公式和公式排序<br>
      * 仅是<b>扩展属性</b>,不是<b>全部属性</b>
      */
-    List<SensorIDWithFormulaBaseInfo> selectSensorIDWithFormulaBaseInfoBySensorIDList(List<Integer> sensorIDList);
+    List<SensorIDWithFormulaBaseInfo> selectManualSensorIDWithFormulaBaseInfoBySensorIDList(List<Integer> sensorIDList);
 }

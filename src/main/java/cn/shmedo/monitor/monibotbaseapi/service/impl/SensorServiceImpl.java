@@ -156,7 +156,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         boolean isManual = request.getManual();
         // 中台传感器名称
-        String mdmbaseSensorName = genSensorName(request.getMonitorType(), request.getProjectID());
+        String mdmbaseSensorName = (isManual ? "manual_" : "") + genSensorName(request.getMonitorType(), request.getProjectID());
 
         //传感器
         TbSensor sensor = new TbSensor();
@@ -476,8 +476,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     public List<SensorSimple> querySimpleList(QuerySensorSimpleListRequest param) {
         LambdaQueryWrapper<TbSensor> wrapper = Wrappers.<TbSensor>lambdaQuery()
-                        .select(TbSensor::getID, TbSensor::getProjectID, TbSensor::getName, TbSensor::getAlias,
-                                TbSensor::getMonitorType, TbSensor::getKind, TbSensor::getMonitorPointID);
+                .select(TbSensor::getID, TbSensor::getProjectID, TbSensor::getName, TbSensor::getAlias,
+                        TbSensor::getMonitorType, TbSensor::getKind, TbSensor::getMonitorPointID);
         Optional.ofNullable(param.getIdList()).filter(e -> !e.isEmpty())
                 .ifPresent(e -> wrapper.in(TbSensor::getID, e));
         Optional.ofNullable(param.getProjectIDList()).filter(e -> !e.isEmpty())

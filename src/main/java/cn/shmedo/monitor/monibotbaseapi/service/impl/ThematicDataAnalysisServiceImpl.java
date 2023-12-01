@@ -515,7 +515,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     .mapToObj(u -> new Tuple<>(u, colNameFieldTokenMap.get(Convert.toStr(header.get(u)))))
                     .collect(Collectors.toMap(Tuple::getItem1, Tuple::getItem2));
             if (colFieldTokenMap.keySet().size() != header.size() - 3) {
-                throw new ParseException("Excel表格中有列不属于该监测类型", -1);
+                throw new ParseException("Excel表格中有列不属于该监测类型的基础属性", -1);
             }
             List<List<Object>> dataList = reader.read(1);
             if (dataList.stream().anyMatch(u -> u.size() <= 3)) {
