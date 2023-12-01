@@ -522,7 +522,7 @@ public class SluiceServiceImpl implements SluiceService {
     public List<GateSimple> listSluiceGate(ListSluiceGateRequest request) {
         return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
                         .in(TbSensor::getProjectID, request.getProjectList())
-                        .in(TbSensor::getMonitorType, SluiceLog.TABLE)
+                        .in(TbSensor::getMonitorType, SluiceLog.MONITOR_TYPE)
                         .select(TbSensor::getID, TbSensor::getAlias)).stream()
                 .map(e -> new GateSimple(e.getID(), e.getAlias())).distinct().toList();
     }
@@ -633,7 +633,7 @@ public class SluiceServiceImpl implements SluiceService {
     protected <T> Map<Integer, String> getUserDict(Collection<T> data, Function<T, Integer> uidFunc) {
         List<Integer> uidSet = data.stream().map(uidFunc).filter(Objects::nonNull).distinct().toList();
         if (!uidSet.isEmpty()) {
-            ResultWrapper<List<UserIDName>> wrapper = userService.queryUserIDName(new QueryUserIDNameParameter(), config.getAuthAppKey(), config.getAuthAppSecret());
+            ResultWrapper<List<UserIDName>> wrapper = userService.queryUserIDName(new QueryUserIDNameParameter(uidSet), config.getAuthAppKey(), config.getAuthAppSecret());
             wrapper.checkApi();
             return Optional.ofNullable(wrapper.getData()).orElse(List.of()).stream()
                     .collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName));
