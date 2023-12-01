@@ -37,7 +37,7 @@ import java.util.stream.Stream;
  *          .groupBy("sid")
  *          .limit(1)
  *          .query(influxDB);
- * # 等效SQL: SELECT * FROM tb_10_data WHERE  ( ( sid = '488' ) OR ( sid = '310' ) )  GROUP BY sid ORDER BY time DESC LIMIT 1 tz('PRC')
+ * //等效SQL: SELECT * FROM tb_10_data WHERE  ( ( sid = '488' ) OR ( sid = '310' ) )  GROUP BY sid ORDER BY time DESC LIMIT 1 tz('PRC')
  * </pre>
  */
 @Slf4j
@@ -337,7 +337,7 @@ public class SimpleQuery {
     }
 
     /**
-     * {@code LIMIT offset, limit}
+     * {@code LIMIT limit OFFSET offset }
      */
     public SimpleQuery limit(@Nonnull Integer offset, @Nonnull Integer limit) {
         assert offset >= 0 && limit > 0;
