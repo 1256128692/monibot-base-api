@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateUtil;
@@ -25,10 +26,12 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Timestamp;
@@ -133,8 +136,6 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
             return new Tuple<>(u.getKey(), collect);
         }).collect(Collectors.toMap(Tuple::getItem1, Tuple::getItem2));
 
-        //TODO test history parse
-
         // build two indexs which base on import dataList.
         Map<Integer, List<Map<String, Object>>> importDataMap = singleInsertDataList.values()
                 .stream().map(Map::values).flatMap(Collection::stream).map(Map::values).flatMap(Collection::stream)
@@ -169,7 +170,8 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                 .collect(Collectors.groupingBy(ManualDataItem::getMonitorType,
                         Collectors.groupingBy(u -> DateUtil.format(u.getTime(), FORMATTER))))
                 .entrySet().stream().map(u -> u.getValue().entrySet().stream().map(w -> {
-                    QueryHistoryData queryHistoryData = needQueryHistoryMap.get(w.getValue().get(0).getSensorID());
+                    QueryHistoryData queryHistoryData = QueryHistoryData.builder().build();
+                    BeanUtil.copyProperties(needQueryHistoryMap.get(w.getValue().get(0).getSensorID()), queryHistoryData);
                     queryHistoryData.setMonitorType(u.getKey());
                     queryHistoryData.setEnd(new Timestamp(DateUtil.parse(w.getKey(), FORMATTER).getTime()));
                     queryHistoryData.setSensorIDList(w.getValue().stream().map(ManualDataItem::getSensorID).distinct().toList());
@@ -178,19 +180,20 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
         SensorDataDao sensorDataDao = ContextHolder.getBean(SensorDataDao.class);
         for (QueryHistoryData queryHistoryData : queryHistoryDataList) {
             Timestamp timestamp = queryHistoryData.getEnd();
-            sensorDataDao.querySensorNewDataBefore(queryHistoryData.getSensorIDList(), timestamp, queryHistoryData.getFieldSelectInfoList(), false, queryHistoryData.getMonitorType())
-                    .stream().peek(u -> {
-                        Integer sensorID = Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN));
-                        String oldDateStr = u.get(DbConstant.TIME_FIELD).toString();
+            List<Map<String, Object>> maps = sensorDataDao.querySensorNewDataBefore(queryHistoryData.getSensorIDList(), timestamp, queryHistoryData.getFieldSelectInfoList(), false, queryHistoryData.getMonitorType());
 
-                        Map<String, String> map1 = influxHistoryIdxDate.containsKey(sensorID) ? influxHistoryIdxDate.get(sensorID) : new HashMap<>();
-                        map1.put(DateUtil.format(timestamp, FORMATTER), oldDateStr);
-                        influxHistoryIdxDate.put(sensorID, map1);
+            maps.stream().peek(u -> {
+                Integer sensorID = Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN));
+                String oldDateStr = u.get(DbConstant.TIME_FIELD).toString();
 
-                        Map<String, Map<String, Object>> map2 = influxHistoryIdxData.containsKey(sensorID) ? influxHistoryIdxData.get(sensorID) : new HashMap<>();
-                        map2.put(oldDateStr, u);
-                        influxHistoryIdxData.put(sensorID, map2);
-                    }).toList();
+                Map<String, String> map1 = influxHistoryIdxDate.containsKey(sensorID) ? influxHistoryIdxDate.get(sensorID) : new HashMap<>();
+                map1.put(DateUtil.format(timestamp, FORMATTER), oldDateStr);
+                influxHistoryIdxDate.put(sensorID, map1);
+
+                Map<String, Map<String, Object>> map2 = influxHistoryIdxData.containsKey(sensorID) ? influxHistoryIdxData.get(sensorID) : new HashMap<>();
+                map2.put(oldDateStr, u);
+                influxHistoryIdxData.put(sensorID, map2);
+            }).toList();
         }
 
         // data parse
@@ -242,8 +245,7 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                                                                                         .orElse(Optional.ofNullable(importIdxData).map(o -> o.get(timeStr))))
                                                                         .orElse(Optional.ofNullable(influxIdxData).map(o -> o.get(timeStr))).orElse(Map.of());
                                                                 if (FormulaData.Provide.DATA.equals(source.getProvide())) {
-                                                                    source.setFieldValue(historyData.containsKey(source.getFieldToken()) ?
-                                                                            Convert.toDouble(historyData.get(source.getFieldToken())) : 0D);
+                                                                    source.setFieldValue(data.containsKey(source.getFieldToken()) ? Convert.toDouble(data.get(source.getFieldToken())) : 0D);
                                                                 } else {
                                                                     if (historyData.containsKey(DbConstant.TIME_FIELD)) {
                                                                         source.setFieldValue(Convert.toDouble(historyData.get(DbConstant.TIME_FIELD)));
@@ -263,11 +265,13 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                                                             });
                                                             break;
                                                         default:
-                                                            throw new IllegalArgumentException("--");
+                                                            throw new IllegalArgumentException("Unsupported type,type:" + type.name());
                                                     }
                                                 });
                                             });
-                                            data.put(m.getFieldToken(), calculate);
+                                            // 这里有一个和中台的解算服务相异的业务场景，导入时可能会是第一条，因此要将需要历史数据的数据置为0D
+                                            // 中台的解算服务是从物联网平台取历史数据（物联网平台仅有基础属性，不存在公式解算），物联网平台如果没有历史数据，解算报错；如果有则正常解算
+                                            data.put(m.getFieldToken(), calculate.isNaN() ? 0D : calculate);
                                         }).toList();
                                 case SCRIPT, HTTP -> log.error("脚本计算/HTTP计算暂未实现");
                                 default -> {
@@ -300,6 +304,8 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
 
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     private static class QueryHistoryData {
         private Integer monitorType;
         private List<Integer> sensorIDList;
