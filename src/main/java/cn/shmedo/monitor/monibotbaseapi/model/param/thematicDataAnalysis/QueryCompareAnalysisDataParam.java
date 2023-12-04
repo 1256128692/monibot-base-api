@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
-import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldDataType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -59,14 +58,16 @@ public class QueryCompareAnalysisDataParam implements ParameterValidator, Resour
     @JsonIgnore
     private MonitorTypeFieldV2 monitorTypeField;
     @JsonIgnore
-    private List<Integer> sensorIDList = List.of(autoSensorID, manualSensorID);
+    private List<Integer> sensorIDList;
     @JsonIgnore
-    private Long interval = (long) (3600000L * (intervalType == 1 ? intervalType : intervalValue * 24));
+    private Long interval;
     @JsonIgnore
     private List<FieldSelectInfo> fieldSelectInfoList;
 
     @Override
     public ResultWrapper<?> validate() {
+        sensorIDList = List.of(autoSensorID, manualSensorID);
+        interval = (long) (3600000L * (intervalType == 1 ? intervalValue : intervalValue * 24));
         List<TbSensor> sensorList = ContextHolder.getBean(TbSensorMapper.class).selectList(new LambdaQueryWrapper<TbSensor>()
                 .eq(TbSensor::getProjectID, projectID).in(TbSensor::getID, sensorIDList));
         if (sensorList.size() != 2) {

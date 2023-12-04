@@ -594,9 +594,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         log.error("解析json array失败,json array:{}", u);
                         return List.of();
                     }
-                }).filter(CollUtil::isNotEmpty).map(u -> u.stream().filter(w ->
-                        ((JSONObject) w).containsKey(fieldToken)).findAny().map(w -> ((JSONObject) w).get(fieldToken)))
-                .map(Convert::toDouble).orElse(null);
+                }).filter(CollUtil::isNotEmpty).flatMap(u -> u.stream().filter(w -> ((JSONObject) w).containsKey(fieldToken))
+                        .findAny().map(w -> ((JSONObject) w).get(fieldToken))).map(Convert::toDouble).orElse(null);
 
         List<Map<String, Object>> dataList = sensorDataDao.querySensorData(param.getSensorIDList(), param.getStartTime(), param.getEndTime(), null, param.getFieldSelectInfoList(), false, monitorType, null);
         Map<Integer, Map<Long, Map<String, Object>>> collect = dataList.stream().filter(u -> u.containsKey(fieldToken))
@@ -633,7 +632,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     }).toList();
             long abnormalCount = list.stream().filter(w -> !w.getNormal()).count();
             builder.abnormalCount(Convert.toInt(abnormalCount));
-            builder.abnormalRatio(list.size() == 0 ? -1 : Convert.toDouble(abnormalCount / list.size()) * 100);
+            builder.abnormalRatio(list.size() == 0 ? -1 : Convert.toDouble(abnormalCount) / list.size() * 100);
             return list;
         }).orElse(List.of());
         return builder.dataList(compareAnalysisDataList).build();
