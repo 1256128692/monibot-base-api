@@ -19,6 +19,7 @@ import cn.hutool.poi.excel.ExcelWriter;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldDataType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -436,10 +437,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addManualDataBatch(AddManualDataBatchParam param) {
-        log.info("\n--------------------\ninsertDataList:\n{}\n--------------------", JSONUtil.toJsonStr(param.getInsertDataList()));
         for (AddManualItem item : param.getInsertDataList()) {
-            List<FieldSelectInfo> fieldSelectInfoList = item.getFieldTokenList().stream().map(InfluxDBDataUtil::buildFieldSelectInfo).toList();
-//            sensorDataDao.insertSensorData(item.getDataList(), false, true, fieldSelectInfoList, item.getMonitorType());
+            List<FieldSelectInfo> fieldSelectInfoList = item.getFieldTokenList().stream()
+                    .map(InfluxDBDataUtil::buildFieldSelectInfo).peek(u -> u.setFieldType(FieldType.DOUBLE)).toList();
+            sensorDataDao.insertSensorData(item.getDataList(), false, true, fieldSelectInfoList, item.getMonitorType(), StrUtil.EMPTY);
         }
     }
 
@@ -489,7 +490,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public ResultWrapper<Object> importManualDataBatch(Integer projectID, Integer monitorType, MultipartFile file) {
-        List<MonitorTypeFieldV2> monitorTypeFieldV2List = tbMonitorTypeFieldMapper.queryByMonitorTypesV2(List.of(monitorType), true);
+        List<MonitorTypeFieldV2> monitorTypeFieldV2List = tbMonitorTypeFieldMapper.queryByMonitorTypesV2(List.of(monitorType), false);
         Map<String, FieldDataType> fieldTokenDataTypeMap = monitorTypeFieldV2List.stream().collect(
                 Collectors.toMap(TbMonitorTypeField::getFieldToken, u -> FieldDataType.valueOfString(u.getFieldDataType())));
         Map<FieldClass, List<MonitorTypeFieldV2>> classFieldMap = monitorTypeFieldV2List.stream().collect(
@@ -1049,7 +1050,6 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         res.addAll(DisplayDensity.needExtraGrouping(displayDensity) ?
                 InfluxDBDataUtil.calculateStatistics(dataList, displayDensity.getValue(), statisticsMethods) : dataList);
     }
-
 
 
     private @Nullable Double getAbnormalValue(final Tuple<Double, Double> limitInfo, @Nullable Double value) {

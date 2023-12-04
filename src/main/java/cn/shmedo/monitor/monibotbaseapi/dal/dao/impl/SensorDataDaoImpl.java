@@ -69,7 +69,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         StringBuilder sqlBuilder = new StringBuilder();
         sensorIDList.forEach(sid -> {
             String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString() +
-                    "' and time <= '" + TimeUtil.formatInfluxTimeString(end) + "' order by time desc limit 1 tz('Asia/Shanghai') ; ";
+                    "' and time < '" + TimeUtil.formatInfluxTimeString(end) + "' order by time desc limit 1 tz('Asia/Shanghai') ; ";
             sqlBuilder.append(sidSql);
         });
         String sql = sqlBuilder.toString();

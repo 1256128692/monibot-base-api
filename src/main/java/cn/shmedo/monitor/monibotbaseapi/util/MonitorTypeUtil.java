@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
@@ -8,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 public class MonitorTypeUtil {
 
@@ -32,9 +34,10 @@ public class MonitorTypeUtil {
             result.append("raw_");
         }
         result.append(monitorType);
-        result.append("_data_");
-        result.append(stat);
-
+//        result.append("_data_");
+//        result.append(stat);
+        result.append("_data");
+        Optional.ofNullable(stat).filter(ObjectUtil::isNotEmpty).ifPresent(u -> result.append("_").append(u));
         return result.toString();
     }
 

@@ -147,7 +147,7 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                 .map(u -> {
                     List<Map<String, Object>> list = u.getValue().stream().sorted(Comparator.comparingLong(w ->
                             DateUtil.parse(w.get(DbConstant.TIME_FIELD).toString(), FORMATTER).getTime())).toList();
-                    Map<String, String> map = IntStream.range(1, list.size() - 1).boxed().collect(Collectors.toMap(
+                    Map<String, String> map = IntStream.range(1, list.size()).boxed().collect(Collectors.toMap(
                             i -> list.get(i).get(DbConstant.TIME_FIELD).toString(),
                             i -> list.get(i - 1).get(DbConstant.TIME_FIELD).toString(), (o1, o2) -> o1, HashMap::new));
                     map.put(list.get(0).get(DbConstant.TIME_FIELD).toString(), null);
@@ -210,7 +210,7 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                     Map<String, Double> sensorParamTokenValueMap = sensorParamValueMap.get(sensorID);
                     Map<String, Double> templateParamTokenValueMap = templateParamValueMap.get(sensorID);
 
-                    return w.getValue().entrySet().stream().map(s -> {
+                    return w.getValue().entrySet().stream().sorted(Comparator.comparingLong(s -> s.getKey().getTime())).map(s -> {
                         Date time = s.getKey();
                         Map<String, Object> data = s.getValue();
                         // parse extend fields
@@ -239,16 +239,15 @@ public class AddManualDataBatchParam implements ParameterValidator, ResourcePerm
                                                                 String timeStr = DateUtil.format(time, FORMATTER);
                                                                 Map<String, Object> historyData = Optional.ofNullable(importIdxDate).map(o -> o.get(timeStr)).map(s1 ->
                                                                                 Optional.ofNullable(influxIdxDate).map(o -> o.get(timeStr)).map(s2 ->
-                                                                                                DateUtil.parse(importIdxDate.get(timeStr), FORMATTER).getTime() >= DateUtil.parse(influxIdxDate.get(timeStr), FORMATTER).getTime() ?
-                                                                                                        Optional.ofNullable(importIdxData).map(o -> o.get(timeStr)) :
-                                                                                                        Optional.ofNullable(influxIdxData).map(o -> o.get(timeStr)))
-                                                                                        .orElse(Optional.ofNullable(importIdxData).map(o -> o.get(timeStr))))
-                                                                        .orElse(Optional.ofNullable(influxIdxData).map(o -> o.get(timeStr))).orElse(Map.of());
+                                                                                                DateUtil.parse(s1, FORMATTER).getTime() >= DateUtil.parse(s2, FORMATTER).getTime() ?
+                                                                                                        Optional.ofNullable(importIdxData).map(o -> o.get(s1)) : Optional.ofNullable(influxIdxData).map(o -> o.get(s2)))
+                                                                                        .orElse(Optional.ofNullable(importIdxData).map(o -> o.get(importIdxDate.get(timeStr)))))
+                                                                        .orElse(Optional.ofNullable(influxIdxData).filter(o -> Objects.nonNull(influxIdxDate) && influxIdxDate.containsKey(timeStr)).map(o -> o.get(influxIdxDate.get(timeStr)))).orElse(Map.of());
                                                                 if (FormulaData.Provide.DATA.equals(source.getProvide())) {
-                                                                    source.setFieldValue(data.containsKey(source.getFieldToken()) ? Convert.toDouble(data.get(source.getFieldToken())) : 0D);
+                                                                    source.setFieldValue(historyData.containsKey(source.getFieldToken()) ? Convert.toDouble(historyData.get(source.getFieldToken())) : 0D);
                                                                 } else {
                                                                     if (historyData.containsKey(DbConstant.TIME_FIELD)) {
-                                                                        source.setFieldValue(Convert.toDouble(historyData.get(DbConstant.TIME_FIELD)));
+                                                                        source.setFieldValue(DateUtil.parse(Convert.toStr(historyData.get(DbConstant.TIME_FIELD)), FORMATTER));
                                                                     } else {
                                                                         source.setFieldValue(time);
                                                                     }
