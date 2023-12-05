@@ -195,6 +195,54 @@ public class ProjectController {
 
 
     /**
+     * @api {post} /QueryProjectWithNextList 查询工程项目列表及下级项目列表
+     * @apiDescription 查询工程项目列表及下级项目列表
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName QueryProjectWithNextList
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} [projectTypeList] 项目类型列表
+     * @apiParam (请求体) {Int[]} [serviceIDList] 服务ID列表
+     * @apiSuccess (返回结果) {Object[]} list 项目信息列表
+     * @apiSuccess (返回结果) {Int} list.id 项目id
+     * @apiSuccess (返回结果) {String} list.projectName 项目名称
+     * @apiSuccess (返回结果) {String} list.shortName 项目简称
+     * @apiSuccess (返回结果) {Int} list.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} list.level 项目等级
+     * @apiSuccess (返回结果) {String} list.projectTypeName 项目类型名称
+     * @apiSuccess (返回结果) {String} list.projectMainTypeName 项目主类型名称
+     * @apiSuccess (返回结果) {Int} list.platformType 平台类型(废弃)
+     * @apiSuccess (返回结果) {Json[]} list.serviceList 服务列表
+     * @apiSuccess (返回结果) {Int} list.serviceList.ID 服务ID
+     * @apiSuccess (返回结果) {String} list.serviceList.serviceName 服务名称
+     * @apiSuccess (返回结果) {String} list.serviceList.serviceAlias 服务别名
+     * @apiSuccess (返回结果) {String} list.serviceList.serviceDesc 服务描述
+     * @apiSuccess (返回结果) {String} list.directManageUnit 直管单位
+     * @apiSuccess (返回结果) {DateTime} list.expiryDate 项目有效期
+     * @apiSuccess (返回结果) {Bool} list.enable 是否有效
+     * @apiSuccess (返回结果) {String} list.location 四级行政区域信息
+     * @apiSuccess (返回结果) {String} list.locationInfo  第四级区域名称
+     * @apiSuccess (返回结果) {String} list.projectAddress 项目地址
+     * @apiSuccess (返回结果) {Double} list.latitude 项目经度
+     * @apiSuccess (返回结果) {Double} list.longitude 项目纬度
+     * @apiSuccess (返回结果) {String} [list.imagePath] 项目图片地址
+     * @apiSuccess (返回结果) {String} [list.projectDesc] 项目简介
+     * @apiSuccess (返回结果) {DateTime} list.createTime 创建时间
+     * @apiSuccess (返回结果) {Int} list.createUserID 创建用户ID
+     * @apiSuccess (返回结果) {DateTime} list.updateTime 修改时间
+     * @apiSuccess (返回结果) {Int} list.updateUserID 修改用户ID
+     * @apiSuccess (返回结果) {Json[]} [list.downLevelProjectList] 下级项目列表
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseProject
+     */
+    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "QueryProjectWithNextList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectWithNextList(@Validated @RequestBody QueryProjectWithNextListParam pa) {
+        return projectService.queryProjectWithNextList(pa);
+    }
+
+
+    /**
      * @api {post} /QueryProjectInfo 查询工程项目详情
      * @apiDescription 查询工程项目详情
      * @apiVersion 1.0.0
