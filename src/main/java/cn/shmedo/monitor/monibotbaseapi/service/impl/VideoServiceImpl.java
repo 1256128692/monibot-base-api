@@ -393,7 +393,14 @@ public class VideoServiceImpl implements VideoService {
             companyInfoList = null;
         }
 
+        List<VideoDeviceSourceBaseInfo> videoDeviceSourceBaseInfos = videoDeviceSourceMapper.selectByDeviceSerialList(pageData.getRecords().stream().map(VideoDevicePageInfo::getDeviceSerial).collect(Collectors.toList()));
+
         pageData.getRecords().forEach(record -> {
+            if (!CollectionUtil.isNullOrEmpty(videoDeviceSourceBaseInfos)) {
+                record.setChannelNoList(videoDeviceSourceBaseInfos.stream()
+                        .filter(v -> v.getDeviceSerial().equals(record.getDeviceSerial()))
+                        .map(VideoDeviceSourceBaseInfo::getChannelCode).collect(Collectors.toList()));
+            }
             record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
             record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
             if (!CollectionUtil.isNullOrEmpty(companyInfoList)) {

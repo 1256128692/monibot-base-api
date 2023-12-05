@@ -832,6 +832,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Date} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 最后更新用户ID
      * @apiSuccess (返回结果) {Date} currentPageData.updateTime 最后更新时间
+     * @apiSuccess (返回结果) {Int[]} currentPageData.channelNoList 视频设备通道号列表
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
