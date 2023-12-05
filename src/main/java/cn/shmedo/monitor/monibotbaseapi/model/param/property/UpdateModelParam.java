@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
@@ -113,8 +114,10 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         if (StringUtils.isNotEmpty(modelName)) {
             LambdaQueryWrapper<TbPropertyModel> checkNameQueryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
                     .ne(TbPropertyModel::getID, this.ID)
-                    .eq(TbPropertyModel::getModelType, this.modelType)
                     .eq(TbPropertyModel::getCompanyID, this.companyID)
+                    .eq(TbPropertyModel::getModelType, this.modelType)
+                    .eq(Objects.nonNull(this.groupID), TbPropertyModel::getGroupID, this.groupID)
+                    .eq(Objects.nonNull(this.modelTypeSubType), TbPropertyModel::getModelTypeSubType, this.modelTypeSubType)
                     .eq(TbPropertyModel::getName, this.modelName);
             if (Objects.nonNull(this.modelTypeSubType)) {
                 checkNameQueryWrapper.eq(TbPropertyModel::getModelTypeSubType, this.modelTypeSubType);
