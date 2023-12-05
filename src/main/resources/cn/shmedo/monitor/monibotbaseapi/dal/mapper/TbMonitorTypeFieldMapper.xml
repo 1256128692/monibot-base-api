@@ -359,6 +359,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo">
         select mtf.ID as monitorTypeFieldID,
         mtf.fieldToken,
+        mtf.fieldClass,
         mtf.fieldName,
         mif.monitorItemID,
         mtf.fieldUnitID,

@@ -7,6 +7,7 @@ public class MonitorTypeFieldBaseInfo {
 
     private Integer monitorTypeFieldID;
     private String fieldToken;
+    private Integer fieldClass;
     private String fieldName;
     private Integer monitorItemID;
     private Integer fieldUnitID;

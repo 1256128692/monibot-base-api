@@ -280,6 +280,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Object[]} list.monitorTypeFieldList 监测点列表
      * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.monitorTypeFieldID 监测子类型ID
      * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldToken 类型token
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.fieldClass 属性类型 1 - 基础属性  2 - 扩展属性 3 - 扩展配置
      * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldName 类型名称
      * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.fieldUnitID 监测子类型ID
