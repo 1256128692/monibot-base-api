@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.validation.constraints.NotNull;
@@ -38,9 +39,11 @@ public class BaseSluiceQuery implements ParameterValidator, ResourcePermissionPr
 
     private String keyword;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime begin;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime end;
 

@@ -48,6 +48,7 @@ import org.influxdb.dto.BatchPoints;
 import org.influxdb.dto.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -150,14 +151,24 @@ public class SluiceServiceImpl implements SluiceService {
             return PageUtil.Page.empty();
         }
 
-        Optional.ofNullable(request.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e -> {
-            List<Tuple3<Collection<String>, String, Boolean>> props =
-                    List.of(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE));
-            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
-            if (!result.isEmpty()) {
-                request.setProjectIDs(result);
+        if (StringUtils.hasText(request.getKeyword())) {
+            //按渠道名称模糊查询
+            List<Tuple3<Collection<String>, String, Boolean>> props = List.of(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE));
+            List<Integer> canal_res = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
+
+            //按项目名称(水闸名称)模糊查询
+            List<Integer> name_res = projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
+                    .in(TbProjectInfo::getID, request.getProjectIDs())
+                    .like(TbProjectInfo::getProjectName, request.getKeyword())
+                    .select(TbProjectInfo::getID)).stream().map(TbProjectInfo::getID).distinct().toList();
+
+            //整合结果
+            if (!canal_res.isEmpty() || !name_res.isEmpty()) {
+                request.setProjectIDs(CollUtil.union(canal_res, name_res));
+            } else {
+                return PageUtil.Page.empty();
             }
-        });
+        }
 
         //将项目ID转换为传感器ID
         List<String> sensorIds = sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
