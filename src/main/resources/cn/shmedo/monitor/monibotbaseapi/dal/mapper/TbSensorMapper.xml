@@ -795,9 +795,6 @@
                         ts.MonitorType IN (60, 61) AND
                     </otherwise>
                 </choose>
-                <if test="param.keyword != null and param.keyword != ''">
-                    tpi.ProjectName LIKE CONCAT('%', #{param.keyword}, '%') AND
-                </if>
             </trim>
         </where>
         GROUP BY
@@ -833,6 +830,11 @@
                         FALSE
                     </otherwise>
                 </choose>
+                <if test="sensorIDList != null and sensorIDList.size() != 0">
+                    <foreach collection="sensorIDList" open="AND ts.ID IN (" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </if>
             </where>
     </select>
 

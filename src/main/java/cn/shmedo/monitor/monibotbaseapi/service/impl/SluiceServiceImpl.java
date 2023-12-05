@@ -237,33 +237,55 @@ public class SluiceServiceImpl implements SluiceService {
 
     @Override
     public PageUtil.Page<Sluice> sluicePage(QuerySluicePageRequest request) {
+        //渠道 模糊过滤
+        if (StringUtils.hasText(request.getKeyword())) {
+            //按渠道名称模糊查询
+            List<Tuple3<Collection<String>, String, Boolean>> props = List.of(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE));
+            List<Integer> canal_res = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
 
-        //渠道、水闸类型、管理单位过滤
-        List<Tuple3<Collection<String>, String, Boolean>> props = new ArrayList<>();
-        Optional.ofNullable(request.getKeyword()).filter(e -> !e.isBlank()).ifPresent(e ->
-                props.add(Tuples.of(List.of(CANAL_NAME), request.getKeyword(), Boolean.TRUE)));
-        Optional.ofNullable(request.getSluiceType()).filter(e -> !e.isBlank()).ifPresent(e ->
-                props.add(Tuples.of(List.of(SLUICE_TYPE), request.getSluiceType(), Boolean.FALSE)));
-        Optional.ofNullable(request.getManageUnit()).filter(e -> !e.isBlank()).ifPresent(e ->
-                props.add(Tuples.of(List.of(MANAGE_UNIT), request.getManageUnit(), Boolean.FALSE)));
-        if (!request.getProjectIDs().isEmpty() && !props.isEmpty()) {
-            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
-            if (StrUtil.isNotBlank(request.getSluiceType()) || StrUtil.isNotBlank(request.getManageUnit())) {
-                request.setProjectIDs(result);
-            } else if (!result.isEmpty()) {
-                request.setProjectIDs(result);
+            //按项目名称(水闸名称)模糊查询
+            List<Integer> name_res = projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
+                    .in(TbProjectInfo::getID, request.getProjectIDs())
+                    .like(TbProjectInfo::getProjectName, request.getKeyword())
+                    .select(TbProjectInfo::getID)).stream().map(TbProjectInfo::getID).distinct().toList();
+
+            //整合结果
+            if (canal_res.isEmpty() && name_res.isEmpty()) {
+                return PageUtil.Page.empty();
             }
+            request.setProjectIDs(CollUtil.union(canal_res, name_res));
         }
 
+        //水闸类型、管理单位 精确过滤
+        if (StringUtils.hasText(request.getSluiceType()) || StringUtils.hasText(request.getManageUnit())) {
+            List<Tuple3<Collection<String>, String, Boolean>> props = new ArrayList<>();
+            Optional.ofNullable(request.getSluiceType()).filter(e -> !e.isBlank()).ifPresent(e ->
+                    props.add(Tuples.of(List.of(SLUICE_TYPE), request.getSluiceType(), Boolean.FALSE)));
+            Optional.ofNullable(request.getManageUnit()).filter(e -> !e.isBlank()).ifPresent(e ->
+                    props.add(Tuples.of(List.of(MANAGE_UNIT), request.getManageUnit(), Boolean.FALSE)));
+            List<Integer> result = propertyMapper.queryPidByProps(request.getProjectIDs(), PropertySubjectType.Project, props);
+            if (result.isEmpty()) {
+                return PageUtil.Page.empty();
+            }
+            request.setProjectIDs(result);
+        }
+
+
         //控制方式过滤
-        if (!request.getProjectIDs().isEmpty() && request.getControlType() != null) {
-            List<Integer> sids = SimpleQuery.of(SluiceStatus.TABLE)
+        Map<Integer, SluiceStatus> statusMap = Map.of();
+        if (request.getControlType() != null) {
+            List<SluiceStatus> list = SimpleQuery.of(SluiceStatus.TABLE)
+                    .select(SluiceStatus.HARDWARE, SluiceStatus.GATE_STA)
                     .eq(SluiceStatus.HARDWARE, request.getControlType().getDeviceCode())
-                    .column(influxDb, DbConstant.SENSOR_ID_TAG, Integer.class);
-            if (sids == null || sids.isEmpty()) {
+                    .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
+                    .limit(1).query(influxDb, SluiceStatus.class);
+           List<Integer> sids = list.stream().filter(e -> request.getControlType().getDeviceCode().equals(e.getHardware()))
+                    .map(SluiceStatus::getSid).toList();
+            if (sids.isEmpty()) {
                 return PageUtil.Page.empty();
             }
             request.getSensorList().addAll(sids);
+            statusMap = list.stream().collect(Collectors.toMap(SluiceStatus::getSid, e -> e));
         }
 
 
@@ -272,7 +294,7 @@ public class SluiceServiceImpl implements SluiceService {
         if (page.getRecords().isEmpty()) {
             return PageUtil.Page.empty();
         }
-        List<Sluice> data = sensorMapper.listSluice(page.getRecords());
+        List<Sluice> data = sensorMapper.listSluice(page.getRecords(), request.getSensorList());
 
 
         //获取字典
@@ -299,20 +321,18 @@ public class SluiceServiceImpl implements SluiceService {
             videoMGMap = Map.of();
         }
 
-        //状态传感器（闸门状态）
+        //状态传感器字典（闸门状态）
         List<Gate> statusGates = data.stream().flatMap(e -> e.getGates().stream())
                 .filter(e -> SluiceStatus.MONITOR_TYPE.equals(e.getMonitorType())).toList();
-        Map<Integer, SluiceStatus> statusMap;
-        if (!statusGates.isEmpty()) {
-            statusMap = SimpleQuery.of(SluiceStatus.TABLE)
-                    .in(DbConstant.SENSOR_ID_TAG, statusGates.stream().map(e -> e.getId().toString()).distinct().toList())
-                    .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
-                    .limit(1).query(influxDb, SluiceStatus.class).stream().collect(Collectors.toMap(SluiceStatus::getSid, e -> e));
-        } else {
-            statusMap = Map.of();
+        if (!statusGates.isEmpty() && statusMap.isEmpty()) {
+                statusMap = SimpleQuery.of(SluiceStatus.TABLE).select(SluiceStatus.HARDWARE, SluiceStatus.GATE_STA)
+                        .in(DbConstant.SENSOR_ID_TAG, statusGates.stream().map(e -> e.getId().toString()).distinct().toList())
+                        .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
+                        .limit(1).query(influxDb, SluiceStatus.class).stream().collect(Collectors.toMap(SluiceStatus::getSid, e -> e));
         }
 
         //组装数据
+        Map<Integer, SluiceStatus> finalStatusMap = statusMap;
         data.forEach(item -> {
             item.getGates().stream().filter(e -> SluiceData.MONITOR_TYPE.equals(e.getMonitorType())).findFirst().ifPresent(sensor -> {
                 Optional.ofNullable(dataMap.get(sensor.getId())).ifPresent(s -> {
@@ -335,7 +355,7 @@ public class SluiceServiceImpl implements SluiceService {
             //闸门列表
             List<Gate> list = item.getGates().stream()
                     .filter(i -> SluiceStatus.MONITOR_TYPE.equals(i.getMonitorType()))
-                    .peek(sensor -> Optional.ofNullable(statusMap.get(sensor.getId())).ifPresent(s -> {
+                    .peek(sensor -> Optional.ofNullable(finalStatusMap.get(sensor.getId())).ifPresent(s -> {
                         sensor.setOpenStatus(s.getGateSta());
                         sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
                     })).toList();

@@ -80,7 +80,8 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
 
-    List<Sluice> listSluice(@Param("projectIDList") Collection<Integer> projectIDList);
+    List<Sluice> listSluice(@Param("projectIDList") Collection<Integer> projectIDList,
+                            @Param("sensorIDList") Collection<Integer> sensoerIDList);
 
     IPage<Integer> sluicePage(@Param("page") IPage<Integer> page, @Param("param")QuerySluicePageRequest param);
 
