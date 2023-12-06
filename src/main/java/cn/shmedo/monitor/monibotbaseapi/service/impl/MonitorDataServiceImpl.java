@@ -274,6 +274,10 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
 
             List<Map<String, Object>> finalSensorDataList = sensorDataList;
+            if (pa.getDataSort()) {
+                CollUtil.sortByProperty(finalSensorDataList, "time");
+            }
+
             allSensorInfoList.forEach(sensorInfo -> {
                 if (!CollectionUtil.isNullOrEmpty(finalSensorDataList)) {
                     List<Map<String, Object>> result = new LinkedList<>();
@@ -301,7 +305,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
                     if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                             pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
-                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType(), pa.getDataSort()));
                     } else {
                         sensorInfo.setMultiSensorData(result);
                     }
@@ -434,7 +438,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     }
                     if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                             pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
-                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType(), pa.getDataSort()));
                     } else {
                         sensorInfo.setMultiSensorData(result);
                     }
@@ -530,7 +534,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
                     if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                             pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
-                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType()));
+                        sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType(), true));
                     } else {
                         sensorInfo.setMultiSensorData(result);
                     }

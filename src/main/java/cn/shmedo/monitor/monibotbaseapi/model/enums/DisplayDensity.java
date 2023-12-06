@@ -49,7 +49,7 @@ public enum DisplayDensity {
      * 是否需要额外进行分组处理<br>
      * 公司使用的InfluxDB版本不支持直接进行自然年/月/周的分组，因此如果需要以上分组则需使用{@code #calculateStatistics}方法进行单独的分组处理
      *
-     * @see cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil#calculateStatistics(List, Integer, Integer)
+     * @see cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil#calculateStatistics(List, Integer, Integer, Boolean)
      */
     public static boolean needExtraGrouping(final DisplayDensity displayDensity) {
         return WEEK.equals(displayDensity) || MONTH.equals(displayDensity) || YEAR.equals(displayDensity);

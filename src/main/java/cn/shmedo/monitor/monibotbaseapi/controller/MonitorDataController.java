@@ -44,6 +44,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
      * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
+     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
      * @apiParam (请求体) {Int[]} [eigenValueIDList] 特征值ID列表
      * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
      * @apiParamExample 请求体示例
@@ -113,6 +114,8 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
+     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6)
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4)
      * @apiParamExample 请求体示例
