@@ -382,7 +382,7 @@ public class SluiceServiceImpl implements SluiceService {
         if (request.getGateID() == null) {
             //一键控制
             List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE)
-                    .in(DbConstant.SENSOR_ID_TAG, dict.keySet())
+                    .in(DbConstant.SENSOR_ID_TAG, dict.keySet().stream().map(Object::toString).toList())
                     //全开则查询当前状态为关闭的闸门，反之亦然
                     .eq(SluiceStatus.GATE_STA, OPEN.equals(kind) ? 0 : 1)
                     .orderByDesc(DbConstant.TIME_FIELD)
