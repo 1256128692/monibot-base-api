@@ -364,7 +364,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public PageUtil.Page<ThematicRainWaterDataInfo> queryRainWaterPageData(QueryRainWaterDataPageParam param) {
-        List<ThematicRainWaterDataInfo> dataList = queryRainWaterDataList(param, TimeUtil.DestinyFormatter.getFormatter(DisplayDensity.fromValue(param.getDisplayDensity())));
+        List<ThematicRainWaterDataInfo> dataList = new ArrayList<>(queryRainWaterDataList(param, TimeUtil.DestinyFormatter.getFormatter(DisplayDensity.fromValue(param.getDisplayDensity()))));
+        Collections.reverse(dataList);
         return PageUtil.page(dataList, param.getPageSize(), param.getCurrentPage());
     }
 

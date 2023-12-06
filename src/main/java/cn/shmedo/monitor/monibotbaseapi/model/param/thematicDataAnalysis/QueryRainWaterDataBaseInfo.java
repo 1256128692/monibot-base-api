@@ -55,6 +55,9 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
         monitorIDList.add(distanceMonitorPointID);
         Optional.ofNullable(volumeFlowInputMonitorPointID).ifPresent(monitorIDList::add);
         Optional.ofNullable(volumeFlowOutputMonitorPointID).ifPresent(monitorIDList::add);
+        if (monitorIDList.size() != monitorIDList.stream().distinct().toList().size()) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不能相同!");
+        }
         List<Map<String, Object>> maps = ContextHolder.getBean(TbMonitorPointMapper.class).selectMonitorTypeExValuesByPointIDList(monitorIDList);
         if (maps.size() != monitorIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不存在!");

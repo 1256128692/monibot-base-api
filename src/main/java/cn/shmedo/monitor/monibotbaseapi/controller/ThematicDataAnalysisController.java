@@ -7,6 +7,8 @@ import cn.shmedo.monitor.monibotbaseapi.core.annotation.ResourceSymbol;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicDryBeachInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicQueryTransverseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,6 +22,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -321,7 +328,9 @@ public class ThematicDataAnalysisController {
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryTransversePage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryTransversePage(@Valid @RequestBody QueryTransversePageParam param) {
-        return ResultWrapper.success(PageUtil.page(thematicDataAnalysisService.queryTransverseList(param), param.getPageSize(), param.getCurrentPage()));
+        List<ThematicQueryTransverseInfo> dataList = new ArrayList<>(thematicDataAnalysisService.queryTransverseList(param));
+        Collections.reverse(dataList);
+        return ResultWrapper.success(PageUtil.page(dataList, param.getPageSize(), param.getCurrentPage()));
     }
 
     /**
@@ -464,7 +473,9 @@ public class ThematicDataAnalysisController {
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryLongitudinalPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryLongitudinalPage(@Valid @RequestBody QueryLongitudinalPageParam param) {
-        return ResultWrapper.success(PageUtil.page(thematicDataAnalysisService.queryLongitudinalList(param), param.getPageSize(), param.getCurrentPage()));
+        List<Map<String, Object>> dataList = new ArrayList<>(thematicDataAnalysisService.queryLongitudinalList(param));
+        Collections.reverse(dataList);
+        return ResultWrapper.success(PageUtil.page(dataList, param.getPageSize(), param.getCurrentPage()));
     }
 
     /**
@@ -580,7 +591,9 @@ public class ThematicDataAnalysisController {
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryDryBeachDataPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDryBeachDataPage(@Valid @RequestBody QueryDryBeachDataPageParam param) {
-        return PageUtil.page(thematicDataAnalysisService.queryDryBeachDataList(param), param.getPageSize(), param.getCurrentPage());
+        List<ThematicDryBeachInfo> dataList = new ArrayList<>(thematicDataAnalysisService.queryDryBeachDataList(param));
+        Collections.reverse(dataList);
+        return PageUtil.page(dataList, param.getPageSize(), param.getCurrentPage());
     }
 
     /**
