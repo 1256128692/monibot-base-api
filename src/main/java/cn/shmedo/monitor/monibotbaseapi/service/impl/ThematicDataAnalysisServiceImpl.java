@@ -276,6 +276,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public List<Map<String, Object>> queryLongitudinalList(QueryLongitudinalListParam param) {
+        Map<Integer, Integer> orderMap = param.getOrderMap();
         DisplayDensity displayDensity = DisplayDensity.fromValue(param.getDisplayDensity());
         final DateTimeFormatter formatter = TimeUtil.DestinyFormatter.getFormatter(displayDensity);
         List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getInspectedPointIDList()));
@@ -331,7 +332,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         dealBilateralData(pointIDEigenValueMap, monitorPointSet, o2, sensorPointMap.get(Convert.toInt(o2.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), osmoticValue, res::add);
                         return res;
                     }).orElse(List.of());
-                    return Map.of("time", DateUtil.parse(u.getKey(), formatter), "pipeDataList", CollUtil.union(nonBilateralList, bilateralList));
+                    return Map.of("time", DateUtil.parse(u.getKey(), formatter), "pipeDataList",
+                            CollUtil.union(nonBilateralList, bilateralList).stream().sorted(Comparator.comparingInt(o -> orderMap.get(o.getMonitorPointID()))).toList());
                 }).sorted((o1, o2) -> DateUtil.compare(Convert.toDate(o1.get("time")), Convert.toDate(o2.get("time")))).toList();
     }
 
