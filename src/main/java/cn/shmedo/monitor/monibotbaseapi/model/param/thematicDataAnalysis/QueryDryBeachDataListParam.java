@@ -35,6 +35,8 @@ public class QueryDryBeachDataListParam extends QueryDryBeachDataParam {
 
     @Override
     public ResultWrapper validate() {
+        Date currentDate = new Date();
+        endTime = endTime.after(currentDate) ? currentDate : endTime;
         ResultWrapper validate = super.validate();
         if (Objects.nonNull(validate)) {
             return validate;

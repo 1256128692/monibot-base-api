@@ -50,6 +50,8 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
 
     @Override
     public ResultWrapper validate() {
+        Date currentDate = new Date();
+        endTime = endTime.after(currentDate) ? currentDate : endTime;
         monitorIDList = new ArrayList<>();
         monitorIDList.add(rainfallMonitorPointID);
         monitorIDList.add(distanceMonitorPointID);

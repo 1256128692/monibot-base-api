@@ -35,6 +35,8 @@ public abstract class WetLineBaseParam extends QueryWetLineConfigParam implement
 
     @Override
     public ResultWrapper validate() {
+        Date currentDate = new Date();
+        endTime = endTime.after(currentDate) ? currentDate : endTime;
         ResultWrapper<?> superValidate = super.validate();
         if (Objects.nonNull(superValidate)) {
             return superValidate;

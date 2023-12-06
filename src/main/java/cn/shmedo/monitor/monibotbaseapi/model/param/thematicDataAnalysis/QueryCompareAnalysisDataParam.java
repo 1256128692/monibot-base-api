@@ -66,6 +66,8 @@ public class QueryCompareAnalysisDataParam implements ParameterValidator, Resour
 
     @Override
     public ResultWrapper<?> validate() {
+        Timestamp currentDate = new Timestamp(new Date().getTime());
+        endTime = endTime.after(currentDate) ? currentDate : endTime;
         sensorIDList = List.of(autoSensorID, manualSensorID);
         interval = (long) (3600000L * (intervalType == 1 ? intervalValue : intervalValue * 24));
         List<TbSensor> sensorList = ContextHolder.getBean(TbSensorMapper.class).selectList(new LambdaQueryWrapper<TbSensor>()
