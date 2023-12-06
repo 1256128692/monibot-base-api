@@ -12,7 +12,7 @@ import java.util.*;
 
 public class InfluxDBDataUtil {
 
-    public static List<Map<String, Object>> calculateStatistics(List<Map<String, Object>> sensorData, Integer densityType, Integer statisticsType) {
+    public static List<Map<String, Object>> calculateStatistics(List<Map<String, Object>> sensorData, Integer densityType, Integer statisticsType, Boolean dataSort) {
         // 根据densityType进行分组
         Map<String, List<Map<String, Object>>> groupedData = groupByDensityType(sensorData, densityType);
 
@@ -25,7 +25,7 @@ public class InfluxDBDataUtil {
                 switch (statisticsType) {
                     case 1:
                         // 最新值，取最后一条数据
-                        statistics = calculateLatestValue(data, densityType);
+                        statistics = calculateLatestValue(data, densityType, dataSort);
                         break;
                     case 2:
                         // 平均值
@@ -47,11 +47,19 @@ public class InfluxDBDataUtil {
         });
 
         // 按照时间倒序排序
-        result.sort((o1, o2) -> {
-            Date time1 = MapUtil.getDate(o1, "time");
-            Date time2 = MapUtil.getDate(o2, "time");
-            return time2.compareTo(time1);
-        });
+        if (!dataSort) {
+            result.sort((o1, o2) -> {
+                Date time1 = MapUtil.getDate(o1, "time");
+                Date time2 = MapUtil.getDate(o2, "time");
+                return time2.compareTo(time1);
+            });
+        } else {
+            result.sort((o1, o2) -> {
+                Date time1 = MapUtil.getDate(o1, "time");
+                Date time2 = MapUtil.getDate(o2, "time");
+                return time1.compareTo(time2); // 正序排序
+            });
+        }
 
         return result;
     }
@@ -60,9 +68,10 @@ public class InfluxDBDataUtil {
      * 计算最新值
      *
      * @param sensorData
+     * @param dataSort
      * @return
      */
-    private static Map<String, Object> calculateLatestValue(List<Map<String, Object>> sensorData, Integer densityType) {
+    private static Map<String, Object> calculateLatestValue(List<Map<String, Object>> sensorData, Integer densityType, Boolean dataSort) {
         Map<String, Object> result = new HashMap<>();
 
         if (CollUtil.isNotEmpty(sensorData)) {
@@ -81,8 +90,14 @@ public class InfluxDBDataUtil {
                 sensorData.sort(Comparator.comparing(m -> MapUtil.getStr(m, "time")));
                 Collections.reverse(sensorData);
 
+                Map<String, Object> latestData = new HashMap<String, Object>();
                 // 获取最新一条数据
-                Map<String, Object> latestData = sensorData.get(0);
+                if (!dataSort) {
+                    latestData = sensorData.get(0);
+                } else {
+                    latestData = sensorData.get(sensorData.size() - 1);
+                }
+
                 // 设置传感器ID
                 latestData.put("sensorID", MapUtil.getInt(sensorData.get(0), "sensorID"));
 

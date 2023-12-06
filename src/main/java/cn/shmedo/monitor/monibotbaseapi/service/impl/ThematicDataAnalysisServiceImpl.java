@@ -962,7 +962,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     List<Map<String, Object>> dataList = sensorDataDao.queryCommonSensorDataList(
                             sensorIDList, startTime, endTime, displayType.getValue(), statisticalMethods, fieldSelectInfos, monitorType);
                     res.addAll(DisplayDensity.needExtraGrouping(displayType) ?
-                            InfluxDBDataUtil.calculateStatistics(dataList, displayType.getValue(), statisticalMethods) : dataList);
+                            InfluxDBDataUtil.calculateStatistics(dataList, displayType.getValue(), statisticalMethods, true) : dataList);
                 }
             }
             return res;
@@ -1050,7 +1050,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         List<Map<String, Object>> dataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, startTime, endTime,
                 displayDensity.getValue(), statisticsMethods, fieldBaseInfoList, monitorType);
         res.addAll(DisplayDensity.needExtraGrouping(displayDensity) ?
-                InfluxDBDataUtil.calculateStatistics(dataList, displayDensity.getValue(), statisticsMethods) : dataList);
+                InfluxDBDataUtil.calculateStatistics(dataList, displayDensity.getValue(), statisticsMethods, true) : dataList);
     }
 
 

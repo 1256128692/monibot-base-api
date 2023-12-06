@@ -162,10 +162,11 @@ public interface SensorDataDao {
 
     /**
      * 查询通用传感器数据列表
+     *
      * @param sensorIDList
      * @param begin
      * @param end
-     * @param densityType 查询密度,例如(1h,1d,1w)
+     * @param densityType    查询密度,例如(1h,1d,1w)
      * @param statisticsType 统计方式,例如(avg,last)
      * @param fieldList
      * @param monitorType

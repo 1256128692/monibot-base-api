@@ -43,6 +43,8 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
     private Integer statisticsType;
 
     private Boolean filterEmptyData;
+
+    private Boolean dataSort;
     /**
      * 特征值ID列表
      */
@@ -114,6 +116,10 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
 
         if (filterEmptyData == null) {
             filterEmptyData = false;
+        }
+
+        if (dataSort == null) {
+            dataSort = false;
         }
 
         return null;
