@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormu
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.MonitorTypeFieldV2;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -45,4 +46,6 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
     List<TbMonitorTypeField> selectListByMonitorID(Integer monitorPointID);
 
     List<MonitorTypeFieldBaseInfo> selectListByMonitorItemIDList(List<Integer> monitorItemIDList);
+
+    List<FieldBaseInfo> selectListByMonitorType(Integer monitorType);
 }

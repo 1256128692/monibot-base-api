@@ -374,4 +374,8 @@
         </foreach>
     </select>
 
+    <select id="selectListByMonitorType"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo">
+        select fieldToken from tb_monitor_type_field where monitorType = #{monitorType}
+    </select>
 </mapper>

@@ -44,4 +44,6 @@ public interface MonitorDataService {
     void addEigenValueList(AddEigenValueListParam pa);
 
     Object queryMonitorPointDataPage(QueryMonitorPointDataPageParam pa);
+
+    Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryMonitorPointHasDataCountParam pa);
 }

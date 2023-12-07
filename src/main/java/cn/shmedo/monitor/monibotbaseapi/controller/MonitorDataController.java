@@ -460,6 +460,32 @@ public class MonitorDataController {
         return monitorDataService.queryMonitorPointHasDataCount(pa);
     }
 
+
+    /**
+     * @api {POST} /QueryDisMonitorTypeHasDataCountByMonitorPoints 查询通用监测点有无数据日期时间列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryDisMonitorTypeHasDataCountByMonitorPoints
+     * @apiDescription 查询通用监测点有无数据日期时间列表,可以跨监测类型, 最低支持到日
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100]
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end 结束时间
+     * @apiParam (请求体) {Int} density 密度,(日:3 月:5 年:6)
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorPointIDList":[1,2],"begin":"2023-10-18 16:02:52","end":"2023-10-18 16:02:52","density":1}
+     * @apiSuccess (返回结果) {Object} data 结果
+     * @apiSuccess (返回结果) {String[]} data.dataList 监测点有数据列表，日格式:yyyy-MM-dd,月格式:yyyy-MM,年格式:yyyy
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:mdmbase:DescribeBaseProject
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
+    @RequestMapping(value = "/QueryDisMonitorTypeHasDataCountByMonitorPoints", method = RequestMethod.POST,
+            produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
+        return monitorDataService.queryDisMonitorTypeHasDataCountByMonitorPoints(pa);
+    }
+
     /**
      * @api {POST} /QueryMonitorTypeConfiguration 查询监测类型的预定义密度与统计方式
      * @apiVersion 1.0.0

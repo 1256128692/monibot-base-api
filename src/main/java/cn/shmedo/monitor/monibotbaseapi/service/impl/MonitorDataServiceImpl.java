@@ -11,9 +11,7 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
@@ -41,12 +39,14 @@ import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -76,6 +76,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private SensorDataDao sensorDataDao;
+
+    private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -382,7 +384,11 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return maps.stream()
-                .filter(m -> m.get(fieldList.get(0).getFieldToken()) != null)
+                .filter(m -> m.get("sensorID") != null && m.get("time") != null &&
+                        m.entrySet().stream()
+                                .filter(entry -> !entry.getKey().equals("sensorID") &&
+                                        !entry.getKey().equals("time"))
+                                .allMatch(entry -> entry.getValue() != null))
                 .map(map -> {
                     Date date = null;
                     try {
@@ -550,6 +556,78 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return PageUtil.page(monitorPointDataInfoList, pa.getPageSize(), pa.getCurrentPage());
+    }
+
+    @Override
+    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryMonitorPointHasDataCountParam pa) {
+        // 全部传感器信息
+        List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
+        if (CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            return Collections.emptyList();
+        }
+
+        // key:监测类型
+        Map<Integer, List<SensorBaseInfoResponse>> groupedByMonitorType = allSensorInfoList.stream()
+                .collect(Collectors.groupingBy(SensorBaseInfoResponse::getMonitorType));
+
+
+        List<Map<String, Object>> allSensorDataList = new LinkedList<Map<String, Object>>();
+
+        // 遍历分组
+        for (Map.Entry<Integer, List<SensorBaseInfoResponse>> entry : groupedByMonitorType.entrySet()) {
+            Integer monitorType = entry.getKey();
+            List<SensorBaseInfoResponse> sensors = entry.getValue();
+
+            List<FieldBaseInfo> fieldList = tbMonitorTypeFieldMapper.selectListByMonitorType(monitorType);
+            // 提取传感器ID列表
+            List<Integer> sensorIDList = sensors.stream()
+                    .map(SensorBaseInfoResponse::getSensorID)
+                    .collect(Collectors.toList());
+
+            List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
+                    pa.getDensity(), StatisticalMethods.LATEST.getValue(), fieldList, pa.getTbMonitorPoints().get(0).getMonitorType());
+
+            // 将查询结果添加到总的列表中
+            allSensorDataList.addAll(maps);
+        }
+        if (CollectionUtil.isNullOrEmpty(allSensorDataList)) {
+            return null;
+        }
+        SimpleDateFormat inputDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        SimpleDateFormat outputDateFormat;
+
+        switch (pa.getDensity()) {
+            case 3:
+                outputDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                break;
+            case 5:
+                outputDateFormat = new SimpleDateFormat("yyyy-MM");
+                break;
+            case 6:
+                outputDateFormat = new SimpleDateFormat("yyyy");
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid density value");
+        }
+
+        return allSensorDataList.stream()
+                .filter(m -> m.get("sensorID") != null && m.get("time") != null &&
+                        m.entrySet().stream()
+                                .filter(entry -> !entry.getKey().equals("sensorID") &&
+                                        !entry.getKey().equals("time"))
+                                .allMatch(entry -> entry.getValue() != null))
+                .map(map -> {
+                    Date date = null;
+                    try {
+                        date = inputDateFormat.parse((String) map.get("time"));
+                    } catch (ParseException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return outputDateFormat.format(date);
+                })
+                .distinct()
+                .collect(Collectors.toList());
+
     }
 
     /**
