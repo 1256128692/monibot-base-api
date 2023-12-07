@@ -18,10 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEve
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo;
@@ -559,7 +556,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     }
 
     @Override
-    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryMonitorPointHasDataCountParam pa) {
+    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryDisMonitorTypeHasDataCountByMonitorPointsParam pa) {
         // 全部传感器信息
         List<SensorBaseInfoResponse> allSensorInfoList = tbSensorMapper.selectListBymonitorPointIDList(pa.getMonitorPointIDList());
         if (CollectionUtil.isNullOrEmpty(allSensorInfoList)) {

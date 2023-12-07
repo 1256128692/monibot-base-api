@@ -482,7 +482,7 @@ public class MonitorDataController {
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryDisMonitorTypeHasDataCountByMonitorPoints", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
+    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(@Valid @RequestBody QueryDisMonitorTypeHasDataCountByMonitorPointsParam pa) {
         return monitorDataService.queryDisMonitorTypeHasDataCountByMonitorPoints(pa);
     }
 

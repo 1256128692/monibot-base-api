@@ -26,10 +26,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -104,7 +102,14 @@ public class SensorDataServiceImpl implements SensorDataService {
                     pa.getDensity(), StatisticalMethods.LATEST.getValue(), fieldList, monitorType);
 
             // 将查询结果添加到总的列表中
-            allSensorDataList.addAll(sensorDataList);
+            allSensorDataList.addAll(sensorDataList.stream()
+                    .filter(m -> m.get("sensorID") != null && m.get("time") != null &&
+                            m.entrySet().stream()
+                                    .filter(data -> !data.getKey().equals("sensorID") &&
+                                            !data.getKey().equals("time"))
+                                    .allMatch(data -> data.getValue() != null))
+                    .distinct()
+                    .collect(Collectors.toList()));
         }
         if (CollectionUtil.isEmpty(allSensorDataList)) {
             return null;

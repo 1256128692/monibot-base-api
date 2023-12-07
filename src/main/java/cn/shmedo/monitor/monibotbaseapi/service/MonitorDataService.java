@@ -5,10 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEve
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
 
@@ -45,5 +42,5 @@ public interface MonitorDataService {
 
     Object queryMonitorPointDataPage(QueryMonitorPointDataPageParam pa);
 
-    Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryMonitorPointHasDataCountParam pa);
+    Object queryDisMonitorTypeHasDataCountByMonitorPoints(QueryDisMonitorTypeHasDataCountByMonitorPointsParam pa);
 }
