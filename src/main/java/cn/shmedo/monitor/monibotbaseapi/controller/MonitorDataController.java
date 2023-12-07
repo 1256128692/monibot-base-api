@@ -9,10 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEve
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointHasDataCountParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorTypeFieldParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
@@ -462,7 +459,6 @@ public class MonitorDataController {
     public Object queryMonitorPointHasDataCount(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
         return monitorDataService.queryMonitorPointHasDataCount(pa);
     }
-
 
     /**
      * @api {POST} /QueryMonitorTypeConfiguration 查询监测类型的预定义密度与统计方式

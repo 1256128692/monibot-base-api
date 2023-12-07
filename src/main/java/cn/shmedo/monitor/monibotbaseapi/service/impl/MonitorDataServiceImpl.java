@@ -382,6 +382,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return maps.stream()
+                .filter(m -> m.get(fieldList.get(0).getFieldToken()) != null)
                 .map(map -> {
                     Date date = null;
                     try {

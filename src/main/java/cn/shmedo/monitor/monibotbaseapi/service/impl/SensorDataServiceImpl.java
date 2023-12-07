@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.entity.MonitorTypeExValue;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatisticsType;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,13 +84,31 @@ public class SensorDataServiceImpl implements SensorDataService {
     @Override
     public SensorHasDataCountResponse querySensorHasDataCount(QuerySensorHasDataCountParam pa) {
         SensorHasDataCountResponse vo = new SensorHasDataCountResponse();
-        List<Map<String, Object>> sensorDataList = sensorDataDao.querySensorDayData(pa.getSensorIDList(), pa.getBegin(), pa.getEnd(), pa.getMonitorType());
-        if (CollectionUtil.isEmpty(sensorDataList)) {
+        List<Map<String, Object>> allSensorDataList = new LinkedList<Map<String, Object>>();
+
+        // 遍历分组
+        for (Map.Entry<Integer, List<TbSensor>> entry : pa.getGroupedByMonitorType().entrySet()) {
+            Integer monitorType = entry.getKey();
+            List<TbSensor> sensors = entry.getValue();
+
+            // 提取传感器ID列表
+            List<Integer> sensorIDList = sensors.stream()
+                    .map(TbSensor::getID)
+                    .collect(Collectors.toList());
+
+            // 进行数据查询
+            List<Map<String, Object>> sensorDataList = sensorDataDao.querySensorDayData(sensorIDList, pa.getBegin(),
+                    pa.getEnd(), monitorType);
+
+            // 将查询结果添加到总的列表中
+            allSensorDataList.addAll(sensorDataList);
+        }
+        if (CollectionUtil.isEmpty(allSensorDataList)) {
             return null;
         }
         vo.setDensity(pa.getDensity());
         // (小时,日,全部)将时间格式转换为"yyyy-MM-dd"
-        List<String> dataList = sensorDataList.stream()
+        List<String> dataList = allSensorDataList.stream()
                 .filter(map -> map.containsKey("time"))
                 .map(map -> (String) map.get("time"))
                 .map(time -> time.substring(0, 10))

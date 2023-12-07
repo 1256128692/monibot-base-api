@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
@@ -43,9 +44,11 @@ public class QuerySensorHasDataCountParam implements ParameterValidator, Resourc
     @JsonIgnore
     private List<TbSensor> sensorList;
 
-    @JsonIgnore
-    private Integer monitorType;
+//    @JsonIgnore
+//    private Integer monitorType;
 
+    @JsonIgnore
+    private Map<Integer, List<TbSensor>> groupedByMonitorType;
 
     @Override
     public ResultWrapper validate() {
@@ -54,23 +57,27 @@ public class QuerySensorHasDataCountParam implements ParameterValidator, Resourc
         if (sensorList.size() < sensorIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有传感器不存在");
         }
-        Set<Integer> collect = sensorList.stream().map(TbSensor::getMonitorType).collect(Collectors.toSet());
-        if (collect.size() > 1) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器类型不一致");
-        }
-        monitorType = sensorList.get(0).getMonitorType();
+//        Set<Integer> collect = sensorList.stream().map(TbSensor::getMonitorType).collect(Collectors.toSet());
+//        if (collect.size() > 1) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传感器类型不一致");
+//        }
+//        monitorType = sensorList.get(0).getMonitorType();
+
+        // 按监测类型进行分组
+        groupedByMonitorType = sensorList.stream()
+                .collect(Collectors.groupingBy(TbSensor::getMonitorType));
 
         // 校验监测点的监测项目名称,如果监测项目名称有1个以上,则这是跨监测项目,返回相应错误
-        TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
-        List<TbMonitorItem> monitorItemList = tbMonitorItemMapper.selectListBySensorIDsAndProjectIDs(sensorIDList, projectIDList);
-        if (CollectionUtil.isNullOrEmpty(monitorItemList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表没有对应的监测项目");
-        } else {
-            long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
-            if (count > 1) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表所属不同监测项目");
-            }
-        }
+//        TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+//        List<TbMonitorItem> monitorItemList = tbMonitorItemMapper.selectListBySensorIDsAndProjectIDs(sensorIDList, projectIDList);
+//        if (CollectionUtil.isNullOrEmpty(monitorItemList)) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表没有对应的监测项目");
+//        } else {
+//            long count = monitorItemList.stream().map(TbMonitorItem::getName).distinct().count();
+//            if (count > 1) {
+//                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前传感器列表所属不同监测项目");
+//            }
+//        }
 
         boolean validDensity = RainDensityType.isValidDensity(density);
         if (!validDensity) {

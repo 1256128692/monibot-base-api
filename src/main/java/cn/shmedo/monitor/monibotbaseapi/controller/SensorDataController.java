@@ -53,7 +53,7 @@ public class SensorDataController {
      * @apiName QuerySensorHasDataCount
      * @apiDescription 计算传感器有数据的时间列表。
      * @apiParam (请求体) {Int[]} projectIDList 工程ID列表
-     * @apiParam (请求体) {Int[]} sensorIDList 传感器列表,[1-100],必须为同一种监测类型
+     * @apiParam (请求体) {Int[]} sensorIDList 传感器列表,[1-100]
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end 结束时间
      * @apiParam (请求体) {Int} density 密度,(0:全部 1:日 2:月, 3:年 [4,5,6,7]:小时)
