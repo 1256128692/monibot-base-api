@@ -771,8 +771,8 @@
     </delete>
 
     <select id="sluicePage" resultType="java.lang.Integer">
-        SELECT ProjectID
-        FROM `tb_sensor` ts LEFT JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+        SELECT ts.ProjectID
+        FROM `tb_sensor` ts
         <where>
             <trim suffixOverrides="AND">
                 <choose>
@@ -787,20 +787,20 @@
                 </choose>
                 <choose>
                     <when test="param.sensorList != null and param.sensorList.size() != 0">
-                        <foreach collection="param.sensorList" item="item" open="(ts.MonitorType = 60 OR ts.ID IN (" close=")) AND" separator=",">
+                        <foreach collection="param.sensorList" item="item" open="ts.ID IN (" close=") AND" separator=",">
                             #{item}
                         </foreach>
                     </when>
                     <otherwise>
-                        ts.MonitorType IN (60, 61) AND
+                        ts.MonitorType = 61 AND
                     </otherwise>
                 </choose>
             </trim>
         </where>
         GROUP BY
-            ProjectID
+            ts.ProjectID
         ORDER BY
-            ProjectID
+            ts.ProjectID
     </select>
 
     <resultMap id="sluiceMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Sluice">
@@ -814,7 +814,7 @@
         </collection>
     </resultMap>
 
-    <select id="listSluice" resultMap="sluiceMap">
+    <select id="sluicePageInfo" resultMap="sluiceMap">
         SELECT ts.ID, ts.Alias, ts.MonitorPointID, ts.ProjectID, ts.MonitorType, tpi.ProjectName
         FROM
             tb_sensor ts
@@ -830,11 +830,16 @@
                         FALSE
                     </otherwise>
                 </choose>
-                <if test="sensorIDList != null and sensorIDList.size() != 0">
-                    <foreach collection="sensorIDList" open="AND ts.ID IN (" close=")" separator="," item="item">
-                        #{item}
-                    </foreach>
-                </if>
+                <choose>
+                    <when test="sensorIDList != null and sensorIDList.size() != 0">
+                        <foreach collection="sensorIDList" item="item" open="AND (ts.MonitorType = 60 OR ts.ID IN (" close="))" separator=",">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        AND ts.MonitorType IN (60, 61)
+                    </otherwise>
+                </choose>
             </where>
     </select>
 

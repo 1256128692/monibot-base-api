@@ -276,7 +276,7 @@ public class SluiceServiceImpl implements SluiceService {
         if (request.getControlType() != null) {
             List<SluiceStatus> list = SimpleQuery.of(SluiceStatus.TABLE)
                     .select(SluiceStatus.HARDWARE, SluiceStatus.GATE_STA)
-                    .eq(SluiceStatus.HARDWARE, request.getControlType().getDeviceCode())
+                    .groupBy(DbConstant.SENSOR_ID_TAG)
                     .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG)
                     .limit(1).query(influxDb, SluiceStatus.class);
            List<Integer> sids = list.stream().filter(e -> request.getControlType().getDeviceCode().equals(e.getHardware()))
@@ -289,12 +289,9 @@ public class SluiceServiceImpl implements SluiceService {
         }
 
 
-        //查询项目信息
+        //一对多映射分页会导致结果数量错误，故先按条件对projectID分页，再通过projectID获取实际结果
         IPage<Integer> page = sensorMapper.sluicePage(new Page<>(request.getCurrentPage(), request.getPageSize()), request);
-        if (page.getRecords().isEmpty()) {
-            return PageUtil.Page.empty();
-        }
-        List<Sluice> data = sensorMapper.listSluice(page.getRecords(), request.getSensorList());
+        List<Sluice> data = sensorMapper.sluicePageInfo(page.getRecords(), request.getSensorList());
 
 
         //获取字典
