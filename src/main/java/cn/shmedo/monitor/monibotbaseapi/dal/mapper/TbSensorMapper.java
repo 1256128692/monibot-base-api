@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sluice.QuerySluicePageRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
@@ -80,9 +79,9 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     void deleteBatchByDeviceSerialList(List<String> deviceSerialList);
 
-    IPage<Integer> sluicePage(@Param("page") IPage<Integer> page, QuerySluicePageRequest param);
+    IPage<Integer> sluicePage(@Param("page") IPage<Integer> page, Collection<Integer> projectIDList);
 
-    List<Sluice> sluicePageInfo(Collection<Integer> projectIDList, Collection<Integer> sensorIDList);
+    List<Sluice> sluicePageInfo(Collection<Integer> projectIDList);
 
     /**
      * 查询闸门对应的物联网设备信息

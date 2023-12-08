@@ -776,8 +776,8 @@
         <where>
             <trim suffixOverrides="AND">
                 <choose>
-                    <when test="param.projectIDs != null and param.projectIDs.size() != 0">
-                        <foreach collection="param.projectIDs" item="item" open="ProjectID IN (" close=") AND" separator=",">
+                    <when test="projectIDList != null and projectIDList.size() != 0">
+                        <foreach collection="projectIDList" item="item" open="ProjectID IN (" close=") AND" separator=",">
                             #{item}
                         </foreach>
                     </when>
@@ -785,16 +785,7 @@
                         FALSE AND
                     </otherwise>
                 </choose>
-                <choose>
-                    <when test="param.sensorList != null and param.sensorList.size() != 0">
-                        <foreach collection="param.sensorList" item="item" open="ts.ID IN (" close=") AND" separator=",">
-                            #{item}
-                        </foreach>
-                    </when>
-                    <otherwise>
-                        ts.MonitorType = 61 AND
-                    </otherwise>
-                </choose>
+                ts.MonitorType = 61 AND
             </trim>
         </where>
         GROUP BY
@@ -816,31 +807,21 @@
 
     <select id="sluicePageInfo" resultMap="sluiceMap">
         SELECT ts.ID, ts.Alias, ts.MonitorPointID, ts.ProjectID, ts.MonitorType, tpi.ProjectName
-        FROM
-            tb_sensor ts
-                LEFT JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
-            <where>
-                <choose>
-                    <when test="projectIDList != null and projectIDList.size() != 0">
-                        <foreach collection="projectIDList" open="ts.ProjectID IN  (" close=")" separator="," item="item">
-                            #{item}
-                        </foreach>
-                    </when>
-                    <otherwise>
-                        FALSE
-                    </otherwise>
-                </choose>
-                <choose>
-                    <when test="sensorIDList != null and sensorIDList.size() != 0">
-                        <foreach collection="sensorIDList" item="item" open="AND (ts.MonitorType = 60 OR ts.ID IN (" close="))" separator=",">
-                            #{item}
-                        </foreach>
-                    </when>
-                    <otherwise>
-                        AND ts.MonitorType IN (60, 61)
-                    </otherwise>
-                </choose>
-            </where>
+        FROM tb_sensor ts
+                 LEFT JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+        <where>
+            <choose>
+                <when test="projectIDList != null and projectIDList.size() != 0">
+                    <foreach collection="projectIDList" open="ts.ProjectID IN  (" close=")" separator="," item="item">
+                        #{item}
+                    </foreach>
+                </when>
+                <otherwise>
+                    FALSE
+                </otherwise>
+            </choose>
+                AND ts.MonitorType IN (60, 61)
+        </where>
     </select>
 
     <select id="queryGateIotToken" resultType="reactor.util.function.Tuple3">
