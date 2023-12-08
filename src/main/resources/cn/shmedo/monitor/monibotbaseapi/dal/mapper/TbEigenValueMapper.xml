@@ -207,6 +207,16 @@
           and MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
           and MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
           and `Name` = #{name,jdbcType=VARCHAR}
+        <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
+            and ID in (
+            select eigenValueID
+            from tb_eigen_value_relation where
+                MonitorPointID in
+            <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
+                #{itemID}
+            </foreach>
+            )
+        </if>
     </select>
 
     <select id="selectListByCondition"
@@ -368,5 +378,20 @@
 
     <select id="selectMaxID" resultType="java.lang.Integer">
         select max(ID) from tb_eigen_value
+    </select>
+
+    <select id="selectNameByMonitorIDList" resultType="java.lang.String">
+        select tev.name from tb_eigen_value tev
+        where tev.ProjectID = #{projectID,jdbcType=INTEGER}
+        and tev.MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
+        <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
+            and tev.ID in (
+            select EigenValueID
+            from tb_eigen_value_relation where MonitorPointID in
+            <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
+                #{itemID}
+            </foreach>
+            )
+        </if>
     </select>
 </mapper>

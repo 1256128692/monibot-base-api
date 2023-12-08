@@ -10,4 +10,6 @@ public class MonitorPointBaseInfoV2 {
     private Boolean monitorPointEnable;
     private Integer monitorType;
     private Integer monitorItemID;
+
+    private Integer eigenValueID;
 }

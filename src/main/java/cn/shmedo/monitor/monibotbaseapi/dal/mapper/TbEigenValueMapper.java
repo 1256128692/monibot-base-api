@@ -58,11 +58,13 @@ public interface TbEigenValueMapper {
      */
     int updateByPrimaryKey(TbEigenValue record);
 
-    Integer selectCountByProjectIDAndItemIDAndFiledIDAndName(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name);
+    Integer selectCountByProjectIDAndItemIDAndFiledIDAndName(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name, List<Integer> monitorPointIDList);
 
     List<EigenValueInfoV1> selectListByCondition(Integer monitorItemID, Integer projectID, List<Integer> monitorPointIDList, Integer scope);
 
-    Integer selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name, Integer eigenValueID);
+    Integer selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(Integer projectID, Integer monitorItemID,
+                                                                  Integer monitorTypeFieldID, String name,
+                                                                  Integer eigenValueID);
 
     void deleteByEigenValueIDList(List<Integer> eigenValueIDList);
 
@@ -75,4 +77,6 @@ public interface TbEigenValueMapper {
     int insertBatchSelective(List<AddEigenValueParam> tbEigenValues);
 
     Integer selectMaxID();
+
+    List<String> selectNameByMonitorIDList(List<Integer> monitorPointIDList, Integer projectID, Integer monitorItemID);
 }

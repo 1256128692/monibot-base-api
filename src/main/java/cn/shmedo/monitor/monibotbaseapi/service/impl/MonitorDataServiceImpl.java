@@ -101,7 +101,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         eigenValueInfoV1List.forEach(item -> {
             item.setScopeStr(ScopeType.getDescriptionByCode(item.getScope()));
             if (!CollectionUtil.isNullOrEmpty(allMonitorPointList)) {
-                item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
+                item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getEigenValueID().equals(item.getId())).collect(Collectors.toList()));
             }
         });
 

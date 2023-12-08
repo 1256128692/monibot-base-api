@@ -879,12 +879,15 @@
                mp.name   as monitorPointName,
                mp.Enable as monitorPointEnable,
                mp.monitorItemID,
-               mp.monitorType
+               mp.monitorType,
+               evr.eigenValueID
         from tb_monitor_point as mp
+                 left join tb_eigen_value_relation evr on evr.monitorPointID = mp.ID
         where 1 = 1
         <if test="eigenValueIDList != null and eigenValueIDList.size != 0">
             and mp.ID in
-            (select monitorPointID from tb_eigen_value_relation where eigenValueID in
+            (select monitorPointID
+             from tb_eigen_value_relation where eigenValueID in
             <foreach collection="eigenValueIDList" item="eigenValueID" index="index" open="(" close=")" separator=",">
                 #{eigenValueID}
             </foreach>

@@ -41,11 +41,19 @@ public class AddEigenValueListParam  implements ParameterValidator, ResourcePerm
             if (!ScopeType.isValidScopeType(dataList.get(i).getScope())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数:scope字段值的为作用范围非法类型");
             }
-            if (dataList.get(i).getScope() == ScopeType.HISTORICAL_DATA.getCode()) {
+            if (dataList.get(i).getScope() == ScopeType.SPECIAL_ANALYSIS.getCode()) {
                 Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndName(projectID,
-                        dataList.get(i).getMonitorItemID(), dataList.get(i).getMonitorTypeFieldID(), dataList.get(i).getName());
+                        dataList.get(i).getMonitorItemID(), dataList.get(i).getMonitorTypeFieldID(),
+                        dataList.get(i).getName(), dataList.get(i).getMonitorPointIDList());
                 if (count > 0) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测子类型的特征值名称已存在");
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测点特征值名称已存在");
+                }
+            } else {
+                Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndName(projectID,
+                        dataList.get(i).getMonitorItemID(), dataList.get(i).getMonitorTypeFieldID(),
+                        dataList.get(i).getName(), null);
+                if (count > 0) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的该特征值名称已存在");
                 }
             }
             List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectPointListByIDList(dataList.get(i).getMonitorPointIDList());

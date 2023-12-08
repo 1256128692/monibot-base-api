@@ -72,11 +72,20 @@ public class UpdateEigenValueParam implements ParameterValidator, ResourcePermis
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数:scope字段值的为作用范围非法类型");
         }
 
-        // 重复名称校验
         TbEigenValueMapper tbEigenValueMapper = ContextHolder.getBean(TbEigenValueMapper.class);
-        Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(projectID, monitorItemID, monitorTypeFieldID, name, eigenValueID);
-        if (count > 0) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测子类型的特征值名称已存在");
+        // 重复名称校验
+        if (scope == ScopeType.SPECIAL_ANALYSIS.getCode()) {
+            List<String> eigenValueNameList = tbEigenValueMapper.selectNameByMonitorIDList(monitorPointIDList, projectID, monitorItemID);
+            if (!CollectionUtil.isNullOrEmpty(eigenValueNameList)) {
+                if (eigenValueNameList.contains(name)) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测点特征值名称已存在");
+                }
+            }
+        } else {
+            Integer count = tbEigenValueMapper.selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(projectID, monitorItemID, monitorTypeFieldID, name, eigenValueID);
+            if (count > 0) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的该特征值名称已存在");
+            }
         }
 
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
