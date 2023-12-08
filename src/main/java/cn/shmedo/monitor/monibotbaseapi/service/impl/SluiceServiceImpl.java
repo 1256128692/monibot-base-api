@@ -179,6 +179,8 @@ public class SluiceServiceImpl implements SluiceService {
         //分页查询
         SimpleQuery query = SimpleQuery.of(SluiceLog.TABLE).in(DbConstant.SENSOR_ID_TAG, sensorIds).orderByDesc(DbConstant.TIME_FIELD);
         Optional.ofNullable(request.getControlType()).ifPresent(e -> query.eq(SluiceLog.HARDWARE, e.getDeviceCode()));
+        Optional.ofNullable(request.getBegin()).ifPresent(e -> query.gte(DbConstant.TIME_FIELD, e));
+        Optional.ofNullable(request.getEnd()).ifPresent(e -> query.lte(DbConstant.TIME_FIELD, e));
 
         Long count = query.count(influxDb, SluiceLog.HARDWARE);
         int totalPage = PageUtil.totalPage(count.intValue(), request.getPageSize());
@@ -382,6 +384,7 @@ public class SluiceServiceImpl implements SluiceService {
                     .in(DbConstant.SENSOR_ID_TAG, dict.keySet().stream().map(Object::toString).toList())
                     //全开则查询当前状态为关闭的闸门，反之亦然
                     .eq(SluiceStatus.GATE_STA, OPEN.equals(kind) ? 0 : 1)
+                    .eq(SluiceStatus.HARDWARE, 0)
                     .orderByDesc(DbConstant.TIME_FIELD)
                     .groupBy(DbConstant.SENSOR_ID_TAG).limit(1).query(influxDb, SluiceStatus.class);
             if (!gates.isEmpty()) {
@@ -396,7 +399,8 @@ public class SluiceServiceImpl implements SluiceService {
             SluiceStatus gate = SimpleQuery.of(SluiceStatus.TABLE).eq(DbConstant.SENSOR_ID_TAG, request.getGateID().toString())
                     .orderByDesc(DbConstant.TIME_FIELD).limit(1).row(influxDb, SluiceStatus.class);
 
-            org.springframework.util.Assert.isTrue(gate != null, "闸门不在线");
+            Assert.isTrue(gate != null, "闸门不在线");
+            Assert.isTrue(gate.getHardware() == 0, "闸门不处于远程模式, 无法控制");
             BatchDispatchRequest.RawCmd rawCmd = buildRawCmd(dict.get(request.getGateID()), builder -> {
                 switch (kind) {
                     case STOP, RISE, FALL -> builder.type(kind.getDeviceCode()).motorDir(kind.getDeviceCode());
