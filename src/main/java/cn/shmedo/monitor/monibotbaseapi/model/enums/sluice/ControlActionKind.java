@@ -32,13 +32,13 @@ public enum ControlActionKind {
      * 开启 通过开合度控制
      */
     @JsonProperty("5")
-    OPEN(5, "开启", 5),
+    OPEN(5, "开启", 0),
 
     /**
      * 关闭 通过开合度控制
      */
     @JsonProperty("6")
-    CLOSE(6, "关闭", 5),
+    CLOSE(6, "关闭", 0),
 
     ;
 

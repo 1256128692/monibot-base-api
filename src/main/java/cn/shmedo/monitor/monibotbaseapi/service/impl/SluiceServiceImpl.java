@@ -386,17 +386,18 @@ public class SluiceServiceImpl implements SluiceService {
             //一键控制
             List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE)
                     .in(DbConstant.SENSOR_ID_TAG, dict.keySet().stream().map(Object::toString).toList())
-                    //全开则查询当前状态为关闭的闸门，反之亦然
-                    .eq(SluiceStatus.GATE_STA, OPEN.equals(kind) ? 0 : 1)
-                    .eq(SluiceStatus.HARDWARE, 0)
                     .orderByDesc(DbConstant.TIME_FIELD)
-                    .groupBy(DbConstant.SENSOR_ID_TAG).limit(1).query(influxDb, SluiceStatus.class);
+                    .groupBy(DbConstant.SENSOR_ID_TAG).limit(1).query(influxDb, SluiceStatus.class).stream()
+                    //过滤出远程控制的闸门
+                    .filter(e -> e.getHardware() == 0)
+                    //过滤出与操作状态相反的闸门
+                    .filter(e -> OPEN.equals(kind) ? e.getGateSta() == 0 : e.getGateSta() == 1)
+                    .filter(e -> dict.containsKey(e.getSid())).toList();
+
             if (!gates.isEmpty()) {
-                List<BatchDispatchRequest.RawCmd> list = gates.stream().filter(e -> dict.containsKey(e.getSid()))
-                        .map(e -> buildRawCmd(dict.get(e.getSid()), builder -> builder
-                                .type(kind.getCode())
-                                .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0))).toList();
-                dispatchRequest.setRawCmdList(list);
+                dispatchRequest.setRawCmdList(gates.stream().map(e -> buildRawCmd(dict.get(e.getSid()),
+                        builder -> builder.type(kind.getDeviceCode())
+                                .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0))).toList());
             }
         } else {
             Assert.isTrue(dict.containsKey(request.getGateID()), "闸门不存在");

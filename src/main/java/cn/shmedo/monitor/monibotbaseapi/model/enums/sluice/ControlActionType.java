@@ -33,7 +33,7 @@ public enum ControlActionType {
     TIME_PERIOD_CONTROL(5, "时段控制", 3, TimePeriodControl.class),
 
     @JsonProperty("6")
-    TOTAL_CONTROL(8, "总量控制", 2, TotalControl.class),
+    TOTAL_CONTROL(6, "总量控制", 2, TotalControl.class),
     ;
 
     @EnumValue
