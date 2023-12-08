@@ -75,7 +75,7 @@ public class UpdateEigenValueParam implements ParameterValidator, ResourcePermis
         TbEigenValueMapper tbEigenValueMapper = ContextHolder.getBean(TbEigenValueMapper.class);
         // 重复名称校验
         if (scope == ScopeType.SPECIAL_ANALYSIS.getCode()) {
-            List<String> eigenValueNameList = tbEigenValueMapper.selectNameByMonitorIDList(monitorPointIDList, projectID, monitorItemID);
+            List<String> eigenValueNameList = tbEigenValueMapper.selectNameByMonitorIDList(monitorPointIDList, projectID, monitorItemID, eigenValueID);
             if (!CollectionUtil.isNullOrEmpty(eigenValueNameList)) {
                 if (eigenValueNameList.contains(name)) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "同一工程下的监测项目的监测点特征值名称已存在");

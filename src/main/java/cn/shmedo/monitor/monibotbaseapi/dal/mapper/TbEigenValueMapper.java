@@ -78,5 +78,5 @@ public interface TbEigenValueMapper {
 
     Integer selectMaxID();
 
-    List<String> selectNameByMonitorIDList(List<Integer> monitorPointIDList, Integer projectID, Integer monitorItemID);
+    List<String> selectNameByMonitorIDList(List<Integer> monitorPointIDList, Integer projectID, Integer monitorItemID, Integer eigenValueID);
 }

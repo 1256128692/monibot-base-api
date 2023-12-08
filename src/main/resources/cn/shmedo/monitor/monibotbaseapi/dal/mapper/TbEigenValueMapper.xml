@@ -393,5 +393,6 @@
             </foreach>
             )
         </if>
+        and tev.ID != #{eigenValueID}
     </select>
 </mapper>
