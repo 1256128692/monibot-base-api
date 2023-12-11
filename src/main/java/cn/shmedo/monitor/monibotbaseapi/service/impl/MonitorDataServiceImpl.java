@@ -176,11 +176,13 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                 Date startTime = adjustToSameYear(dateRange.getStartTime(), beginYear);
                 Date endTime = adjustToSameYear(dateRange.getEndTime(), endYear);
 
-                return DateUtil.isIn(begin, startTime, endTime) || DateUtil.isIn(end, startTime, endTime);
+                return DateUtil.isIn(begin, startTime, endTime) || DateUtil.isIn(end, startTime, endTime)
+                        || DateUtil.isIn(startTime, begin, end) || DateUtil.isIn(endTime, begin, end);
             } else {
                 // 非每年的情况
                 return DateUtil.isIn(begin, dateRange.getStartTime(), dateRange.getEndTime()) ||
-                        DateUtil.isIn(end, dateRange.getStartTime(), dateRange.getEndTime());
+                        DateUtil.isIn(end, dateRange.getStartTime(), dateRange.getEndTime())
+                        || DateUtil.isIn(dateRange.getStartTime(), begin, end) || DateUtil.isIn(dateRange.getEndTime(), begin, end);
             }
         });
     }
