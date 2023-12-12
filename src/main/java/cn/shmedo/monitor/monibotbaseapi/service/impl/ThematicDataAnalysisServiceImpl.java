@@ -397,10 +397,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     u.getValue().stream().peek(w -> {
                         Optional.ofNullable(w.get(SLOPE_RATIO)).map(Convert::toDouble).ifPresent(builder::slopeRratio);
                         Optional.ofNullable(w.get(rainfallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
-                        Optional.ofNullable(w.get(DRY_BEACH)).map(Convert::toDouble).ifPresent(n -> builder.dryBeach(Optional.ofNullable(design)
-                                .filter(s -> s < n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
-                        Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(n -> builder.distance(Optional.ofNullable(minDryBeach)
+                        Optional.ofNullable(w.get(DRY_BEACH)).map(Convert::toDouble).ifPresent(n -> builder.dryBeach(Optional.ofNullable(minDryBeach)
                                 .filter(s -> s > n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
+                        Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(n -> builder.distance(Optional.ofNullable(design)
+                                .filter(s -> s < n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
                     }).toList();
                     return builder.build();
                 }).sorted((o1, o2) -> DateUtil.compare(o1.getTime(), o2.getTime())).toList();
