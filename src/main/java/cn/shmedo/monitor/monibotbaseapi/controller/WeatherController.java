@@ -30,7 +30,7 @@ public class WeatherController {
      * @apiVersion 1.0.0
      * @apiGroup 预报管理模块
      * @apiName QueryWeatherForecast
-     * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {Object} projectInfo 项目信息
      * @apiSuccess (返回结果) {Int} projectInfo.id 项目ID
      * @apiSuccess (返回结果) {String} projectInfo.projectName 项目名称

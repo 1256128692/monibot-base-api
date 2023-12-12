@@ -35,7 +35,8 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int deleteProjectInfoList(List idList);
 
-    List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(Integer companyID, List<Integer> projectIDList);
+    List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(@Param("companyID") Integer companyID,
+                                                              @Param("projectIDList") List<Integer> projectIDList);
 
     List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName, List<String> platformTypeSet);
 
