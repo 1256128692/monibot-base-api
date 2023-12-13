@@ -1,6 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
@@ -296,6 +300,9 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {Double} [state.rebootCode] 设备重启代码
      * @apiSuccess (返回结果) {Double} [state.loraUpSignal] LORA上行信号强度，单位dbm
      * @apiSuccess (返回结果) {Double} [state.loraDownSignal] LORA下行信号强度，单位dbm
+     * @apiSuccess (返回结果) {Json} [location] 位置信息
+     * @apiSuccess (返回结果) {String} location.address 地址
+     * @apiSuccess (返回结果) {String} [location.locationJson] 位置扩展，json字符串
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDevice
      */
@@ -303,5 +310,27 @@ public class WtDeviceController {
     @PostMapping(value = "/QueryDeviceDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deviceInfo(@Valid @RequestBody QueryDeviceDetailParam param) {
         return wtDeviceService.deviceDetail(param);
+    }
+
+    /**
+     * @api {POST} /SetIotDeviceLocationInSys 设置物联网设备位置信息
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName SetIotDeviceLocationInSys
+     * @apiDescription 设置物联网设备位置信息，仅在当前系统中
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {String} deviceToken 设备SN
+     * @apiParam (请求参数) {String} address 地址
+     * @apiParam (请求参数) {String} [locationJson] 位置扩展，json字符串
+     * @apiSuccess (返回结果) {String} none 无返回值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:SetIotDeviceInfoInSys
+     */
+    @Permission(permissionName = "mdmbase:SetIotDeviceInfoInSys")
+    @LogParam(moduleName = "水利设备列表模块", operationName = "设置物联网设备位置信息", operationProperty = OperationProperty.UPDATE)
+    @PostMapping(value = "/SetIotDeviceLocationInSys", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object setIotDeviceLocationInSys(@Valid @RequestBody SetIotDeviceLocationInSysParam pa) {
+        wtDeviceService.setIotDeviceLocationInSys(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 }

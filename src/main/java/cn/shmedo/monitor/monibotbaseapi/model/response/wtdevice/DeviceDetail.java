@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceIotLocation;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceState;
 import lombok.*;
 
@@ -58,4 +59,6 @@ public class DeviceDetail {
      * 设备状态
      */
     private DeviceState state;
+
+    private TbDeviceIotLocation location;
 }

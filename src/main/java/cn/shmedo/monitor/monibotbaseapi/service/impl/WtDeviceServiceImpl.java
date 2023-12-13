@@ -11,10 +11,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnLog;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnRule;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceState;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
@@ -35,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.alibaba.nacos.shaded.io.grpc.netty.shaded.io.netty.util.internal.StringUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -63,6 +61,8 @@ public class WtDeviceServiceImpl implements WtDeviceService {
     private final TbMonitorPointMapper monitorPointMapper;
 
     private final RedisService redisService;
+
+    private final TbDeviceIotLocationMapper tbDeviceIotLocationMapper;
 
     @Override
     public Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param) {
@@ -861,7 +861,43 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
         //TODO 设备状态（正常/异常）设备有报警即异常，否则正常；临时默认为在线状态
         result.getState().setStatus(Boolean.TRUE.equals(result.getOnlineStatus()) ? 0 : 1);
+        // 设置设备状态
+        result.setLocation(
+                tbDeviceIotLocationMapper.selectOne(
+                        new LambdaQueryWrapper<TbDeviceIotLocation>()
+                                .eq(TbDeviceIotLocation::getDeviceToken, param.getDevice().getDeviceToken())
+                )
+        );
         return result;
+    }
+
+    @Override
+    public void setIotDeviceLocationInSys(SetIotDeviceLocationInSysParam pa, Integer userID) {
+        TbDeviceIotLocation tbDeviceIotLocation = tbDeviceIotLocationMapper.selectOne(
+                new LambdaQueryWrapper<TbDeviceIotLocation>()
+                        .eq(TbDeviceIotLocation::getDeviceToken, pa.getDeviceToken())
+        );
+        Date now = new Date();
+        if (tbDeviceIotLocation == null) {
+
+            tbDeviceIotLocationMapper.insert(
+                    TbDeviceIotLocation.builder()
+                            .deviceToken(pa.getDeviceToken())
+                            .address(pa.getAddress())
+                            .locationJson(pa.getLocationJson())
+                            .createTime(now)
+                            .updateTime(now)
+                            .createUserID(userID)
+                            .updateUserID(userID)
+                            .build()
+            );
+        } else {
+            tbDeviceIotLocation.setUpdateTime(now);
+            tbDeviceIotLocation.setAddress(pa.getAddress());
+            tbDeviceIotLocation.setLocationJson(pa.getLocationJson());
+            tbDeviceIotLocation.setUpdateUserID(userID);
+            tbDeviceIotLocationMapper.updateById(tbDeviceIotLocation);
+        }
     }
 
 }

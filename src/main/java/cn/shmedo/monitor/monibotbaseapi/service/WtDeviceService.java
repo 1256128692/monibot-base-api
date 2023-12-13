@@ -25,4 +25,6 @@ public interface WtDeviceService {
     Object queryWtVideoTypeList(QueryWtVideoTypeParam param);
 
     DeviceDetail deviceDetail(QueryDeviceDetailParam param);
+
+    void setIotDeviceLocationInSys(SetIotDeviceLocationInSysParam pa, Integer userID);
 }
