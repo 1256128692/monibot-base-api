@@ -98,9 +98,10 @@ public class GqMonitorDataController {
      * @apiParamExample 请求体示例
      * {"companyID":1,"kind":"1","token":"sss","monitorPointName":"测测","projectTypeID":10,"densityType":1
      * "statisticsType":1,"begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","pageSize":10,"currentPage":1}
-     * @apiSuccess (返回结果) {Int} totalCount 数据总量
-     * @apiSuccess (返回结果) {Int} totalPage 总页数
-     * @apiSuccess (返回结果) {Object[]} currentPageData 项目信息列表
+     * @apiSuccess (响应结果) {Int} totalCount 数据总量
+     * @apiSuccess (响应结果) {Int} totalPage 总页数
+     * @apiSuccess (响应结果) {Object} map   监测类型属性字段列表
+     * @apiSuccess (响应结果) {Object[]} currentPageData 项目信息列表
      * @apiSuccess (响应结果) {Int} currentPageData.companyID       公司ID
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID       监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName  监测点名称
@@ -119,7 +120,6 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} currentPageData.sensorData.time  数据采集时间
      * @apiSuccess (响应结果) {T} currentPageData.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
-     * @apiSuccess (响应结果) {Object} map   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} map.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} map.fieldName   字段名称
      * @apiSuccess (响应结果) {String} map.engUnit 英文单位
