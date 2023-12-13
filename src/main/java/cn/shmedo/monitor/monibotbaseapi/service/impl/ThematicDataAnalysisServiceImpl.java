@@ -271,7 +271,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         u.setEmptyPipeDistance(w.getItem2());
                     })).toList();
         }
-        return res;
+        return res.afterProperties();
     }
 
     @Override
@@ -352,7 +352,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             Optional.ofNullable(param.getVolumeFlowInputMonitorPointID()).flatMap(w -> u.stream().filter(o -> Objects.nonNull(o.getVolumeFlowInput()))
                     .reduce((o1, o2) -> o1.getVolumeFlowInput() > o2.getVolumeFlowInput() ? o1 : o2)
                     .map(s -> s.toMaxDataMap(3, formatter))).ifPresent(maxDataList::add);
-            Optional.ofNullable(param.getVolumeFlowOutputMonitorPointID()).flatMap(w -> u.stream().filter(o -> Objects.nonNull(o.getVolumeFlowInput()))
+            Optional.ofNullable(param.getVolumeFlowOutputMonitorPointID()).flatMap(w -> u.stream().filter(o -> Objects.nonNull(o.getVolumeFlowOutput()))
                     .reduce((o1, o2) -> o1.getVolumeFlowOutput() > o2.getVolumeFlowOutput() ? o1 : o2)
                     .map(s -> s.toMaxDataMap(4, formatter))).ifPresent(maxDataList::add);
             builder.maxDataList(maxDataList);
@@ -372,6 +372,10 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public List<ThematicDryBeachInfo> queryDryBeachDataList(QueryDryBeachDataListParam param) {
+        List<TbSensor> tbSensorList = param.getTbSensorList();
+        if (CollUtil.isEmpty(tbSensorList)) {
+            return List.of();
+        }
         DisplayDensity displayDensity = DisplayDensity.fromValue(param.getDisplayDensity());
         final String rainfallToken = param.getRainfallToken();
         final DateTimeFormatter formatter = TimeUtil.DestinyFormatter.getFormatter(displayDensity);
@@ -389,7 +393,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                 .filter(w -> MIN_DRY_BEACH.equals(w.getEigenValueName())).map(ThematicEigenValueInfo::getEigenValue)
                 .reduce((o1, o2) -> o1 < o2 ? o1 : o2)).orElse(null);
 
-        List<Map<String, Object>> dataList = queryDryBeachDataList(param.getTbSensorList(), param.getMonitorTypeFieldMap(),
+        List<Map<String, Object>> dataList = queryDryBeachDataList(tbSensorList, param.getMonitorTypeFieldMap(),
                 displayDensity, param.getStartTime(), param.getEndTime());
         return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD))
                 .collect(Collectors.groupingBy(u -> DateUtil.format(Convert.toDate(u.get(DbConstant.TIME_FIELD)), formatter))).entrySet().stream().map(u -> {
@@ -408,13 +412,16 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
     @Override
     public DryBeachDataInfo queryDryBeachData(QueryDryBeachDataParam param) {
+        DryBeachDataInfo.DryBeachDataInfoBuilder builder = DryBeachDataInfo.builder();
+        List<TbSensor> tbSensorList = param.getTbSensorList();
+        if (CollUtil.isEmpty(tbSensorList)) {
+            return builder.build();
+        }
         final Integer rainfallMonitorPointID = param.getRainfallMonitorPointID();
         final Integer dryBeachMonitorPointID = param.getDryBeachMonitorPointID();
         final Integer distanceMonitorPointID = param.getDistanceMonitorPointID();
-
-        DryBeachDataInfo.DryBeachDataInfoBuilder builder = DryBeachDataInfo.builder();
         Map<Integer, List<TbMonitorTypeField>> monitorTypeFieldMap = param.getMonitorTypeFieldMap();
-        for (TbSensor tbSensor : param.getTbSensorList()) {
+        for (TbSensor tbSensor : tbSensorList) {
             Integer sensorID = tbSensor.getID();
             Integer monitorPointID = tbSensor.getMonitorPointID();
             Integer monitorType = tbSensor.getMonitorType();
@@ -975,6 +982,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         final Integer volumeFlowOutputMonitorPointID = param.getVolumeFlowOutputMonitorPointID();
         final String rainFallToken = param.getRainFallToken();
         List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getMonitorIDList()));
+        if (CollUtil.isEmpty(sensorList)) {
+            return List.of();
+        }
         Map<Integer, Integer> sensorPointIDMap = sensorList.stream().collect(Collectors.toMap(TbSensor::getID, TbSensor::getMonitorPointID));
         List<Map<String, Object>> dataList = queryRainWaterDataList(sensorList, DisplayDensity.fromValue(param.getDisplayDensity()), param.getStartTime(), param.getEndTime());
         return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD)).collect(Collectors.groupingBy(u ->

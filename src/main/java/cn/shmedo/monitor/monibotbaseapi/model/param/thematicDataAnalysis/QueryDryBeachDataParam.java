@@ -53,14 +53,9 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
         if (pointIDExValuesList.size() != 3) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不存在!");
         }
-        tbSensorList = ContextHolder.getBean(TbSensorMapper.class).selectList(new LambdaQueryWrapper<TbSensor>()
-                .in(TbSensor::getMonitorPointID, List.of(dryBeachMonitorPointID, rainfallMonitorPointID, distanceMonitorPointID)));
-        if (tbSensorList.size() != 3) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点未绑定传感器!");
-        }
-        for (TbSensor tbSensor : tbSensorList) {
-            Integer pointID = tbSensor.getMonitorPointID();
-            Integer monitorType = tbSensor.getMonitorType();
+        for (Map<String, Object> map : pointIDExValuesList) {
+            Integer pointID = (Integer) map.get("monitorPointID");
+            Integer monitorType = (Integer) map.get("monitorType");
             if (dryBeachMonitorPointID.equals(pointID) && !monitorType.equals(MonitorType.DRY_BEACH.getKey())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的干滩监测点的监测类型错误!");
             } else if (distanceMonitorPointID.equals(pointID) && !monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
@@ -72,6 +67,8 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
                 }
             }
         }
+        tbSensorList = ContextHolder.getBean(TbSensorMapper.class).selectList(new LambdaQueryWrapper<TbSensor>()
+                .in(TbSensor::getMonitorPointID, List.of(dryBeachMonitorPointID, rainfallMonitorPointID, distanceMonitorPointID)));
         List<Integer> monitorTypeList = tbSensorList.stream().map(TbSensor::getMonitorType).distinct().toList();
         monitorTypeFieldMap = ContextHolder.getBean(TbMonitorTypeFieldMapper.class).selectList(
                         new LambdaQueryWrapper<TbMonitorTypeField>().in(TbMonitorTypeField::getMonitorType, monitorTypeList))
