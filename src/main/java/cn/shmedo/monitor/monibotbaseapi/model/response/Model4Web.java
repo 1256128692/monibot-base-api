@@ -27,6 +27,7 @@ public class Model4Web extends TbPropertyModel {
     private LocalDateTime createTime;
 
     private String groupName;
+    private boolean edit = true;
 
     private List<TbProperty> propertyList;
 

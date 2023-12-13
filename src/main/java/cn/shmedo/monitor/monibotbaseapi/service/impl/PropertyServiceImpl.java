@@ -3,8 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
@@ -269,13 +267,15 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         if (param.getExcludeFileProperty() != null && param.getExcludeFileProperty()) {
             model4WebList = model4WebList.stream().filter(
                     e -> {
-                        if (ObjectUtil.isEmpty(e.getPropertyList()))
+                        if (ObjectUtil.isEmpty(e.getPropertyList())) {
                             return true;
+                        }
                         return e.getPropertyList().stream().noneMatch(
                                 p -> FormPropertyType.FILE.getCode().equals(p.getType().intValue()) || FormPropertyType.PICTURE.getCode().equals(p.getType().intValue()));
                     }
             ).toList();
         }
+        batchModelCheck(param.getCompanyID(), model4WebList);
         return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID).reversed()
                 .thenComparing(Model4Web::getCreateTime).reversed()).toList();
     }
@@ -348,6 +348,59 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 同步刷新缓存
         formModelCache.putBatch(List.of(tbPropertyModel), newTbPropertyList);
         return 1 == row;
+    }
+
+    public void batchModelCheck(Integer companyID, List<Model4Web> model4WebList) {
+        List<Integer> modelIDList;
+        Map<Integer, List<TbPropertyModel>> modelTypeGroupMap = model4WebList.stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
+        // 工程项目类型校验表单模板是否有被项目使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getID).toList();
+            List<TbProjectInfo> tbProjectInfoList = tbProjectInfoMapper.selectList(new QueryWrapper<TbProjectInfo>().lambda()
+                    .in(TbProjectInfo::getModelID, modelIDList));
+            if (CollectionUtil.isNotEmpty(tbProjectInfoList)) {
+                List<Integer> useModelIDList = tbProjectInfoList.stream().map(TbProjectInfo::getModelID).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        // 设备类型校验表单模板是否有被设备使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.DEVICE.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.DEVICE.getCode()).stream().map(TbPropertyModel::getID).toList();
+            List<TbOtherDevice> tbOtherDeviceList = tbOtherDeviceMapper.selectList(new QueryWrapper<TbOtherDevice>().lambda()
+                    .in(TbOtherDevice::getTemplateID, modelIDList));
+            if (CollectionUtil.isNotEmpty(tbOtherDeviceList)) {
+                List<Integer> useModelIDList = tbOtherDeviceList.stream().map(TbOtherDevice::getTemplateID).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        // 工作流类型校验表单模板是否有被工作流使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.WORK_FLOW.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.WORK_FLOW.getCode()).stream().map(TbPropertyModel::getID).toList();
+            ResultWrapper<List<DescribeWorkFlowTemplateResponse>> resultWrapper = workFlowTemplateService
+                    .searchWorkFlowTemplateList(new SearchWorkFlowTemplateListParam(companyID, modelIDList));
+            if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
+                List<Integer> useModelIDList = resultWrapper.getData().stream().map(r -> r.getID().intValue()).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        //处理预定义模板
+        model4WebList.forEach(mw -> {
+                    if (mw.getCreateType() != null && mw.getCreateType().equals(CreateType.PREDEFINED.getType().intValue())) {
+                        mw.setEdit(false);
+                    }
+                });
     }
 
     public Boolean deleteModelCheck(DeleteModelCheckParam param) {
