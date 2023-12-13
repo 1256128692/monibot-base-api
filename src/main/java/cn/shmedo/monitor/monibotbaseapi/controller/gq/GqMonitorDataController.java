@@ -52,10 +52,10 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectID 工程ID
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectTypeID 工程类型
      * @apiSuccess (响应结果) {String} data.sensorInfoList.projectTypeName 工程类型名称
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.typeName 量水类型名称
+     * @apiSuccess (响应结果) {String} data.sensorInfoList.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorAlias  传感器别名
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.kindName  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
      * @apiSuccess (响应结果) {Object[]} data.sensorInfoList.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorData.time  数据采集时间
@@ -100,7 +100,6 @@ public class GqMonitorDataController {
      * "statisticsType":1,"begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","pageSize":10,"currentPage":1}
      * @apiSuccess (响应结果) {Int} totalCount 数据总量
      * @apiSuccess (响应结果) {Int} totalPage 总页数
-     * @apiSuccess (响应结果) {Object} map   监测类型属性字段列表
      * @apiSuccess (响应结果) {Object[]} currentPageData 项目信息列表
      * @apiSuccess (响应结果) {Int} currentPageData.companyID       公司ID
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID       监测点ID
@@ -112,14 +111,14 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (响应结果) {Int} currentPageData.projectTypeID 工程类型
      * @apiSuccess (响应结果) {String} currentPageData.projectTypeName 工程类型名称
-     * @apiSuccess (响应结果) {String} currentPageData.typeName 量水类型名称
+     * @apiSuccess (响应结果) {String} currentPageData.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorName  传感器名称
      * @apiSuccess (响应结果) {Int} currentPageData.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {String} currentPageData.kindName  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
      * @apiSuccess (响应结果) {Object[]} currentPageData.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} currentPageData.sensorData.time  数据采集时间
      * @apiSuccess (响应结果) {T} currentPageData.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object} map   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} map.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} map.fieldName   字段名称
      * @apiSuccess (响应结果) {String} map.engUnit 英文单位
@@ -167,10 +166,9 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectID 工程ID
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectTypeID 工程类型
      * @apiSuccess (响应结果) {String} data.sensorInfoList.projectTypeName 工程类型名称
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.typeName 量水类型名称
+     * @apiSuccess (响应结果) {String} data.sensorInfoList.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorName  传感器名称
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.kindName  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
      * @apiSuccess (响应结果) {Object[]} data.sensorInfoList.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorData.time  数据采集时间
@@ -199,17 +197,17 @@ public class GqMonitorDataController {
      * @apiName GqMonitorPointDataPush
      * @apiDescription 监测点数据补录
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
+     * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Object[]} dataList 数据列表
      * @apiParam (请求体) {Int} dataList.sid 传感器ID
      * @apiParam (请求体) {DateTime} dataList.time 补录时间
-     * @apiParam (请求体) {Object} dataList.map 数据列表
-     * @apiParam (请求体) {String} dataList.map.fieldToken 子类型字段
-     * @apiParam (请求体) {Double} dataList.map.value 数据
+     * @apiParam (请求体) {Object} dataList.sensorData 数据列表
+     * @apiParam (请求体) {String} dataList.sensorData.fieldToken 子类型字段
+     * @apiParam (请求体) {Double} dataList.sensorData.value 数据
      * @apiParamExample 请求体示例
-     * {"companyID":1,"projectTypeID":"1","dataList":[
+     * {"companyID":1,"monitorType":"1","dataList":[
      * {
-     * "sid":1,"time":"2023-10-06 16:29:31","map":["fieldToken":"ss","value":1.1]]
+     * "sid":1,"time":"2023-10-06 16:29:31","sensorData":["fieldToken":"ss","value":1.1]]
      * }
      * }
      * @apiSuccess (返回结果) {String} none 空
