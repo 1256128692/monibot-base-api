@@ -197,6 +197,7 @@ public class PropertyController {
      * @apiSuccess (返回结果) {Int} modelList.groupName  模板组名称（当modelType为0时，group对应projectName）
      * @apiSuccess (返回结果) {String} modelList.name  模板名称
      * @apiSuccess (返回结果) {Int} modelList.createType  模板创建类型
+     * @apiSuccess (返回结果) {Bool} modelList.editor  是否允许编辑
      * @apiSuccess (返回结果) {Object[]} modelList.propertyList  模板的属性列表
      * @apiSuccess (返回结果) {Int} modelList.propertyList.propertyID  属性ID
      * @apiSuccess (返回结果) {String} modelList.propertyList.name  模板的属性名称
