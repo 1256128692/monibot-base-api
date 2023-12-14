@@ -675,9 +675,8 @@ public class ThematicDataAnalysisController {
     }
 
     /**
-     * @apiIgnore
      * @api {POST} /AddManualDataBatchV2 数据比测-批量人工录入V2
-     * @apiDescription 数据比测-批量人工录入V2
+     * @apiDescription 数据比测-批量人工录入V2，仅在/AddManualDataBatch接口上封装了一层，两个接口都可以用。
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName AddManualDataBatchV2
