@@ -679,12 +679,12 @@ public class SensorDataDaoImpl implements SensorDataDao {
         selectField.add(DbConstant.SENSOR_ID_TAG);
         String fieldString = String.join(",", selectField);
         StringBuilder sqlBuilder = new StringBuilder();
-        sensorIDList.forEach(sid -> {
-            String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString() + "' " +
-                    "and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
-            sqlBuilder.append(sidSql);
-        });
-        return sqlBuilder.toString();
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+        String sidSql = " select  " + fieldString + " from  " + measurement + " where " + sidOrString +
+                " and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 10000 tz('Asia/Shanghai') ; ";
+        sqlBuilder.append(sidSql);
+        return sidSql;
     }
 
     /**
@@ -716,13 +716,14 @@ public class SensorDataDaoImpl implements SensorDataDao {
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
                 + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
-                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+                + " order by time desc limit 10000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
 
 
     /**
      * 查询每日通用的传感器数据,在日统计表的基础上
+     *
      * @return
      */
     private String getDaylySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString, String measurement,
@@ -739,7 +740,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+                + "' GROUP BY sid order by time desc limit 10000 tz('Asia/Shanghai') ; ";
         return sidSql;
 
     }
