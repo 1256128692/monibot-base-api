@@ -9,10 +9,11 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.GroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.WetLineConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
@@ -20,6 +21,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -81,4 +83,7 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     WetLineConfigInfo selectWetLineConfig(@Param("param") QueryWetLineConfigParam param);
 
     List<MonitorPointBaseInfoV2> selectListByEigenValueIDList(@Param("eigenValueIDList") List<Integer> eigenValueIDList);
+
+    List<MonitorPointSimple> listByProjectType(@Param("projectIDList") Collection<Integer> projectIDList,
+                                               @Param("monitorTypeList") Collection<Integer> monitorTypeList);
 }

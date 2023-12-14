@@ -381,7 +381,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Int} data.value.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} data.value.monitorItemID 监测项id
      * @apiSuccess (返回结果) {String} data.value.name 监测点名称
-     * @apiSuccess (返回结果) {Bool} data.value.enable 是否启用
+     * @apiSuccess (返回结果) {Int} data.value.projectType 项目类型
      * @apiSampleRequest off
      * @apiSuccessExample {json} 响应示例
      *                    {"1": [{"id": 1,"projectID": 1,"monitorType": 1,"monitorItemID": 1,"name": 1,"enable": 0}]}
@@ -389,7 +389,7 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorPointWithProjectType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointWithProjectType(@Validated @RequestBody Void pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorPointWithProjectType(@Validated @RequestBody QueryMonitorPointWithProjectTypeParam pa) {
+        return monitorPointService.queryMonitorPointWithProjectType(pa);
     }
 }

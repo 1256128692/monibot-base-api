@@ -1,8 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
@@ -13,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -161,6 +160,12 @@ public class MonitorPointServiceImpl implements MonitorPointService {
         }
 
         return list;
+    }
+
+    @Override
+    public Map<Integer, List<MonitorPointSimple>> queryMonitorPointWithProjectType(QueryMonitorPointWithProjectTypeParam pa) {
+        return tbMonitorPointMapper.listByProjectType(pa.getProjectList(), pa.getProjectTypes())
+                .stream().collect(Collectors.groupingBy(MonitorPointSimple::getProjectType));
     }
 
     private List<MonitorGroupBaseInfoV1> buildGroupTree(Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap, Integer parentID) {
