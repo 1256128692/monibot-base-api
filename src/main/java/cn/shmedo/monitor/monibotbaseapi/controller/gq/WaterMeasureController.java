@@ -38,14 +38,14 @@ public class WaterMeasureController {
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点id
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {Int} currentPageData.sensorID 监测传感器ID
-     * @apiSuccess (返回结果) {String} currentPageData.sensorKind 传感器类型1-自动化传感器 2-融合传感器 3-人工传感器
-     * @apiSuccess (返回结果) {Int} currentPageData.waterMeasureType 量水类型 (1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水)
-     * @apiSuccess (返回结果) {Int} currentPageData.waterMeasureWay 量水方式 </br>
+     * @apiSuccess (返回结果) {String} currentPageData.sensorKind 传感器类型1-自动化传感器 3-人工传感器
+     * @apiSuccess (返回结果) {Int} [currentPageData.waterMeasureType] 量水类型 (1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水)
+     * @apiSuccess (返回结果) {Int} [currentPageData.waterMeasureWay] 量水方式 </br>
      * 11三角堰 12矩形堰 13梯形堰 14巴歇尔槽 15无喉道段量水槽</br>
      * 21浮子式水位计 22超声波水位计 23压力式水位计 24水表 25电磁流量计 26超声波流量计 27其他量水仪表</br>
      * 31水闸 32渡槽 33跌水 34放水涵 35其他</br>41U形断面 42梯形断面 43矩形断面</br>51流速仪
-     * @apiSuccess (返回结果) {Int} currentPageData.calculateType 计算方法 (1水工建筑法 2水位流量关系法 3流速面积法 4量水堰槽法)
-     * @apiSuccess (返回结果) {Int[]} currentPageData.monitorElements 监测要素集 (2水位 3流速 14流量)
+     * @apiSuccess (返回结果) {Int} [currentPageData.calculateType] 计算方法 (1水工建筑法 2水位流量关系法 3流速面积法 4量水堰槽法)
+     * @apiSuccess (返回结果) {Int[]} [currentPageData.monitorElements] 监测要素集 (2水位 3流速 14流量)
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListWaterMeasurePoint
      */
@@ -63,7 +63,6 @@ public class WaterMeasureController {
      * @apiName QueryWaterMeasurePoint
      * @apiDescription 查询量水点详情
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} monitorPointID 监测点id
      * @apiParam (请求参数) {Int} sensorID 监测传感器ID
      * @apiSuccess (返回结果) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {Int} projectID 工程ID
@@ -74,9 +73,11 @@ public class WaterMeasureController {
      * @apiSuccess (返回结果) {String} monitorTypeName 监测类型名称
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点id
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} monitorItemID 监测项id
+     * @apiSuccess (返回结果) {String} monitorItemName 监测项名称
      * @apiSuccess (返回结果) {String} gpsLocation 监测点位置(经纬度)
      * @apiSuccess (返回结果) {Int} sensorID 传感器id
-     * @apiSuccess (返回结果) {String} sensorKind 传感器类型1-自动化传感器 2-融合传感器 3-人工传感器
+     * @apiSuccess (返回结果) {Int} sensorKind 传感器类型1-自动化传感器 3-人工传感器
      * @apiSuccess (返回结果) {Int} waterMeasureType 量水类型 (1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水)
      * @apiSuccess (返回结果) {Int} waterMeasureWay 量水方式 </br>
      * 11三角堰 12矩形堰 13梯形堰 14巴歇尔槽 15无喉道段量水槽</br>
@@ -100,16 +101,16 @@ public class WaterMeasureController {
      * @apiGroup 灌区量测水管理
      * @apiName UpdateWaterMeasurePoint
      * @apiDescription 更新量水点
-     * @apiParam (请求参数) {Int} monitorPointID 监测点id
-     * @apiParam (请求参数) {Int} sensorID 监测传感器ID
-     * @apiParam (请求参数) {Int} waterMeasureType 量水类型 (1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水)
-     * @apiParam (请求参数) {Int} waterMeasureWay 量水方式 </br>
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} sensorID 监测传感器id
+     * @apiParam (请求参数) {String} [gpsLocation] 监测点位置(经纬度)
+     * @apiParam (请求参数) {Int} [waterMeasureType] 量水类型(sensorKind=1时可为空)</br>1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水
+     * @apiParam (请求参数) {Int} [waterMeasureWay] 量水方式(sensorKind=1时可为空) </br>
      * 11三角堰 12矩形堰 13梯形堰 14巴歇尔槽 15无喉道段量水槽</br>
      * 21浮子式水位计 22超声波水位计 23压力式水位计 24水表 25电磁流量计 26超声波流量计 27其他量水仪表</br>
      * 31水闸 32渡槽 33跌水 34放水涵 35其他</br>41U形断面 42梯形断面 43矩形断面</br>51流速仪
-     * @apiParam (请求参数) {Int} calculateType 计算方法 (1水工建筑法 2水位流量关系法 3流速面积法 4量水堰槽法)
-     * @apiParam (请求参数) {Int[]} monitorElements 监测要素集 (2水位 3流速 14流量)
-     * @apiParam (请求参数) {Int} sensorID 监测传感器id
+     * @apiParam (请求参数) {Int} [calculateType] 计算方法(sensorKind=1时可为空)</br>1水工建筑法 2水位流量关系法 3流速面积法 4量水堰槽法
+     * @apiParam (请求参数) {Int[]} [monitorElements] 监测要素集(sensorKind=1时可为空)</br>2水位 3流速 14流量
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateWaterMeasurePoint
