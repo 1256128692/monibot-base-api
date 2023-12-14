@@ -29,6 +29,8 @@ public class MonitorPointDataInfo {
      */
     private List<EventBaseInfo> eventList;
 
+    private Integer sensorDataCount;
+
     /**
      * 按照时间倒序排序
      * 批量传感器的数据信息

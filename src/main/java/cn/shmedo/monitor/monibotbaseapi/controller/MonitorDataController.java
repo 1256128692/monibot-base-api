@@ -63,6 +63,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {DateTime} data.sensorList.multiSensorData.time  数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorList.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Bool} [data.multiSensor]   是否为关联多传感器
+     * @apiSuccess (响应结果) {Int} data.sensorDataCount  数据总量
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -139,6 +140,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.fieldToken.time  数据采集时间
      * @apiSuccess (响应结果) {Int} data.sensorList.minSensorDataList.fieldToken.sensorID   传感器ID
      * @apiSuccess (响应结果) {Double} data.sensorList.minSensorDataList.fieldToken.value   数值
+     * @apiSuccess (响应结果) {Int} data.sensorDataCount  数据总量
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称

@@ -682,7 +682,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
         String sidSql = " select  " + fieldString + " from  " + measurement + " where " + sidOrString +
-                " and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 10000 tz('Asia/Shanghai') ; ";
+                " and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         sqlBuilder.append(sidSql);
         return sidSql;
     }
@@ -716,7 +716,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
                 + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
-                + " order by time desc limit 10000 tz('Asia/Shanghai') ; ";
+                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
     }
 
@@ -740,7 +740,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
         String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
                 + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
-                + "' GROUP BY sid order by time desc limit 10000 tz('Asia/Shanghai') ; ";
+                + "' GROUP BY sid order by time desc limit 50000 tz('Asia/Shanghai') ; ";
         return sidSql;
 
     }
