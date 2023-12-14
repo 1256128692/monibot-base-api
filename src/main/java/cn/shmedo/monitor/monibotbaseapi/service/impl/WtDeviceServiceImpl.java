@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceState;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.IntelDeviceType4Location;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
@@ -62,7 +63,7 @@ public class WtDeviceServiceImpl implements WtDeviceService {
 
     private final RedisService redisService;
 
-    private final TbDeviceIotLocationMapper tbDeviceIotLocationMapper;
+    private final TbDeviceIntelLocationMapper tbDeviceIntelLocationMapper;
 
     @Override
     public Collection<ProductSimple> productSimpleList(QueryProductSimpleParam param) {
@@ -863,28 +864,31 @@ public class WtDeviceServiceImpl implements WtDeviceService {
         result.getState().setStatus(Boolean.TRUE.equals(result.getOnlineStatus()) ? 0 : 1);
         // 设置设备状态
         result.setLocation(
-                tbDeviceIotLocationMapper.selectOne(
-                        new LambdaQueryWrapper<TbDeviceIotLocation>()
-                                .eq(TbDeviceIotLocation::getDeviceToken, param.getDevice().getDeviceToken())
+                tbDeviceIntelLocationMapper.selectOne(
+                        new LambdaQueryWrapper<TbDeviceIntelLocation>()
+                                .eq(TbDeviceIntelLocation::getDeviceToken, param.getDevice().getDeviceToken())
+                                .eq(TbDeviceIntelLocation::getType, IntelDeviceType4Location.IOT.getType())
                 )
         );
         return result;
     }
 
     @Override
-    public void setIotDeviceLocationInSys(SetIotDeviceLocationInSysParam pa, Integer userID) {
-        TbDeviceIotLocation tbDeviceIotLocation = tbDeviceIotLocationMapper.selectOne(
-                new LambdaQueryWrapper<TbDeviceIotLocation>()
-                        .eq(TbDeviceIotLocation::getDeviceToken, pa.getDeviceToken())
+    public void setIntelDeviceLocationInSys(SetIntelDeviceLocationInSysParam pa, Integer userID) {
+        TbDeviceIntelLocation tbDeviceIntelLocation = tbDeviceIntelLocationMapper.selectOne(
+                new LambdaQueryWrapper<TbDeviceIntelLocation>()
+                        .eq(TbDeviceIntelLocation::getDeviceToken, pa.getDeviceToken())
+                        .eq(TbDeviceIntelLocation::getType, pa.getType())
         );
         Date now = new Date();
-        if (tbDeviceIotLocation == null) {
+        if (tbDeviceIntelLocation == null) {
 
-            tbDeviceIotLocationMapper.insert(
-                    TbDeviceIotLocation.builder()
+            tbDeviceIntelLocationMapper.insert(
+                    TbDeviceIntelLocation.builder()
                             .deviceToken(pa.getDeviceToken())
                             .address(pa.getAddress())
                             .locationJson(pa.getLocationJson())
+                            .type(pa.getType())
                             .createTime(now)
                             .updateTime(now)
                             .createUserID(userID)
@@ -892,11 +896,11 @@ public class WtDeviceServiceImpl implements WtDeviceService {
                             .build()
             );
         } else {
-            tbDeviceIotLocation.setUpdateTime(now);
-            tbDeviceIotLocation.setAddress(pa.getAddress());
-            tbDeviceIotLocation.setLocationJson(pa.getLocationJson());
-            tbDeviceIotLocation.setUpdateUserID(userID);
-            tbDeviceIotLocationMapper.updateById(tbDeviceIotLocation);
+            tbDeviceIntelLocation.setUpdateTime(now);
+            tbDeviceIntelLocation.setAddress(pa.getAddress());
+            tbDeviceIntelLocation.setLocationJson(pa.getLocationJson());
+            tbDeviceIntelLocation.setUpdateUserID(userID);
+            tbDeviceIntelLocationMapper.updateByTypeAndToken(tbDeviceIntelLocation);
         }
     }
 

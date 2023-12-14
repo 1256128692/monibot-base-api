@@ -26,5 +26,5 @@ public interface WtDeviceService {
 
     DeviceDetail deviceDetail(QueryDeviceDetailParam param);
 
-    void setIotDeviceLocationInSys(SetIotDeviceLocationInSysParam pa, Integer userID);
+    void setIntelDeviceLocationInSys(SetIntelDeviceLocationInSysParam pa, Integer userID);
 }

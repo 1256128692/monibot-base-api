@@ -955,6 +955,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorItemName] 监测项目名称
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.gpsLocation] 监测点位置
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.location] 行政区划
+     * @apiSuccess (返回结果) {Json} [location] 位置信息
+     * @apiSuccess (返回结果) {String} location.address 地址
+     * @apiSuccess (返回结果) {String} [location.locationJson] 位置扩展，json字符串
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */

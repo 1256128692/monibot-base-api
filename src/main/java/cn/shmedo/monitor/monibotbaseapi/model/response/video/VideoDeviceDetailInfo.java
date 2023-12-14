@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.video;
 
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceIntelLocation;
 import lombok.Data;
 
 import java.util.Date;
@@ -25,5 +26,7 @@ public class VideoDeviceDetailInfo {
     private Date createTime;
 
     private List<VideoCaptureBaseInfoV2> videoDeviceSourceList;
+
+    private TbDeviceIntelLocation location;
 
 }

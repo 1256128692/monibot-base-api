@@ -5,10 +5,11 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPoi
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: monibot-base-api
@@ -35,4 +36,6 @@ public interface MonitorPointService {
     void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID);
 
     Object queryMonitorGroupPointList(QueryMonitorGroupPointParam pa);
+
+    Map<Integer, List<MonitorPointSimple>> queryMonitorPointWithProjectType(QueryMonitorPointWithProjectTypeParam pa);
 }

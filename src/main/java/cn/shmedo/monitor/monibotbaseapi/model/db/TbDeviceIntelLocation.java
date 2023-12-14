@@ -1,27 +1,29 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 
 import java.util.Date;
-
 import lombok.Builder;
 import lombok.Data;
 
 /**
- * 物联网设备位置表
+ * 智能设备位置表
  */
 @Data
 @Builder
-@TableName(value = "tb_device_iot_location")
-public class TbDeviceIotLocation {
+@TableName(value = "tb_device_intel_location")
+public class TbDeviceIntelLocation {
     /**
-     * 设备token
+     * 设备token标识
      */
-    @TableId(value = "DeviceToken", type = IdType.INPUT)
+    @TableField(value = "DeviceToken")
     private String deviceToken;
+
+    /**
+     * 类型，0,1对应iot，视频设备
+     */
+    @TableField(value = "Type")
+    private Byte type;
 
     /**
      * 位置扩展

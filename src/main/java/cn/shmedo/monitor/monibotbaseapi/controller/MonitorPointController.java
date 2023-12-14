@@ -364,4 +364,32 @@ public class MonitorPointController {
     public Object queryMonitorGroupPointList(@Validated @RequestBody QueryMonitorGroupPointParam pa) {
         return monitorPointService.queryMonitorGroupPointList(pa);
     }
+
+    /**
+     * @api {POST} /QueryMonitorPointWithProjectType 查询项目类型下监测点列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorPointWithProjectType
+     * @apiDescription 查询项目类型下监测点列表
+     * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int[]} [projectTypes] 项目类型列表
+     * @apiSuccess (返回结果) {Object} data 结果集(Map)
+     * @apiSuccess (返回结果) {String} data.key 项目类型
+     * @apiSuccess (返回结果) {Object[]} data.value 监测点列表
+     * @apiSuccess (返回结果) {Int} data.value.id 监测点id
+     * @apiSuccess (返回结果) {Int} data.value.projectID 项目id
+     * @apiSuccess (返回结果) {Int} data.value.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.value.monitorItemID 监测项id
+     * @apiSuccess (返回结果) {String} data.value.name 监测点名称
+     * @apiSuccess (返回结果) {Int} data.value.projectType 项目类型
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 响应示例
+     *                    {"1": [{"id": 1,"projectID": 1,"monitorType": 1,"monitorItemID": 1,"name": 1,"enable": 0}]}
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @PostMapping(value = "/QueryMonitorPointWithProjectType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorPointWithProjectType(@Validated @RequestBody QueryMonitorPointWithProjectTypeParam pa) {
+        return monitorPointService.queryMonitorPointWithProjectType(pa);
+    }
 }
