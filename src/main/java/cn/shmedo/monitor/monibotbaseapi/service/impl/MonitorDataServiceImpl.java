@@ -269,11 +269,13 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         // 监测项目与监测子字段类型关系表
         List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
 
+
         if (!CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
             List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
             List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
-
+            Integer total = 0;
+            total = sensorDataList.size();
             List<Map<String, Object>> finalSensorDataList = sensorDataList;
             if (pa.getDataSort()) {
                 CollUtil.sortByProperty(finalSensorDataList, "time");
@@ -314,9 +316,11 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                 }
             });
 
+            Integer finalTotal = total;
             monitorPointDataInfoList.forEach(m -> {
                 m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
                 m.setFieldList(fieldList);
+                m.setSensorDataCount(finalTotal);
             });
         }
 
@@ -418,10 +422,12 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         List<FieldBaseInfo> fieldList = tbMonitorItemFieldMapper.selectListByMonitorItemID(pa.getMonitorItemID());
 
         if (!CollectionUtil.isNullOrEmpty(allSensorInfoList)) {
+            Integer total = 0;
             List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
             List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
 
+            total = sensorDataList.size();
             allSensorInfoList.forEach(sensorInfo -> {
                 if (!CollectionUtil.isNullOrEmpty(sensorDataList)) {
                     List<Map<String, Object>> result = new LinkedList<>();
@@ -460,9 +466,11 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             });
 
 
+            Integer finalTotal = total;
             monitorPointDataInfoList.forEach(m -> {
                 m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
                 m.setFieldList(fieldList);
+                m.setSensorDataCount(finalTotal);
             });
         }
 
