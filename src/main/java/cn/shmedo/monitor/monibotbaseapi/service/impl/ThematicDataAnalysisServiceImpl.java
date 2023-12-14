@@ -39,6 +39,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResp
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.util.CustomWrapper;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -320,7 +321,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                             .orElse(false)).toList();
 
                     // 防渗墙双边点集
-                    List<ThematicPipeData> bilateralList = Optional.of(list).filter(w -> w.size() == 2).map(w -> {
+                    List<ThematicPipeData> bilateralList = list.size() == 2 ? Optional.of(list).map(w -> {
                         List<ThematicPipeData> res = new ArrayList<>();
                         Map<String, Object> o1 = w.get(0);
                         Map<String, Object> o2 = w.get(1);
@@ -331,7 +332,11 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         dealBilateralData(pointIDEigenValueMap, monitorPointSet, o1, sensorPointMap.get(Convert.toInt(o1.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), osmoticValue, res::add);
                         dealBilateralData(pointIDEigenValueMap, monitorPointSet, o2, sensorPointMap.get(Convert.toInt(o2.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), osmoticValue, res::add);
                         return res;
-                    }).orElse(List.of());
+                    }).orElse(List.of()) : list.stream().map(w -> {
+                        CustomWrapper<ThematicPipeData> wrapper = new CustomWrapper<>(null);
+                        dealBilateralData(pointIDEigenValueMap, monitorPointSet, w, sensorPointMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN))), null, pipeData -> wrapper.setValue(v -> pipeData));
+                        return wrapper.get();
+                    }).filter(Objects::nonNull).toList();
                     return Map.of("time", DateUtil.parse(u.getKey(), formatter), "pipeDataList",
                             CollUtil.union(nonBilateralList, bilateralList).stream().sorted(Comparator.comparingInt(o -> orderMap.get(o.getMonitorPointID()))).toList());
                 }).sorted((o1, o2) -> DateUtil.compare(Convert.toDate(o1.get("time")), Convert.toDate(o2.get("time")))).toList();

@@ -675,6 +675,31 @@ public class ThematicDataAnalysisController {
     }
 
     /**
+     * @apiIgnore
+     * @api {POST} /AddManualDataBatchV2 数据比测-批量人工录入V2
+     * @apiDescription 数据比测-批量人工录入V2
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName AddManualDataBatchV2
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Object[]} dataList 数据列表
+     * @apiParam (请求体) {Int} dataList.sensorID 传感器ID
+     * @apiParam (请求体) {DateTime} dataList.time 时间
+     * @apiParam (请求体) {Object[]} dataList.fieldList 属性列表
+     * @apiParam (请求体) {String} dataList.fieldList.fieldToken 属性标识
+     * @apiParam (请求体) {String} dataList.fieldList.value 值字符串,将根据匹配到的属性字段类型解析成对应的值
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/AddManualDataBatchV2", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addManualDataBatchV2(@Valid @RequestBody AddManualDataBatchV2Param param) {
+        thematicDataAnalysisService.addManualDataBatch(param.getParam());
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
      * @api {POST} /GetImportManualTemplate 数据比测-获取批量导入模板
      * @apiDescription 数据比测-获取批量导入模板
      * @apiVersion 1.0.0
