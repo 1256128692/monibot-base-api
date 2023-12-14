@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.core.annotation.ResourceSymbol;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
@@ -772,5 +773,23 @@ public class ThematicDataAnalysisController {
     @PostMapping(value = "/QueryCompareAnalysisData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryCompareAnalysisData(@Valid @RequestBody QueryCompareAnalysisDataParam param) {
         return thematicDataAnalysisService.queryCompareAnalysisData(param);
+    }
+
+    /**
+     * @api {POST} /FlushWetLineConfig 刷新浸润线配置
+     * @apiDescription 刷新浸润线配置,查询浸润线配置前调用该接口。<br>如果对应监测点组、监测点被删除,此时的浸润线配置中的对应监测点组、监测点的ID会从字符串中被删掉
+     * @apiVersion 1.0.0
+     * @apiGroup 专题模块
+     * @apiName FlushWetLineConfig
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    //@Permission(permissionName = "")
+    @PostMapping(value = "/FlushWetLineConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object flushWetLineConfig(@Valid @RequestBody QueryMonitorClassParam param) {
+        thematicDataAnalysisService.flushWetLineConfig(param.getProjectID());
+        return ResultWrapper.successWithNothing();
     }
 }

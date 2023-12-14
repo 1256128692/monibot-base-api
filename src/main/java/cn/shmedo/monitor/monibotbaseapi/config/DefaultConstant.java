@@ -305,12 +305,25 @@ public class DefaultConstant {
     }
 
     /**
-     * 专题分析 误差范围配置<br>
-     * group - mistakeConfig<br>
-     * key - 监测类型<br>
-     * value :[{fieldToken1:xxx}]
+     * 专题分析 一些预定义的自定义配置
      */
-    public interface ThematicMistakeConfig {
-        String GROUP = "mistakeConfig";
+    public interface ThematicProjectConfig {
+        /**
+         * 误差范围配置<br>
+         * group - mistakeConfig<br>
+         * key - 监测类型<br>
+         * value - [{fieldToken1:xxx}]
+         */
+        String MISTAKE_CONFIG_GROUP = "mistakeConfig";
+
+        /**
+         * 浸润线配置<br>
+         * group - seepage-line<br>
+         * key - row/col row:横剖面配置;col:纵剖面配置<br>
+         * value - monitorGroupID1,monitorGroupID2,... 监测点组ID拼接成的字符串
+         */
+        String SEEPAGE_LINE_CONFIG_GROUP = "seepage-line";
+        String SEEPAGE_LINE_CONFIG_KEY_ROW = "row";
+        String SEEPAGE_LINE_CONFIG_KEY_COL = "col";
     }
 }

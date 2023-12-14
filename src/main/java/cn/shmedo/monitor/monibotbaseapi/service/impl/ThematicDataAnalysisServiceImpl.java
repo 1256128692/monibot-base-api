@@ -37,6 +37,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBas
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.*;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbProjectConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomWrapper;
@@ -65,6 +66,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -83,11 +85,12 @@ import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicEx
 public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisService {
     private final SensorDataDao sensorDataDao;
     private final TbProjectInfoMapper tbProjectInfoMapper;
-    private final TbProjectConfigMapper tbProjectConfigMapper;
+    private final TbMonitorGroupMapper tbMonitorGroupMapper;
     private final TbMonitorPointMapper tbMonitorPointMapper;
     private final TbSensorMapper tbSensorMapper;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final TbEigenValueMapper tbEigenValueMapper;
+    private final ITbProjectConfigService tbProjectConfigService;
     private final FileService fileService;
 
     @Override
@@ -99,7 +102,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Map<Integer, Double> monitorPointIDUpperLimitMap = param.getMonitorPointIDUpperLimitMap();
         String absolutePath = Optional.ofNullable(tbMonitorGroup.getImagePath()).filter(ObjectUtil::isNotEmpty)
                 .map(fileService::getFileUrl).orElse(null);
-        String groupConfig = tbProjectConfigMapper.selectList(new LambdaQueryWrapper<TbProjectConfig>()
+        String groupConfig = tbProjectConfigService.list(new LambdaQueryWrapper<TbProjectConfig>()
                         .eq(TbProjectConfig::getKey, "stConfig::" + monitorGroupID)
                         .eq(TbProjectConfig::getGroup, "monitorGroup")).stream().findFirst()
                 .map(TbProjectConfig::getValue).orElse(null);
@@ -597,9 +600,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         Integer monitorType = param.getMonitorType();
 
         // 误差值
-        List<TbProjectConfig> tbProjectConfigList = tbProjectConfigMapper.selectList(new LambdaQueryWrapper<TbProjectConfig>()
+        List<TbProjectConfig> tbProjectConfigList = tbProjectConfigService.list(new LambdaQueryWrapper<TbProjectConfig>()
                 .eq(TbProjectConfig::getProjectID, param.getProjectID()).eq(TbProjectConfig::getKey, monitorType)
-                .eq(TbProjectConfig::getGroup, DefaultConstant.ThematicMistakeConfig.GROUP));
+                .eq(TbProjectConfig::getGroup, DefaultConstant.ThematicProjectConfig.MISTAKE_CONFIG_GROUP));
         Double mistakeValue = Optional.of(tbProjectConfigList).filter(CollUtil::isNotEmpty).map(u -> u.get(0))
                 .map(TbProjectConfig::getValue).map(u -> {
                     try {
@@ -651,6 +654,30 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             return list;
         }).orElse(List.of());
         return builder.dataList(compareAnalysisDataList).build();
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void flushWetLineConfig(Integer projectID) {
+        List<TbProjectConfig> list = new ArrayList<>();
+        Set<Integer> monitorGroupIDSet = tbMonitorGroupMapper.selectList(new LambdaQueryWrapper<TbMonitorGroup>()
+                .eq(TbMonitorGroup::getProjectID, projectID)).stream().map(TbMonitorGroup::getID).collect(Collectors.toSet());
+        tbProjectConfigService.list(new LambdaQueryWrapper<TbProjectConfig>()
+                        .eq(TbProjectConfig::getProjectID, projectID).eq(TbProjectConfig::getGroup, DefaultConstant.ThematicProjectConfig.SEEPAGE_LINE_CONFIG_GROUP)
+                        .in(TbProjectConfig::getKey, List.of(DefaultConstant.ThematicProjectConfig.SEEPAGE_LINE_CONFIG_KEY_COL, DefaultConstant.ThematicProjectConfig.SEEPAGE_LINE_CONFIG_KEY_ROW)))
+                .stream().peek(u -> {
+                    String newValue = Optional.ofNullable(u.getValue()).flatMap(w -> Arrays.stream(w.split(","))
+                            .filter(s -> Pattern.matches("\\d{1,9}", s)).map(Integer::valueOf)
+                            .filter(monitorGroupIDSet::contains).map(String::valueOf).reduce((o1, o2) -> o1 + "," + o2)).orElse("");
+                    if (!Objects.equals(newValue, u.getValue())) {
+                        TbProjectConfig config = new TbProjectConfig();
+                        config.setID(u.getID());
+                        config.setValue(newValue);
+                        list.add(config);
+                    }
+                }).toList();
+        Optional.of(list).filter(CollUtil::isNotEmpty).ifPresent(this.tbProjectConfigService::updateBatchById);
     }
 
     /**

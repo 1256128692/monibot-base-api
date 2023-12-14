@@ -53,4 +53,6 @@ public interface IThematicDataAnalysisService {
     ResultWrapper<Object> importManualDataBatch(Integer projectID, Integer monitorType, MultipartFile file);
 
     CompareAnalysisDataInfo queryCompareAnalysisData(QueryCompareAnalysisDataParam param);
+
+    void flushWetLineConfig(Integer projectID);
 }
