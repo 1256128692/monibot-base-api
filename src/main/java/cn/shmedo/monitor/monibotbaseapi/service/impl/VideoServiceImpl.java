@@ -21,10 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
@@ -36,7 +33,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
@@ -45,7 +41,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
-import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
@@ -57,7 +52,6 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +89,7 @@ public class VideoServiceImpl implements VideoService {
     private final TbProjectInfoMapper projectInfoMapper;
 
     private UserService userService;
-
+    private final TbDeviceIntelLocationMapper tbDeviceIntelLocationMapper;
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
 
@@ -1271,6 +1265,15 @@ public class VideoServiceImpl implements VideoService {
                 }
             });
         }
+        // 设置设备状态
+        info.setLocation(
+                tbDeviceIntelLocationMapper.selectOne(
+                        new LambdaQueryWrapper<TbDeviceIntelLocation>()
+                                .eq(TbDeviceIntelLocation::getDeviceToken, info.getDeviceSerial())
+                                .eq(TbDeviceIntelLocation::getType, IntelDeviceType4Location.VIDEO.getType())
+
+                )
+        );
         return info;
     }
 

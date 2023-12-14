@@ -313,24 +313,25 @@ public class WtDeviceController {
     }
 
     /**
-     * @api {POST} /SetIotDeviceLocationInSys 设置物联网设备位置信息
+     * @api {POST} /SetIntelDeviceLocationInSys 设置智能设备位置信息
      * @apiVersion 1.0.0
      * @apiGroup 水利设备列表模块
-     * @apiName SetIotDeviceLocationInSys
-     * @apiDescription 设置物联网设备位置信息，仅在当前系统中
+     * @apiName SetIntelDeviceLocationInSys
+     * @apiDescription 设置智能设备位置信息，仅在当前系统中
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {String} deviceToken 设备SN
+     * @apiParam (请求参数) {String} deviceToken 设备SN或者视频设备的Serial
+     * @apiParam (请求参数) {Int} type 类型，0,1对应iot，视频设备
      * @apiParam (请求参数) {String} address 地址
      * @apiParam (请求参数) {String} [locationJson] 位置扩展，json字符串
      * @apiSuccess (返回结果) {String} none 无返回值
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:SetIotDeviceInfoInSys
+     * @apiPermission 项目权限 mdmbase:SetIntelDeviceInfoInSys
      */
-    @Permission(permissionName = "mdmbase:SetIotDeviceInfoInSys")
+    @Permission(permissionName = "mdmbase:SetIntelDeviceInfoInSys")
     @LogParam(moduleName = "水利设备列表模块", operationName = "设置物联网设备位置信息", operationProperty = OperationProperty.UPDATE)
-    @PostMapping(value = "/SetIotDeviceLocationInSys", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object setIotDeviceLocationInSys(@Valid @RequestBody SetIotDeviceLocationInSysParam pa) {
-        wtDeviceService.setIotDeviceLocationInSys(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    @PostMapping(value = "/SetIntelDeviceLocationInSys", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object setIntelDeviceLocationInSys(@Valid @RequestBody SetIntelDeviceLocationInSysParam pa) {
+        wtDeviceService.setIntelDeviceLocationInSys(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 }

@@ -5,11 +5,10 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.IntelDeviceType4Location;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
-import java.util.List;
 
 /**
  * @program: monibot-base-api
@@ -17,17 +16,22 @@ import java.util.List;
  * @create: 2023-12-13 15:46
  **/
 @Data
-public class SetIotDeviceLocationInSysParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class SetIntelDeviceLocationInSysParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
     @NotBlank
     private String deviceToken;
+    @NotNull
+    private Byte type;
     private String locationJson;
     @NotBlank
     private String address;
 
     @Override
     public ResultWrapper validate() {
+        if (!IntelDeviceType4Location.isLegal(type)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "类型错误");
+        }
         if (ObjectUtil.isNotEmpty(locationJson) && !JSONUtil.isTypeJSON(locationJson)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "位置扩展格式错误");
         }
