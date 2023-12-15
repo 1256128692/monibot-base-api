@@ -3,8 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.controller.gq;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.QueryMonitorPointDataParam;
-import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,23 +20,22 @@ import org.springframework.web.bind.annotation.RestController;
 public class GqMonitorDataController {
 
 
-    private MonitorDataService monitorDataService;
+    private GqMonitorPointService gqMonitorPointService;
 
 
     /**
-     * @api {POST} /GqQueryMonitorPointDataList 查询灌区监测点数据列表
+     * @api {POST} /GqQueryMonitorPointDataList 查询灌区监测点单日数据列表
      * @apiVersion 1.0.0
      * @apiGroup 灌区监测数据模块
      * @apiName GqQueryMonitorPointDataList
-     * @apiDescription 跨监测项目, 查询灌区监测点数据列表, 只统计单日的, 返回8, 12, 16, 20点数据每个时刻的最新数据
+     * @apiDescription 跨监测项目, 查询灌区监测点单日数据列表, 只统计单日的, 返回8, 12, 16, 20点数据每个时刻的最新数据
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
-     * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器
+     * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器, null - 查询全部
      * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:未定义)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
      * @apiParamExample 请求体示例
      * {"companyID":1,"kind":"1","token":"sss","monitorPointName":"测测","projectTypeID":10,
      * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31"}
@@ -56,24 +55,25 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorName  传感器名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorAlias  传感器别名
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {Object[]} data.sensorInfoList.sensorData   传感器数据
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {Object[]} data.sensorInfoList.sensorDataList   传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorDataList.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorDataList.time  数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorInfoList.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
-     * @apiSuccess (响应结果) {Object} data.fieldInfo   监测类型属性字段列表
-     * @apiSuccess (响应结果) {String} data.fieldInfo.fieldToken  字段标志
-     * @apiSuccess (响应结果) {String} data.fieldInfo.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} data.fieldInfo.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} data.fieldInfo.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} data.fieldInfo.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} data.fieldInfo.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {Object[]} data.fieldInfoList   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.fieldInfoList.unitDesc  单位类型描述
+     * @apiSuccess (响应结果) {Int} data.fieldInfoList.displayOrder  字段排序
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/GqQueryMonitorPointDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object gqQueryMonitorPointDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object gqQueryMonitorPointDataList(@Validated @RequestBody GqQueryMonitorPointDataParam pa) {
+        return gqMonitorPointService.gqQueryMonitorPointDataList(pa);
     }
 
 
@@ -114,17 +114,10 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorName  传感器名称
      * @apiSuccess (响应结果) {Int} currentPageData.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {Object[]} currentPageData.sensorData   传感器数据
+     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
      * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} currentPageData.sensorData.time  数据采集时间
      * @apiSuccess (响应结果) {T} currentPageData.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
-     * @apiSuccess (响应结果) {Object} map   监测类型属性字段列表
-     * @apiSuccess (响应结果) {String} map.fieldToken  字段标志
-     * @apiSuccess (响应结果) {String} map.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} map.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} map.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} map.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} map.unitDesc  单位类型描述
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
@@ -173,13 +166,6 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorData.sensorID   传感器ID
      * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorData.time  数据采集时间
      * @apiSuccess (响应结果) {T} data.sensorInfoList.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
-     * @apiSuccess (响应结果) {Object} data.fieldInfo   监测类型属性字段列表
-     * @apiSuccess (响应结果) {String} data.fieldInfo.fieldToken  字段标志
-     * @apiSuccess (响应结果) {String} data.fieldInfo.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} data.fieldInfo.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} data.fieldInfo.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} data.fieldInfo.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} data.fieldInfo.unitDesc  单位类型描述
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */

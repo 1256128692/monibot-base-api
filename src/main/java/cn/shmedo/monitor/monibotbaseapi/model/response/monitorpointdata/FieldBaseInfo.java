@@ -19,6 +19,6 @@ public class FieldBaseInfo {
 
     private String unitDesc;
 
-
+    private Integer displayOrder;
 
 }

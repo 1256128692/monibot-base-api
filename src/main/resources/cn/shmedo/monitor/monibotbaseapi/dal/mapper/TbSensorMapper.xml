@@ -839,4 +839,37 @@
             AND ts.ID = #{sensorID}
         </if>
     </select>
+
+
+    <select id="selectListByGqQueryCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3">
+        select pi.companyID,
+               mp.ID          as monitorPointID,
+               mp.Name        as monitorPointName,
+               mt.monitorType,
+               mt.TypeName    as monitorTypeName,
+               mt.TypeAlias   as monitorTypeAlias,
+               s.ID           as sensorID,
+               s.Name         as sensorName,
+               s.Alias        as sensorAlias,
+               s.kind,
+               mp.projectID,
+               pi.projectType as projectTypeID,
+               pt.TypeName    as projectTypeName,
+               mp.exValues
+        from tb_sensor s
+                 left join tb_monitor_point mp on s.monitorPointID = mp.ID
+                 left join tb_monitor_type mt on mp.monitorType = mt.ID
+                 left join tb_project_info pi on mp.projectID = pi.ID
+                 left join tb_project_type pt on pt.ID = pi.projectType
+        where pi.companyID = #{companyID}
+          and pi.projectType = #{projectTypeID}
+          and mt.monitorType = #{monitorType}
+        <if test="kind != null">
+            and s.kind = #{kind}
+        </if>
+        <if test="tokenStr != null">
+          and mp.exValues like concat('%', #{tokenStr}, '%')
+        </if>
+    </select>
 </mapper>

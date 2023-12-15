@@ -2,10 +2,12 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Sluice;
@@ -95,4 +97,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
      * 仅是<b>扩展属性</b>,不是<b>全部属性</b>
      */
     List<SensorIDWithFormulaBaseInfo> selectManualSensorIDWithFormulaBaseInfoBySensorIDList(List<Integer> sensorIDList);
+
+    List<SensorBaseInfoV3> selectListByGqQueryCondition(GqQueryMonitorPointDataParam pa);
 }
