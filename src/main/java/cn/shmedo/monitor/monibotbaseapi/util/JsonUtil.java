@@ -8,11 +8,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 
 @Slf4j
 public class JsonUtil {
+
+    public static final String LEFT_BRACE = "{";
+    public static final String RIGHT_BRACE = "}";
+    public static final String LEFT_BRACKET = "[";
+    public static final String RIGHT_BRACKET = "]";
+
     public static <T> T toObject(String str, Class<T> tClass) {
         try {
             ObjectMapper objectMapper = ContextHolder.getBean(ObjectMapper.class);
@@ -97,5 +104,30 @@ public class JsonUtil {
             return valueNode.isTextual() ? valueNode.textValue() : valueNode.toString();
         }
         return null;
+    }
+
+    /**
+     * 判断字符串是否为JSON字符串<br/>
+     * <p>
+     * 标准: 被 {@code []} 或 {@code {}} 包裹，且可以被反序列化为使用一组JsonNode实例表示的树<br/>
+     * <p/>
+     *
+     * @param json JSON字符串
+     * @return 是否为JSON字符串
+     */
+    public static boolean isJson(String json) {
+        if (StringUtils.hasText(json)) {
+            String val = json.trim();
+            if (val.startsWith(LEFT_BRACE) && val.endsWith(RIGHT_BRACE) ||
+                    val.startsWith(LEFT_BRACKET) && val.endsWith(RIGHT_BRACKET)) {
+                try {
+                    ContextHolder.getBean(ObjectMapper.class).readTree(val);
+                    return true;
+                } catch (IOException e) {
+                    return false;
+                }
+            }
+        }
+        return false;
     }
 }

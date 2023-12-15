@@ -4,7 +4,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.CalculateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureWay;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
@@ -23,6 +25,8 @@ import java.util.List;
  * @author Chengfs on 2023/12/15
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MonitorPointExValue {
 
     private WaterMeasureType waterMeasureType;

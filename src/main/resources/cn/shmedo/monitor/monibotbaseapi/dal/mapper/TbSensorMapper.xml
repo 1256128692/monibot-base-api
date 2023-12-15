@@ -872,4 +872,64 @@
           and mp.exValues like concat('%', #{tokenStr}, '%')
         </if>
     </select>
+
+    <select id="measurePointPage"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointSimple">
+        SELECT ts.ID             sensorID,
+               ts.Kind           sensorKind,
+               ts.ProjectID      projectID,
+               ts.MonitorPointID monitorPointID,
+               tpi.CompanyID     companyID,
+               tpi.ProjectName   projectName,
+               tpi.ProjectType   projectType,
+               tmp.`Name`        monitorPointName,
+               tmp.ExValues      exValues
+        FROM `tb_sensor` ts
+                 INNER JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+                 INNER JOIN tb_monitor_point tmp ON ts.MonitorPointID = tmp.ID
+        <where>
+            <trim suffixOverrides="AND">
+                <choose>
+                    <when test="param.projectIdList != null and param.projectIdList.size() != 0">
+                        <foreach collection="param.projectIdList" separator="," item="item" open="ts.ProjectID IN ("
+                                 close=") AND">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        FALSE AND
+                    </otherwise>
+                </choose>
+                ts.MonitorType IN (60, 70) AND
+                <if test="param.keyword != null and param.keyword != ''">
+                    tmp.`Name` LIKE CONCAT('%', #{param.keyword}, '%') AND
+                </if>
+            </trim>
+        </where>
+        ORDER BY ts.ID DESC
+    </select>
+
+    <select id="singleMeasurePoint"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointInfo">
+        SELECT
+            ts.ID sensorID,
+            ts.Kind sensorKind,
+            ts.ProjectID projectID,
+            ts.MonitorPointID monitorPointID,
+            tpi.CompanyID companyID,
+            tpi.ProjectName projectName,
+            tpi.ProjectType projectType,
+            tmp.`Name` monitorPointName,
+            tmp.ExValues exValues,
+            tmp.GpsLocation gpsLocation,
+            tmi.ID monitorItemID,
+            tmi.`Name` monitorItemName
+        FROM
+            `tb_sensor` ts
+                INNER JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+                INNER JOIN tb_monitor_point tmp ON ts.MonitorPointID = tmp.ID
+                INNER JOIN tb_monitor_item tmi ON tmp.MonitorItemID = tmi.ID
+        WHERE
+            ts.ID = #{sensorID} AND ts.MonitorType IN (60, 70)
+    </select>
 </mapper>

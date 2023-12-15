@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.gq;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.*;
+import cn.shmedo.monitor.monibotbaseapi.service.WaterMeasureService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
@@ -16,6 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class WaterMeasureController {
+
+    private final WaterMeasureService service;
 
     /**
      * @api {POST} /QueryWaterMeasurePointPage 分页查询量水点
@@ -49,11 +54,10 @@ public class WaterMeasureController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListWaterMeasurePoint
      */
-//    @Permission(permissionName = "mdmbase:ListWaterMeasurePoint")
+    @Permission(permissionName = "mdmbase:ListWaterMeasurePoint")
     @PostMapping(value = "/QueryWaterMeasurePointPage", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object measurePointPage(@Validated @RequestBody Void request) {
-
-        return ResultWrapper.successWithNothing();
+    public Object measurePointPage(@Validated @RequestBody WaterMeasurePointPageRequest request) {
+        return service.measurePointPage(request);
     }
 
     /**
@@ -85,14 +89,13 @@ public class WaterMeasureController {
      * 31水闸 32渡槽 33跌水 34放水涵 35其他</br>41U形断面 42梯形断面 43矩形断面</br>51流速仪
      * @apiSuccess (返回结果) {Int} calculateType 计算方法 (1水工建筑法 2水位流量关系法 3流速面积法 4量水堰槽法)
      * @apiSuccess (返回结果) {Int[]} monitorElements 监测要素集 (2水位 3流速 14流量)
-     * @apiSuccess (返回结果) {Int} sensorID 监测传感器id
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeWaterMeasurePoint
      */
-//    @Permission(permissionName = "mdmbase:DescribeWaterMeasurePoint")
+    @Permission(permissionName = "mdmbase:DescribeWaterMeasurePoint")
     @PostMapping(value = "/QueryWaterMeasurePoint", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object measurePointSingle(@Validated @RequestBody Void request) {
-        return ResultWrapper.successWithNothing();
+    public Object measurePointSingle(@Validated @RequestBody SingleMeasurePointRequest request) {
+        return service.singleMeasurePoint(request);
     }
 
     /**
@@ -115,9 +118,10 @@ public class WaterMeasureController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:UpdateWaterMeasurePoint
      */
-//    @Permission(permissionName = "mdmbase:UpdateWaterMeasurePoint")
+    @Permission(permissionName = "mdmbase:UpdateWaterMeasurePoint")
     @PostMapping(value = "/UpdateWaterMeasurePoint", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object updateMeasurePoint(@Validated @RequestBody Void request) {
+    public Object updateMeasurePoint(@Validated @RequestBody UpdateMeasurePointRequest request) {
+        service.updateMeasurePoint(request);
         return ResultWrapper.successWithNothing();
     }
 
@@ -143,11 +147,12 @@ public class WaterMeasureController {
      * @apiParam (请求参数) {Int} sensorID 监测传感器id
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:AddWaterMeasurePoint
+     * @apiPermission 系统权限 mdmbase:UpdateWaterMeasurePoint
      */
-//    @Permission(permissionName = "mdmbase:AddWaterMeasurePoint")
+    @Permission(permissionName = "mdmbase:UpdateWaterMeasurePoint")
     @PostMapping(value = "/AddWaterMeasurePoint", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object addMeasurePoint(@Validated @RequestBody Void request) {
+    public Object addMeasurePoint(@Validated @RequestBody AddMeasurePointRequest request) {
+        service.addMeasurePoint(request);
         return ResultWrapper.successWithNothing();
     }
 
@@ -156,7 +161,7 @@ public class WaterMeasureController {
      * @apiVersion 1.0.0
      * @apiGroup 灌区量测水管理
      * @apiName ListWaterMeasureSensor
-     * @apiDescription 量水点人工传感器列表
+     * @apiDescription 量水点人工传感器列表 (仅未绑定监测点的人工传感器)
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiParam (请求参数) {Int} monitorType 监测类型
@@ -166,9 +171,9 @@ public class WaterMeasureController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeWaterMeasurePoint
      */
-//    @Permission(permissionName = "mdmbase:DescribeWaterMeasurePoint")
+    @Permission(permissionName = "mdmbase:DescribeWaterMeasurePoint")
     @PostMapping(value = "/ListWaterMeasureSensor", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object listWaterMeasureSensor(@Validated @RequestBody Void request) {
-        return ResultWrapper.successWithNothing();
+    public Object listWaterMeasureSensor(@Validated @RequestBody ListWaterMeasureSensorRequest request) {
+        return service.listWaterMeasureSensor(request);
     }
 }

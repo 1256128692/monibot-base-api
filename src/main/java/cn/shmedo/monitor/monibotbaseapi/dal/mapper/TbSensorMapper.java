@@ -2,10 +2,13 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
+import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.WaterMeasurePointPageRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
@@ -15,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.Sens
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.SensorWithMore;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import reactor.util.function.Tuple3;
@@ -99,4 +103,12 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorIDWithFormulaBaseInfo> selectManualSensorIDWithFormulaBaseInfoBySensorIDList(List<Integer> sensorIDList);
 
     List<SensorBaseInfoV3> selectListByGqQueryCondition(GqQueryMonitorPointDataParam pa);
+
+    /**
+     * 灌区-量水点 分页
+     */
+    Page<WaterMeasurePointSimple> measurePointPage(@Param("page") IPage<WaterMeasurePointSimple> page,
+                                                   @Param("param") WaterMeasurePointPageRequest param);
+
+    WaterMeasurePointInfo singleMeasurePoint(Integer sensorID);
 }
