@@ -378,4 +378,19 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo">
         select fieldToken from tb_monitor_type_field where monitorType = #{monitorType} and FieldClass = 1
     </select>
+
+    <select id="selectListByType"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo">
+        select tmtf.fieldToken,
+               tmtf.fieldName,
+               tmtf.fieldUnitID,
+               du.engUnit,
+               du.chnUnit,
+               du.unitClass,
+               du.unitDesc,
+               tmtf.displayOrder
+        from tb_monitor_type_field tmtf
+                 left join tb_data_unit du on tmtf.fieldUnitID = du.ID
+        where tmtf.monitorType = #{monitorType}
+    </select>
 </mapper>
