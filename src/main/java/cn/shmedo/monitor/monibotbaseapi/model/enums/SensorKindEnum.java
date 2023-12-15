@@ -1,5 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,15 +18,21 @@ public enum SensorKindEnum {
     /**
      * 自动化传感器
      */
+    @JsonProperty("1")
     AUTO_KIND((byte) 1),
     /**
      * 融合传感器
      */
+    @JsonProperty("2")
     MERGE_KIND((byte) 2),
     /**
      * 人工传感器
      */
+    @JsonProperty("3")
     MANUAL_KIND((byte) 3);
+
+    @EnumValue
+    @JsonValue
     private final Byte code;
 
     public static SensorKindEnum fromCode(final byte code) {

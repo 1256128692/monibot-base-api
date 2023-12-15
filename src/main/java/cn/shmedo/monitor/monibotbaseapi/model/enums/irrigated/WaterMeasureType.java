@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated;
 
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlType;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -60,18 +61,19 @@ public enum WaterMeasureType {
         return false;
     }
 
-    public boolean validElements(MonitorElement... element) {
+    public boolean validElements(MonitorType... element) {
         if (element != null) {
             switch (this) {
                 case STANDARD_SECTION -> {
-                    return Arrays.stream(element).allMatch(MonitorElement.WATER_LEVEL::equals);
+                    return Arrays.stream(element).allMatch(MonitorType.WATER_LEVEL::equals);
                 }
                 case CURRENT_METER -> {
                     return Arrays.stream(element)
-                            .allMatch(e -> MonitorElement.FLOW_SPEED.equals(e) || MonitorElement.FLOW_RATE.equals(e));
+                            .allMatch(e -> MonitorType.FLOW_VELOCITY.equals(e) || MonitorType.FLOW_CAPACITY.equals(e));
                 }
                 default -> {
-                    return true;
+                    return Arrays.stream(element)
+                            .allMatch(e -> MonitorType.WATER_LEVEL.equals(e) || MonitorType.FLOW_VELOCITY.equals(e) || MonitorType.FLOW_CAPACITY.equals(e));
                 }
             }
         }
