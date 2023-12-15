@@ -358,12 +358,13 @@ public class SluiceServiceImpl implements SluiceService {
             //闸门列表
             List<Gate> list = item.getGates().stream()
                     .filter(i -> SluiceStatus.MONITOR_TYPE.equals(i.getMonitorType()))
+                    .filter(i -> statusMap.containsKey(i.getId()))
                     .peek(sensor -> Optional.ofNullable(statusMap.get(sensor.getId())).ifPresent(s -> {
                         sensor.setOpenStatus(s.getGateSta());
                         sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
                     })).toList();
             item.setGates(list);
-            item.setOpenStatus(list.stream().anyMatch(i -> i.getOpenStatus() == 1) ? 1 : 0);
+            item.setOpenStatus(list.stream().anyMatch(i -> Objects.equals(i.getOpenStatus(),1)) ? 1 : 0);
 
             Optional.ofNullable(propMap.get(item.getProjectID())).ifPresent(p -> {
                 item.setCanal(p.get(CANAL_NAME));
