@@ -670,6 +670,33 @@ public class SensorDataDaoImpl implements SensorDataDao {
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
+    @Override
+    public void insertSensorCommonData(List<Map<String, Object>> sensorDataList, List<FieldBaseInfo> fieldInfoList, Integer monitorType, String tableSuffix) {
+
+        if (ObjectUtil.isEmpty(sensorDataList)) {
+            return;
+        }
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, tableSuffix);
+        BatchPoints batchPoints = BatchPoints.database(fileConfig.getInfluxDatabase()).build();
+        for (Map<String, Object> item : sensorDataList) {
+
+            Map<String, Object> collect = fieldInfoList.stream()
+                    .filter(e -> item.containsKey(e.getFieldToken()) && ObjectUtil.isNotEmpty(item.get(e.getFieldToken())))
+                    .collect(Collectors.toMap(
+                            FieldBaseInfo::getFieldToken,
+                            fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
+            if (collect.size() > 0) {
+                Point.Builder builder = Point.measurement(measurement);
+                builder.fields(collect);
+                builder.time(((Date) item.get("time")).getTime(),
+                        TimeUnit.MILLISECONDS);
+                builder.tag("sid", item.get("sensorID").toString());
+                batchPoints.point(builder.build());
+            }
+        }
+        influxDB.write(batchPoints);
+    }
+
 
     /**
      * 查询全部传感器的最新值

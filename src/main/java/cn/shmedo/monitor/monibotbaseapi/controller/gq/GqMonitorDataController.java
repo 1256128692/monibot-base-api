@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.gq;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
 import lombok.AllArgsConstructor;
@@ -187,14 +188,37 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {Object[]} dataList 数据列表
      * @apiParam (请求体) {Int} dataList.sid 传感器ID
      * @apiParam (请求体) {DateTime} dataList.time 补录时间
-     * @apiParam (请求体) {Object} dataList.sensorData 数据列表
+     * @apiParam (请求体) {Object[]} dataList.sensorData 数据列表
      * @apiParam (请求体) {String} dataList.sensorData.fieldToken 子类型字段
-     * @apiParam (请求体) {Double} dataList.sensorData.value 数据
+     * @apiParam (请求体) {Object} dataList.sensorData.value 数据
      * @apiParamExample 请求体示例
-     * {"companyID":1,"monitorType":"1","dataList":[
      * {
-     * "sid":1,"time":"2023-10-06 16:29:31","sensorData":["fieldToken":"ss","value":1.1]]
+     * "companyID": 138,
+     * "monitorType": 60,
+     * "dataList": [
+     * {
+     * "sid": "999",
+     * "time": "2023-12-15 08:00:01",
+     * "sensorDataList": [
+     * {
+     * "fieldToken": "frontwater",
+     * "value":1.1
+     * },
+     * {
+     * "fieldToken": "afterwater",
+     * "value":2.2
+     * },
+     * {
+     * "fieldToken": "flowRate",
+     * "value":32.1
+     * },
+     * {
+     * "fieldToken": "totalFlow",
+     * "value":32.1
      * }
+     * ]
+     * }
+     * ]
      * }
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -202,8 +226,8 @@ public class GqMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/GqMonitorPointDataPush", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object gqMonitorPointDataPush(@Validated @RequestBody Object pa) {
-        return null;
+    public Object gqMonitorPointDataPush(@Validated @RequestBody GqMonitorPointDataPushParam pa) {
+        return gqMonitorPointService.gqMonitorPointDataPush(pa);
     }
 
 }

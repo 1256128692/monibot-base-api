@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -7,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.GqMonitorPointDataResponse;
@@ -17,6 +19,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,5 +55,27 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         }
 
         return new GqMonitorPointDataResponse(sensorInfoList, fieldInfoList);
+    }
+
+    @Override
+    public Object gqMonitorPointDataPush(GqMonitorPointDataPushParam pa) {
+
+        List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
+
+        List<Map<String, Object>> sensorDataList = new ArrayList<>();
+        pa.getDataList().forEach(p -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("sensorID", p.getSid());
+            map.put("time", p.getTime());
+            p.getSensorDataList().forEach(d -> {
+                map.put(d.getFieldToken(), d.getValue());
+            });
+            sensorDataList.add(map);
+        });
+
+        String tableSuffix = null;
+        sensorDataDao.insertSensorCommonData(sensorDataList, fieldInfoList, pa.getMonitorType(), tableSuffix);
+
+        return ResultWrapper.successWithNothing();
     }
 }

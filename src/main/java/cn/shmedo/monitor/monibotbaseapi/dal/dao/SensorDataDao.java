@@ -106,6 +106,8 @@ public interface SensorDataDao {
     void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw,
                           List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType, String tableSuffix);
 
+
+
     /**
      * 删除传感器在时间点上的数据
      *
@@ -173,4 +175,13 @@ public interface SensorDataDao {
      * @return
      */
     List<Map<String, Object>> queryCommonSensorDataList(List<Integer> sensorIDList, Date begin, Date end, Integer densityType, Integer statisticsType, List<FieldBaseInfo> fieldList, Integer monitorType);
+
+    /**
+     * 插入通用数据
+     * @param sensorDataList
+     * @param fieldInfoList
+     * @param monitorType
+     * @param tableSuffix
+     */
+    void insertSensorCommonData(List<Map<String, Object>> sensorDataList, List<FieldBaseInfo> fieldInfoList, Integer monitorType, String tableSuffix);
 }
