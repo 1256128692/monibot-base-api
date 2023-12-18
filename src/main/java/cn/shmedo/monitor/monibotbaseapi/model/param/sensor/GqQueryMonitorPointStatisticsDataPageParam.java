@@ -5,20 +5,20 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
 import java.util.Objects;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class GqQueryMonitorPointDataParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class GqQueryMonitorPointStatisticsDataPageParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
@@ -33,6 +33,20 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
     @NotNull(message = "结束时间不能为空")
     private Date end;
 
+    private Boolean dataSort;
+
+    @NotNull(message = "密度不能为空")
+    private Integer densityType;
+    @NotNull(message = "统计方式不能为空")
+    private Integer statisticsType;
+
+    @NotNull
+    @Range(min = 1, max = 100)
+    private Integer pageSize;
+    @NotNull
+    @Positive
+    private Integer currentPage;
+
     @JsonIgnore
     private Integer monitorType;
 
@@ -44,13 +58,6 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
         if (begin.after(end)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
         }
-        long between = DateUtil.between(begin, end, DateUnit.HOUR);
-        if (between >= 24) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "查询时间范围不能超过24小时");
-        }
-
-        begin = DateUtil.beginOfDay(begin).offset(DateField.HOUR, 8);
-        end = DateUtil.beginOfDay(end).offset(DateField.HOUR, 20);
 
         if (!(Objects.equals(projectTypeID, ProjectType.SLUICE.getCode()) || Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode()) )) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持工程类型为水闸或者渠系");
@@ -69,6 +76,16 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
         } else {
             tokenStr = null;
         }
+
+        if ( !(DisplayDensity.DAY.getValue() == densityType || DisplayDensity.MONTH.getValue() == densityType ||
+                DisplayDensity.YEAR.getValue() == densityType) ) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度仅支持日,月,年");
+        }
+
+        if ( StatisticalMethods.AVERAGE.getValue() != statisticsType) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "统计方式仅支持平均");
+        }
+
         return null;
     }
 

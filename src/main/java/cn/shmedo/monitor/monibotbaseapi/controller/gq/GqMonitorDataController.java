@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -88,7 +89,7 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
      * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:未定义)
+     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:3)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -112,21 +113,23 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID    传感器ID
      * @apiSuccess (响应结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (响应结果) {Int} currentPageData.projectTypeID 工程类型
+     * @apiSuccess (响应结果) {String} currentPageData.projectName 工程名称
      * @apiSuccess (响应结果) {String} currentPageData.projectTypeName 工程类型名称
      * @apiSuccess (响应结果) {String} currentPageData.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} currentPageData.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Date} currentPageData.time  数据时间
      * @apiSuccess (响应结果) {Int} currentPageData.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {Object} currentPageData.sensorData   传感器数据
-     * @apiSuccess (响应结果) {Int} currentPageData.sensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {DateTime} currentPageData.sensorData.time  数据采集时间
-     * @apiSuccess (响应结果) {T} currentPageData.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object} currentPageData.data   传感器数据
+     * @apiSuccess (响应结果) {Double} currentPageData.data.avgWaterLevel  平均水位
+     * @apiSuccess (响应结果) {Double} currentPageData.data.avgWaterFlow  平均流量
+     * @apiSuccess (响应结果) {Double} currentPageData.data.waterTotal  总放水量
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/GqQueryMonitorPointStatisticsDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object gqQueryMonitorPointStatisticsDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object gqQueryMonitorPointStatisticsDataPage(@Validated @RequestBody GqQueryMonitorPointStatisticsDataPageParam pa) {
+        return gqMonitorPointService.gqQueryMonitorPointStatisticsDataPage(pa);
     }
 
 
@@ -139,7 +142,7 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
      * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:未定义)
+     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:3)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -149,25 +152,26 @@ public class GqMonitorDataController {
      * @apiParamExample 请求体示例
      * {"companyID":1,"kind":"1","token":"sss","monitorPointName":"测测","projectTypeID":10,"densityType":1
      * "statisticsType":1,"begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31"}
-     * @apiSuccess (响应结果) {Object} data                 结果
-     * @apiSuccess (响应结果) {Object[]} data.sensorInfoList  传感器信息列表
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.companyID       公司ID
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.monitorPointID       监测点ID
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.monitorPointName  监测点名称
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.monitorType          监测类型
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorID    传感器ID
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectTypeID 工程类型
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.projectTypeName 工程类型名称
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.waterMeasuringTypeName 量水类型名称
-     * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorName  传感器名称
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
-     * @apiSuccess (响应结果) {Object[]} data.sensorInfoList.sensorData   传感器数据
-     * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorInfoList.sensorData.time  数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorInfoList.sensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} sensorInfoList  传感器信息列表
+     * @apiSuccess (响应结果) {Int} sensorInfoList.companyID       公司ID
+     * @apiSuccess (响应结果) {Int} sensorInfoList.monitorPointID       监测点ID
+     * @apiSuccess (响应结果) {String} sensorInfoList.monitorPointName  监测点名称
+     * @apiSuccess (响应结果) {Int} sensorInfoList.monitorType          监测类型
+     * @apiSuccess (响应结果) {String} sensorInfoList.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} sensorInfoList.monitorTypeAlias  监测类型别名
+     * @apiSuccess (响应结果) {Int} sensorInfoList.sensorID    传感器ID
+     * @apiSuccess (响应结果) {Int} sensorInfoList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} sensorInfoList.projectTypeID 工程类型
+     * @apiSuccess (响应结果) {String} sensorInfoList.projectName 工程名称
+     * @apiSuccess (响应结果) {String} sensorInfoList.projectTypeName 工程类型名称
+     * @apiSuccess (响应结果) {String} sensorInfoList.waterMeasuringTypeName 量水类型名称
+     * @apiSuccess (响应结果) {String} sensorInfoList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Int} sensorInfoList.kind  传感器数据来源,1 - 自动化传感器 3 - 人工传感器
+     * @apiSuccess (响应结果) {Date} sensorInfoList.time  时间
+     * @apiSuccess (响应结果) {Int} sensorInfoList.data  数据
+     * @apiSuccess (响应结果) {Double} sensorInfoList.data.avgWaterLevel  平均水位
+     * @apiSuccess (响应结果) {Double} sensorInfoList.data.avgWaterFlow  平均流量
+     * @apiSuccess (响应结果) {Double} sensorInfoList.data.waterTotal  总放水量
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */

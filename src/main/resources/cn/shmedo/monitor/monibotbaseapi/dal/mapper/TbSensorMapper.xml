@@ -869,8 +869,11 @@
         <if test="kind != null">
             and s.kind = #{kind}
         </if>
-        <if test="tokenStr != null">
+        <if test="tokenStr != null and tokenStr != ''">
           and mp.exValues like concat('%', #{tokenStr}, '%')
+        </if>
+        <if test="monitorPointName != null and monitorPointName != ''">
+            and mp.Name like concat('%', #{monitorPointName}, '%')
         </if>
     </select>
 

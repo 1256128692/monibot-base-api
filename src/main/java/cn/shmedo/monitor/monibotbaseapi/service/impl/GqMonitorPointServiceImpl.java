@@ -1,29 +1,36 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.GqMonitorPointDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
+import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @EnableTransactionManagement
@@ -42,7 +49,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
     @Override
     public GqMonitorPointDataResponse gqQueryMonitorPointDataList(GqQueryMonitorPointDataParam pa) {
 
-        List<SensorBaseInfoV3> sensorInfoList =  tbSensorMapper.selectListByGqQueryCondition(pa);
+        List<SensorBaseInfoV3> sensorInfoList = tbSensorMapper.selectListByGqQueryCondition(pa);
 
         List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
 
@@ -79,5 +86,84 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         sensorDataDao.insertSensorCommonData(sensorDataList, fieldInfoList, pa.getMonitorType(), tableSuffix);
 
         return ResultWrapper.successWithNothing();
+    }
+
+    @Override
+    public Object gqQueryMonitorPointStatisticsDataPage(GqQueryMonitorPointStatisticsDataPageParam pa) {
+
+
+        List<SensorBaseInfoV3> sensorInfoList = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
+                pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                null, null, pa.getMonitorType(), null
+        ));
+
+        if (CollectionUtil.isNullOrEmpty(sensorInfoList)) {
+            return PageUtil.Page.empty();
+        }
+
+        // 监测项目与监测子字段类型关系表
+        List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
+
+        List<Integer> sensorIDList = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
+        List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensityType(),
+                pa.getStatisticsType(), fieldInfoList, pa.getMonitorType());
+
+        if (CollectionUtil.isNullOrEmpty(maps)) {
+            return PageUtil.Page.empty();
+        }
+
+        if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
+                pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
+            sensorInfoList.forEach(s -> {
+                s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps, pa.getDensityType(), pa.getStatisticsType(), true)
+                        .stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
+                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
+            });
+        } else {
+            sensorInfoList.forEach(s -> {
+                s.setSensorDataList(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
+                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
+            });
+        }
+
+        List<SensorBaseInfoV3> resultList = new LinkedList<SensorBaseInfoV3>();
+        sensorInfoList.forEach(sensor -> {
+            sensor.getSensorDataList().stream()
+                    .forEach(dataMap -> {
+                        Date time = null;
+                        Double afterwater = null;
+                        Double totalFlow = null;
+                        Double dailyWaterTotal = null;
+                        SensorBaseInfoV3 clonedObject = null;
+                        if (sensor.getMonitorType() == MonitorType.SLUICE_REGIMEN.getKey()) {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                            try {
+                                time = dateFormat.parse((String) dataMap.get("time"));
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                            afterwater = (Double) dataMap.get("afterwater");
+                            totalFlow = (Double) dataMap.get("totalFlow");
+                            dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
+                        }
+                        clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
+                        clonedObject.setData(new IrrigatedAreaInfo(
+                                time, afterwater, totalFlow, dailyWaterTotal
+                        ));
+                        clonedObject.setTime(time);
+                        resultList.add(clonedObject);
+                    });
+        });
+        resultList.forEach(r -> {
+            r.setSensorDataList(null);
+        });
+        Comparator<SensorBaseInfoV3> comparator = Comparator.comparing(SensorBaseInfoV3::getTime);
+        if (pa.getDataSort() != null && pa.getDataSort()) {
+            comparator = comparator.reversed();
+        }
+
+        List<SensorBaseInfoV3> list = resultList.stream().sorted(comparator).collect(Collectors.toList());
+        PageUtil.Page<SensorBaseInfoV3> page = PageUtil.page(list, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.Page<SensorBaseInfoV3>(page.totalPage(), page.currentPageData(), page.totalCount());
     }
 }
