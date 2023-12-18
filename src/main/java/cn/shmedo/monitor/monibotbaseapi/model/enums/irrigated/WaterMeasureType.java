@@ -79,4 +79,13 @@ public enum WaterMeasureType {
         }
         return false;
     }
+
+    public static String getDescByCode(int code) {
+        for (WaterMeasureType value : WaterMeasureType.values()) {
+            if (value.code == code) {
+                return value.desc;
+            }
+        }
+        return null;
+    }
 }

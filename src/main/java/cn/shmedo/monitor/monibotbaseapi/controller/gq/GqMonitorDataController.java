@@ -33,7 +33,7 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
      * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器, null - 查询全部
-     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:未定义)
+     * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:3)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
@@ -51,6 +51,7 @@ public class GqMonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.sensorID    传感器ID
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectID 工程ID
      * @apiSuccess (响应结果) {Int} data.sensorInfoList.projectTypeID 工程类型
+     * @apiSuccess (响应结果) {String} data.sensorInfoList.projectName 工程名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.projectTypeName 工程类型名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.waterMeasuringTypeName 量水类型名称
      * @apiSuccess (响应结果) {String} data.sensorInfoList.sensorName  传感器名称

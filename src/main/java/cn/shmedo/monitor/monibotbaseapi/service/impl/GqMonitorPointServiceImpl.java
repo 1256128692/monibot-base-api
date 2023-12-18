@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
@@ -47,10 +48,11 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
 
         if (!CollectionUtil.isNullOrEmpty(sensorInfoList)) {
             List<Integer> sensorIDList = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
-            List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), DisplayDensity.HOUR.getValue(),
+            List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), DisplayDensity.FOUR_HOUR.getValue(),
                     StatisticalMethods.LATEST.getValue(), fieldInfoList, pa.getMonitorType());
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
+                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
             });
         }
 
