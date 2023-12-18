@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.monitor.enums.CalType;
@@ -134,7 +135,7 @@ public class TryingRequest implements ParameterValidator, ResourcePermissionProv
         }
 
         //转换参数列表为map
-        this.paramList.stream().filter(param -> param.getOrigin() == null || param.getValue() == null)
+        this.paramList.stream().filter(param -> StrUtil.isBlank(param.getOrigin()) || StrUtil.isBlank(param.getValue()))
                 .findFirst().ifPresent(param -> {
                     throw new IllegalArgumentException("参数列表中存在空值");
                 });
