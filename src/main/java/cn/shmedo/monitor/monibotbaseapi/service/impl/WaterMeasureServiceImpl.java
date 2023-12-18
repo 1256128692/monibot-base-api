@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,8 +42,8 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
         sensorMapper.measurePointPage(page, request);
 
         page.getRecords().forEach(item -> {
-            item.setProjectTypeName(item.getProjectType().getName());
             parseExValue(item);
+            Optional.ofNullable(item.getProjectType()).ifPresent(t -> item.setProjectTypeName(t.getName()));
         });
         return new PageUtil.Page<>(page.getPages(), page.getRecords(), page.getTotal());
     }
@@ -50,13 +51,17 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
     @Override
     public WaterMeasurePointInfo singleMeasurePoint(SingleMeasurePointRequest request) {
         WaterMeasurePointInfo result = sensorMapper.singleMeasurePoint(request.getSensorID());
-        parseExValue(result);
+        Optional.ofNullable(result).ifPresent(item -> {
+            parseExValue(item);
+            Optional.ofNullable(item.getProjectType()).ifPresent(t -> item.setProjectTypeName(t.getName()));
+        });
         return result;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addMeasurePoint(AddMeasurePointRequest request) {
+        Date now = new Date();
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
 
         TbMonitorPoint point = new TbMonitorPoint();
@@ -66,6 +71,8 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
         point.setName(request.getMonitorPointName());
         point.setGpsLocation(request.getGpsLocation());
         point.setEnable(Boolean.TRUE);
+        point.setCreateTime(now);
+        point.setUpdateTime(now);
 
         MonitorPointExValue exValue = new MonitorPointExValue(request.getWaterMeasureType(), request.getWaterMeasureWay(),
                 request.getCalculateType(), request.getMonitorElements().stream().toList());

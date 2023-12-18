@@ -77,11 +77,11 @@ public class AddMeasurePointRequest implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper<?> validate() {
-        Assert.isTrue(waterMeasureType.validWaterMeasureWay(waterMeasureWay), "Illegal WaterMeasureWay");
-        Assert.isTrue(waterMeasureType.validCalculateType(calculateType), "Illegal CalculateType");
-        Assert.isTrue(waterMeasureType.validElements(monitorElements.toArray(MonitorType[]::new)), "Illegal MonitorType");
-        Assert.isTrue(MonitorType.WATER_LEVEL.equals(monitorType) || MonitorType.FLOW_VELOCITY.equals(monitorType) ||
-                MonitorType.FLOW_CAPACITY.equals(monitorType), "Illegal MonitorType");
+        Assert.isTrue(waterMeasureType.validWaterMeasureWay(waterMeasureWay), "非法参数: WaterMeasureWay");
+        Assert.isTrue(waterMeasureType.validCalculateType(calculateType), "非法参数: CalculateType");
+        Assert.isTrue(waterMeasureType.validElements(monitorElements.toArray(MonitorType[]::new)), "非法参数: MonitorElements");
+        Assert.isTrue(MonitorType.SLUICE_REGIMEN.equals(monitorType) ||
+                MonitorType.CHANNEL_WATER_LEVEL.equals(monitorType), "非法参数: MonitorType");
 
         TbMonitorItemMapper monitorItemMapper = SpringUtil.getBean(TbMonitorItemMapper.class);
         Assert.isTrue(monitorItemMapper.exists(Wrappers.<TbMonitorItem>lambdaQuery()
@@ -91,9 +91,10 @@ public class AddMeasurePointRequest implements ParameterValidator, ResourcePermi
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
         this.sensor = sensorMapper.selectOne(Wrappers.<TbSensor>lambdaQuery()
                 .eq(TbSensor::getProjectID, projectID)
-                .eq(TbSensor::getID, sensorID).select(TbSensor::getID, TbSensor::getMonitorPointID));
+                .eq(TbSensor::getID, sensorID).select(TbSensor::getID, TbSensor::getMonitorPointID, TbSensor::getMonitorType));
         Assert.notNull(sensor, "传感器不存在");
         Assert.isTrue(sensor.getMonitorPointID() == null, "传感器已绑定其他监测点");
+        Assert.isTrue(sensor.getMonitorType().equals(monitorType.getKey()), "传感器监测类型不匹配");
 
         return null;
     }

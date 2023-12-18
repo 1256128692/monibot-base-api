@@ -61,7 +61,7 @@ public class UpdateMeasurePointRequest implements ParameterValidator, ResourcePe
         Assert.notNull(sensor, "传感器不存在");
         Assert.notNull(sensor.getMonitorPointID(), "传感器未绑定监测点");
 
-        if (SensorKindEnum.AUTO_KIND.getCode().equals(sensor.getKind())) {
+        if (SensorKindEnum.MANUAL_KIND.getCode().equals(sensor.getKind())) {
             Assert.notNull(waterMeasureType, "waterMeasureType can not be null");
             Assert.notNull(waterMeasureWay, "waterMeasureWay can not be null");
             Assert.notNull(calculateType, "calculateType can not be null");
@@ -69,12 +69,13 @@ public class UpdateMeasurePointRequest implements ParameterValidator, ResourcePe
         }
         Optional.ofNullable(waterMeasureType).ifPresent(type -> {
             Optional.ofNullable(waterMeasureWay).ifPresent(way ->
-                    Assert.isTrue(type.validWaterMeasureWay(way), "Illegal waterMeasureWay"));
+                    Assert.isTrue(type.validWaterMeasureWay(way), "非法参数: waterMeasureWay"));
             Optional.ofNullable(calculateType).ifPresent(cType ->
-                    Assert.isTrue(type.validCalculateType(cType), "Illegal calculateType"));
+                    Assert.isTrue(type.validCalculateType(cType), "非法参数: calculateType"));
             Optional.ofNullable(monitorElements).ifPresent(elements ->
-                    Assert.isTrue(type.validElements(elements.toArray(MonitorType[]::new)), "Illegal monitorElements"));
+                    Assert.isTrue(type.validElements(elements.toArray(MonitorType[]::new)), "非法参数: monitorElements"));
         });
+        monitorElements = Optional.ofNullable(monitorElements).orElse(Set.of());
         return null;
     }
 
