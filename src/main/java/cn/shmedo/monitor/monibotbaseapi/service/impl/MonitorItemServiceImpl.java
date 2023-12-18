@@ -29,6 +29,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -261,6 +262,21 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                     }).sorted(Comparator.comparing(MonitorTypeItemNameInfo::getDisplayOrder, Comparator.nullsLast(Integer::compareTo)))
                     .toList()).build();
         }).toList();
+    }
+
+    @Override
+    public List<MonitorItemSimple> listMonitorItemSimple(QueryMonitorItemSimpleListParam param) {
+        LambdaQueryWrapper<TbMonitorItem> query = Wrappers.<TbMonitorItem>lambdaQuery()
+                .eq(TbMonitorItem::getProjectID, param.getProjectID())
+                .eq(TbMonitorItem::getEnable, param.getEnable());
+        Optional.ofNullable(param.getMonitorType()).ifPresent(e -> query.eq(TbMonitorItem::getMonitorType, e));
+        Optional.ofNullable(param.getCreateType()).ifPresent(e -> query.eq(TbMonitorItem::getCreateType, e));
+
+        return tbMonitorItemMapper.selectList(query.select(TbMonitorItem::getID, TbMonitorItem::getName,
+                                TbMonitorItem::getAlias, TbMonitorItem::getProjectID, TbMonitorItem::getCreateType,
+                                TbMonitorItem::getMonitorType, TbMonitorItem::getEnable)
+                        .orderByDesc(TbMonitorItem::getID))
+                .stream().map(MonitorItemSimple::valueOf).toList();
     }
 
     private void handleMonitorClassDensity(Integer projectID, WtMonitorItemInfo result) {
