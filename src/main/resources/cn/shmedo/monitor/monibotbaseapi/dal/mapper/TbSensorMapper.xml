@@ -907,12 +907,16 @@
                     </otherwise>
                 </choose>
                 ts.MonitorType IN (60, 70) AND
+                ts.Kind IN (1, 3) AND
                 <if test="param.keyword != null and param.keyword != ''">
                     tmp.`Name` LIKE CONCAT('%', #{param.keyword}, '%') AND
                 </if>
+                <if test="param.companyID != null">
+                    tpi.CompanyID = #{param.companyID} AND
+                </if>
             </trim>
         </where>
-        ORDER BY ts.ID DESC
+        ORDER BY CONVERT (tmp.`Name` USING gbk ) COLLATE gbk_chinese_ci ASC
     </select>
 
     <select id="singleMeasurePoint"
@@ -922,6 +926,7 @@
                ts.ProjectID      projectID,
                ts.MonitorPointID monitorPointID,
                ts.Alias          sensorAlias,
+               ts.MonitorType    monitorType,
                tpi.CompanyID     companyID,
                tpi.ProjectName   projectName,
                tpi.ProjectType   projectType,
@@ -936,5 +941,36 @@
                  INNER JOIN tb_monitor_item tmi ON tmp.MonitorItemID = tmi.ID
         WHERE ts.ID = #{sensorID}
           AND ts.MonitorType IN (60, 70)
+          AND tpi.CompanyID = #{companyID}
+    </select>
+
+    <update id="updatePointBySensorID">
+        update tb_sensor
+        set MonitorPointID = #{pointID},
+            UpdateUserID   = #{userID}
+        where ID = #{sensorID}
+    </update>
+
+    <select id="listWaterMeasureSensor" resultType="reactor.util.function.Tuple2">
+        SELECT ts.ID    t1,
+               ts.alias t2
+        FROM tb_sensor ts
+                 INNER JOIN tb_project_info tpi ON ts.ProjectID = tpi.ID
+        WHERE
+        <trim suffixOverrides="AND">
+            ts.monitorPointID IS NULL AND
+            ts.kind = 3 AND
+            ts.Enable = TRUE AND
+            <if test="param.companyID != null">
+                tpi.CompanyID = #{param.companyID} AND
+            </if>
+            <if test="param.projectID != null">
+                ts.ProjectID = #{param.projectID} AND
+            </if>
+            <if test="param.monitorType != null">
+                ts.MonitorType = #{param.monitorType} AND
+            </if>
+        </trim>
+        ORDER BY ts.ID DESC;
     </select>
 </mapper>

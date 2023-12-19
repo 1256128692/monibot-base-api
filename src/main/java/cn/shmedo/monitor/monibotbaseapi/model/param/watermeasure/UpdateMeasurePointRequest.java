@@ -35,11 +35,10 @@ public class UpdateMeasurePointRequest implements ParameterValidator, ResourcePe
 
     @NotNull
     @Positive
-    private Integer companyID;
-
-    @NotNull
-    @Positive
     private Integer sensorID;
+
+    @Positive
+    private Integer targetSensorID;
 
     private String gpsLocation;
 
@@ -56,10 +55,25 @@ public class UpdateMeasurePointRequest implements ParameterValidator, ResourcePe
 
     @Override
     public ResultWrapper<?> validate() {
-        this.sensor = SpringUtil.getBean(TbSensorMapper.class).selectOne(Wrappers.<TbSensor>lambdaQuery()
-                .eq(TbSensor::getID, sensorID).select(TbSensor::getProjectID, TbSensor::getMonitorPointID, TbSensor::getKind));
+        TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
+        this.sensor = sensorMapper.selectOne(Wrappers.<TbSensor>lambdaQuery()
+                .eq(TbSensor::getID, sensorID).select(TbSensor::getProjectID, TbSensor::getMonitorType,
+                        TbSensor::getMonitorPointID, TbSensor::getKind));
         Assert.notNull(sensor, "传感器不存在");
         Assert.notNull(sensor.getMonitorPointID(), "传感器未绑定监测点");
+
+        targetSensorID = sensorID.equals(targetSensorID) ? null : targetSensorID;
+        Optional.ofNullable(targetSensorID).ifPresent(id -> {
+            Assert.isTrue(SensorKindEnum.MANUAL_KIND.getCode().equals(sensor.getKind()), "不允许修改自动采集量水点计算方式");
+            TbSensor target = sensorMapper.selectOne(Wrappers.<TbSensor>lambdaQuery()
+                    .eq(TbSensor::getProjectID, sensor.getProjectID()).eq(TbSensor::getID, id)
+                    .select(TbSensor::getID, TbSensor::getKind, TbSensor::getMonitorPointID, TbSensor::getMonitorType));
+            Assert.notNull(target, "传感器不存在");
+            Assert.isTrue(target.getMonitorPointID() == null, "传感器已绑定其他监测点");
+            Assert.isTrue(target.getMonitorType().equals(sensor.getMonitorType()), "传感器监测类型不匹配");
+//            Assert.isTrue(SensorKindEnum.MANUAL_KIND.getCode().equals(target.getKind()), "不允许修改非人工传感器");
+        });
+
 
         if (SensorKindEnum.MANUAL_KIND.getCode().equals(sensor.getKind())) {
             Assert.notNull(waterMeasureType, "waterMeasureType can not be null");

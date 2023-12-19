@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
@@ -10,7 +9,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.MonitorPointExValue;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointSimple;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorKindEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WaterMeasureService;
 import cn.shmedo.monitor.monibotbaseapi.util.JsonUtil;
@@ -34,7 +32,6 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
 
     private final TbSensorMapper sensorMapper;
     private final TbMonitorPointMapper monitorPointMapper;
-    private final TbMonitorItemMapper monitorItemMapper;
 
     @Override
     public PageUtil.Page<WaterMeasurePointSimple> measurePointPage(WaterMeasurePointPageRequest request) {
@@ -50,9 +47,10 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
 
     @Override
     public WaterMeasurePointInfo singleMeasurePoint(SingleMeasurePointRequest request) {
-        WaterMeasurePointInfo result = sensorMapper.singleMeasurePoint(request.getSensorID());
+        WaterMeasurePointInfo result = sensorMapper.singleMeasurePoint(request.getSensorID(), request.getCompanyID());
         Optional.ofNullable(result).ifPresent(item -> {
             parseExValue(item);
+            Optional.ofNullable(item.getMonitorType()).ifPresent(t -> item.setMonitorTypeName(t.getValue()));
             Optional.ofNullable(item.getProjectType()).ifPresent(t -> item.setProjectTypeName(t.getName()));
         });
         return result;
@@ -66,7 +64,7 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
 
         TbMonitorPoint point = new TbMonitorPoint();
         point.setProjectID(request.getProjectID());
-        point.setMonitorType(request.getSensorID());
+        point.setMonitorType(request.getMonitorType().getKey());
         point.setMonitorItemID(request.getMonitorItemID());
         point.setName(request.getMonitorPointName());
         point.setGpsLocation(request.getGpsLocation());
@@ -89,6 +87,7 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateMeasurePoint(UpdateMeasurePointRequest request) {
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         TbMonitorPoint point = monitorPointMapper.selectOne(Wrappers.<TbMonitorPoint>lambdaQuery()
                 .eq(TbMonitorPoint::getID, request.getSensor().getMonitorPointID()).select(TbMonitorPoint::getID));
         Optional.ofNullable(request.getGpsLocation()).ifPresent(point::setGpsLocation);
@@ -96,21 +95,20 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
         MonitorPointExValue exValue = new MonitorPointExValue(request.getWaterMeasureType(), request.getWaterMeasureWay(),
                 request.getCalculateType(), request.getMonitorElements().stream().toList());
         point.setExValues(JsonUtil.toJson(exValue));
+        point.setUpdateUserID(subject.getSubjectID());
         monitorPointMapper.updateById(point);
+
+        Optional.ofNullable(request.getTargetSensorID()).ifPresent(id -> {
+            sensorMapper.updatePointBySensorID(request.getSensorID(), null, subject.getSubjectID());
+            sensorMapper.updatePointBySensorID(id, request.getSensor().getMonitorPointID(),subject.getSubjectID());
+        });
     }
 
     @Override
     public List<?> listWaterMeasureSensor(ListWaterMeasureSensorRequest request) {
         record result(Integer id, String alias) {}
-        return sensorMapper.selectList(Wrappers.<TbSensor>lambdaQuery()
-                        .eq(TbSensor::getProjectID, request.getProjectID())
-                        .eq(TbSensor::getMonitorType, request.getMonitorType())
-                        .eq(TbSensor::getKind, SensorKindEnum.MANUAL_KIND.getCode())
-                        .eq(TbSensor::getEnable, Boolean.TRUE)
-                        .isNull(TbSensor::getMonitorPointID)
-                        .select(TbSensor::getID, TbSensor::getAlias)
-                        .orderByDesc(TbSensor::getID))
-                .stream().map(r -> new result(r.getID(), r.getAlias())).toList();
+        return sensorMapper.listWaterMeasureSensor(request)
+                .stream().map(r -> new result(r.getT1(), r.getT2())).toList();
     }
 
     private void parseExValue(WaterMeasurePointSimple item) {

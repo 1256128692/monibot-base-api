@@ -35,6 +35,10 @@ public class WaterMeasurePointSimple {
 
     private String monitorPointName;
 
+    private MonitorType monitorType;
+
+    private String monitorTypeName;
+
     private Integer sensorID;
 
     private SensorKindEnum sensorKind;

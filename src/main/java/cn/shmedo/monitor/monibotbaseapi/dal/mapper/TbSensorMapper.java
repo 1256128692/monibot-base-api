@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDa
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
+import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.ListWaterMeasureSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.WaterMeasurePointPageRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3;
@@ -21,6 +22,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
 import java.util.Collection;
@@ -110,5 +112,13 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     Page<WaterMeasurePointSimple> measurePointPage(@Param("page") IPage<WaterMeasurePointSimple> page,
                                                    @Param("param") WaterMeasurePointPageRequest param);
 
-    WaterMeasurePointInfo singleMeasurePoint(Integer sensorID);
+    WaterMeasurePointInfo singleMeasurePoint(@Param("sensorID") Integer sensorID,@Param("companyID") Integer companyID);
+
+    /**
+     * 更新传感器对应的监测点，监测点可以为空
+     */
+    void updatePointBySensorID(@Param("sensorID") Integer sensorID, @Param("pointID") Integer pointID,
+                               @Param("userID") Integer userID);
+
+    List<Tuple2<Integer, String>> listWaterMeasureSensor(@Param("param") ListWaterMeasureSensorRequest param);
 }

@@ -105,8 +105,8 @@ public class WaterMeasureController {
      * @apiGroup 灌区量测水管理
      * @apiName UpdateWaterMeasurePoint
      * @apiDescription 更新量水点
-     * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} sensorID 监测传感器id
+     * @apiParam (请求参数) {Int} [targetSensorID] 目标监测传感器id (改变量水点对应传感器时使用)
      * @apiParam (请求参数) {String} [gpsLocation] 监测点位置(经纬度)
      * @apiParam (请求参数) {Int} [waterMeasureType] 量水类型(sensorKind=1时可为空)</br>1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水
      * @apiParam (请求参数) {Int} [waterMeasureWay] 量水方式(sensorKind=1时可为空) </br>
