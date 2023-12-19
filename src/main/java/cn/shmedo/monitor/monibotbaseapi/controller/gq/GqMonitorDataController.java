@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -177,8 +178,8 @@ public class GqMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseProject")
     @RequestMapping(value = "/GqQueryMonitorPointStatisticsDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object gqQueryMonitorPointStatisticsDataList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object gqQueryMonitorPointStatisticsDataList(@Validated @RequestBody GqQueryMonitorPointStatisticsDataParam pa) {
+        return gqMonitorPointService.gqQueryMonitorPointStatisticsDataList(pa);
     }
 
 

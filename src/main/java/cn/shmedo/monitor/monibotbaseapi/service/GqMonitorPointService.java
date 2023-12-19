@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.GqMonitorPointDataResponse;
 
 public interface GqMonitorPointService {
@@ -11,4 +12,6 @@ public interface GqMonitorPointService {
     Object gqMonitorPointDataPush(GqMonitorPointDataPushParam pa);
 
     Object gqQueryMonitorPointStatisticsDataPage(GqQueryMonitorPointStatisticsDataPageParam pa);
+
+    Object gqQueryMonitorPointStatisticsDataList(GqQueryMonitorPointStatisticsDataParam pa);
 }
