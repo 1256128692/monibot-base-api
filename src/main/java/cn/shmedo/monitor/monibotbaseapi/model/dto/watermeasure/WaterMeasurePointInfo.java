@@ -20,4 +20,5 @@ public class WaterMeasurePointInfo extends WaterMeasurePointSimple {
 
     private String gpsLocation;
 
+    private String sensorAlias;
 }

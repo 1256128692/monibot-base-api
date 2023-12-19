@@ -81,6 +81,7 @@ public class WaterMeasureController {
      * @apiSuccess (返回结果) {String} monitorItemName 监测项名称
      * @apiSuccess (返回结果) {String} gpsLocation 监测点位置(经纬度)
      * @apiSuccess (返回结果) {Int} sensorID 传感器id
+     * @apiSuccess (返回结果) {Int} sensorAlias 传感器别名
      * @apiSuccess (返回结果) {Int} sensorKind 传感器类型1-自动化传感器 3-人工传感器
      * @apiSuccess (返回结果) {Int} waterMeasureType 量水类型 (1特设量水设施量水 2仪器仪表量水 3水工建筑量水 4标准断面量水 5流速仪量水)
      * @apiSuccess (返回结果) {Int} waterMeasureWay 量水方式 </br>

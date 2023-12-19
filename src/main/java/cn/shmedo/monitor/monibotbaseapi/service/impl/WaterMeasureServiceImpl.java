@@ -2,8 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
@@ -33,8 +33,8 @@ import java.util.Optional;
 public class WaterMeasureServiceImpl implements WaterMeasureService {
 
     private final TbSensorMapper sensorMapper;
-    private final TbProjectInfoMapper projectMapper;
     private final TbMonitorPointMapper monitorPointMapper;
+    private final TbMonitorItemMapper monitorItemMapper;
 
     @Override
     public PageUtil.Page<WaterMeasurePointSimple> measurePointPage(WaterMeasurePointPageRequest request) {

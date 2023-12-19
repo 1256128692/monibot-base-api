@@ -80,12 +80,13 @@ public class AddMeasurePointRequest implements ParameterValidator, ResourcePermi
         Assert.isTrue(waterMeasureType.validWaterMeasureWay(waterMeasureWay), "非法参数: WaterMeasureWay");
         Assert.isTrue(waterMeasureType.validCalculateType(calculateType), "非法参数: CalculateType");
         Assert.isTrue(waterMeasureType.validElements(monitorElements.toArray(MonitorType[]::new)), "非法参数: MonitorElements");
-        Assert.isTrue(MonitorType.SLUICE_REGIMEN.equals(monitorType) ||
-                MonitorType.CHANNEL_WATER_LEVEL.equals(monitorType), "非法参数: MonitorType");
+        Assert.isTrue(MonitorType.CHANNEL_WATER_LEVEL.equals(monitorType), "非法参数: MonitorType");
 
         TbMonitorItemMapper monitorItemMapper = SpringUtil.getBean(TbMonitorItemMapper.class);
         Assert.isTrue(monitorItemMapper.exists(Wrappers.<TbMonitorItem>lambdaQuery()
                 .eq(TbMonitorItem::getProjectID, projectID)
+                .eq(TbMonitorItem::getMonitorType, monitorType.getKey())
+                .eq(TbMonitorItem::getEnable, Boolean.TRUE)
                 .eq(TbMonitorItem::getID, monitorItemID)), "监测项不存在");
 
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
