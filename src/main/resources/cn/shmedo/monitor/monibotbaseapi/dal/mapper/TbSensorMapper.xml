@@ -723,9 +723,9 @@
             ts.`MonitorType` monitorType,
             ts.`TemplateID` templateID,
             tmtt.`CalType` calType,
-            ttf.`Formula` formula,
-            ttf.`FieldCalOrder` fieldCalOrder,
-            tmtf.`FieldToken` fieldToken,
+            t.`Formula` formula,
+            t.`FieldCalOrder` fieldCalOrder,
+            t.`FieldToken` fieldToken,
             tp_s.`ID` sParamID,
             tp_s.`SubjectID` sParamSubjectID,
             tp_s.`SubjectType` sParamSubjectType,
@@ -750,9 +750,11 @@
             LEFT JOIN `tb_parameter` tp_s ON tp_s.`SubjectID` = ts.`ID` AND tp_s.`SubjectType` = 3
             LEFT JOIN `tb_parameter` tp_t ON tp_t.`SubjectID` = ts.`TemplateID` AND tp_t.`SubjectType` = 4
             LEFT JOIN `tb_monitor_type_template` tmtt ON tmtt.`ID` = ts.`TemplateID`
-            LEFT JOIN `tb_template_formula` ttf ON ttf.`TemplateID` = tmtt.`ID`
-            LEFT JOIN `tb_monitor_type_field` tmtf ON tmtf.`ID` = ttf.`FieldID`
-        WHERE ts.`Kind` = 3 AND tsds.`DataSourceComposeType` = 500 AND tmtf.`FieldClass` = 2 AND ts.`ID` IN
+            LEFT JOIN (
+                SELECT ttf.`TemplateID`,ttf.`Formula`,ttf.`FieldCalOrder`,tmtf.`FieldToken` FROM `tb_template_formula` ttf
+                    LEFT JOIN `tb_monitor_type_field` tmtf ON tmtf.`ID` = ttf.`FieldID` WHERE tmtf.`FieldClass` = 2
+            ) t ON t.`TemplateID` = tmtt.`ID`
+        WHERE ts.`Kind` = 3 AND tsds.`DataSourceComposeType` = 500 AND ts.`ID` IN
         <foreach collection="sensorIDList" item="item" index="index" open="(" close=")" separator=",">
             #{item}
         </foreach>
