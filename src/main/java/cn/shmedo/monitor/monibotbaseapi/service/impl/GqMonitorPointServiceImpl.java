@@ -90,23 +90,59 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
 
     @Override
     public Object gqQueryMonitorPointStatisticsDataPage(GqQueryMonitorPointStatisticsDataPageParam pa) {
+        List<Map<String, Object>> maps = new LinkedList<>();
+        List<SensorBaseInfoV3> sensorInfoList = new LinkedList<>();
+        if (pa.getProjectTypeID() == null) {
+            List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    null, null, MonitorType.SLUICE_REGIMEN.getKey(), null
+            ));
+            List<SensorBaseInfoV3> sensorInfoV2 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), null
+            ));
 
+            if (!CollectionUtil.isNullOrEmpty(sensorInfoV1)) {
+                sensorInfoList.addAll(sensorInfoV1);
+                // 监测项目与监测子字段类型关系表
+                List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(MonitorType.SLUICE_REGIMEN.getKey());
 
-        List<SensorBaseInfoV3> sensorInfoList = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
-                null, null, pa.getMonitorType(), null
-        ));
+                List<Integer> sensorIDListV1 = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
+                List<Map<String, Object>> mapsV1 = sensorDataDao.queryCommonSensorDataList(sensorIDListV1, pa.getBegin(), pa.getEnd(), pa.getDensityType(),
+                        pa.getStatisticsType(), fieldInfoList, MonitorType.SLUICE_REGIMEN.getKey());
+                maps.addAll(mapsV1);
+            }
+            if (!CollectionUtil.isNullOrEmpty(sensorInfoV2)) {
+                sensorInfoList.addAll(sensorInfoV2);
+                // 监测项目与监测子字段类型关系表
+                List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(MonitorType.CHANNEL_WATER_LEVEL.getKey());
 
-        if (CollectionUtil.isNullOrEmpty(sensorInfoList)) {
-            return PageUtil.Page.empty();
+                List<Integer> sensorIDListV2 = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
+                List<Map<String, Object>> mapsV2 = sensorDataDao.queryCommonSensorDataList(sensorIDListV2, pa.getBegin(), pa.getEnd(), pa.getDensityType(),
+                        pa.getStatisticsType(), fieldInfoList, MonitorType.CHANNEL_WATER_LEVEL.getKey());
+                maps.addAll(mapsV2);
+            }
+
+        } else {
+            List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    null, null, pa.getMonitorType(), null
+            ));
+
+            sensorInfoList.addAll(sensorInfoV1);
+            if (CollectionUtil.isNullOrEmpty(sensorInfoList)) {
+                return PageUtil.Page.empty();
+            }
+
+            // 监测项目与监测子字段类型关系表
+            List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
+
+            List<Integer> sensorIDList = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
+            List<Map<String, Object>> mapsV1 = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensityType(),
+                    pa.getStatisticsType(), fieldInfoList, pa.getMonitorType());
+            maps.addAll(mapsV1);
         }
 
-        // 监测项目与监测子字段类型关系表
-        List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
-
-        List<Integer> sensorIDList = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
-        List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensityType(),
-                pa.getStatisticsType(), fieldInfoList, pa.getMonitorType());
 
         if (CollectionUtil.isNullOrEmpty(maps)) {
             return PageUtil.Page.empty();
@@ -135,8 +171,9 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                         Double totalFlow = null;
                         Double dailyWaterTotal = null;
                         SensorBaseInfoV3 clonedObject = null;
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                         if (sensor.getMonitorType() == MonitorType.SLUICE_REGIMEN.getKey()) {
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                            // 闸门类型
                             try {
                                 time = dateFormat.parse((String) dataMap.get("time"));
                             } catch (ParseException e) {
@@ -144,8 +181,17 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                             }
                             afterwater = (Double) dataMap.get("afterwater");
                             totalFlow = (Double) dataMap.get("totalFlow");
-                            dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
+                        } else {
+                            // 渠系类型
+                            try {
+                                time = dateFormat.parse((String) dataMap.get("time"));
+                            } catch (ParseException e) {
+                                throw new RuntimeException(e);
+                            }
+                            afterwater = (Double) dataMap.get("waterH");
+                            totalFlow = (Double) dataMap.get("waterS");
                         }
+                        dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
                         clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
                         clonedObject.setData(new IrrigatedAreaInfo(
                                 time, afterwater, totalFlow, dailyWaterTotal

@@ -5,6 +5,7 @@ import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -56,12 +57,11 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持工程类型为水闸或者渠系");
         }
         if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
-            monitorType = 60;
+            monitorType = MonitorType.SLUICE_REGIMEN.getKey();
         }
 
         if (Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode())) {
-            // TODO,未定
-//            monitorType = 60;
+            monitorType = MonitorType.CHANNEL_WATER_LEVEL.getKey();
         }
 
         if (token == 1) {

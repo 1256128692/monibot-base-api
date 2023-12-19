@@ -6,6 +6,7 @@ import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,7 +23,6 @@ public class GqQueryMonitorPointStatisticsDataPageParam implements ParameterVali
 
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
-    @NotNull(message = "项目类型不能为空")
     private Integer projectTypeID;
     private Integer kind;
     @NotNull(message = "量水类型不能为空")
@@ -59,16 +59,17 @@ public class GqQueryMonitorPointStatisticsDataPageParam implements ParameterVali
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");
         }
 
-        if (!(Objects.equals(projectTypeID, ProjectType.SLUICE.getCode()) || Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode()) )) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持工程类型为水闸或者渠系");
-        }
-        if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
-            monitorType = 60;
-        }
+        if (projectTypeID != null) {
+            if (!(Objects.equals(projectTypeID, ProjectType.SLUICE.getCode()) || Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode()) )) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持工程类型为水闸或者渠系");
+            }
+            if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
+                monitorType = MonitorType.SLUICE_REGIMEN.getKey();
+            }
 
-        if (Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode())) {
-            // TODO,未定
-//            monitorType = 60;
+            if (Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode())) {
+                monitorType = MonitorType.CHANNEL_WATER_LEVEL.getKey();
+            }
         }
 
         if (token == 1) {

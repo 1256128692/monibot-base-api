@@ -87,7 +87,7 @@ public class GqMonitorDataController {
      * @apiName GqQueryMonitorPointStatisticsDataPage
      * @apiDescription 跨监测项目, 查询灌区监测点统计数据分页, 目前只支持:水闸:11,渠系:10
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
+     * @apiParam (请求体) {Int} [projectTypeID] 工程类型,(水闸:11,渠系:10,全部:null)
      * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器
      * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:3)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
@@ -140,7 +140,7 @@ public class GqMonitorDataController {
      * @apiName GqQueryMonitorPointStatisticsDataList
      * @apiDescription 跨监测项目, 查询灌区监测点统计数据列表, 目前只支持:水闸:11,渠系:10
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} projectTypeID 工程类型,(水闸:11,渠系:10)
+     * @apiParam (请求体) {Int} [projectTypeID] 工程类型,(水闸:11,渠系:10,全部:null)
      * @apiParam (请求体) {Int} [kind] 数据来源,1 - 自动化传感器 3 - 人工传感器
      * @apiParam (请求体) {Int} token 量水类型,(水工建筑量水:3)
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
