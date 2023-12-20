@@ -29,10 +29,8 @@ public class GqMonitorPointDataPushParam implements ParameterValidator, Resource
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "补录数据不能为空");
             }
             for (int j = 0; j < dataList.get(i).getSensorDataList().size(); j++) {
-                if (!(dataList.get(i).getSensorDataList().get(j).getValue() instanceof Integer
-                        || dataList.get(i).getSensorDataList().get(j).getValue() instanceof Long
-                        || dataList.get(i).getSensorDataList().get(j).getValue() instanceof Double)) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "补录数据类型必须为long或者double类型");
+                if (!(dataList.get(i).getSensorDataList().get(j).getValue() instanceof Double)) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "补录数据类型必须为double类型");
                 }
             }
         }

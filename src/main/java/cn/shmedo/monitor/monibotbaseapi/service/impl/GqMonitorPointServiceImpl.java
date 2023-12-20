@@ -92,11 +92,11 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         List<SensorBaseInfoV3> sensorInfoList = new LinkedList<>();
         if (pa.getProjectTypeID() == null) {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, MonitorType.SLUICE_REGIMEN.getKey(), null
             ));
             List<SensorBaseInfoV3> sensorInfoV2 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), null
             ));
 
@@ -123,7 +123,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
 
         } else {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, pa.getMonitorType(), null
             ));
 
@@ -151,12 +151,10 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps, pa.getDensityType(), pa.getStatisticsType(), true)
                         .stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
-                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
             });
         } else {
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
-                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
             });
         }
 
@@ -218,11 +216,11 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         List<SensorBaseInfoV3> sensorInfoList = new LinkedList<>();
         if (pa.getProjectTypeID() == null) {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, MonitorType.SLUICE_REGIMEN.getKey(), null
             ));
             List<SensorBaseInfoV3> sensorInfoV2 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), null
             ));
 
@@ -249,7 +247,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
 
         } else {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
-                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), pa.getToken(), pa.getMonitorPointName(),
+                    pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
                     null, null, pa.getMonitorType(), null
             ));
 
@@ -277,12 +275,10 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps, pa.getDensityType(), pa.getStatisticsType(), true)
                         .stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
-                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
             });
         } else {
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
-                s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
             });
         }
 

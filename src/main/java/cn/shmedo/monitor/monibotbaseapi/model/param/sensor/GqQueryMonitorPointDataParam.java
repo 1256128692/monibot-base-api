@@ -28,7 +28,7 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
     private Integer kind;
     @NotNull(message = "量水类型不能为空")
     private Integer token;
-    private Integer monitorPointName;
+    private String monitorPointName;
     @NotNull(message = "开始时间不能为空")
     private Date begin;
     @NotNull(message = "结束时间不能为空")
@@ -64,7 +64,7 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
             monitorType = MonitorType.CHANNEL_WATER_LEVEL.getKey();
         }
 
-        if (token == 1) {
+        if (token == 3) {
             tokenStr = "\"waterMeasureType\": 1";
         } else {
             tokenStr = null;

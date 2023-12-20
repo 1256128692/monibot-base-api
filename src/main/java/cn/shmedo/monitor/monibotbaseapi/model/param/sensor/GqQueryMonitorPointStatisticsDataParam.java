@@ -20,9 +20,7 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
     private Integer companyID;
     private Integer projectTypeID;
     private Integer kind;
-    @NotNull(message = "量水类型不能为空")
-    private Integer token;
-    private Integer monitorPointName;
+    private String monitorPointName;
     @NotNull(message = "开始时间不能为空")
     private Date begin;
     @NotNull(message = "结束时间不能为空")
@@ -38,8 +36,6 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
     @JsonIgnore
     private Integer monitorType;
 
-    @JsonIgnore
-    private String tokenStr;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -58,12 +54,6 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
             if (Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode())) {
                 monitorType = MonitorType.CHANNEL_WATER_LEVEL.getKey();
             }
-        }
-
-        if (token == 1) {
-            tokenStr = "\"waterMeasureType\": 1";
-        } else {
-            tokenStr = null;
         }
 
         if ( !(DisplayDensity.DAY.getValue() == densityType || DisplayDensity.MONTH.getValue() == densityType ||
