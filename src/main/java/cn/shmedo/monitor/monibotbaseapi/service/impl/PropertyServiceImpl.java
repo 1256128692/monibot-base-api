@@ -318,19 +318,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         TbPropertyModel tbPropertyModel = param.getTbPropertyModel();
         int row = tbPropertyModelMapper.updateById(tbPropertyModel);
 
-        // 更新模板下属性
-        Set<Integer> keySet = param.getAllPropertyIdAndNameMap().keySet();
-        if (CollectionUtil.isNotEmpty(param.getAddModelItemList())) {
-            Set<Integer> addModelItemIdSet = param.getAddModelItemList().stream().map(ModelItem::getID).collect(Collectors.toSet());
-            keySet.removeAll(addModelItemIdSet);
-        }
-        if (CollectionUtil.isNotEmpty(param.getUpdateModelItemList())) {
-            Set<Integer> updateModelItemIdSet = param.getUpdateModelItemList().stream().map(ModelItem::getID).collect(Collectors.toSet());
-            keySet.removeAll(updateModelItemIdSet);
-        }
         // --1-- 删除属性模板
-        if (CollectionUtil.isNotEmpty(keySet)) {
-            tbPropertyMapper.deleteBatchIds(keySet);
+        if (CollectionUtil.isNotEmpty(param.getRemoveModelItemIDSet())) {
+            tbPropertyMapper.deleteBatchIds(param.getRemoveModelItemIDSet());
         }
         // --2-- 修改属性模板
         if (CollectionUtil.isNotEmpty(param.getUpdateModelItemList())) {
