@@ -71,13 +71,13 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "统计方式仅支持平均");
         }
 
-        tokenStr1 = "\"waterMeasureType\": 3";
-        tokenStr2 = "\"waterMeasureType\": 4";
+        tokenStr1 = "\"waterMeasureType\":3";
+        tokenStr2 = "\"waterMeasureType\":4";
         if (projectTypeID != null) {
             if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
-                tokenStr3 = "\"waterMeasureType\": 3";
+                tokenStr3 = "\"waterMeasureType\":3";
             } else {
-                tokenStr3 = "\"waterMeasureType\": 4";
+                tokenStr3 = "\"waterMeasureType\":4";
             }
         }
 

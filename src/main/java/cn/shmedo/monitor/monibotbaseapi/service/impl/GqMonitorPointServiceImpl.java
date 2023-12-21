@@ -85,10 +85,6 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         String tableSuffix = null;
         sensorDataDao.insertSensorCommonData(sensorDataList, fieldInfoList, pa.getMonitorType(), tableSuffix);
 
-        if (Objects.equals(pa.getMonitorType(), MonitorType.CHANNEL_WATER_LEVEL.getKey())) {
-            tbSensorMapper.batchUpdateBySensorKind(pa.getKind(), pa.getDataList().stream().map(s -> s.getSid()).collect(Collectors.toList()));
-        }
-
         return ResultWrapper.successWithNothing();
     }
 

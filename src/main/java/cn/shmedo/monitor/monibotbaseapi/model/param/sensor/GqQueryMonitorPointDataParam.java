@@ -52,7 +52,7 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
         }
 
         begin = DateUtil.beginOfDay(begin).offset(DateField.HOUR, 8);
-        end = DateUtil.beginOfDay(end).offset(DateField.HOUR, 20);
+        end = DateUtil.beginOfDay(end).offset(DateField.HOUR, 21);
 
         if (!(Objects.equals(projectTypeID, ProjectType.SLUICE.getCode()) || Objects.equals(projectTypeID, ProjectType.CANAL_SYSTEM.getCode()) )) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持工程类型为水闸或者渠系");
@@ -70,9 +70,9 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持量水类型为水工建筑量水或者标准断面量水");
         }
         if (Objects.equals(token, WaterMeasureType.WATERWORK.getCode())) {
-            tokenStr = "\"waterMeasureType\": 3";
+            tokenStr = "\"waterMeasureType\":3";
         } else {
-            tokenStr = "\"waterMeasureType\": 4";
+            tokenStr = "\"waterMeasureType\":4";
         }
         return null;
     }
