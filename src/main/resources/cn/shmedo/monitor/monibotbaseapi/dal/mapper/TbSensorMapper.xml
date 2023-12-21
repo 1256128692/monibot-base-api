@@ -973,4 +973,13 @@
         </trim>
         ORDER BY ts.ID DESC;
     </select>
+
+    <update id="batchUpdateBySensorKind">
+        update tb_sensor
+        set kind = #{kind}
+        where ID in
+        <foreach collection="sensorIDList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

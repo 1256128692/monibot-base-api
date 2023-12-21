@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -48,6 +49,15 @@ public class GqQueryMonitorPointStatisticsDataPageParam implements ParameterVali
     @JsonIgnore
     private Integer monitorType;
 
+    @JsonIgnore
+    private String tokenStr1;
+
+    @JsonIgnore
+    private String tokenStr2;
+
+    @JsonIgnore
+    private String tokenStr3;
+
     @Override
     public ResultWrapper<?> validate() {
         if (begin.after(end)) {
@@ -74,6 +84,16 @@ public class GqQueryMonitorPointStatisticsDataPageParam implements ParameterVali
 
         if ( StatisticalMethods.AVERAGE.getValue() != statisticsType) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "统计方式仅支持平均");
+        }
+
+        tokenStr1 = "\"waterMeasureType\": 3";
+        tokenStr2 = "\"waterMeasureType\": 4";
+        if (projectTypeID != null) {
+            if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
+                tokenStr3 = "\"waterMeasureType\": 3";
+            } else {
+                tokenStr3 = "\"waterMeasureType\": 4";
+            }
         }
 
         return null;

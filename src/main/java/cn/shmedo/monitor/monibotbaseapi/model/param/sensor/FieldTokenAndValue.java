@@ -7,5 +7,5 @@ import lombok.Data;
 public class FieldTokenAndValue {
 
     private String fieldToken;
-    private Object value;
+    private String value;
 }

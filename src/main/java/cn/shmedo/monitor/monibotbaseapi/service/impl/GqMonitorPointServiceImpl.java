@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.json.JSONUtil;
+import cn.hutool.core.convert.Convert;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -54,7 +55,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         if (!CollectionUtil.isNullOrEmpty(sensorInfoList)) {
             List<Integer> sensorIDList = sensorInfoList.stream().map(SensorBaseInfoV3::getSensorID).collect(Collectors.toList());
             List<Map<String, Object>> maps = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(), DisplayDensity.FOUR_HOUR.getValue(),
-                    StatisticalMethods.LATEST.getValue(), fieldInfoList, pa.getMonitorType());
+                    StatisticalMethods.FIRST.getValue(), fieldInfoList, pa.getMonitorType());
             sensorInfoList.forEach(s -> {
                 s.setSensorDataList(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
                 s.setWaterMeasuringTypeName(WaterMeasureType.getDescByCode(pa.getToken()));
@@ -65,6 +66,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object gqMonitorPointDataPush(GqMonitorPointDataPushParam pa) {
 
         List<FieldBaseInfo> fieldInfoList = tbMonitorTypeFieldMapper.selectListByType(pa.getMonitorType());
@@ -75,13 +77,17 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
             map.put("sensorID", p.getSid());
             map.put("time", p.getTime());
             p.getSensorDataList().forEach(d -> {
-                map.put(d.getFieldToken(), d.getValue());
+                map.put(d.getFieldToken(), Convert.toDouble(d.getValue()));
             });
             sensorDataList.add(map);
         });
 
         String tableSuffix = null;
         sensorDataDao.insertSensorCommonData(sensorDataList, fieldInfoList, pa.getMonitorType(), tableSuffix);
+
+        if (Objects.equals(pa.getMonitorType(), MonitorType.CHANNEL_WATER_LEVEL.getKey())) {
+            tbSensorMapper.batchUpdateBySensorKind(pa.getKind(), pa.getDataList().stream().map(s -> s.getSid()).collect(Collectors.toList()));
+        }
 
         return ResultWrapper.successWithNothing();
     }
@@ -93,11 +99,11 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         if (pa.getProjectTypeID() == null) {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, MonitorType.SLUICE_REGIMEN.getKey(), null
+                    null, null, MonitorType.SLUICE_REGIMEN.getKey(), pa.getTokenStr1()
             ));
             List<SensorBaseInfoV3> sensorInfoV2 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), null
+                    null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), pa.getTokenStr2()
             ));
 
             if (!CollectionUtil.isNullOrEmpty(sensorInfoV1)) {
@@ -124,7 +130,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         } else {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, pa.getMonitorType(), null
+                    null, null, pa.getMonitorType(), pa.getTokenStr3()
             ));
 
             sensorInfoList.addAll(sensorInfoV1);
@@ -217,11 +223,11 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         if (pa.getProjectTypeID() == null) {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, MonitorType.SLUICE_REGIMEN.getKey(), null
+                    null, null, MonitorType.SLUICE_REGIMEN.getKey(), pa.getTokenStr1()
             ));
             List<SensorBaseInfoV3> sensorInfoV2 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), null
+                    null, null, MonitorType.CHANNEL_WATER_LEVEL.getKey(), pa.getTokenStr2()
             ));
 
             if (!CollectionUtil.isNullOrEmpty(sensorInfoV1)) {
@@ -248,7 +254,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         } else {
             List<SensorBaseInfoV3> sensorInfoV1 = tbSensorMapper.selectListByGqQueryCondition(new GqQueryMonitorPointDataParam(
                     pa.getCompanyID(), pa.getProjectTypeID(), pa.getKind(), null, pa.getMonitorPointName(),
-                    null, null, pa.getMonitorType(), null
+                    null, null, pa.getMonitorType(),  pa.getTokenStr3()
             ));
 
             sensorInfoList.addAll(sensorInfoV1);

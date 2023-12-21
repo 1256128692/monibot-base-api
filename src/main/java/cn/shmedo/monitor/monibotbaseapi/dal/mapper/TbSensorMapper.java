@@ -121,4 +121,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
                                @Param("userID") Integer userID);
 
     List<Tuple2<Integer, String>> listWaterMeasureSensor(@Param("param") ListWaterMeasureSensorRequest param);
+
+    void batchUpdateBySensorKind(Integer kind, List<Integer> sensorIDList);
 }

@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -64,10 +65,14 @@ public class GqQueryMonitorPointDataParam implements ParameterValidator, Resourc
             monitorType = MonitorType.CHANNEL_WATER_LEVEL.getKey();
         }
 
-        if (token == 3) {
-            tokenStr = "\"waterMeasureType\": 1";
+
+        if (! (Objects.equals(token, WaterMeasureType.WATERWORK.getCode()) || Objects.equals(token, WaterMeasureType.STANDARD_SECTION.getCode()))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "仅支持量水类型为水工建筑量水或者标准断面量水");
+        }
+        if (Objects.equals(token, WaterMeasureType.WATERWORK.getCode())) {
+            tokenStr = "\"waterMeasureType\": 3";
         } else {
-            tokenStr = null;
+            tokenStr = "\"waterMeasureType\": 4";
         }
         return null;
     }

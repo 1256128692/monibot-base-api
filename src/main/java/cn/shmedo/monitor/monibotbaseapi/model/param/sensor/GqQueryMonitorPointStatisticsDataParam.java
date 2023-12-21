@@ -36,6 +36,12 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
     @JsonIgnore
     private Integer monitorType;
 
+    @JsonIgnore
+    private String tokenStr1;
+    @JsonIgnore
+    private String tokenStr2;
+    @JsonIgnore
+    private String tokenStr3;
 
     @Override
     public ResultWrapper<?> validate() {
@@ -63,6 +69,16 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
 
         if ( StatisticalMethods.AVERAGE.getValue() != statisticsType) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "统计方式仅支持平均");
+        }
+
+        tokenStr1 = "\"waterMeasureType\": 3";
+        tokenStr2 = "\"waterMeasureType\": 4";
+        if (projectTypeID != null) {
+            if (Objects.equals(projectTypeID, ProjectType.SLUICE.getCode())) {
+                tokenStr3 = "\"waterMeasureType\": 3";
+            } else {
+                tokenStr3 = "\"waterMeasureType\": 4";
+            }
         }
 
         return null;
