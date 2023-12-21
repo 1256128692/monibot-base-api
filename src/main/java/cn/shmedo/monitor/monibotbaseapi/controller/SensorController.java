@@ -598,10 +598,10 @@ public class SensorController {
      * @apiName CalculateField
      * @apiParam (请求体) {Int} projectID 项目id
      * @apiParam (请求体) {Int} sensorID 监测传感器id
-     * @apiParam (请求体) {Int} targetFieldID 待计算的目标字段id
+     * @apiParam (请求体) {String} targetFieldToken 待计算的目标字段token
      * @apiParam (请求体) {Object[]} [paramList] 参数列表
      * @apiParam (请求体) {Double} paramList.value 参数值
-     * @apiParam (请求体) {Int} paramList.fieldID 参数字段id
+     * @apiParam (请求体) {String} paramList.fieldToken 参数字段token
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Double} data.value 计算结果
      * @apiSuccess (响应结果) {String} data.fieldToken 字段标识

@@ -12,15 +12,16 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 试运行 请求体
@@ -50,14 +50,13 @@ public class CalculateFieldRequest implements ParameterValidator, ResourcePermis
     @Positive
     private Integer sensorID;
 
-    @NotNull
-    @Positive
-    private Integer targetFieldID;
+    @NotBlank
+    private String targetFieldToken;
 
     @Valid
     private List<@NotNull Param> paramList;
 
-    record Param(@NotNull @Positive Integer fieldID, @NotNull Double value) {
+    record Param(@NotEmpty String fieldToken, @NotNull Double value) {
     }
 
     @JsonIgnore
@@ -70,12 +69,12 @@ public class CalculateFieldRequest implements ParameterValidator, ResourcePermis
     private Dict configFieldValue;
 
     @JsonIgnore
-    private String fieldToken;
+    private Integer targetFieldID;
 
     @Override
     public ResultWrapper<?> validate() {
-        paramList = Optional.ofNullable(paramList).orElse(List.of());
 
+        //校验传感器
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
         TbSensor sensor = sensorMapper.selectOne(Wrappers.<TbSensor>lambdaQuery().eq(TbSensor::getID, sensorID)
                 .eq(TbSensor::getProjectID, projectID).select(TbSensor::getProjectID, TbSensor::getMonitorType,
@@ -83,25 +82,26 @@ public class CalculateFieldRequest implements ParameterValidator, ResourcePermis
         Assert.notNull(sensor, () -> new InvalidParameterException("传感器不存在"));
         this.configFieldValue = JSONUtil.toBean(sensor.getConfigFieldValue(), Dict.class);
 
+        //获取模板
         RedisService redisService = SpringUtil.getBean(RedisConstant.MONITOR_REDIS_SERVICE, RedisService.class);
         template = redisService.get(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY,
                 sensor.getTemplateID().toString(), MonitorTypeTemplateCacheData.class);
         Assert.notNull(template, "传感器计算模板不存在");
 
-        TbMonitorTypeFieldMapper monitorTypeFieldMapper = SpringUtil.getBean(TbMonitorTypeFieldMapper.class);
-        Map<Integer, TbMonitorTypeField> fieldMap = monitorTypeFieldMapper.selectList(Wrappers.<TbMonitorTypeField>lambdaQuery()
-                        .in(TbMonitorTypeField::getID, Stream.concat(Stream.of(targetFieldID), paramList.stream().map(Param::fieldID)).toList())
-                        .select(TbMonitorTypeField::getID, TbMonitorTypeField::getFieldToken))
-                .stream().collect(Collectors.toMap(TbMonitorTypeField::getID, e -> e));
-        Assert.isTrue(fieldMap.containsKey(targetFieldID), () -> new InvalidParameterException("字段 " + targetFieldID + "不存在"));
-        this.fieldToken = fieldMap.get(targetFieldID).getFieldToken();
+        // 校验字段
+        Map<String, MonitorTypeCacheData.Field> fieldMap = redisService.get(RedisKeys.MONITOR_TYPE_KEY,
+                        sensor.getMonitorType().toString(), MonitorTypeCacheData.class)
+                .getMonitortypeFieldList().stream()
+                .collect(Collectors.toMap(MonitorTypeCacheData.Field::getFieldToken, e -> e));
+        Assert.isTrue(fieldMap.containsKey(targetFieldToken), () -> new InvalidParameterException("目标字段不存在"));
+        this.targetFieldID = fieldMap.get(targetFieldToken).getID();
 
-        paramFiledMap = paramList.stream().map(e -> {
-            TbMonitorTypeField f = fieldMap.get(e.fieldID());
-            Assert.notNull(f, () -> new InvalidParameterException("字段 " + e.fieldID() + "不存在"));
-            return Map.entry(f.getFieldToken(), e.value());
-        }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
+        paramFiledMap = Optional.ofNullable(paramList).orElse(List.of()).stream()
+                .peek(e -> Assert.isTrue(fieldMap.containsKey(e.fieldToken()),
+                        () -> new InvalidParameterException("未知参数字段: " + e.fieldToken)))
+                .collect(Collectors.toMap(Param::fieldToken, Param::value));
+        Assert.isFalse(paramFiledMap.containsKey(targetFieldToken), () -> new InvalidParameterException("目标字段不能作为参数"));
         return null;
     }
 

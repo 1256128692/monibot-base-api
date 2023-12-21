@@ -538,7 +538,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                                     }
                                 });
                             });
-                            return new TryingResponse(data, request.getFieldToken(), request.getTargetFieldID());
+                            return new TryingResponse(data, request.getTargetFieldToken(), request.getTargetFieldID());
                         }
                     }
                     case SCRIPT:
