@@ -866,7 +866,9 @@
                  left join tb_project_info pi on mp.projectID = pi.ID
                  left join tb_project_type pt on pt.ID = pi.projectType
         where pi.companyID = #{companyID}
+        <if test="projectTypeID != null">
           and pi.projectType = #{projectTypeID}
+        </if>
           and s.monitorType = #{monitorType}
         <if test="kind != null">
             and s.kind = #{kind}

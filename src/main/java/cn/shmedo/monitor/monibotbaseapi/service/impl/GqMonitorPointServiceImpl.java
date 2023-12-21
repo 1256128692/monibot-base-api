@@ -189,11 +189,13 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                             afterwater = (Double) dataMap.get("waterH");
                             totalFlow = (Double) dataMap.get("waterS");
                         }
-                        dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
                         clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
-                        clonedObject.setData(new IrrigatedAreaInfo(
-                                time, afterwater, totalFlow, dailyWaterTotal
-                        ));
+                        if (totalFlow != null) {
+                            dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
+                            clonedObject.setData(new IrrigatedAreaInfo(
+                                    time, afterwater, totalFlow, dailyWaterTotal
+                            ));
+                        }
                         clonedObject.setTime(time);
                         resultList.add(clonedObject);
                     });
@@ -313,11 +315,13 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                             afterwater = (Double) dataMap.get("waterH");
                             totalFlow = (Double) dataMap.get("waterS");
                         }
-                        dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
                         clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
-                        clonedObject.setData(new IrrigatedAreaInfo(
-                                time, afterwater, totalFlow, dailyWaterTotal
-                        ));
+                        if (totalFlow != null) {
+                            dailyWaterTotal = totalFlow * 24 * 3600 / 10000;
+                            clonedObject.setData(new IrrigatedAreaInfo(
+                                    time, afterwater, totalFlow, dailyWaterTotal
+                            ));
+                        }
                         clonedObject.setTime(time);
                         resultList.add(clonedObject);
                     });
