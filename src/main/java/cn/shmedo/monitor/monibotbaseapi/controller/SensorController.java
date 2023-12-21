@@ -424,6 +424,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.paramList.exValues 参数扩展字段
      * @apiSuccess (响应结果) {String} data.paramList.dataType 参数数据类型
      * @apiSuccess (响应结果) {String} data.paramList.type 参数类型 IOT-物模型数据源类型、MON-监测传感器数据类型、SLEF-自身数据、HISTORY-自身历史数据、CONS-常量、PARAM-参数、EX-扩展配置
+     * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
      * @apiPermission mdmbase:DescribeSensor
@@ -450,6 +451,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Object[]} data
      * @apiSuccess (响应结果) {Double} data.value
      * @apiSuccess (响应结果) {String} data.fieldToken
+     * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
      * @apiPermission mdmbase:DescribeSensor
@@ -586,5 +588,33 @@ public class SensorController {
     @PostMapping(value = "/QuerySensorSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySensorSimpleList(@Valid @RequestBody QuerySensorSimpleListRequest param) {
         return sensorService.querySimpleList(param);
+    }
+
+    /**
+     * @api {POST} /CalculateField 计算传感器指定字段
+     * @apiDescription 计算传感器指定字段 (通常用于计算扩展字段)
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName CalculateField
+     * @apiParam (请求体) {Int} projectID 项目id
+     * @apiParam (请求体) {Int} sensorID 监测传感器id
+     * @apiParam (请求体) {Int} targetFieldID 待计算的目标字段id
+     * @apiParam (请求体) {Object[]} [paramList] 参数列表
+     * @apiParam (请求体) {Double} paramList.value 参数值
+     * @apiParam (请求体) {Int} paramList.fieldID 参数字段id
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {Double} data.value 计算结果
+     * @apiSuccess (响应结果) {String} data.fieldToken 字段标识
+     * @apiSuccess (响应结果) {Int} data.fieldID 字段id
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 响应结果示例
+     * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
+     * @apiPermission mdmbase:DescribeSensor
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
+    @PostMapping(value = "/Calculate", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object calculate(@RequestBody @Validated CalculateFieldRequest request) {
+        return sensorService.calculateField(request);
     }
 }

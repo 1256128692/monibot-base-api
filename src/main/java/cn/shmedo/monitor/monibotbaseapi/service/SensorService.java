@@ -124,4 +124,6 @@ public interface SensorService extends IService<TbSensor> {
     List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param);
 
     List<SensorSimple> querySimpleList(QuerySensorSimpleListRequest param);
+
+    TryingResponse calculateField(CalculateFieldRequest request);
 }

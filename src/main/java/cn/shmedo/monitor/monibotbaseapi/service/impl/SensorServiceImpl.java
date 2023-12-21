@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjUtil;
@@ -10,8 +11,12 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.iot.entity.api.monitor.enums.*;
+import cn.shmedo.iot.entity.api.monitor.enums.CalType;
+import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.base.Tuple;
+import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -486,6 +491,66 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .ifPresent(e -> wrapper.in(TbSensor::getMonitorType, e));
 
         return this.list(wrapper).stream().map(SensorSimple::valueOf).toList();
+    }
+
+    @Override
+    public TryingResponse calculateField(CalculateFieldRequest request) {
+        switch (request.getTemplate().getDataSourceComposeType()) {
+            case SINGLE_IOT, SINGLE_MONITOR -> {
+                Map<String, TbParameter> templateParamMap = monitorRedisService.getList(RedisKeys.PARAMETER_PREFIX_KEY +
+                                ParameterSubjectType.TEMPLATE.getCode(), request.getTemplate().getID().toString(), TbParameter.class)
+                        .stream().collect(Collectors.toMap(TbParameter::getToken, e -> e));
+
+                Map<String, TbParameter> sensorParamMap = monitorRedisService.getList(RedisKeys.PARAMETER_PREFIX_KEY +
+                                ParameterSubjectType.SENSOR.getCode(), request.getSensorID().toString(), TbParameter.class)
+                        .stream().collect(Collectors.toMap(TbParameter::getToken, e -> e));
+
+                switch (request.getTemplate().getCalType()) {
+                    case FORMULA: {
+                        FormulaCacheData formula = request.getTemplate().getTemplateFormulaList().stream()
+                                .filter(e -> e.getFieldID().equals(request.getTargetFieldID())).findFirst().orElse(null);
+                        if (formula != null) {
+                            Double data = FormulaUtil.calculate(formula.getFormula(), typeListMap -> {
+                                typeListMap.forEach((type, sources) -> {
+                                    switch (type) {
+                                        case SELF -> {
+                                            sources.forEach(source -> {
+                                                source.setFieldValue(request.getParamFiledMap().get(source.getFieldToken()));
+                                            });
+                                        }
+                                        case PARAM -> {
+                                            sources.forEach(source -> {
+                                                String value = sensorParamMap.containsKey(source.getFieldToken()) ?
+                                                        sensorParamMap.get(source.getFieldToken()).getPaValue() :
+                                                        templateParamMap.get(source.getFieldToken()).getPaValue();
+                                                source.setFieldValue(Convert.toDouble(value));
+                                            });
+                                        }
+                                        case MON -> {
+                                            //TODO:
+                                        }
+                                        case EX -> {
+                                            sources.forEach(source -> request.getConfigFieldValue().get(source.getFieldToken()));
+                                        }
+                                        default -> {
+                                            throw new InvalidParameterException("缺少必要参数");
+                                        }
+                                    }
+                                });
+                            });
+                            return new TryingResponse(data, request.getFieldToken(), request.getTargetFieldID());
+                        }
+                    }
+                    case SCRIPT:
+                    case HTTP:
+                    case NONE:
+                }
+            }
+            default -> {
+                throw new InvalidParameterException("不支持的数据源组合类型");
+            }
+        }
+        return null;
     }
 
     /**
