@@ -172,22 +172,22 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                         if (sensor.getMonitorType() == MonitorType.SLUICE_REGIMEN.getKey()) {
                             // 闸门类型
-                            try {
-                                time = dateFormat.parse((String) dataMap.get("time"));
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                            afterwater = (Double) dataMap.get("afterwater");
-                            totalFlow = (Double) dataMap.get("totalFlow");
+                                afterwater = Convert.toDouble(dataMap.get("afterwater"));
+                                totalFlow = Convert.toDouble(dataMap.get("totalFlow"));
                         } else {
                             // 渠系类型
+                                afterwater = Convert.toDouble(dataMap.get("waterH"));
+                                totalFlow = Convert.toDouble(dataMap.get("waterS"));
+                        }
+
+                        if (pa.getDensityType() == DisplayDensity.DAY.getValue()) {
                             try {
                                 time = dateFormat.parse((String) dataMap.get("time"));
                             } catch (ParseException e) {
                                 throw new RuntimeException(e);
                             }
-                            afterwater = (Double) dataMap.get("waterH");
-                            totalFlow = (Double) dataMap.get("waterS");
+                        } else {
+                            time = (Date) dataMap.get("time");
                         }
                         clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
                         if (totalFlow != null) {
@@ -298,22 +298,22 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
                         if (sensor.getMonitorType() == MonitorType.SLUICE_REGIMEN.getKey()) {
                             // 闸门类型
-                            try {
-                                time = dateFormat.parse((String) dataMap.get("time"));
-                            } catch (ParseException e) {
-                                throw new RuntimeException(e);
-                            }
-                            afterwater = (Double) dataMap.get("afterwater");
-                            totalFlow = (Double) dataMap.get("totalFlow");
+                            afterwater = Convert.toDouble(dataMap.get("afterwater"));
+                            totalFlow = Convert.toDouble(dataMap.get("totalFlow"));
                         } else {
                             // 渠系类型
+                            afterwater = Convert.toDouble(dataMap.get("waterH"));
+                            totalFlow = Convert.toDouble(dataMap.get("waterS"));
+                        }
+
+                        if (pa.getDensityType() == DisplayDensity.DAY.getValue()) {
                             try {
                                 time = dateFormat.parse((String) dataMap.get("time"));
                             } catch (ParseException e) {
                                 throw new RuntimeException(e);
                             }
-                            afterwater = (Double) dataMap.get("waterH");
-                            totalFlow = (Double) dataMap.get("waterS");
+                        } else {
+                            time = (Date) dataMap.get("time");
                         }
                         clonedObject = BeanUtil.toBean(sensor, SensorBaseInfoV3.class);
                         if (totalFlow != null) {
