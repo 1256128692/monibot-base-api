@@ -612,7 +612,7 @@ public class SensorController {
      * @apiPermission mdmbase:DescribeSensor
      */
     @Permission(permissionName = "mdmbase:DescribeBaseSensor")
-    @PostMapping(value = "/Calculate", produces = MediaType.APPLICATION_JSON_VALUE,
+    @PostMapping(value = "/CalculateField", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object calculate(@RequestBody @Validated CalculateFieldRequest request) {
         return sensorService.calculateField(request);
