@@ -5,6 +5,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -382,6 +383,7 @@ public class SluiceServiceImpl implements SluiceService {
         ControlActionKind kind = request.getActionKind();
         ControlActionType type = request.getActionType();
         BatchDispatchRequest dispatchRequest = new BatchDispatchRequest();
+        CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         Map<Integer, Tuple2<String, Integer>> dict = getGateIotDeviceMap(request.getProjectID(), request.getGateID());
         if (request.getGateID() == null) {
             //一键控制
@@ -398,6 +400,7 @@ public class SluiceServiceImpl implements SluiceService {
             if (!gates.isEmpty()) {
                 dispatchRequest.setRawCmdList(gates.stream().map(e -> buildRawCmd(dict.get(e.getSid()),
                         builder -> builder.type(kind.getDeviceCode())
+                                .userID(subject.getSubjectID())
                                 .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0))).toList());
             }
         } else {
@@ -408,6 +411,7 @@ public class SluiceServiceImpl implements SluiceService {
             Assert.isTrue(gate != null, "闸门不在线");
             Assert.isTrue(gate.getHardware() == 0, "闸门不处于远程模式, 无法控制");
             BatchDispatchRequest.RawCmd rawCmd = buildRawCmd(dict.get(request.getGateID()), builder -> {
+                builder.userID(subject.getSubjectID());
                 switch (kind) {
                     case STOP, RISE, FALL -> builder.type(5).motorDir(kind.getDeviceCode());
                     case AUTO -> {

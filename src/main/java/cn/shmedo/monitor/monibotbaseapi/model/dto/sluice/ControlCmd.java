@@ -32,8 +32,8 @@ public class ControlCmd {
     private final String FIXED_TIME = "fixedTime";
     private final String TOTAL_FLOW = "totalFlow";
     private final String MOTOR_DIR = "motorDir";
-
-    //$cmd=md_setgatecfg&index=1&type=0&crackLevel=1.0&waterLevel=1.2&startTime=123&stopTime=123&fixedTime=123&totalFlow=12&motorDir=1&apikey=123456&msgid=123456
+    private final String USER_ID = "userID";
+    private final String PAUSE_FLAG = "pauseFlag";
 
     /**
      * 电机序号
@@ -81,6 +81,16 @@ public class ControlCmd {
      */
     private Integer motorDir;
 
+    /**
+     * 指令下发者 用户ID
+     */
+    private Integer userID;
+
+    /**
+     * 暂停指令：0恢复 1暂停
+     */
+    private Integer pauseFlag;
+
     public String toRaw() {
         List<String> params = new ArrayList<>();
         params.add(CMD_NAME);
@@ -93,6 +103,8 @@ public class ControlCmd {
         Optional.ofNullable(fixedTime).ifPresent(e -> params.add(FIXED_TIME + "=" + e));
         Optional.ofNullable(totalFlow).ifPresent(e -> params.add(TOTAL_FLOW + "=" + e));
         Optional.ofNullable(motorDir).ifPresent(e -> params.add(MOTOR_DIR + "=" + e));
+        Optional.ofNullable(userID).ifPresent(e -> params.add(USER_ID + "=" + e));
+        Optional.ofNullable(pauseFlag).ifPresent(e -> params.add(PAUSE_FLAG + "=" + e));
         return String.join("&", params);
     }
 }
