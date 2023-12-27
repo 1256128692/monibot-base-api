@@ -409,7 +409,7 @@ public class SluiceServiceImpl implements SluiceService {
             Assert.isTrue(gate.getHardware() == 0, "闸门不处于远程模式, 无法控制");
             BatchDispatchRequest.RawCmd rawCmd = buildRawCmd(dict.get(request.getGateID()), builder -> {
                 switch (kind) {
-                    case STOP, RISE, FALL -> builder.type(kind.getDeviceCode()).motorDir(kind.getDeviceCode());
+                    case STOP, RISE, FALL -> builder.type(5).motorDir(kind.getDeviceCode());
                     case AUTO -> {
                         builder.type(type.getDeviceCode());
                         switch (type) {
