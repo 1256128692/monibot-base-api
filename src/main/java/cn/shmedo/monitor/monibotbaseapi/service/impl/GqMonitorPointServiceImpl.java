@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DateUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
@@ -11,13 +12,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.StatisticalMethods;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.irrigated.WaterMeasureType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqMonitorPointDataPushParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointStatisticsDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensordata.StatisticsSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.GqMonitorPointService;
+import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
+import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -44,6 +45,8 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
     private final TbSensorMapper tbSensorMapper;
 
     private SensorDataDao sensorDataDao;
+
+    private final SensorDataService sensorDataService;
 
     @Override
     public GqMonitorPointDataResponse gqQueryMonitorPointDataList(GqQueryMonitorPointDataParam pa) {
@@ -84,6 +87,18 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
 
         String tableSuffix = null;
         sensorDataDao.insertSensorCommonData(sensorDataList, fieldInfoList, pa.getMonitorType(), tableSuffix);
+
+        // 更新日平均数据
+        StatisticsSensorDataParam param = new StatisticsSensorDataParam();
+        param.setRaw(false);
+        param.setBegin(DateUtil.beginOfDay(pa.getDataList().get(0).getTime()));
+        param.setEnd(DateUtil.endOfDay(pa.getDataList().get(0).getTime()));
+        param.setSensorIDList(pa.getDataList().stream().map(SensorInfluxdbData::getSid).collect(Collectors.toList()));
+        param.setSensorList(tbSensorMapper.selectBatchIds(pa.getDataList().stream().map(SensorInfluxdbData::getSid).collect(Collectors.toList())));
+        param.setMonitorType(pa.getMonitorType());
+        if (!CollectionUtil.isNullOrEmpty(param.getSensorList())) {
+            sensorDataService.statisticsSensorData(param);
+        }
 
         return ResultWrapper.successWithNothing();
     }
@@ -180,7 +195,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                                 totalFlow = Convert.toDouble(dataMap.get("waterS"));
                         }
 
-                        if (pa.getDensityType() == DisplayDensity.DAY.getValue()) {
+                        if (pa.getDensityType() == DisplayDensity.SPECIAL_DAY.getValue()) {
                             try {
                                 time = dateFormat.parse((String) dataMap.get("time"));
                             } catch (ParseException e) {
@@ -306,7 +321,7 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
                             totalFlow = Convert.toDouble(dataMap.get("waterS"));
                         }
 
-                        if (pa.getDensityType() == DisplayDensity.DAY.getValue()) {
+                        if (pa.getDensityType() == DisplayDensity.SPECIAL_DAY.getValue()) {
                             try {
                                 time = dateFormat.parse((String) dataMap.get("time"));
                             } catch (ParseException e) {

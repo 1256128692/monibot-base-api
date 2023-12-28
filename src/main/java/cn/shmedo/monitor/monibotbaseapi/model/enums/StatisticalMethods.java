@@ -6,7 +6,9 @@ public enum StatisticalMethods {
     AVERAGE(2, "avg"),
     CUMULATIVE(3, "sum"),
     CHANGE(4, "diff"),
-    FIRST(5, "first");
+    FIRST(5, "first"),
+    AVERAGE1(6, "avg_1"),
+    ;
 
     private int value;
     private String name;

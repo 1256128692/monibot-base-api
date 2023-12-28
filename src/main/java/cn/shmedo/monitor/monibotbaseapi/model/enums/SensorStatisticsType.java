@@ -11,7 +11,9 @@ public enum SensorStatisticsType {
 
     MEAN(2, "mean", "平均值", "avg"),
     SUM(3, "sum", "求和", "sum"),
-    DIFF(4, "diff", "阶段变化", "diff");
+    DIFF(4, "diff", "阶段变化", "diff"),
+    MEAN1(5, "mean", "单日4个瞬时值的平均值", "avg_1")
+    ;
 
 
     private Integer code;

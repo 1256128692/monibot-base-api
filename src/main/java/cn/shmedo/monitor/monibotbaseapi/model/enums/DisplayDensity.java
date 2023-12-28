@@ -17,8 +17,10 @@ public enum DisplayDensity {
 
     SIX_HOUR(9, "6h"),
 
-    TWELVE_HOUR(10, "12h");
+    TWELVE_HOUR(10, "12h"),
 
+    SPECIAL_DAY(11, "1d")
+    ;
 
     private int value;
     private String name;

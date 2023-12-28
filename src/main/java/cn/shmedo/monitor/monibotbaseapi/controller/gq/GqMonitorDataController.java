@@ -94,8 +94,8 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
-     * @apiParam (请求体) {Int} densityType 密度,(日:3 月:5 年:6)
-     * @apiParam (请求体) {Int} statisticsType 统计方式,(平均:2)
+     * @apiParam (请求体) {Int} densityType 密度,(日:11 月:5 年:6)
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(平均:6)
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiParamExample 请求体示例
@@ -146,8 +146,8 @@ public class GqMonitorDataController {
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
-     * @apiParam (请求体) {Int} densityType 密度,(日:3 月:5 年:6)
-     * @apiParam (请求体) {Int} statisticsType 统计方式,(平均:2)
+     * @apiParam (请求体) {Int} densityType 密度,(日:11 月:5 年:6)
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(平均:6)
      * @apiParamExample 请求体示例
      * {"companyID":1,"kind":"1","token":"sss","monitorPointName":"测测","projectTypeID":10,"densityType":1
      * "statisticsType":1,"begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31"}

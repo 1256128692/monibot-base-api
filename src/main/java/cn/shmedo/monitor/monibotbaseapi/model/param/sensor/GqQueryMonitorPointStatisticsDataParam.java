@@ -62,12 +62,12 @@ public class GqQueryMonitorPointStatisticsDataParam  implements ParameterValidat
             }
         }
 
-        if ( !(DisplayDensity.DAY.getValue() == densityType || DisplayDensity.MONTH.getValue() == densityType ||
+        if ( !(DisplayDensity.SPECIAL_DAY.getValue() == densityType || DisplayDensity.MONTH.getValue() == densityType ||
                 DisplayDensity.YEAR.getValue() == densityType) ) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "密度仅支持日,月,年");
         }
 
-        if ( StatisticalMethods.AVERAGE.getValue() != statisticsType) {
+        if ( StatisticalMethods.AVERAGE1.getValue() != statisticsType) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "统计方式仅支持平均");
         }
 

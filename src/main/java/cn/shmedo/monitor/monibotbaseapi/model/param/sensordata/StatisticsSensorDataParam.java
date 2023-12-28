@@ -105,4 +105,12 @@ public class StatisticsSensorDataParam implements ParameterValidator, ResourcePe
     public Integer getMonitorType() {
         return monitorType;
     }
+
+    public void setSensorList(List<TbSensor> sensorList) {
+        this.sensorList = sensorList;
+    }
+
+    public void setMonitorType(Integer monitorType) {
+        this.monitorType = monitorType;
+    }
 }

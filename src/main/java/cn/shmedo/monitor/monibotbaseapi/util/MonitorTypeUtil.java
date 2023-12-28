@@ -218,13 +218,19 @@ public class MonitorTypeUtil {
         // 查询最新数据的时候查原始表即可
         if (statisticsType != null) {
             if (statisticsType != StatisticalMethods.LATEST.getValue()) {
-                // 查询小时的时候也查询原始表即可
-                if (densityType != DisplayDensity.HOUR.getValue() && densityType != DisplayDensity.TWO_HOUR.getValue() &&
-                        densityType != DisplayDensity.FOUR_HOUR.getValue() && densityType != DisplayDensity.SIX_HOUR.getValue() &&
-                        densityType != DisplayDensity.TWELVE_HOUR.getValue() && densityType != DisplayDensity.DAY.getValue()) {
+                if (statisticsType == StatisticalMethods.AVERAGE1.getValue()) {
                     result.append("_");
                     result.append(StatisticalMethods.fromValue(statisticsType).getName());
+                } else {
+                    // 查询小时的时候也查询原始表即可
+                    if (densityType != DisplayDensity.HOUR.getValue() && densityType != DisplayDensity.TWO_HOUR.getValue() &&
+                            densityType != DisplayDensity.FOUR_HOUR.getValue() && densityType != DisplayDensity.SIX_HOUR.getValue() &&
+                            densityType != DisplayDensity.TWELVE_HOUR.getValue() && densityType != DisplayDensity.DAY.getValue()) {
+                        result.append("_");
+                        result.append(StatisticalMethods.fromValue(statisticsType).getName());
+                    }
                 }
+
             }
         }
         return result.toString();

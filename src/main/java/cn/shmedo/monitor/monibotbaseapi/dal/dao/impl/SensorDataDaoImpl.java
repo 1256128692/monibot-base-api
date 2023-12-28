@@ -140,6 +140,38 @@ public class SensorDataDaoImpl implements SensorDataDao {
             QueryResult tailTemp = influxDB.query(new Query(tailSql), TimeUnit.MILLISECONDS);
             List<Map<String, Object>> tailList = InfluxSensorDataUtil.parseResult(tailTemp, resultField);
             return handleDiffData(headList, tailList);
+        } else if (sensorStatisticsType.getCode().equals(SensorStatisticsType.MEAN1.getCode())) {
+            // 处理时间,调整小时数
+            Date beginOfHour = DateUtil.offsetHour(DateUtil.beginOfDay(DateUtil.date(begin)), 8);
+            Date endOfHour = DateUtil.offsetHour(DateUtil.endOfDay(DateUtil.date(end)), -3);
+            String beginString1 = TimeUtil.formatInfluxTimeString(new Timestamp(beginOfHour.getTime()));
+            String endString1 = TimeUtil.formatInfluxTimeString(new Timestamp(endOfHour.getTime()));
+            List<String> selectField = new LinkedList<>();
+            // 返回结果会进一步处理
+            List<String> resultField = new LinkedList<>();
+            fieldSelectInfoList.forEach(item -> {
+                selectField.add(String.format("first" + "(%s) as %s", item.getFieldToken(), item.getFieldToken()) + " ");
+                resultField.add(item.getFieldToken());
+            });
+            // 仅查这时间段内的4个瞬时数据
+            String selectFieldString = String.join(",", selectField);
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append(" select ");
+            sqlBuilder.append(selectFieldString);
+            sqlBuilder.append(" from  ").append(measurement);
+            sqlBuilder.append(" where time>='" + beginString1 + "' and time<'" + endString1 + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) ");
+            sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(4h) fill(none) ");
+            sqlBuilder.append(" order by time asc ");
+            sqlBuilder.append(" tz('Asia/Shanghai') ");
+            String sql = sqlBuilder.toString();
+            QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+            List<Map<String, Object>> mapList = InfluxSensorDataUtil.parseResult(queryResult, resultField);
+            List<Map<String, Object>> maps = handleSpecialMean(mapList,
+                    fieldSelectInfoList.stream().map(FieldSelectInfo::getFieldToken).collect(Collectors.toList()));
+            return maps;
+
         } else {
             List<String> selectField = new LinkedList<>();
             // 返回结果会进一步处理
@@ -163,6 +195,73 @@ public class SensorDataDaoImpl implements SensorDataDao {
             QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
             return InfluxSensorDataUtil.parseResult(queryResult, resultField);
         }
+    }
+
+
+    /**
+     * 处理特殊监测类型的日平均统计方式
+     * 将不同传感器,当日的4个时刻的瞬时值作为平均值的计算
+     *
+     * @param mapList
+     * @return
+     */
+    private List<Map<String, Object>> handleSpecialMean(List<Map<String, Object>> mapList, List<String> fields) {
+        Map<Integer, Map<String, Object>> sensorDataMap = new HashMap<>();
+
+        for (Map<String, Object> data : mapList) {
+            int sensorID = (int) data.get("sensorID");
+            sensorDataMap.computeIfAbsent(sensorID, k -> new HashMap<>());
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    Object value = data.get(field);
+                    sensorDataMap.get(sensorID).put(field, value);
+                }
+            }
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<Integer, Map<String, Object>> entry : sensorDataMap.entrySet()) {
+            int sensorID = entry.getKey();
+
+            int count = 0;
+            Map<String, Double> fieldTotal = new HashMap<>();
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    fieldTotal.put(field, 0.0);
+                }
+            }
+            for (Map<String, Object> data : mapList) {
+                if ((int) data.get("sensorID") == sensorID) {
+                    count++;
+
+                    for (String field : fields) {
+                        if (!field.equals("sensorID") && !field.equals("time")) {
+                            Object value = data.get(field);
+                            if (value instanceof Number) {
+                                double total = fieldTotal.get(field) + ((Number) value).doubleValue();
+                                fieldTotal.put(field, total);
+                            }
+                        }
+                    }
+                }
+            }
+            Map<String, Object> meanData = new HashMap<>();
+            meanData.put("sensorID", sensorID);
+
+            if (!mapList.isEmpty()) {
+                meanData.put("time", mapList.get(0).get("time").toString().substring(0,10) + " 00:00:00.000");
+            }
+
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    double meanValue = fieldTotal.get(field) / count;
+                    meanData.put(field, meanValue);
+                }
+            }
+            result.add(meanData);
+        }
+
+        return result;
     }
 
     /**
@@ -663,6 +762,7 @@ public class SensorDataDaoImpl implements SensorDataDao {
             case 4:
             case 5:
             case 6:
+            case 11:
                 sql = getDaylySensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
                 break;
         }
