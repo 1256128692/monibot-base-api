@@ -64,7 +64,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.shmedo.monitor.monibotbaseapi.constants.SluiceConstant.*;
-import static cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind.OPEN;
+import static cn.shmedo.monitor.monibotbaseapi.model.enums.sluice.ControlActionKind.*;
 
 /**
  * @author Chengfs on 2023/11/21
@@ -365,7 +365,7 @@ public class SluiceServiceImpl implements SluiceService {
                         sensor.setControlType(ControlType.formDeviceCode(s.getHardware()));
                     })).toList();
             item.setGates(list);
-            item.setOpenStatus(list.stream().anyMatch(i -> Objects.equals(i.getOpenStatus(),1)) ? 1 : 0);
+            item.setOpenStatus(list.stream().anyMatch(i -> Objects.equals(i.getOpenStatus(), 1)) ? 1 : 0);
 
             Optional.ofNullable(propMap.get(item.getProjectID())).ifPresent(p -> {
                 item.setCanal(p.get(CANAL_NAME));
@@ -385,23 +385,33 @@ public class SluiceServiceImpl implements SluiceService {
         BatchDispatchRequest dispatchRequest = new BatchDispatchRequest();
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         Map<Integer, Tuple2<String, Integer>> dict = getGateIotDeviceMap(request.getProjectID(), request.getGateID());
+
+        //一键控制 全关/全开/停止
         if (request.getGateID() == null) {
-            //一键控制
-            List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE)
+            //所有可控制闸门
+            List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE).eq(SluiceStatus.HARDWARE, 0)
                     .in(DbConstant.SENSOR_ID_TAG, dict.keySet().stream().map(Object::toString).toList())
-                    .orderByDesc(DbConstant.TIME_FIELD)
-                    .groupBy(DbConstant.SENSOR_ID_TAG).limit(1).query(influxDb, SluiceStatus.class).stream()
-                    //过滤出远程控制的闸门
-                    .filter(e -> e.getHardware() == 0)
-                    //过滤出与操作状态相反的闸门
-                    .filter(e -> OPEN.equals(kind) ? e.getGateSta() == 0 : e.getGateSta() == 1)
-                    .filter(e -> dict.containsKey(e.getSid())).toList();
+                    .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG).limit(1)
+                    .query(influxDb, SluiceStatus.class);
+            if (kind.equals(STOP)) {
+                //一键停止时，要求所有闸门必须处于开合度模式 或者 电机已停止运行
+                Assert.isTrue(gates.stream().allMatch(e -> e.getSoftware() == 0 || e.getMotorSta() == 2), "有闸门正处于其他模式下运行, 请先停止");
+            } else {
+                //全开/全关，要求所有闸门 电机已停止运行
+                Assert.isTrue(gates.stream().allMatch(e -> e.getMotorSta() == 2), "有闸门正在运行中, 请先停止");
+            }
 
             if (!gates.isEmpty()) {
                 dispatchRequest.setRawCmdList(gates.stream().map(e -> buildRawCmd(dict.get(e.getSid()),
-                        builder -> builder.type(kind.getDeviceCode())
-                                .userID(subject.getSubjectID())
-                                .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0))).toList());
+                        builder -> {
+                            builder.userID(subject.getSubjectID());
+                            if (STOP.equals(kind)) {
+                                builder.pauseFlag(1);
+                            } else {
+                                builder.type(kind.getDeviceCode())
+                                        .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0);
+                            }
+                        })).toList());
             }
         } else {
             Assert.isTrue(dict.containsKey(request.getGateID()), "闸门不存在");
@@ -413,8 +423,19 @@ public class SluiceServiceImpl implements SluiceService {
             BatchDispatchRequest.RawCmd rawCmd = buildRawCmd(dict.get(request.getGateID()), builder -> {
                 builder.userID(subject.getSubjectID());
                 switch (kind) {
-                    case STOP, RISE, FALL -> builder.type(5).motorDir(kind.getDeviceCode());
+                    case STOP -> {
+                        if (gate.getSoftware() == 5) {
+                            builder.type(5).motorDir(kind.getDeviceCode());
+                        } else {
+                            builder.pauseFlag(1);
+                        }
+                    }
+                    case RISE, FALL -> {
+                        Assert.isTrue(gate.getMotorSta() == 2, "闸门运行中, 请先停止");
+                        builder.type(5).motorDir(kind.getDeviceCode());
+                    }
                     case AUTO -> {
+                        Assert.isTrue(gate.getMotorSta() == 2, "闸门运行中, 请先停止");
                         builder.type(type.getDeviceCode());
                         switch (type) {
                             case CONSTANT_WATER_LEVEL -> builder.waterLevel(request.getTarget().getWaterLevel());
@@ -430,10 +451,12 @@ public class SluiceServiceImpl implements SluiceService {
                         }
                     }
                     case OPEN -> {
+                        Assert.isTrue(gate.getMotorSta() == 2, "闸门运行中, 请先停止");
                         Assert.isTrue(gate.getGateSta() == 1, "闸门已开启");
                         builder.type(kind.getDeviceCode()).crackLevel(gate.getGateOpenMax());
                     }
                     case CLOSE -> {
+                        Assert.isTrue(gate.getMotorSta() == 2, "闸门运行中, 请先停止");
                         Assert.isTrue(gate.getGateSta() == 0, "闸门已关闭");
                         builder.type(kind.getDeviceCode()).crackLevel(0D);
                     }

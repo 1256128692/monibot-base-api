@@ -37,7 +37,7 @@ public class SluiceStatus {
     private Double gateOpenMax;
 
     /**
-     * 电机运行状态 上、下、停
+     * 电机运行状态 0上、1下、2停
      */
     private Integer motorSta;
 

@@ -170,7 +170,7 @@ public class SluiceController {
      * @apiName SluiceControl
      * @apiDescription 闸门远程控制
      * @apiParam (请求参数) {Int} projectID 项目(水闸) id
-     * @apiParam (请求参数) {Int} [gateID] 闸门id (为空时控制所有闸门, 仅允许 5开启/6关闭)
+     * @apiParam (请求参数) {Int} [gateID] 闸门id (为空时控制所有闸门, 仅允许 1停止/5开启/6关闭)
      * @apiParam (请求参数) {Int} actionKind 操作种类 (1停止 2上升 3下降 4自动控制 5开启 6关闭)
      * @apiParam (请求参数) {Int} [actionType] 操作类型 (仅actionKind=4有效: 1恒定水位 2恒定流量 3恒定闸位 4时长控制 5时段控制 6总量控制)
      * @apiParam (请求参数) {Object} [target] 控制目标 (仅actionKind=4有效, 不同actionType下具有不同结构)

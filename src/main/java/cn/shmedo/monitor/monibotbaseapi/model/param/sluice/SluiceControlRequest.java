@@ -89,8 +89,9 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
     @Override
     public ResultWrapper<?> validate() {
         if (gateID == null) {
-            Assert.isTrue(ControlActionKind.OPEN.equals(actionKind) ||
-                    ControlActionKind.CLOSE.equals(actionKind));
+            Assert.isTrue(ControlActionKind.OPEN.equals(actionKind)
+                    || ControlActionKind.CLOSE.equals(actionKind)
+                    || ControlActionKind.STOP.equals(actionKind));
         } else {
             if (ControlActionKind.AUTO.equals(actionKind)) {
                 Assert.isTrue(actionType != null && target != null);
