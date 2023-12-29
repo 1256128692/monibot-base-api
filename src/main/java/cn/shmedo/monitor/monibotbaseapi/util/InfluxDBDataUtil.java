@@ -31,7 +31,14 @@ public class InfluxDBDataUtil {
                         // 平均值
                         statistics = calculateAverage(data, densityType);
                         break;
+                    case 6:
+                        // 平均值
+                        statistics = calculateAverage(data, densityType);
+                        break;
                     case 3:
+                        // 求和
+                        statistics = calculateSum(data, densityType);
+                        break;
                     case 4:
                         // 求和
                         statistics = calculateSum(data, densityType);

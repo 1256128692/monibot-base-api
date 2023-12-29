@@ -166,8 +166,8 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                 pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
             sensorInfoList.forEach(s -> {
-                s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps, pa.getDensityType(), pa.getStatisticsType(), true)
-                        .stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
+                s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID()))
+                        .collect(Collectors.toList()), pa.getDensityType(), pa.getStatisticsType(), true));
             });
         } else {
             sensorInfoList.forEach(s -> {
@@ -292,8 +292,8 @@ public class GqMonitorPointServiceImpl implements GqMonitorPointService {
         if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                 pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
             sensorInfoList.forEach(s -> {
-                s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps, pa.getDensityType(), pa.getStatisticsType(), true)
-                        .stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).collect(Collectors.toList()));
+                s.setSensorDataList(InfluxDBDataUtil.calculateStatistics(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID()))
+                        .collect(Collectors.toList()), pa.getDensityType(), pa.getStatisticsType(), true));
             });
         } else {
             sensorInfoList.forEach(s -> {
