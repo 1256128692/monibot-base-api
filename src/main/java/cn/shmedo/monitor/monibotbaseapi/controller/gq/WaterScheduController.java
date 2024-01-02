@@ -63,7 +63,7 @@ public class WaterScheduController {
      * @apiSuccess (响应结果) {Int} totalCount 数据总量
      * @apiSuccess (响应结果) {Int} totalPage 总页数
      * @apiSuccess (响应结果) {Object[]} currentPageData 项目信息列表
-     * @apiSuccess (响应结果) {Int} dataList.id       用水单位id
+     * @apiSuccess (响应结果) {Int} currentPageData.id       用水单位id
      * @apiSuccess (响应结果) {String} currentPageData.name       用水单位名称
      * @apiSuccess (响应结果) {String} currentPageData.townRegion       所属行政区划
      * @apiSuccess (响应结果) {String} currentPageData.townRegionStr  所属行政区划中文名
@@ -165,7 +165,7 @@ public class WaterScheduController {
      * {"companyID":1,"dataList":[
      * {"name":"名称","townRegion":"12231145","liaison":"斯蒂芬","phoneNumber":"1384654151",
      * "monitorPointInfoList":[{
-     * "projectID":"1","monitorPointID":"1","propertyID":"11"
+     * "projectID":"1","monitorPointID":"1","raiseCropName":"水稻"
      * }]}]}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -186,7 +186,7 @@ public class WaterScheduController {
      * @apiName GqUpdateWaterManagementUnit
      * @apiDescription 修改用水单位, 绑定监测点列表为空时, 则不修改, 不为空时则按内容重新绑定
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} id 数据列表
+     * @apiParam (请求体) {Int} id 用水单位ID
      * @apiParam (请求体) {String} name       用水单位名称
      * @apiParam (请求体) {String} townRegion    所属行政区划
      * @apiParam (请求体) {String} liaison       联系人
@@ -196,11 +196,10 @@ public class WaterScheduController {
      * @apiParam (请求体) {Int} monitorPointInfoList.monitorPointID 监测点ID
      * @apiParam (请求体) {String} monitorPointInfoList.raiseCropName 种植物名称
      * @apiParamExample 请求体示例
-     * {"companyID":1,"dataList":[
-     * {"id":"1","name":"名称","townRegion":"12231145","liaison":"斯蒂芬","phoneNumber":"1384654151",
+     * {"companyID":1,"id":"1","name":"名称","townRegion":"12231145","liaison":"斯蒂芬","phoneNumber":"1384654151",
      * "monitorPointInfoList":[{
      * "projectID":"1","monitorPointID":"1","propertyID":"11"
-     * }]}]}
+     * }]}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
@@ -220,7 +219,7 @@ public class WaterScheduController {
      * @apiName GqBatchDeleteWaterManagementUnit
      * @apiDescription 批量删除用水单位, 以及对应的田间地块绑定信息
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} idList 数据列表
+     * @apiParam (请求体) {Int[]} idList 用水单位ID列表
      * @apiParamExample 请求体示例
      * {"companyID":1,"idList":[1,2,3]}
      * @apiSuccess (返回结果) {String} none 空
@@ -352,18 +351,16 @@ public class WaterScheduController {
      * @apiName GqUpdateWaterPlan
      * @apiDescription 修改用水申报
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Object[]} dataList
-     * @apiParam (请求体) {Int} dataList.id 用水计划ID
-     * @apiParam (请求体) {Int} dataList.waterManagementUnitID 用水单位ID
-     * @apiParam (请求体) {Int} dataList.projectID 工程ID
-     * @apiParam (请求体) {DateTime} dataList.begin 开始时间
-     * @apiParam (请求体) {DateTime} dataList.end   结束时间
-     * @apiParam (请求体) {Double} dataList.waterConsumption  计划用水量
+     * @apiParam (请求体) {Int} id 用水计划ID
+     * @apiParam (请求体) {Int} waterManagementUnitID 用水单位ID
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {Double} waterConsumption  计划用水量
      * @apiParamExample 请求体示例
-     * {"companyID":1,"dataList":[{
-     * "id":"1","waterManagementUnitName":"1","begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31",
+     * {"companyID":1,"id":"1","waterManagementUnitName":"1","begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31",
      * * "projectID":"12312314","waterConsumption":"20.11"
-     * }]}
+     * }
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
@@ -396,7 +393,6 @@ public class WaterScheduController {
 //        return gqMonitorPointService.gqQueryMonitorPointDataList(pa);
         return null;
     }
-
 
 
     /**
