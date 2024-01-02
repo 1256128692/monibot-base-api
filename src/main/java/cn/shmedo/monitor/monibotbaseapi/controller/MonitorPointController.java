@@ -416,7 +416,7 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorPointIncludeSensorList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointIncludeSensorList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointIncludeSensorList(@Validated @RequestBody QueryMonitorPointIncludeSensorParam pa) {
+        return monitorPointService.queryMonitorPointIncludeSensorList(pa);
     }
 }

@@ -168,6 +168,14 @@ public class MonitorPointServiceImpl implements MonitorPointService {
                 .stream().collect(Collectors.groupingBy(MonitorPointSimple::getProjectType));
     }
 
+    @Override
+    public Object queryMonitorPointIncludeSensorList(QueryMonitorPointIncludeSensorParam pa) {
+
+        return tbMonitorPointMapper.listByProjectTypeAndMonitorType(pa.getProjectType(), pa.getMonitorType(), pa.getCompanyID())
+                .stream().collect(Collectors.groupingBy(MonitorPointSimple::getProjectType));
+
+    }
+
     private List<MonitorGroupBaseInfoV1> buildGroupTree(Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap, Integer parentID) {
         List<MonitorGroupBaseInfoV1> result = groupMap.get(parentID);
         if (result != null) {
