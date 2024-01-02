@@ -674,4 +674,28 @@ public class ProjectController {
         return projectService.queryNextLevelProjectAndCanUsed(pa);
     }
 
+
+    /**
+     * @api {POST} /QueryProjectWithRaiseCrops 查询田间工程以及种植作物和面积相关信息
+     * @apiVersion 1.0.0
+     * @apiGroup 工程项目管理模块
+     * @apiName GqQueryProjectWithRaiseCrops
+     * @apiDescription 查询田间工程以及种植作物和面积相关信息,仅查询工程类型为水闸,渠系
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParamExample 请求体示例
+     * {"companyID":1}
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {Int} data.projectID     工程ID
+     * @apiSuccess (响应结果) {String[]} data.raiseCropNameList   种植作物名称
+     * @apiSuccess (响应结果) {Double} data.fieldArea       田间面积,单位(万亩)
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseProject
+     */
+    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @RequestMapping(value = "/QueryProjectWithRaiseCrops", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryProjectWithRaiseCrops(@Validated @RequestBody Object pa) {
+//        return gqMonitorPointService.gqQueryMonitorPointDataList(pa);
+        return null;
+    }
+
 }
