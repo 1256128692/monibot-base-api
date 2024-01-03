@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectWithRaiseCropsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithIrrigationInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo;
@@ -61,4 +63,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     void updateLevel2Unallocatedwhennorealtion();
 
     List<ProjectVideoInfo> selectListByIDs(List<Integer> projectIDs);
+
+    List<ProjectWithIrrigationInfo> queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
 }

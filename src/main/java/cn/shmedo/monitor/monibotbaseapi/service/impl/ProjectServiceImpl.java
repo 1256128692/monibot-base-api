@@ -32,10 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithNext;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryNextLevelAndAvailableProjectResult;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectService;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
@@ -1237,5 +1234,35 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         });
 
         return oneList;
+    }
+
+    @Override
+    public Object queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa) {
+        // 默认只查询田间类型的工程
+        List<ProjectWithIrrigationInfo> projectWithIrrigationInfos = tbProjectInfoMapper.queryProjectWithRaiseCrops(pa);
+        Map<Integer, List<ProjectWithIrrigationInfo>> groupedByProjectID = projectWithIrrigationInfos.stream()
+                .filter(p -> p.getKeyName().equals("种植作物") || p.getKeyName().equals("田间面积"))
+                .collect(Collectors.groupingBy(ProjectWithIrrigationInfo::getProjectID));
+
+        return groupedByProjectID.values().stream()
+                .flatMap(list -> list.stream()
+                        .peek(p -> {
+                            if ("种植作物".equals(p.getKeyName())) {
+                                p.setRaiseCropNameList(convertToRaiseCropNameList(p.getValue()));
+                                p.setValue(null);
+                            }
+                        }))
+                .collect(Collectors.toList());
+    }
+
+
+    private static List<String> convertToRaiseCropNameList(String raiseCropName) {
+        try {
+            // 尝试解析为 JSON 数组
+            return JSONUtil.parseArray(raiseCropName).toList(String.class);
+        } catch (Exception e) {
+            // 解析失败，将其作为单个元素的列表处理
+            return Collections.singletonList(raiseCropName);
+        }
     }
 }

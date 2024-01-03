@@ -1,38 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
-    <!--@mbg.generated-->
-    <!--@Table tb_project_info-->
-    <id column="ID" jdbcType="INTEGER" property="ID" />
-    <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
-    <result column="Level" jdbcType="TINYINT" property="level" />
-    <result column="ProjectName" jdbcType="VARCHAR" property="projectName" />
-    <result column="ShortName" jdbcType="VARCHAR" property="shortName" />
-    <result column="ProjectType" jdbcType="TINYINT" property="projectType" />
-    <result column="ExpiryDate" jdbcType="TIMESTAMP" property="expiryDate" />
-    <result column="DirectManageUnit" jdbcType="VARCHAR" property="directManageUnit" />
-    <result column="Enable" jdbcType="BIT" property="enable" />
-    <result column="Location" jdbcType="VARCHAR" property="location" />
-    <result column="ProjectAddress" jdbcType="VARCHAR" property="projectAddress" />
-    <result column="Latitude" jdbcType="DOUBLE" property="latitude" />
-    <result column="Longitude" jdbcType="DOUBLE" property="longitude" />
-    <result column="ImagePath" jdbcType="VARCHAR" property="imagePath" />
-    <result column="ProjectDesc" jdbcType="VARCHAR" property="projectDesc" />
-    <result column="ModelID" jdbcType="INTEGER" property="modelID" />
-    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
-    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
-    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
-    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    <!--@mbg.generated-->
-    ID, CompanyID, `Level`, ProjectName, ShortName, ProjectType, ExpiryDate, DirectManageUnit, 
-    `Enable`, `Location`, ProjectAddress, Latitude, Longitude, ImagePath, ProjectDesc, 
-    ModelID, CreateTime, CreateUserID, UpdateTime, UpdateUserID
-  </sql>
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo">
+        <!--@mbg.generated-->
+        <!--@Table tb_project_info-->
+        <id column="ID" jdbcType="INTEGER" property="ID"/>
+        <result column="CompanyID" jdbcType="INTEGER" property="companyID"/>
+        <result column="Level" jdbcType="TINYINT" property="level"/>
+        <result column="ProjectName" jdbcType="VARCHAR" property="projectName"/>
+        <result column="ShortName" jdbcType="VARCHAR" property="shortName"/>
+        <result column="ProjectType" jdbcType="TINYINT" property="projectType"/>
+        <result column="ExpiryDate" jdbcType="TIMESTAMP" property="expiryDate"/>
+        <result column="DirectManageUnit" jdbcType="VARCHAR" property="directManageUnit"/>
+        <result column="Enable" jdbcType="BIT" property="enable"/>
+        <result column="Location" jdbcType="VARCHAR" property="location"/>
+        <result column="ProjectAddress" jdbcType="VARCHAR" property="projectAddress"/>
+        <result column="Latitude" jdbcType="DOUBLE" property="latitude"/>
+        <result column="Longitude" jdbcType="DOUBLE" property="longitude"/>
+        <result column="ImagePath" jdbcType="VARCHAR" property="imagePath"/>
+        <result column="ProjectDesc" jdbcType="VARCHAR" property="projectDesc"/>
+        <result column="ModelID" jdbcType="INTEGER" property="modelID"/>
+        <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
+        <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        <!--@mbg.generated-->
+        ID,
+        CompanyID,
+        `Level`,
+        ProjectName,
+        ShortName,
+        ProjectType,
+        ExpiryDate,
+        DirectManageUnit,
+        `Enable`,
+        `Location`,
+        ProjectAddress,
+        Latitude,
+        Longitude,
+        ImagePath,
+        ProjectDesc,
+        ModelID,
+        CreateTime,
+        CreateUserID,
+        UpdateTime,
+        UpdateUserID
+    </sql>
     <delete id="deleteProjectInfoList" parameterType="java.lang.Integer">
-        DELETE tb_project_info from tb_project_info where ID in
+        DELETE tb_project_info
+        from tb_project_info where ID in
         <foreach close=")" collection="idList" item="item" open="(" separator=",">
             #{item}
         </foreach>
@@ -89,7 +107,9 @@
     </select>
 
     <select id="getProjectPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">
-        SELECT <include refid="Base_Column_List" /> FROM tb_project_info
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_project_info
         <where>
             <trim suffixOverrides="AND">
                 <if test="pa.projectIDList != null and pa.projectIDList.size() != 0">
@@ -100,32 +120,38 @@
                     AND
                 </if>
                 <if test="pa.projectName != null and pa.projectName != ''">
-                    ProjectName LIKE CONCAT('%',#{pa.projectName},'%') AND
+                    ProjectName LIKE CONCAT('%', #{pa.projectName}, '%')
+                      AND
                 </if>
                 <if test="pa.queryCode != null and pa.queryCode != ''">
                     (
-                    ProjectName LIKE CONCAT('%',#{pa.queryCode},'%')
-                    or
-                    DirectManageUnit LIKE CONCAT('%', #{pa.queryCode},'%')
-
-                    ) AND
+                                ProjectName LIKE CONCAT('%', #{pa.queryCode}, '%')
+                            or
+                                DirectManageUnit LIKE CONCAT('%', #{pa.queryCode}, '%')
+                        )
+                      AND
                 </if>
                 <if test="pa.location != null and pa.location != ''">
-                    Location LIKE CONCAT('%', #{pa.location}, '%') AND
+                    Location LIKE CONCAT('%', #{pa.location}, '%')
+                      AND
                 </if>
                 <if test="pa.companyID != null">
-                    CompanyID = #{pa.companyID} AND
+                    CompanyID = #{pa.companyID}
+                      AND
                 </if>
                 <if test="pa.projectType != null">
-                    ProjectType = #{pa.projectType} AND
+                    ProjectType = #{pa.projectType}
+                      AND
                 </if>
-                <if test="pa.enable != null ">
+                <if test="pa.enable != null">
                     <choose>
                         <when test="pa.enable">
-                            Enable = 1 AND
+                            Enable = 1
+                              AND
                         </when>
                         <otherwise>
-                            Enable = 0 AND
+                            Enable = 0
+                              AND
                         </otherwise>
                     </choose>
                 </if>
@@ -137,16 +163,20 @@
                     AND
                 </if>
                 <if test="pa.expiryDate != null">
-                    ExpiryDate &lt;= #{pa.expiryDate} AND
+                    ExpiryDate &lt;= #{pa.expiryDate}
+                      AND
                 </if>
                 <if test="pa.expiryDateBegin != null">
-                    ExpiryDate &gt;= #{pa.expiryDateBegin} AND
+                    ExpiryDate &gt;= #{pa.expiryDateBegin}
+                      AND
                 </if>
                 <if test="pa.expiryDateEnd != null">
-                    ExpiryDate &lt;= #{pa.expiryDateEnd} AND
+                    ExpiryDate &lt;= #{pa.expiryDateEnd}
+                      AND
                 </if>
                 <if test="pa.endCreateTime != null">
-                    CreateTime &lt;= #{pa.endCreateTime} AND
+                    CreateTime &lt;= #{pa.endCreateTime}
+                      AND
                 </if>
                 <if test="pa.beginCreateTime != null">
                     CreateTime &gt;= #{pa.beginCreateTime} AND
@@ -157,20 +187,24 @@
     </select>
 
     <select id="countByNameExcludeID" resultType="int">
-        select count(1) from tb_project_info where  ProjectName = #{projectName}
+        select count(1)
+        from tb_project_info where ProjectName = #{projectName}
         <if test="projectID != null">
-        and id != #{projectID}
+            and id != #{projectID}
         </if>
     </select>
 
     <select id="countByProjectIDList" resultType="int">
-        select count(1) from tb_project_info where CompanyID = #{companyID} and ID in
+        select count(1)
+        from tb_project_info where CompanyID = #{companyID}
+                               and ID in
         <foreach close=")" collection="idList" item="item" open="(" separator=",">
-        #{item}
+            #{item}
         </foreach>
     </select>
     <select id="countComany" resultType="int">
-        select CompanyID from tb_project_info where ID in
+        select CompanyID
+        from tb_project_info where ID in
         <foreach close=")" collection="idList" item="item" open="(" separator=",">
             #{item}
         </foreach>
@@ -178,10 +212,9 @@
     </select>
 
 
-
     <select id="selectListByCompanyIDAndProjectIDList" resultMap="BaseResultMap">
         select
-        <include refid="Base_Column_List" />
+        <include refid="Base_Column_List"/>
         from tb_project_info
         where CompanyID = #{companyID,jdbcType=INTEGER}
         <if test="projectIDList != null and projectIDList.size &gt; 0">
@@ -193,9 +226,9 @@
     </select>
 
 
-
-    <select id="selectListByCompanyIDAndMonitorItemName" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse">
-        select pi.ID as projectID,
+    <select id="selectListByCompanyIDAndMonitorItemName"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse">
+        select pi.ID        as projectID,
                pi.CompanyID,
                pi.ProjectName,
                pi.ShortName as projectShortName,
@@ -204,143 +237,162 @@
                  left join tb_monitor_item mi on mi.projectID = pi.ID
         where mi.CompanyID = #{companyID,jdbcType=INTEGER}
           and mi.Alias = #{monitorItemName}
-
     </select>
-    <select id="selectMonitorPointRelateSensorConfig" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
-        SELECT
-            ts.ID targetID,
-            ts.`Name` targetName,
-            tpc.`Value` config
-        FROM
-            tb_sensor ts
-            LEFT JOIN tb_project_config tpc ON tpc.`Key`=CONCAT(#{keyName}, '::', ts.ID )
-        WHERE
-            ts.MonitorPointID = #{monitorPointID}
-            AND ts.MonitorType =#{monitorType}
-            AND IF( tpc.ID IS NULL, 1=1, tpc.`Group`=#{groupName})
+    <select id="selectMonitorPointRelateSensorConfig"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
+        SELECT ts.ID       targetID,
+               ts.`Name`   targetName,
+               tpc.`Value` config
+        FROM tb_sensor ts
+                 LEFT JOIN tb_project_config tpc ON tpc.`Key` = CONCAT(#{keyName}, '::', ts.ID)
+        WHERE ts.MonitorPointID = #{monitorPointID}
+          AND ts.MonitorType = #{monitorType}
+          AND IF(tpc.ID IS NULL, 1 = 1, tpc.`Group` = #{groupName})
     </select>
-    <select id="selectMonitorGroupRelatePointConfig" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
-        SELECT
-            tmp.ID targetID,
-            tmp.`Name` targetName,
-            tpc.`Value` config,
-            ts.ID childID
-        FROM
-            tb_monitor_point tmp
-            LEFT JOIN tb_sensor ts ON ts.MonitorPointID=tmp.ID
-            LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorPointID=tmp.ID
-            LEFT JOIN tb_project_config tpc ON tpc.`Key`=CONCAT(#{keyName}, '::', tmp.ID )
-        WHERE
-            tmgp.MonitorGroupID = #{monitorGroupID}
-            AND ts.MonitorType =#{monitorType}
-            AND IF( tpc.ID IS NULL, 1=1, tpc.`Group`=#{groupName})
+    <select id="selectMonitorGroupRelatePointConfig"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse">
+        SELECT tmp.ID      targetID,
+               tmp.`Name`  targetName,
+               tpc.`Value` config,
+               ts.ID       childID
+        FROM tb_monitor_point tmp
+                 LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
+                 LEFT JOIN tb_monitor_group_point tmgp ON tmgp.MonitorPointID = tmp.ID
+                 LEFT JOIN tb_project_config tpc ON tpc.`Key` = CONCAT(#{keyName}, '::', tmp.ID)
+        WHERE tmgp.MonitorGroupID = #{monitorGroupID}
+          AND ts.MonitorType = #{monitorType}
+          AND IF(tpc.ID IS NULL, 1 = 1, tpc.`Group` = #{groupName})
     </select>
 
-  <update id="updateLevel">
-      update tb_project_info
-      set level = #{level},
-      updateTime = #{date},
-      updateUserID = #{userID}
-      where ID in <foreach close=")" collection="pidList" item="id" open="(" separator=",">
-      #{id}
-  </foreach>
+    <update id="updateLevel">
+        update tb_project_info
+        set level        = #{level},
+            updateTime   = #{date},
+            updateUserID = #{userID}
+        where ID in
+        <foreach close=")" collection="pidList" item="id" open="(" separator=",">
+            #{id}
+        </foreach>
     </update>
 
-  <select id="getProjectList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">
-      SELECT <include refid="Base_Column_List" /> FROM tb_project_info
-      <where>
-          <trim suffixOverrides="AND">
-              <if test="projectIDList != null and projectIDList.size() != 0">
-                  ID IN
-                  <foreach close=")" collection="projectIDList" item="item" open="(" separator=",">
-                      #{item}
-                  </foreach>
-                  AND
-              </if>
-              <if test="projectName != null and projectName != ''">
-                  ProjectName LIKE CONCAT('%',#{projectName},'%') AND
-              </if>
-              <if test="queryCode != null and queryCode != ''">
-                  (
-                  ProjectName LIKE CONCAT('%',#{queryCode},'%')
-                  or
-                  DirectManageUnit LIKE CONCAT('%', #{queryCode},'%')
-
-                  ) AND
-              </if>
-              <if test="location != null and location != ''">
-                  Location LIKE CONCAT('%', #{location}, '%') AND
-              </if>
-              <if test="companyID != null">
-                  CompanyID = #{companyID} AND
-              </if>
-              <if test="projectType != null">
-                  ProjectType = #{projectType} AND
-              </if>
-              <if test="enable != null ">
-                  <choose>
-                      <when test="enable">
-                          Enable = 1 AND
-                      </when>
-                      <otherwise>
-                          Enable = 0 AND
-                      </otherwise>
-                  </choose>
-              </if>
-              <if test="serviceIDList != null and serviceIDList.size() != 0">
-                  id in (
-                    select ProjectID from tb_project_service_relation where ServiceID in
-                  <foreach close=")" collection="serviceIDList" item="sid" open="(" separator=",">
-                      #{sid}
-                  </foreach>
-                  )
-                  AND
-              </if>
-              <if test="expiryDate != null">
-                  ExpiryDate &lt;= #{expiryDate} AND
-              </if>
-              <if test="expiryDateBegin != null">
-                  ExpiryDate &gt;= #{expiryDateBegin} AND
-              </if>
-              <if test="expiryDateEnd != null">
-                  ExpiryDate &lt;= #{expiryDateEnd} AND
-              </if>
-              <if test="endCreateTime != null">
-                  CreateTime &lt;= #{endCreateTime} AND
-              </if>
-              <if test="beginCreateTime != null">
-                  CreateTime &gt;= #{beginCreateTime} AND
-              </if>
-          </trim>
-      </where>
-      ORDER BY CreateTime DESC
+    <select id="getProjectList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tb_project_info
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="projectIDList != null and projectIDList.size() != 0">
+                    ID IN
+                    <foreach close=")" collection="projectIDList" item="item" open="(" separator=",">
+                        #{item}
+                    </foreach>
+                    AND
+                </if>
+                <if test="projectName != null and projectName != ''">
+                    ProjectName LIKE CONCAT('%', #{projectName}, '%')
+                      AND
+                </if>
+                <if test="queryCode != null and queryCode != ''">
+                    (
+                                ProjectName LIKE CONCAT('%', #{queryCode}, '%')
+                            or
+                                DirectManageUnit LIKE CONCAT('%', #{queryCode}, '%')
+                        )
+                      AND
+                </if>
+                <if test="location != null and location != ''">
+                    Location LIKE CONCAT('%', #{location}, '%')
+                      AND
+                </if>
+                <if test="companyID != null">
+                    CompanyID = #{companyID}
+                      AND
+                </if>
+                <if test="projectType != null">
+                    ProjectType = #{projectType}
+                      AND
+                </if>
+                <if test="enable != null">
+                    <choose>
+                        <when test="enable">
+                            Enable = 1
+                              AND
+                        </when>
+                        <otherwise>
+                            Enable = 0
+                              AND
+                        </otherwise>
+                    </choose>
+                </if>
+                <if test="serviceIDList != null and serviceIDList.size() != 0">
+                    id in (
+                    select ProjectID
+                    from tb_project_service_relation where ServiceID in
+                    <foreach close=")" collection="serviceIDList" item="sid" open="(" separator=",">
+                        #{sid}
+                    </foreach>
+                    )
+                      AND
+                </if>
+                <if test="expiryDate != null">
+                    ExpiryDate &lt;= #{expiryDate}
+                      AND
+                </if>
+                <if test="expiryDateBegin != null">
+                    ExpiryDate &gt;= #{expiryDateBegin}
+                      AND
+                </if>
+                <if test="expiryDateEnd != null">
+                    ExpiryDate &lt;= #{expiryDateEnd}
+                      AND
+                </if>
+                <if test="endCreateTime != null">
+                    CreateTime &lt;= #{endCreateTime}
+                      AND
+                </if>
+                <if test="beginCreateTime != null">
+                    CreateTime &gt;= #{beginCreateTime} AND
+                </if>
+            </trim>
+        </where>
+        ORDER BY CreateTime DESC
     </select>
 
-  <update id="updateLevel2Unallocated">
-      update tb_project_info
-      set level = 0
-      where level &gt; 0
-        and id not in (select upLevelID from tb_project_relation)
-        and id not in (select downLevelID from tb_project_relation)
-  </update>
-
-  <select id="selectAll" resultMap="BaseResultMap">
-    select * from tb_project_info
-    </select>
-
-  <update id="updateLevel2Unallocatedwhennorealtion">
+    <update id="updateLevel2Unallocated">
         update tb_project_info
         set level = 0
         where level &gt; 0
-            and id not in (select upLevelID from tb_project_relation)
-            and id not in (select downLevelID from tb_project_relation)
+          and id not in (select upLevelID from tb_project_relation)
+          and id not in (select downLevelID from tb_project_relation)
     </update>
 
-  <select id="selectListByIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo">
-      select ID as projectID, projectName
-      from tb_project_info where ID in
-      <foreach close=")" collection="projectIDs" item="item" open="(" separator=",">
-          #{item}
-      </foreach>
-  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select *
+        from tb_project_info
+    </select>
+
+    <update id="updateLevel2Unallocatedwhennorealtion">
+        update tb_project_info
+        set level = 0
+        where level &gt; 0
+          and id not in (select upLevelID from tb_project_relation)
+          and id not in (select downLevelID from tb_project_relation)
+    </update>
+
+    <select id="selectListByIDs" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo">
+        select ID as projectID, projectName
+        from tb_project_info where ID in
+        <foreach close=")" collection="projectIDs" item="item" open="(" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="queryProjectWithRaiseCrops"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithIrrigationInfo">
+        select pp.ProjectID, pp.Value, p.Name as keyName
+        from tb_project_property pp
+                 left join tb_property p on pp.PropertyID = p.ID
+        where pp.SubjectType = 0
+          and pp.ProjectID in (select ID from tb_project_info where ProjectType = 13 and CompanyID = #{companyID})
+    </select>
 </mapper>

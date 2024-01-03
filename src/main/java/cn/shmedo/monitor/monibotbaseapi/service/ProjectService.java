@@ -76,4 +76,6 @@ public interface ProjectService {
     void removeProjectRelation(RemoveProjectRelationParam pa, Integer subjectID);
 
     List<ProjectWithNext> queryProjectWithNextList(QueryProjectWithNextListParam pa);
+
+    Object queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
 }
