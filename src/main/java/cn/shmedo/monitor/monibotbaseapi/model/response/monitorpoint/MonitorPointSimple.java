@@ -19,4 +19,8 @@ public class MonitorPointSimple {
     private String name;
 
     private Integer projectType;
+
+    private String projectTypeName;
+
+    private String projectName;
 }

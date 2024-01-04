@@ -924,18 +924,26 @@
 
     <select id="listByProjectTypeAndMonitorType"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple">
-        SELECT tmp.ID, tmp.ProjectID, tmp.MonitorType, tmp.MonitorItemID, tmp.`Name`,tpi.ProjectType
+        SELECT tmp.ID,
+               tmp.ProjectID,
+               tmp.MonitorType,
+               tmp.MonitorItemID,
+               tmp.`Name`,
+               tpi.ProjectType,
+               tpt.TypeName as projectTypeName,
+               tpi.ProjectName
         FROM `tb_monitor_point` tmp
-        LEFT JOIN `tb_project_info` tpi ON tmp.ProjectID = tpi.ID
-        right join tb_sensor ts on tmp.ID = ts.MonitorPointID
+                 LEFT JOIN `tb_project_info` tpi ON tmp.ProjectID = tpi.ID
+                 LEFT JOIN `tb_project_type` tpt ON tpt.ID = tpi.ProjectType
+                 right join tb_sensor ts on tmp.ID = ts.MonitorPointID
         <where>
             <trim suffixOverrides="AND">
-                tmp.`Enable` = 1 and
-                tpi.companyID = #{companyID}
-                <if test="projectType != null ">
+                tmp.`Enable` = 1
+                  and tpi.companyID = #{companyID}
+                <if test="projectType != null">
                     and ts.ProjectID in (select ID from `tb_project_info` where ProjectType = #{projectType})
                 </if>
-                <if test="monitorType != null ">
+                <if test="monitorType != null">
                     and tmp.MonitorType = #{monitorType}
                 </if>
             </trim>

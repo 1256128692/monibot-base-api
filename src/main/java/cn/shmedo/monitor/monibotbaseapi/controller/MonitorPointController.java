@@ -402,19 +402,19 @@ public class MonitorPointController {
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} [projectType] 项目类型
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
-     * @apiSuccess (返回结果) {Object} data 结果集(Map)
-     * @apiSuccess (返回结果) {String} data.key 项目类型
-     * @apiSuccess (返回结果) {Object[]} data.value 监测点列表
-     * @apiSuccess (返回结果) {Int} data.value.id 监测点id
-     * @apiSuccess (返回结果) {Int} data.value.projectID 项目id
-     * @apiSuccess (返回结果) {Int} data.value.monitorType 监测类型
-     * @apiSuccess (返回结果) {Int} data.value.monitorItemID 监测项id
-     * @apiSuccess (返回结果) {String} data.value.name 监测点名称
-     * @apiSuccess (返回结果) {Int} data.value.projectType 项目类型
+     * @apiSuccess (返回结果) {Object[]} data 结果集
+     * @apiSuccess (返回结果) {Int} data.id 监测点id
+     * @apiSuccess (返回结果) {Int} data.projectID 工程id
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.monitorItemID 监测项目id
+     * @apiSuccess (返回结果) {String} data.name 监测点名称
+     * @apiSuccess (返回结果) {Int} data.projectType 工程类型
+     * @apiSuccess (返回结果) {String} data.projectTypeName 工程类型名称
+     * @apiSuccess (返回结果) {String} data.projectName 工程名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     * @apiPermission 系统权限+应用权限 mdmbase:ListBaseMonitorPoint
      */
-    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint", allowApplication = true)
     @PostMapping(value = "/QueryMonitorPointIncludeSensorList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorPointIncludeSensorList(@Validated @RequestBody QueryMonitorPointIncludeSensorParam pa) {
         return monitorPointService.queryMonitorPointIncludeSensorList(pa);

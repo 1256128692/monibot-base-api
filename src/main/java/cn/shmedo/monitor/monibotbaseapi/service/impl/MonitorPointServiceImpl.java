@@ -171,8 +171,8 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     @Override
     public Object queryMonitorPointIncludeSensorList(QueryMonitorPointIncludeSensorParam pa) {
 
-        return tbMonitorPointMapper.listByProjectTypeAndMonitorType(pa.getProjectType(), pa.getMonitorType(), pa.getCompanyID())
-                .stream().collect(Collectors.groupingBy(MonitorPointSimple::getProjectType));
+        return tbMonitorPointMapper.listByProjectTypeAndMonitorType(pa.getProjectType(),
+                pa.getMonitorType(), pa.getCompanyID());
 
     }
 
