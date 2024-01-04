@@ -684,11 +684,13 @@ public class ProjectController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParamExample 请求体示例
      * {"companyID":1}
-     * @apiSuccess (响应结果) {Object[]} data
+     * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.projectID     工程ID
-     * @apiSuccess (响应结果) {String[]} data.raiseCropNameList   种植作物名称
-     * @apiSuccess (响应结果) {Double} data.value       田间面积,单位(万亩)
-     * @apiSuccess (响应结果) {Double} data.keyName     名称(种植作物,田间面积)
+     * @apiSuccess (响应结果) {Int} data.projectName     工程名称
+     * @apiSuccess (响应结果) {Object[]} data.dataList     种植相关信息列表
+     * @apiSuccess (响应结果) {String[]} data.dataList.raiseCropNameList   种植作物名称
+     * @apiSuccess (响应结果) {String} data.dataList.value       田间面积,单位(万亩)
+     * @apiSuccess (响应结果) {Double} data.dataList.keyName     名称(种植作物,田间面积)
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */

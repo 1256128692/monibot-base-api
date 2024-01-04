@@ -8,6 +8,7 @@ import java.util.List;
 @Data
 public class ProjectWithIrrigationInfo {
 
+    @JsonIgnore
     private Integer projectID;
     private List<String> raiseCropNameList;
     private String value;

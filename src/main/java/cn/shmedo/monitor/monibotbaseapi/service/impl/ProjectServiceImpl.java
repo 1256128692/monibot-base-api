@@ -1240,11 +1240,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     public Object queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa) {
         // 默认只查询田间类型的工程
         List<ProjectWithIrrigationInfo> projectWithIrrigationInfos = tbProjectInfoMapper.queryProjectWithRaiseCrops(pa);
+        if (CollectionUtil.isEmpty(projectWithIrrigationInfos)) {
+            return Collections.emptyList();
+        }
         Map<Integer, List<ProjectWithIrrigationInfo>> groupedByProjectID = projectWithIrrigationInfos.stream()
                 .filter(p -> p.getKeyName().equals("种植作物") || p.getKeyName().equals("田间面积"))
                 .collect(Collectors.groupingBy(ProjectWithIrrigationInfo::getProjectID));
+        if (CollectionUtil.isEmpty(groupedByProjectID)) {
+            return Collections.emptyList();
+        }
 
-        return groupedByProjectID.values().stream()
+        List<Integer> projectIDList = projectWithIrrigationInfos.stream().map(ProjectWithIrrigationInfo::getProjectID).collect(Collectors.toList());
+        List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(pa.getCompanyID(), projectIDList);
+
+
+        List<ProjectWithIrrigationInfo> projectWithIrrigationInfos1 = groupedByProjectID.values().stream()
                 .flatMap(list -> list.stream()
                         .peek(p -> {
                             if ("种植作物".equals(p.getKeyName())) {
@@ -1253,6 +1263,19 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                             }
                         }))
                 .collect(Collectors.toList());
+        List<ProjectWithIrrigationBaseInfo> projectWithIrrigationBaseInfoList = new LinkedList<>();
+        tbProjectInfos.forEach(p -> {
+            ProjectWithIrrigationBaseInfo vo = new ProjectWithIrrigationBaseInfo();
+            vo.setProjectID(p.getID());
+            vo.setProjectName(p.getProjectName());
+            if (!CollectionUtil.isEmpty(projectWithIrrigationInfos1)) {
+                vo.setDataList(projectWithIrrigationInfos1.stream().filter(i -> i.getProjectID().equals(p.getID())).collect(Collectors.toList()));
+            }
+            projectWithIrrigationBaseInfoList.add(vo);
+        });
+
+
+        return projectWithIrrigationBaseInfoList;
     }
 
 
