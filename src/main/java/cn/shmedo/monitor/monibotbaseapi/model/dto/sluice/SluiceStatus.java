@@ -57,7 +57,7 @@ public class SluiceStatus {
     private Integer gateSta;
 
     /**
-     * 软件模式 开合度、恒定水位、累计流量、固定时间段、恒定时长、单独控制、自动校准
+     * 软件模式 0开合度、1恒定水位、2累计流量、3固定时间段、4恒定时长、5单独控制、6自动校准
      */
     private Integer software;
 

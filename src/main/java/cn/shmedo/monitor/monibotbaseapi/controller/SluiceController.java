@@ -206,10 +206,13 @@ public class SluiceController {
      * @apiSuccess (返回结果) {Double} gates.openDegree 闸门开度(m)
      * @apiSuccess (返回结果) {Double} gates.powerCurrent 电源电流 (A)
      * @apiSuccess (返回结果) {Double} gates.powerVoltage 电源电压 (V)
-     * @apiSuccess (返回结果) {Int} gates.controlType 控制类型 1远程控制 2手动控制 3现地控制
+     * @apiSuccess (返回结果) {Int} gates.controlType 控制类型 (硬件模式) 1远程控制 2手动控制 3现地控制
      * @apiSuccess (返回结果) {Double} gates.maxOpenDegree 闸门最大开度
      * @apiSuccess (返回结果) {Int} gates.runningState 电机运行状态 0上、1下、2停
      * @apiSuccess (返回结果) {Int} gates.limitSwSta 限位开关状态（0：上下限位均未触发；1：上限位触发；2：下限位触发；3：上下均触发）
+     * @apiSuccess (返回结果) {Double} gates.gateTemp 驱动器温度
+     * @apiSuccess (返回结果) {Int} [gates.actionKind] 操作种类 (1停止 2上升 3下降 4自动控制)
+     * @apiSuccess (返回结果) {Int} [gates.actionType] 操作类型 (仅actionKind=4有效: 1恒定水位 2恒定流量 3恒定闸位 4时长控制 5时段控制 6总量控制)
      * @apiSuccess (返回结果) {Double} maxFlowRate 最大过闸流量
      * @apiSuccess (返回结果) {Double} maxBackWaterLevel 最大闸后水位
      * @apiSuccess (返回结果) {Double} frontWaterLevel 闸前水位(m)

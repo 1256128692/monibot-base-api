@@ -389,13 +389,14 @@ public class SluiceServiceImpl implements SluiceService {
         //一键控制 全关/全开/停止
         if (request.getGateID() == null) {
             //所有可控制闸门
-            List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE).eq(SluiceStatus.HARDWARE, 0)
+            List<SluiceStatus> gates = SimpleQuery.of(SluiceStatus.TABLE)
                     .in(DbConstant.SENSOR_ID_TAG, dict.keySet().stream().map(Object::toString).toList())
                     .orderByDesc(DbConstant.TIME_FIELD).groupBy(DbConstant.SENSOR_ID_TAG).limit(1)
-                    .query(influxDb, SluiceStatus.class);
+                    .query(influxDb, SluiceStatus.class)
+                    .stream().filter(e -> e.getHardware()== 0).toList();
             if (kind.equals(STOP)) {
-                //一键停止时，要求所有闸门必须处于开合度模式 或者 电机已停止运行
-                Assert.isTrue(gates.stream().allMatch(e -> e.getSoftware() == 0 || e.getMotorSta() == 2), "有闸门正处于其他模式下运行, 请先停止");
+                //一键停止时，要求所有闸门必须处于自动控制模式 或者 电机已停止运行
+                Assert.isTrue(gates.stream().allMatch(e -> e.getSoftware() != 5 || e.getMotorSta() == 2), "有闸门正处于其他模式下运行, 请先停止");
             } else {
                 //全开/全关，要求所有闸门 电机已停止运行
                 Assert.isTrue(gates.stream().allMatch(e -> e.getMotorSta() == 2), "有闸门正在运行中, 请先停止");
@@ -409,6 +410,7 @@ public class SluiceServiceImpl implements SluiceService {
                                 builder.pauseFlag(1);
                             } else {
                                 builder.type(kind.getDeviceCode())
+                                        .pauseFlag(0)
                                         .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0);
                             }
                         })).toList());
@@ -436,7 +438,7 @@ public class SluiceServiceImpl implements SluiceService {
                     }
                     case AUTO -> {
                         Assert.isTrue(gate.getMotorSta() == 2, "闸门运行中, 请先停止");
-                        builder.type(type.getDeviceCode());
+                        builder.type(type.getDeviceCode()).pauseFlag(0);
                         switch (type) {
                             case CONSTANT_WATER_LEVEL -> builder.waterLevel(request.getTarget().getWaterLevel());
                             case CONSTANT_FLOW -> {
@@ -511,6 +513,9 @@ public class SluiceServiceImpl implements SluiceService {
                         gate.setPowerVoltage(status.getGateVolt());
                         gate.setRunningState(status.getMotorSta());
                         gate.setLimitSwSta(status.getLimitSwSta());
+                        gate.setGateTemp(status.getGateTemp());
+                        gate.setActionType(ControlActionType.formSluiceStatus(status));
+                        gate.setActionKind(ControlActionKind.fromSluiceStatus(status));
                         return gate;
                     }).toList();
             result.setGates(gates);
