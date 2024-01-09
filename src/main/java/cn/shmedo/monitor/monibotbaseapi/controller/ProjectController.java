@@ -694,7 +694,7 @@ public class ProjectController {
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */
-    @Permission(permissionName = "mdmbase:ListBaseProject")
+    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
     @RequestMapping(value = "/QueryProjectWithRaiseCrops", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectWithRaiseCrops(@Validated @RequestBody QueryProjectWithRaiseCropsParam pa) {
         return projectService.queryProjectWithRaiseCrops(pa);
