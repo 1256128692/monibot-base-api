@@ -14,7 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.config.PlatformAndProjectTypeRelation;
+import cn.shmedo.monitor.monibotbaseapi.config.AuthServiceIDAndProjectTypeRelation;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -234,14 +234,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public List<TbProjectType> getProjectType(String platform) {
+    public List<TbProjectType> getProjectType(Integer serviceID) {
         //查询全部项目类型并返回
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
-        if (ObjectUtil.isNotEmpty(platform)) {
-            if (!PlatformAndProjectTypeRelation.isLegalPlatform(platform)) {
+        if (ObjectUtil.isNotEmpty(serviceID)) {
+            if (!AuthServiceIDAndProjectTypeRelation.isLegalServiceID(serviceID)) {
                 return List.of();
             }
-            list = list.stream().filter(e -> PlatformAndProjectTypeRelation.isLegalProjectType(platform, e.getTypeName())).toList();
+            list = list.stream().filter(e -> AuthServiceIDAndProjectTypeRelation.isLegalProjectType(serviceID, e.getTypeName())).toList();
         }
         return list;
     }

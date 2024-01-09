@@ -410,7 +410,7 @@ public class ProjectController {
      * @apiGroup 工程项目管理模块
      * @apiName QueryProjectType
      * @apiDescription 查询项目类型
-     * @apiParam (请求体) {String} [platform] 平台， 可选参数为“流域平台”，“灌区平台”，“水库平台”
+     * @apiParam (请求体) {Int} [serviceID] 所属平台（服务）ID
      * @apiSuccess (返回结果) {Object[]} projectType 项目类型
      * @apiSuccess (返回结果) {int} projectType.id ID
      * @apiSuccess (返回结果) {String} projectType.typeName 类型名称
@@ -421,7 +421,7 @@ public class ProjectController {
     @Permission(permissionScope = PermissionScope.LOGGED)
     @RequestMapping(value = "QueryProjectType", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryProjectType(@Validated @RequestBody QueryProjectTypeParam param) {
-        return projectService.getProjectType(param.getPlatform());
+        return projectService.getProjectType(param.getServiceID());
     }
 
     /**

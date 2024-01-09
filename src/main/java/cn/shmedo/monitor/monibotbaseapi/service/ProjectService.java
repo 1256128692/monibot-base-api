@@ -30,7 +30,7 @@ public interface ProjectService {
      * 查询项目类型
      * @return
      */
-    List<TbProjectType> getProjectType(String platform);
+    List<TbProjectType> getProjectType(Integer serviceID);
 
     void transferProject(TransferProjectParam param, CurrentSubject currentSubject);
 

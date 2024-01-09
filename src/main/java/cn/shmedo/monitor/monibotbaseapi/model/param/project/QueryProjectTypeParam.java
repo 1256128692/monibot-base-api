@@ -14,7 +14,7 @@ import lombok.Data;
  **/
 @Data
 public class QueryProjectTypeParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-    private String platform;
+    private Integer serviceID;
 
     @Override
     public ResultWrapper validate() {
