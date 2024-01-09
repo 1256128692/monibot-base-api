@@ -297,8 +297,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag,
                         TbPropertyModel::getCreateType, param.getCreateType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
-            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
+        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType())) &&
+                (Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
+            queryWrapper.eq(TbPropertyModel::getCompanyID, param.getCompanyID());
         }
         if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
             if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
@@ -387,10 +388,10 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
         //处理预定义模板
         model4WebList.forEach(mw -> {
-                    if (mw.getCreateType() != null && mw.getCreateType().equals(CreateType.PREDEFINED.getType().intValue())) {
-                        mw.setEdit(false);
-                    }
-                });
+            if (mw.getCreateType() != null && mw.getCreateType().equals(CreateType.PREDEFINED.getType().intValue())) {
+                mw.setEdit(false);
+            }
+        });
     }
 
     public Boolean deleteModelCheck(DeleteModelCheckParam param) {
