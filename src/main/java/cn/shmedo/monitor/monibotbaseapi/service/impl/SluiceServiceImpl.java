@@ -410,6 +410,7 @@ public class SluiceServiceImpl implements SluiceService {
                                 builder.pauseFlag(1);
                             } else {
                                 builder.type(kind.getDeviceCode())
+                                        .pauseFlag(0)
                                         .crackLevel(OPEN.equals(kind) ? e.getGateOpenMax() : 0);
                             }
                         })).toList());
@@ -512,6 +513,9 @@ public class SluiceServiceImpl implements SluiceService {
                         gate.setPowerVoltage(status.getGateVolt());
                         gate.setRunningState(status.getMotorSta());
                         gate.setLimitSwSta(status.getLimitSwSta());
+                        gate.setGateTemp(status.getGateTemp());
+                        gate.setActionType(ControlActionType.formSluiceStatus(status));
+                        gate.setActionKind(ControlActionKind.fromSluiceStatus(status));
                         return gate;
                     }).toList();
             result.setGates(gates);

@@ -1,13 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums.sluice;
 
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.SluiceStatus;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import jakarta.annotation.Nonnull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.util.Arrays;
 
 /**
  * @author Chengfs on 2023/11/21
@@ -48,9 +46,19 @@ public enum ControlActionKind {
     private final String desc;
     private final Integer deviceCode;
 
-    public static ControlType formInt(@Nonnull Integer code) {
-        return Arrays.stream(ControlType.values())
-                .filter(e -> e.getCode().equals(code)).findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("ControlType code " + code + " is not exist"));
+    public static ControlActionKind fromSluiceStatus(SluiceStatus status) {
+        if (status.getSoftware() == 5) {
+            switch (status.getMotorSta()) {
+                case 0:
+                    return ControlActionKind.RISE;
+                case 1:
+                    return ControlActionKind.FALL;
+                case 2:
+                    return ControlActionKind.STOP;
+            }
+        } else {
+            return ControlActionKind.AUTO;
+        }
+        return null;
     }
 }

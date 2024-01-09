@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums.sluice;
 
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sluice.SluiceStatus;
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
@@ -49,10 +50,33 @@ public enum ControlActionType {
                 .orElseThrow(() -> new IllegalArgumentException("ControlActionType code " + code + " is not exist"));
     }
 
-    public static interface ConstantWaterLevel {}
-    public static interface ConstantFlow {}
-    public static interface ConstantSluiceLevel {}
-    public static interface TimeControl {}
-    public static interface TimePeriodControl {}
-    public static interface TotalControl {}
+    public static ControlActionType formSluiceStatus(SluiceStatus status) {
+        return switch (status.getSoftware()) {
+            case 0 -> CONSTANT_SLUICE_LEVEL;
+            case 1 -> CONSTANT_WATER_LEVEL;
+            case 2 -> TOTAL_CONTROL;
+            case 3 -> TIME_PERIOD_CONTROL;
+            case 4 -> TIME_CONTROL;
+            case 7 -> CONSTANT_FLOW;
+            default -> null;
+        };
+    }
+
+    public static interface ConstantWaterLevel {
+    }
+
+    public static interface ConstantFlow {
+    }
+
+    public static interface ConstantSluiceLevel {
+    }
+
+    public static interface TimeControl {
+    }
+
+    public static interface TimePeriodControl {
+    }
+
+    public static interface TotalControl {
+    }
 }
