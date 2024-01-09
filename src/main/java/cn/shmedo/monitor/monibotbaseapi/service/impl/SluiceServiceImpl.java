@@ -395,8 +395,8 @@ public class SluiceServiceImpl implements SluiceService {
                     .query(influxDb, SluiceStatus.class)
                     .stream().filter(e -> e.getHardware()== 0).toList();
             if (kind.equals(STOP)) {
-                //一键停止时，要求所有闸门必须处于开合度模式 或者 电机已停止运行
-                Assert.isTrue(gates.stream().allMatch(e -> e.getSoftware() == 0 || e.getMotorSta() == 2), "有闸门正处于其他模式下运行, 请先停止");
+                //一键停止时，要求所有闸门必须处于自动控制模式 或者 电机已停止运行
+                Assert.isTrue(gates.stream().allMatch(e -> e.getSoftware() != 5 || e.getMotorSta() == 2), "有闸门正处于其他模式下运行, 请先停止");
             } else {
                 //全开/全关，要求所有闸门 电机已停止运行
                 Assert.isTrue(gates.stream().allMatch(e -> e.getMotorSta() == 2), "有闸门正在运行中, 请先停止");
