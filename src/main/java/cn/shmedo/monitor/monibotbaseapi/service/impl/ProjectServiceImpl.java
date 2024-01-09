@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.ErrorConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.config.PlatformAndProjectTypeRelation;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -96,6 +97,16 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.AUTH_REDIS_SERVICE)
     private RedisService authRedisService;
+
+    private static List<String> convertToRaiseCropNameList(String raiseCropName) {
+        try {
+            // 尝试解析为 JSON 数组
+            return JSONUtil.parseArray(raiseCropName).toList(String.class);
+        } catch (Exception e) {
+            // 解析失败，将其作为单个元素的列表处理
+            return Collections.singletonList(raiseCropName);
+        }
+    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -223,9 +234,15 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public List<TbProjectType> getProjectType() {
+    public List<TbProjectType> getProjectType(String platform) {
         //查询全部项目类型并返回
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
+        if (ObjectUtil.isNotEmpty(platform)) {
+            if (!PlatformAndProjectTypeRelation.isLegalPlatform(platform)) {
+                return List.of();
+            }
+            list = list.stream().filter(e -> PlatformAndProjectTypeRelation.isLegalProjectType(platform, e.getTypeName())).toList();
+        }
         return list;
     }
 
@@ -261,7 +278,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
     }
-
 
     @Override
     public void raiseExpiryDate(RaiseExpiryDateParam param, Integer userID) {
@@ -878,7 +894,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         return new QueryWtProjectResponse(waterInfo);
     }
 
-
     @Override
     public List<QueryProjectBaseInfoResponse> queryProjectBaseInfoList(QueryProjectBaseInfoListParam pa) {
 
@@ -1276,16 +1291,5 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
 
         return projectWithIrrigationBaseInfoList;
-    }
-
-
-    private static List<String> convertToRaiseCropNameList(String raiseCropName) {
-        try {
-            // 尝试解析为 JSON 数组
-            return JSONUtil.parseArray(raiseCropName).toList(String.class);
-        } catch (Exception e) {
-            // 解析失败，将其作为单个元素的列表处理
-            return Collections.singletonList(raiseCropName);
-        }
     }
 }
