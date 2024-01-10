@@ -298,6 +298,8 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         boolean testCompanySelectFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
                 Objects.nonNull(param.getProjectType()) && Objects.nonNull(param.getModelType()) &&
                 Objects.nonNull(param.getGroupID()) && Objects.isNull(param.getCreateType());
+        // 工程项目列表高级搜索过滤条件
+        boolean filterFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType()) && Objects.nonNull(param.getCreateType());
 
         LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
                 .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
@@ -314,7 +316,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             if (Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag) {
                 queryWrapper.eq(TbPropertyModel::getCreateType, param.getCreateType());
             }
-            if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
+            if (!filterFlag && !(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
                 queryWrapper.eq(TbPropertyModel::getCompanyID, param.getCompanyID());
             }
         }
