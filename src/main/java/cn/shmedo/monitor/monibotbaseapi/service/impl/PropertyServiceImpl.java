@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -290,21 +291,27 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
      * @return
      */
     private LambdaQueryWrapper<TbPropertyModel> getListQueryParam(QueryModelListParam param, boolean groupParamFlag, boolean selectParamFlag) {
-        // 测试企业查分组列表时条件
-        boolean testCompanyParamFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
-                CreateType.CUSTOMIZED.getType().equals(param.getCreateType()) &&
-                Objects.isNull(param.getProjectType());
+        // 测试企业查分组列表条件
+        boolean testCompanyGroupFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
+                CreateType.CUSTOMIZED.getType().equals(param.getCreateType()) && Objects.isNull(param.getProjectType());
+        // 测试企业查下拉列表条件
+        boolean testCompanySelectFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
+                Objects.nonNull(param.getProjectType()) && Objects.nonNull(param.getModelType()) &&
+                Objects.nonNull(param.getGroupID()) && Objects.isNull(param.getCreateType());
+
         LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
                 .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
                 .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
                 .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        // 分组和下拉框需要展示预定义模板（打补丁）
-        if(testCompanyParamFlag){
-            queryWrapper.eq(TbPropertyModel::getCompanyID, DefaultConstant.MD_ID).eq(TbPropertyModel::getCreateType, CreateType.PREDEFINED.getType())
-                    .or().eq(TbPropertyModel::getCompanyID, param.getCompanyID());
-        }else {
-            if(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag){
+        // 分组和下拉框需要展示预定义模板（补丁）
+        if (testCompanyGroupFlag || testCompanySelectFlag) {
+            queryWrapper.and(query ->
+                    query.eq(TbPropertyModel::getCompanyID, DefaultConstant.MD_ID)
+                            .eq(TbPropertyModel::getCreateType, CreateType.PREDEFINED.getType())
+                            .or().eq(TbPropertyModel::getCompanyID, param.getCompanyID()));
+        } else {
+            if (Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag) {
                 queryWrapper.eq(TbPropertyModel::getCreateType, param.getCreateType());
             }
             if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
