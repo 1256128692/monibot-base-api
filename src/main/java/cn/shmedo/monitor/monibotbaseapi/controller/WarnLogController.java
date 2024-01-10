@@ -48,22 +48,24 @@ public class WarnLogController {
     }
 
     /**
-     * @api {POST} /QueryWarnLatest 查询最新报警
+     * @api {POST} /QueryUnreadWarnLatest 查询最新未读报警消息
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
-     * @apiName QueryWarnLatest
-     * @apiDescription 查询最新报警
+     * @apiName QueryUnreadWarnLatest
+     * @apiDescription 查询最新未读报警消息
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} platform 平台
-     * @apiSuccess (返回结果) {Object} deviceWarn 设备报警数据列表
-     * @apiSuccess (返回结果) {Int} deviceWarn.id 报警ID
+     * @apiSuccess (返回结果) {Object} deviceWarn 设备报警未读消息数据
+     * @apiSuccess (返回结果) {Int} deviceWarn.warnLogID 报警ID
+     * @apiSuccess (返回结果) {Int} deviceWarn.notifyID 系统通知ID
      * @apiSuccess (返回结果) {String} deviceWarn.warnName 报警名称
      * @apiSuccess (返回结果) {DateTime} deviceWarn.warnTime 报警时间
-     * @apiSuccess (返回结果) {String} deviceWarn.deviceType 设备类型
+     * @apiSuccess (返回结果) {Int} deviceWarn.deviceType 设备类型 1.物联网设备 2.视频设备
      * @apiSuccess (返回结果) {String} deviceWarn.deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
      * @apiSuccess (返回结果) {String} deviceWarn.deviceToken 设备sn
-     * @apiSuccess (返回结果) {Object} dataWarn 数据报警数据
-     * @apiSuccess (返回结果) {Int} dataWarn.id 报警ID
+     * @apiSuccess (返回结果) {Object} dataWarn 数据报警未读消息数据
+     * @apiSuccess (返回结果) {Int} dataWarn.warnLogID 报警ID
+     * @apiSuccess (返回结果) {Int} dataWarn.notifyID 系统通知ID
      * @apiSuccess (返回结果) {String} dataWarn.warnName 报警名称
      * @apiSuccess (返回结果) {DateTime} dataWarn.warnTime 报警时间
      * @apiSuccess (返回结果) {Int} dataWarn.projectID 工程ID
@@ -78,8 +80,8 @@ public class WarnLogController {
      * @apiPermission 系统权限 mdmbase:
      */
 //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/QueryWarnLatestList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWarnLatestList(@Valid @RequestBody Object param) {
+    @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryUnreadWarnLatest(@Valid @RequestBody Object param) {
         return ResultWrapper.successWithNothing();
     }
 
@@ -88,7 +90,7 @@ public class WarnLogController {
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryDataWarnPage
-     * @apiDescription 查询数据报警分页
+     * @apiDescription 查询数据报警分页(包含实时报警和历史报警)
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
@@ -102,14 +104,14 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 默认全部
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map 包含报警标签等数据,格式为:{"warnTag":1,"warnLevelType":1,"warnLevelStyle":1}
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.id 报警记录ID
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {Object} currentPageData.warnLevel 报警等级枚举
      * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
-     * @apiSuccess (返回结果) {String} currentPageData.warnLevel.styleName 枚举样式名称(等级样式里对应的前缀+报警标签拼接而成)
-     * @apiSuccess (返回结果) {String} currentPageData.warnLevel.alias 别名名称
+     * @apiSuccess (返回结果) {String} [currentPageData.warnLevel.alias] 别名名称
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
@@ -139,7 +141,7 @@ public class WarnLogController {
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryDeviceWarnPage
-     * @apiDescription 查询设备报警分页
+     * @apiDescription 查询设备报警分页(包含实时报警和历史报警)
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
@@ -194,14 +196,16 @@ public class WarnLogController {
      * @apiName QueryDataWarnDetail
      * @apiDescription 查询数据报警详情
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} id 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiSuccess (返回结果) {Int} id 报警记录ID
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
+     * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
+     * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
+     * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object} warnLevel 报警等级枚举
      * @apiSuccess (返回结果) {Int} warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
-     * @apiSuccess (返回结果) {String} warnLevel.styleName 枚举样式名称(等级样式里对应的前缀+报警标签拼接而成)
-     * @apiSuccess (返回结果) {String} warnLevel.alias 别名名称
+     * @apiSuccess (返回结果) {String} [warnLevel.alias] 别名名称
      * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间,仅记录为历史报警时,字段不为null
@@ -233,7 +237,7 @@ public class WarnLogController {
      * @apiName QueryDeviceWarnDetail
      * @apiDescription 查询设备报警详情
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiSuccess (返回结果) {Int} id 报警记录ID
+     * @apiSuccess (请求参数) {Int} warnLogID 报警记录ID
      * @apiSuccess (返回结果) {Int} id 报警记录ID
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
@@ -272,15 +276,17 @@ public class WarnLogController {
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryDataWarnHistory
-     * @apiDescription 查询数据报警历史
+     * @apiDescription 查询数据报警历史(报警等级变化)
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} id 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
+     * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
+     * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
+     * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.warnTime 报警时间
      * @apiSuccess (返回结果) {Object} dataList.warnLevel 报警等级枚举
      * @apiSuccess (返回结果) {Int} dataList.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
-     * @apiSuccess (返回结果) {String} dataList.warnLevel.styleName 枚举样式名称(等级样式里对应的前缀+报警标签拼接而成)
-     * @apiSuccess (返回结果) {String} dataList.warnLevel.alias 别名名称
+     * @apiSuccess (返回结果) {String} [dataList.warnLevel.alias] 别名名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
@@ -296,9 +302,9 @@ public class WarnLogController {
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryDeviceWarnHistory
-     * @apiDescription 查询设备报警历史
+     * @apiDescription 查询设备报警历史(在线离线变化)
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} id 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.time 时间
      * @apiSuccess (返回结果) {Boolean} dataList.value 是否在线 true:在线; false:离线
@@ -343,7 +349,7 @@ public class WarnLogController {
      * @apiName CancelDataWarn
      * @apiDescription 取消数据报警, 可同时设置沉默周期
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} id 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiParam (请求参数) {Int} [silenceCycle] 设置的沉默周期(小时),若该项不为null时会根据当前时间设置沉默周期
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
@@ -362,7 +368,7 @@ public class WarnLogController {
      * @apiName FillDealOpinion
      * @apiDescription 填写报警处理意见
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} id 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiParam (请求参数) {String} opinion 意见
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
