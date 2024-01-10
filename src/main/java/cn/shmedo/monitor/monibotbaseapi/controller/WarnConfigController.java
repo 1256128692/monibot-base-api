@@ -241,9 +241,9 @@ public class WarnConfigController {
      * @apiSuccess (返回结果) {Object[]} [aliasList] 别名数据
      * @apiSuccess (返回结果) {Int} aliasList.key 报警等级枚举key,枚举值:<br>1: 红色/1级/Ⅰ级;<br>2: 橙色/2级/Ⅱ级;<br>3: 黄色/3级/Ⅲ级;<br>4: 蓝色/4级/Ⅳ级，依次往后推
      * @apiSuccess (返回结果) {String} aliasList.alias 别名名称
-     * @apiSuccess (返回结果) {Int} warnLevel.warnTag 报警标签枚举 1.报警 2.告警 3.预警
-     * @apiSuccess (返回结果) {Int} warnLevel.warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
-     * @apiSuccess (返回结果) {Int} warnLevel.warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
+     * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
+     * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
+     * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} dataList.monitorPointName 监测点名称
