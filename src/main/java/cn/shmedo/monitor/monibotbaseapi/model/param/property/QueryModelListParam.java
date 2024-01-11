@@ -15,6 +15,7 @@ import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,6 +39,11 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     private Integer modelTypeSubType;
 
     private Integer groupID;
+
+    /**
+     * 水利需求新增字段，为了支持工程项目表单分组时，可以过滤出想要的分组（项目类型）
+     */
+    private List<Integer> groupIDList;
 
     private Integer platform;
 
