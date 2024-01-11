@@ -217,7 +217,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 工程项目模板组下没有模板，也要显示
-        if (groupParamFlag && StringUtils.isEmpty(param.getName()) && PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+        if (groupParamFlag && StringUtils.isEmpty(param.getName()) &&
+                CollectionUtil.isEmpty(param.getGroupIDList()) &&
+                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
             Set<Integer> groupIDSet;
             if (modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
                 groupIDSet = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
@@ -239,6 +241,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
         // 非工程项目模板组下没有模板，也要显示
         if (StringUtils.isEmpty(param.getName()) &&
+                CollectionUtil.isEmpty(param.getGroupIDList()) &&
                 (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))) {
             Set<Integer> groupIDSet = model4WebList.stream().map(Model4Web::getGroupID).collect(Collectors.toSet());
             if (!groupIDSet.contains(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP)) {
@@ -308,6 +311,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
         // 分组和下拉框需要展示预定义模板（补丁）
         if (testCompanyGroupFlag || testCompanySelectFlag) {
+            // 处理测试企业下情况
             queryWrapper.and(query ->
                     query.eq(TbPropertyModel::getCompanyID, DefaultConstant.MD_ID)
                             .eq(TbPropertyModel::getCreateType, CreateType.PREDEFINED.getType())
@@ -326,6 +330,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
             } else {
                 queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
             }
+        }
+        if (CollectionUtil.isNotEmpty(param.getGroupIDList())) {
+            queryWrapper.in(TbPropertyModel::getGroupID, param.getGroupIDList());
         }
         return queryWrapper;
     }
