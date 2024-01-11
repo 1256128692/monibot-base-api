@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
-import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
@@ -350,27 +349,6 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateThresholdBaseConfig(@Valid @RequestBody Object param) {
-        return ResultWrapper.successWithNothing();
-    }
-
-    /**
-     * @api {POST} /SaveDataWarn 写入数据报警
-     * @apiVersion 1.0.0
-     * @apiGroup 报警配置模块
-     * @apiName SaveDataWarn
-     * @apiDescription 写入数据报警 (仅限服务内部调用)
-     * @apiParam (请求参数) {Int} thresholdID 阈值配置id
-     * @apiParam (请求参数) {Int} warnLevel 报警等级(1-4)
-     * @apiParam (请求参数) {Double} warnValue 报警数据值
-     * @apiParam (请求参数) {DateTime} warnTime 报警时间(yyyy-MM-dd HH:mm:ss)
-     * @apiSuccess (返回结果) {String} none 无
-     * @apiSampleRequest off
-     * @apiPermission 应用权限, 不允许用户调用 mdmbase:WriteBaseWarn
-     */
-    @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
-    @PostMapping(value = "/SaveDataWarn", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object saveDataWarn(@Valid @RequestBody Void request) {
-        //TODO 根据平台配置构建报警内容、发送通知
         return ResultWrapper.successWithNothing();
     }
 }
