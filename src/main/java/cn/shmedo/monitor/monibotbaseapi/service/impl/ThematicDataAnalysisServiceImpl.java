@@ -1050,9 +1050,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         for (Map.Entry<Integer, List<TbSensor>> entry : collect.entrySet()) {
             Integer monitorType = entry.getKey();
             List<Integer> sensorIDList = entry.getValue().stream().map(TbSensor::getID).distinct().toList();
-            // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段变化'
+            // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段累积'
             if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
-                int statisticalMethods = displayDensity.equals(DisplayDensity.ALL) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CHANGE.getValue();
+                int statisticalMethods = displayDensity.equals(DisplayDensity.ALL) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CUMULATIVE.getValue();
                 queryDataAddToRes(displayDensity, startTime, endTime, res, monitorType, sensorIDList, monitorTypeFieldMap, statisticalMethods);
             } else if (monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
                 queryDataAddToRes(displayDensity, startTime, endTime, res, monitorType, sensorIDList, monitorTypeFieldMap, StatisticalMethods.LATEST.getValue());
@@ -1070,11 +1070,11 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         for (Map.Entry<Integer, List<TbSensor>> entry : monitorTypeSensorMap.entrySet()) {
             Integer monitorType = entry.getKey();
             Integer statisticsMethods = null;
-            // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段变化'
+            // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段累积'
             if (monitorType.equals(MonitorType.DRY_BEACH.getKey()) || monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
                 statisticsMethods = StatisticalMethods.LATEST.getValue();
             } else if (monitorType.equals(MonitorType.WT_RAINFALL.getKey()) || monitorType.equals(MonitorType.RAINFALL.getKey())) {
-                statisticsMethods = displayDensity.equals(DisplayDensity.ALL) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CHANGE.getValue();
+                statisticsMethods = displayDensity.equals(DisplayDensity.ALL) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CUMULATIVE.getValue();
             }
             if (Objects.nonNull(statisticsMethods) && monitorTypeFieldMap.containsKey(monitorType)) {
                 queryDataAddToRes(displayDensity, startTime, endTime, res, monitorType,

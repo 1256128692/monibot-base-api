@@ -6,7 +6,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
