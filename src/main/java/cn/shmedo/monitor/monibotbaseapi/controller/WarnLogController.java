@@ -109,8 +109,9 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} currentPageData.id 报警记录ID
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
+     * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
      * @apiSuccess (返回结果) {Object} currentPageData.warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
+     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
      * @apiSuccess (返回结果) {String} [currentPageData.warnLevel.alias] 别名名称
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
@@ -159,6 +160,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} currentPageData.id 报警记录ID
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
+     * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
@@ -200,6 +202,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} id 报警记录ID
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
+     * @apiSuccess (返回结果) {String} [dealContent] 处理意见,若未填报为null
      * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
      * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
@@ -237,10 +240,11 @@ public class WarnLogController {
      * @apiName QueryDeviceWarnDetail
      * @apiDescription 查询设备报警详情
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiSuccess (请求参数) {Int} warnLogID 报警记录ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiSuccess (返回结果) {Int} id 报警记录ID
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
+     * @apiSuccess (返回结果) {String} [dealContent] 处理意见,若未填报为null
      * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间,仅记录为历史报警,字段不为null
@@ -332,6 +336,8 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiParam (请求参数) {Int} templateID 模板ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
+     * @apiParam (请求参数) {Int} warnType 报警类型,1.数据报警 2.设备报警
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
@@ -369,7 +375,8 @@ public class WarnLogController {
      * @apiDescription 填写报警处理意见
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnLogID 报警记录ID
-     * @apiParam (请求参数) {String} opinion 意见
+     * @apiParam (请求参数) {Int} warnType 报警类型,1.数据报警 2.设备报警
+     * @apiParam (请求参数) {String} [opinion] 意见
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:

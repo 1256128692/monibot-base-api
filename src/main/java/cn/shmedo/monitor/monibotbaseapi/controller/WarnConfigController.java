@@ -146,33 +146,9 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} [notifyConfigID] 报警通知配置ID,为空时表示默认配置
-     * @apiSuccess (返回结果) {Object[]} projectList 工程数据
-     * @apiSuccess (返回结果) {Int} projectList.projectID 工程ID
-     * @apiSuccess (返回结果) {String} projectList.projectName 工程名称
-     * @apiSuccess (返回结果) {String} projectList.projectShortName 工程别称
-     * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
-     * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
-     * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
-     * @apiSuccess (返回结果) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
-     * @apiSuccess (返回结果) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信
-     * @apiSuccess (返回结果) {Object[]} depts 部门列表
-     * @apiSuccess (返回结果) {Object} depts.deptInfo 部门信息
-     * @apiSuccess (返回结果) {Int} depts.deptInfo.id 部门ID
-     * @apiSuccess (返回结果) {String} depts.deptInfo.name 名称
-     * @apiSuccess (返回结果) {Int} depts.deptInfo.companyID 所属公司
-     * @apiSuccess (返回结果) {Int} [depts.deptInfo.parentID] 所属部门ID
-     * @apiSuccess (返回结果) {String} depts.deptInfo.desc 部门描述
-     * @apiSuccess (返回结果) {Int} depts.deptInfo.displayOrder 排序字段
-     * @apiSuccess (返回结果) {Boolean} depts.deptInfo.choose 是否选中,true:选中; false:未选中(如果所属的部门已经选中,则此处也会是选中)
-     * @apiSuccess (返回结果) {Object[]} depts.subDepts 子部分列表,和部门列表形式相同
-     * @apiSuccess (返回结果) {Object[]} depts.usersInDept 员工列表
-     * @apiSuccess (返回结果) {Int} depts.usersInDept.userID 用户ID
-     * @apiSuccess (返回结果) {String} depts.usersInDept.userName 用户名称
-     * @apiSuccess (返回结果) {String} depts.usersInDept.choose 是否选中,true:选中; false:未选中
-     * @apiSuccess (返回结果) {Object[]} companyExternalUserList 外部联系人信息
-     * @apiSuccess (返回结果) {Int} companyExternalUserList.userID 用户ID
-     * @apiSuccess (返回结果) {String} companyExternalUserList.userName 用户名称
-     * @apiSuccess (返回结果) {Boolean} companyExternalUserList.choose 是否选中,true:选中; false:未选中
+     * @apiSuccess (返回结果) {Int[]} deptIDList 部门IDList
+     * @apiSuccess (返回结果) {Int[]} userIDList 员工IDList
+     * @apiSuccess (返回结果) {Int[]} externalIDList 外部联系人IDList
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
@@ -276,7 +252,8 @@ public class WarnConfigController {
      * @apiName UpdateWarnThresholdConfig
      * @apiDescription 编辑报警阈值配置
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} thresholdConfigID 报警阈值配置ID
+     * @apiParam (请求参数) {Int} sensorID 传感器ID
+     * @apiParam (请求参数) {Int} fieldID 监测属性ID
      * @apiParam (请求参数) {String} [warnName] 报警名称
      * @apiParam (请求参数) {Int} [compareMode] 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
      * @apiParam (请求参数) {Boolean} [enable] 是否启用 false.未启用 true.启用
@@ -304,7 +281,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} dataList.fieldID 监测属性ID
      * @apiParam (请求参数) {String} dataList.warnName 报警名称
      * @apiParam (请求参数) {Int} dataList.compareMode 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
-     * @apiParam (请求参数) {Boolean} [enable] 是否启用 false.未启用 true.启用(默认启用)
+     * @apiParam (请求参数) {Boolean} [dataList.enable] 是否启用 false.未启用 true.启用(默认启用)
      * @apiParam (请求参数) {String} [dataList.value] 报警等级阈值配置json,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
