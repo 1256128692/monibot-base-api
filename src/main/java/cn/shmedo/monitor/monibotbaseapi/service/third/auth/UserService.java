@@ -5,10 +5,8 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -61,11 +59,21 @@ public interface UserService {
     @RequestLine("POST /QueryUserIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<List<UserIDName>> queryUserIDName(QueryUserIDNameParameter pa,
-                                              @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+                                                    @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
 
     @RequestLine("POST /ListCompanyIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa,
                                                               @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDeptSimpleList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<DeptSimpleInfo>> queryDeptSimpleList(QueryDeptSimpleListParam pa,
+                                                            @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryUserNoPage")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<UserNoPageInfo>> queryUserNoPage(QueryUserNoPageParam pa,
+                                                        @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 }

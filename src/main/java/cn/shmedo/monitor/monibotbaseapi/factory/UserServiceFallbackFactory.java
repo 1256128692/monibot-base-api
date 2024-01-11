@@ -7,10 +7,8 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +67,16 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<DeptSimpleInfo>> queryDeptSimpleList(QueryDeptSimpleListParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<UserNoPageInfo>> queryUserNoPage(QueryUserNoPageParam pa, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

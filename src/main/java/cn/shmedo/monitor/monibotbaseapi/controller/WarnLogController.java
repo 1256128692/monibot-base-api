@@ -3,7 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @date 2024-01-08 15:50
  */
 @RestController
-@AllArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WarnLogController {
     /**
      * @api {POST} /QueryWarnNotifyPage 报警消息分页
@@ -156,6 +156,7 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} [deviceType] 设备类型 1.物联网设备 2.视频设备
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object} map 包含报警标签等数据,格式为:{"warnTag":1,"warnLevelType":1,"warnLevelStyle":1}
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.id 报警记录ID
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
@@ -306,12 +307,11 @@ public class WarnLogController {
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryDeviceWarnHistory
-     * @apiDescription 查询设备报警历史(在线离线变化)
+     * @apiDescription 查询设备报警历史
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnLogID 报警记录ID
-     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
-     * @apiSuccess (返回结果) {DateTime} dataList.time 时间
-     * @apiSuccess (返回结果) {Boolean} dataList.value 是否在线 true:在线; false:离线
+     * @apiSuccess (返回结果) {DateTime} warnTime 报警时间
+     * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间
      * @apiSuccess (返回结果) {Object[]} fourGSignalList 4g信号强度列表
      * @apiSuccess (返回结果) {DateTime} fourGSignalList.time 时间
      * @apiSuccess (返回结果) {Double} fourGSignalList.value 4g信号强度值
