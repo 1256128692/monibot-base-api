@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.region.GetLocationParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.region.ListAreaCodeByLocationNameParam;
 import cn.shmedo.monitor.monibotbaseapi.service.RegionAreaService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -56,6 +57,25 @@ public class CommonController {
     @RequestMapping(value = "/GetLocation", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object getLocation(@RequestBody @Validated GetLocationParam params) {
         return ResultWrapper.success(regionAreaService.getLocationById(params));
+    }
+
+    /**
+     * @api {POST} /ListAreaCodeByLocationName 根据地区名称批量获取地区编号
+     * @apiDescription 根据地区名称批量获取地区编号, 最多支持四级地区名称
+     * @apiVersion 1.0.0
+     * @apiGroup 通用模块
+     * @apiName ListAreaCodeByLocationName
+     * @apiParam (请求体) {String[]} locationNameList 地区名称列表,示例: 浙江,杭州,余杭,仓前街道
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {String} dataList.locationName 地区名称
+     * @apiSuccess (返回结果) {String} dataList.code 地区编号,示例: "{\"province\":330000,\"city\":330100,\"area\":330110,\"town\":330110012}"
+     * @apiSampleRequest off
+     * @apiPermission 登录权限
+     */
+    @Permission(permissionScope = PermissionScope.LOGGED)
+    @RequestMapping(value = "/ListAreaCodeByLocationName", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object listAreaCodeByLocationName(@RequestBody @Validated ListAreaCodeByLocationNameParam param) {
+        return ResultWrapper.success(regionAreaService.listAreaCodeByLocationName(param));
     }
 
     /**

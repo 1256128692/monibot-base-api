@@ -1012,7 +1012,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
     private List<ThematicRainWaterDataInfo> queryRainWaterDataList(final QueryRainWaterDataBaseInfo param, final DateTimeFormatter formatter) {
         final Integer volumeFlowInputMonitorPointID = param.getVolumeFlowInputMonitorPointID();
         final Integer volumeFlowOutputMonitorPointID = param.getVolumeFlowOutputMonitorPointID();
-        final String rainFallToken = param.getRainFallToken();
+        final String rainfallToken = param.getRainfallToken();
         List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getMonitorIDList()));
         if (CollUtil.isEmpty(sensorList)) {
             return List.of();
@@ -1022,9 +1022,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         return dataList.stream().filter(u -> u.containsKey(DbConstant.TIME_FIELD)).collect(Collectors.groupingBy(u ->
                 DateUtil.format(Convert.toDate(u.get(DbConstant.TIME_FIELD)), formatter))).entrySet().stream().map(u -> {
             ThematicRainWaterDataInfo.ThematicRainWaterDataInfoBuilder builder = ThematicRainWaterDataInfo.builder().time(DateUtil.parse(u.getKey(), formatter));
-            u.getValue().stream().filter(w -> w.containsKey(rainFallToken) || w.containsKey(DISTANCE) || w.containsKey(VOLUME_FLOW)).peek(w -> {
-                if (w.containsKey(rainFallToken)) {
-                    Optional.ofNullable(w.get(rainFallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
+            u.getValue().stream().filter(w -> w.containsKey(rainfallToken) || w.containsKey(DISTANCE) || w.containsKey(VOLUME_FLOW)).peek(w -> {
+                if (w.containsKey(rainfallToken)) {
+                    Optional.ofNullable(w.get(rainfallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
                 } else if (w.containsKey(DISTANCE)) {
                     Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(builder::distance);
                 } else if (w.containsKey(VOLUME_FLOW)) {
@@ -1051,7 +1051,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             Integer monitorType = entry.getKey();
             List<Integer> sensorIDList = entry.getValue().stream().map(TbSensor::getID).distinct().toList();
             // 库水位、流量：最新一条；降雨量：如果'显示密度'是全部则为'最新一条'，否则是'阶段累积'
-            if (monitorType.equals(MonitorType.WT_RAINFALL.getKey())) {
+            if (monitorType.equals(MonitorType.WT_RAINFALL.getKey()) || monitorType.equals(MonitorType.RAINFALL.getKey())) {
                 int statisticalMethods = displayDensity.equals(DisplayDensity.ALL) ? StatisticalMethods.LATEST.getValue() : StatisticalMethods.CUMULATIVE.getValue();
                 queryDataAddToRes(displayDensity, startTime, endTime, res, monitorType, sensorIDList, monitorTypeFieldMap, statisticalMethods);
             } else if (monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {

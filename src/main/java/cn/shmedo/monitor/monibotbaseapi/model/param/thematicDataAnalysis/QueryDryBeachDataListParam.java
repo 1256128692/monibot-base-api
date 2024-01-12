@@ -46,8 +46,11 @@ public class QueryDryBeachDataListParam extends QueryDryBeachDataParam {
                 .map(JSONUtil::parseArray).anyMatch(u -> !u.contains(displayDensity))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在监测点不支持选择的显示密度!");
         }
+        // 中台只会用到{@code periodRainfall}属性,{@code dailyRainfall}统计的是08:00:00~08:00:00的数据
+        // rainfallToken = getRainfallMonitorType().equals(MonitorType.RAINFALL.getKey()) ?
+        //         DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.getRainfallToken(DisplayDensity.fromValue(displayDensity));
         rainfallToken = getRainfallMonitorType().equals(MonitorType.RAINFALL.getKey()) ?
-                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
+                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL;
         return null;
     }
 }
