@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.*;
@@ -8,7 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -44,7 +45,7 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
     @NotNull(message = "结束时间不能为空")
     private Date endTime;
     @JsonIgnore
-    private String rainFallToken;
+    private String rainfallToken;
     @JsonIgnore
     private List<Integer> monitorIDList;
 
@@ -71,8 +72,12 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在监测点不支持选择的显示密度!");
         }
         // 中台只会用到{@code periodRainfall}属性,{@code dailyRainfall}统计的是08:00:00~08:00:00的数据
-        // rainFallToken = DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
-        rainFallToken = DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL;
+        // rainfallToken = DefaultConstant.ThematicFieldToken.getRainfallToken(DisplayDensity.fromValue(displayDensity));
+        Integer rainfallMonitorType = maps.stream().filter(u -> u.get("monitorPointID").equals(rainfallMonitorPointID))
+                .map(u -> u.get("monitorType")).map(Convert::toInt).findAny()
+                .orElseThrow(() -> new IllegalArgumentException("Unreachable Exception"));
+        rainfallToken = rainfallMonitorType.equals(MonitorType.RAINFALL.getKey()) ?
+                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL;
         return null;
     }
 
