@@ -89,4 +89,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
                                                @Param("monitorTypeList") Collection<Integer> monitorTypeList);
 
     List<MonitorPointSimple> listByProjectTypeAndMonitorType(Integer projectType, Integer monitorType, Integer companyID);
+
+    List<MonitorPoint4Web> queryList(Integer projectID, Integer monitorType, Integer monitorItemID, String queryCode);
 }

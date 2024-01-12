@@ -40,4 +40,6 @@ public interface MonitorPointService {
     Map<Integer, List<MonitorPointSimple>> queryMonitorPointWithProjectType(QueryMonitorPointWithProjectTypeParam pa);
 
     Object queryMonitorPointIncludeSensorList(QueryMonitorPointIncludeSensorParam pa);
+
+    List<MonitorPoint4Web> queryMonitorPointList(QueryMonitorPointListParam pa);
 }

@@ -4,7 +4,6 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
-import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -12,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class QueryMonitorPointListParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class QueryCompanyMonitorPointNewDataListParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;

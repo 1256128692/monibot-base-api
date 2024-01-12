@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryCompanyMonitorPointNewDataListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import lombok.AllArgsConstructor;
@@ -228,6 +229,52 @@ public class MonitorPointController {
     public Object queryMonitorPointPageList(@Validated @RequestBody QueryMonitorPointPageListParam pa) {
         return monitorPointService.queryMonitorPointPageList(pa);
     }
+
+    /**
+     * @api {POST} /QueryMonitorPointList 查询监测点
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorPointList
+     * @apiDescription 查询监测点
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
+     * @apiSuccess (返回结果) {Object[]} dataList 监测点列表
+     * @apiSuccess (返回结果) {Int} dataList.id 监测点ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorTypeMultiSensor 监测类型是否多传感器
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {String} dataList.name 监测点名称
+     * @apiSuccess (返回结果) {String} [dataList.installLocation] 安装位置
+     * @apiSuccess (返回结果) {String} [dataList.gpsLocation] 地图位置
+     * @apiSuccess (返回结果) {String} [dataList.imageLocation] 底图位置
+     * @apiSuccess (返回结果) {String} [dataList.overallViewLocation] 全景位置
+     * @apiSuccess (返回结果) {String} [dataList.spatialLocation] 三维位置
+     * @apiSuccess (返回结果) {Bool} dataList.enable 是否启用
+     * @apiSuccess (返回结果) {String} [dataList.exValues] 拓展字段
+     * @apiSuccess (返回结果) {Int} dataList.displayOrder 排序字段
+     * @apiSuccess (返回结果) {Object[]} dataList.sensorList 监测传感器列表
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.id 传感器ID
+     * @apiSuccess (返回结果) {String} dataList.sensorList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorList.alias 传感器别名
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.kind 传感器类型
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.status 传感器状态
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @PostMapping(value = "/QueryMonitorPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+
+    public Object queryMonitorPointList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+        return monitorPointService.queryMonitorPointList(pa);
+    }
+
 
     /**
      * @api {POST} /QueryMonitorPointSimpleList 查询监测点简要信息列表

@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface WtMonitorService {
 
-    List<SensorNewDataInfo> queryMonitorPointList(QueryMonitorPointListParam pa);
+    List<SensorNewDataInfo> queryMonitorPointList(QueryCompanyMonitorPointNewDataListParam pa);
 
 
     List<FieldSelectInfo> getFieldSelectInfoListFromModleTypeFieldList(List<TbMonitorTypeField> list);

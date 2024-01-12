@@ -176,6 +176,23 @@ public class MonitorPointServiceImpl implements MonitorPointService {
 
     }
 
+    @Override
+    public List<MonitorPoint4Web> queryMonitorPointList(QueryMonitorPointListParam pa) {
+
+        List<MonitorPoint4Web> list = tbMonitorPointMapper.queryList(pa.getProjectID(), pa.getMonitorType(), pa.getMonitorItemID(), pa.getQueryCode());
+        List<Integer> pIDList = list.stream().map(MonitorPoint4Web::getID).collect(Collectors.toList());
+        List<TbSensor> tbSensorList = tbSensorMapper.selectList(
+                new QueryWrapper<TbSensor>().in("MonitorPointID", pIDList)
+        );
+        if (CollectionUtils.isNotEmpty(tbSensorList)) {
+            Map<Integer, List<TbSensor>> map = tbSensorList.stream().collect(Collectors.groupingBy(TbSensor::getMonitorPointID));
+            list.forEach(item -> {
+                item.setSensorList(map.get(item.getID()));
+            });
+        }
+        return list;
+    }
+
     private List<MonitorGroupBaseInfoV1> buildGroupTree(Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap, Integer parentID) {
         List<MonitorGroupBaseInfoV1> result = groupMap.get(parentID);
         if (result != null) {

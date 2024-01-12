@@ -76,7 +76,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
 
     @Override
-    public List<SensorNewDataInfo> queryMonitorPointList(QueryMonitorPointListParam pa) {
+    public List<SensorNewDataInfo> queryMonitorPointList(QueryCompanyMonitorPointNewDataListParam pa) {
 
         LambdaQueryWrapper<TbProjectInfo> wrapper = new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getCompanyID, pa.getCompanyID());

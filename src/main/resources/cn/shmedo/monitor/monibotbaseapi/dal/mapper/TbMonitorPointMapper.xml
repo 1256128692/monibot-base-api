@@ -949,4 +949,34 @@
             </trim>
         </where>
     </select>
+
+    <select id="queryList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
+        select p.*,
+        t.ID          as monitorTypeID,
+        t.TypeName    as monitorTypeName,
+        t.TypeAlias   as monitorTypeAlias,
+        t.MultiSensor as monitorTypeMultiSensor,
+        it.Name       as monitorItemName,
+        it.Alias      as monitorItemAlias
+        from tb_monitor_point as p
+        left join tb_monitor_type as t on t.MonitorType = p.MonitorType
+        left join tb_monitor_item as it on it.id = p.MonitorItemID
+        where p.ProjectID = #{projectID}
+        <if test="monitorType != null">
+            and p.MonitorType = #{monitorType}
+        </if>
+        <if test="monitorItemID != null">
+            and p.MonitorItemID = #{monitorItemID}
+        </if>
+        <if test="queryCode != null and queryCode != ''">
+            and (
+            p.Name like concat('%', #{queryCode}, '%')
+            or p.id in (select distinct MonitorPointID
+            from tb_sensor
+            where Name like concat('%', #{queryCode}, '%')
+            or Alias like concat('%', #{queryCode}, '%'))
+            )
+        </if>
+        order by p.ID desc
+    </select>
 </mapper>
