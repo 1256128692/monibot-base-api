@@ -70,7 +70,9 @@ public class QueryRainWaterDataBaseInfo implements ParameterValidator, ResourceP
                 && !JSONUtil.parseArray(u.get(DbConstant.DISPLAY_DENSITY)).contains(displayDensity))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在监测点不支持选择的显示密度!");
         }
-        rainFallToken = DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
+        // 中台只会用到{@code periodRainfall}属性,{@code dailyRainfall}统计的是08:00:00~08:00:00的数据
+        // rainFallToken = DefaultConstant.ThematicFieldToken.getRainFallToken(DisplayDensity.fromValue(displayDensity));
+        rainFallToken = DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL;
         return null;
     }
 

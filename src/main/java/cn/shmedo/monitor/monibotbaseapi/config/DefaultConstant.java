@@ -245,7 +245,7 @@ public class DefaultConstant {
         String DISTANCE = "distance";
 
         /**
-         * 根据{@code density}获取降雨量token
+         * 根据{@code density}获取降雨量token,仅水利可能会用到
          */
         static String getRainFallToken(final DisplayDensity density) {
             switch (density) {
