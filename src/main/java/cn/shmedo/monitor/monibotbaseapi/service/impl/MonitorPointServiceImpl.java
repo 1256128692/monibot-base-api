@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
@@ -180,6 +181,9 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     public List<MonitorPoint4Web> queryMonitorPointList(QueryMonitorPointListParam pa) {
 
         List<MonitorPoint4Web> list = tbMonitorPointMapper.queryList(pa.getProjectID(), pa.getMonitorType(), pa.getMonitorItemID(), pa.getQueryCode());
+        if (ObjectUtil.isEmpty(list)) {
+            return Collections.emptyList();
+        }
         List<Integer> pIDList = list.stream().map(MonitorPoint4Web::getID).collect(Collectors.toList());
         List<TbSensor> tbSensorList = tbSensorMapper.selectList(
                 new QueryWrapper<TbSensor>().in("MonitorPointID", pIDList)
