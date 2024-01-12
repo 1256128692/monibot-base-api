@@ -63,9 +63,10 @@ public class RegionAreaServiceImpl extends ServiceImpl<RegionAreaMapper, RegionA
         List<RegionArea> regionAreaList = baseMapper.selectList(new LambdaQueryWrapper<RegionArea>()
                 .and(wrapper -> {
                     for (String locationName : param.getLocationNameList()) {
-                        wrapper.or().eq(RegionArea::getMergerName, locationName).eq(RegionArea::getLevel, locationName.split(",").length - 1);
+                        String[] nameSplit = locationName.split(",");
+                        wrapper.or().eq(RegionArea::getMergerName, locationName).eq(RegionArea::getShortName, nameSplit[nameSplit.length - 1]);
                     }
-                }));
+                }).ne(RegionArea::getName, "直辖区").ne(RegionArea::getName, "市辖区"));
         if (regionAreaList.isEmpty() || regionAreaList.size() != param.getLocationNameList().size()) {
             throw new InvalidParameterException("非法的地区名称");
         }
