@@ -63,6 +63,26 @@ public class RedisKeys {
     public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";
 
     public static final String ASSET_HOUSE_KEY = "cn.shmedo.monitor.assetHouse";
+
+    /**
+     * 报警阈值配置 缓存<br/>
+     * 类型：分组k-v
+     */
+    public static final String WARN_THRESHOLD = "cn.shmedo.monitor.warn.threshold:";
+
+    /**
+     * 报警触发配置 缓存<br/>
+     * 类型：分组+ hash，hKey:{projectID}:{monitorItemID}<br/>
+     * 示例：cn.shmedo.iot.monitor.warnTrigger:{platform}
+     */
+    public static final String WARN_TRIGGER = "cn.shmedo.monitor.warn.global:";
+
+    /**
+     * 沉默周期配置 缓存<br/>
+     * 类型: 分组
+     * 示例: cn.shmedo.iot.monitor.warn.silenceCycle:{thresholdID}
+     */
+    public static final String WARN_SILENCE_CYCLE = "cn.shmedo.monitor.warn.silenceCycle:";
 }
 
     

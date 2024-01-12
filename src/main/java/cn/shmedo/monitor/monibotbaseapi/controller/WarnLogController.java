@@ -3,12 +3,18 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.DataWarnDto;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -17,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WarnLogController {
+
+    private final ITbDataWarnLogService warnLogService;
     /**
      * @api {POST} /QueryWarnNotifyPage 报警消息分页
      * @apiVersion 1.0.0
@@ -408,8 +416,8 @@ public class WarnLogController {
      */
     @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
     @PostMapping(value = "/SaveDataWarn", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object saveDataWarn(@Valid @RequestBody Void request) {
-        //TODO 根据平台配置构建报警内容、发送通知
+    public Object saveDataWarn(@Valid @NotEmpty @RequestBody List<@NotNull DataWarnDto> request) {
+        warnLogService.saveDataWarnLog(request);
         return ResultWrapper.successWithNothing();
     }
 }
