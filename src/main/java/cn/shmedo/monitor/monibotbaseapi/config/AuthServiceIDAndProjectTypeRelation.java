@@ -16,7 +16,7 @@ public class AuthServiceIDAndProjectTypeRelation {
     static {
         relation = Map.of(
                 15, List.of("水库", "堤防", "河道", "灌区", "流域"),
-                16, List.of("灌区", "水库", "河道", "渠首", "机井", "渠系", "水闸", "泵站"),
+                16, List.of("灌区", "水库", "河道", "渠首", "机井", "渠系", "水闸", "泵站", "田间"),
                 17, List.of("水库")
         );
     }
