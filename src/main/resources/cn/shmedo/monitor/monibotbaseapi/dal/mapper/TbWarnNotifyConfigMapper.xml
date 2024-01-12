@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper">
+    <select id="selectWarnNotifyConfigDetailByID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail">
+        SELECT
+            wnc.`Depts` deptIDStr,
+            wnc.`Users` userIDStr,
+            CONCAT('[',GROUP_CONCAT(ncpr.ProjectID),']') projectIDStr
+        FROM tb_warn_notify_config wnc
+            LEFT JOIN tb_notify_config_project_relation ncpr ON ncpr.`NotifyConfigID`=wnc.`ID`
+        WHERE wnc.`ID`=#{id}
+        GROUP BY wnc.`ID`
+    </select>
+</mapper>
