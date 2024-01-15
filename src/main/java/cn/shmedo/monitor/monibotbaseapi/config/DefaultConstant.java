@@ -99,6 +99,11 @@ public class DefaultConstant {
     public static final String YS_DEVICE_NORMAL_MSG = "操作成功";
 
     /**
+     * 短信默认签名
+     */
+    public static final String SMS_SIGN_NAME = "米度测控";
+
+    /**
      * 海康视频参数key<br>
      * 这里仅注释它的含义,具体取值等需在对应接口上查看相应海康接口文档引用。
      */

@@ -5,13 +5,17 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeptSimpleInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     @RequestLine("GET /GetCurrentSubject")
@@ -76,4 +80,20 @@ public interface UserService {
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<List<UserNoPageInfo>> queryUserNoPage(QueryUserNoPageParam pa,
                                                         @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    /**
+     * 批量添加系统通知
+     */
+    @RequestLine("POST /AddNotify")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<Integer>> addSysNotify(SysNotify request, @Param("appKey") String appKey,
+                                              @Param("appSecret") String appSecret);
+
+    /**
+     * 批量查询用户联系方式
+     */
+    @RequestLine("POST /QueryUserContact")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Map<Integer, String>> queryUserContact(QueryUserContactParam param, @Param("appKey") String appKey,
+                                                  @Param("appSecret") String appSecret);
 }

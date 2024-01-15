@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLog;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataWarnCase;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
@@ -78,6 +79,9 @@ public class DataWarnDto {
 
     @JsonIgnore
     private String warnContent;
+
+    @JsonIgnore
+    private DataWarnCase warnCase;
 
     public TbDataWarnLog toTbDataWarnLog(){
         TbDataWarnLog entity = new TbDataWarnLog();

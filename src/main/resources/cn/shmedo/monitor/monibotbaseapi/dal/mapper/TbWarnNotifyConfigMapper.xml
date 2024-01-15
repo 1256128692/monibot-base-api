@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper">
+    <select id="queryByProjectID" resultType="java.util.Map">
+        SELECT twnc.`CompanyID`,
+               twnc.`Platform`,
+               twnc.`NotifyType`,
+               twnc.`WarnLevel`,
+               twnc.`NotifyMethod`,
+               twnc.`Depts`,
+               twnc.`Users`,
+               twnc.`Roles`,
+               twnc.`ExValue`,
+               tncpr.ProjectID projectID
+        FROM `tb_warn_notify_config` twnc
+                 LEFT JOIN `tb_notify_config_project_relation` tncpr ON twnc.ID = tncpr.NotifyConfigID
+        <where>
+            <trim prefixOverrides="AND">
+                AND twnc.`NotifyType` = #{notifyType}
+            </trim>
+            <if test="list != null and list.size() != 0">
+                <foreach collection="list" open="AND tncpr.ProjectID IN (" close=")" separator="," item="item">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+</mapper>
