@@ -967,12 +967,27 @@ public class VideoServiceImpl implements VideoService {
         if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
             return true;
         } else {
-            tbVideoDevices.forEach(v -> {
-                VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream().filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
-                if (videoDeviceBaseInfoV1 != null) {
-                    v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
-                }
+            // 使用CompletableFuture来异步执行比对任务
+            CompletableFuture<Void> compareFuture = CompletableFuture.runAsync(() -> {
+                tbVideoDevices.forEach(v -> {
+                    VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream()
+                            .filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
+
+                    // 如果设备之前是在线，现在变为离线，则打印设备ID
+                    if (videoDeviceBaseInfoV1 != null) {
+                        // 如果之前是在线，现在变为离线，则打印设备ID
+                        if (v.getDeviceStatus() != null && v.getDeviceStatus()
+                                && videoDeviceBaseInfoV1.getStatus() != null && !videoDeviceBaseInfoV1.getStatus()) {
+//                            System.out.println("设备序列号：" + v.getDeviceSerial() + " 由在线变为离线");
+                        }
+
+                        v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
+                    }
+                });
             });
+
+            // 等待异步任务完成
+            compareFuture.join();
 
             if (tbVideoDevices.size() > 100) {
 
