@@ -83,7 +83,7 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
 
         @NotNull(groups = {TotalControl.class}, message = "totalFlow must not be null")
         @Positive(groups = {TotalControl.class}, message = "totalFlow must be positive")
-        private Integer totalFlow;
+        private Double totalFlow;
     }
 
     @Override

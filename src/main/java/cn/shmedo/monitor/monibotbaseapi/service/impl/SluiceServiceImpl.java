@@ -441,9 +441,7 @@ public class SluiceServiceImpl implements SluiceService {
                         builder.type(type.getDeviceCode()).pauseFlag(0);
                         switch (type) {
                             case CONSTANT_WATER_LEVEL -> builder.waterLevel(request.getTarget().getWaterLevel());
-                            case CONSTANT_FLOW -> {
-                                //TODO: 设备暂不支持此模式
-                            }
+                            case CONSTANT_FLOW -> builder.flowRate(request.getTarget().getFlowRate());
                             case CONSTANT_SLUICE_LEVEL -> builder.crackLevel(request.getTarget().getGateDegree());
                             case TIME_CONTROL -> builder.startTime(request.getTarget().getOpenTime())
                                     .fixedTime(request.getTarget().getDuration());

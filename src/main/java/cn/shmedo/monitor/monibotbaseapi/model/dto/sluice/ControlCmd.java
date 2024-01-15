@@ -34,6 +34,7 @@ public class ControlCmd {
     private final String MOTOR_DIR = "motorDir";
     private final String USER_ID = "userID";
     private final String PAUSE_FLAG = "pauseFlag";
+    private final String FLOW_RATE = "flowRate";
 
     /**
      * 电机序号
@@ -74,7 +75,7 @@ public class ControlCmd {
     /**
      * 累计流量 m³
      */
-    private Integer totalFlow;
+    private Double totalFlow;
 
     /**
      * 远程手动 （0上、1下、2停）
@@ -91,6 +92,11 @@ public class ControlCmd {
      */
     private Integer pauseFlag;
 
+    /**
+     * 瞬时流量
+     */
+    private Double flowRate;
+
     public String toRaw() {
         List<String> params = new ArrayList<>();
         params.add(CMD_NAME);
@@ -105,6 +111,7 @@ public class ControlCmd {
         Optional.ofNullable(motorDir).ifPresent(e -> params.add(MOTOR_DIR + "=" + e));
         Optional.ofNullable(userID).ifPresent(e -> params.add(USER_ID + "=" + e));
         Optional.ofNullable(pauseFlag).ifPresent(e -> params.add(PAUSE_FLAG + "=" + e));
+        Optional.ofNullable(flowRate).ifPresent(e -> params.add(FLOW_RATE + "=" + e));
         return String.join("&", params);
     }
 }
