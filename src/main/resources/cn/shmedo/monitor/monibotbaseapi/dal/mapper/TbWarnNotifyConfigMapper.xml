@@ -63,4 +63,24 @@
             </trim>
         </where>
     </select>
+
+
+    <select id="queryByCompanyIDAndPlatformID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig">
+        select twnc.ID,
+               twnc.`CompanyID`,
+               twnc.`Platform`,
+               twnc.`NotifyType`,
+               twnc.`WarnLevel`,
+               twnc.`NotifyMethod`,
+               twnc.`Depts`,
+               twnc.`Users`,
+               twnc.`Roles`,
+               twnc.`ExValue`
+        FROM `tb_warn_notify_config` twnc
+        <where>
+            twnc.CompanyID = #{companyID}
+              and twnc.Platform = #{platform}
+        </where>
+    </select>
 </mapper>

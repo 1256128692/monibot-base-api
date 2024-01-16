@@ -23,7 +23,7 @@ public class AuthServiceIDAndProjectTypeRelation {
                 17, List.of("水库")
         );
         // MDNET3.0
-        allTypeServiceList = List.of(20);
+        allTypeServiceList = List.of(21);
     }
 
     public static boolean isLegalServiceID(Integer serviceID) {
