@@ -110,7 +110,7 @@ public class WarnLogController {
      * @apiParam (请求参数) {DateTime} [startTime] 开始时间(报警开始时间筛选)
      * @apiParam (请求参数) {DateTime} [endTime] 结束时间(报警开始时间筛选)
      * @apiParam (请求参数) {Int} [warnLevel] 报警等级枚举
-     * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 默认全部
+     * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 2:取消 默认全部
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object} map 包含报警标签等数据,格式为:{"warnTag":1,"warnLevelType":1,"warnLevelStyle":1}
@@ -122,7 +122,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Object} currentPageData.warnLevel 报警等级枚举
      * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
      * @apiSuccess (返回结果) {String} [currentPageData.warnLevel.alias] 别名名称
-     * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理
+     * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
      * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
@@ -161,7 +161,7 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} [projectID] 工程项目
      * @apiParam (请求参数) {DateTime} [startTime] 开始时间(报警开始时间筛选)
      * @apiParam (请求参数) {DateTime} [endTime] 结束时间(报警开始时间筛选)
-     * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 默认全部
+     * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 2:取消 默认全部
      * @apiParam (请求参数) {Int} [deviceType] 设备类型 1.物联网设备 2.视频设备
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
@@ -171,7 +171,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
-     * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理
+     * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
      * @apiSuccess (返回结果) {Object[]} currentPageData.projectList 工程列表
@@ -219,7 +219,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Object} warnLevel 报警等级枚举
      * @apiSuccess (返回结果) {Int} warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
      * @apiSuccess (返回结果) {String} [warnLevel.alias] 别名名称
-     * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理
+     * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间,仅记录为历史报警时,字段不为null
      * @apiSuccess (返回结果) {Int} projectID 工程ID

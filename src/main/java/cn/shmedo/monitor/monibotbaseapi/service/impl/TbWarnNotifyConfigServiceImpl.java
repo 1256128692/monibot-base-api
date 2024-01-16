@@ -1,25 +1,38 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyConfigProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyConfigProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserNoPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DataWarnConfigInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DeviceWarnConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +45,7 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     private final UserService userService;
     private final FileConfig fileConfig;
     private final TbProjectInfoMapper tbProjectInfoMapper;
+    private final TbNotifyConfigProjectRelationMapper tbNotifyConfigProjectRelationMapper;
 
     @Override
     public WarnNotifyConfigDetail queryWarnNotifyConfigDetail(QueryWarnNotifyConfigDetailParam param) {
@@ -39,8 +53,8 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
         WarnNotifyConfigDetail detail = param.getDetail();
         Optional.ofNullable(detail.getUserIDStr()).filter(JSONUtil::isTypeJSONArray).map(JSONUtil::parseArray)
                 .map(u -> JSONUtil.toList(u, Integer.class)).filter(CollUtil::isNotEmpty).ifPresent(u -> {
-                    Set<Integer> externalUserIDSet = Optional.of(new QueryUserNoPageParam(companyID, null, null, null, null, null, true, u, null))
-                            .map(w -> userService.queryUserNoPage(w, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                    Set<Integer> externalUserIDSet = Optional.of(new QueryUserInDeptListNoPageParam(companyID, null, null, null, null, null, true, u, null))
+                            .map(w -> userService.queryUserInDeptListNoPage(w, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
                             .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).map(w ->
                                     w.stream().map(UserNoPageInfo::getUser).filter(s -> !companyID.equals(s.getCompanyID()))
                                             .map(UserNoPageInfo.TbUserEx::getUserID).collect(Collectors.toSet())).orElse(Set.of());
@@ -53,5 +67,110 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
                                 tbProjectInfoMapper.selectListByCompanyIDAndProjectIDList(companyID, null)
                                         .stream().map(TbProjectInfo::getID).toList()));
         return detail;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param) {
+        List<TbNotifyConfigProjectRelation> updateRelationList = param.getUpdateRelationList();
+        if (CollUtil.isNotEmpty(updateRelationList)) {
+            tbNotifyConfigProjectRelationMapper.delete(new LambdaQueryWrapper<TbNotifyConfigProjectRelation>()
+                    .eq(TbNotifyConfigProjectRelation::getNotifyConfigID, param.getNotifyConfigID()));
+            tbNotifyConfigProjectRelationMapper.insertBatchSomeColumn(updateRelationList);
+        }
+        updateById(param.getTbWarnNotifyConfig());
+    }
+
+    @Override
+    public WarnNotifyConfigInfo queryWarnNotifyConfigList(CompanyPlatformParam param, TbWarnBaseConfig tbWarnBaseConfig) {
+        Integer companyID = param.getCompanyID();
+        WarnNotifyConfigInfo info = new WarnNotifyConfigInfo();
+        BeanUtil.copyProperties(tbWarnBaseConfig, info);
+        // set Projects
+        setWarnNotifyConfigProjectInfo(info, companyID, param.getPlatform());
+        // set Users
+        setWarnNotifyConfigUserInfo(info, companyID);
+        return info;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteWarnNotifyConfigBatch(List<Integer> notifyConfigIDList) {
+        tbNotifyConfigProjectRelationMapper.delete(new LambdaQueryWrapper<TbNotifyConfigProjectRelation>()
+                .in(TbNotifyConfigProjectRelation::getNotifyConfigID, notifyConfigIDList));
+        removeBatchByIds(notifyConfigIDList);
+    }
+
+    private void setWarnNotifyConfigProjectInfo(WarnNotifyConfigInfo info, final Integer companyID, final Integer platform) {
+        Map<Integer, TbProjectInfo> allProjectIDMap = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, companyID)).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        List<QueryProjectBaseInfoResponse> allProjectList = allProjectIDMap.values().stream().map(u -> {
+            QueryProjectBaseInfoResponse response = new QueryProjectBaseInfoResponse();
+            response.setProjectID(u.getID());
+            response.setProjectName(u.getProjectName());
+            response.setProjectShortName(u.getShortName());
+            return response;
+        }).toList();
+        List<DataWarnConfigInfo> deviceWarnConfigInfoList = baseMapper.selectWarnNotifyConfigList(
+                        companyID, platform, NotifyType.DEVICE_NOTIFY.getCode())
+                .stream().peek(u -> u.afterProperties(allProjectIDMap, allProjectList)).toList();
+        List<DataWarnConfigInfo> dataWarnConfigInfoList = baseMapper.selectWarnNotifyConfigList(
+                        companyID, platform, NotifyType.DATA_NOTIFY.getCode())
+                .stream().peek(u -> u.afterProperties(allProjectIDMap, allProjectList)).toList();
+        info.setDeviceWarnList(new ArrayList<>(deviceWarnConfigInfoList));
+        info.setDataWarnList(dataWarnConfigInfoList);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void setWarnNotifyConfigUserInfo(WarnNotifyConfigInfo info, final Integer companyID) {
+        Map<Integer, UserNoPageInfo.TbUserEx> userMap = new HashMap<>();
+        Map<Integer, Map<Integer, UserNoPageInfo.TbUserEx>> deptIDUsersMap = new HashMap<>();
+
+        fillUserAndDeptMap(info.getDeviceWarnList(), userMap, deptIDUsersMap);
+        fillUserAndDeptMap(info.getDataWarnList(), userMap, deptIDUsersMap);
+
+        // get user and dept info then
+        Optional.of(deptIDUsersMap).filter(CollUtil::isNotEmpty).map(u -> {
+                    QueryUserInDeptListNoPageParam userNoPageParam = new QueryUserInDeptListNoPageParam();
+                    userNoPageParam.setCompanyID(companyID);
+                    userNoPageParam.setFollowChildDept(true);
+                    userNoPageParam.setDeptIDList(new ArrayList<>(u.keySet()));
+                    return userNoPageParam;
+                }).map(u -> userService.queryUserInDeptListNoPage(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u -> {
+                    u.stream().peek(w -> {
+                        UserNoPageInfo.TbUserEx user = w.getUser();
+                        w.getDepartments().stream().peek(s -> Optional.ofNullable(deptIDUsersMap.get(s.getId()))
+                                .ifPresent(n -> n.putIfAbsent(user.getUserID(), user))).toList();
+                    }).toList();
+                    u.stream().map(UserNoPageInfo::getUser).peek(w -> userMap.putIfAbsent(w.getUserID(), w)).toList();
+                });
+        Optional.of(userMap.keySet()).filter(CollUtil::isNotEmpty).map(u -> {
+                    QueryUserInDeptListNoPageParam userNoPageParam = new QueryUserInDeptListNoPageParam();
+                    userNoPageParam.setCompanyID(companyID);
+                    userNoPageParam.setIncludeExternal(true);
+                    userNoPageParam.setUserIDList(new ArrayList<>(u));
+                    return userNoPageParam;
+                }).map(u -> userService.queryUserInDeptListNoPage(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u ->
+                        u.stream().map(UserNoPageInfo::getUser).peek(w -> userMap.putIfAbsent(w.getUserID(), w)).toList());
+        info.setUserName(companyID, userMap, deptIDUsersMap);
+    }
+
+    /**
+     * filling users and dept info to relative {@link Map}.
+     *
+     * @param dataList       source
+     * @param userMap        <pre>Map<{@code userId},{@code null}></pre>
+     * @param deptIDUsersMap <pre>Map<{@code deptId},empty map of {@code Map<userId, userInfo>}></pre>
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void fillUserAndDeptMap(final List<? extends DeviceWarnConfigInfo> dataList,
+                                    Map<Integer, UserNoPageInfo.TbUserEx> userMap,
+                                    Map<Integer, Map<Integer, UserNoPageInfo.TbUserEx>> deptIDUsersMap) {
+        dataList.stream().peek(u -> {
+            Optional.ofNullable(u.getAllUserList()).ifPresent(w -> w.stream().peek(s -> userMap.putIfAbsent(s, null)).toList());
+            Optional.ofNullable(u.getDeptList()).ifPresent(w -> w.stream().peek(s -> deptIDUsersMap.putIfAbsent(s, new HashMap<>())).toList());
+        }).toList();
     }
 }

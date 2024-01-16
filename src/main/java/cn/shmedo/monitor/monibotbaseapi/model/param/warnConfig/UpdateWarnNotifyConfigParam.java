@@ -6,8 +6,10 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyConfigProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyConfigProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
@@ -21,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -42,11 +43,14 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
     private final CompanyPlatformParam companyPlatformParam = new CompanyPlatformParam();
     @JsonIgnore
     private TbWarnNotifyConfig tbWarnNotifyConfig;
+    @JsonIgnore
+    private List<TbNotifyConfigProjectRelation> updateRelationList;
 
     @Override
     public ResultWrapper<?> validate() {
         final Integer companyID = getCompanyID();
         final Integer platform = getPlatform();
+        final Integer notifyConfigID = getNotifyConfigID();
         companyPlatformParam.setCompanyID(companyID);
         companyPlatformParam.setPlatform(platform);
         ResultWrapper<?> validate = companyPlatformParam.validate();
@@ -54,7 +58,8 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
             return validate;
         }
         List<TbWarnNotifyConfig> tbWarnNotifyConfigList = ContextHolder.getBean(TbWarnNotifyConfigMapper.class)
-                .selectBatchIds(List.of(getNotifyConfigID()));
+                .selectList(new LambdaQueryWrapper<TbWarnNotifyConfig>().eq(TbWarnNotifyConfig::getCompanyID, companyID)
+                        .eq(TbWarnNotifyConfig::getPlatform, platform).eq(TbWarnNotifyConfig::getId, notifyConfigID));
         if (CollUtil.isEmpty(tbWarnNotifyConfigList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "报警通知配置不存在");
         }
@@ -64,7 +69,7 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
         if (CollUtil.isNotEmpty(roleList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目前暂不支持添加角色");
         }
-        Optional.ofNullable(notifyMethod).map(HashSet::new).map(JSONUtil::toJsonStr).ifPresent(tbWarnNotifyConfig::setNotifyMethod);
+        Optional.ofNullable(notifyMethod).map(HashSet::new).filter(CollUtil::isNotEmpty).map(JSONUtil::toJsonStr).ifPresent(tbWarnNotifyConfig::setNotifyMethod);
         if (CollUtil.isNotEmpty(warnLevel)) {
             if (!NotifyType.DATA_NOTIFY.getCode().equals(tbWarnNotifyConfig.getNotifyType())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "只有数据报警可以配置报警等级枚举key");
@@ -74,10 +79,25 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
                 return valid;
             }
         }
-        projectIDList = Optional.ofNullable(projectIDList).map(u -> u.stream().distinct().collect(Collectors.toList())).orElse(null);
-        if (CollUtil.isNotEmpty(projectIDList) && ContextHolder.getBean(TbProjectInfoMapper.class)
-                .selectCount(new LambdaQueryWrapper<TbProjectInfo>().in(TbProjectInfo::getID, projectIDList)) != projectIDList.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有工程ID不存在");
+        if (Objects.nonNull(allProject) || Objects.nonNull(projectIDList)) {
+            if (CollUtil.isNotEmpty(projectIDList) && ContextHolder.getBean(TbProjectInfoMapper.class)
+                    .selectCount(new LambdaQueryWrapper<TbProjectInfo>().in(TbProjectInfo::getID, projectIDList)) != projectIDList.size()) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有工程ID不存在");
+            }
+            if (Objects.nonNull(allProject) && allProject) {
+                projectIDList = List.of(-1);
+            }
+            projectIDList = Objects.nonNull(projectIDList) ? projectIDList.stream().sorted().toList() : null;
+            List<Integer> dbProjectList = ContextHolder.getBean(TbNotifyConfigProjectRelationMapper.class)
+                    .selectList(new LambdaQueryWrapper<TbNotifyConfigProjectRelation>()
+                            .eq(TbNotifyConfigProjectRelation::getNotifyConfigID, notifyConfigID))
+                    .stream().map(TbNotifyConfigProjectRelation::getProjectID).sorted().toList();
+            if (!CollUtil.isEqualList(projectIDList, dbProjectList)) {
+                updateRelationList = projectIDList.stream().map(u -> new TbNotifyConfigProjectRelation(null, u, notifyConfigID)).toList();
+            }
+        }
+        if (CollUtil.isEmpty(deptList) && CollUtil.isEmpty(userList)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "必须选择通知对象");
         }
         return valid(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
                 users -> tbWarnNotifyConfig.setUsers(JSONUtil.toJsonStr(users)), ex -> tbWarnNotifyConfig.setExValue(ex));

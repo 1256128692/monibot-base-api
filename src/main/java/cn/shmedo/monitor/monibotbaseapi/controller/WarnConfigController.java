@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
@@ -113,8 +114,8 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryWarnNotifyConfigList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnNotifyConfigList(@Valid @RequestBody CompanyPlatformParam param) {
-        //TODO
-        return ResultWrapper.successWithNothing();
+        TbWarnBaseConfig tbWarnBaseConfig = tbWarnBaseConfigService.queryByCompanyIDAndPlatform(param.getCompanyID(), param.getPlatform());
+        return tbWarnNotifyConfigService.queryWarnNotifyConfigList(param, tbWarnBaseConfig);
     }
 
     /**
@@ -178,11 +179,11 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} notifyConfigID 报警通知配置ID
      * @apiParam (请求参数) {Boolean} [allProject] 是否是全部工程 true:全部工程,false:指定工程
-     * @apiParam (请求参数) {Int[]} [projectIDList] 工程ID list,若allProject参数为true时,该项值将被忽略
+     * @apiParam (请求参数) {Int[]} [projectIDList] 工程ID list,当allProject参数为true,该项值将被忽略
      * @apiParam (请求参数) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口,仅noticeType==2时有该项
      * @apiParam (请求参数) {Int[]} [notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信
-     * @apiParam (请求参数) {Int[]} [deptList] 选中的部门
-     * @apiParam (请求参数) {Int[]} [userList] 选中的用户
+     * @apiParam (请求参数) {Int[]} [deptList] 选中的部门(如果数据不变,需要将之前的数据传过来)
+     * @apiParam (请求参数) {Int[]} [userList] 选中的用户(如果数据不变,需要将之前的数据传过来)
      * @apiParam (请求参数) {Int[]} [roleList] 选中的角色,目前暂不支持添加角色
      * @apiParam (请求参数) {String} [exValue] 扩展信息,包括对某个用户id指定特殊电话,格式 [{"用户id":"用户联系电话"}]
      * @apiSuccess (返回结果) {String} none 无
@@ -192,7 +193,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateWarnNotifyConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWarnNotifyConfig(@Valid @RequestBody UpdateWarnNotifyConfigParam param) {
-        tbWarnNotifyConfigService.updateById(param.getTbWarnNotifyConfig());
+        tbWarnNotifyConfigService.updateWarnNotifyConfig(param);
         return ResultWrapper.successWithNothing();
     }
 
@@ -211,11 +212,11 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/DeleteWarnNotifyConfigBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteWarnNotifyConfigBatch(@Valid @RequestBody DeleteWarnNotifyConfigBatchParam param) {
-        tbWarnNotifyConfigService.removeBatchByIds(param.getNotifyConfigIDList());
+        tbWarnNotifyConfigService.deleteWarnNotifyConfigBatch(param.getNotifyConfigIDList());
         return ResultWrapper.successWithNothing();
     }
 
-//    TODO ===================================================================================
+//    TODO ==================================================================================
 
     /**
      * @api {POST} /QueryWarnThresholdConfigList 查询报警阈值配置不分页

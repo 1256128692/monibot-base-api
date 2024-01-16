@@ -9,11 +9,11 @@ import java.util.List;
  * @author youxian.kong@shmedo.cn
  * @date 2024-01-11 16:54
  */
-public class QueryUserNoPageParam {
+public class QueryUserInDeptListNoPageParam {
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID不能小于0")
     private Integer companyID;
-    private Integer deptID;
+    private List<Integer> deptIDList;
     private String account;
     private String userName;
     private String cellPhone;
@@ -22,13 +22,14 @@ public class QueryUserNoPageParam {
     private List<Integer> userIDList;
     private Boolean followChildDept;
 
-    public QueryUserNoPageParam() {
+    public QueryUserInDeptListNoPageParam() {
     }
 
-    public QueryUserNoPageParam(Integer companyID, Integer deptID, String account, String userName, String cellPhone,
-                                Integer groupID, Boolean includeExternal, List<Integer> userIDList, Boolean followChildDept) {
+    public QueryUserInDeptListNoPageParam(Integer companyID, List<Integer> deptIDList, String account, String userName,
+                                          String cellPhone, Integer groupID, Boolean includeExternal, List<Integer> userIDList,
+                                          Boolean followChildDept) {
         this.companyID = companyID;
-        this.deptID = deptID;
+        this.deptIDList = deptIDList;
         this.account = account;
         this.userName = userName;
         this.cellPhone = cellPhone;
@@ -46,12 +47,12 @@ public class QueryUserNoPageParam {
         this.companyID = companyID;
     }
 
-    public Integer getDeptID() {
-        return deptID;
+    public List<Integer> getDeptIDList() {
+        return deptIDList;
     }
 
-    public void setDeptID(Integer deptID) {
-        this.deptID = deptID;
+    public void setDeptIDList(List<Integer> deptIDList) {
+        this.deptIDList = deptIDList;
     }
 
     public String getAccount() {

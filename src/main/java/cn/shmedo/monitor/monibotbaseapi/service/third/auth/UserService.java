@@ -72,8 +72,8 @@ public interface UserService {
     ResultWrapper<List<DeptSimpleInfo>> queryDeptSimpleList(QueryDeptSimpleListParam pa,
                                                             @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
-    @RequestLine("POST /QueryUserNoPage")
+    @RequestLine("POST /QueryUserInDeptListNoPage")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<List<UserNoPageInfo>> queryUserNoPage(QueryUserNoPageParam pa,
-                                                        @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+    ResultWrapper<List<UserNoPageInfo>> queryUserInDeptListNoPage(QueryUserInDeptListNoPageParam pa,
+                                                                  @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 }

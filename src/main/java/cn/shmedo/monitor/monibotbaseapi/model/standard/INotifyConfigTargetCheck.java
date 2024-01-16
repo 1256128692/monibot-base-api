@@ -10,7 +10,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryDeptSimpleListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserNoPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import jakarta.annotation.Nullable;
 
@@ -74,12 +74,12 @@ public interface INotifyConfigTargetCheck {
             }
             if (Optional.ofNullable(userList).filter(CollUtil::isNotEmpty).map(u -> {
                         Optional.ofNullable(usersConsumer).ifPresent(w -> w.accept(u));
-                        QueryUserNoPageParam param = new QueryUserNoPageParam();
+                        QueryUserInDeptListNoPageParam param = new QueryUserInDeptListNoPageParam();
                         param.setCompanyID(companyID);
                         param.setUserIDList(u);
                         param.setIncludeExternal(true);
                         return param;
-                    }).map(u -> userService.queryUserNoPage(u, authAppKey, authAppSecret)).filter(ResultWrapper::apiSuccess)
+                    }).map(u -> userService.queryUserInDeptListNoPage(u, authAppKey, authAppSecret)).filter(ResultWrapper::apiSuccess)
                     .map(ResultWrapper::getData).map(u -> !Objects.equals(u.size(), userList.size())).orElse(false)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有用户不存在");
             }

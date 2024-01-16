@@ -33,7 +33,7 @@ public class QueryWarnNotifyConfigDetailParam extends CompanyPlatformParam {
             return validate;
         }
         if (Objects.isNull(detail = ContextHolder.getBean(TbWarnNotifyConfigMapper.class)
-                .selectWarnNotifyConfigDetailByID(getNotifyConfigID()))) {
+                .selectWarnNotifyConfigDetailByID(getCompanyID(), getPlatform(), notifyConfigID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "报警通知配置不存在");
         }
         return null;

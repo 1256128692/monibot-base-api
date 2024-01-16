@@ -76,7 +76,7 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
             }
 
             @Override
-            public ResultWrapper<List<UserNoPageInfo>> queryUserNoPage(QueryUserNoPageParam pa, String appKey, String appSecret) {
+            public ResultWrapper<List<UserNoPageInfo>> queryUserInDeptListNoPage(QueryUserInDeptListNoPageParam pa, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

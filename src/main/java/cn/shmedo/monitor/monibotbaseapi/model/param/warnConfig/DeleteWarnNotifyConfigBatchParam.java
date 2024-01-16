@@ -6,6 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,11 +28,15 @@ public class DeleteWarnNotifyConfigBatchParam implements ParameterValidator, Res
 
     @Override
     public ResultWrapper<?> validate() {
+        TbWarnNotifyConfigMapper tbWarnNotifyConfigMapper = ContextHolder.getBean(TbWarnNotifyConfigMapper.class);
         if (notifyConfigIDList.size() == 1) {
-            if (!ContextHolder.getBean(TbWarnNotifyConfigMapper.class).exists(new LambdaQueryWrapper<TbWarnNotifyConfig>()
+            if (!tbWarnNotifyConfigMapper.exists(new LambdaQueryWrapper<TbWarnNotifyConfig>()
                     .eq(TbWarnNotifyConfig::getId, notifyConfigIDList.get(0)).eq(TbWarnNotifyConfig::getCompanyID, companyID))) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的报警通知配置不存在");
             }
+        }
+        if (tbWarnNotifyConfigMapper.selectBatchIds(notifyConfigIDList).stream().anyMatch(u -> !u.getCompanyID().equals(companyID))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "存在报警通知配置不属于当前公司");
         }
         return null;
     }

@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper">
+    <resultMap id="SelectWarnNotifyConfigListMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DataWarnConfigInfo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="notifyMethod" jdbcType="VARCHAR" property="notifyMethod"/>
+        <result column="users" jdbcType="VARCHAR" property="users"/>
+        <result column="depts" jdbcType="VARCHAR" property="depts"/>
+        <result column="warnLevel" jdbcType="VARCHAR" property="warnLevel"/>
+        <collection property="projectIDList" ofType="java.lang.Integer">
+            <id column="projectID" jdbcType="INTEGER"/>
+        </collection>
+    </resultMap>
     <select id="selectWarnNotifyConfigDetailByID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail">
         SELECT
@@ -9,7 +19,21 @@
             CONCAT('[',GROUP_CONCAT(ncpr.ProjectID),']') projectIDStr
         FROM tb_warn_notify_config wnc
             LEFT JOIN tb_notify_config_project_relation ncpr ON ncpr.`NotifyConfigID`=wnc.`ID`
-        WHERE wnc.`ID`=#{id}
+        WHERE wnc.`ID`=#{id} AND wnc.`CompanyID`=#{companyID} AND wnc.`Platform`=#{platform}
         GROUP BY wnc.`ID`
     </select>
+    <select id="selectWarnNotifyConfigList" resultMap="SelectWarnNotifyConfigListMap">
+        SELECT
+            wnc.`ID` id,
+            wnc.`NotifyMethod` notifyMethod,
+            wnc.`Users` users,
+            wnc.`Depts` depts,
+            wnc.`WarnLevel` warnLevel,
+            ncpr.`ProjectID` projectID
+        FROM
+            `tb_warn_notify_config` wnc
+            LEFT JOIN `tb_notify_config_project_relation` ncpr ON wnc.`ID` = ncpr.`NotifyConfigID`
+        WHERE wnc.`CompanyID`=#{companyID} AND wnc.`Platform`=#{platform} AND wnc.`NotifyType`=#{notifyType}
+    </select>
+
 </mapper>
