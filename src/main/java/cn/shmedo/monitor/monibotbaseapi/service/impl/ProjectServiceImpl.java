@@ -238,6 +238,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         //查询全部项目类型并返回
         List<TbProjectType> list = tbProjectTypeMapper.selectAll();
         if (ObjectUtil.isNotEmpty(serviceID)) {
+            if (AuthServiceIDAndProjectTypeRelation.isAllTypeService(serviceID)) {
+                return list;
+            }
             if (!AuthServiceIDAndProjectTypeRelation.isLegalServiceID(serviceID)) {
                 return List.of();
             }
