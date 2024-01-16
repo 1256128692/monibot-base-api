@@ -36,6 +36,8 @@ public class WaterMeasureServiceImpl implements WaterMeasureService {
     @Override
     public PageUtil.Page<WaterMeasurePointSimple> measurePointPage(WaterMeasurePointPageRequest request) {
         Page<WaterMeasurePointSimple> page = new Page<>(request.getCurrentPage(), request.getPageSize());
+        //sql使用了特殊排序，需禁用sql优化，避免mbp警告日志
+        page.setOptimizeCountSql(false);
         sensorMapper.measurePointPage(page, request);
 
         page.getRecords().forEach(item -> {
