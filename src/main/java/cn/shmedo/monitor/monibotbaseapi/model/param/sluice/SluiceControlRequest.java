@@ -13,6 +13,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -56,7 +57,7 @@ public class SluiceControlRequest implements ParameterValidator, ResourcePermiss
         private Double flowRate;
 
         @NotNull(groups = {ConstantSluiceLevel.class}, message = "gateDegree must not be null")
-        @Positive(groups = {ConstantSluiceLevel.class}, message = "gateDegree must be positive")
+        @Min(value = 0, groups = {ConstantSluiceLevel.class}, message = "gateDegree must be greater than or equal to 0")
         private Double gateDegree;
 
         @NotNull(groups = {TimeControl.class}, message = "openTime must not be null")
