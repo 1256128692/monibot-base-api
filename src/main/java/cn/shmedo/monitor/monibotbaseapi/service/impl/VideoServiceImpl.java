@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
@@ -21,22 +22,28 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
@@ -90,6 +97,16 @@ public class VideoServiceImpl implements VideoService {
 
     private UserService userService;
     private final TbDeviceIntelLocationMapper tbDeviceIntelLocationMapper;
+
+    private final TbDeviceWarnLogMapper tbDeviceWarnLogMapper;
+    private final ITbWarnNotifyConfigService iTbWarnNotifyConfigService;
+    private final TbWarnNotifyConfigMapper tbWarnNotifyConfigMapper;
+
+    private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
+
+    private final NotifyService notifyService;
+
+    private final ITbDeviceWarnLogService tbDeviceWarnLogService;
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
 
@@ -573,7 +590,7 @@ public class VideoServiceImpl implements VideoService {
         }
 
 
-        // TODO,因为目前没有验证码,暂时不验证删除萤石云设备
+        // ,因为目前没有验证码,暂时不验证删除萤石云设备
 //        pa.getTbVideoDevices().forEach(d -> {
 //            if (d.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
 //                ysService.deleteDevice(getYsToken(), d.getDeviceSerial());
@@ -963,7 +980,7 @@ public class VideoServiceImpl implements VideoService {
         allVideoDevices.addAll(hkAllVideoDevices);
 
 
-        List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectList(null);
+        List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectAllList();
         if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
             return true;
         } else {
@@ -973,12 +990,24 @@ public class VideoServiceImpl implements VideoService {
                     VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream()
                             .filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
 
-                    // 如果设备之前是在线，现在变为离线，则打印设备ID
                     if (videoDeviceBaseInfoV1 != null) {
-                        // 如果之前是在线，现在变为离线，则打印设备ID
-                        if (v.getDeviceStatus() != null && v.getDeviceStatus()
-                                && videoDeviceBaseInfoV1.getStatus() != null && !videoDeviceBaseInfoV1.getStatus()) {
-//                            System.out.println("设备序列号：" + v.getDeviceSerial() + " 由在线变为离线");
+
+                        if ((v.getDeviceStatus() != null && v.getDeviceStatus()
+                                && videoDeviceBaseInfoV1.getStatus() != null && !videoDeviceBaseInfoV1.getStatus()
+                                && v.getProjectID() != null && v.getProjectID() != -1)
+                                ) {
+                            List<Integer> platformIDList = projectInfoMapper.selectPlatformListByProjectID(v.getProjectID());
+                            if (!CollectionUtil.isNullOrEmpty(platformIDList)) {
+                                platformIDList.forEach(platform -> {
+                                    DateTime date = DateUtil.date();
+                                    // 如果之前是在线，现在变为离线，则发送设备预警
+                                    tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
+                                            v.getCompanyID(), platform ,v.getDeviceSerial(),date,v.getDeviceType(),
+                                            v.getDeviceToken(), v.getProjectName(), "视频设备"
+                                    ));
+
+                                });
+                            }
                         }
 
                         v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());

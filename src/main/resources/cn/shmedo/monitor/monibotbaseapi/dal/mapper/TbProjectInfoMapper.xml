@@ -395,4 +395,8 @@
         where pp.SubjectType = 0
           and pp.ProjectID in (select ID from tb_project_info where ProjectType = 13 and CompanyID = #{companyID})
     </select>
+
+    <select id="selectPlatformListByProjectID" resultType="java.lang.Integer">
+        select ServiceID from tb_project_service_relation where ProjectID = #{projectID}
+    </select>
 </mapper>

@@ -65,4 +65,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<ProjectVideoInfo> selectListByIDs(List<Integer> projectIDs);
 
     List<ProjectWithIrrigationInfo> queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
+
+    List<Integer> selectPlatformListByProjectID(Integer projectID);
 }

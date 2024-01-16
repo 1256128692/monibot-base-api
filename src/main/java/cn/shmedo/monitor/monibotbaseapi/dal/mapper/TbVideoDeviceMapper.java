@@ -47,4 +47,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     VideoDeviceInfoV5 selectByVideoDeviceSourceID(Integer videoDeviceSourceID);
 
     List<VideoBaseInfo> selectListByCompanyID(Integer companyID, Boolean deviceStatus, String queryContent);
+
+    List<TbVideoDevice> selectAllList();
 }

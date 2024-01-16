@@ -462,4 +462,10 @@
             and deviceSerial like concat('%', #{queryContent}, '%') or deviceName like concat('%', #{queryContent}, '%')
         </if>
     </select>
+
+    <select id="selectAllList" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice">
+        select tvd.*, tpi.ProjectName
+        from tb_video_device tvd
+                 left join tb_project_info tpi on tpi.ID = tvd.ProjectID
+    </select>
 </mapper>
