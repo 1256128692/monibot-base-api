@@ -3,18 +3,15 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.DataWarnDto;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDataWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -403,21 +400,20 @@ public class WarnLogController {
      * @apiGroup 报警管理模块
      * @apiName SaveDataWarn
      * @apiDescription 写入数据报警 (仅限服务内部调用)
-     * @apiParam (请求参数) {Object[]} data 数据集
-     * @apiParam (请求参数) {Int} data.thresholdID 阈值配置id
-     * @apiParam (请求参数) {Int} data.warnLevel 报警等级(1-4)
-     * @apiParam (请求参数) {Double} data.warnValue 报警数据值
-     * @apiParam (请求参数) {DateTime} data.warnTime 报警时间(yyyy-MM-dd HH:mm:ss)
+     * @apiParam (请求参数) {Int} thresholdID 阈值配置id
+     * @apiParam (请求参数) {Int} warnLevel 报警等级(1-4)
+     * @apiParam (请求参数) {Double} warnValue 报警数据值
+     * @apiParam (请求参数) {DateTime} warnTime 报警时间(yyyy-MM-dd HH:mm:ss)
      * @apiSuccess (返回结果) {String} none 无
      * @apiParamExample {json} Request-Example:
-     * [{"thresholdID": 1,"warnLevel": 1,"warnValue": 0.1,"warnTime": "2024-01-01 00:00:00"}]
+     * {"thresholdID": 1,"warnLevel": 1,"warnValue": 0.1,"warnTime": "2024-01-01 00:00:00"}
      * @apiSampleRequest off
      * @apiPermission 应用权限, 不允许用户调用 mdmbase:WriteBaseWarn
      */
     @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
     @PostMapping(value = "/SaveDataWarn", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object saveDataWarn(@Valid @NotEmpty @RequestBody List<@NotNull DataWarnDto> request) {
-        warnLogService.saveDataWarnLog(request);
+    public Object saveDataWarn(@Valid @NotNull @RequestBody SaveDataWarnParam param) {
+        warnLogService.saveDataWarnLog(param);
         return ResultWrapper.successWithNothing();
     }
 }

@@ -2,10 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
-import reactor.util.function.Tuple2;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -18,5 +14,4 @@ public interface ITbWarnBaseConfigService extends IService<TbWarnBaseConfig> {
         return new TbWarnBaseConfig(null, companyID, platform, 1, 1, 1, null, null, null, null);
     }
 
-    Map<Integer, Map<Integer, TbWarnBaseConfig>> groupByCompanyIDAndPlatform(List<Tuple2<Integer, Integer>> param);
 }

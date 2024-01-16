@@ -13,12 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class WarnThresholdConfigInfo extends TbWarnThresholdConfig {
+public class WarnThresholdConfig extends TbWarnThresholdConfig {
 
     private String projectName;
-    private String monitorTypeName;
-    private String monitorItemName;
     private String sensorName;
+    private String monitorPointName;
     private String fieldName;
     private String fieldUnitEng;
 }

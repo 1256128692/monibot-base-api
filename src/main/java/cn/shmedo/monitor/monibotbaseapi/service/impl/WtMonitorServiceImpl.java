@@ -565,9 +565,11 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             if (!monitorTypeMap.isEmpty()) {
                 // 监测类型相关信息
                 TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
-                item.setMonitorTypeName(tbMonitorType.getTypeName());
-                item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
-                item.setDisplayOrder(tbMonitorType.getDisplayOrder());
+                if (tbMonitorType != null) {
+                    item.setMonitorTypeName(tbMonitorType.getTypeName());
+                    item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
+                    item.setDisplayOrder(tbMonitorType.getDisplayOrder());
+                }
             }
             if (!projectTypeMap.isEmpty()) {
                 // 工程类型信息
@@ -597,7 +599,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<MonitorTypeBaseInfo> filteredList = monitorTypeBaseInfos.stream()
                 .filter(monitorTypeBaseInfo -> monitorTypeBaseInfo.getMonitorItemList() != null
                         && !monitorTypeBaseInfo.getMonitorItemList().isEmpty())
-                .sorted(Comparator.comparing(MonitorTypeBaseInfo::getDisplayOrder))
+                .sorted(Comparator.comparing(MonitorTypeBaseInfo::getDisplayOrder, Comparator.nullsLast(Integer::compareTo)))
                 .collect(Collectors.toList());
         vo.setTypeInfoList(filteredList);
         return vo;

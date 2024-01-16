@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper">
 
-    <select id="listInfoById" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfigInfo">
+    <select id="getInfoById" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig">
         SELECT twhc.ID,
                twhc.CompanyID,
                twhc.Platform,
@@ -16,25 +16,19 @@
                twhc.WarnName,
                twhc.`Value`,
                twhc.ExValue,
-               tpi.ProjectName,
-               ts.Alias     sensorName,
-               tmt.TypeName monitorTypeName,
-               tmtf.FieldName,
-               tmi.`Name`   monitorItemName,
-               tdu.EngUnit  fieldUnitEng
+               tpi.ProjectName projectName,
+               ts.Alias        sensorName,
+               tmp.`Name`      monitorPointName,
+               tmtf.FieldName  fieldName,
+               tdu.EngUnit     fieldUnitEng
         FROM `tb_warn_threshold_config` twhc
                  LEFT JOIN tb_project_info tpi ON twhc.ProjectID = tpi.ID
                  LEFT JOIN tb_sensor ts ON twhc.SensorID = ts.ID
-                 LEFT JOIN tb_monitor_type tmt ON twhc.MonitorType = tmt.MonitorType
+                 LEFT JOIN tb_monitor_point tmp ON tmp.ID = ts.MonitorPointID
                  LEFT JOIN tb_monitor_type_field tmtf ON twhc.FieldID = tmtf.ID
-                 LEFT JOIN tb_monitor_item tmi ON twhc.MonitorItemID
                  LEFT JOIN tb_data_unit tdu ON tmtf.FieldUnitID = tdu.ID
         <where>
-            <if test="list != null and list.size() != 0">
-                <foreach collection="list" open="twhc.ID IN (" close=")" separator="," item="item">
-                    #{item}
-                </foreach>
-            </if>
+            twhc.ID = #{id}
         </where>
     </select>
 </mapper>

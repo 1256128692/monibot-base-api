@@ -7,7 +7,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyCo
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import com.baomidou.mybatisplus.extension.service.IService;
+import jakarta.annotation.Nonnull;
 
 import java.util.List;
 
@@ -23,4 +25,7 @@ public interface ITbWarnNotifyConfigService extends IService<TbWarnNotifyConfig>
     WarnNotifyConfigInfo queryWarnNotifyConfigList(CompanyPlatformParam param, TbWarnBaseConfig tbWarnBaseConfig);
 
     void deleteWarnNotifyConfigBatch(List<Integer> notifyConfigIDList);
+
+    WarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID,
+                                                 @Nonnull Integer platform, @Nonnull Integer notifyType);
 }

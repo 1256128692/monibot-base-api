@@ -19,4 +19,6 @@ public interface TbWarnNotifyConfigMapper extends BasicMapper<TbWarnNotifyConfig
     List<DataWarnConfigInfo> selectWarnNotifyConfigList(@Param("companyID") Integer companyID,
                                                         @Param("platform") Integer platform,
                                                         @Param("notifyType") Integer notifyType);
+
+    TbWarnNotifyConfig queryByProjectIDAndPlatform(Integer projectID, Integer platform, Integer notifyType);
 }
