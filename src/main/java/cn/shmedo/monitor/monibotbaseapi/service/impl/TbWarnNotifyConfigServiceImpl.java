@@ -12,7 +12,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyConfigProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
@@ -27,10 +29,8 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,7 +105,8 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     }
 
     @Override
-    public WarnNotifyConfig queryByProjectIDAndPlatform(@NotNull Integer projectID, @NotNull Integer platform, @NotNull Integer notifyType) {
+    public WarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform,
+                                                        @Nonnull Integer notifyType) {
         TbWarnNotifyConfig config = baseMapper.queryByProjectIDAndPlatform(projectID, platform, notifyType);
         if (config != null) {
             ResultWrapper<Map<Integer, String>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()

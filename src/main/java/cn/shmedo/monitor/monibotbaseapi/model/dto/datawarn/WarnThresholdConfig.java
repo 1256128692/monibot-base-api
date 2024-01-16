@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class WarnThresholdConfig extends TbWarnThresholdConfig {
 
     private String projectName;
+    private String projectShortName;
     private String sensorName;
     private String monitorPointName;
     private String fieldName;

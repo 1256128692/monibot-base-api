@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DataWarnConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail;
+import jakarta.annotation.Nonnull;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface TbWarnNotifyConfigMapper extends BasicMapper<TbWarnNotifyConfig
                                                         @Param("platform") Integer platform,
                                                         @Param("notifyType") Integer notifyType);
 
-    TbWarnNotifyConfig queryByProjectIDAndPlatform(Integer projectID, Integer platform, Integer notifyType);
+    TbWarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform, @Nonnull Integer notifyType);
 
     TbWarnNotifyConfig queryByCompanyIDAndPlatformID(@Param("companyID") Integer companyID, @Param("platform") Integer platform);
 

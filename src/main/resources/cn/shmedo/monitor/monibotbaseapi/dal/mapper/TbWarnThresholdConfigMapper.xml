@@ -17,6 +17,7 @@
                twhc.`Value`,
                twhc.ExValue,
                tpi.ProjectName projectName,
+               tpi.ShortName   projectShortName,
                ts.Alias        sensorName,
                tmp.`Name`      monitorPointName,
                tmtf.FieldName  fieldName,

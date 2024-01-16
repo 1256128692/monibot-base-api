@@ -120,6 +120,8 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 entity.setWarnLevel(param.getWarnLevel());
                 entity.setWarnTime(param.getWarnTime());
                 entity.setWarnContent(param.getWarnContent());
+                entity.setDealStatus(0);
+                entity.setDataStatus(0);
                 yield entity;
             }
             case SAME -> {
@@ -154,7 +156,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                                             param.getWarnContent(), SysNotify.Status.UNREAD, param.getWarnTime())),
                                     config.getContacts().keySet().toArray(Integer[]::new));
                         } catch (Exception e) {
-                            log.info("规则:{} 项目: {}, 平台: {} 报警平台通知发送失败: {}", threshold.getId(), threshold.getProjectID(),
+                            log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(), threshold.getProjectID(),
                                     threshold.getPlatform(), e.getMessage());
                         }
 
@@ -174,29 +176,53 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         // 短信
                         //${warnType}${projectName}内${pointName}于${time}发生${warnName}，报警等级:${warnLevel}，实测数据:{fliedName}${warnData}${unit}，请关注！
                         Map<String, Object> paramMap = Map.of("warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
-                                "projectName", threshold.getProjectName(),
+                                "projectName", cutSmsField(threshold.getProjectShortName(), threshold.getProjectName()),
                                 "pointName", threshold.getMonitorPointName(),
                                 "time", DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
-                                "warnName", threshold.getWarnName(),
+                                "warnName", cutSmsField(threshold.getWarnName()),
                                 "warnLevel", param.getWarnLevelName(),
-                                "fliedName", threshold.getFieldName(),
-                                "warnData", param.getWarnValue().toString(),
-                                "unit", threshold.getFieldUnitEng());
+                                "sensorName", cutSmsField(threshold.getFieldName()),
+                                "sensorData", cutSmsField(param.getWarnValue().toString()),
+                                "unit", Optional.ofNullable(threshold.getFieldUnitEng())
+                                        .filter(e -> !e.isEmpty()).orElse("无"));
                         try {
                             boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDataWarnTemplateCode(), paramMap,
                                     config.getContacts().values().toArray(String[]::new));
                             assert result;
                         } catch (Exception e) {
-                            log.info("规则:{} 项目: {}, 平台: {} 报警短信发送失败: {}", threshold.getId(), threshold.getProjectID(),
+                            log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(), threshold.getProjectID(),
                                     threshold.getPlatform(), e.getMessage());
                         }
                     }
                 }
             } else {
-                log.info("规则:{} 项目: {}, 平台: {} 未配置通知人, 无法发送通知", threshold.getId(), threshold.getProjectID(),
+                log.info("规则:{} 项目: {}, 平台: {} 数据报警未配置通知人, 无法发送通知", threshold.getId(), threshold.getProjectID(),
                         threshold.getPlatform());
             }
         }
     }
 
+    /**
+     * 按短信长度要求截取字符串
+     *
+     * @param fieldName 主要字段
+     * @param backup    备用字段
+     * @return 截取后的字段
+     */
+    private String cutSmsField(String fieldName, String backup) {
+        if (fieldName != null && !fieldName.isEmpty()) {
+            return fieldName.substring(0, Math.min(fieldName.length(), 10));
+        }
+        if (backup != null && !backup.isEmpty()) {
+            return backup.substring(0, Math.min(backup.length(), 10));
+        }
+        return null;
+    }
+
+    /**
+     * @see #cutSmsField(String, String)
+     */
+    private String cutSmsField(String fieldName) {
+        return cutSmsField(fieldName, null);
+    }
 }
