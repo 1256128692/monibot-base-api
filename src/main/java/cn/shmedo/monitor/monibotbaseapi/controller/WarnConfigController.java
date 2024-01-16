@@ -3,9 +3,11 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnThresholdConfigService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WarnConfigController {
     private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
     private final ITbWarnBaseConfigService tbWarnBaseConfigService;
+    private final ITbWarnThresholdConfigService tbWarnThresholdConfigService;
 
     /**
      * @api {POST} /QueryWarnBaseConfig 查询平台报警基础配置
@@ -216,7 +219,29 @@ public class WarnConfigController {
         return ResultWrapper.successWithNothing();
     }
 
-//    TODO ==================================================================================
+    /**
+     * @api {POST} /QueryMonitorWithThresholdConfigCount 查询工程下监测项目基础信息和启用的阈值属性配置个数
+     * @apiVersion 1.0.0
+     * @apiGroup 报警配置模块
+     * @apiName QueryMonitorWithThresholdConfigCount
+     * @apiDescription 查询工程下监测项目基础信息和启用的阈值属性配置个数
+     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.id id
+     * @apiSuccess (返回结果) {String} dataList.name 监测项目名称
+     * @apiSuccess (返回结果) {String} dataList.alias 监测项目别称
+     * @apiSuccess (返回结果) {Boolean} dataList.enable 是否启用
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorClass 监测类别,0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测
+     * @apiSuccess (返回结果) {Int} dataList.configCount 阈值属性已启用的配置个数
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:
+     */
+    //    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/QueryMonitorWithThresholdConfigCount", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorWithThresholdConfigCount(@Valid @RequestBody QueryMonitorClassParam param) {
+        return tbWarnThresholdConfigService.queryMonitorWithThresholdConfigCountByProjectID(param.getProjectID());
+    }
 
     /**
      * @api {POST} /QueryWarnThresholdConfigList 查询报警阈值配置不分页
@@ -258,6 +283,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryWarnThresholdConfigList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnThresholdConfigList(@Valid @RequestBody Object param) {
+        //TODO
         return ResultWrapper.successWithNothing();
     }
 
@@ -270,17 +296,18 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} sensorID 传感器ID
      * @apiParam (请求参数) {Int} fieldID 监测属性ID
-     * @apiParam (请求参数) {String} [warnName] 报警名称
-     * @apiParam (请求参数) {Int} [compareMode] 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
-     * @apiParam (请求参数) {Boolean} [enable] 是否启用 false.未启用 true.启用
-     * @apiParam (请求参数) {String} [value] 报警等级阈值配置json,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
+     * @apiParam (请求参数) {String} [warnName] 报警名称,如果已经设置则必须传入此项
+     * @apiParam (请求参数) {Int} [compareMode] 比较方式,如果已经设置则必须传入此项 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用,如果已经设置则必须传入此项 false.未启用 true.启用
+     * @apiParam (请求参数) {String} [value] 报警等级阈值配置json,如果已经设置则必须传入此项,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateWarnThresholdConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateWarnThresholdConfig(@Valid @RequestBody Object param) {
+    public Object updateWarnThresholdConfig(@Valid @RequestBody UpdateWarnThresholdConfigParam param) {
+        //TODO
         return ResultWrapper.successWithNothing();
     }
 
@@ -306,6 +333,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddWarnThresholdConfigBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWarnThresholdConfigBatch(@Valid @RequestBody Object param) {
+        //TODO
         return ResultWrapper.successWithNothing();
     }
 
@@ -336,6 +364,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryThresholdBaseConfig(@Valid @RequestBody Object param) {
+        //TODO
         return ResultWrapper.successWithNothing();
     }
 
@@ -362,6 +391,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateThresholdBaseConfig(@Valid @RequestBody Object param) {
+        //TODO
         return ResultWrapper.successWithNothing();
     }
 }

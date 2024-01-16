@@ -31,4 +31,20 @@
             twhc.ID = #{id}
         </where>
     </select>
+    <select id="selectMonitorWithThresholdConfigCountByProjectID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo">
+        SELECT
+            mi.`ID` id,
+            mi.`Name` 'name',
+            mi.`Alias` alias,
+            mi.`Enable` 'enable',
+            mi.`MonitorType` monitorType,
+            mi.`MonitorClass` monitorClass,
+            COUNT(wtc.`ID`) configCount
+        FROM
+            tb_monitor_item mi
+            LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mi.`ID` AND wtc.`Enable` IS TRUE
+        WHERE mi.`ProjectID`=#{projectID}
+        GROUP BY mi.`ID`
+    </select>
 </mapper>

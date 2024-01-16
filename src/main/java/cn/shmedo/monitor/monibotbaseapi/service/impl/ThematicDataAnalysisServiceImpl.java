@@ -609,7 +609,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         JSONArray array = JSONUtil.parseArray(u);
                         return array.stream().map(JSONUtil::parseObj).toList();
                     } catch (JSONException e) {
-                        log.error("解析json array失败,json array:{}", u);
+                        log.error("parse json error,json array:{}", u);
                         return List.of();
                     }
                 }).filter(CollUtil::isNotEmpty).flatMap(u -> u.stream().filter(w -> ((JSONObject) w).containsKey(fieldToken))

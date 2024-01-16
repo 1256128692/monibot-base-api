@@ -46,7 +46,7 @@ public class DeviceWarnConfigInfo {
         try {
             return Optional.ofNullable(notifyMethod).map(JSONUtil::parseArray).map(u -> JSONUtil.toList(u, Integer.class)).orElse(List.of());
         } catch (JSONException e) {
-            log.error("解析json失败,notifyMethod: {}", notifyMethod);
+            log.error("parse json error,notifyMethod: {}", notifyMethod);
             return List.of();
         }
     }
@@ -81,7 +81,7 @@ public class DeviceWarnConfigInfo {
                     .map(u -> JSONUtil.toList(u, Integer.class)).ifPresent(this::setDeptList);
         } catch (JSONException e) {
             log.error("parse json error,userListStr:{},\tdeptListStr:{}", users, depts);
-            throw new IllegalArgumentException("");
+            throw new IllegalArgumentException();
         }
     }
 }
