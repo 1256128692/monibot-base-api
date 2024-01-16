@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
-import cn.shmedo.monitor.monibotbaseapi.model.domain.INotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
 import jakarta.annotation.Nonnull;
@@ -44,12 +43,4 @@ public interface NotifyService {
      */
     List<Integer> sysNotify(Integer companyID, Supplier<Collection<SysNotify.Notify>> notifySupplier,
                             @Nonnull Integer... userIDs);
-
-    /**
-     * 批量异步发送通知<br/>
-     * ！发送失败也不会抛出异常
-     *
-     * @param notifyList {@link INotify}
-     */
-    <T extends INotify> void asyncSend(Collection<T> notifyList);
 }

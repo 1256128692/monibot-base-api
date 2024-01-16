@@ -1,10 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfigInfo;
-import org.apache.ibatis.annotations.Param;
-
-import java.util.List;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
+import jakarta.annotation.Nonnull;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -12,5 +10,5 @@ import java.util.List;
  */
 public interface TbWarnThresholdConfigMapper extends BasicMapper<TbWarnThresholdConfig> {
 
-    List<WarnThresholdConfigInfo> listInfoById(@Param("list") List<Integer> list);
+    WarnThresholdConfig getInfoById(@Nonnull Integer id);
 }

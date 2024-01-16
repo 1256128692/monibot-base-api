@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.notify;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.domain.INotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -60,10 +59,5 @@ public class NotifyServiceImpl implements NotifyService {
                 .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
 
         return Optional.ofNullable(result.getData()).orElse(List.of());
-    }
-
-    @Override
-    public <T extends INotify> void asyncSend(Collection<T> notifyList) {
-        //TODO 2024/1/15
     }
 }

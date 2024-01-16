@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.third.notify;
 
-import cn.shmedo.monitor.monibotbaseapi.model.domain.INotify;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +14,7 @@ import java.util.Collection;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SmsNotify implements INotify {
+public class SmsNotify {
 
     /**
      * 接收短信的 手机号

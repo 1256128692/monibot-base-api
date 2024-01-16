@@ -6,11 +6,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import reactor.util.function.Tuple2;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -24,9 +19,4 @@ public class TbWarnBaseConfigServiceImpl extends ServiceImpl<TbWarnBaseConfigMap
                 .eq(TbWarnBaseConfig::getPlatform, platform)).stream().findFirst().orElse(getDefault(companyID, platform));
     }
 
-    @Override
-    public Map<Integer, Map<Integer, TbWarnBaseConfig>> groupByCompanyIDAndPlatform(List<Tuple2<Integer, Integer>> param) {
-        return baseMapper.queryByCompanyIDAndPlatform(param).stream()
-                .collect(Collectors.groupingBy(TbWarnBaseConfig::getCompanyID, Collectors.toMap(TbWarnBaseConfig::getPlatform, e -> e)));
-    }
 }
