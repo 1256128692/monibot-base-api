@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IPlatformCheck;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -35,7 +36,7 @@ public class UpdateThresholdBaseConfigParam implements ParameterValidator, Resou
     private Integer triggerType;
     private Integer triggerTimes;
     @NotEmpty
-    private List<Object> aliasConfigList;
+    private List<@Valid FieldWarnAlias> aliasConfigList;
 
     @Override
     public ResultWrapper validate() {
@@ -61,5 +62,22 @@ public class UpdateThresholdBaseConfigParam implements ParameterValidator, Resou
     @Override
     public Resource parameter() {
         return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+    }
+
+    @Data
+    private final static class FieldWarnAlias {
+        @NotNull(message = "属性ID不能为空")
+        @Positive(message = "属性ID必须为正值")
+        private Integer fieldID;
+        private List<@Valid WarnLevelAlias> dataList;
+    }
+
+    @Data
+    private final static class WarnLevelAlias {
+        @NotNull(message = "报警等级枚举key不能为空")
+        @Positive(message = "报警等级枚举key必须为正值")
+        private Integer warnLevel;
+        @NotEmpty(message = "配置的别名不能为空")
+        private String alias;
     }
 }

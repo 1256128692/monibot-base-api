@@ -434,6 +434,14 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateThresholdBaseConfig(@Valid @RequestBody UpdateThresholdBaseConfigParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+
+
         //TODO
         return ResultWrapper.successWithNothing();
     }

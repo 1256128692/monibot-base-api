@@ -45,7 +45,7 @@ public class WarnNotifyConfigInfo extends WarnBaseConfigInfo {
                     userMap.putAll(w.stream().map(deptIDUsersMap::get).filter(Objects::nonNull).map(s ->
                                     s.values().stream().map(m -> new UserIDName(m.getUserID(), m.getName())).toList())
                             .filter(CollUtil::isNotEmpty).flatMap(Collection::stream)
-                            .collect(Collectors.toMap(UserIDName::getUserID, Function.identity()))));
+                            .collect(Collectors.toMap(UserIDName::getUserID, Function.identity(), (t1, t2) -> t1))));
         }).toList();
     }
 }
