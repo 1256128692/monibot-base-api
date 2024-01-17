@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.service.IDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class VideoController {
     private final VideoService videoService;
     private final ITbVideoDeviceService tbVideoDeviceService;
+
+    private final IDeviceService deviceService;
 
     /**
      * @api {POST} /QueryVideoMonitorPointLiveInfo 查询视频类型监测点直播地址信息
@@ -985,5 +988,22 @@ public class VideoController {
         return videoService.batchUpdateVideoDeviceStatus(pa);
     }
 
+
+    /**
+     * @api {POST} /BatchHandlerIotDeviceStatusChange 批量处理Iot设备在线离线状态变化
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量处理Iot设备在线离线状态变化,设备由在线转变为离线后,发送预警通知
+     * @apiName BatchHandlerIotDeviceStatusChange
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiSuccess (返回结果) {Boolean} data 数据
+     * @apiSampleRequest off
+     * @apiPermission 系统权限+应用权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice", allowApplication = true)
+    @RequestMapping(value = "/BatchHandlerIotDeviceStatusChange", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object batchHandlerIotDeviceStatusChange(@Validated @RequestBody BatchUpdateVideoDeviceStatusParam pa) {
+        return deviceService.batchHandlerIotDeviceStatusChange(pa);
+    }
 
 }
