@@ -89,4 +89,16 @@ public class TbDataWarnLog {
      */
     @TableField("ExValue")
     private String exValue;
+
+    /**
+     * 报警结束时间
+     */
+    @TableField("WarnEndTime")
+    private Date warnEndTime;
+
+    /**
+     * 处理人ID
+     */
+    @TableField("DealUserID")
+    private Integer dealUserID;
 }
