@@ -34,6 +34,9 @@ public class TbDeviceWarnLog {
      */
     @TableField("Platform")
     private Integer platform;
+
+    @TableField("ProjectID")
+    private Integer projectID;
     /**
      * 设备Token
      */

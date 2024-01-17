@@ -399,4 +399,12 @@
     <select id="selectPlatformListByProjectID" resultType="java.lang.Integer">
         select ServiceID from tb_project_service_relation where ProjectID = #{projectID}
     </select>
+
+    <select id="selectAllIncludeServiceID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithServiceInfo">
+        select tpi.ID,
+               tpi.CompanyID,
+               tpi.projectName
+        from tb_project_info tpi
+    </select>
 </mapper>
