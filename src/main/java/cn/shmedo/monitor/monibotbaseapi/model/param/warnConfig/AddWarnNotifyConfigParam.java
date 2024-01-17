@@ -57,11 +57,8 @@ public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements IN
         final Integer companyID = getCompanyID();
         final Integer platform = getPlatform();
         final Date current = new Date();
-        final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         // Set time here to avoid using database default timezone.
         tbWarnNotifyConfig = new TbWarnNotifyConfig();
-        tbWarnNotifyConfig.setCreateUserID(userID);
-        tbWarnNotifyConfig.setUpdateUserID(userID);
         tbWarnNotifyConfig.setCreateTime(current);
         tbWarnNotifyConfig.setUpdateTime(current);
         tbWarnNotifyConfig.setCompanyID(companyID);
