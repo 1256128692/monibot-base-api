@@ -220,7 +220,13 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateWarnNotifyConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWarnNotifyConfig(@Valid @RequestBody UpdateWarnNotifyConfigParam param) {
-        tbWarnNotifyConfigService.updateWarnNotifyConfig(param);
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        tbWarnNotifyConfigService.updateWarnNotifyConfig(param, userID);
         return ResultWrapper.successWithNothing();
     }
 

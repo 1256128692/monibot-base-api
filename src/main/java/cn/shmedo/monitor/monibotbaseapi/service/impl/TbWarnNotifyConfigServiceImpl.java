@@ -85,14 +85,16 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param) {
+    public void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param, Integer userID) {
         List<TbNotifyConfigProjectRelation> updateRelationList = param.getUpdateRelationList();
         if (CollUtil.isNotEmpty(updateRelationList)) {
             tbNotifyConfigProjectRelationMapper.delete(new LambdaQueryWrapper<TbNotifyConfigProjectRelation>()
                     .eq(TbNotifyConfigProjectRelation::getNotifyConfigID, param.getNotifyConfigID()));
             tbNotifyConfigProjectRelationMapper.insertBatchSomeColumn(updateRelationList);
         }
-        updateById(param.getTbWarnNotifyConfig());
+        TbWarnNotifyConfig tbWarnNotifyConfig = param.getTbWarnNotifyConfig();
+        tbWarnNotifyConfig.setUpdateUserID(userID);
+        updateById(tbWarnNotifyConfig);
     }
 
     @Override

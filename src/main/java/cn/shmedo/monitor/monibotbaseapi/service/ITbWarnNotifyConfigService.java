@@ -22,7 +22,7 @@ public interface ITbWarnNotifyConfigService extends IService<TbWarnNotifyConfig>
 
     void addWarnNotifyConfig(TbWarnNotifyConfig tbWarnNotifyConfig, List<Integer> projectIDList, Integer userID);
 
-    void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param);
+    void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param, Integer userID);
 
     WarnNotifyConfigInfo queryWarnNotifyConfigList(CompanyPlatformParam param, TbWarnBaseConfig tbWarnBaseConfig);
 

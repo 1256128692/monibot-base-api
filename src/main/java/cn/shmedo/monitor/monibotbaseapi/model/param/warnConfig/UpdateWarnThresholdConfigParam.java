@@ -63,7 +63,6 @@ public class UpdateWarnThresholdConfigParam extends CompanyPlatformParam {
         }
         final Integer companyID = getCompanyID();
         final Integer platform = getPlatform();
-//        final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         final Date current = new Date();
         if (enable && ObjectUtil.isEmpty(value)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未配置完全的报警阈值配置无法启用");

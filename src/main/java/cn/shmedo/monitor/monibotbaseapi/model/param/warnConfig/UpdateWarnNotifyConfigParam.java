@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -64,7 +63,6 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "报警通知配置不存在");
         }
         tbWarnNotifyConfig = tbWarnNotifyConfigList.stream().findAny().orElseThrow();
-        tbWarnNotifyConfig.setUpdateUserID(CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         tbWarnNotifyConfig.setUpdateTime(new Date());
         if (CollUtil.isNotEmpty(roleList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "目前暂不支持添加角色");
