@@ -13,7 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyConfigProjectRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
-import cn.shmedo.monitor.monibotbaseapi.model.standard.DataWarnNotifyLevelCheck;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IDataWarnNotifyLevelCheck;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.INotifyConfigTargetCheck;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -30,7 +30,7 @@ import java.util.*;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailParam implements INotifyConfigTargetCheck, DataWarnNotifyLevelCheck {
+public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailParam implements INotifyConfigTargetCheck, IDataWarnNotifyLevelCheck {
     private Boolean allProject;
     private List<Integer> projectIDList;
     private List<Integer> warnLevel;
@@ -99,7 +99,7 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
         if (CollUtil.isEmpty(deptList) && CollUtil.isEmpty(userList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "必须选择通知对象");
         }
-        return valid(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
+        return validTarget(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
                 users -> tbWarnNotifyConfig.setUsers(JSONUtil.toJsonStr(users)), ex -> tbWarnNotifyConfig.setExValue(ex));
     }
 

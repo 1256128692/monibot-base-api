@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  * @author youxian.kong@shmedo.cn
  * @date 2024-01-12 16:51
  */
-public interface DataWarnNotifyLevelCheck {
+public interface IDataWarnNotifyLevelCheck {
     List<Integer> getWarnLevel();
 
     /**

@@ -33,19 +33,19 @@ public interface INotifyConfigTargetCheck {
     /**
      * check only version.
      *
-     * @see #valid(Consumer, Consumer, Consumer)
+     * @see #validTarget(Consumer, Consumer, Consumer)
      */
-    default ResultWrapper<?> valid() {
-        return valid(null, null, null);
+    default ResultWrapper<?> validTarget() {
+        return validTarget(null, null, null);
     }
 
     /**
      * 配置的被通知对象的合法性校验(提供{@link Consumer}让调用方可以获取校验后的值)<br>
      * 注意: 仅校验{@link List}里元素的合法性,不校验{@link List}本身是否<b>必须存在、非空</b>
      */
-    default ResultWrapper<?> valid(@Nullable final Consumer<List<Integer>> deptsConsumer,
-                                   @Nullable final Consumer<List<Integer>> usersConsumer,
-                                   @Nullable final Consumer<String> exValueConsumer) {
+    default ResultWrapper<?> validTarget(@Nullable final Consumer<List<Integer>> deptsConsumer,
+                                         @Nullable final Consumer<List<Integer>> usersConsumer,
+                                         @Nullable final Consumer<String> exValueConsumer) {
         String exValue = getExValue();
         if (ObjectUtil.isNotEmpty(exValue)) {
             try {

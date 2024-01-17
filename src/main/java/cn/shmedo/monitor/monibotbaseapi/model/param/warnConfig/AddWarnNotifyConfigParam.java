@@ -10,7 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
-import cn.shmedo.monitor.monibotbaseapi.model.standard.DataWarnNotifyLevelCheck;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IDataWarnNotifyLevelCheck;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.INotifyConfigTargetCheck;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements INotifyConfigTargetCheck, DataWarnNotifyLevelCheck {
+public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements INotifyConfigTargetCheck, IDataWarnNotifyLevelCheck {
     private Boolean allProject;
     @Size(min = 1, message = "选中的工程ID数不能小于1")
     private List<Integer> projectIDList;
@@ -69,12 +69,16 @@ public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements IN
         tbWarnNotifyConfig.setNotifyMethod(JSONUtil.toJsonStr(new HashSet<>(notifyMethod)));
         tbWarnNotifyConfig.setNotifyType(notifyType);
         projectIDList = Optional.ofNullable(projectIDList).map(u -> u.stream().distinct().collect(Collectors.toList())).orElse(null);
-        if ((Objects.isNull(allProject) || !allProject) && CollUtil.isEmpty(projectIDList)) {
+        allProject = Objects.nonNull(allProject) && allProject;
+        if (!allProject && CollUtil.isEmpty(projectIDList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程ID不能为空");
         }
         if (CollUtil.isNotEmpty(projectIDList) && ContextHolder.getBean(TbProjectInfoMapper.class)
                 .selectCount(new LambdaQueryWrapper<TbProjectInfo>().in(TbProjectInfo::getID, projectIDList)) != projectIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有工程ID不存在");
+        }
+        if (allProject) {
+            projectIDList = List.of(-1);
         }
         if (NotifyType.DATA_NOTIFY.getCode().equals(notifyType)) {
             if (CollUtil.isEmpty(warnLevel)) {
@@ -91,7 +95,7 @@ public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements IN
         if (CollUtil.isEmpty(deptList) && CollUtil.isEmpty(userList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "必须选择通知对象");
         }
-        return valid(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
+        return validTarget(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
                 users -> tbWarnNotifyConfig.setUsers(JSONUtil.toJsonStr(users)), ex -> tbWarnNotifyConfig.setExValue(ex));
     }
 }

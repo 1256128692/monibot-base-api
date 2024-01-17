@@ -1,8 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
@@ -14,6 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -67,7 +74,18 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateWarnBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWarnBaseConfig(@Valid @RequestBody UpdateWarnBaseConfigParam param) {
-        tbWarnBaseConfigService.saveOrUpdate(param.getTbWarnBaseConfig());
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
+        tbWarnBaseConfig.setUpdateUserID(userID);
+        if (Objects.isNull(tbWarnBaseConfig.getCreateUserID())) {
+            tbWarnBaseConfig.setCreateUserID(userID);
+        }
+        tbWarnBaseConfigService.saveOrUpdate(tbWarnBaseConfig);
         return ResultWrapper.successWithNothing();
     }
 
@@ -137,7 +155,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int[]} [deptList] 选中的部门
      * @apiParam (请求参数) {Int[]} [userList] 选中的用户
      * @apiParam (请求参数) {Int[]} [roleList] 选中的角色,目前暂不支持添加角色
-     * @apiParam (请求参数) {String} [exValue] 扩展信息,包括对某个用户id指定特殊电话,格式 [{"用户id":"用户联系电话"}]
+     * @apiParam (请求参数) {String} [exValue] 扩展信息,包括对某个用户id指定特殊电话,格式 "[{\"用户id\":\"用户联系电话\"}]"
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
@@ -145,7 +163,7 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddWarnNotifyConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWarnNotifyConfig(@Valid @RequestBody AddWarnNotifyConfigParam param) {
-        tbWarnNotifyConfigService.save(param.getTbWarnNotifyConfig());
+        tbWarnNotifyConfigService.addWarnNotifyConfig(param.getTbWarnNotifyConfig(),param.getProjectIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -188,7 +206,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int[]} [deptList] 选中的部门(如果数据不变,需要将之前的数据传过来)
      * @apiParam (请求参数) {Int[]} [userList] 选中的用户(如果数据不变,需要将之前的数据传过来)
      * @apiParam (请求参数) {Int[]} [roleList] 选中的角色,目前暂不支持添加角色
-     * @apiParam (请求参数) {String} [exValue] 扩展信息,包括对某个用户id指定特殊电话,格式 [{"用户id":"用户联系电话"}]
+     * @apiParam (请求参数) {String} [exValue] 扩展信息,包括对某个用户id指定特殊电话,格式 "[{\"用户id\":\"用户联系电话\"}]"
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
@@ -276,7 +294,7 @@ public class WarnConfigController {
      * @apiSuccess (返回结果) {String} [dataList.sensorList.fieldList.warnName] 触发的报警名称
      * @apiSuccess (返回结果) {Int} [dataList.sensorList.fieldList.compareMode] 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
      * @apiSuccess (返回结果) {Boolean} [dataList.sensorList.fieldList.enable] 是否启用 false.未启用 true.启用
-     * @apiSuccess (返回结果) {String} [dataList.sensorList.fieldList.value] 报警等级阈值配置json,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
+     * @apiSuccess (返回结果) {String} [dataList.sensorList.fieldList.value] 报警等级阈值配置json,格式"{\"1\":{\"upper\":100,\"lower\":50},\"2\":{\"upper\":50,\"lower\":25}}",其中key为报警等级枚举key;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
@@ -294,12 +312,14 @@ public class WarnConfigController {
      * @apiName UpdateWarnThresholdConfig
      * @apiDescription 编辑报警阈值配置
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} sensorID 传感器ID
+     * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
      * @apiParam (请求参数) {Int} fieldID 监测属性ID
-     * @apiParam (请求参数) {String} [warnName] 报警名称,如果已经设置则必须传入此项
-     * @apiParam (请求参数) {Int} [compareMode] 比较方式,如果已经设置则必须传入此项 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
-     * @apiParam (请求参数) {Boolean} [enable] 是否启用,如果已经设置则必须传入此项 false.未启用 true.启用
-     * @apiParam (请求参数) {String} [value] 报警等级阈值配置json,如果已经设置则必须传入此项,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
+     * @apiParam (请求参数) {String} [warnName] 报警名称,为空时表示该项置空
+     * @apiParam (请求参数) {Int} compareMode 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
+     * @apiParam (请求参数) {Boolean} enable 是否启用 false.未启用 true.启用
+     * @apiParam (请求参数) {String} [value] 报警等级阈值配置json,为空时表示该项置空,格式"{\"1\":{\"upper\":100,\"lower\":50},\"2\":{\"upper\":50,\"lower\":25}}",其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
@@ -307,7 +327,18 @@ public class WarnConfigController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateWarnThresholdConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateWarnThresholdConfig(@Valid @RequestBody UpdateWarnThresholdConfigParam param) {
-        //TODO
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        TbWarnThresholdConfig tbWarnThresholdConfig = param.getTbWarnThresholdConfig();
+        tbWarnThresholdConfig.setUpdateUserID(userID);
+        if (Objects.isNull(tbWarnThresholdConfig.getCreateUserID())) {
+            tbWarnThresholdConfig.setCreateUserID(userID);
+        }
+        tbWarnThresholdConfigService.saveOrUpdate(tbWarnThresholdConfig);
         return ResultWrapper.successWithNothing();
     }
 
@@ -325,7 +356,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {String} dataList.warnName 报警名称
      * @apiParam (请求参数) {Int} dataList.compareMode 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
      * @apiParam (请求参数) {Boolean} [dataList.enable] 是否启用 false.未启用 true.启用(默认启用)
-     * @apiParam (请求参数) {String} [dataList.value] 报警等级阈值配置json,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}},其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
+     * @apiParam (请求参数) {String} [dataList.value] 报警等级阈值配置json,格式"{\"1\":{\"upper\":100,\"lower\":50},\"2\":{\"upper\":50,\"lower\":25}}",其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
@@ -390,7 +421,7 @@ public class WarnConfigController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/UpdateThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateThresholdBaseConfig(@Valid @RequestBody Object param) {
+    public Object updateThresholdBaseConfig(@Valid @RequestBody UpdateThresholdBaseConfigParam param) {
         //TODO
         return ResultWrapper.successWithNothing();
     }

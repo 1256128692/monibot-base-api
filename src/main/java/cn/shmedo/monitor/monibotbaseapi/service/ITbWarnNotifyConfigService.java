@@ -20,6 +20,8 @@ import java.util.List;
 public interface ITbWarnNotifyConfigService extends IService<TbWarnNotifyConfig> {
     WarnNotifyConfigDetail queryWarnNotifyConfigDetail(QueryWarnNotifyConfigDetailParam param);
 
+    void addWarnNotifyConfig(TbWarnNotifyConfig tbWarnNotifyConfig, List<Integer> projectIDList);
+
     void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param);
 
     WarnNotifyConfigInfo queryWarnNotifyConfigList(CompanyPlatformParam param, TbWarnBaseConfig tbWarnBaseConfig);

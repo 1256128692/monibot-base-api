@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig;
 
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -64,15 +63,13 @@ public class UpdateWarnBaseConfigParam extends CompanyPlatformParam {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该平台已配置过数据报警通知,不允许修改报警等级类型");
             }
         }
-        Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         // Set time here to avoid using database default timezone.
         Date current = new Date();
         List<TbWarnBaseConfig> list = ContextHolder.getBean(TbWarnBaseConfigMapper.class).selectList(new LambdaQueryWrapper<TbWarnBaseConfig>()
                 .eq(TbWarnBaseConfig::getCompanyID, companyID).eq(TbWarnBaseConfig::getPlatform, platform));
         tbWarnBaseConfig = list.stream().findAny().orElse(new TbWarnBaseConfig(null, companyID, platform,
                 WarnTag.TYPE1.getCode(), DataWarnLevelType.FOUR_LEVEL.getCode(), WarnLevelStyle.COLOR.getCode(),
-                userID, current, null, null));
-        tbWarnBaseConfig.setUpdateUserID(userID);
+                null, current, null, null));
         tbWarnBaseConfig.setUpdateTime(current);
         Optional.ofNullable(warnTag).ifPresent(tbWarnBaseConfig::setWarnTag);
         Optional.ofNullable(warnLevelType).ifPresent(tbWarnBaseConfig::setWarnLevelType);

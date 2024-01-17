@@ -74,6 +74,15 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public void addWarnNotifyConfig(TbWarnNotifyConfig tbWarnNotifyConfig, List<Integer> projectIDList) {
+        this.save(tbWarnNotifyConfig);
+        final Integer notifyConfigId = tbWarnNotifyConfig.getId();
+        List<TbNotifyConfigProjectRelation> list = projectIDList.stream().map(u -> new TbNotifyConfigProjectRelation(null, u, notifyConfigId)).toList();
+        tbNotifyConfigProjectRelationMapper.insertBatchSomeColumn(list);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateWarnNotifyConfig(UpdateWarnNotifyConfigParam param) {
         List<TbNotifyConfigProjectRelation> updateRelationList = param.getUpdateRelationList();
         if (CollUtil.isNotEmpty(updateRelationList)) {
