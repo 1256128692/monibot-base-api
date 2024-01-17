@@ -33,6 +33,7 @@ public class NotifyServiceImpl implements NotifyService {
     public boolean smsNotify(String signName, String templateCode, Supplier<Collection<SmsNotify.Param>> paramSupplier,
                              @Nonnull String... phoneNumbers) {
         SmsNotify param = SmsNotify.builder().signName(signName).templateCode(templateCode)
+                .userPhones(Arrays.stream(phoneNumbers).distinct().toList())
                 .params(paramSupplier.get()).build();
         ResultWrapper<Void> result = mdNotifyService.sendSms(param);
         return Optional.of(result.apiSuccess()).filter(e -> e)
@@ -55,7 +56,8 @@ public class NotifyServiceImpl implements NotifyService {
 
         ResultWrapper<List<Integer>> result = userService.addSysNotify(param,
                 config.getAuthAppKey(), config.getAuthAppSecret());
-        Optional.of(result.apiSuccess()).filter(e -> e)
+
+        Optional.of(result).filter(ResultWrapper::apiSuccess)
                 .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
 
         return Optional.ofNullable(result.getData()).orElse(List.of());

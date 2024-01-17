@@ -52,7 +52,7 @@
         <where>
             <trim prefixOverrides="AND">
                 <if test="projectID != null">
-                    AND tncpr.ProjectID = #{projectID}
+                    AND tncpr.ProjectID IN (#{projectID}, - 1)
                 </if>
                 <if test="notifyType != null">
                     AND twnc.`NotifyType` = #{notifyType}
@@ -62,6 +62,8 @@
                 </if>
             </trim>
         </where>
+        ORDER BY tncpr.ProjectID DESC
+        LIMIT 1
     </select>
 
 
