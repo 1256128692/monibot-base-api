@@ -25,7 +25,7 @@ public class SaveDataWarnParam {
     /**
      * 报警等级 1-4
      */
-    @Range(min = 1, max = 4)
+    @Range(min = 0, max = 4)
     private Integer warnLevel;
 
     /**
@@ -37,7 +37,7 @@ public class SaveDataWarnParam {
     /**
      * 报警时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date warnTime;
 
     @JsonIgnore

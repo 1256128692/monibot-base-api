@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -58,12 +59,22 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     @Transactional(rollbackFor = Exception.class)
     public void saveDataWarnLog(SaveDataWarnParam param) {
 
+        if (param.getWarnLevel() == 0) {
+            boolean updated = this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
+                    .eq(TbDataWarnLog::getWarnThresholdID, param.getThresholdID())
+                    .ne(TbDataWarnLog::getDealStatus, 2)
+                    .set(TbDataWarnLog::getDataStatus, 0)
+                    .set(TbDataWarnLog::getWarnEndTime, param.getWarnTime()));
+            Assert.isTrue(updated, "更新数据报警数据状态失败");
+            return;
+        }
+
         //查询规则对应报警是否存在
         TbDataWarnLog existLog = this.getOne(Wrappers.<TbDataWarnLog>lambdaQuery()
                 .eq(TbDataWarnLog::getWarnThresholdID, param.getThresholdID())
-                .ne(TbDataWarnLog::getDealStatus, 2)
-                .orderByDesc(TbDataWarnLog::getId)
-                .select(TbDataWarnLog::getId, TbDataWarnLog::getWarnThresholdID, TbDataWarnLog::getWarnLevel));
+                .isNull(TbDataWarnLog::getWarnEndTime)
+                .select(TbDataWarnLog::getId, TbDataWarnLog::getWarnThresholdID,
+                        TbDataWarnLog::getWarnLevel, TbDataWarnLog::getWarnTime));
 
         //区分报警类型
         if (existLog != null) {
@@ -85,11 +96,10 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         //历史记录 (除了新生成的报警，均需要记录变更历史)
         if (!NEW.equals(param.getWarnCase())) {
             TbDataWarnLogHistory history = new TbDataWarnLogHistory();
-            assert existLog != null;
             history.setWarnLogID(existLog.getId());
             history.setWarnLevel(existLog.getWarnLevel());
             history.setWarnTime(existLog.getWarnTime());
-            this.historyMapper.insert(history);
+            Assert.isTrue(this.historyMapper.insert(history) > 0, "存储数据报警失败");
         }
 
         //通知内容
@@ -101,7 +111,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
 
             WarnTag warnTag = WarnTag.fromCode(config.getWarnTag());
             WarnLevelStyle style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
-            String levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel()] + warnTag.getDesc();
+            String levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel() - 1] + warnTag.getDesc();
 
             String content = StrUtil.format(WARN_CONTENT_FORMAT, threshold.getProjectName(), threshold.getMonitorPointName(),
                     DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
@@ -121,23 +131,23 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 entity.setWarnTime(param.getWarnTime());
                 entity.setWarnContent(param.getWarnContent());
                 entity.setDealStatus(0);
-                entity.setDataStatus(0);
+                entity.setDataStatus(1);
                 yield entity;
             }
             case SAME -> {
-                assert existLog != null;
                 existLog.setWarnTime(param.getWarnTime());
+                existLog.setDataStatus(1);
                 yield existLog;
             }
             case UPGRADE, DOWNLEVEL -> {
-                assert existLog != null;
                 existLog.setWarnTime(param.getWarnTime());
                 existLog.setWarnContent(param.getWarnContent());
                 existLog.setWarnLevel(param.getWarnLevel());
+                existLog.setDataStatus(1);
                 yield existLog;
             }
         };
-        this.saveOrUpdate(warnLog);
+        Assert.isTrue(this.saveOrUpdate(warnLog), "存储数据报警失败");
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
@@ -158,6 +168,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         } catch (Exception e) {
                             log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(), threshold.getProjectID(),
                                     threshold.getPlatform(), e.getMessage());
+                            throw e;
                         }
 
                         //通知关联
@@ -188,7 +199,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         try {
                             boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDataWarnTemplateCode(), paramMap,
                                     config.getContacts().values().toArray(String[]::new));
-                            assert result;
+                            Assert.isTrue(result);
                         } catch (Exception e) {
                             log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(), threshold.getProjectID(),
                                     threshold.getPlatform(), e.getMessage());
