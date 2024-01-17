@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
+import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -34,7 +35,8 @@ public class NotifyServiceImpl implements NotifyService {
                              @Nonnull String... phoneNumbers) {
         SmsNotify param = SmsNotify.builder().signName(signName).templateCode(templateCode)
                 .userPhones(Arrays.stream(phoneNumbers).distinct().toList())
-                .params(paramSupplier.get()).build();
+                .params(paramSupplier.get().stream()
+                        .map(e -> new SmsNotify.Param(e.keyName(), formatSmsParam(e.value()))).toList()).build();
         ResultWrapper<Void> result = mdNotifyService.sendSms(param);
         return Optional.of(result.apiSuccess()).filter(e -> e)
                 .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
@@ -61,5 +63,15 @@ public class NotifyServiceImpl implements NotifyService {
                 .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
 
         return Optional.ofNullable(result.getData()).orElse(List.of());
+    }
+
+    /**
+     * 格式化短信参数内容，防止超过20个字符
+     */
+    private String formatSmsParam(String value) {
+        if (value != null) {
+            return value.substring(0, Math.min(value.length(), 20));
+        }
+        return StrUtil.EMPTY;
     }
 }
