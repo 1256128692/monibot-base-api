@@ -163,7 +163,7 @@
 
     <select id="selectListByProjectIDAndItemIDs"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.dataEvent.QueryDataEventInfo">
-        select ID, ProjectID, `Name`, Frequency, TimeRange, ExValue
+        select ID, ProjectID, `Name`, Frequency, TimeRange, ExValue, CreateTime
         from tb_data_event
         where ProjectID = #{projectID}
         <if test="monitorItemIDList != null and monitorItemIDList.size != 0">

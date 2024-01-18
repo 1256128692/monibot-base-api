@@ -979,7 +979,7 @@ public class VideoServiceImpl implements VideoService {
         allVideoDevices.addAll(ysAllVideoDevices);
         allVideoDevices.addAll(hkAllVideoDevices);
 
-
+        List<TbDeviceWarnLog> tbDeviceWarnLogs = tbDeviceWarnLogMapper.selectList(null);
         List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectAllList();
         if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
             return true;
@@ -992,18 +992,18 @@ public class VideoServiceImpl implements VideoService {
 
                     if (videoDeviceBaseInfoV1 != null) {
 
-                        if ((v.getDeviceStatus() != null && v.getDeviceStatus()
-                                && videoDeviceBaseInfoV1.getStatus() != null && !videoDeviceBaseInfoV1.getStatus()
-                                && v.getProjectID() != null && v.getProjectID() != -1)
-                                ) {
+                        if ((videoDeviceBaseInfoV1.getStatus() != null && v.getProjectID() != null && v.getProjectID() != -1)) {
                             List<Integer> platformIDList = projectInfoMapper.selectPlatformListByProjectID(v.getProjectID());
                             if (!CollectionUtil.isNullOrEmpty(platformIDList)) {
                                 platformIDList.forEach(platform -> {
                                     DateTime date = DateUtil.date();
-                                    // 如果之前是在线，现在变为离线，则发送设备预警
+                                    TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream()
+                                            .filter(deviceWarn -> deviceWarn.getDeviceSerial().equals(v.getDeviceSerial())
+                                                    && deviceWarn.getPlatform().equals(platform)).findFirst().orElse(null);
                                     tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
-                                            v.getCompanyID(), platform ,v.getDeviceSerial(),date,v.getDeviceType(),
-                                            v.getDeviceToken(), v.getProjectName(), "视频设备"
+                                            v.getCompanyID(), platform, v.getProjectID(), date, v.getDeviceType(),
+                                            v.getDeviceToken(), v.getProjectName(), "视频设备", tbDeviceWarnLog,
+                                            videoDeviceBaseInfoV1.getStatus()
                                     ));
 
                                 });

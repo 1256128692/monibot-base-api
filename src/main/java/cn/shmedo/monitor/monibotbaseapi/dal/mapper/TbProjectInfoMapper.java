@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequ
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectWithRaiseCropsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithIrrigationInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithServiceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo;
@@ -67,4 +68,6 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     List<ProjectWithIrrigationInfo> queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
 
     List<Integer> selectPlatformListByProjectID(Integer projectID);
+
+    List<ProjectWithServiceInfo> selectAllIncludeServiceID();
 }

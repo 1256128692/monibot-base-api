@@ -399,6 +399,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Object[]} dataList.monitorItemList 监测项目列表
      * @apiSuccess (响应结果) {Int} dataList.monitorItemList.monitorItemID 监测项目ID
      * @apiSuccess (响应结果) {String} dataList.monitorItemList.name 监测项目名称
+     * @apiSuccess (响应结果) {Date} dataList.monitorItemList.createTime 创建时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */

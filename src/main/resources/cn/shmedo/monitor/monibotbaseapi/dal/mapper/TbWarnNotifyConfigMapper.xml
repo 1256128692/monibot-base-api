@@ -72,19 +72,24 @@
     <select id="queryByCompanyIDAndPlatformID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig">
         select twnc.ID,
-               twnc.`CompanyID`,
-               twnc.`Platform`,
-               twnc.`NotifyType`,
-               twnc.`WarnLevel`,
-               twnc.`NotifyMethod`,
-               twnc.`Depts`,
-               twnc.`Users`,
-               twnc.`Roles`,
-               twnc.`ExValue`
+        twnc.`CompanyID`,
+        twnc.`Platform`,
+        twnc.`NotifyType`,
+        twnc.`WarnLevel`,
+        twnc.`NotifyMethod`,
+        twnc.`Depts`,
+        twnc.`Users`,
+        twnc.`Roles`,
+        twnc.`ExValue`
         FROM `tb_warn_notify_config` twnc
+        LEFT JOIN `tb_notify_config_project_relation` tncpr ON twnc.ID = tncpr.NotifyConfigID
         <where>
             twnc.CompanyID = #{companyID}
-              and twnc.Platform = #{platform}
+            and twnc.Platform = #{platform}
+            and twnc.`NotifyType` = #{notifyType}
+            and tncpr.ProjectID = #{projectID}
         </where>
+        ORDER BY tncpr.ProjectID DESC
+        LIMIT 1
     </select>
 </mapper>

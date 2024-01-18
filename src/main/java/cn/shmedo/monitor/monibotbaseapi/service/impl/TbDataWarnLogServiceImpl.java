@@ -187,13 +187,14 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         // 短信
                         //${warnType}${projectName}内${pointName}于${time}发生${warnName}，报警等级:${warnLevel}，实测数据:{fliedName}${warnData}${unit}，请关注！
                         Map<String, Object> paramMap = Map.of("warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
-                                "projectName", cutSmsField(threshold.getProjectShortName(), threshold.getProjectName()),
+                                "projectName", Optional.ofNullable(threshold.getProjectShortName())
+                                        .filter(e -> !e.isBlank()).orElse(threshold.getProjectName()),
                                 "pointName", threshold.getMonitorPointName(),
                                 "time", DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
-                                "warnName", cutSmsField(threshold.getWarnName()),
+                                "warnName", threshold.getWarnName(),
                                 "warnLevel", param.getWarnLevelName(),
-                                "sensorName", cutSmsField(threshold.getFieldName()),
-                                "sensorData", cutSmsField(param.getWarnValue().toString()),
+                                "sensorName", threshold.getFieldName(),
+                                "sensorData", param.getWarnValue().toString(),
                                 "unit", Optional.ofNullable(threshold.getFieldUnitEng())
                                         .filter(e -> !e.isEmpty()).orElse("无"));
                         try {
@@ -211,29 +212,5 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         threshold.getPlatform());
             }
         }
-    }
-
-    /**
-     * 按短信长度要求截取字符串
-     *
-     * @param fieldName 主要字段
-     * @param backup    备用字段
-     * @return 截取后的字段
-     */
-    private String cutSmsField(String fieldName, String backup) {
-        if (fieldName != null && !fieldName.isEmpty()) {
-            return fieldName.substring(0, Math.min(fieldName.length(), 10));
-        }
-        if (backup != null && !backup.isEmpty()) {
-            return backup.substring(0, Math.min(backup.length(), 10));
-        }
-        return null;
-    }
-
-    /**
-     * @see #cutSmsField(String, String)
-     */
-    private String cutSmsField(String fieldName) {
-        return cutSmsField(fieldName, null);
     }
 }
