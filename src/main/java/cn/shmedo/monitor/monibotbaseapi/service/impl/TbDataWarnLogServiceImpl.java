@@ -63,6 +63,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
             boolean updated = this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
                     .eq(TbDataWarnLog::getWarnThresholdID, param.getThresholdID())
                     .ne(TbDataWarnLog::getDealStatus, 2)
+                    .isNull(TbDataWarnLog::getWarnEndTime)
                     .set(TbDataWarnLog::getDataStatus, 0)
                     .set(TbDataWarnLog::getWarnEndTime, param.getWarnTime()));
             Assert.isTrue(updated, "更新数据报警数据状态失败");

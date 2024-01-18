@@ -401,7 +401,7 @@ public class WarnLogController {
      * @apiName SaveDataWarn
      * @apiDescription 写入数据报警 (仅限服务内部调用)
      * @apiParam (请求参数) {Int} thresholdID 阈值配置id
-     * @apiParam (请求参数) {Int} warnLevel 报警等级(1-4)
+     * @apiParam (请求参数) {Int} warnLevel 报警等级(0-4 0表示未触发预警，数据已恢复正常)
      * @apiParam (请求参数) {Double} warnValue 报警数据值
      * @apiParam (请求参数) {DateTime} warnTime 报警时间(yyyy-MM-dd HH:mm:ss)
      * @apiSuccess (返回结果) {String} none 无
