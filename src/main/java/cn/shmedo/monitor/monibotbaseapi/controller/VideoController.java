@@ -227,7 +227,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.displayOrder 监测分组展示顺序
      * @apiSuccess (返回结果) {Object[]} [dataList.monitorGroupDataList.monitorPointDataList] 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorItemID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.displayOrder 监测点展示顺序
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.monitorPointName 监测点名称
@@ -276,7 +276,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.displayOrder 监测分组展示顺序
      * @apiSuccess (返回结果) {Object[]} [dataList.monitorPointDataList] 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.displayOrder 监测点展示顺序
      * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointName 监测点名称

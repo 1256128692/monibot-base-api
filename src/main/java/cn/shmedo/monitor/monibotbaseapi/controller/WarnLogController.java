@@ -117,7 +117,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
      * @apiSuccess (返回结果) {Object} currentPageData.warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
+     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
      * @apiSuccess (返回结果) {String} [currentPageData.warnLevel.alias] 别名名称
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
@@ -214,7 +214,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object} warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
+     * @apiSuccess (返回结果) {Int} warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
      * @apiSuccess (返回结果) {String} [warnLevel.alias] 别名名称
      * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
@@ -296,7 +296,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.warnTime 报警时间
      * @apiSuccess (返回结果) {Object} dataList.warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} dataList.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
+     * @apiSuccess (返回结果) {Int} dataList.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
      * @apiSuccess (返回结果) {String} [dataList.warnLevel.alias] 别名名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:

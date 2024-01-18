@@ -39,8 +39,8 @@ public class UpdateThresholdBaseConfigParam extends QueryThresholdBaseConfigPara
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public ResultWrapper validate() {
-        ResultWrapper validate = super.validate();
+    public ResultWrapper<?> validate() {
+        ResultWrapper<?> validate = super.validate();
         if (Objects.nonNull(validate)) {
             return validate;
         }
@@ -71,7 +71,7 @@ public class UpdateThresholdBaseConfigParam extends QueryThresholdBaseConfigPara
 
         // warn level alias config
         if (CollUtil.isNotEmpty(aliasConfigList)) {
-            final Integer monitorType = getTbMonitorItemList().stream().findAny().map(TbMonitorItem::getMonitorType).orElseThrow();
+            final Integer monitorType = getMonitorType();
             Set<Integer> warnLevelSet = ContextHolder.getBean(ITbWarnBaseConfigService.class).getWarnLevelSet(getCompanyID(), platform);
             Set<Integer> fieldIDSet = ContextHolder.getBean(TbMonitorItemFieldMapper.class).selectList(
                             new LambdaQueryWrapper<TbMonitorItemField>().eq(TbMonitorItemField::getMonitorItemID, monitorItemID))

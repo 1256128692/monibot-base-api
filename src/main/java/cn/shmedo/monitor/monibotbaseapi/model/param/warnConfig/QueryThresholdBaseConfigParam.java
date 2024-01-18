@@ -35,25 +35,26 @@ public class QueryThresholdBaseConfigParam implements ParameterValidator, Resour
     @JsonIgnore
     private Integer companyID;
     @JsonIgnore
-    private List<TbMonitorItem> tbMonitorItemList;
+    private Integer monitorType;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         if (!validPlatform()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台不存在!");
         }
-        List<TbProjectInfo> tbProjectInfoList = ContextHolder.getBean(TbProjectInfoMapper.class).selectList(new LambdaQueryWrapper<TbProjectInfo>()
-                .eq(TbProjectInfo::getID, projectID));
+        List<TbProjectInfo> tbProjectInfoList = ContextHolder.getBean(TbProjectInfoMapper.class)
+                .selectList(new LambdaQueryWrapper<TbProjectInfo>().eq(TbProjectInfo::getID, projectID));
         if (CollUtil.isEmpty(tbProjectInfoList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程不存在");
         }
-        tbMonitorItemList = ContextHolder.getBean(TbMonitorItemMapper.class).selectList(new LambdaQueryWrapper<TbMonitorItem>()
-                .eq(TbMonitorItem::getID, monitorItemID)
-                .eq(TbMonitorItem::getProjectID, projectID));
+        List<TbMonitorItem> tbMonitorItemList = ContextHolder.getBean(TbMonitorItemMapper.class)
+                .selectList(new LambdaQueryWrapper<TbMonitorItem>().eq(TbMonitorItem::getID, monitorItemID)
+                        .eq(TbMonitorItem::getProjectID, projectID));
         if (CollUtil.isEmpty(tbMonitorItemList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
         }
         this.companyID = tbProjectInfoList.stream().findAny().map(TbProjectInfo::getCompanyID).orElseThrow();
+        this.monitorType = tbMonitorItemList.stream().findAny().map(TbMonitorItem::getMonitorType).orElseThrow();
         return null;
     }
 

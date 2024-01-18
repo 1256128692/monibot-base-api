@@ -1,6 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper">
+    <resultMap id="WarnThresholdConfigListMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdMonitorPointInfo">
+        <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+        <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+        <collection property="sensorList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdSensorInfo">
+            <id column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+            <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
+            <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
+            <collection property="fieldList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnFieldThresholdConfigInfo">
+                <id column="fieldID" jdbcType="INTEGER" property="fieldID"/>
+                <result column="fieldName" jdbcType="VARCHAR" property="fieldName"/>
+                <result column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+                <result column="configID" jdbcType="INTEGER" property="configID"/>
+                <result column="warnName" jdbcType="VARCHAR" property="warnName"/>
+                <result column="compareMode" jdbcType="INTEGER" property="compareMode"/>
+                <result column="wtcEnable" jdbcType="BIT" property="enable"/>
+                <result column="wtcValue" jdbcType="VARCHAR" property="value"/>
+            </collection>
+        </collection>
+    </resultMap>
+
     <select id="getInfoById" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig">
         SELECT twhc.ID,
                twhc.CompanyID,
@@ -50,5 +70,40 @@
             LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mi.`ID` AND wtc.`Enable` IS TRUE
         WHERE mi.`ProjectID`=#{projectID}
         GROUP BY mi.`ID`
+    </select>
+    <select id="selectWarnThresholdConfigList" resultMap="WarnThresholdConfigListMap">
+        SELECT
+            mp.`ID` monitorPointID,
+            mp.`Name` monitorPointName,
+            s.`ID` sensorID,
+            s.`Name` sensorName,
+            s.`Alias` sensorAlias,
+            mtf.`ID` fieldID,
+            mtf.`FieldName` fieldName,
+            mtf.`FieldToken` fieldToken,
+            wtc.`ID` configID,
+            wtc.`WarnName` warnName,
+            wtc.`CompareMode` compareMode,
+            wtc.`Enable` wtcEnable,
+            wtc.`Value` wtcValue
+        FROM
+            tb_monitor_point mp
+            LEFT JOIN tb_sensor s ON s.`MonitorPointID` = mp.`ID`
+            <if test="param.monitorPointIDList != null and param.monitorPointIDList.size &gt; 0">
+                AND mp.`ID` IN
+                <foreach collection="param.monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+            LEFT JOIN tb_monitor_item_field mif ON mif.`MonitorItemID` = mp.`MonitorItemID`
+            LEFT JOIN tb_monitor_type_field mtf ON mtf.`ID` = mif.`MonitorTypeFieldID`
+            LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mp.`MonitorItemID` AND wtc.`SensorID` = s.`ID` AND wtc.`FieldID` = mtf.`ID` AND wtc.`Platform`=#{param.platform}
+            <if test="param.sensorIDList != null and param.sensorIDList.size &gt; 0">
+                AND wtc.`SensorID` IN
+                <foreach collection="param.sensorIDList" item="item" index="index" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        WHERE s.`ID` IS NOT NULL AND mp.`MonitorItemID`=#{param.monitorItemID}
     </select>
 </mapper>
