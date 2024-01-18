@@ -54,11 +54,11 @@ public class TbDeviceWarnLogServiceImpl implements ITbDeviceWarnLogService {
                     param.getProjectID(), param.getDeviceToken(), param.getTime(), null, content, null, 0,
                     null, null, null, null, null);
 
-            if (param.getStatus() !=null && !param.getStatus()) {
+            if (param.getStatus() != null && !param.getStatus()) {
                 tbDeviceWarnLogMapper.insert(tbDeviceWarnLog);
 
                 TbWarnNotifyConfig warnNotifyConfig = tbWarnNotifyConfigMapper.queryByCompanyIDAndPlatformID(param.getCompanyID(),
-                        param.getPlatform(),1, param.getProjectID());
+                        param.getPlatform(), 1, param.getProjectID());
 
                 if (ObjectUtil.isNotNull(warnNotifyConfig)) {
                     //通知 (需要发送通知)
@@ -120,12 +120,12 @@ public class TbDeviceWarnLogServiceImpl implements ITbDeviceWarnLogService {
                         log.info("设备SN:{}  平台: {} 未配置通知人, 无法发送通知", param.getDeviceToken(), param.getPlatform());
                     }
                 }
-            } else {
-                if (param.getStatus() != null && param.getStatus() && param.getTbDeviceWarnLog() != null) {
-                    param.getTbDeviceWarnLog().setWarnTime(param.getTime());
-                    param.getTbDeviceWarnLog().setDataStatus(0);
-                    tbDeviceWarnLogMapper.updateById(param.getTbDeviceWarnLog());
-                }
+            }
+        } else {
+            if (param.getStatus() != null && param.getStatus()) {
+                param.getTbDeviceWarnLog().setWarnTime(param.getTime());
+                param.getTbDeviceWarnLog().setDataStatus(0);
+                tbDeviceWarnLogMapper.updateById(param.getTbDeviceWarnLog());
             }
         }
     }

@@ -36,6 +36,7 @@ public class DeviceServiceImpl implements IDeviceService {
     private final TbProjectInfoMapper projectInfoMapper;
 
     private final IotService iotService;
+
     @Override
     public Boolean batchHandlerIotDeviceStatusChange(BatchUpdateVideoDeviceStatusParam pa) {
 
@@ -61,22 +62,25 @@ public class DeviceServiceImpl implements IDeviceService {
         if (result.apiSuccess()) {
             for (SimpleDeviceV5 device : result.getData()) {
 
-                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream().filter(deviceWarn -> deviceWarn.getDeviceSerial().equals(device.getDeviceToken()))
-                        .findFirst().orElse(null);
-
                 List<String> sendAddressList = device.getSendAddressList();
 
                 if (!CollectionUtil.isNullOrEmpty(sendAddressList)) {
                     for (String serviceID : sendAddressList) {
                         if (!CollectionUtil.isNullOrEmpty(tbProjectInfos)) {
                             ProjectWithServiceInfo projectWithServiceInfo = tbProjectInfos.stream().filter(project -> serviceID.equals(String.valueOf(project.getID()))).findFirst().orElse(null);
-                            if (projectWithServiceInfo != null ) {
+                            if (projectWithServiceInfo != null) {
                                 List<Integer> platformIDList = projectInfoMapper.selectPlatformListByProjectID(projectWithServiceInfo.getID());
                                 if (!CollectionUtil.isNullOrEmpty(platformIDList)) {
                                     platformIDList.forEach(p -> {
+                                        TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream().filter(deviceWarn ->
+                                                        deviceWarn.getDeviceSerial().equals(device.getDeviceToken())
+                                                                && deviceWarn.getPlatform().equals(p)
+                                                                && deviceWarn.getProjectID().equals(Integer.valueOf(serviceID))
+                                                                && deviceWarn.getWarnEndTime() == null)
+                                                .findFirst().orElse(null);
                                         tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
                                                 projectWithServiceInfo.getCompanyID(), p,
-                                                projectWithServiceInfo.getID(),DateUtil.date(), device.getProductName(),
+                                                projectWithServiceInfo.getID(), DateUtil.date(), device.getProductName(),
                                                 device.getDeviceToken(), projectWithServiceInfo.getProjectName(), "Iot设备", tbDeviceWarnLog,
                                                 device.getOnlineStatus()));
                                     });
