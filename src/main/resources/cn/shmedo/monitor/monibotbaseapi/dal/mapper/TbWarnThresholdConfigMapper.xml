@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper">
-
     <select id="getInfoById" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig">
         SELECT twhc.ID,
                twhc.CompanyID,
@@ -35,15 +34,19 @@
     <select id="selectMonitorWithThresholdConfigCountByProjectID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo">
         SELECT
-            mi.`ID` id,
-            mi.`Name` 'name',
-            mi.`Alias` alias,
-            mi.`Enable` 'enable',
-            mi.`MonitorType` monitorType,
+            mi.`ID` itemID,
+            mi.`Name` itemName,
+            mi.`Alias` itemAlias,
+            mi.`Enable` enable,
+            mt.`MonitorType` monitorType,
+            mt.`TypeName` typeName,
+            mt.`TypeAlias` typeAlias,
+            mt.`CreateType` createType,
             mi.`MonitorClass` monitorClass,
             COUNT(wtc.`ID`) configCount
         FROM
             tb_monitor_item mi
+            LEFT JOIN tb_monitor_type mt ON mt.`MonitorType` = mi.`MonitorType`
             LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mi.`ID` AND wtc.`Enable` IS TRUE
         WHERE mi.`ProjectID`=#{projectID}
         GROUP BY mi.`ID`

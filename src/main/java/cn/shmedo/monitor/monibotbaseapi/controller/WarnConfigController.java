@@ -258,13 +258,23 @@ public class WarnConfigController {
      * @apiDescription 查询工程下监测项目基础信息和启用的阈值属性配置个数
      * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
-     * @apiSuccess (返回结果) {Int} dataList.id id
-     * @apiSuccess (返回结果) {String} dataList.name 监测项目名称
-     * @apiSuccess (返回结果) {String} dataList.alias 监测项目别称
+     * @apiSuccess (返回结果) {Int} dataList.itemID 监测项目ID
+     * @apiSuccess (返回结果) {String} dataList.itemName 监测项目名称
+     * @apiSuccess (返回结果) {String} dataList.itemAlias 监测项目别称
      * @apiSuccess (返回结果) {Boolean} dataList.enable 是否启用
      * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} dataList.typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} dataList.typeAlias 监测类型别名
      * @apiSuccess (返回结果) {Int} dataList.monitorClass 监测类别,0:环境监测 1:安全监测 2:工情监测 3:防洪调度指挥监测 4:视频监测
+     * @apiSuccess (返回结果) {Int} dataList.createType 创建类型
      * @apiSuccess (返回结果) {Int} dataList.configCount 阈值属性已启用的配置个数
+     * @apiSuccess (返回结果) {Object[]} dataList.fieldList 监测项目属性列表
+     * @apiSuccess (返回结果) {Int} dataList.fieldList.fieldID 字段ID
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldToken 字段标识
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldName 字段名称
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldAlias 字段别称
+     * @apiSuccess (返回结果) {String} [dataList.fieldList.fieldDesc] 字段描述
+     * @apiSuccess (返回结果) {String} dataList.fieldList.engUnit 单位
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
