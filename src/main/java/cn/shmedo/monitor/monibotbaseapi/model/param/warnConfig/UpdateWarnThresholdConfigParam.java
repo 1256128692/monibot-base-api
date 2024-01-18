@@ -15,7 +15,6 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareMode;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataWarnLevelType;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -81,9 +80,7 @@ public class UpdateWarnThresholdConfigParam extends CompanyPlatformParam {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性不存在");
         }
         if (ObjectUtil.isNotEmpty(value)) {
-            TbWarnBaseConfig tbWarnBaseConfig = ContextHolder.getBean(ITbWarnBaseConfigService.class)
-                    .queryByCompanyIDAndPlatform(companyID, platform);
-            Set<Integer> warnLevelSet = DataWarnLevelType.fromCode(tbWarnBaseConfig.getWarnLevelType()).getWarnLevelSet();
+            Set<Integer> warnLevelSet = ContextHolder.getBean(ITbWarnBaseConfigService.class).getWarnLevelSet(companyID, platform);
             List<String> configKeyList = CompareMode.fromCode(compareMode).getConfigKeyList();
             try {
                 // e.g. {"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25},...}

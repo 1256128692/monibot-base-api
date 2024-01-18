@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,6 +66,7 @@ public class TbVideoDevice implements Serializable {
     private Integer projectID;
 
     @JsonIgnore
+    @TableField(exist = false)
     private String projectName;
 
     /**

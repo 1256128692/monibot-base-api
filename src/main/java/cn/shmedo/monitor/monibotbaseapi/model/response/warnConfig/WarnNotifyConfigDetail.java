@@ -24,15 +24,31 @@ public class WarnNotifyConfigDetail {
     private String deptIDStr;
     @JsonIgnore
     private String userIDStr;
+    @JsonIgnore
+    private String notifyMethodStr;
+    @JsonIgnore
+    private String warnLevelStr;
 
     @JsonProperty(value = "allProject")
     private Boolean allProject() {
-        return Optional.ofNullable(projectIDStr).map(String::trim).map("-1"::equals).orElse(false);
+        return Optional.ofNullable(projectIDStr).map(String::trim).map("[-1]"::equals).orElse(false);
     }
 
     @JsonProperty(value = "deptIDList")
     private List<Integer> deptIDList() {
         return Optional.ofNullable(deptIDStr).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseArray)
+                .map(u -> JSONUtil.toList(u, Integer.class)).orElse(List.of());
+    }
+
+    @JsonProperty(value = "notifyMethod")
+    private List<Integer> notifyMethod() {
+        return Optional.ofNullable(notifyMethodStr).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseArray)
+                .map(u -> JSONUtil.toList(u, Integer.class)).orElse(List.of());
+    }
+
+    @JsonProperty(value = "warnLevel")
+    private List<Integer> warnLevel() {
+        return Optional.ofNullable(warnLevelStr).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseArray)
                 .map(u -> JSONUtil.toList(u, Integer.class)).orElse(List.of());
     }
 }

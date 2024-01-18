@@ -9,9 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
-import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
-import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
-import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnThresholdConfigService;
+import cn.shmedo.monitor.monibotbaseapi.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,7 @@ public class WarnConfigController {
     private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
     private final ITbWarnBaseConfigService tbWarnBaseConfigService;
     private final ITbWarnThresholdConfigService tbWarnThresholdConfigService;
+    private final IWarnConfigService warnConfigService;
 
     /**
      * @api {POST} /QueryWarnBaseConfig 查询平台报警基础配置
@@ -183,6 +182,8 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} notifyConfigID 报警通知配置ID
      * @apiSuccess (返回结果) {Boolean} allProject 是否是全部工程, true:全部工程,false:指定工程
+     * @apiSuccess (返回结果) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiSuccess (返回结果) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口,仅noticeType==2时有该项
      * @apiSuccess (返回结果) {Int[]} projectIDList 工程ID list
      * @apiSuccess (返回结果) {Int[]} deptIDList 部门IDList
      * @apiSuccess (返回结果) {Int[]} userIDList 员工IDList
@@ -406,9 +407,9 @@ public class WarnConfigController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryThresholdBaseConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryThresholdBaseConfig(@Valid @RequestBody Object param) {
-        //TODO
-        return ResultWrapper.successWithNothing();
+    public Object queryThresholdBaseConfig(@Valid @RequestBody QueryThresholdBaseConfigParam param) {
+        TbWarnBaseConfig tbWarnBaseConfig = tbWarnBaseConfigService.queryByCompanyIDAndPlatform(param.getCompanyID(), param.getPlatform());
+        return warnConfigService.queryThresholdBaseConfig(param, tbWarnBaseConfig);
     }
 
     /**
@@ -420,11 +421,11 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiParam (请求参数) {Int} platform 平台
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求参数) {Int} [triggerType] 触发设置类型 1.有数据满足规则,直接触发对应等级报警 2.有连续n次数据满足规则,再触发对应等级报警
+     * @apiParam (请求参数) {Int} [triggerType] 触发设置类型(该项为空时将忽略triggerTimes入参) 1.有数据满足规则,直接触发对应等级报警 2.有连续n次数据满足规则,再触发对应等级报警
      * @apiParam (请求参数) {Int} [triggerTimes] 满足规则触发报警的次数,triggerType==1时该项恒为-1
-     * @apiParam (请求参数) {Object[]} aliasConfigList 别名配置列表
+     * @apiParam (请求参数) {Object[]} [aliasConfigList] 别名配置列表
      * @apiParam (请求参数) {Int} aliasConfigList.fieldID 监测属性ID
-     * @apiParam (请求参数) {Object[]} [aliasConfigList.dataList] 数据列表
+     * @apiParam (请求参数) {Object[]} aliasConfigList.dataList 数据列表
      * @apiParam (请求参数) {Int} aliasConfigList.dataList.warnLevel 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnThresholdConfigList">/QueryWarnThresholdConfigList</a>接口
      * @apiParam (请求参数) {String} aliasConfigList.dataList.alias 别名
      * @apiSuccess (返回结果) {String} none 无
@@ -440,9 +441,7 @@ public class WarnConfigController {
         }
         // TODO 加上权限校验注解后将上文替换成本注解
         // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-
-
-        //TODO
+        warnConfigService.updateThresholdBaseConfig(param.getTbTriggerConfig(), param.getTbWarnLevelAliasList(), userID);
         return ResultWrapper.successWithNothing();
     }
 }

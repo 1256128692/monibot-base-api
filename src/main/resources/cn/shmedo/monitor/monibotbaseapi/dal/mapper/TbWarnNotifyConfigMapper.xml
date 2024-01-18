@@ -16,6 +16,8 @@
         SELECT
             wnc.`Depts` deptIDStr,
             wnc.`Users` userIDStr,
+            wnc.`WarnLevel` warnLevelStr,
+            wnc.`NotifyMethod` notifyMethodStr,
             CONCAT('[',GROUP_CONCAT(ncpr.ProjectID),']') projectIDStr
         FROM tb_warn_notify_config wnc
             LEFT JOIN tb_notify_config_project_relation ncpr ON ncpr.`NotifyConfigID`=wnc.`ID`
