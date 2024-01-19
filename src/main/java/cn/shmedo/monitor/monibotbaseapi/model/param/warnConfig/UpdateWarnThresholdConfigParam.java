@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareMode;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IThresholdConfigValueCheck;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -34,7 +35,7 @@ import java.util.*;
 @Data
 @Slf4j
 @EqualsAndHashCode(callSuper = true)
-public class UpdateWarnThresholdConfigParam extends CompanyPlatformParam {
+public class UpdateWarnThresholdConfigParam extends CompanyPlatformParam implements IThresholdConfigValueCheck {
     @NotNull(message = "监测项目ID不能为空")
     @Positive(message = "监测项目ID必须为正值")
     private Integer monitorItemID;
@@ -75,30 +76,23 @@ public class UpdateWarnThresholdConfigParam extends CompanyPlatformParam {
         }
         final TbSensor tbSensor = sensorList.stream().findAny().orElseThrow();
         final Integer monitorType = tbSensor.getMonitorType();
-        if (!ContextHolder.getBean(TbMonitorTypeFieldMapper.class).exists(new LambdaQueryWrapper<TbMonitorTypeField>()
-                .eq(TbMonitorTypeField::getID, fieldID).eq(TbMonitorTypeField::getMonitorType, monitorType))) {
+        List<TbMonitorTypeField> fieldList = ContextHolder.getBean(TbMonitorTypeFieldMapper.class)
+                .selectList(new LambdaQueryWrapper<TbMonitorTypeField>().eq(TbMonitorTypeField::getID, fieldID)
+                        .eq(TbMonitorTypeField::getMonitorType, monitorType));
+        if (CollUtil.isEmpty(fieldList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "属性不存在");
+        }
+        if (ObjectUtil.isEmpty(warnName)) {
+            String fieldName = fieldList.stream().findAny().map(TbMonitorTypeField::getFieldName).orElseThrow();
+            warnName = fieldName + "异常";
         }
         if (ObjectUtil.isNotEmpty(value)) {
             Set<Integer> warnLevelSet = ContextHolder.getBean(ITbWarnBaseConfigService.class).getWarnLevelSet(companyID, platform);
             List<String> configKeyList = CompareMode.fromCode(compareMode).getConfigKeyList();
             try {
-                // e.g. {"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25},...}
-                JSONObject object = JSONUtil.parseObj(value);
-                Set<String> configWarnLevel = object.keySet();
-                // check keys
-                if (enable && configWarnLevel.size() == 0) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未配置完全的报警阈值配置无法启用");
-                }
-                if (configWarnLevel.stream().map(Integer::valueOf).anyMatch(u -> !warnLevelSet.contains(u))) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "配置的报警等级阈值和平台报警等级枚举设置不匹配");
-                }
-                // check values
-                if (object.values().stream().map(JSONUtil::parseObj).map(MapWrapper::keySet).anyMatch(u -> !u.containsAll(configKeyList))) {
-                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "配置的报警等级阈值和比较方式不匹配");
-                }
-            } catch (JSONException e) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "配置的报警等级阈值不合法");
+                this.validateValue(value, enable, warnLevelSet, configKeyList);
+            } catch (IllegalArgumentException e) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, e.getMessage());
             }
         }
         List<TbWarnThresholdConfig> tbWarnThresholdConfigList = ContextHolder.getBean(TbWarnThresholdConfigMapper.class)

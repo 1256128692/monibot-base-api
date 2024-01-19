@@ -20,7 +20,6 @@ public class CompanyPlatformParam implements ParameterValidator, ResourcePermiss
     @Positive(message = "平台key必须为正值")
     private Integer platform;
 
-    @SuppressWarnings("unchecked")
     @Override
     public ResultWrapper<?> validate() {
         if (!validPlatform()) {

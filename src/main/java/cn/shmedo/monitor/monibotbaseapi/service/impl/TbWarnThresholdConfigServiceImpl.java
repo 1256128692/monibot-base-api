@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFi
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdConfigListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdMonitorPointInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.standard.IThresholdConfigValueCheck;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnThresholdConfigService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThresholdConfigMapper, TbWarnThresholdConfig> implements ITbWarnThresholdConfigService {
+public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThresholdConfigMapper, TbWarnThresholdConfig> implements ITbWarnThresholdConfigService, IThresholdConfigValueCheck {
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -60,14 +61,9 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
         List<WarnThresholdMonitorPointInfo> dataList = this.baseMapper.selectWarnThresholdConfigList(param);
         final Boolean status = param.getStatus();
         if (Objects.nonNull(status)) {
-            // 只要配置了某一级报警阈值,就是'已配置'
             final Function<String, Boolean> func = value -> {
                 try {
-                    return Optional.ofNullable(value).filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj).map(MapWrapper::entrySet)
-                            .filter(CollUtil::isNotEmpty).map(u -> status != u.stream().anyMatch(w -> Optional.ofNullable(w.getValue())
-                                    .filter(ObjectUtil::isNotEmpty).map(JSONUtil::parseObj).map(MapWrapper::entrySet)
-                                    .filter(CollUtil::isNotEmpty).map(s -> s.stream().map(Map.Entry::getValue).allMatch(n ->
-                                            ObjectUtil.isNotEmpty(n) && !"null".equals(n))).orElse(false))).orElse(status);
+                    return !queryConfigStatus(value, status);
                 } catch (JSONException e) {
                     // 解析异常,始终清空
                     log.error("parse json error, threshold value: {}", value);

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -369,6 +370,7 @@ public class WarnConfigController {
      * @apiName AddWarnThresholdConfigBatch
      * @apiDescription 批量阈值设置
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Boolean} [isEmptyCoverage] 是否空值覆盖.<br>若之前有配置过某个传感器属性的某一级配置(记为A),在本次批量配置中又配置到了该传感器属性的另一级配置(记为B,有A!=B),但A级配置处不为空时,如果本项为true,则会用空值覆盖掉之前A级的配置
      * @apiParam (请求参数) {Int[]} sensorIDList 传感器ID List
      * @apiParam (请求参数) {Object[]} dataList 数据列表
@@ -383,8 +385,18 @@ public class WarnConfigController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddWarnThresholdConfigBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addWarnThresholdConfigBatch(@Valid @RequestBody Object param) {
-        //TODO
+    public Object addWarnThresholdConfigBatch(@Valid @RequestBody AddWarnThresholdConfigBatchParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        List<TbWarnThresholdConfig> tbWarnThresholdConfigList = param.getTbWarnThresholdConfigList().stream().peek(u -> {
+            u.setUpdateUserID(userID);
+            if (Objects.isNull(u.getCreateUserID())) {
+                u.setCreateUserID(userID);
+            }
+        }).toList();
+        this.tbWarnThresholdConfigService.saveOrUpdateBatch(tbWarnThresholdConfigList);
         return ResultWrapper.successWithNothing();
     }
 
