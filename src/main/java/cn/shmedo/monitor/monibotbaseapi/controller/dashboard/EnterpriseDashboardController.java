@@ -32,7 +32,7 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询行业分布统计，MDNET平台中项目现有量与近1年增长量
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiSuccess (返回结果) {ObjectList} industryList 行业列表
+     * @apiSuccess (返回结果) {Object[]} industryList 行业列表
      * @apiSuccess (返回结果) {Int} industryList.projectMainType 项目一级分类
      * @apiSuccess (返回结果) {String} industryList.projectMainTypeName 项目一级分类名称
      * @apiSuccess (返回结果) {Int} industryList.projectCount 项目现有量
@@ -123,8 +123,8 @@ public class EnterpriseDashboardController {
      * @apiSuccess (返回结果) {Int} provinceList.provinceCode 省份code码
      * @apiSuccess (返回结果) {String} provinceList.provinceName 省份名称（shortName）
      * @apiSuccess (返回结果) {String} provinceList.provincialCapital 省会
-     * @apiSuccess (返回结果) {String} provinceList.longitude 经度
-     * @apiSuccess (返回结果) {String} provinceList.latitude 纬度
+     * @apiSuccess (返回结果) {Double} provinceList.longitude 经度
+     * @apiSuccess (返回结果) {Double} provinceList.latitude 纬度
      * @apiSuccess (返回结果) {Int} provinceList.projectCount 项目统计
      * @apiSuccess (返回结果) {Object[]} provinceList.cityList 城市列表
      * @apiSuccess (返回结果) {Int} provinceList.cityList.cityCode 城市code
@@ -248,9 +248,14 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询设备在线率，返回近七天在线率
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiSuccess (返回结果) {Object[]} onlineRateList 在线率列表
-     * @apiSuccess (返回结果) {String} onlineRateList.date 日期
-     * @apiSuccess (返回结果) {Double} onlineRateList.onlineRate 在线率
+     * @apiSuccess (返回结果) {Int} activeCount 指令交互次数
+     * @apiSuccess (返回结果) {Int} activeAccessCount 指令交互成功次数
+     * @apiSuccess (返回结果) {Int} otaCount 远程升级次数
+     * @apiSuccess (返回结果) {Int} otaAccessCount 远程升级成功次数
+     * @apiSuccess (返回结果) {Int} execCount 规则执行次数
+     * @apiSuccess (返回结果) {Int} execAccessCount 规则执行成功次数
+     * @apiSuccess (返回结果) {Int} onlineCount 设备在线数
+     * @apiSuccess (返回结果) {Int} offlineCount 设备离线数
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
