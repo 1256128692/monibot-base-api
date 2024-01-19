@@ -3,7 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDataWarnParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class WarnLogController {
 
     private final ITbDataWarnLogService warnLogService;
+
     /**
      * @api {POST} /QueryWarnNotifyPage 报警消息分页
      * @apiVersion 1.0.0
@@ -100,13 +101,13 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
+     * @apiParam (请求参数) {Int} platform 所属平台
      * @apiParam (请求参数) {Boolean} [isRealTime] 是否是实时报警,默认true.true:实时报警, false:历史报警
      * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索监测点名称和报警名称
-     * @apiParam (请求参数) {Int} [platform] 所属平台
      * @apiParam (请求参数) {Int} [projectID] 工程项目
      * @apiParam (请求参数) {DateTime} [startTime] 开始时间(报警开始时间筛选)
      * @apiParam (请求参数) {DateTime} [endTime] 结束时间(报警开始时间筛选)
-     * @apiParam (请求参数) {Int} [warnLevel] 报警等级枚举
+     * @apiParam (请求参数) {Int} [warnLevel] 报警等级枚举key
      * @apiParam (请求参数) {Int} [dealStatus] 处理状态 0:未处理 1:已处理 2:取消 默认全部
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
@@ -116,9 +117,12 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
-     * @apiSuccess (返回结果) {Object} currentPageData.warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} currentPageData.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
-     * @apiSuccess (返回结果) {String} [currentPageData.warnLevel.alias] 别名名称
+     * @apiSuccess (返回结果) {Int} [currentPageData.dealUserID] 处理人ID,若未填报为null
+     * @apiSuccess (返回结果) {String} [currentPageData.dealUserName] 处理人名称,若未填报为null
+     * @apiSuccess (返回结果) {DateTime} [currentPageData.dealTime] 处理时间,若未填报为null
+     * @apiSuccess (返回结果) {Object} currentPageData.aliasConfig 报警等级枚举
+     * @apiSuccess (返回结果) {Int} currentPageData.aliasConfig.warnLevel 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
+     * @apiSuccess (返回结果) {String} [currentPageData.aliasConfig.alias] 别名名称
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
@@ -131,16 +135,19 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} currentPageData.gpsLocation 监测点位置
-     * @apiSuccess (返回结果) {String} currentPageData.fieldID 监测属性ID
+     * @apiSuccess (返回结果) {Int} currentPageData.fieldID 监测属性ID
      * @apiSuccess (返回结果) {String} currentPageData.fieldName 监测属性名称
      * @apiSuccess (返回结果) {String} currentPageData.fieldToken 监测属性token
+     * @apiSuccess (返回结果) {Int} currentPageData.sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} currentPageData.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} currentPageData.sensorAlias 传感器别称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDataWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDataWarnPage(@Valid @RequestBody Object param) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDataWarnPage(@Valid @RequestBody QueryDataWarnPageParam param) {
+        return warnLogService.queryDataWarnPage(param);
     }
 
     /**
@@ -152,9 +159,9 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
+     * @apiParam (请求参数) {Int} platform 所属平台
      * @apiParam (请求参数) {Boolean} [isRealTime] 是否是实时报警,默认true.true:实时报警, false:历史报警
      * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索设备SN号和报警名称
-     * @apiParam (请求参数) {Int} [platform] 所属平台
      * @apiParam (请求参数) {Int} [projectID] 工程项目
      * @apiParam (请求参数) {DateTime} [startTime] 开始时间(报警开始时间筛选)
      * @apiParam (请求参数) {DateTime} [endTime] 结束时间(报警开始时间筛选)
@@ -168,6 +175,9 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
+     * @apiSuccess (返回结果) {Int} [currentPageData.dealUserID] 处理人ID,若未填报为null
+     * @apiSuccess (返回结果) {String} [currentPageData.dealUserName] 处理人名称,若未填报为null
+     * @apiSuccess (返回结果) {DateTime} [currentPageData.dealTime] 处理时间,若未填报为null
      * @apiSuccess (返回结果) {Int} currentPageData.dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} currentPageData.warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [currentPageData.warnEndTime] 报警结束时间,仅isRealTime为false历史报警时,字段不为null
@@ -194,8 +204,8 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDeviceWarnPage(@Valid @RequestBody Object param) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDeviceWarnPage(@Valid @RequestBody QueryDeviceWarnPageParam param) {
+        return warnLogService.queryDeviceWarnPage(param);
     }
 
     /**
@@ -210,12 +220,15 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [dealContent] 处理意见,若未填报为null
+     * @apiSuccess (返回结果) {Int} [dealUserID] 处理人ID,若未填报为null
+     * @apiSuccess (返回结果) {String} [dealUserName] 处理人名称,若未派发为null
+     * @apiSuccess (返回结果) {DateTime} [dealTime] 处理时间,若未填报为null
      * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
      * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
-     * @apiSuccess (返回结果) {Object} warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
-     * @apiSuccess (返回结果) {String} [warnLevel.alias] 别名名称
+     * @apiSuccess (返回结果) {Object} aliasConfig 报警等级枚举
+     * @apiSuccess (返回结果) {Int} aliasConfig.warnLevel 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
+     * @apiSuccess (返回结果) {String} [aliasConfig.alias] 别名名称
      * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理 2:取消
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间,仅记录为历史报警时,字段不为null
@@ -236,7 +249,7 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDataWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDataWarnDetail(@Valid @RequestBody Object param) {
+    public Object queryDataWarnDetail(@Valid @RequestBody QueryWarnDetailParam param) {
         return ResultWrapper.successWithNothing();
     }
 
@@ -252,6 +265,9 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [dealContent] 处理意见,若未填报为null
+     * @apiSuccess (返回结果) {Int} [dealUserID] 处理人ID,若未填报为null
+     * @apiSuccess (返回结果) {String} [dealUserName] 处理人名称,若未派发为null
+     * @apiSuccess (返回结果) {DateTime} [dealTime] 处理时间,若未填报为null
      * @apiSuccess (返回结果) {Int} dealStatus 处理状态 0:未处理 1:已处理
      * @apiSuccess (返回结果) {DateTime} warnTime 报警开始时间
      * @apiSuccess (返回结果) {DateTime} [warnEndTime] 报警结束时间,仅记录为历史报警,字段不为null
@@ -278,7 +294,7 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDeviceWarnDetail(@Valid @RequestBody Object param) {
+    public Object queryDeviceWarnDetail(@Valid @RequestBody QueryWarnDetailParam param) {
         return ResultWrapper.successWithNothing();
     }
 
@@ -295,9 +311,9 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.warnTime 报警时间
-     * @apiSuccess (返回结果) {Object} dataList.warnLevel 报警等级枚举
-     * @apiSuccess (返回结果) {Int} dataList.warnLevel.key 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
-     * @apiSuccess (返回结果) {String} [dataList.warnLevel.alias] 别名名称
+     * @apiSuccess (返回结果) {Object} dataList.aliasConfig 报警等级枚举
+     * @apiSuccess (返回结果) {Int} dataList.aliasConfig.warnLevel 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
+     * @apiSuccess (返回结果) {String} [dataList.aliasConfig.alias] 别名名称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */

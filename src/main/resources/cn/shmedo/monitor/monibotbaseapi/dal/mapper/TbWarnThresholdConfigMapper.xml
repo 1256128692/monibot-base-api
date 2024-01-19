@@ -88,22 +88,22 @@
             wtc.`Value` wtcValue
         FROM
             tb_monitor_point mp
-            LEFT JOIN tb_sensor s ON s.`MonitorPointID` = mp.`ID`
             <if test="param.monitorPointIDList != null and param.monitorPointIDList.size &gt; 0">
                 AND mp.`ID` IN
                 <foreach collection="param.monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
                     #{item}
                 </foreach>
             </if>
+            LEFT JOIN tb_sensor s ON s.`MonitorPointID` = mp.`ID`
+            <if test="param.sensorIDList != null and param.sensorIDList.size &gt; 0">
+            AND s.`ID` IN
+            <foreach collection="param.sensorIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
             LEFT JOIN tb_monitor_item_field mif ON mif.`MonitorItemID` = mp.`MonitorItemID`
             LEFT JOIN tb_monitor_type_field mtf ON mtf.`ID` = mif.`MonitorTypeFieldID`
             LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mp.`MonitorItemID` AND wtc.`SensorID` = s.`ID` AND wtc.`FieldID` = mtf.`ID` AND wtc.`Platform`=#{param.platform}
-            <if test="param.sensorIDList != null and param.sensorIDList.size &gt; 0">
-                AND wtc.`SensorID` IN
-                <foreach collection="param.sensorIDList" item="item" index="index" open="(" close=")" separator=",">
-                    #{item}
-                </foreach>
-            </if>
         WHERE s.`ID` IS NOT NULL AND mp.`MonitorItemID`=#{param.monitorItemID}
     </select>
 </mapper>

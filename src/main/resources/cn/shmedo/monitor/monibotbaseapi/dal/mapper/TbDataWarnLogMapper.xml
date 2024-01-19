@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogMapper">
+    <resultMap id="DataWarnPageMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnPageInfo">
+        <id column="id" jdbcType="INTEGER" property="id"/>
+        <result column="warnName" jdbcType="VARCHAR" property="warnName"/>
+        <result column="workOrderID" jdbcType="INTEGER" property="workOrderID"/>
+        <result column="dealContent" jdbcType="VARCHAR" property="dealContent"/>
+        <result column="dealUserID" jdbcType="INTEGER" property="dealUserID"/>
+        <result column="dealTime" jdbcType="TIMESTAMP" property="dealTime"/>
+        <result column="dealStatus" jdbcType="INTEGER" property="dealStatus"/>
+        <result column="warnTime" jdbcType="TIMESTAMP" property="warnTime"/>
+        <result column="warnEndTime" jdbcType="TIMESTAMP" property="warnEndTime"/>
+        <result column="projectID" jdbcType="INTEGER" property="projectID"/>
+        <result column="projectName" jdbcType="VARCHAR" property="projectName"/>
+        <result column="projectShotName" jdbcType="VARCHAR" property="projectShotName"/>
+        <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+        <result column="monitorItemName" jdbcType="VARCHAR" property="monitorItemName"/>
+        <result column="monitorItemAlias" jdbcType="VARCHAR" property="monitorItemAlias"/>
+        <result column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+        <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+        <result column="gpsLocation" jdbcType="VARCHAR" property="gpsLocation"/>
+        <result column="fieldID" jdbcType="INTEGER" property="fieldID"/>
+        <result column="fieldName" jdbcType="VARCHAR" property="fieldName"/>
+        <result column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+        <result column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+        <result column="sensorName" jdbcType="VARCHAR" property="sensorName"/>
+        <result column="sensorAlias" jdbcType="VARCHAR" property="sensorAlias"/>
+        <association property="aliasConfig" javaType="cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnLevelAliasInfo">
+            <result column="warnLevel" jdbcType="INTEGER" property="warnLevel"/>
+            <result column="alias" jdbcType="VARCHAR" property="alias"/>
+        </association>
+    </resultMap>
+    <select id="selectDataWarnPage"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnPageInfo">
+        SELECT
+            dwl.`ID` id,
+            wtc.`WarnName` warnName,
+            dwl.`WorkOrderID` workOrderID,
+            dwl.`DealContent` dealContent,
+            dwl.`DealUserID` dealUserID,
+            dwl.`DealTime` dealTime,
+            dwl.`DealStatus` dealStatus,
+            dwl.`WarnTime` warnTime,
+            dwl.`WarnEndTime` warnEndTime,
+            pi.`ID` projectID,
+            pi.`ProjectName` projectName,
+            pi.`ShortName` projectShotName,
+            mi.`ID` monitorItemID,
+            mi.`Name` monitorItemName,
+            mi.`Alias` monitorItemAlias,
+            mp.`ID` monitorPointID,
+            mp.`Name` monitorPointName,
+            mp.`GpsLocation` gpsLocation,
+            mtf.`ID` fieldID,
+            mtf.`FieldName` fieldName,
+            mtf.`FieldToken` fieldToken,
+            s.`ID` sensorID,
+            s.`Name` sensorName,
+            s.`Alias` sensorAlias,
+            dwl.`WarnLevel` warnLevel,
+            wla.`Alias` alias
+        FROM
+            tb_data_warn_log dwl
+            LEFT JOIN tb_warn_threshold_config wtc ON wtc.ID = dwl.WarnThresholdID
+            LEFT JOIN tb_sensor s ON s.ID = wtc.SensorID
+            LEFT JOIN tb_monitor_point mp ON mp.ID = s.MonitorPointID
+            LEFT JOIN tb_monitor_item mi ON mi.ID = mp.MonitorItemID
+            LEFT JOIN tb_project_info pi ON pi.Id = mp.ProjectID
+            LEFT JOIN tb_monitor_item_field mif ON mif.MonitorItemID = mi.ID
+            LEFT JOIN tb_monitor_type_field mtf ON mtf.ID = mif.MonitorTypeFieldID
+            LEFT JOIN tb_warn_level_alias wla ON wla.MonitorItemID = mi.ID AND wla.FieldID = mtf.ID AND wla.Platform =#{param.platform}
+        WHERE dwl.CompanyID=#{param.companyID} AND dwl.Platform=#{param.platform}
+        <choose>
+            <when test="param.isRealTime">
+                AND dwl.`WarnEndTime` IS NULL
+            </when>
+            <otherwise>
+                AND dwl.`WarnEndTime` IS NOT NULL
+            </otherwise>
+        </choose>
+        <if test="param.queryCode != null and param.queryCode != ''">
+            AND (mp.`Name` LIKE CONCAT('%',#{param.queryCode},'%') OR wtc.`WarnName` LIKE CONCAT('%',#{param.queryCode},'%'))
+        </if>
+        <if test="param.projectID != null">
+            AND pi.ID =#{param.projectID}
+        </if>
+        <if test="param.startTime != null">
+            AND dwl.WarnTime &gt;= #{param.startTime}
+        </if>
+        <if test="param.endTime != null">
+            AND dwl.WarnTime &lt;= #{param.endTime}
+        </if>
+        <if test="param.dealStatus != null">
+            AND dwl.DealStatus =#{param.dealStatus}
+        </if>
+        <if test="param.warnLevel != null">
+            AND dwl.`WarnLevel` =#{param.warnLevel}
+        </if>
+    </select>
+</mapper>

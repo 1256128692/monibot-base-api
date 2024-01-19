@@ -1,9 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
+import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogHistoryMapper;
@@ -19,22 +22,30 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDataWarnParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.shmedo.monitor.monibotbaseapi.model.enums.DataWarnCase.*;
 
@@ -55,7 +66,9 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     private final TbDataWarnLogHistoryMapper historyMapper;
     private final TbWarnNotifyRelationMapper notifyRelationMapper;
     private final FileConfig fileConfig;
+    private final UserService userService;
 
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveDataWarnLog(SaveDataWarnParam param) {
 
@@ -213,5 +226,32 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         threshold.getPlatform());
             }
         }
+    }
+
+    @Override
+    @Deprecated
+    public PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param) {
+
+
+//        return new PageUtil.PageWithMap<>(, , , Dict.of(param.getTbWarnBaseConfig()));
+        return null;
+    }
+
+    @Override
+    public PageUtil.PageWithMap<DataWarnPageInfo> queryDataWarnPage(QueryDataWarnPageParam param) {
+        TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
+        IPage<DataWarnPageInfo> page = this.baseMapper.selectDataWarnPage(new Page<>(param.getCurrentPage(), param.getPageSize()), param);
+        List<DataWarnPageInfo> records = page.getRecords();
+        Optional.of(records.stream().map(DataWarnPageInfo::getDealUserID).collect(Collectors.toSet()))
+                .filter(CollUtil::isNotEmpty).map(u -> new QueryUserIDNameParameter(u.stream().toList()))
+                .map(u -> userService.queryUserIDName(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).map(u -> u.stream().collect(Collectors
+                        .toMap(UserIDName::getUserID, UserIDName::getUserName))).filter(CollUtil::isNotEmpty).ifPresent(u ->
+                        records.stream().filter(w -> u.containsKey(w.getDealUserID())).peek(w ->
+                                w.setDealUserName(u.get(w.getDealUserID()))).toList());
+        return new PageUtil.PageWithMap<>(page.getPages(), page.getRecords(), page.getTotal(), Map.of(
+                "warnTag", tbWarnBaseConfig.getWarnTag(),
+                "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
+                "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle()));
     }
 }
