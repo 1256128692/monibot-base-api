@@ -227,10 +227,14 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询设备运维统计
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiSuccess (返回结果) {Double} onlineRate 在线率（设备实时在线率，点击可查看7天在线率，每日在线率取最接近当日8：00的在线率）
-     * @apiSuccess (返回结果) {Object[]} commandList 指令列表
-     * @apiSuccess (返回结果) {Int} commandList.commandType 指令类型：0-指令交互；1-远程升级；2-规则执行
-     * @apiSuccess (返回结果) {Int} commandList.count 累计次数
+     * @apiSuccess (返回结果) {Int} activeCount 指令交互次数
+     * @apiSuccess (返回结果) {Int} activeAccessCount 指令交互成功次数
+     * @apiSuccess (返回结果) {Int} otaCount 远程升级次数
+     * @apiSuccess (返回结果) {Int} otaAccessCount 远程升级成功次数
+     * @apiSuccess (返回结果) {Int} execCount 规则执行次数
+     * @apiSuccess (返回结果) {Int} execAccessCount 规则执行成功次数
+     * @apiSuccess (返回结果) {Int} onlineCount 设备在线数
+     * @apiSuccess (返回结果) {Int} offlineCount 设备离线数
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
@@ -248,14 +252,9 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询设备在线率，返回近七天在线率
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiSuccess (返回结果) {Int} activeCount 指令交互次数
-     * @apiSuccess (返回结果) {Int} activeAccessCount 指令交互成功次数
-     * @apiSuccess (返回结果) {Int} otaCount 远程升级次数
-     * @apiSuccess (返回结果) {Int} otaAccessCount 远程升级成功次数
-     * @apiSuccess (返回结果) {Int} execCount 规则执行次数
-     * @apiSuccess (返回结果) {Int} execAccessCount 规则执行成功次数
-     * @apiSuccess (返回结果) {Int} onlineCount 设备在线数
-     * @apiSuccess (返回结果) {Int} offlineCount 设备离线数
+     * @apiSuccess (返回结果) {Object[]} onlineRateList 在线率列表
+     * @apiSuccess (返回结果) {String} onlineRateList.date 日期
+     * @apiSuccess (返回结果) {Double} onlineRateList.onlineRate 在线率
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
