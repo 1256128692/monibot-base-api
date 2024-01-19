@@ -2,11 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.map.MapWrapper;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONException;
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
@@ -25,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -63,15 +58,15 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
         if (Objects.nonNull(status)) {
             final Function<String, Boolean> func = value -> {
                 try {
-                    return !queryConfigStatus(value, status);
+                    return queryConfigStatus(value, status);
                 } catch (JSONException e) {
-                    // 解析异常,始终清空
+                    // 解析异常,始终排除
                     log.error("parse json error, threshold value: {}", value);
-                    return true;
+                    return false;
                 }
             };
-            dataList.stream().peek(u -> u.getSensorList().stream().peek(w -> w.getFieldList().stream().peek(s ->
-                    s.dealStatusFilter(func)).toList()).toList()).toList();
+            dataList.stream().peek(u -> u.getSensorList().stream().peek(w -> w.setFieldList(
+                    w.getFieldList().stream().filter(s -> func.apply(s.getValue())).toList())).toList()).toList();
         }
         info.setDataList(dataList);
         return info;

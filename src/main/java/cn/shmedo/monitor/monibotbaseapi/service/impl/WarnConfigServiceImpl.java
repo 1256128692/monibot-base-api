@@ -2,19 +2,22 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbTriggerConfigMapper;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnLevelAliasMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryThresholdBaseConfigParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.ThresholdBaseConfigFieldInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.ThresholdBaseConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -25,6 +28,7 @@ import java.util.*;
 public class WarnConfigServiceImpl implements IWarnConfigService {
     private final ITbTriggerConfigService tbTriggerConfigService;
     private final ITbWarnLevelAliasService tbWarnLevelAliasService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     public ThresholdBaseConfigInfo queryThresholdBaseConfig(QueryThresholdBaseConfigParam param, TbWarnBaseConfig tbWarnBaseConfig) {
@@ -53,6 +57,10 @@ public class WarnConfigServiceImpl implements IWarnConfigService {
             }
             u.setUpdateUserID(userID);
             this.tbTriggerConfigService.saveOrUpdate(u);
+            Integer triggerTimes = u.getTriggerTimes();
+            publisher.publishEvent(new WarnConfigEventDto(this, RedisKeys.WARN_TRIGGER + u.getPlatform(),
+                    u.getProjectID() + ":" + u.getMonitorItemID(), null,
+                    Map.of("triggerType", triggerTimes == -1 ? 1 : 2, "continuousTime", triggerTimes)));
         });
         Optional.ofNullable(tbWarnLevelAliasList).filter(CollUtil::isNotEmpty).ifPresent(u -> {
             List<TbWarnLevelAlias> list = u.stream().peek(w -> {
@@ -63,5 +71,16 @@ public class WarnConfigServiceImpl implements IWarnConfigService {
             }).toList();
             this.tbWarnLevelAliasService.saveOrUpdateBatch(list);
         });
+    }
+
+    @Override
+    public void publishThresholdConfigMsg(List<TbWarnThresholdConfig> configList) {
+        configList.stream().peek(u -> {
+            u.setCreateUserID(null);
+            u.setUpdateUserID(null);
+            u.setCreateTime(null);
+            u.setUpdateTime(null);
+        }).collect(Collectors.groupingBy(TbWarnThresholdConfig::getSensorID)).forEach((k, v) -> publisher.publishEvent(
+                new WarnConfigEventDto(this, RedisKeys.WARN_THRESHOLD + k, null, null, v)));
     }
 }

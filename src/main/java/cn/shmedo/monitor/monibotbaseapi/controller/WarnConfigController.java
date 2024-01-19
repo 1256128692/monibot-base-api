@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.*;
 import cn.shmedo.monitor.monibotbaseapi.service.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -360,6 +363,7 @@ public class WarnConfigController {
             tbWarnThresholdConfig.setCreateUserID(userID);
         }
         tbWarnThresholdConfigService.saveOrUpdate(tbWarnThresholdConfig);
+        publishThresholdConfigMsg(List.of(tbWarnThresholdConfig));
         return ResultWrapper.successWithNothing();
     }
 
@@ -397,6 +401,7 @@ public class WarnConfigController {
             }
         }).toList();
         this.tbWarnThresholdConfigService.saveOrUpdateBatch(tbWarnThresholdConfigList);
+        publishThresholdConfigMsg(tbWarnThresholdConfigList);
         return ResultWrapper.successWithNothing();
     }
 
@@ -462,5 +467,12 @@ public class WarnConfigController {
         // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         warnConfigService.updateThresholdBaseConfig(param.getTbTriggerConfig(), param.getTbWarnLevelAliasList(), userID);
         return ResultWrapper.successWithNothing();
+    }
+
+    private void publishThresholdConfigMsg(List<TbWarnThresholdConfig> configList) {
+        Set<Integer> sensorIDSet = configList.stream().map(TbWarnThresholdConfig::getSensorID).collect(Collectors.toSet());
+        List<TbWarnThresholdConfig> list = tbWarnThresholdConfigService.list(new LambdaQueryWrapper<TbWarnThresholdConfig>()
+                .in(TbWarnThresholdConfig::getSensorID, sensorIDSet));
+        warnConfigService.publishThresholdConfigMsg(list);
     }
 }
