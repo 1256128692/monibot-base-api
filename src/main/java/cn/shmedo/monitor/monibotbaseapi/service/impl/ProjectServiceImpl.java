@@ -53,6 +53,7 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -71,7 +72,7 @@ import java.util.stream.Stream;
 @EnableTransactionManagement
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService {
+public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProjectInfo> implements ProjectService, InitializingBean {
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbTagMapper tbTagMapper;
     private final TbProjectTypeMapper tbProjectTypeMapper;
@@ -88,6 +89,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbProjectRelationMapper tbProjectRelationMapper;
     private final TbDocumentFileMapper tbDocumentFileMapper;
     private final TbProjectServiceRelationMapper tbProjectServiceRelationMapper;
+    private final RegionArea defaultRegionArea = new RegionArea();
+    private Map<String, RegionArea> regionAreaMap;
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
@@ -97,6 +100,50 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.AUTH_REDIS_SERVICE)
     private RedisService authRedisService;
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        regionAreaMap = monitorRedisService.getAll(RedisKeys.REGION_AREA_KEY, RegionArea.class);
+        // 缓存预热--工程项目信息
+        setupProjectInfoCache();
+    }
+
+    /**
+     * 设置工程项目信息缓存
+     */
+    private void setupProjectInfoCache() {
+        // redis没有key时才参加缓存预热
+        if (!monitorRedisService.hasKey(RedisKeys.PROJECT_KEY)) {
+            List<TbProjectInfo> list = this.list();
+            Optional.ofNullable(list).ifPresent(li -> {
+                // 处理属性
+                List<ProjectInfoCache> cacheList = BeanUtil.copyToList(li, ProjectInfoCache.class);
+                cacheList.forEach(projectInfoCache -> doProjectInfoCache(projectInfoCache, regionAreaMap));
+                // 设置缓存
+                monitorRedisService.putAll(RedisKeys.PROJECT_KEY, cacheList.stream().collect(Collectors.toMap(ProjectInfoCache::getID, Function.identity())));
+            });
+        }
+    }
+
+    private void doProjectInfoCache(ProjectInfoCache projectInfoCache, Map<String, RegionArea> regionAreaMap) {
+        // 项目类型
+        TbProjectType tbProjectType = ProjectTypeCache.projectTypeMap.getOrDefault(projectInfoCache.getProjectType(), null);
+        Optional.ofNullable(tbProjectType).ifPresent(t -> {
+            projectInfoCache.setProjectTypeName(t.getTypeName());
+            projectInfoCache.setProjectMainTypeName(t.getMainType());
+        });
+        // 行政区划
+        Optional.ofNullable(projectInfoCache.getLocation()).filter(StringUtils::isNotBlank)
+                .map(loc -> {
+                    ProjectInfoCache.LocationInfo locationInfo = JSONUtil.toBean(loc, ProjectInfoCache.LocationInfo.class);
+                    locationInfo.setProvinceName(regionAreaMap.getOrDefault(String.valueOf(locationInfo.getProvince()), defaultRegionArea).getName())
+                            .setCityName(regionAreaMap.getOrDefault(String.valueOf(locationInfo.getCity()), defaultRegionArea).getName())
+                            .setAreaName(regionAreaMap.getOrDefault(String.valueOf(locationInfo.getArea()), defaultRegionArea).getName())
+                            .setTownName(regionAreaMap.getOrDefault(String.valueOf(locationInfo.getTown()), defaultRegionArea).getName());
+                    return locationInfo;
+                })
+                .ifPresent(projectInfoCache::setLocationInfo);
+    }
 
     private static List<String> convertToRaiseCropNameList(String raiseCropName) {
         try {
@@ -218,7 +265,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
 
-
+        // 添加项目缓存
+        ProjectInfoCache projectInfoCache = BeanUtil.toBean(tbProjectInfo, ProjectInfoCache.class);
+        doProjectInfoCache(projectInfoCache, regionAreaMap);
+        monitorRedisService.putIfAbsent(RedisKeys.PROJECT_KEY, String.valueOf(projectInfoCache.getID()), projectInfoCache);
         return tbProjectInfo.getID();
     }
 
@@ -351,6 +401,10 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 .eq(TbDocumentFile::getSubjectType, DocumentSubjectType.PROJECT.getCode())
                 .in(TbDocumentFile::getSubjectID, param.getDataIDList()));
         tbProjectInfoMapper.updateLevel2Unallocated();
+
+        // 删除项目缓存
+        List<String> idList = param.getDataIDList().stream().map(String::valueOf).collect(Collectors.toList());
+        monitorRedisService.remove(RedisKeys.PROJECT_KEY, idList);
     }
 
     @Override
@@ -422,6 +476,11 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 throw new CustomBaseException(info.getCode(), info.getMsg());
             }
         }
+
+        // 刷新项目缓存
+        ProjectInfoCache projectInfoCache = BeanUtil.toBean(projectInfo, ProjectInfoCache.class);
+        doProjectInfoCache(projectInfoCache, regionAreaMap);
+        monitorRedisService.put(RedisKeys.PROJECT_KEY, String.valueOf(projectInfoCache.getID()), projectInfoCache);
     }
 
     @Override
@@ -1295,4 +1354,5 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
 
         return projectWithIrrigationBaseInfoList;
     }
+
 }

@@ -46,4 +46,14 @@ public enum PlatformType {
         return Arrays.stream(PlatformType.values())
                 .filter(item -> item.getType().equals(type)).findFirst().orElse(null);
     }
+
+    /**
+     * 根据类型描述获取枚举
+     * @param typeStr  类型描述
+     * @return  枚举
+     */
+    public static PlatformType getByTypeStr(String typeStr) {
+        return Arrays.stream(PlatformType.values())
+                .filter(item -> item.getTypeStr().equals(typeStr)).findFirst().orElse(null);
+    }
 }

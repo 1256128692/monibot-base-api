@@ -41,8 +41,8 @@ public class WeatherController {
      * @apiSuccess (返回结果) {DateTime} projectInfo.expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} projectInfo.enable 是否有效
      * @apiSuccess (返回结果) {String} projectInfo.projectAddress 项目地址
-     * @apiSuccess (返回结果) {Double} projectInfo.latitude 项目经度
-     * @apiSuccess (返回结果) {Double} projectInfo.longitude 项目纬度
+     * @apiSuccess (返回结果) {Double} projectInfo.longitude 项目经度
+     * @apiSuccess (返回结果) {Double} projectInfo.latitude 项目纬度
      * @apiSuccess (返回结果) {String} projectInfo.[imagePath] 项目图片地址
      * @apiSuccess (返回结果) {String} projectInfo.[projectDesc] 项目简介
      * @apiSuccess (返回结果) {DateTime} projectInfo.createTime 创建时间

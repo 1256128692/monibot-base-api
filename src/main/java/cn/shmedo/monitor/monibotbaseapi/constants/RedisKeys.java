@@ -58,6 +58,11 @@ public class RedisKeys {
     public static final String PROJECT_TYPE_KEY = "cn.shmedo.mdmbse.projectTypeCache";
 
     /**
+     * 工程项目缓存
+     */
+    public static final String PROJECT_KEY = "cn.shmedo.mdmbse.projectCache";
+
+    /**
      * 表单模板缓存
      */
     public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";
