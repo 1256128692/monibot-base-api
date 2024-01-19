@@ -560,4 +560,10 @@ public class TimeUtil {
             return formatter;
         }
     }
+
+    public static Date previousYear(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -1);
+        return calendar.getTime();
+    }
 }

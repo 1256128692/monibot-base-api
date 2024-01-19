@@ -30,7 +30,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     IPage<ProjectInfo> getProjectPage(IPage<ProjectInfo> page,
                                       @Param("pa") QueryProjectListRequest pa);
 
-    int countByNameExcludeID(String projectName, Integer projectID);
+    int countByNameExcludeID(@Param("projectName") String projectName, @Param("projectID") Integer projectID);
 
     int countByProjectIDList(List<Integer> idList, Integer companyID);
 

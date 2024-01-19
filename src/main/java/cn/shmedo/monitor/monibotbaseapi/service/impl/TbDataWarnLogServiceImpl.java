@@ -93,7 +93,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         //区分报警类型
         if (existLog != null) {
             if (Objects.equals(existLog.getWarnLevel(), param.getWarnLevel())) {
-                //等级未变更，更新报警时间，记录历史
+                //等级未变更，更新报警时间、通知内容，记录历史
                 param.setWarnCase(SAME);
             } else if (existLog.getWarnLevel() > param.getWarnLevel()) {
                 //报警升级，更新报警时间和内容，发送变更通知，记录历史
@@ -116,23 +116,21 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
             Assert.isTrue(this.historyMapper.insert(history) > 0, "存储数据报警失败");
         }
 
-        //通知内容
-        WarnThresholdConfig threshold = null;
-        if (!SAME.equals(param.getWarnCase())) {
-            //查询阈值配置详情
-            threshold = thresholdConfigMapper.getInfoById(param.getThresholdID());
-            TbWarnBaseConfig config = baseConfigService.queryByCompanyIDAndPlatform(threshold.getCompanyID(), threshold.getPlatform());
+        //查询阈值配置详情
+        WarnThresholdConfig threshold = thresholdConfigMapper.getInfoById(param.getThresholdID());
 
-            WarnTag warnTag = WarnTag.fromCode(config.getWarnTag());
-            WarnLevelStyle style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
-            String levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel() - 1] + warnTag.getDesc();
+        //重新构建通知内容
+        TbWarnBaseConfig config = baseConfigService.queryByCompanyIDAndPlatform(threshold.getCompanyID(), threshold.getPlatform());
+        WarnTag warnTag = WarnTag.fromCode(config.getWarnTag());
+        WarnLevelStyle style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
+        String levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel() - 1] + warnTag.getDesc();
 
-            String content = StrUtil.format(WARN_CONTENT_FORMAT, threshold.getProjectName(), threshold.getMonitorPointName(),
-                    DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
-                    threshold.getWarnName(), levelStr, threshold.getFieldName(), param.getWarnValue(), threshold.getFieldUnitEng());
-            param.setWarnContent(content);
-            param.setWarnLevelName(levelStr);
-        }
+        String content = StrUtil.format(WARN_CONTENT_FORMAT, threshold.getProjectName(), threshold.getMonitorPointName(),
+                DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
+                threshold.getWarnName(), levelStr, threshold.getFieldName(), param.getWarnValue(), threshold.getFieldUnitEng());
+        param.setWarnContent(content);
+        param.setWarnLevelName(levelStr);
+
 
         //报警实体
         TbDataWarnLog warnLog = switch (param.getWarnCase()) {
@@ -149,6 +147,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 yield entity;
             }
             case SAME -> {
+                existLog.setWarnContent(param.getWarnContent());
                 existLog.setWarnTime(param.getWarnTime());
                 existLog.setDataStatus(1);
                 yield existLog;
@@ -166,11 +165,11 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
             assert threshold != null;
-            WarnNotifyConfig config = notifyConfigService.queryByProjectIDAndPlatform(threshold.getProjectID(),
+            WarnNotifyConfig notifyConfig = notifyConfigService.queryByProjectIDAndPlatform(threshold.getProjectID(),
                     threshold.getPlatform(), 2);
-            if (config != null) {
-                if (config.getLevels().contains(param.getWarnLevel())) {
-                    if (config.getMethods().contains(1)) {
+            if (notifyConfig != null) {
+                if (notifyConfig.getLevels().contains(param.getWarnLevel())) {
+                    if (notifyConfig.getMethods().contains(1)) {
                         // 平台消息
                         final String warnName = threshold.getWarnName();
                         List<Integer> notifyIds = null;
@@ -178,10 +177,10 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                             notifyIds = notifyService.sysNotify(threshold.getCompanyID(),
                                     () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
                                             param.getWarnContent(), SysNotify.Status.UNREAD, param.getWarnTime())),
-                                    config.getContacts().keySet().toArray(Integer[]::new));
+                                    notifyConfig.getContacts().keySet().toArray(Integer[]::new));
                         } catch (Exception e) {
-                            log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(), threshold.getProjectID(),
-                                    threshold.getPlatform(), e.getMessage());
+                            log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(),
+                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
                             throw e;
                         }
 
@@ -197,10 +196,10 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                                         }).toList()));
                     }
 
-                    if (config.getMethods().contains(2)) {
+                    if (notifyConfig.getMethods().contains(2)) {
                         // 短信
-                        //${warnType}${projectName}内${pointName}于${time}发生${warnName}，报警等级:${warnLevel}，实测数据:{fliedName}${warnData}${unit}，请关注！
-                        Map<String, Object> paramMap = Map.of("warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
+                        Map<String, Object> paramMap = Map.of(
+                                "warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
                                 "projectName", Optional.ofNullable(threshold.getProjectShortName())
                                         .filter(e -> !e.isBlank()).orElse(threshold.getProjectName()),
                                 "pointName", threshold.getMonitorPointName(),
@@ -212,18 +211,19 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                                 "unit", Optional.ofNullable(threshold.getFieldUnitEng())
                                         .filter(e -> !e.isEmpty()).orElse("无"));
                         try {
-                            boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDataWarnTemplateCode(), paramMap,
-                                    config.getContacts().values().toArray(String[]::new));
+                            boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME,
+                                    fileConfig.getDataWarnTemplateCode(), paramMap,
+                                    notifyConfig.getContacts().values().toArray(String[]::new));
                             Assert.isTrue(result);
                         } catch (Exception e) {
-                            log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(), threshold.getProjectID(),
-                                    threshold.getPlatform(), e.getMessage());
+                            log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(),
+                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
                         }
                     }
                 }
             } else {
-                log.info("规则:{} 项目: {}, 平台: {} 数据报警未配置通知人, 无法发送通知", threshold.getId(), threshold.getProjectID(),
-                        threshold.getPlatform());
+                log.info("规则:{} 项目: {}, 平台: {} 数据报警未配置通知人, 无法发送通知", threshold.getId(),
+                        threshold.getProjectID(), threshold.getPlatform());
             }
         }
     }
