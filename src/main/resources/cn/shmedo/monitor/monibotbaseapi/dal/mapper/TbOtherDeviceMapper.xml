@@ -55,4 +55,15 @@
           (vendor = #{item.vendor} and model = #{item.model} and token = #{item.token})
       </foreach>
   </select>
+
+  <select id="queryCountByProjectIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.OtherDeviceCountInfo">
+      select projectID,count(1) as otherCount
+      from tb_other_device
+      WHERE ProjectID IN
+      <foreach collection="projectIDList" item="projectID" open="(" separator="," close=")">
+      #{projectID}
+      </foreach>
+      GROUP BY ProjectID
+    </select>
 </mapper>

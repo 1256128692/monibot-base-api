@@ -88,6 +88,12 @@ public class RedisKeys {
      * 示例: cn.shmedo.iot.monitor.warn.silenceCycle:{thresholdID}
      */
     public static final String WARN_SILENCE_CYCLE = "cn.shmedo.monitor.warn.silenceCycle:";
+
+
+    /**
+     * 设备资产
+     */
+    public static final String DEVICE_ASSET_KEY = "cn.shmedo.monitor.project.deviceAsset";
 }
 
     
