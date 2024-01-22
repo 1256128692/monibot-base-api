@@ -74,13 +74,13 @@ public class TbDeviceWarnLogServiceImpl implements ITbDeviceWarnLogService {
                             Map<Integer, String> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
 
                             try {
-//                                boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDeviceWarnTemplateCode(),
-//                                        Map.of("projectName", param.getProjectName(),
-//                                                "deviceModel", param.getDeviceSource(),
-//                                                "time", param.getTime(),
-//                                                "deviceType", param.getDeviceType(),
-//                                                "deviceSn", param.getDeviceToken()), phoneMap.values().toArray(String[]::new));
-//                                assert result;
+                                boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDeviceWarnTemplateCode(),
+                                        Map.of("projectName", param.getProjectName(),
+                                                "deviceModel", param.getDeviceSource(),
+                                                "time", param.getTime(),
+                                                "deviceType", param.getDeviceType(),
+                                                "deviceSn", param.getDeviceToken()), phoneMap.values().toArray(String[]::new));
+                                assert result;
                             } catch (Exception e) {
                                 log.info("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceToken(),
                                         param.getPlatform(), e.getMessage());
@@ -93,26 +93,26 @@ public class TbDeviceWarnLogServiceImpl implements ITbDeviceWarnLogService {
                             final String warnName = "设备下线";
                             List<Integer> notifyIds = null;
                             Map<Integer, String> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
-//                            try {
-//                                notifyIds = notifyService.sysNotify(param.getCompanyID(),
-//                                        () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
-//                                                content, SysNotify.Status.UNREAD, param.getTime())),
-//                                        phoneUserMap.keySet().toArray(Integer[]::new));
-//                            } catch (Exception e) {
-//                                log.info("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceToken(),
-//                                        param.getPlatform(), e.getMessage());
-//                            }
+                            try {
+                                notifyIds = notifyService.sysNotify(param.getCompanyID(),
+                                        () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
+                                                content, SysNotify.Status.UNREAD, param.getTime())),
+                                        phoneUserMap.keySet().toArray(Integer[]::new));
+                            } catch (Exception e) {
+                                log.info("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceToken(),
+                                        param.getPlatform(), e.getMessage());
+                            }
 
-                            //通知关联
-//                            Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
-//                                    .ifPresent(e -> notifyRelationMapper.insertBatchSomeColumn(e.stream()
-//                                            .map(item -> {
-//                                                TbWarnNotifyRelation relation = new TbWarnNotifyRelation();
-//                                                relation.setNotifyID(item);
-//                                                relation.setWarnLogID(tbDeviceWarnLog.getId());
-//                                                relation.setType(1);
-//                                                return relation;
-//                                            }).toList()));
+//                            通知关联
+                            Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
+                                    .ifPresent(e -> notifyRelationMapper.insertBatchSomeColumn(e.stream()
+                                            .map(item -> {
+                                                TbWarnNotifyRelation relation = new TbWarnNotifyRelation();
+                                                relation.setNotifyID(item);
+                                                relation.setWarnLogID(tbDeviceWarnLog.getId());
+                                                relation.setType(1);
+                                                return relation;
+                                            }).toList()));
 
                         }
                     } else {

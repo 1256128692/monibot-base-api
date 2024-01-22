@@ -1,11 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
-import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.CheckProjectNameParam;
 import cn.shmedo.monitor.monibotbaseapi.service.IOtherDeviceService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -55,16 +52,33 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Int}   dataCount   数据总数量
      * @apiSuccess (返回结果) {Int}   monitorItemCount   监测项目数量
      * @apiSuccess (返回结果) {Int}   monitorPointTotalCount   监测点总数量
-     * @apiSuccess (返回结果) {Object[]}   data   监测类型信息
-     * @apiSuccess (返回结果) {Int}   data.monitorType   监测类型ID
-     * @apiSuccess (返回结果) {String}   data.monitorTypeName   监测类型名称
-     * @apiSuccess (返回结果) {Int}   data.monitorPointCount   监测类型下监测点数量
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddBaseProject
      */
     @Permission(permissionName = "mdmbase:AddBaseProject")
     @RequestMapping(value = "DataCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object dataCountStatistics(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /MonitorItemCountStatistics  工程下监测项目的监测点数量
+     * @apiVersion 1.0.0
+     * @apiGroup 工程下首页统计模块
+     * @apiName MonitorItemCountStatistics
+     * @apiDescription 工程下监测项目的监测点数量
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiSuccess (返回结果) {Object[]}   data   数据
+     * @apiSuccess (返回结果) {Int}   data.monitorItemID   监测项目ID
+     * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
+     * @apiSuccess (返回结果) {Int}   data.monitorPointCount   监测点数量
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     */
+    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @RequestMapping(value = "MonitorItemCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object monitorItemCountStatistics(@Validated @RequestBody Object pa) {
         return null;
     }
 
@@ -93,43 +107,68 @@ public class ProjectStatisticsController {
 
 
     /**
-     * @api {POST} /QuerySingleProjectMonitorPointNewDataList  查询单工程下监测点下传感器最新数据列表
+     * @api {POST} /QuerySingleProjectMonitorPointInfoList  查询单工程下监测点信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
-     * @apiName DistinctWarnTypeMonitorPointCount
+     * @apiName QuerySingleProjectMonitorPointInfoList
      * @apiDescription 查询单工程下监测点下传感器最新数据列表
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
+     * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
      * @apiSuccess (返回结果) {Object[]}   data   数据
      * @apiSuccess (返回结果) {Int}   data.monitorPointID   监测点ID
      * @apiSuccess (返回结果) {String}   data.monitorPointName   监测点名称
      * @apiSuccess (返回结果) {String}   data.gpsLocation   监测点位置
-     * @apiSuccess (返回结果) {Int}   data.monitorItemID   监测项目ID
-     * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
-     * @apiSuccess (返回结果) {Int}   data.monitorGroupID   监测组ID
-     * @apiSuccess (返回结果) {String}   data.monitorGroupName   监测组名称
-     * @apiSuccess (返回结果) {Date}   data.dataTime   最新接收数据时间
-     * @apiSuccess (返回结果) {Int}   data.dataWarnStatus   监测点预警状态
-     * @apiSuccess (返回结果) {Boolean}   data.deviceOnlineStatus   设备在线状态,按规则取某个特定的传感器
-     * @apiSuccess (返回结果) {T}   data.data   监测点下单个传感器最新数据对象,包含基础属性,监测值,属性单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddBaseProject
      */
     @Permission(permissionName = "mdmbase:AddBaseProject")
-    @RequestMapping(value = "QuerySingleProjectMonitorPointNewDataList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object querySingleProjectMonitorPointNewDataList(@Validated @RequestBody Object pa) {
+    @RequestMapping(value = "QuerySingleProjectMonitorPointInfoList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySingleProjectMonitorPointInfoList(@Validated @RequestBody Object pa) {
         return null;
     }
 
 
     /**
-     * @api {POST} /QuerySingleProjectMonitorPointNewDataPage  查询单工程下监测点下传感器最新数据分页
+     * @api {POST} /QuerySingleProjectMonitorPointDetail  查询单工程下监测点详情信息
+     * @apiVersion 1.0.0
+     * @apiGroup 工程下首页统计模块
+     * @apiName QuerySingleProjectMonitorPointDetail
+     * @apiDescription 查询单工程下监测点详情信息
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {Int}   monitorPointID   监测点ID
+     * @apiSuccess (返回结果) {String}   monitorPointName   监测点名称
+     * @apiSuccess (返回结果) {String}   gpsLocation   监测点位置
+     * @apiSuccess (返回结果) {Int}   monitorItemID   监测项目ID
+     * @apiSuccess (返回结果) {String}   monitorItemName   监测项目名称
+     * @apiSuccess (返回结果) {Int}   monitorGroupID   监测组ID
+     * @apiSuccess (返回结果) {String}   monitorGroupName   监测组名称
+     * @apiSuccess (返回结果) {Date}   dataTime   最新接收数据时间
+     * @apiSuccess (返回结果) {Int}   dataWarnStatus   监测点预警状态,按传感器最高预警状态为判断依据
+     * @apiSuccess (返回结果) {Boolean}   deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
+     * @apiSuccess (返回结果) {T}   data   监测点下单个传感器最新数据对象,包含传感器ID名称,基础属性,监测值,属性单位
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     */
+    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @RequestMapping(value = "QuerySingleProjectMonitorPointDetail", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySingleProjectMonitorPointDetail(@Validated @RequestBody Object pa) {
+        return null;
+    }
+
+
+    /**
+     * @api {POST} /QuerySingleProjectMonitorPointNewDataPage  查询单工程监测点下传感器最新数据分页
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
      * @apiName QuerySingleProjectMonitorPointNewDataPage
      * @apiDescription 查询单工程下监测点下传感器最新数据分页
      * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
+     * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 总数量
@@ -143,9 +182,10 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorGroupID   监测组ID
      * @apiSuccess (返回结果) {String}   currentPageData.monitorGroupName   监测组名称
      * @apiSuccess (返回结果) {Date}   currentPageData.dataTime   最新接收数据时间
-     * @apiSuccess (返回结果) {Int}   currentPageData.dataWarnStatus   监测点预警状态
-     * @apiSuccess (返回结果) {Boolean}   currentPageData.deviceOnlineStatus   设备在线状态,按规则取某个特定的传感器
-     * @apiSuccess (返回结果) {T}   currentPageData.data   监测点下单个传感器最新数据对象,包含基础属性,监测值,属性单位
+     * @apiSuccess (返回结果) {Boolean}   currentPageData.multiSensor 是否为多传感器
+     * @apiSuccess (返回结果) {Int}   currentPageData.dataWarnStatus   监测点预警状态,按传感器最高预警状态为判断依据
+     * @apiSuccess (返回结果) {Boolean}   currentPageData.deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
+     * @apiSuccess (返回结果) {T}   currentPageData.data   监测点下单个传感器最新数据对象,包含传感器ID名称,基础属性,监测值,属性单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddBaseProject
      */
