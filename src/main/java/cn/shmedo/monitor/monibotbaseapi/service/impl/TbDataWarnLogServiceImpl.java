@@ -4,7 +4,6 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -44,7 +43,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static cn.shmedo.monitor.monibotbaseapi.model.enums.DataWarnCase.*;
@@ -73,13 +75,12 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     public void saveDataWarnLog(SaveDataWarnParam param) {
 
         if (param.getWarnLevel() == 0) {
-            boolean updated = this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
+            this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
                     .eq(TbDataWarnLog::getWarnThresholdID, param.getThresholdID())
                     .ne(TbDataWarnLog::getDealStatus, 2)
                     .isNull(TbDataWarnLog::getWarnEndTime)
                     .set(TbDataWarnLog::getDataStatus, 0)
                     .set(TbDataWarnLog::getWarnEndTime, param.getWarnTime()));
-            Assert.isTrue(updated, "更新数据报警数据状态失败");
             return;
         }
 
@@ -160,7 +161,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 yield existLog;
             }
         };
-        Assert.isTrue(this.saveOrUpdate(warnLog), "存储数据报警失败");
+        this.saveOrUpdate(warnLog);
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
