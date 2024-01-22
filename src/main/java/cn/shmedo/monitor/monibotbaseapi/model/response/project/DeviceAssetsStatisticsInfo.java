@@ -14,4 +14,9 @@ public class DeviceAssetsStatisticsInfo {
     private Integer videoOfflineCount;
     private Integer otherCount;
 
+
+    private Double intelligenceRate;
+    private Double videoRate;
+    private Integer projectTotalCount;
+
 }

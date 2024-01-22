@@ -1,13 +1,16 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.OtherDeviceCountInfo;
@@ -149,4 +152,37 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
 
         return true;
     }
+
+    @Override
+    public Object queryDeviceCountStatistics(ProjectConditionParam pa) {
+
+        DeviceAssetsStatisticsInfo vo = redisService.get(RedisKeys.DEVICE_ASSET_KEY,
+                pa.getProjectID().toString(), DeviceAssetsStatisticsInfo.class);
+        if (ObjectUtil.isNull(vo)) {
+            return null;
+        }
+
+        // 对属性进行非空校验
+        vo.setVideoRate(calculateRate(vo.getVideoCount(), vo.getVideoOnlineCount()));
+        vo.setIntelligenceRate(calculateRate(vo.getIntelligenceCount(), vo.getIntelligenceOnlineCount()));
+        vo.setProjectTotalCount(vo.getIntelligenceCount() + vo.getVideoCount() + vo.getOtherCount());
+
+        return vo;
+    }
+
+    /**
+     * 计算比率，并保留两位小数
+     * @param totalCount
+     * @param onlineCount
+     * @return
+     */
+    private Double calculateRate(Integer totalCount, Integer onlineCount) {
+        if (ObjectUtil.isNull(totalCount) || ObjectUtil.isNull(onlineCount) || totalCount == 0) {
+            return 0.0;
+        }
+
+        double rate = (double) onlineCount / totalCount;
+        return Math.round(rate * 100.0) / 100.0;
+    }
+
 }

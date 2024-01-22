@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import lombok.AllArgsConstructor;
@@ -48,7 +49,7 @@ public class ProjectStatisticsController {
      * @apiName DeviceCountStatistics
      * @apiDescription 设备资产数量统计,走缓存查询
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiSuccess (返回结果) {Int}   totalCount   全部设备总数量
+     * @apiSuccess (返回结果) {Int}   projectTotalCount   工程下设备总数量
      * @apiSuccess (返回结果) {Int}   intelligenceCount   智能设备总数量
      * @apiSuccess (返回结果) {Int}   intelligenceOnlineCount   智能设备在线数量
      * @apiSuccess (返回结果) {Int}   intelligenceOffOnlineCount   智能设备离线数量
@@ -58,16 +59,13 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Int}   videoOffOnlineCount   视频设备离线数量
      * @apiSuccess (返回结果) {Double}   videoRate   视频设备在线率
      * @apiSuccess (返回结果) {Int}   otherCount   其它设备总数量
-     * @apiSuccess (返回结果) {Int}   otherOnlineCount   其它设备在线数量
-     * @apiSuccess (返回结果) {Int}   otherOffOnlineCount   其它设备离线数量
-     * @apiSuccess (返回结果) {Double}   otherRate   其它设备在线率
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "DeviceCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deviceCountStatistics(@Validated @RequestBody Object pa) {
-        return null;
+    public Object deviceCountStatistics(@Validated @RequestBody ProjectConditionParam pa) {
+        return projectStatisticsService.queryDeviceCountStatistics(pa);
     }
 
 
