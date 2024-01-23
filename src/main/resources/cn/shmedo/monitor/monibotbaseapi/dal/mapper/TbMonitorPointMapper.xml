@@ -979,4 +979,15 @@
         </if>
         order by p.ID desc
     </select>
+
+    <select id="selectItemCountByProjectID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo">
+        select tmp.monitorItemID,
+               tmi.NAME      AS monitorItemName,
+               count(tmp.ID) as monitorPointCount
+        from tb_monitor_point tmp
+                 left join tb_monitor_item tmi on tmi.ID = tmp.MonitorItemID
+        WHERE tmp.ProjectID = #{projectID}
+        GROUP BY tmi.ID
+    </select>
 </mapper>

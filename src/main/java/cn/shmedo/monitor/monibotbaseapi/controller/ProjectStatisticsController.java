@@ -101,12 +101,12 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   data.monitorPointCount   监测点数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "MonitorItemCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object monitorItemCountStatistics(@Validated @RequestBody Object pa) {
-        return null;
+    public Object monitorItemCountStatistics(@Validated @RequestBody ProjectConditionParam pa) {
+        return projectStatisticsService.queryMonitorItemCountStatistics(pa);
     }
 
 

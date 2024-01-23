@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.WetLineConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
@@ -91,4 +92,6 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
     List<MonitorPointSimple> listByProjectTypeAndMonitorType(Integer projectType, Integer monitorType, Integer companyID);
 
     List<MonitorPoint4Web> queryList(Integer projectID, Integer monitorType, Integer monitorItemID, String queryCode);
+
+    List<MonitorItemCountStatisticsInfo> selectItemCountByProjectID(Integer projectID);
 }

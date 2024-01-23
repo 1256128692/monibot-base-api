@@ -48,7 +48,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
 
     private final RedisService redisService;
     @Override
-    public Object updateDeviceCountStatistics(UpdateDeviceCountStatisticsParam pa) {
+    public Boolean updateDeviceCountStatistics(UpdateDeviceCountStatisticsParam pa) {
 
         // 我要查询全部工程的统计
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectAll();
@@ -159,7 +159,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     }
 
     @Override
-    public Object queryDeviceCountStatistics(ProjectConditionParam pa) {
+    public DeviceAssetsStatisticsInfo queryDeviceCountStatistics(ProjectConditionParam pa) {
 
         DeviceAssetsStatisticsInfo vo = redisService.get(RedisKeys.DEVICE_ASSET_KEY,
                 pa.getProjectID().toString(), DeviceAssetsStatisticsInfo.class);
@@ -189,6 +189,12 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         vo.setMonitorItemCount(itemCount);
         vo.setMonitorPointTotalCount(pointCount);
         return vo;
+    }
+
+    @Override
+    public Object queryMonitorItemCountStatistics(ProjectConditionParam pa) {
+
+        return tbMonitorPointMapper.selectItemCountByProjectID(pa.getProjectID());
     }
 
     /**
