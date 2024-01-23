@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
@@ -134,13 +136,50 @@ public class ProjectStatisticsController {
 
 
     /**
+     * @api {POST} /AddUserCollectionMonitorPoint  用户新增监测点收藏
+     * @apiVersion 1.0.0
+     * @apiGroup 工程下首页统计模块
+     * @apiName AddUserCollectionMonitorPoint
+     * @apiDescription 工程下预警类型下监测点数量
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
+     */
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
+    @RequestMapping(value = "AddUserCollectionMonitorPoint", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addUserCollectionMonitorPoint(@Validated @RequestBody AddUserCollectionMonitorPointParam pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /DeleteUserCollectionMonitorPoint  用户取消监测点收藏
+     * @apiVersion 1.0.0
+     * @apiGroup 工程下首页统计模块
+     * @apiName DeleteUserCollectionMonitorPoint
+     * @apiDescription 工程下预警类型下监测点数量
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
+     */
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
+    @RequestMapping(value = "DeleteUserCollectionMonitorPoint", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object deleteUserCollectionMonitorPoint(@Validated @RequestBody ProjectConditionParam pa) {
+        return ResultWrapper.successWithNothing();
+    }
+
+
+    /**
      * @api {POST} /QuerySingleProjectMonitorPointInfoList  查询单工程下监测点信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
      * @apiName QuerySingleProjectMonitorPointInfoList
      * @apiDescription 查询单工程下监测点下传感器最新数据列表
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1,设备离线:5]
+     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
@@ -157,9 +196,9 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Boolean}   data.deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
      * @apiSuccess (返回结果) {T}   data.data   监测点下单个传感器最新数据对象,包含传感器ID名称,基础属性,监测值,属性单位
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "QuerySingleProjectMonitorPointInfoList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySingleProjectMonitorPointInfoList(@Validated @RequestBody Object pa) {
         return null;
@@ -174,7 +213,7 @@ public class ProjectStatisticsController {
      * @apiName QuerySingleProjectMonitorPointNewDataPage
      * @apiDescription 查询单工程下监测点下传感器最新数据分页
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1,设备离线:5]
+     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
@@ -196,9 +235,9 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Boolean}   currentPageData.deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
      * @apiSuccess (返回结果) {T}   currentPageData.data   监测点下单个传感器最新数据对象,包含传感器ID名称,基础属性,监测值,属性单位
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "QuerySingleProjectMonitorPointNewDataPage", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object querySingleProjectMonitorPointNewDataPage(@Validated @RequestBody Object pa) {
         return null;
