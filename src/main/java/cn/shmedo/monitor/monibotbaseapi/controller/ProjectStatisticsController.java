@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
@@ -150,6 +151,7 @@ public class ProjectStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "AddUserCollectionMonitorPoint", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addUserCollectionMonitorPoint(@Validated @RequestBody AddUserCollectionMonitorPointParam pa) {
+        projectStatisticsService.addUserCollectionMonitorPoint(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -167,7 +169,8 @@ public class ProjectStatisticsController {
      */
     @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "DeleteUserCollectionMonitorPoint", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteUserCollectionMonitorPoint(@Validated @RequestBody ProjectConditionParam pa) {
+    public Object deleteUserCollectionMonitorPoint(@Validated @RequestBody DeleteUserCollectionMonitorPointParam pa) {
+        projectStatisticsService.deleteUserCollectionMonitorPoint(pa);
         return ResultWrapper.successWithNothing();
     }
 

@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
@@ -19,4 +21,8 @@ public interface ProjectStatisticsService {
     List<MonitorItemCountStatisticsInfo> queryMonitorItemCountStatistics(ProjectConditionParam pa);
 
     WarnInfo queryDistinctWarnTypeMonitorPointCount(ProjectConditionParam pa);
+
+    void addUserCollectionMonitorPoint(AddUserCollectionMonitorPointParam pa);
+
+    void deleteUserCollectionMonitorPoint(DeleteUserCollectionMonitorPointParam pa);
 }

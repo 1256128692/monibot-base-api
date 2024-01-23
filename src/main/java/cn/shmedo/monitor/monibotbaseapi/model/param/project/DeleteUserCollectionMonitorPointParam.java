@@ -1,11 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.project;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -24,9 +22,13 @@ public class DeleteUserCollectionMonitorPointParam implements ParameterValidator
     @Size(min = 1, max = 100)
     private List<Integer> monitorPointIDList;
 
+    @JsonIgnore
+    private Integer userID;
+
     @Override
     public ResultWrapper validate() {
 
+        this.userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         return null;
     }
 

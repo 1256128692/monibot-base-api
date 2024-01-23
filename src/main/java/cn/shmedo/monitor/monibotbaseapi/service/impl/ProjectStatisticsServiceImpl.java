@@ -9,6 +9,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
@@ -26,6 +28,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -48,6 +51,8 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private final TbSensorMapper tbSensorMapper;
+
+    private final TbUserFollowMonitorPointMapper tbUserFollowMonitorPointMapper;
 
     private final RedisService redisService;
     @Override
@@ -209,6 +214,22 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         return WarnInfo.toBuliderNewVo(tbSensorList);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addUserCollectionMonitorPoint(AddUserCollectionMonitorPointParam pa) {
+
+        tbUserFollowMonitorPointMapper.insertBatch(pa.getUserFollowMonitorPointList());
+
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteUserCollectionMonitorPoint(DeleteUserCollectionMonitorPointParam pa) {
+
+        tbUserFollowMonitorPointMapper.deleteBatch(pa.getMonitorPointIDList(), pa.getUserID());
+
+    }
+
     /**
      * 计算比率，并保留两位小数
      * @param totalCount
@@ -216,6 +237,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
      * @return
      */
     private Double calculateRate(Integer totalCount, Integer onlineCount) {
+
         if (ObjectUtil.isNull(totalCount) || ObjectUtil.isNull(onlineCount) || totalCount == 0) {
             return 0.0;
         }
