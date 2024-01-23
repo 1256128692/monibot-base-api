@@ -4,21 +4,23 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbOtherDeviceMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeTemplateCacheData;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.OtherDeviceCountInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.DataCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 @Service
@@ -40,6 +41,10 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private final TbVideoDeviceMapper videoDeviceMapper;
 
     private final TbOtherDeviceMapper tbOtherDeviceMapper;
+
+    private final TbMonitorPointMapper tbMonitorPointMapper;
+
+    private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private final RedisService redisService;
     @Override
@@ -167,6 +172,22 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         vo.setIntelligenceRate(calculateRate(vo.getIntelligenceCount(), vo.getIntelligenceOnlineCount()));
         vo.setProjectTotalCount(vo.getIntelligenceCount() + vo.getVideoCount() + vo.getOtherCount());
 
+        return vo;
+    }
+
+    @Override
+    public DataCountStatisticsInfo queryDataCountStatistics(ProjectConditionParam pa) {
+        DataCountStatisticsInfo vo = new DataCountStatisticsInfo();
+
+        Integer dataCount = redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY,
+                pa.getProjectID().toString(), Integer.class);
+        vo.setDataCount(dataCount == null ? 0 : dataCount);
+        Long itemCount = tbMonitorItemMapper.selectCount(new QueryWrapper<TbMonitorItem>().lambda()
+                .eq(TbMonitorItem::getProjectID, pa.getProjectID()));
+        Long pointCount = tbMonitorPointMapper.selectCount(new QueryWrapper<TbMonitorPoint>().lambda()
+                .eq(TbMonitorPoint::getProjectID, pa.getProjectID()));
+        vo.setMonitorItemCount(itemCount);
+        vo.setMonitorPointTotalCount(pointCount);
         return vo;
     }
 

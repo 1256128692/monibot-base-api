@@ -94,6 +94,12 @@ public class RedisKeys {
      * 设备资产
      */
     public static final String DEVICE_ASSET_KEY = "cn.shmedo.monitor.project.deviceAsset";
+
+
+    /**
+     * 设备数据量
+     */
+    public static final String DEVICE_DATA_COUNT_KEY = "cn.shmedo.monitor.project.dataCount";
 }
 
     

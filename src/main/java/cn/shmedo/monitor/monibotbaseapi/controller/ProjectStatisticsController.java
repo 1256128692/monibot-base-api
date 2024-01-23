@@ -77,15 +77,15 @@ public class ProjectStatisticsController {
      * @apiDescription 工程下数据总量以及监测项目和点位数量,数据总量走缓存
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Int}   dataCount   数据总数量
-     * @apiSuccess (返回结果) {Int}   monitorItemCount   监测项目数量
-     * @apiSuccess (返回结果) {Int}   monitorPointTotalCount   监测点总数量
+     * @apiSuccess (返回结果) {Long}   monitorItemCount   监测项目数量
+     * @apiSuccess (返回结果) {Long}   monitorPointTotalCount   监测点总数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "DataCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object dataCountStatistics(@Validated @RequestBody Object pa) {
-        return null;
+    public Object dataCountStatistics(@Validated @RequestBody ProjectConditionParam pa) {
+        return projectStatisticsService.queryDataCountStatistics(pa);
     }
 
 
