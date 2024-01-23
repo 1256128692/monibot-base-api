@@ -118,18 +118,18 @@ public class ProjectStatisticsController {
      * @apiDescription 工程下预警类型下监测点数量
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Int}   noDataCount   无数据状态下监测点数量
-     * @apiSuccess (返回结果) {Int}   normalDataCount   正常状态下监测点数量
-     * @apiSuccess (返回结果) {Int}   LevelOneCount   预警级别1下监测点数量
-     * @apiSuccess (返回结果) {Int}   LevelTwoCount   预警级别2下监测点数量
-     * @apiSuccess (返回结果) {Int}   LevelThreeCount   预警级别3下监测点数量
-     * @apiSuccess (返回结果) {Int}   LevelFourCount   预警级别4下监测点数量
+     * @apiSuccess (返回结果) {Int}   normalCount   正常状态下监测点数量
+     * @apiSuccess (返回结果) {Int}   LevelOneCount   预警级别1下监测点数量(蓝色)
+     * @apiSuccess (返回结果) {Int}   LevelTwoCount   预警级别2下监测点数量(黄色)
+     * @apiSuccess (返回结果) {Int}   LevelThreeCount   预警级别3下监测点数量(橙色)
+     * @apiSuccess (返回结果) {Int}   LevelFourCount   预警级别4下监测点数量(红色)
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:AddBaseProject
+     * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
-    @Permission(permissionName = "mdmbase:AddBaseProject")
+    @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "DistinctWarnTypeMonitorPointCount", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object distinctWarnTypeMonitorPointCount(@Validated @RequestBody Object pa) {
-        return null;
+    public Object distinctWarnTypeMonitorPointCount(@Validated @RequestBody ProjectConditionParam pa) {
+        return projectStatisticsService.queryDistinctWarnTypeMonitorPointCount(pa);
     }
 
 

@@ -1,21 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.OtherDeviceCountInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DataCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
@@ -45,6 +46,8 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private final TbMonitorPointMapper tbMonitorPointMapper;
 
     private final TbMonitorItemMapper tbMonitorItemMapper;
+
+    private final TbSensorMapper tbSensorMapper;
 
     private final RedisService redisService;
     @Override
@@ -192,9 +195,18 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     }
 
     @Override
-    public Object queryMonitorItemCountStatistics(ProjectConditionParam pa) {
+    public List<MonitorItemCountStatisticsInfo> queryMonitorItemCountStatistics(ProjectConditionParam pa) {
 
         return tbMonitorPointMapper.selectItemCountByProjectID(pa.getProjectID());
+    }
+
+    @Override
+    public WarnInfo queryDistinctWarnTypeMonitorPointCount(ProjectConditionParam pa) {
+
+        List<TbSensor> tbSensorList = tbSensorMapper.selectList(new QueryWrapper<TbSensor>().lambda()
+                .eq(TbSensor::getProjectID, pa.getProjectID()));
+
+        return WarnInfo.toBuliderNewVo(tbSensorList);
     }
 
     /**

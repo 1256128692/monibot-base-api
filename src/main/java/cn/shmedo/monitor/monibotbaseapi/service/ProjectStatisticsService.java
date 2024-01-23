@@ -2,8 +2,12 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DataCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo;
+
+import java.util.List;
 
 public interface ProjectStatisticsService {
     Boolean updateDeviceCountStatistics(UpdateDeviceCountStatisticsParam pa);
@@ -12,5 +16,7 @@ public interface ProjectStatisticsService {
 
     DataCountStatisticsInfo queryDataCountStatistics(ProjectConditionParam pa);
 
-    Object queryMonitorItemCountStatistics(ProjectConditionParam pa);
+    List<MonitorItemCountStatisticsInfo> queryMonitorItemCountStatistics(ProjectConditionParam pa);
+
+    WarnInfo queryDistinctWarnTypeMonitorPointCount(ProjectConditionParam pa);
 }
