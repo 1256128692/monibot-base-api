@@ -63,6 +63,11 @@ public class RedisKeys {
     public static final String PROJECT_KEY = "cn.shmedo.mdmbse.projectCache";
 
     /**
+     * 大屏产品服务设备统计
+     */
+    public static final String MONITOR_TYPE_DEVICE_COUNT = "cn.shmedo.monitor.monitorType.deviceCount";
+
+    /**
      * 表单模板缓存
      */
     public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";

@@ -1,12 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.dashboard;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @Author wuxl
@@ -17,6 +22,8 @@ import lombok.Data;
  * @Version 1.0
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class QueryProductServicesParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
@@ -26,13 +33,13 @@ public class QueryProductServicesParam implements ParameterValidator, ResourcePe
      */
     private Byte projectMainType;
 
-    /**
-     * 监测类型
-     */
-    private int monitorType;
-
     @Override
     public ResultWrapper<?> validate() {
+        Boolean validMainType = Optional.of(Arrays.stream(PlatformType.values()).map(PlatformType::getType).collect(Collectors.toSet()))
+                .map(t -> t.contains(projectMainType)).get();
+        if (Objects.nonNull(projectMainType) && !validMainType) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目一级分类不合法");
+        }
         return null;
     }
 
