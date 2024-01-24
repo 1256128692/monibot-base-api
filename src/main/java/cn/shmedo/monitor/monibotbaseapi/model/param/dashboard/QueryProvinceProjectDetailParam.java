@@ -4,9 +4,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -15,16 +13,14 @@ import java.util.stream.Collectors;
 
 /**
  * @Author wuxl
- * @Date 2024/1/18 16:27
- * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.param.dashboard
- * @ClassName: QueryIndustryDistributionParam
+ * @Date 2024/1/24 10:41
+ * @PackageName:cn.shmedo.monitor.monibotbaseapi.controller.dashboard
+ * @ClassName: QueryProvinceProjectDetailParam
  * @Description: TODO
  * @Version 1.0
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class QueryProductServicesParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class QueryProvinceProjectDetailParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
 
@@ -32,6 +28,8 @@ public class QueryProductServicesParam implements ParameterValidator, ResourcePe
      * 项目一级分类
      */
     private Byte projectMainType;
+
+    private Integer provinceCode;
 
     @Override
     public ResultWrapper<?> validate() {

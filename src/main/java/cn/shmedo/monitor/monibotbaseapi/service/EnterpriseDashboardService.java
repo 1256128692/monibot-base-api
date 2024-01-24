@@ -2,8 +2,8 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.IndustryDistributionRes;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.QueryProductServicesRes;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 
 import java.util.List;
 
@@ -18,5 +18,11 @@ import java.util.List;
 public interface EnterpriseDashboardService {
     List<IndustryDistributionRes> queryIndustryDistribution(QueryIndustryDistributionParam param);
 
-    List<QueryProductServicesRes> queryProductServices(QueryProductServicesParam param);
+    List<ProductServicesRes> queryProductServices(QueryProductServicesParam param);
+
+    ResourceOverviewRes queryResourceOverview(QueryProductServicesParam param);
+
+    List<ProvinceProjectRes> queryProvinceProject(QueryProductServicesParam param);
+
+    ProvinceProjectDetailRes queryProvinceProjectDetail(QueryProvinceProjectDetailParam param);
 }

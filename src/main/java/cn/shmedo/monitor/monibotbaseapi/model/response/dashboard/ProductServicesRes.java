@@ -15,7 +15,7 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class QueryProductServicesRes {
+public class ProductServicesRes {
     private Integer monitorType;
     private String monitorTypeName;
     private int deviceCount;

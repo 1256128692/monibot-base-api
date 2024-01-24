@@ -13,6 +13,7 @@ import lombok.experimental.Accessors;
  * @Version 1.0
  */
 @Data
+@Accessors(chain = true)
 public class ProjectInfoCache extends TbProjectInfo {
     /**
      * 项目类型名称
@@ -32,13 +33,13 @@ public class ProjectInfoCache extends TbProjectInfo {
     @Data
     @Accessors(chain = true)
     public static class LocationInfo{
-        private int province;
+        private Integer province;
         private String provinceName;
-        private int city;
+        private Integer city;
         private String cityName;
-        private int area;
+        private Integer area;
         private String areaName;
-        private int town;
+        private Integer town;
         private String townName;
     }
 }

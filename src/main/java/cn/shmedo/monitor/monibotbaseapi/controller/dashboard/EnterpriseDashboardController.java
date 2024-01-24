@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.service.EnterpriseDashboardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +87,8 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryResourceOverview")
-    public Object queryResourceOverview() {
-        return null;
+    public Object queryResourceOverview(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryResourceOverview(param);
     }
 
     /**
@@ -98,7 +99,7 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询企业工程分布
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiParam (请求参数) {Int} [provinceCode] 省份code码
+     * @apiParam (请求参数) {Int} [provinceCode] 省份code码（暂不支持）
      * @apiSuccess (返回结果) {Object[]} provinceList 省份列表
      * @apiSuccess (返回结果) {Int} provinceList.provinceCode 省份code码
      * @apiSuccess (返回结果) {String} provinceList.provinceName 省份名称（shortName）
@@ -115,8 +116,8 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryProvinceProject")
-    public Object queryProvinceProject() {
-        return null;
+    public Object queryProvinceProject(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryProvinceProject(param);
     }
 
     /**
@@ -128,6 +129,7 @@ public class EnterpriseDashboardController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
      * @apiParam (请求参数) {Int} provinceCode 省份code码
+     * @apiSuccess (返回结果) {Int} provinceCode 省份code码
      * @apiSuccess (返回结果) {String} provinceName 省份名称
      * @apiSuccess (返回结果) {Int} projectCount 项目统计
      * @apiSuccess (返回结果) {Object[]} projectList 项目列表
@@ -152,8 +154,8 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryProvinceProjectDetail")
-    public Object queryProvinceProjectDetail() {
-        return null;
+    public Object queryProvinceProjectDetail(@RequestBody @Valid QueryProvinceProjectDetailParam param) {
+        return dashboardService.queryProvinceProjectDetail(param);
     }
 
     /**
