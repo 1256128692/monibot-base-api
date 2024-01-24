@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareMode;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryMonitorWithThresholdConfigCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnThresholdConfigListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
@@ -54,7 +55,13 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
                                                                     TbWarnBaseConfig tbWarnBaseConfig) {
         WarnThresholdConfigListInfo info = new WarnThresholdConfigListInfo();
         BeanUtil.copyProperties(tbWarnBaseConfig, info);
-        List<WarnThresholdMonitorPointInfo> dataList = this.baseMapper.selectWarnThresholdConfigList(param);
+        List<WarnThresholdMonitorPointInfo> dataList = this.baseMapper.selectWarnThresholdConfigList(param)
+                .stream().peek(u -> u.getSensorList().stream().peek(w -> w.getFieldList().stream().peek(s -> {
+                    if (Objects.isNull(s.getConfigID())) {
+                        s.setWarnName(s.getFieldName() + "异常");
+                        s.setCompareMode(CompareMode.GT.getCode());
+                    }
+                }).toList()).toList()).toList();
         final Boolean status = param.getStatus();
         if (Objects.nonNull(status)) {
             final Function<String, Boolean> func = value -> {

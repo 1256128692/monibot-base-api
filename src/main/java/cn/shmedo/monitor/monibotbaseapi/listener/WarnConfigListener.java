@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.listener;
 
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigClearDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import jakarta.annotation.Resource;
@@ -34,11 +35,16 @@ public class WarnConfigListener {
         if (Objects.isNull(hashKey)) {
             if (Objects.isNull(expires)) {
                 monitorRedisService.set(key, value);
-            }else {
+            } else {
                 monitorRedisService.set(key, value, expires);
             }
         } else {
             monitorRedisService.put(key, hashKey, value);
         }
+    }
+
+    @EventListener
+    public void listenClearWarnEvent(WarnConfigClearDto dto) {
+        monitorRedisService.del(dto.getKeys());
     }
 }

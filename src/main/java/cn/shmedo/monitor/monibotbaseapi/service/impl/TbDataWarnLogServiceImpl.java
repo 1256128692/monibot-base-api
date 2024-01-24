@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigClearDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
@@ -282,13 +283,15 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         Integer silenceCycle = param.getSilenceCycle();
         Date current = new Date();
         TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
+        Integer warnThresholdID = tbDataWarnLog.getWarnThresholdID();
         tbDataWarnLog.setDealTime(current);
         tbDataWarnLog.setDealStatus(2);
         tbDataWarnLog.setWarnEndTime(current);
         if (Objects.nonNull(silenceCycle)) {
-            publisher.publishEvent(new WarnConfigEventDto(this, RedisKeys.WARN_SILENCE_CYCLE + tbDataWarnLog.getWarnThresholdID(),
+            publisher.publishEvent(new WarnConfigEventDto(this, RedisKeys.WARN_SILENCE_CYCLE + warnThresholdID,
                     null, silenceCycle * 3600000L, tbDataWarnLog.getWarnLevel()));
         }
+        publisher.publishEvent(new WarnConfigClearDto(this, RedisKeys.WARN_HIT + warnThresholdID));
         this.updateById(tbDataWarnLog);
     }
 

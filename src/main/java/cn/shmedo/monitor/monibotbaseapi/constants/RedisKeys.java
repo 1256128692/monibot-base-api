@@ -94,6 +94,12 @@ public class RedisKeys {
      */
     public static final String WARN_SILENCE_CYCLE = "cn.shmedo.monitor.warn.silenceCycle:";
 
+    /**
+     * 报警连续触发计数器 缓存<br/>
+     * 类型: 分组 <br/>
+     * 示例：cn.shmedo.monitor.warn.hit:{thresholdID}
+     */
+    public static final String WARN_HIT = "cn.shmedo.monitor.warn.hit:";
 
     /**
      * 设备资产

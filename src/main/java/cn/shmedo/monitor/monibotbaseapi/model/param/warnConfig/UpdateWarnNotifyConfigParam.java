@@ -97,8 +97,9 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
         if (CollUtil.isEmpty(deptList) && CollUtil.isEmpty(userList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "必须选择通知对象");
         }
-        return validTarget(depts -> tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(depts)),
-                users -> tbWarnNotifyConfig.setUsers(JSONUtil.toJsonStr(users)), ex -> tbWarnNotifyConfig.setExValue(ex));
+        tbWarnNotifyConfig.setDepts(JSONUtil.toJsonStr(deptList));
+        tbWarnNotifyConfig.setUsers(JSONUtil.toJsonStr(userList));
+        return validTarget(null, null, ex -> tbWarnNotifyConfig.setExValue(ex));
     }
 
     /**
