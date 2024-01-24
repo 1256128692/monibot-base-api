@@ -43,4 +43,16 @@ public interface NotifyService {
      */
     List<Integer> sysNotify(Integer companyID, Supplier<Collection<SysNotify.Notify>> notifySupplier,
                             @Nonnull Integer... userIDs);
+
+    /**
+     * 发送邮件通知
+     *
+     * @param mailTag      企业id
+     * @param isHtml 内容提供器
+     * @param contentSupplier 内容提供器        目标用户id
+     * @param mailAddresses  目标邮箱
+     * @return 是否成功
+     */
+    boolean mailNotify(String mailTag, Boolean isHtml, Supplier<String> contentSupplier,
+                            @Nonnull String... mailAddresses);
 }

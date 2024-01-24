@@ -5,12 +5,14 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.notify.MdNotifyService;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -63,6 +65,17 @@ public class NotifyServiceImpl implements NotifyService {
                 .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
 
         return Optional.ofNullable(result.getData()).orElse(List.of());
+    }
+
+    @Override
+    public boolean mailNotify(String mailTag, Boolean isHtml, Supplier<String> contentSupplier, @NotNull String... mailAddresses) {
+        MailNotify param = MailNotify.builder().mailTag(mailTag)
+                .isHtml(isHtml)
+                .mailContent(contentSupplier.get())
+                .userMailAddressList(Arrays.stream(mailAddresses).distinct().toList()).build();
+        ResultWrapper<Void> result = mdNotifyService.sendMail(param);
+        return Optional.of(result.apiSuccess()).filter(e -> e)
+                .orElseThrow(() -> new CustomBaseException(result.getCode(), result.getMsg()));
     }
 
     /**
