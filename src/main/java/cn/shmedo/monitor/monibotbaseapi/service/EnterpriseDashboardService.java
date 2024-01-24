@@ -25,4 +25,10 @@ public interface EnterpriseDashboardService {
     List<ProvinceProjectRes> queryProvinceProject(QueryProductServicesParam param);
 
     ProvinceProjectDetailRes queryProvinceProjectDetail(QueryProvinceProjectDetailParam param);
+
+    Object queryDataAccess(QueryProductServicesParam param);
+
+    DataManagementRes queryDataManagement(QueryProductServicesParam param);
+
+    DeviceMaintenanceRes queryDeviceMaintenance(QueryProductServicesParam param);
 }
