@@ -31,8 +31,7 @@
             <result column="alias" jdbcType="VARCHAR" property="alias"/>
         </association>
     </resultMap>
-    <select id="selectDataWarnPage"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnPageInfo">
+    <select id="selectDataWarnPage" resultMap="DataWarnPageMap">
         SELECT
             dwl.`ID` id,
             wtc.`WarnName` warnName,
