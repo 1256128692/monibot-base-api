@@ -261,6 +261,7 @@ public class WarnConfigController {
      * @apiName QueryMonitorWithThresholdConfigCount
      * @apiDescription 查询工程下监测项目基础信息和启用的阈值属性配置个数
      * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Int} platform 平台key
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.itemID 监测项目ID
      * @apiSuccess (返回结果) {String} dataList.itemName 监测项目名称
@@ -284,8 +285,8 @@ public class WarnConfigController {
      */
     //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryMonitorWithThresholdConfigCount", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorWithThresholdConfigCount(@Valid @RequestBody QueryMonitorClassParam param) {
-        return tbWarnThresholdConfigService.queryMonitorWithThresholdConfigCountByProjectID(param.getProjectID());
+    public Object queryMonitorWithThresholdConfigCount(@Valid @RequestBody QueryMonitorWithThresholdConfigCountParam param) {
+        return tbWarnThresholdConfigService.queryMonitorWithThresholdConfigCountByProjectID(param);
     }
 
     /**

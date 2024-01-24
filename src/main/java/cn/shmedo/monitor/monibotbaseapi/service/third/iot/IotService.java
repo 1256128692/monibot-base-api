@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.TokenAndMsgID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
@@ -38,8 +39,9 @@ public interface IotService {
 
     /**
      * 根据推送地址查询设备简单信息列表
+     *
      * @param param 请求参数
-     * @return  {@link ResultWrapper<List<SimpleDeviceV5>>}
+     * @return {@link ResultWrapper<List<SimpleDeviceV5>>}
      */
     @RequestLine("POST /QueryDeviceSimpleBySenderAddress")
     ResultWrapper<List<SimpleDeviceV5>> queryDeviceSimpleBySenderAddress(QueryDeviceSimpleBySenderAddressParam param);
@@ -49,6 +51,7 @@ public interface IotService {
 
     /**
      * 查询设备最新状态
+     *
      * @return {@link ResultWrapper<DeviceStateResponse>}
      */
     @RequestLine("POST /QueryDeviceNewState")
@@ -56,6 +59,7 @@ public interface IotService {
 
     /**
      * 查询设备最新扩展状态
+     *
      * @return {@link ResultWrapper<DeviceStateResponse>}
      */
     @RequestLine("POST /QueryDeviceExpandNewState")
@@ -64,6 +68,7 @@ public interface IotService {
 
     /**
      * 批量创建设备
+     *
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /CreateMultipleDevice")
@@ -76,6 +81,7 @@ public interface IotService {
 
     /**
      * 批量删除设备
+     *
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /DeleteDevice")
@@ -92,9 +98,9 @@ public interface IotService {
 
     @RequestLine("POST /TransferDevice")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
-                                           @Param("appKey") String appKey,
-                                           @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean> transferDevice(TransferDeviceParam param,
+                                          @Param("appKey") String appKey,
+                                          @Param("appSecret") String appSecret);
 
     /**
      * 批量下发透传指令
@@ -107,9 +113,16 @@ public interface IotService {
 
     /**
      * 根据uniqueTokens查询设备的简单信息
+     *
      * @param param {@link QueryDeviceSimpleByUniqueTokensParam}
      * @return {@code ResultWrapper<List<DeviceSimple>>}
      */
     @RequestLine("POST /GetDeviceSimpleByUniqueTokens")
     ResultWrapper<List<DeviceSimple>> queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam param);
+
+    @RequestLine("POST /QueryDeviceStateList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param,
+                                                              @Param("appKey") String appKey,
+                                                              @Param("appSecret") String appSecret);
 }

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warnlog;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -7,6 +8,7 @@ import lombok.Data;
  * @date 2024-01-19 17:06
  */
 @Data
+@Builder
 public class DeviceProjectInfo {
     private Integer projectID;
     private String projectName;

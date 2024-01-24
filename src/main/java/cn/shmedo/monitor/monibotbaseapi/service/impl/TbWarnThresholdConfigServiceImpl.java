@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryMonitorWithThresholdConfigCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnThresholdConfigListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
@@ -38,8 +39,8 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
-    public List<MonitorWithThresholdConfigCountInfo> queryMonitorWithThresholdConfigCountByProjectID(Integer projectID) {
-        List<MonitorWithThresholdConfigCountInfo> infoList = baseMapper.selectMonitorWithThresholdConfigCountByProjectID(projectID);
+    public List<MonitorWithThresholdConfigCountInfo> queryMonitorWithThresholdConfigCountByProjectID(QueryMonitorWithThresholdConfigCountParam param) {
+        List<MonitorWithThresholdConfigCountInfo> infoList = baseMapper.selectMonitorWithThresholdConfigCountByProjectID(param.getProjectID(), param.getPlatform());
         Optional.of(infoList.stream().map(MonitorItemV1::getItemID).toList()).filter(CollUtil::isNotEmpty)
                 .map(tbMonitorTypeFieldMapper::queryMonitorTypeFieldV1ByMonitorItems).map(u ->
                         u.stream().collect(Collectors.groupingBy(MonitorTypeFieldV1::getItemID))).filter(CollUtil::isNotEmpty)

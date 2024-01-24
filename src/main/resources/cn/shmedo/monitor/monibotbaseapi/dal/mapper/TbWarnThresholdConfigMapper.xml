@@ -67,7 +67,7 @@
         FROM
             tb_monitor_item mi
             LEFT JOIN tb_monitor_type mt ON mt.`MonitorType` = mi.`MonitorType`
-            LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mi.`ID` AND wtc.`Enable` IS TRUE
+            LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mi.`ID` AND wtc.`Enable` IS TRUE AND wtc.Platform=#{platform}
         WHERE mi.`ProjectID`=#{projectID}
         GROUP BY mi.`ID`
     </select>
@@ -105,5 +105,29 @@
             LEFT JOIN tb_monitor_type_field mtf ON mtf.`ID` = mif.`MonitorTypeFieldID`
             LEFT JOIN tb_warn_threshold_config wtc ON wtc.`MonitorItemID` = mp.`MonitorItemID` AND wtc.`SensorID` = s.`ID` AND wtc.`FieldID` = mtf.`ID` AND wtc.`Platform`=#{param.platform}
         WHERE s.`ID` IS NOT NULL AND mp.`MonitorItemID`=#{param.monitorItemID}
+    </select>
+    <select id="selectDataWarnRelativeByID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnDetailInfo">
+        SELECT
+            wtc.WarnName warnName,
+            pi.ID projectID,
+            pi.ProjectName projectName,
+            pi.ShortName projectShotName,
+            mi.ID monitorItemID,
+            mi.`Name` monitorItemName,
+            mi.Alias monitorItemAlias,
+            mp.ID monitorPointID,
+            mp.`Name` monitorPointName,
+            mp.GpsLocation gpsLocation,
+            mtf.ID fieldID,
+            mtf.FieldName fieldName,
+            mtf.FieldToken fieldToken
+        FROM
+            tb_warn_threshold_config wtc
+            LEFT JOIN tb_project_info pi ON pi.ID = wtc.ProjectID
+            LEFT JOIN tb_monitor_item mi ON mi.ID = wtc.MonitorItemID
+            LEFT JOIN tb_sensor s ON s.ID = wtc.SensorID
+            LEFT JOIN tb_monitor_point mp ON mp.ID = s.MonitorPointID
+            LEFT JOIN tb_monitor_type_field mtf ON mtf.ID = wtc.FieldID
+        WHERE wtc.ID=#{id}
     </select>
 </mapper>

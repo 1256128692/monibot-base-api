@@ -92,4 +92,9 @@ public class TbDeviceWarnLog {
      */
     @TableField("ExValue")
     private String exValue;
+    /**
+     * 处理人ID
+     */
+    @TableField("DealUserID")
+    private Integer dealUserID;
 }

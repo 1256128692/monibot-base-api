@@ -1,46 +1,55 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DatePattern;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.lang.Dict;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONException;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogHistoryMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLog;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLogHistory;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyRelation;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.CancelDataWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDataWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.ThresholdBaseConfigFieldInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnLevelAliasInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnDetailInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnHistoryInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnHistoryListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +68,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
 
     private static final String WARN_CONTENT_FORMAT = "{} 内 {} {} 发生 {} — {}，实测数据：{} {} {}，请关注！";
 
+    private final TbWarnLevelAliasMapper tbWarnLevelAliasMapper;
     private final TbWarnThresholdConfigMapper thresholdConfigMapper;
     private final ITbWarnBaseConfigService baseConfigService;
     private final ITbWarnNotifyConfigService notifyConfigService;
@@ -67,6 +77,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     private final TbWarnNotifyRelationMapper notifyRelationMapper;
     private final FileConfig fileConfig;
     private final UserService userService;
+    private final ApplicationEventPublisher publisher;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -228,15 +239,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         }
     }
 
-    @Override
-    @Deprecated
-    public PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param) {
-
-
-//        return new PageUtil.PageWithMap<>(, , , Dict.of(param.getTbWarnBaseConfig()));
-        return null;
-    }
-
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public PageUtil.PageWithMap<DataWarnPageInfo> queryDataWarnPage(QueryDataWarnPageParam param) {
         TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
@@ -253,5 +256,90 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 "warnTag", tbWarnBaseConfig.getWarnTag(),
                 "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
                 "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle()));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void cancelDataWarn(Integer userID, CancelDataWarnParam param) {
+        Integer silenceCycle = param.getSilenceCycle();
+        Date current = new Date();
+        TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
+        tbDataWarnLog.setDealTime(current);
+        tbDataWarnLog.setDealStatus(2);
+        tbDataWarnLog.setWarnEndTime(current);
+        if (Objects.nonNull(silenceCycle)) {
+            publisher.publishEvent(new WarnConfigEventDto(this, RedisKeys.WARN_SILENCE_CYCLE + tbDataWarnLog.getWarnThresholdID(),
+                    null, silenceCycle * 3600000L, tbDataWarnLog.getWarnLevel()));
+        }
+        this.updateById(tbDataWarnLog);
+    }
+
+    @Override
+    public DataWarnDetailInfo queryDataWarnDetail(QueryDataWarnDetailParam param) {
+        final TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
+        final Integer platform = tbDataWarnLog.getPlatform();
+        final Integer warnLevel = tbDataWarnLog.getWarnLevel();
+        TbWarnBaseConfig tbWarnBaseConfig = baseConfigService.queryByCompanyIDAndPlatform(param.getCompanyID(), platform);
+        DataWarnDetailInfo info = this.thresholdConfigMapper.selectDataWarnRelativeByID(tbDataWarnLog.getWarnThresholdID());
+        BeanUtil.copyProperties(tbDataWarnLog, info);
+        BeanUtil.copyProperties(tbWarnBaseConfig, info);
+        tbWarnLevelAliasMapper.selectThresholdBaseConfigFieldInfoList(platform, info.getMonitorItemID())
+                .stream().filter(u -> u.getFieldID().equals(info.getFieldID())).map(ThresholdBaseConfigFieldInfo::getAliasConfigList)
+                .flatMap(Collection::stream).filter(u -> u.getWarnLevel().equals(warnLevel)).findAny()
+                .ifPresent(info::setAliasConfig);
+        return info;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public DataWarnHistoryInfo queryDataWarnHistory(QueryDataWarnDetailParam param) {
+        final Integer platform = param.getTbDataWarnLog().getPlatform();
+        TbWarnBaseConfig tbWarnBaseConfig = this.baseConfigService.queryByCompanyIDAndPlatform(param.getCompanyID(), platform);
+        TbWarnThresholdConfig tbWarnThresholdConfig = thresholdConfigMapper.selectById(param.getTbDataWarnLog().getWarnThresholdID());
+        JSONObject configValue = Optional.ofNullable(tbWarnThresholdConfig.getValue()).filter(ObjectUtil::isNotEmpty)
+                .map(u -> {
+                    try {
+                        return JSONUtil.parseObj(u);
+                    } catch (JSONException e) {
+                        log.error("parse json error,json: {}", u);
+                        return null;
+                    }
+                }).orElse(new JSONObject());
+
+        DataWarnHistoryInfo info = new DataWarnHistoryInfo();
+        BeanUtil.copyProperties(tbWarnBaseConfig, info);
+        List<TbDataWarnLogHistory> historyList = historyMapper.selectList(new LambdaQueryWrapper<TbDataWarnLogHistory>()
+                .eq(TbDataWarnLogHistory::getWarnLogID, param.getWarnLogID()).orderByAsc(TbDataWarnLogHistory::getWarnTime));
+        // 最多展示后三天
+        if (CollUtil.isNotEmpty(historyList)) {
+            Date startWarnTime = historyList.stream().findFirst().map(TbDataWarnLogHistory::getWarnTime).orElseThrow();
+            DateTime showEndTime = DateUtil.offsetDay(startWarnTime, 3);
+            historyList = historyList.stream().filter(u -> u.getWarnTime().before(showEndTime)).toList();
+        }
+        List<DataWarnHistoryListInfo> dataList = historyList.stream().map(u -> {
+            Integer warnLevel = u.getWarnLevel();
+            String thresholdStr = Optional.of(warnLevel).map(String::valueOf).map(configValue::get).map(JSONUtil::toJsonStr)
+                    .orElse(StrUtil.EMPTY_JSON);
+            return DataWarnHistoryListInfo.builder().warnTime(u.getWarnTime()).compareMode(tbWarnThresholdConfig.getCompareMode())
+                    .threshold(thresholdStr).aliasConfig(new WarnLevelAliasInfo(warnLevel, null)).build();
+        }).toList();
+        info.setDataList(dataList);
+
+        // alias
+        Set<Integer> warnLevelSet = historyList.stream().map(TbDataWarnLogHistory::getWarnLevel).collect(Collectors.toSet());
+        Map<Integer, String> aliasMap = Optional.of(warnLevelSet).filter(CollUtil::isNotEmpty).map(u ->
+                tbWarnLevelAliasMapper.selectList(new LambdaQueryWrapper<TbWarnLevelAlias>()
+                        .eq(TbWarnLevelAlias::getPlatform, platform)
+                        .eq(TbWarnLevelAlias::getMonitorItemID, tbWarnThresholdConfig.getMonitorItemID())
+                        .eq(TbWarnLevelAlias::getFieldID, tbWarnThresholdConfig.getFieldID())
+                        .in(TbWarnLevelAlias::getWarnLevel, u))).map(u -> u.stream().collect(Collectors
+                .toMap(TbWarnLevelAlias::getWarnLevel, TbWarnLevelAlias::getAlias))).orElse(Map.of());
+        if (CollUtil.isNotEmpty(aliasMap)) {
+            dataList.stream().peek(u -> {
+                WarnLevelAliasInfo aliasConfig = u.getAliasConfig();
+                Optional.of(aliasConfig.getWarnLevel()).map(aliasMap::get).ifPresent(aliasConfig::setAlias);
+            }).toList();
+        }
+        return info;
     }
 }

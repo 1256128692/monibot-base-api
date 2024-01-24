@@ -23,6 +23,7 @@
         <collection property="projectList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$Project">
             <result property="projectID" column="projectID" jdbcType="INTEGER"/>
             <result property="projectName" column="projectName" jdbcType="VARCHAR"/>
+            <result property="projectShortName" column="projectShortName" jdbcType="VARCHAR"/>
             <result property="regionArea" column="regionArea" jdbcType="VARCHAR"/>
             <collection property="monitorPointList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog$MonitorPoint">
                 <result property="monitorPointID" column="monitorPointID" jdbcType="INTEGER"/>
@@ -32,6 +33,7 @@
                 <result property="monitorTypeAlias" column="monitorTypeAlias" jdbcType="VARCHAR"/>
                 <result property="monitorItemID" column="monitorItemID" jdbcType="INTEGER"/>
                 <result property="monitorItemName" column="monitorItemName" jdbcType="VARCHAR"/>
+                <result property="monitorItemAlias" column="monitorItemAlias" jdbcType="VARCHAR"/>
                 <result property="installLocation" column="installLocation" jdbcType="VARCHAR"/>
                 <result property="monitorPointLocation" column="monitorPointLocation" jdbcType="VARCHAR"/>
             </collection>
@@ -427,9 +429,11 @@
         SELECT
             tpi.`ID` projectID,
             tpi.ProjectName projectName,
+            tpi.shortName projectShortName,
             tpi.Location regionArea,
             tmi.`ID` monitorItemID,
             tmi.`Name` monitorItemName,
+            tmi.`Alias` monitorItemAlias,
             tmp.`ID` monitorPointID,
             tmp.`Name` monitorPointName,
             tmp.GpsLocation monitorPointLocation,

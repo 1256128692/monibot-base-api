@@ -1,10 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.IWarnLogService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +18,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+import java.util.Optional;
+
 /**
  * @author youxian.kong@shmedo.cn
  * @date 2024-01-08 15:50
@@ -20,8 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class WarnLogController {
-
-    private final ITbDataWarnLogService warnLogService;
+    private final IWarnLogService warnLogService;
+    private final ITbDataWarnLogService dataWarnLogService;
+    private final ITbDeviceWarnLogService deviceWarnLogService;
 
     /**
      * @api {POST} /QueryWarnNotifyPage 报警消息分页
@@ -147,7 +156,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDataWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDataWarnPage(@Valid @RequestBody QueryDataWarnPageParam param) {
-        return warnLogService.queryDataWarnPage(param);
+        return dataWarnLogService.queryDataWarnPage(param);
     }
 
     /**
@@ -193,7 +202,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} currentPageData.projectList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} currentPageData.projectList.gpsLocation 监测点位置
-     * @apiSuccess (返回结果) {String} currentPageData.deviceType 设备类型
+     * @apiSuccess (返回结果) {Int} currentPageData.deviceType 设备类型 1.物联网设备 2.视频设备
      * @apiSuccess (返回结果) {String} currentPageData.deviceToken 设备SN
      * @apiSuccess (返回结果) {Int} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
@@ -205,7 +214,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDeviceWarnPage(@Valid @RequestBody QueryDeviceWarnPageParam param) {
-        return warnLogService.queryDeviceWarnPage(param);
+        return deviceWarnLogService.queryDeviceWarnPage(param);
     }
 
     /**
@@ -241,7 +250,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} gpsLocation 监测点位置
-     * @apiSuccess (返回结果) {String} fieldID 监测属性ID
+     * @apiSuccess (返回结果) {Int} fieldID 监测属性ID
      * @apiSuccess (返回结果) {String} fieldName 监测属性名称
      * @apiSuccess (返回结果) {String} fieldToken 监测属性token
      * @apiSampleRequest off
@@ -249,8 +258,8 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDataWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDataWarnDetail(@Valid @RequestBody QueryWarnDetailParam param) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDataWarnDetail(@Valid @RequestBody QueryDataWarnDetailParam param) {
+        return dataWarnLogService.queryDataWarnDetail(param);
     }
 
     /**
@@ -294,7 +303,7 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDeviceWarnDetail(@Valid @RequestBody QueryWarnDetailParam param) {
+    public Object queryDeviceWarnDetail(@Valid @RequestBody QueryDeviceWarnDetailParam param) {
         return ResultWrapper.successWithNothing();
     }
 
@@ -311,6 +320,8 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.warnTime 报警时间
+     * @apiSuccess (返回结果) {Int} dataList.compareMode 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
+     * @apiSuccess (返回结果) {String} dataList.threshold 阈值,格式{"upper":2.0,"lower":1.0}(json字符串),如果对应的配置被更改导致查不到时会返回"{}"
      * @apiSuccess (返回结果) {Object} dataList.aliasConfig 报警等级枚举
      * @apiSuccess (返回结果) {Int} dataList.aliasConfig.warnLevel 报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口
      * @apiSuccess (返回结果) {String} [dataList.aliasConfig.alias] 别名名称
@@ -319,9 +330,9 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDataWarnHistory", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDataWarnHistory(@Valid @RequestBody Object param) {
+    public Object queryDataWarnHistory(@Valid @RequestBody QueryDataWarnDetailParam param) {
         // 实时报警只到此刻,且历史和实时都限制(自报警后)最多不超过3天
-        return ResultWrapper.successWithNothing();
+        return dataWarnLogService.queryDataWarnHistory(param);
     }
 
     /**
@@ -345,8 +356,8 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnHistory", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDeviceWarnHistory(@Valid @RequestBody Object param) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDeviceWarnHistory(@Valid @RequestBody QueryDeviceWarnDetailParam param) {
+        return deviceWarnLogService.queryDeviceWarnHistory(param.getTbDeviceWarnLog());
     }
 
     /**
@@ -366,7 +377,14 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddWarnWorkFlowTask", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addWarnWorkFlowTask(@Valid @RequestBody Object param) {
+    public Object addWarnWorkFlowTask(@Valid @RequestBody AddWarnWorkFlowTaskParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        warnLogService.addWarnWorkFlowTask(userID, param);
         return ResultWrapper.successWithNothing();
     }
 
@@ -385,7 +403,14 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/CancelDataWarn", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object cancelDataWarn(@Valid @RequestBody Object param) {
+    public Object cancelDataWarn(@Valid @RequestBody CancelDataWarnParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        dataWarnLogService.cancelDataWarn(userID, param);
         return ResultWrapper.successWithNothing();
     }
 
@@ -405,7 +430,14 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/FillDealOpinion", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object fillDealOpinion(@Valid @RequestBody Object param) {
+    public Object fillDealOpinion(@Valid @RequestBody FillDealOpinionParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        warnLogService.fillDealOpinion(userID, param);
         return ResultWrapper.successWithNothing();
     }
 
@@ -429,7 +461,7 @@ public class WarnLogController {
     @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
     @PostMapping(value = "/SaveDataWarn", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object saveDataWarn(@Valid @NotNull @RequestBody SaveDataWarnParam param) {
-        warnLogService.saveDataWarnLog(param);
+        dataWarnLogService.saveDataWarnLog(param);
         return ResultWrapper.successWithNothing();
     }
 }

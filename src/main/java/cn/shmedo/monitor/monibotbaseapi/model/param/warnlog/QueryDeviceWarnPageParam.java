@@ -1,11 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warnlog;
 
 import cn.shmedo.iot.entity.api.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.validator.constraints.Range;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -24,5 +27,11 @@ public class QueryDeviceWarnPageParam extends QueryWarnPageBaseParam {
             return validate;
         }
         return null;
+    }
+
+    public QueryWtTerminalWarnLogPageParam build() {
+        QueryWtTerminalWarnLogPageParam param = new QueryWtTerminalWarnLogPageParam();
+        Optional.ofNullable(getProjectID()).map(List::of).ifPresent(param::setProjectIDList);
+        return param;
     }
 }

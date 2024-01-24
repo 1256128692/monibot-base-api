@@ -31,6 +31,8 @@ public class WtTerminalWarnLog {
     public static class Project {
         private Integer projectID;
         private String projectName;
+        @JsonIgnore
+        private String projectShortName;
         private String regionArea;
         private Set<MonitorPoint> monitorPointList;
     }
@@ -45,6 +47,7 @@ public class WtTerminalWarnLog {
         private String monitorTypeAlias;
         private Integer monitorItemID;
         private String monitorItemName;
+        private String monitorItemAlias;
         private String monitorPointLocation;
         private String installLocation;
     }
