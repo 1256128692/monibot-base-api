@@ -271,8 +271,8 @@ public class ProjectStatisticsController {
      */
     @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "QuerySingleProjectMonitorPointNewDataPage", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object querySingleProjectMonitorPointNewDataPage(@Validated @RequestBody Object pa) {
-        return null;
+    public Object querySingleProjectMonitorPointNewDataPage(@Validated @RequestBody QuerySingleProjectMonitorPointNewDataPageParam pa) {
+        return projectStatisticsService.querySingleProjectMonitorPointNewDataPage(pa);
     }
 
 

@@ -26,4 +26,6 @@ public interface ProjectStatisticsService {
     Object querySingleProjectMonitorPointInfoList(QuerySingleProjectMonitorPointInfoListParam pa);
 
     Boolean updateSensorOnlineStatusByIot(UpdateDeviceCountStatisticsParam pa);
+
+    Object querySingleProjectMonitorPointNewDataPage(QuerySingleProjectMonitorPointNewDataPageParam pa);
 }

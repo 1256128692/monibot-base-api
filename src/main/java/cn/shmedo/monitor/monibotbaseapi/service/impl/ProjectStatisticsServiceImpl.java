@@ -29,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
@@ -373,6 +374,91 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         }
 
         return true;
+    }
+
+    @Override
+    public Object querySingleProjectMonitorPointNewDataPage(QuerySingleProjectMonitorPointNewDataPageParam pa) {
+        // 先查询所有传感器,然后按监测点进行分组,按照条件(监测项目ID列表,监测点名称,收藏的监测点ID列表)
+        List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(),
+                pa.getMonitorItemIDList(),
+                pa.getMonitorPointName());
+
+        if (CollectionUtils.isEmpty(sensorBaseInfoV4List)) {
+            return Collections.emptyList();
+        }
+
+        // 分组完之后进行遍历,每个监测点根据传感器去判断自己的监测点状态,然后按照条件(监测点状态进行筛选)
+        Map<Integer, List<SensorBaseInfoV4>> monitorPointInfoList = sensorBaseInfoV4List.stream()
+                .collect(Collectors.groupingBy(SensorBaseInfoV4::getMonitorPointID));
+
+        // 存储结果的列表
+        List<SensorBaseInfoV4> resultList = new ArrayList<>();
+
+        // 遍历分组后的数据
+        List<SensorBaseInfoV4> finalResultList = resultList;
+        monitorPointInfoList.forEach((monitorPointID, sensors) -> {
+
+            sensors.forEach(sensor -> {
+                // 监测点是否收藏
+                if (pa.getMonitorPointIDList().contains(sensor.getMonitorPointID())) {
+                    sensor.setMonitorPointCollection(true);
+                } else {
+                    sensor.setMonitorPointCollection(false);
+                }
+                if (sensor.getDeviceOnlineStatus() == null) {
+                    // 为null默认离线
+                    sensor.setDeviceOnlineStatus(0);
+                }
+            });
+
+            // 只取一个传感器,取的规则按照当前点的传感器最高预警的一个即可
+            SensorBaseInfoV4 maxStatusSensor = sensors.stream()
+                    .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+                    .orElse(null);
+
+            // 将找到的传感器添加到结果列表中
+            if (maxStatusSensor != null) {
+                finalResultList.add(maxStatusSensor);
+            }
+        });
+
+        if (pa.getMonitorPointCollection() != null && pa.getMonitorPointCollection()) {
+            resultList = resultList.stream().filter(r -> r.getMonitorPointCollection().equals(pa.getMonitorPointCollection())).collect(Collectors.toList());
+        }
+
+        if (CollectionUtils.isNotEmpty(pa.getMonitorStatusList())) {
+            resultList = resultList.stream().filter(r -> pa.getMonitorStatusList().contains(r.getDataWarnStatus())).collect(Collectors.toList());
+        }
+
+        // 最后根据监测类型再去分组这些监测点,然后遍历监测类型,去查该类型下监测点的传感器的最新数据,封装打包
+        Map<Integer, List<SensorBaseInfoV4>> monitorTypeList = resultList.stream()
+                .collect(Collectors.groupingBy(SensorBaseInfoV4::getMonitorType));
+
+        monitorTypeList.forEach((monitorType, sensors) -> {
+
+            List<FieldBaseInfo> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByType(monitorType);
+
+            List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(monitorTypeFields);
+            List<Integer> sensorIDList = sensors.stream().map(SensorBaseInfoV4::getSensorID).collect(Collectors.toList());
+            List<Map<String, Object>> maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
+
+            sensors.forEach(s -> {
+                s.setMonitorTypeFields(monitorTypeFields);
+                if (CollectionUtils.isNotEmpty(maps)) {
+                    s.setSensorData(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).findFirst().orElse(null));
+                    if (ObjectUtil.isNotNull(s.getSensorData())) {
+                        s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
+                    }
+                }
+            });
+
+        });
+
+        // 按照时间倒序排序
+        resultList.sort(Comparator.comparing(SensorBaseInfoV4::getDataTime, Comparator.nullsLast(Comparator.reverseOrder())));
+
+        // 列表分页
+        return PageUtil.page(resultList, pa.getPageSize(), pa.getCurrentPage());
     }
 
     /**
