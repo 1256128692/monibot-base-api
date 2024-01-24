@@ -158,7 +158,6 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         }
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param) {
         TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
@@ -243,10 +242,13 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
             info.setDeviceToken(u.getDeviceSerial());
             return info;
         }).toList();
-        Set<String> deviceTokens = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
+        Set<String> deviceTokens = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken)
+                .filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         if (CollUtil.isNotEmpty(deviceTokens)) {
-            List<TbVideoDevice> tbVideoDeviceList = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>().in(TbVideoDevice::getDeviceToken, deviceTokens));
-            Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceList.stream().collect(Collectors.toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
+            List<TbVideoDevice> tbVideoDeviceList = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>()
+                    .in(TbVideoDevice::getDeviceToken, deviceTokens));
+            Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceList.stream().collect(Collectors
+                    .toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
             TransferUtil.applyDeviceBase(deviceWarnPageInfoList,
                     () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                     DeviceWarnPageInfo::getDeviceToken,
@@ -335,11 +337,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                     }
                 }).filter(u -> Optional.ofNullable(deviceType).filter(ObjectUtil::isNotEmpty).map(w ->
                         w.equals(u.getDeviceType())).orElse(true)).toList();
-//                PageUtil.Page<DeviceWarnPageInfo> page = PageUtil.page(deviceWarnPageInfoList, param.getPageSize(), param.getCurrentPage());
-//                return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), warnBaseInfo);
             }
         }
-//        return PageUtil.PageWithMap.emptyWithMap(warnBaseInfo);
         return List.of();
     }
 }
