@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -19,6 +20,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInf
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStateListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
@@ -158,6 +161,11 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param) {
+        TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
+        Map<String, Object> warnBaseInfo = Map.of("warnTag", tbWarnBaseConfig.getWarnTag(),
+                "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
+                "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle());
+
         LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>().eq(TbDeviceWarnLog::getPlatform, param.getPlatform());
         if (param.getIsRealTime()) {
             wrapper.isNull(TbDeviceWarnLog::getWarnEndTime);
@@ -173,21 +181,74 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         Optional.ofNullable(param.getEndTime()).ifPresent(u -> wrapper.le(TbDeviceWarnLog::getWarnTime, u));
         Optional.ofNullable(param.getDealStatus()).ifPresent(u -> wrapper.eq(TbDeviceWarnLog::getDealStatus, u));
         List<TbDeviceWarnLog> tbDeviceWarnLogList = this.list(wrapper);
+        List<DeviceWarnPageInfo> deviceWarnPageInfoList = queryDeviceWarnList(tbDeviceWarnLogList, param.getCompanyID(), param.build(), param.getDeviceType());
+        if (CollUtil.isNotEmpty(deviceWarnPageInfoList)) {
+            PageUtil.Page<DeviceWarnPageInfo> page = PageUtil.page(deviceWarnPageInfoList, param.getPageSize(), param.getCurrentPage());
+            return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), warnBaseInfo);
+        }
+        return PageUtil.PageWithMap.emptyWithMap(warnBaseInfo);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public DeviceWarnHistoryInfo queryDeviceWarnHistory(TbDeviceWarnLog tbDeviceWarnLog) {
+        Date warnTime = tbDeviceWarnLog.getWarnTime();
+        DeviceWarnHistoryInfo info = new DeviceWarnHistoryInfo();
+        info.setWarnTime(warnTime);
+        info.setWarnEndTime(tbDeviceWarnLog.getWarnEndTime());
+        Optional.of(QueryDeviceStateListParam.builder().deviceToken(tbDeviceWarnLog.getDeviceSerial())
+                        .begin(DateUtil.offsetDay(warnTime, -3)).end(DateUtil.offsetDay(warnTime, 3)).build())
+                .map(u -> iotService.queryDeviceStateList(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u -> {
+                    List<Map<String, Object>> fourGSignalList = new ArrayList<>();
+                    List<Map<String, Object>> extPowerVoltList = new ArrayList<>();
+                    u.stream().sorted(Comparator.comparing(DeviceStateInfo::getTime)).peek(w -> {
+                        Date time = w.getTime();
+                        fourGSignalList.add(Map.of("time", time, "value", w.getFourGSignal()));
+                        extPowerVoltList.add(Map.of("time", time, "value", w.getExtPowerVolt()));
+                    }).toList();
+                    info.setFourGSignalList(fourGSignalList);
+                    info.setExtPowerVoltList(extPowerVoltList);
+                });
+        return info;
+    }
+
+    @Override
+    public DeviceWarnPageInfo queryDeviceWarnDetail(QueryDeviceWarnDetailParam param) {
+        return queryDeviceWarnList(List.of(param.getTbDeviceWarnLog()), param.getCompanyID(), new QueryWtTerminalWarnLogPageParam(), null)
+                .stream().findAny().orElseThrow(() -> new RuntimeException("Unreachable Exception"));
+    }
+
+    public @Nullable String getLowestAreaCode(final String areaJson) {
+        try {
+            return Optional.ofNullable(areaJson).map(JSONUtil::parseObj).flatMap(u ->
+                    Stream.of("town", "area", "city", "province")
+                            .filter(u::containsKey).findFirst().map(u::getStr)).orElseThrow(IllegalArgumentException::new);
+        } catch (JSONException | IllegalArgumentException e) {
+            log.error("parse area json failed,area json: {}", areaJson);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private List<DeviceWarnPageInfo> queryDeviceWarnList(final List<TbDeviceWarnLog> tbDeviceWarnLogList, final Integer companyID,
+                                                         final QueryWtTerminalWarnLogPageParam param, @Nullable Integer deviceType) {
         Map<Integer, TbProjectInfo> projectInfoMap = Optional.of(tbDeviceWarnLogList.stream().map(TbDeviceWarnLog::getProjectID)
                 .collect(Collectors.toSet())).filter(CollUtil::isNotEmpty).map(u -> tbProjectInfoMapper.selectList(
                 new LambdaQueryWrapper<TbProjectInfo>().in(TbProjectInfo::getID, u))).map(u -> u.stream()
                 .collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()))).orElse(Map.of());
-
-        List<DeviceWarnPageInfo> deviceWarnPageInfoList = tbDeviceWarnLogList.stream().map(u -> DeviceWarnPageInfo
-                .builder().dealContent(u.getDealContent()).dealUserID(u.getDealUserID()).dealTime(u.getDealTime())
-                .id(u.getId()).projectID(u.getProjectID()).workOrderID(u.getWorkOrderID()).warnTime(u.getWarnTime())
-                .warnEndTime(u.getWarnEndTime()).deviceToken(u.getDeviceSerial()).build()).toList();
+        List<DeviceWarnPageInfo> deviceWarnPageInfoList = tbDeviceWarnLogList.stream().map(u -> {
+            DeviceWarnPageInfo info = new DeviceWarnPageInfo();
+            BeanUtil.copyProperties(u, info);
+            info.setDeviceToken(u.getDeviceSerial());
+            return info;
+        }).toList();
         Set<String> deviceTokens = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken).filter(ObjectUtil::isNotEmpty).collect(Collectors.toSet());
         if (CollUtil.isNotEmpty(deviceTokens)) {
             List<TbVideoDevice> tbVideoDeviceList = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>().in(TbVideoDevice::getDeviceToken, deviceTokens));
             Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceList.stream().collect(Collectors.toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
             TransferUtil.applyDeviceBase(deviceWarnPageInfoList,
-                    () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(param.getCompanyID()).build(),
+                    () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                     DeviceWarnPageInfo::getDeviceToken,
                     (e, device) -> {
                         e.setGpsLocation(device.getGpsLocation());
@@ -206,7 +267,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
             Set<String> uniqueTokenSet = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken).filter(StrUtil::isNotEmpty)
                     .collect(Collectors.toSet());
             if (!uniqueTokenSet.isEmpty()) {
-                List<WtTerminalWarnLog> wtTerminalWarnLogs = tbWarnLogMapper.queryTerminalWarnListByUniqueToken(param.build(), uniqueTokenSet);
+                List<WtTerminalWarnLog> wtTerminalWarnLogs = tbWarnLogMapper.queryTerminalWarnListByUniqueToken(param, uniqueTokenSet);
                 // user
                 List<Integer> dealUserIDList = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDealUserID).filter(Objects::nonNull)
                         .distinct().toList();
@@ -249,7 +310,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
                 Map<String, WtTerminalWarnLog> uniqueTokenProjectInfoMap = wtTerminalWarnLogs
                         .stream().collect(Collectors.toMap(WtTerminalWarnLog::getUniqueToken, Function.identity()));
-                deviceWarnPageInfoList.stream().peek(item -> {
+                return deviceWarnPageInfoList.stream().peek(item -> {
                     if (uniqueTokenProjectInfoMap.containsKey(item.getUniqueToken())) {
                         Optional.ofNullable(item.getDealUserID()).map(userIDNameMap::get).ifPresent(item::setDealUserName);
                         item.setProjectList(uniqueTokenProjectInfoMap.get(item.getUniqueToken()).getProjectList()
@@ -272,51 +333,13 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                     .build()));
                         });
                     }
-                }).filter(u -> Optional.ofNullable(param.getDeviceType()).filter(ObjectUtil::isNotEmpty).map(w ->
+                }).filter(u -> Optional.ofNullable(deviceType).filter(ObjectUtil::isNotEmpty).map(w ->
                         w.equals(u.getDeviceType())).orElse(true)).toList();
-                PageUtil.Page<DeviceWarnPageInfo> page = PageUtil.page(deviceWarnPageInfoList, param.getPageSize(), param.getCurrentPage());
-                TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
-                return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), Map.of(
-                        "warnTag", tbWarnBaseConfig.getWarnTag(),
-                        "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
-                        "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle()));
+//                PageUtil.Page<DeviceWarnPageInfo> page = PageUtil.page(deviceWarnPageInfoList, param.getPageSize(), param.getCurrentPage());
+//                return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), warnBaseInfo);
             }
         }
-        return PageUtil.PageWithMap.empty();
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public DeviceWarnHistoryInfo queryDeviceWarnHistory(TbDeviceWarnLog tbDeviceWarnLog) {
-        Date warnTime = tbDeviceWarnLog.getWarnTime();
-        DeviceWarnHistoryInfo info = new DeviceWarnHistoryInfo();
-        info.setWarnTime(warnTime);
-        info.setWarnEndTime(tbDeviceWarnLog.getWarnEndTime());
-        Optional.of(QueryDeviceStateListParam.builder().deviceToken(tbDeviceWarnLog.getDeviceSerial())
-                        .begin(DateUtil.offsetDay(warnTime, -3)).end(DateUtil.offsetDay(warnTime, 3)).build())
-                .map(u -> iotService.queryDeviceStateList(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
-                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u -> {
-                    List<Map<String, Object>> fourGSignalList = new ArrayList<>();
-                    List<Map<String, Object>> extPowerVoltList = new ArrayList<>();
-                    u.stream().sorted(Comparator.comparing(DeviceStateInfo::getTime)).peek(w -> {
-                        Date time = w.getTime();
-                        fourGSignalList.add(Map.of("time", time, "value", w.getFourGSignal()));
-                        extPowerVoltList.add(Map.of("time", time, "value", w.getExtPowerVolt()));
-                    }).toList();
-                    info.setFourGSignalList(fourGSignalList);
-                    info.setExtPowerVoltList(extPowerVoltList);
-                });
-        return info;
-    }
-
-    public @Nullable String getLowestAreaCode(final String areaJson) {
-        try {
-            return Optional.ofNullable(areaJson).map(JSONUtil::parseObj).flatMap(u ->
-                    Stream.of("town", "area", "city", "province")
-                            .filter(u::containsKey).findFirst().map(u::getStr)).orElseThrow(IllegalArgumentException::new);
-        } catch (JSONException | IllegalArgumentException e) {
-            log.error("parse area json failed,area json: {}", areaJson);
-        }
-        return null;
+//        return PageUtil.PageWithMap.emptyWithMap(warnBaseInfo);
+        return List.of();
     }
 }

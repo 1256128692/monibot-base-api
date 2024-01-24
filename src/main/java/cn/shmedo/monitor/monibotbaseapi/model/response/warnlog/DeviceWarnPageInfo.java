@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warnlog;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,7 +11,6 @@ import java.util.List;
  * @date 2024-01-19 16:53
  */
 @Data
-@Builder
 public class DeviceWarnPageInfo {
     private Integer id;
     private String warnName;

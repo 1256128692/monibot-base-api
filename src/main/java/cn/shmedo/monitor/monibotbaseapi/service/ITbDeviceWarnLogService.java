@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceWarnLog;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DeviceWarnHistoryInfo;
@@ -17,4 +18,6 @@ public interface ITbDeviceWarnLogService extends IService<TbDeviceWarnLog> {
     PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param);
 
     DeviceWarnHistoryInfo queryDeviceWarnHistory(TbDeviceWarnLog tbDeviceWarnLog);
+
+    DeviceWarnPageInfo queryDeviceWarnDetail(QueryDeviceWarnDetailParam param);
 }

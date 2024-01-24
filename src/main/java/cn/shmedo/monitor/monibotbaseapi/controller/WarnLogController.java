@@ -292,7 +292,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} projectList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} projectList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} projectList.gpsLocation 监测点位置
-     * @apiSuccess (返回结果) {String} deviceType 设备类型
+     * @apiSuccess (返回结果) {Int} deviceType 设备类型 1.物联网设备 2.视频设备
      * @apiSuccess (返回结果) {String} deviceToken 设备SN
      * @apiSuccess (返回结果) {Int} productID 产品ID
      * @apiSuccess (返回结果) {String} deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
@@ -304,7 +304,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryDeviceWarnDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryDeviceWarnDetail(@Valid @RequestBody QueryDeviceWarnDetailParam param) {
-        return ResultWrapper.successWithNothing();
+        return deviceWarnLogService.queryDeviceWarnDetail(param);
     }
 
     /**
