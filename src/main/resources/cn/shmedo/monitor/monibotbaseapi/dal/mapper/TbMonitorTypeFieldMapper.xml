@@ -388,7 +388,8 @@
                du.chnUnit,
                du.unitClass,
                du.unitDesc,
-               tmtf.displayOrder
+               tmtf.displayOrder,
+               tmtf.fieldClass
         from tb_monitor_type_field tmtf
                  left join tb_data_unit du on tmtf.fieldUnitID = du.ID
         where tmtf.monitorType = #{monitorType}

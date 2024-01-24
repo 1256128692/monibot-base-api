@@ -1013,4 +1013,39 @@
             WHERE ID = #{item.sensorID}
         </foreach>
     </update>
+
+    <select id="selectListByCondition"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4">
+        select ts.ID           as sensorID,
+               ts.Name         as sensorName,
+               ts.monitorType,
+               ts.monitorPointID,
+               tmp.Name        as monitorPointName,
+               tmp.gpsLocation,
+               tmp.monitorItemID,
+               tmi.Name        as monitorItemName,
+               tmg.ID          as monitorGroupID,
+               tmg.Name        as monitorGroupName,
+               ts.status       as dataWarnStatus,
+               ts.onlineStatus as deviceOnlineStatus,
+               tmt.multiSensor
+        from tb_sensor ts
+                 left join tb_monitor_point tmp on ts.monitorPointID = tmp.ID
+                 left join tb_monitor_item tmi on tmp.monitorItemID = tmi.ID
+                 left join tb_monitor_group_point tmgp on tmgp.monitorPointID = tmp.ID
+                 left join tb_monitor_group tmg on tmg.ID = tmgp.monitorGroupID
+                 left join tb_monitor_type tmt on ts.monitorType = tmt.ID
+        where ts.monitorPointID is not null
+          and ts.ProjectID = #{projectID}
+        <if test="monitorPointName != null and monitorPointName != ''">
+            and tmp.Name like CONCAT('%', #{monitorPointName}, '%')
+        </if>
+        <if test="monitorItemIDList != null and monitorItemIDList.size() != 0">
+            and
+            <foreach collection="monitorItemIDList" separator="," item="item" open="tmi.ID IN ("
+                     close=") AND">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

@@ -21,4 +21,5 @@ public class FieldBaseInfo {
 
     private Integer displayOrder;
 
+    private Integer fieldClass;
 }

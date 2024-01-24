@@ -127,4 +127,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorWithDataSourceInfo> selectListFromIotSerivce();
 
     void updateStatusById(Integer id, SensorStatusDesc status);
+
+    List<SensorBaseInfoV4> selectListByCondition(Integer projectID, List<Integer> monitorItemIDList, String monitorPointName);
 }
