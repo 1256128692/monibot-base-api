@@ -34,6 +34,9 @@ public class SaveDataWarnParam {
     @NotNull
     private Double warnValue;
 
+    @NotNull
+    private Integer sensorID;
+
     /**
      * 报警时间
      */

@@ -984,4 +984,10 @@
             #{id}
         </foreach>
     </update>
+
+    <update id="updateStatusById">
+        update `tb_sensor`
+        set `Status` = #{status.status}
+        WHERE `ID` = #{id}
+    </update>
 </mapper>

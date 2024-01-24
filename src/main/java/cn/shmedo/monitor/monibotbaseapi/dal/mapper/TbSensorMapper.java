@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointSimple;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.GqQueryMonitorPointDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.SensorListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
@@ -123,4 +124,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<Tuple2<Integer, String>> listWaterMeasureSensor(@Param("param") ListWaterMeasureSensorRequest param);
 
     void batchUpdateBySensorKind(Integer kind, List<Integer> sensorIDList);
+
+    void updateStatusById(@Param("id") Integer id, @Param("status") SensorStatusDesc status);
 }

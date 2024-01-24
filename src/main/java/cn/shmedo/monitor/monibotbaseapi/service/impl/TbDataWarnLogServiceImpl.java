@@ -11,7 +11,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -21,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
@@ -75,6 +75,8 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     private final NotifyService notifyService;
     private final TbDataWarnLogHistoryMapper historyMapper;
     private final TbWarnNotifyRelationMapper notifyRelationMapper;
+    private final TbSensorMapper sensorMapper;
+    private final TbWarnLevelAliasMapper warnLevelAliasMapper;
     private final FileConfig fileConfig;
     private final UserService userService;
     private final ApplicationEventPublisher publisher;
@@ -84,13 +86,14 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     public void saveDataWarnLog(SaveDataWarnParam param) {
 
         if (param.getWarnLevel() == 0) {
-            boolean updated = this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
+            this.update(Wrappers.<TbDataWarnLog>lambdaUpdate()
                     .eq(TbDataWarnLog::getWarnThresholdID, param.getThresholdID())
                     .ne(TbDataWarnLog::getDealStatus, 2)
                     .isNull(TbDataWarnLog::getWarnEndTime)
                     .set(TbDataWarnLog::getDataStatus, 0)
                     .set(TbDataWarnLog::getWarnEndTime, param.getWarnTime()));
-            Assert.isTrue(updated, "更新数据报警数据状态失败");
+
+            sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.NORMAL);
             return;
         }
 
@@ -133,8 +136,22 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         //重新构建通知内容
         TbWarnBaseConfig config = baseConfigService.queryByCompanyIDAndPlatform(threshold.getCompanyID(), threshold.getPlatform());
         WarnTag warnTag = WarnTag.fromCode(config.getWarnTag());
-        WarnLevelStyle style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
-        String levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel() - 1] + warnTag.getDesc();
+        //查询报警级别别名
+        TbWarnLevelAlias levelAlias = warnLevelAliasMapper.selectOne(Wrappers.<TbWarnLevelAlias>lambdaQuery()
+                .eq(TbWarnLevelAlias::getPlatform, threshold.getPlatform())
+                .eq(TbWarnLevelAlias::getProjectID, threshold.getProjectID())
+                .eq(TbWarnLevelAlias::getMonitorType, threshold.getMonitorType())
+                .eq(TbWarnLevelAlias::getMonitorItemID, threshold.getMonitorItemID())
+                .eq(TbWarnLevelAlias::getFieldID, threshold.getFieldID())
+                .eq(TbWarnLevelAlias::getWarnLevel, param.getWarnLevel())
+                .select(TbWarnLevelAlias::getAlias));
+        String levelStr;
+        if (levelAlias != null && StrUtil.isNotBlank(levelAlias.getAlias())) {
+            levelStr = levelAlias.getAlias();
+        } else {
+            WarnLevelStyle style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
+            levelStr = style.getDesc().split(StrUtil.COMMA)[param.getWarnLevel() - 1] + warnTag.getDesc();
+        }
 
         String content = StrUtil.format(WARN_CONTENT_FORMAT, threshold.getProjectName(), threshold.getMonitorPointName(),
                 DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
@@ -171,7 +188,8 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 yield existLog;
             }
         };
-        Assert.isTrue(this.saveOrUpdate(warnLog), "存储数据报警失败");
+        this.saveOrUpdate(warnLog);
+        sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.getByWarnLevel(param.getWarnLevel()));
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {

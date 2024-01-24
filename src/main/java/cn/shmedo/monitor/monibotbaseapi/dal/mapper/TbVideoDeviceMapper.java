@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -49,4 +50,6 @@ public interface TbVideoDeviceMapper extends BaseMapper<TbVideoDevice> {
     List<VideoBaseInfo> selectListByCompanyID(Integer companyID, Boolean deviceStatus, String queryContent);
 
     List<TbVideoDevice> selectAllList();
+
+    List<DeviceAssetsStatisticsInfo> queryOnlineCountByProjectIDList(List<Integer> projectIDList);
 }

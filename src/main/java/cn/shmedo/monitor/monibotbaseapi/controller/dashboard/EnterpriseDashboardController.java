@@ -31,7 +31,6 @@ public class EnterpriseDashboardController {
      * @apiName QueryIndustryDistribution
      * @apiDescription 查询行业分布统计，MDNET平台中项目现有量与近1年增长量
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
      * @apiSuccess (返回结果) {Object[]} industryList 行业列表
      * @apiSuccess (返回结果) {Int} industryList.projectMainType 项目一级分类
      * @apiSuccess (返回结果) {String} industryList.projectMainTypeName 项目一级分类名称
@@ -46,12 +45,6 @@ public class EnterpriseDashboardController {
         return ResultWrapper.success(dashboardService.queryIndustryDistribution(param));
     }
 
-    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
-    @PostMapping("QueryMonitoringCapability")
-    public Object queryMonitoringCapability() {
-        return null;
-    }
-
     /**
      * @api {POST} /QueryProductServices 查询产品服务
      * @apiVersion 1.0.0
@@ -60,7 +53,6 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询产品服务。统计所选行业各监测类型下的设备使用量。
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiParam (请求参数) {Int} [monitorType] 监测类型（为空时，productList返回空；非空时，productList返回非空）
      * @apiSuccess (返回结果) {Object[]} monitorList 监测列表
      * @apiSuccess (返回结果) {Int} monitorList.monitorType 监测类型
      * @apiSuccess (返回结果) {String} monitorList.monitorTypeName 监测类型名称
@@ -76,12 +68,6 @@ public class EnterpriseDashboardController {
     @PostMapping("QueryProductServices")
     public Object queryProductServices(@RequestBody @Valid QueryProductServicesParam param) {
         return dashboardService.queryProductServices(param);
-    }
-
-    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
-    @PostMapping("QueryProductServiceDetail")
-    public Object queryProductServiceDetail() {
-        return null;
     }
 
     /**
@@ -101,12 +87,6 @@ public class EnterpriseDashboardController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryResourceOverview")
     public Object queryResourceOverview() {
-        return null;
-    }
-
-    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
-    @PostMapping("QueryProvinceHasProject")
-    public Object queryProvinceHasProject() {
         return null;
     }
 
@@ -147,7 +127,7 @@ public class EnterpriseDashboardController {
      * @apiDescription 查询省份项目详情
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiParam (请求参数) {Int} [provinceCode] 省份code码
+     * @apiParam (请求参数) {Int} provinceCode 省份code码
      * @apiSuccess (返回结果) {String} provinceName 省份名称
      * @apiSuccess (返回结果) {Int} projectCount 项目统计
      * @apiSuccess (返回结果) {Object[]} projectList 项目列表
@@ -235,12 +215,14 @@ public class EnterpriseDashboardController {
      * @apiSuccess (返回结果) {Int} execAccessCount 规则执行成功次数
      * @apiSuccess (返回结果) {Int} onlineCount 设备在线数
      * @apiSuccess (返回结果) {Int} offlineCount 设备离线数
+     * @apiSuccess (返回结果) {Double} deviceOnlineRate 设备在线率
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryDeviceMaintenance")
     public Object queryDeviceMaintenance() {
+        // todo 设备在线率保留两位小数
         return null;
     }
 

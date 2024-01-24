@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.IndustryDistributionRes;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.QueryProductServicesRes;
 
 import java.util.List;
 
@@ -17,5 +18,5 @@ import java.util.List;
 public interface EnterpriseDashboardService {
     List<IndustryDistributionRes> queryIndustryDistribution(QueryIndustryDistributionParam param);
 
-    Object queryProductServices(QueryProductServicesParam param);
+    List<QueryProductServicesRes> queryProductServices(QueryProductServicesParam param);
 }

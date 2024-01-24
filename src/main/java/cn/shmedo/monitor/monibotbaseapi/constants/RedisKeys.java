@@ -63,6 +63,11 @@ public class RedisKeys {
     public static final String PROJECT_KEY = "cn.shmedo.mdmbse.projectCache";
 
     /**
+     * 大屏产品服务设备统计
+     */
+    public static final String MONITOR_TYPE_DEVICE_COUNT = "cn.shmedo.monitor.monitorType.deviceCount";
+
+    /**
      * 表单模板缓存
      */
     public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";
@@ -88,6 +93,18 @@ public class RedisKeys {
      * 示例: cn.shmedo.iot.monitor.warn.silenceCycle:{thresholdID}
      */
     public static final String WARN_SILENCE_CYCLE = "cn.shmedo.monitor.warn.silenceCycle:";
+
+
+    /**
+     * 设备资产
+     */
+    public static final String DEVICE_ASSET_KEY = "cn.shmedo.monitor.project.deviceAsset";
+
+
+    /**
+     * 设备数据量
+     */
+    public static final String DEVICE_DATA_COUNT_KEY = "cn.shmedo.monitor.project.dataCount";
 }
 
     
