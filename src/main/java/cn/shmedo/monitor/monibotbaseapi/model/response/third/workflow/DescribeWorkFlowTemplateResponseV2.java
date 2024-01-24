@@ -77,7 +77,7 @@ public class DescribeWorkFlowTemplateResponseV2 {
     /**
      * 工作流模板状态（0-停用；1-启用）
      */
-    private Integer status;
+    private Boolean status;
     /**
      * 创建人ID
      */
@@ -101,7 +101,7 @@ public class DescribeWorkFlowTemplateResponseV2 {
                                               Integer platform, String platformName, Integer groupID, String groupName,
                                               Integer workFlowType, String workFlowTypeName, String startBpmnNodeID,
                                               List<TemplateNodeInfo> nodeList, String workFlowID, String workFlowKey,
-                                              Integer workFlowVersion, Integer isLatest, Integer status, Integer createUserID,
+                                              Integer workFlowVersion, Integer isLatest, Boolean status, Integer createUserID,
                                               String createName, String createTime) {
         this.ID = ID;
         this.companyID = companyID;
@@ -253,11 +253,11 @@ public class DescribeWorkFlowTemplateResponseV2 {
         this.isLatest = isLatest;
     }
 
-    public Integer getStatus() {
+    public Boolean getStatus() {
         return status;
     }
 
-    public void setStatus(Integer status) {
+    public void setStatus(Boolean status) {
         this.status = status;
     }
 
