@@ -2,29 +2,32 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleByUniqueTokensParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.otherdevice.OtherDeviceCountInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DataCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorWithDataSourceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,9 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private final TbMonitorItemMapper tbMonitorItemMapper;
 
     private final TbSensorMapper tbSensorMapper;
+
+    private final TbSensorDataSourceMapper tbSensorDataSourceMapper;
+    private final FileConfig fileConfig;
 
     private final TbUserFollowMonitorPointMapper tbUserFollowMonitorPointMapper;
 
@@ -228,6 +234,69 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
 
         tbUserFollowMonitorPointMapper.deleteBatch(pa.getMonitorPointIDList(), pa.getUserID());
 
+    }
+
+    @Override
+    public Object querySingleProjectMonitorPointInfoList(QuerySingleProjectMonitorPointInfoListParam pa) {
+
+        // 先查询所有传感器,然后按监测点进行分组,按照条件(监测项目ID列表,监测点名称,收藏的监测点ID列表)
+
+        // 分组完之后进行遍历,每个监测点根据传感器去判断自己的监测点状态,然后按照条件(监测点状态进行筛选),顺便把监测点在线离线状态解决
+
+        // 然后就是每个监测点,只取一个传感器,取的规则按照当前点的传感器最高预警的一个即可
+
+        // 最后根据监测类型再去分组这些监测点,然后遍历监测类型,去查该类型下监测点的传感器的最新数据,封装打包
+
+
+
+        return null;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Boolean updateSensorOnlineStatusByIot(UpdateDeviceCountStatisticsParam pa) {
+
+        List<SensorWithDataSourceInfo> sensorWithDataSourceInfoList = tbSensorMapper.selectListFromIotSerivce();
+
+        if (CollectionUtils.isEmpty(sensorWithDataSourceInfoList)) {
+            return true;
+        }
+
+        sensorWithDataSourceInfoList.forEach(s -> {
+            if (StringUtils.isNotEmpty(s.getDataSourceToken()) && s.getDataSourceToken().contains("@")) {
+                String[] parts = s.getDataSourceToken().split("@");
+                s.setUniqueToken(parts[0]);
+            }
+        });
+
+        List<String> uniqueTokenList = sensorWithDataSourceInfoList.stream()
+                .map(SensorWithDataSourceInfo::getUniqueToken)
+                .filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(uniqueTokenList)) {
+            return true;
+        }
+
+        ResultWrapper<List<DeviceInfo>> result = iotService.queryDeviceInfoByUniqueTokens(
+                new QueryDeviceInfoByUniqueTokensParam(uniqueTokenList),
+                fileConfig.getAuthAppKey(),
+                fileConfig.getAuthAppSecret());
+
+        if (result.apiSuccess()) {
+            if (CollectionUtils.isNotEmpty(result.getData())) {
+                sensorWithDataSourceInfoList.forEach(s -> {
+                    DeviceInfo deviceInfo = result.getData().stream().filter(r -> r.getUniqueToken().equals(s.getUniqueToken())).findFirst().orElse(null);
+                    if (deviceInfo != null && deviceInfo.getOnline() != null) {
+                        s.setOnlineStatus(deviceInfo.getOnline());
+                    }
+                });
+
+                tbSensorMapper.updateBatch(sensorWithDataSourceInfoList);
+            }
+        } else {
+            return false;
+        }
+
+        return true;
     }
 
     /**

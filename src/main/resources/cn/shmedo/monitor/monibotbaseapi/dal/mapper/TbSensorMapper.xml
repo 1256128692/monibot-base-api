@@ -990,4 +990,27 @@
         set `Status` = #{status.status}
         WHERE `ID` = #{id}
     </update>
+
+    <select id="selectListFromIotSerivce"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorWithDataSourceInfo">
+        select ts.ID   as sensorID,
+               ts.Name as sensorName,
+               ts.dataSourceID,
+               ts.dataSourceComposeType,
+               tsds.dataSourceToken,
+               ts.onlineStatus
+        from tb_sensor ts
+                 left join tb_sensor_data_source tsds on ts.dataSourceID = tsds.dataSourceID
+        where ts.dataSourceComposeType in (1, 2, 3)
+          and tsds.dataSourceToken is not null
+    </select>
+
+
+    <update id="updateBatch">
+        <foreach collection="sensorWithDataSourceInfoList" item="item" separator=";">
+            UPDATE tb_sensor
+            SET onlineStatus = #{item.onlineStatus}
+            WHERE ID = #{item.sensorID}
+        </foreach>
+    </update>
 </mapper>

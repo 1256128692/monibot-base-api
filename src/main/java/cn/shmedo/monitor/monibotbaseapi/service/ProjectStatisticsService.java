@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.WarnInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DataCountStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo;
@@ -25,4 +22,8 @@ public interface ProjectStatisticsService {
     void addUserCollectionMonitorPoint(AddUserCollectionMonitorPointParam pa);
 
     void deleteUserCollectionMonitorPoint(DeleteUserCollectionMonitorPointParam pa);
+
+    Object querySingleProjectMonitorPointInfoList(QuerySingleProjectMonitorPointInfoListParam pa);
+
+    Boolean updateSensorOnlineStatusByIot(UpdateDeviceCountStatisticsParam pa);
 }

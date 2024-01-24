@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.factory;
 import cn.hutool.core.exceptions.ExceptionUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
@@ -108,6 +109,12 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
             public ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
+
+            @Override
+            public ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam param, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
         };
     }
 

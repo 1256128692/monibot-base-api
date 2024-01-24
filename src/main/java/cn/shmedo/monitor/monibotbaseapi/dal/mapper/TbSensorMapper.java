@@ -11,10 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.video.SensorBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV6;
 import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.ListWaterMeasureSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.watermeasure.WaterMeasurePointPageRequest;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV3;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorListResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sluice.Sluice;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.SensorIDWithFormulaBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoCaptureBaseInfo;
@@ -125,5 +122,9 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     void batchUpdateBySensorKind(Integer kind, List<Integer> sensorIDList);
 
-    void updateStatusById(@Param("id") Integer id, @Param("status") SensorStatusDesc status);
+    void updateBatch(List<SensorWithDataSourceInfo> sensorWithDataSourceInfoList);
+
+    List<SensorWithDataSourceInfo> selectListFromIotSerivce();
+
+    void updateStatusById(Integer sensorID, SensorStatusDesc byWarnLevel);
 }

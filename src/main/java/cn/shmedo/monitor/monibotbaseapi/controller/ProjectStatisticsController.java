@@ -4,10 +4,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.AddUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.DeleteUserCollectionMonitorPointParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.ProjectConditionParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.UpdateDeviceCountStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -34,11 +31,11 @@ public class ProjectStatisticsController {
      * @apiName UpdateDeviceCountStatistics
      * @apiDescription 更新设备资产数量统计,每小时触发一次
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiSuccess (返回结果) {Boolean}   flag   更新是否成功
+     * @apiSuccess (返回结果) {Boolean}   data   更新是否成功
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateDeviceCountStatistics
+     * @apiPermission 系统权限 mdmbase:UpdateDeviceCountStatistics
      */
-    @Permission(permissionName = "mdmbase:UpdateDeviceCountStatistics")
+    @Permission(permissionName = "mdmbase:UpdateDeviceCountStatistics", allowApplication = true)
     @RequestMapping(value = "UpdateDeviceCountStatistics", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateDeviceCountStatistics(@Validated @RequestBody UpdateDeviceCountStatisticsParam pa) {
         return projectStatisticsService.updateDeviceCountStatistics(pa);
@@ -176,13 +173,31 @@ public class ProjectStatisticsController {
 
 
     /**
+     * @api {POST} /UpdateSensorOnlineStatusByIot  刷新传感器的在线离线状态
+     * @apiVersion 1.0.0
+     * @apiGroup 工程下首页统计模块
+     * @apiName UpdateSensorOnlineStatusByIot
+     * @apiDescription 刷新传感器的在线离线状态
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiSuccess (返回结果) {Boolean} data 更新是否成功
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:UpdateSensorOnlineStatus
+     */
+    @Permission(permissionName = "mdmbase:UpdateSensorOnlineStatus", allowApplication = true)
+    @RequestMapping(value = "UpdateSensorOnlineStatusByIot", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateSensorOnlineStatusByIot(@Validated @RequestBody UpdateDeviceCountStatisticsParam pa) {
+        return projectStatisticsService.updateSensorOnlineStatusByIot(pa);
+    }
+
+
+    /**
      * @api {POST} /QuerySingleProjectMonitorPointInfoList  查询单工程下监测点信息列表
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
      * @apiName QuerySingleProjectMonitorPointInfoList
      * @apiDescription 查询单工程下监测点下传感器最新数据列表
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
@@ -196,15 +211,16 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   data.monitorGroupName   监测组名称
      * @apiSuccess (返回结果) {Date}   data.dataTime   最新接收数据时间
      * @apiSuccess (返回结果) {Int}   data.dataWarnStatus   监测点预警状态,按传感器最高预警状态为判断依据
-     * @apiSuccess (返回结果) {Boolean}   data.deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
+     * @apiSuccess (返回结果) {Int}   data.deviceOnlineStatus   设备在线状态,按规则如果全部在线则为在线,反正则为离线
+     * @apiSuccess (返回结果) {Boolean}   data.monitorPointCollection   当前用户是否收藏该监测点
      * @apiSuccess (返回结果) {T}   data.data   监测点下单个传感器最新数据对象,包含传感器ID名称,基础属性,监测值,属性单位
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
     @Permission(permissionName = "mdmbase:DescribeProjectInfo")
     @RequestMapping(value = "QuerySingleProjectMonitorPointInfoList", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object querySingleProjectMonitorPointInfoList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object querySingleProjectMonitorPointInfoList(@Validated @RequestBody QuerySingleProjectMonitorPointInfoListParam pa) {
+        return projectStatisticsService.querySingleProjectMonitorPointInfoList(pa);
     }
 
 
@@ -216,7 +232,7 @@ public class ProjectStatisticsController {
      * @apiName QuerySingleProjectMonitorPointNewDataPage
      * @apiDescription 查询单工程下监测点下传感器最新数据分页
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatus] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
