@@ -111,6 +111,11 @@ public class RedisKeys {
      * 设备数据量
      */
     public static final String DEVICE_DATA_COUNT_KEY = "cn.shmedo.monitor.project.dataCount";
+
+    /**
+     * 报警监测点数量按监测类型统计
+     */
+    public static final String WARN_POINT_STATS = "cn.shmedo.monitor.warnPointStats:";
 }
 
     

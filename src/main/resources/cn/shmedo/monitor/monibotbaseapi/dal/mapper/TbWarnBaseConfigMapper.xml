@@ -1,19 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnBaseConfigMapper">
-
-    <select id="queryByCompanyIDAndPlatform" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig">
-        SELECT `ID`,
-               `CompanyID`,
-               `Platform`,
-               `WarnTag`,
-               `WarnLevelType`,
-               `WarnLevelStyle`
-        FROM `tb_warn_base_config`
-        <where>
-            <foreach collection="list" open="(" close=")" separator="OR" item="item">
-                (CompanyID = #{item.t1} AND ProjectType = #{item.t2})
-            </foreach>
-        </where>
-    </select>
 </mapper>
