@@ -28,7 +28,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryIndustryDistribution 查询行业分布
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryIndustryDistribution
      * @apiDescription 查询行业分布统计，MDNET平台中项目现有量与近1年增长量
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -49,7 +49,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryProductServices 查询产品服务
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryProductServices
      * @apiDescription 查询产品服务。统计所选行业各监测类型下的设备使用量。
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -74,7 +74,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryResourceOverview 查询资源总览
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryResourceOverview
      * @apiDescription 查询资源总览。包括服务客户，覆盖区域，管理项目
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -94,7 +94,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryProvinceProject 查询企业工程分布
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryProvinceProject
      * @apiDescription 查询企业工程分布
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -123,7 +123,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryProvinceProjectDetail 查询省份项目详情
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryProvinceProjectDetail
      * @apiDescription 查询省份项目详情
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -161,7 +161,7 @@ public class EnterpriseDashboardController {
     /**
      * @api {POST} /QueryDataAccess 查询数据接入
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryDataAccess
      * @apiDescription 查询数据接入。静态数据（数据共享、协议支持）；动态数据（设备管理，总台、本年、本月）
      * @apiParam (请求参数) {Int} companyID 公司ID
@@ -176,45 +176,45 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryDataAccess")
-    public Object queryDataAccess() {
-        return null;
+    public Object queryDataAccess(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryDataAccess(param);
     }
 
     /**
      * @api {POST} /QueryDataManagement 查询数据管理
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryDataManagement
      * @apiDescription 查询数据管理
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
-     * @apiSuccess (返回结果) {Int} total 数据总量
-     * @apiSuccess (返回结果) {Int} governanceTotal 治理条数
-     * @apiSuccess (返回结果) {Int} systemGovernanceTotal 系统治理条数
-     * @apiSuccess (返回结果) {Int} artificialGovernanceTotal 人工治理条数
+     * @apiSuccess (返回结果) {Long} total 数据总量
+     * @apiSuccess (返回结果) {Long} governanceTotal 治理条数
+     * @apiSuccess (返回结果) {Long} systemGovernanceTotal 系统治理条数
+     * @apiSuccess (返回结果) {Long} artificialGovernanceTotal 人工治理条数
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryDataManagement")
-    public Object queryDataManagement() {
-        return null;
+    public Object queryDataManagement(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryDataManagement(param);
     }
 
     /**
      * @api {POST} /QueryDeviceMaintenance 查询设备运维统计
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryDeviceMaintenance
      * @apiDescription 查询设备运维统计
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [projectMainType] 项目一级分类（1-水文水利；2-矿山；3-国土地灾；4-城市基建）
      * @apiSuccess (返回结果) {Int} activeCount 指令交互次数
-     * @apiSuccess (返回结果) {Int} activeAccessCount 指令交互成功次数
+     * @apiSuccess (返回结果) {Int} activeSuccessCount 指令交互成功次数
      * @apiSuccess (返回结果) {Int} otaCount 远程升级次数
-     * @apiSuccess (返回结果) {Int} otaAccessCount 远程升级成功次数
+     * @apiSuccess (返回结果) {Int} otaSuccessCount 远程升级成功次数
      * @apiSuccess (返回结果) {Int} execCount 规则执行次数
-     * @apiSuccess (返回结果) {Int} execAccessCount 规则执行成功次数
+     * @apiSuccess (返回结果) {Int} execSuccessCount 规则执行成功次数
      * @apiSuccess (返回结果) {Int} onlineCount 设备在线数
      * @apiSuccess (返回结果) {Int} offlineCount 设备离线数
      * @apiSuccess (返回结果) {Double} deviceOnlineRate 设备在线率
@@ -223,15 +223,14 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryDeviceMaintenance")
-    public Object queryDeviceMaintenance() {
-        // todo 设备在线率保留两位小数
-        return null;
+    public Object queryDeviceMaintenance(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryDeviceMaintenance(param);
     }
 
     /**
      * @api {POST} /QueryDeviceOnlineRate 查询设备在线率
      * @apiVersion 1.0.0
-     * @apiGroup 监测企业大屏
+     * @apiGroup 监测企业大屏模块
      * @apiName QueryDeviceOnlineRate
      * @apiDescription 查询设备在线率，返回近七天在线率
      * @apiParam (请求参数) {Int} companyID 公司ID

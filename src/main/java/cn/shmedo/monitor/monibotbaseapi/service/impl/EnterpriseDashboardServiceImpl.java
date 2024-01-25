@@ -1,8 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
@@ -12,19 +13,27 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStatisticByMonitorProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectInfoCache;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import cn.shmedo.monitor.monibotbaseapi.service.EnterpriseDashboardService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import com.alibaba.nacos.shaded.com.google.common.collect.Lists;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -45,7 +54,13 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.IOT_REDIS_SERVICE)
     private RedisService iotRedisService;
+
+    private final IotService iotService;
+    private final FileConfig fileConfig;
     Map<Long, RegionArea> provincialCapitalMap;
+    private static final DecimalFormat decimalFormat = new DecimalFormat("#.00");
+    private static final Timestamp startTime = Timestamp.valueOf("1970-01-01 00:00:00");
+
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -128,10 +143,10 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @Override
     public ResourceOverviewRes queryResourceOverview(QueryProductServicesParam param) {
         // 服务客户、覆盖区域、管理工程
-        Set<ProjectInfoCache> projectInfoCacheSet = filterIndustry(param.getProjectMainType(), null);
-        long companyCount = projectInfoCacheSet.stream().map(ProjectInfoCache::getCompanyID).distinct().count();
-        long areaCount = projectInfoCacheSet.stream().map(p -> p.getLocationInfo().getCity()).distinct().count();
-        long projectCount = projectInfoCacheSet.stream().map(ProjectInfoCache::getID).distinct().count();
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        long companyCount = projectInfoCacheList.stream().map(ProjectInfoCache::getCompanyID).distinct().count();
+        long areaCount = projectInfoCacheList.stream().map(p -> p.getLocationInfo().getCity()).distinct().count();
+        long projectCount = projectInfoCacheList.stream().map(ProjectInfoCache::getID).distinct().count();
         return new ResourceOverviewRes()
                 .setCompanyCount((int) companyCount)
                 .setAreaCount((int) areaCount)
@@ -141,11 +156,11 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @Override
     public List<ProvinceProjectRes> queryProvinceProject(QueryProductServicesParam param) {
         // 条件过滤
-        Set<ProjectInfoCache> projectInfoCacheSet = filterIndustry(param.getProjectMainType(), null);
-        Set<ProjectInfoCache.LocationInfo> locationInfoSet = projectInfoCacheSet.stream().map(ProjectInfoCache::getLocationInfo).collect(Collectors.toSet());
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        Set<ProjectInfoCache.LocationInfo> locationInfoSet = projectInfoCacheList.stream().map(ProjectInfoCache::getLocationInfo).collect(Collectors.toSet());
         Map<Integer, List<ProjectInfoCache.LocationInfo>> provinceMap = locationInfoSet.stream().collect(Collectors.groupingBy(ProjectInfoCache.LocationInfo::getProvince));
         Map<Integer, List<ProjectInfoCache.LocationInfo>> cityMap = locationInfoSet.stream().collect(Collectors.groupingBy(ProjectInfoCache.LocationInfo::getCity));
-        Map<Integer, Map<Integer, List<ProjectInfoCache>>> map = projectInfoCacheSet.stream()
+        Map<Integer, Map<Integer, List<ProjectInfoCache>>> map = projectInfoCacheList.stream()
                 .collect(Collectors.groupingBy(province -> province.getLocationInfo().getProvince(),
                         Collectors.groupingBy(city -> city.getLocationInfo().getCity())));
 
@@ -176,10 +191,10 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
 
     @Override
     public ProvinceProjectDetailRes queryProvinceProjectDetail(QueryProvinceProjectDetailParam param) {
-        Set<ProjectInfoCache> projectInfoCacheSet = filterIndustry(param.getProjectMainType(), param.getProvinceCode());
-        if(CollectionUtil.isEmpty(projectInfoCacheSet))
+        List<ProjectInfoCache> projectInfoCaches = filterIndustry(param.getProjectMainType(), param.getProvinceCode());
+        if (CollectionUtil.isEmpty(projectInfoCaches))
             return null;
-        Map<Integer, List<ProjectInfoCache>> map = projectInfoCacheSet.stream()
+        Map<Integer, List<ProjectInfoCache>> map = projectInfoCaches.stream()
                 .collect(Collectors.groupingBy(province -> province.getLocationInfo().getProvince()));
         List<ProjectInfoCache> projectInfoCacheList = map.get(param.getProvinceCode());
         List<ProvinceProjectDetailRes.Project> projectList = CustomizeBeanUtil.copyListProperties(projectInfoCacheList, ProvinceProjectDetailRes.Project::new);
@@ -191,6 +206,94 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
                 .setProjectList(projectList);
     }
 
+    @Override
+    public Object queryDataAccess(QueryProductServicesParam param) {
+        return null;
+    }
+
+    @Override
+    public DataManagementRes queryDataManagement(QueryProductServicesParam param) {
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        AtomicLong total = new AtomicLong();
+        Optional.ofNullable(projectInfoCacheList).ifPresent(set -> set.forEach(pro -> {
+            String key = RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pro.getID();
+            String value = monitorRedisService.get(key);
+            if (StringUtils.isNoneBlank(value)) {
+                total.addAndGet(Long.parseLong(value));
+            }
+        }));
+        // 需要治理占千分之三；系统治理占96%；人工治理占4%
+        long governanceTotal = (long) Math.floor(total.get() * 0.003);
+        long systemGovernanceTotal = (long) Math.floor(governanceTotal * 0.96);
+        return new DataManagementRes()
+                .setTotal(total.get())
+                .setGovernanceTotal(governanceTotal)
+                .setSystemGovernanceTotal(systemGovernanceTotal)
+                .setArtificialGovernanceTotal(governanceTotal - systemGovernanceTotal);
+    }
+
+    @Override
+    public DeviceMaintenanceRes queryDeviceMaintenance(QueryProductServicesParam param) {
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        Set<Integer> projectIDSet = projectInfoCacheList.stream().map(ProjectInfoCache::getID).collect(Collectors.toSet());
+        if (CollectionUtil.isEmpty(projectIDSet))
+            return null;
+        List<DeviceStatisticByMonitorProjectListResult> projectListResultList = queryDeviceStatistic(param.getCompanyID(), projectIDSet);
+        if (CollectionUtil.isEmpty(projectListResultList))
+            return null;
+        AtomicLong activeCount = new AtomicLong();
+        AtomicLong activeSuccessCount = new AtomicLong();
+        AtomicLong otaCount = new AtomicLong();
+        AtomicLong otaSuccessCount = new AtomicLong();
+        AtomicLong execCount = new AtomicLong();
+        AtomicLong execSuccessCount = new AtomicLong();
+        AtomicLong onlineCount = new AtomicLong();
+        AtomicLong offlineCount = new AtomicLong();
+        projectListResultList.forEach(result -> {
+            activeCount.addAndGet(result.getActiveCount());
+            activeSuccessCount.addAndGet(result.getActiveSuccessCount());
+            otaCount.addAndGet(result.getOtaCount());
+            otaSuccessCount.addAndGet(result.getOtaSuccessCount());
+            execCount.addAndGet(result.getExecCount());
+            execSuccessCount.addAndGet(result.getExecSuccessCount());
+            onlineCount.addAndGet(result.getOnlineCount());
+            offlineCount.addAndGet(result.getOfflineCount());
+        });
+        double deviceOnlineRate = Double.parseDouble(decimalFormat.format((double) onlineCount.get() / offlineCount.get()));
+        return new DeviceMaintenanceRes()
+                .setActiveCount(activeCount.get())
+                .setActiveSuccessCount(activeSuccessCount.get())
+                .setOtaCount(otaCount.get())
+                .setOtaSuccessCount(otaSuccessCount.get())
+                .setExecCount(execCount.get())
+                .setExecSuccessCount(execSuccessCount.get())
+                .setOnlineCount(onlineCount.get())
+                .setOfflineCount(offlineCount.get())
+                .setDeviceOnlineRate(deviceOnlineRate);
+    }
+
+    /**
+     * 处理QueryDeviceStatisticByMonitorProjectList接口在时间和查询条件上的限制
+     *
+     * @param companyID    公司ID
+     * @param projectIDSet 项目ID列表
+     * @return 设备统计列表
+     */
+    private List<DeviceStatisticByMonitorProjectListResult> queryDeviceStatistic(Integer companyID, Set<Integer> projectIDSet) {
+        ArrayList<DeviceStatisticByMonitorProjectListResult> resultList = new ArrayList<>();
+        List<List<Integer>> seperatorList = cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil.seperatorList(new ArrayList<>(projectIDSet), 100);
+        seperatorList.parallelStream().forEach(seperator -> {
+            QueryDeviceStatisticByMonitorProjectListParam monitorProjectListParam = new QueryDeviceStatisticByMonitorProjectListParam(
+                    companyID, seperator, startTime, Timestamp.valueOf(LocalDateTime.now()));
+            ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> resultWrapper = iotService.queryDeviceStatisticByMonitorProjectList(
+                    monitorProjectListParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
+                resultList.addAll(resultWrapper.getData());
+            }
+        });
+        return resultList;
+    }
+
     /**
      * 根据行业类型，或省份code码获取项目列表
      *
@@ -198,7 +301,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
      * @param provinceCode    省份code码
      * @return 项目列表
      */
-    private Set<ProjectInfoCache> filterIndustry(Byte projectMainType, Integer provinceCode) {
+    private List<ProjectInfoCache> filterIndustry(Byte projectMainType, Integer provinceCode) {
         // 项目信息
         Map<String, ProjectInfoCache> projectInfoCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_KEY, ProjectInfoCache.class);
         // 项目类型
@@ -215,7 +318,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
                         return true;
                     }
                 })
-                .filter(v -> Objects.isNull(provinceCode) || v.getLocationInfo().getProvince().equals(provinceCode)).collect(Collectors.toSet());
+                .filter(v -> Objects.isNull(provinceCode) || v.getLocationInfo().getProvince().equals(provinceCode)).collect(Collectors.toList());
     }
 
 }

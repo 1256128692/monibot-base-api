@@ -205,19 +205,38 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         Integer dataCount = redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY,
                 pa.getProjectID().toString(), Integer.class);
         vo.setDataCount(dataCount == null ? 0 : dataCount);
-        Long itemCount = tbMonitorItemMapper.selectCount(new QueryWrapper<TbMonitorItem>().lambda()
-                .eq(TbMonitorItem::getProjectID, pa.getProjectID()));
-        Long pointCount = tbMonitorPointMapper.selectCount(new QueryWrapper<TbMonitorPoint>().lambda()
-                .eq(TbMonitorPoint::getProjectID, pa.getProjectID()));
-        vo.setMonitorItemCount(itemCount);
-        vo.setMonitorPointTotalCount(pointCount);
+
+        // 查询含有传感器的监测点
+        List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(), null, null);
+        vo.setMonitorPointTotalCount(sensorBaseInfoV4List.stream().map(SensorBaseInfoV4::getMonitorPointID).distinct().count());
+
+        // 查询含有监测点(且携带传感器) 的监测项目数量
+        if (CollectionUtils.isNotEmpty(sensorBaseInfoV4List)) {
+            List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectPointListByIDList(
+                    sensorBaseInfoV4List.stream().map(SensorBaseInfoV4::getMonitorPointID).distinct().collect(Collectors.toList()));
+            vo.setMonitorItemCount(tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorItemID).distinct().count());
+        } else {
+            vo.setMonitorItemCount(0L);
+        }
+
         return vo;
     }
 
     @Override
     public List<MonitorItemCountStatisticsInfo> queryMonitorItemCountStatistics(ProjectConditionParam pa) {
 
-        return tbMonitorPointMapper.selectItemCountByProjectID(pa.getProjectID());
+        // 查询含有传感器的监测点
+        List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(), null, null);
+
+        // 查询含有监测点(且携带传感器) 的监测项目数量
+        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectPointListByIDList(
+                sensorBaseInfoV4List.stream().map(SensorBaseInfoV4::getMonitorPointID).distinct().collect(Collectors.toList()));
+
+        if (CollectionUtils.isEmpty(tbMonitorPoints)){
+            return Collections.emptyList();
+        }
+
+        return tbMonitorPointMapper.selectItemCountByProjectID(pa.getProjectID(), tbMonitorPoints.stream().map(TbMonitorPoint::getID).collect(Collectors.toList()));
     }
 
     @Override

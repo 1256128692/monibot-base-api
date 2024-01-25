@@ -988,6 +988,11 @@
         from tb_monitor_point tmp
                  left join tb_monitor_item tmi on tmi.ID = tmp.MonitorItemID
         WHERE tmp.ProjectID = #{projectID}
+        <if test="monitorIDList != null and monitorIDList.size() != 0">
+            <foreach collection="monitorIDList" separator="," item="item" open=" AND tmp.ID IN (" close=") ">
+                #{item}
+            </foreach>
+        </if>
         GROUP BY tmi.ID
     </select>
 </mapper>

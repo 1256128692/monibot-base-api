@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -122,4 +123,10 @@ public interface IotService {
     ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam queryDeviceInfoByUniqueTokensParam,
                                                                   @Param("appKey") String appKey,
                                                                   @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDeviceStatisticByMonitorProjectList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param,
+                                                                                                            @Param("appKey") String appKey,
+                                                                                                            @Param("appSecret") String appSecret);
 }

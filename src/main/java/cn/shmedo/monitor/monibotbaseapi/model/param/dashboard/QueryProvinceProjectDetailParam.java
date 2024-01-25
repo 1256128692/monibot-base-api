@@ -29,6 +29,7 @@ public class QueryProvinceProjectDetailParam implements ParameterValidator, Reso
      */
     private Byte projectMainType;
 
+    @NotNull(message = "省份code码不能为空")
     private Integer provinceCode;
 
     @Override
