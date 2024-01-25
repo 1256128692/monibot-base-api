@@ -94,5 +94,6 @@
         <if test="param.warnLevel != null">
             AND dwl.`WarnLevel` =#{param.warnLevel}
         </if>
+        ORDER BY dwl.`WarnTime` DESC
     </select>
 </mapper>

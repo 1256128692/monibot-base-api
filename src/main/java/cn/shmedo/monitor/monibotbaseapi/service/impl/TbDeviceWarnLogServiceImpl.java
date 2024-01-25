@@ -165,7 +165,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                 "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
                 "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle());
 
-        LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>().eq(TbDeviceWarnLog::getPlatform, param.getPlatform());
+        LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>()
+                .eq(TbDeviceWarnLog::getPlatform, param.getPlatform()).orderByDesc(TbDeviceWarnLog::getWarnTime);
         if (param.getIsRealTime()) {
             wrapper.isNull(TbDeviceWarnLog::getWarnEndTime);
         } else {

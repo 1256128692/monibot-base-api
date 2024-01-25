@@ -36,6 +36,7 @@
             `tb_warn_notify_config` wnc
             LEFT JOIN `tb_notify_config_project_relation` ncpr ON wnc.`ID` = ncpr.`NotifyConfigID`
         WHERE wnc.`CompanyID`=#{companyID} AND wnc.`Platform`=#{platform} AND wnc.`NotifyType`=#{notifyType}
+        ORDER BY wnc.CreateTime DESC
     </select>
 
     <select id="queryByProjectIDAndPlatform" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig">
