@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequiredArgsConstructor
-@Deprecated
 public class WorkFlowDashboardController {
     /**
      * @api {POST} /QueryInspectionTask 查询巡检任务统计

@@ -487,6 +487,9 @@ public class ProjectController {
      * @apiSuccess (返回结果) {String} data.projectTypeName 项目类型名称
      * @apiSuccess (返回结果) {String} data.projectMainTypeName 项目主类型名称
      * @apiSuccess (返回结果) {String} [data.imagePath] 项目图片地址
+     * @apiSuccess (返回结果) {Double} data.latitude 经度
+     * @apiSuccess (返回结果) {Double} data.longitude 纬度
+     * @apiSuccess (返回结果) {Int} data.projectStatus 项目状态 0 正常  1 超汛限
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseProject
      */

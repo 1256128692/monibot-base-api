@@ -189,7 +189,7 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} projectID 工程项目ID
      * @apiSuccess (返回结果) {String} projectName 工程项目名称
      * @apiSuccess (返回结果) {String} shortName 工程项目短名称
-     * @apiSuccess (返回结果) {String} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
+     * @apiSuccess (返回结果) {Int} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
      * @apiSuccess (返回结果) {String} areaCode 行政区划code
      * @apiSuccess (返回结果) {String} areaName 行政区划名称
      * @apiSuccess (返回结果) {DateTime} dataTime 最新数据时间
@@ -205,6 +205,57 @@ public class WtStatisticsController {
         return null;
     }
 
+    /**
+     * @api {POST} /ReservoirVideoMonitorPoint 水库视频监测点列表
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName ReservoirVideoMonitorPoint
+     * @apiDescription 水库视频监测点列表
+     * @apiParam (请求参数) {Int} companyID 企业ID
+     * @apiParam (请求参数) {Int} [projectID] 工程项目ID
+     * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} shortName 工程项目短名称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
+     */
+//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @PostMapping("ReservoirVideoMonitorPoint")
+    public Object reservoirVideoMonitorPoint() {
+        return null;
+    }
 
-
+    /**
+     * @api {POST} /ReservoirProjectDetail 水库详情信息
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName ReservoirProjectDetail
+     * @apiDescription 水库详情信息
+     * @apiParam (请求参数) {Int} projectID 工程项目ID
+     * @apiSuccess (返回结果) {Int} projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} shortName 工程项目短名称
+     * @apiSuccess (返回结果) {Int} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
+     * @apiSuccess (返回结果) {Double} checkFloodWater 校核洪水位
+     * @apiSuccess (返回结果) {Double} designFloodWater 设计洪水位
+     * @apiSuccess (返回结果) {Double} normalStorageWater 正常蓄水位
+     * @apiSuccess (返回结果) {Double} periodLimitWater 期限制水位
+     * @apiSuccess (返回结果) {Double} totalCapacity 总库容
+     * @apiSuccess (返回结果) {String} manageUnit 管理单位
+     * @apiSuccess (返回结果) {String} contactsPhone 联系电话
+     * @apiSuccess (返回结果) {String} administrationDirector 行政负责人
+     * @apiSuccess (返回结果) {String} mainManagementDirector 主管负责人
+     * @apiSuccess (返回结果) {String} managementDirector 管理负责人
+     * @apiSuccess (返回结果) {String} patrolDirector 巡查负责人
+     * @apiSuccess (返回结果) {String} technicalDirector 技术负责人
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
+     */
+//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @PostMapping("ReservoirProjectDetail")
+    public Object reservoirProjectDetail() {
+        return null;
+    }
 }
