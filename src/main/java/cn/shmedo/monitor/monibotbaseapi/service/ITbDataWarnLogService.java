@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
-import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.CancelDataWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnPageParam;

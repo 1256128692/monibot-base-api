@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONException;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
@@ -10,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CompareMode;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryMonitorWithThresholdConfigCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnThresholdConfigListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnThresholdConfigEnableBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo;
@@ -78,5 +80,13 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
         }
         info.setDataList(dataList);
         return info;
+    }
+
+    @Override
+    public void updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID) {
+        List<TbWarnThresholdConfig> updateList = param.getUpdateList().stream().peek(u -> u.setUpdateUserID(userID)).toList();
+        if (CollUtil.isNotEmpty(updateList)) {
+            this.updateBatchById(updateList);
+        }
     }
 }

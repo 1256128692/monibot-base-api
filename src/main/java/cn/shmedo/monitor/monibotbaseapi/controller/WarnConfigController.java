@@ -407,6 +407,34 @@ public class WarnConfigController {
     }
 
     /**
+     * @api {POST} /UpdateWarnThresholdConfigEnableBatch 批量启用、禁用阈值配置
+     * @apiVersion 1.0.0
+     * @apiGroup 报警配置模块
+     * @apiName UpdateWarnThresholdConfigEnableBatch
+     * @apiDescription 批量启用、停用阈值配置
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} platform 平台key
+     * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求参数) {Int[]} sensorIDList 传感器IDList
+     * @apiParam (请求参数) {Boolean} enable true.启用; false.禁用
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:
+     */
+//    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/UpdateWarnThresholdConfigEnableBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateWarnThresholdConfigEnableBatch(@Valid @RequestBody UpdateWarnThresholdConfigEnableBatchParam param) {
+        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+        if (Objects.isNull(userID)) {
+            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+        }
+        // TODO 加上权限校验注解后将上文替换成本注解
+        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        tbWarnThresholdConfigService.updateWarnThresholdConfigEnableBatch(param, userID);
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
      * @api {POST} /QueryThresholdBaseConfig 查询阈值全局配置
      * @apiVersion 1.0.0
      * @apiGroup 报警配置模块

@@ -304,10 +304,10 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         DataWarnDetailInfo info = this.thresholdConfigMapper.selectDataWarnRelativeByID(tbDataWarnLog.getWarnThresholdID());
         BeanUtil.copyProperties(tbDataWarnLog, info);
         BeanUtil.copyProperties(tbWarnBaseConfig, info);
-        tbWarnLevelAliasMapper.selectThresholdBaseConfigFieldInfoList(platform, info.getMonitorItemID())
+        WarnLevelAliasInfo warnLevelAliasInfo = tbWarnLevelAliasMapper.selectThresholdBaseConfigFieldInfoList(platform, info.getMonitorItemID())
                 .stream().filter(u -> u.getFieldID().equals(info.getFieldID())).map(ThresholdBaseConfigFieldInfo::getAliasConfigList)
-                .flatMap(Collection::stream).filter(u -> u.getWarnLevel().equals(warnLevel)).findAny()
-                .ifPresent(info::setAliasConfig);
+                .flatMap(Collection::stream).filter(u -> u.getWarnLevel().equals(warnLevel)).findAny().orElse(new WarnLevelAliasInfo(warnLevel, null));
+        info.setAliasConfig(warnLevelAliasInfo);
         return info;
     }
 

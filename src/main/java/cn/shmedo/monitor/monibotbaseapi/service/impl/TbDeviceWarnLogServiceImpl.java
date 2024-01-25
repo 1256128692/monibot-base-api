@@ -266,7 +266,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                             e.setDeviceModel(device.getProductName());
                         }
                     });
-            Set<String> uniqueTokenSet = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken).filter(StrUtil::isNotEmpty)
+            Set<String> uniqueTokenSet = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getUniqueToken).filter(StrUtil::isNotEmpty)
                     .collect(Collectors.toSet());
             if (!uniqueTokenSet.isEmpty()) {
                 List<WtTerminalWarnLog> wtTerminalWarnLogs = tbWarnLogMapper.queryTerminalWarnListByUniqueToken(param, uniqueTokenSet);

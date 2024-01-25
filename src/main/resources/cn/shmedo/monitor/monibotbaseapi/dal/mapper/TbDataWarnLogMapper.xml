@@ -59,16 +59,14 @@
             s.`Alias` sensorAlias,
             dwl.`WarnLevel` warnLevel,
             wla.`Alias` alias
-        FROM
-            tb_data_warn_log dwl
+        FROM tb_data_warn_log dwl
             LEFT JOIN tb_warn_threshold_config wtc ON wtc.ID = dwl.WarnThresholdID
             LEFT JOIN tb_sensor s ON s.ID = wtc.SensorID
-            LEFT JOIN tb_monitor_point mp ON mp.ID = s.MonitorPointID
-            LEFT JOIN tb_monitor_item mi ON mi.ID = mp.MonitorItemID
-            LEFT JOIN tb_project_info pi ON pi.Id = mp.ProjectID
-            LEFT JOIN tb_monitor_item_field mif ON mif.MonitorItemID = mi.ID
-            LEFT JOIN tb_monitor_type_field mtf ON mtf.ID = mif.MonitorTypeFieldID
-            LEFT JOIN tb_warn_level_alias wla ON wla.MonitorItemID = mi.ID AND wla.FieldID = mtf.ID AND wla.Platform =#{param.platform}
+            LEFT JOIN tb_monitor_item mi ON mi.ID = wtc.MonitorItemID
+            LEFT JOIN tb_monitor_point mp ON mp.ID = s.MonitorPointID AND mp.MonitorItemID = mi.ID
+            LEFT JOIN tb_project_info pi ON pi.Id = mi.ProjectID
+            LEFT JOIN tb_monitor_type_field mtf ON  mtf.ID = wtc.FieldID
+            LEFT JOIN tb_warn_level_alias wla ON wla.MonitorItemID = mi.ID AND wla.FieldID = mtf.ID AND wla.WarnLevel=dwl.WarnLevel AND wla.Platform =wtc.Platform
         WHERE dwl.CompanyID=#{param.companyID} AND dwl.Platform=#{param.platform}
         <choose>
             <when test="param.isRealTime">

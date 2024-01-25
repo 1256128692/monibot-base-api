@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryMonitorWithThresholdConfigCountParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnThresholdConfigListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnThresholdConfigEnableBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdConfigListInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -18,4 +19,6 @@ public interface ITbWarnThresholdConfigService extends IService<TbWarnThresholdC
     List<MonitorWithThresholdConfigCountInfo> queryMonitorWithThresholdConfigCountByProjectID(QueryMonitorWithThresholdConfigCountParam projectID);
 
     WarnThresholdConfigListInfo queryWarnThresholdConfigList(QueryWarnThresholdConfigListParam param, TbWarnBaseConfig tbWarnBaseConfig);
+
+    void updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID);
 }
