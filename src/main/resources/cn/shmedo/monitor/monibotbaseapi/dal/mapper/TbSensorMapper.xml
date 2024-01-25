@@ -1041,9 +1041,8 @@
             and tmp.Name like CONCAT('%', #{monitorPointName}, '%')
         </if>
         <if test="monitorItemIDList != null and monitorItemIDList.size() != 0">
-            and
-            <foreach collection="monitorItemIDList" separator="," item="item" open="tmi.ID IN ("
-                     close=") AND">
+            <foreach collection="monitorItemIDList" separator="," item="item" open=" AND tmi.ID IN ("
+                     close=") ">
                 #{item}
             </foreach>
         </if>
