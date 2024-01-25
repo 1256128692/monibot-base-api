@@ -543,7 +543,7 @@ public class VideoController {
      * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
-     * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.companyID 公司ID
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceType 视频设备类型
      * @apiSuccess (返回结果) {String} dataList.deviceName 视频设备名称

@@ -261,7 +261,7 @@ public class WtDeviceController {
      * @api {POST} /QueryDeviceDetail 查询设备详情
      * @apiVersion 1.0.0
      * @apiGroup 水利设备列表模块
-     * @apiName QueryProductSimpleList
+     * @apiName QueryDeviceDetail
      * @apiDescription 产品简要信息列表
      * @apiParam (请求参数) {Int[]} projectIDList 工程项目ID列表
      * @apiParam (请求参数) {Int} [companyID] 公司ID,为null则获取当前用户所在公司ID
