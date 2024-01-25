@@ -411,11 +411,13 @@ public class WarnConfigController {
      * @apiVersion 1.0.0
      * @apiGroup 报警配置模块
      * @apiName UpdateWarnThresholdConfigEnableBatch
-     * @apiDescription 批量启用、停用阈值配置
-     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiDescription 批量启用、禁用阈值配置
+     * @apiParam (请求参数) {Int} projectID 公司ID
      * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求参数) {Int[]} sensorIDList 传感器IDList
+     * @apiParam (请求参数) {Boolean} [status] 设置状态 false:未设置 true:已设置
+     * @apiParam (请求参数) {Int[]} [monitorPointIDList] 监测点ID List
+     * @apiParam (请求参数) {Int[]} [sensorIDList] 传感器ID List
      * @apiParam (请求参数) {Boolean} enable true.启用; false.禁用
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off

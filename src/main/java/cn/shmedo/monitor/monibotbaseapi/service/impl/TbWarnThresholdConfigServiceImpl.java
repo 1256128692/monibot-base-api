@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONException;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
@@ -15,18 +14,19 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnThresho
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.MonitorWithThresholdConfigCountInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnFieldThresholdConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdConfigListInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnThresholdMonitorPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IThresholdConfigValueCheck;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnThresholdConfigService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -84,9 +84,31 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
 
     @Override
     public void updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID) {
-        List<TbWarnThresholdConfig> updateList = param.getUpdateList().stream().peek(u -> u.setUpdateUserID(userID)).toList();
-        if (CollUtil.isNotEmpty(updateList)) {
-            this.updateBatchById(updateList);
-        }
+        Date updateTime = new Date();
+        Boolean enable = param.getEnable();
+        List<Integer> configIDList = queryWarnThresholdConfigList(param, null).getDataList().stream()
+                .map(u -> u.getSensorList().stream().map(w -> w.getFieldList().stream()
+                        .map(WarnFieldThresholdConfigInfo::getConfigID).toList()).toList())
+                .flatMap(Collection::stream).flatMap(Collection::stream).toList();
+
+        Optional.of(configIDList).map(u -> new LambdaQueryWrapper<TbWarnThresholdConfig>().in(TbWarnThresholdConfig::getId, u)
+                .ne(TbWarnThresholdConfig::getEnable, enable)).map(this::list).filter(CollUtil::isNotEmpty).ifPresent(updateList -> {
+            if (enable) {
+                final Function<String, Boolean> func = value -> {
+                    try {
+                        return queryConfigStatus(value, true);
+                    } catch (JSONException e) {
+                        // 解析异常,始终排除
+                        log.error("parse json error, threshold value: {}", value);
+                        return false;
+                    }
+                };
+                updateList = updateList.stream().filter(u -> func.apply(u.getValue())).toList();
+            }
+            Optional.of(updateList).filter(CollUtil::isNotEmpty).map(u -> u.stream().map(TbWarnThresholdConfig::getId).toList())
+                    .ifPresent(u -> this.update(new LambdaUpdateWrapper<TbWarnThresholdConfig>()
+                            .in(TbWarnThresholdConfig::getId, u).set(TbWarnThresholdConfig::getEnable, enable)
+                            .set(TbWarnThresholdConfig::getUpdateTime, userID).set(TbWarnThresholdConfig::getUpdateTime, updateTime)));
+        });
     }
 }

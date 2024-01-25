@@ -138,8 +138,14 @@ public class AddWarnThresholdConfigBatchParam implements ParameterValidator, Res
                         final Integer compareMode = u.getCompareMode();
                         final String oldValue = w.getValue();
                         try {
-                            if (!isEmptyCoverage) {
-                                u.setWarnName(w.getWarnName());
+                            if (isEmptyCoverage) {
+                                if (ObjectUtil.isEmpty(u.getWarnName())) {
+                                    u.setWarnName(fieldIDNameMap.get(u.getFieldID()) + "异常");
+                                }
+                            } else {
+                                if (ObjectUtil.isEmpty(u.getWarnName())) {
+                                    u.setWarnName(w.getWarnName());
+                                }
                                 JSONObject updateJson = JSONUtil.parseObj(u.getValue());
                                 // 如果比较方式相同且要求空值不覆盖,才会根据{@code oldJson}将{@code updateJson}补全
                                 if (compareMode.equals(w.getCompareMode())) {
