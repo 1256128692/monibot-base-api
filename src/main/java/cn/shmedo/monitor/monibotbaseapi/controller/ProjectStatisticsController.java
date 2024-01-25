@@ -74,7 +74,7 @@ public class ProjectStatisticsController {
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
      * @apiName DataCountStatistics
-     * @apiDescription 工程下数据总量以及监测项目和点位数量,数据总量走缓存
+     * @apiDescription 工程下数据总量以及监测项目和点位数量(点下面必须包含传感器),数据总量走缓存
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Int}   dataCount   数据总数量
      * @apiSuccess (返回结果) {Long}   monitorItemCount   监测项目数量
@@ -94,7 +94,7 @@ public class ProjectStatisticsController {
      * @apiVersion 1.0.0
      * @apiGroup 工程下首页统计模块
      * @apiName MonitorItemCountStatistics
-     * @apiDescription 工程下监测项目的监测点数量
+     * @apiDescription 工程下监测项目的监测点数量,其中监测点必须含有传感器
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Object[]}   data   数据
      * @apiSuccess (返回结果) {Int}   data.monitorItemID   监测项目ID

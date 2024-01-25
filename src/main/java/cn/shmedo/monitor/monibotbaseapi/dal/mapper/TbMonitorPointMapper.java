@@ -93,5 +93,5 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     List<MonitorPoint4Web> queryList(Integer projectID, Integer monitorType, Integer monitorItemID, String queryCode);
 
-    List<MonitorItemCountStatisticsInfo> selectItemCountByProjectID(Integer projectID);
+    List<MonitorItemCountStatisticsInfo> selectItemCountByProjectID(Integer projectID, List<Integer> monitorIDList);
 }
