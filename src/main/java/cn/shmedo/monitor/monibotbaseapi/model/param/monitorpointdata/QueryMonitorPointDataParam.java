@@ -91,7 +91,7 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
             }
         } else {
             if (!StringUtils.isNotBlank(monitorTypeList.get(0).getExValues())) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型没有配置预定义密度与统计方式");
+//                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "该监测类型没有配置预定义密度与统计方式");
             } else {
                 MonitorTypeConfigV1 monitorTypeConfigV1 = JSONUtil.toBean(monitorTypeList.get(0).getExValues(), MonitorTypeConfigV1.class);
                 if (densityType == DisplayDensity.TWO_HOUR.getValue()
