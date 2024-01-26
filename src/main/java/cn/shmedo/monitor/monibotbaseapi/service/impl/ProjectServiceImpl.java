@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.AuthServiceIDAndProjectTypeRelati
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Company;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;

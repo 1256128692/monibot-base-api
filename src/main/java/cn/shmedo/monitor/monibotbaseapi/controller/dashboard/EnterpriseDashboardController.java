@@ -243,7 +243,7 @@ public class EnterpriseDashboardController {
      */
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("QueryDeviceOnlineRate")
-    public Object queryDeviceOnlineRate() {
-        return null;
+    public Object queryDeviceOnlineRate(@RequestBody @Valid QueryProductServicesParam param) {
+        return dashboardService.queryDeviceOnlineRate(param);
     }
 }

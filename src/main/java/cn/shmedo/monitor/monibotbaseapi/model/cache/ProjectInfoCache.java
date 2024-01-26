@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.response.project;
+package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import lombok.Data;

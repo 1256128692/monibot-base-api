@@ -5,18 +5,15 @@ import lombok.experimental.Accessors;
 
 /**
  * @Author wuxl
- * @Date 2024/1/24 13:29
+ * @Date 2024/1/25 11:51
  * @PackageName:cn.shmedo.monitor.monibotbaseapi.model.response.dashboard
- * @ClassName: DataAccessRes
+ * @ClassName: DeviceOnlineRes
  * @Description: TODO
  * @Version 1.0
  */
 @Data
 @Accessors(chain = true)
-public class DataAccessRes {
-    private String[] platformNameList;
-    private String[] protocolNameList;
-    private long deviceCount;
-    private long increaseInThePastYear;
-    private long increaseInThePastMonth;
+public class DeviceOnlineRes {
+    private String date;
+    private Double onlineRate;
 }

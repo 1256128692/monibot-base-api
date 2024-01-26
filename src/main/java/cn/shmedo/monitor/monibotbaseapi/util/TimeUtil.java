@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
@@ -8,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -24,6 +26,8 @@ public class TimeUtil {
     private static final String MILLI_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String STANDARD_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String MILLI_TIME_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static final Timestamp DEFAULT_START_TIME = Timestamp.valueOf("1970-01-01 00:00:00");
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DatePattern.NORM_DATE_PATTERN);
     /**
      * 海康视频设备回放的时间格式
      */
@@ -561,9 +565,33 @@ public class TimeUtil {
         }
     }
 
-    public static Date previousYear(){
+    public static Date previousYear() {
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.YEAR, -1);
         return calendar.getTime();
+    }
+
+    public static String getDate(DateTimeFormatter formatter) {
+        // 获取当前日期和时间
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        // 从日期和时间中提取日期部分
+        return currentDateTime.format(formatter);
+    }
+
+    /**
+     * 获取当前的前N天
+     *
+     * @param days 前多少天
+     * @return
+     */
+    public static String[] getPreviousDays(int days) {
+        String[] res = new String[days];
+        for (int i = 0; i < days; i++) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -i);
+            String date = simpleDateFormat.format(calendar.getTime());
+            res[i] = date;
+        }
+        return res;
     }
 }

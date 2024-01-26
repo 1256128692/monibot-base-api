@@ -1,6 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.dashboard;
 
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectInfoCache;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;

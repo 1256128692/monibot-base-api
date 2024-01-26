@@ -26,9 +26,11 @@ public interface EnterpriseDashboardService {
 
     ProvinceProjectDetailRes queryProvinceProjectDetail(QueryProvinceProjectDetailParam param);
 
-    Object queryDataAccess(QueryProductServicesParam param);
+    DataAccessRes queryDataAccess(QueryProductServicesParam param);
 
     DataManagementRes queryDataManagement(QueryProductServicesParam param);
 
     DeviceMaintenanceRes queryDeviceMaintenance(QueryProductServicesParam param);
+
+    List<DeviceOnlineRes> queryDeviceOnlineRate(QueryProductServicesParam param);
 }

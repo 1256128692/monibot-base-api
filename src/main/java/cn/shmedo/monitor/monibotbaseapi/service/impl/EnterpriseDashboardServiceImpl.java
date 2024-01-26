@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineCache;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.RegionArea;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
@@ -15,7 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServic
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStatisticByMonitorProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectInfoCache;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import cn.shmedo.monitor.monibotbaseapi.service.EnterpriseDashboardService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
@@ -59,8 +60,6 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     private final FileConfig fileConfig;
     Map<Long, RegionArea> provincialCapitalMap;
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.00");
-    private static final Timestamp startTime = Timestamp.valueOf("1970-01-01 00:00:00");
-
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -107,7 +106,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         // 监测类型
         Map<String, MonitorTypeCacheData> monitorTypeMap = iotRedisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
 
-        Set<Integer> projectIDSet = filterIndustry(param.getProjectMainType(), null)
+        Set<Integer> projectIDSet = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet())
                 .stream().map(ProjectInfoCache::getID).collect(Collectors.toSet());
         projectIDSet.forEach(projectID -> {
             // key-工程项目分组
@@ -143,7 +142,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @Override
     public ResourceOverviewRes queryResourceOverview(QueryProductServicesParam param) {
         // 服务客户、覆盖区域、管理工程
-        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
         long companyCount = projectInfoCacheList.stream().map(ProjectInfoCache::getCompanyID).distinct().count();
         long areaCount = projectInfoCacheList.stream().map(p -> p.getLocationInfo().getCity()).distinct().count();
         long projectCount = projectInfoCacheList.stream().map(ProjectInfoCache::getID).distinct().count();
@@ -156,7 +155,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @Override
     public List<ProvinceProjectRes> queryProvinceProject(QueryProductServicesParam param) {
         // 条件过滤
-        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
         Set<ProjectInfoCache.LocationInfo> locationInfoSet = projectInfoCacheList.stream().map(ProjectInfoCache::getLocationInfo).collect(Collectors.toSet());
         Map<Integer, List<ProjectInfoCache.LocationInfo>> provinceMap = locationInfoSet.stream().collect(Collectors.groupingBy(ProjectInfoCache.LocationInfo::getProvince));
         Map<Integer, List<ProjectInfoCache.LocationInfo>> cityMap = locationInfoSet.stream().collect(Collectors.groupingBy(ProjectInfoCache.LocationInfo::getCity));
@@ -191,7 +190,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
 
     @Override
     public ProvinceProjectDetailRes queryProvinceProjectDetail(QueryProvinceProjectDetailParam param) {
-        List<ProjectInfoCache> projectInfoCaches = filterIndustry(param.getProjectMainType(), param.getProvinceCode());
+        List<ProjectInfoCache> projectInfoCaches = filterIndustry(param.getProjectMainType(), param.getProvinceCode(), param.getProjectIDSet());
         if (CollectionUtil.isEmpty(projectInfoCaches))
             return null;
         Map<Integer, List<ProjectInfoCache>> map = projectInfoCaches.stream()
@@ -207,13 +206,28 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     }
 
     @Override
-    public Object queryDataAccess(QueryProductServicesParam param) {
-        return null;
+    public DataAccessRes queryDataAccess(QueryProductServicesParam param) {
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
+        Set<String> cacheProjectIDSet = projectInfoCacheList.stream().map(ProjectInfoCache::getID).map(String::valueOf).collect(Collectors.toSet());
+        Map<String, DataAccessRes> accessCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_DEVICE_MANAGEMENT_DATA_ACCESS, DataAccessRes.class);
+        // 过滤出符合项目的数据
+        List<DataAccessRes> dataAccessResList = new ArrayList<>();
+        accessCacheMap.forEach((k, v) -> {
+            if (cacheProjectIDSet.contains(k))
+                dataAccessResList.add(v);
+        });
+        Set<Byte> platformTypes = Objects.nonNull(param.getProjectMainType()) ? Set.of(param.getProjectMainType()) : PlatformType.defaultTypes;
+        return new DataAccessRes()
+                .setPlatformNameList(PlatformType.getPlatformNames(platformTypes).toArray(new String[0]))
+                .setProtocolNameList(PlatformType.getProtocols(platformTypes).toArray(new String[0]))
+                .setDeviceCount(dataAccessResList.stream().mapToLong(DataAccessRes::getDeviceCount).sum())
+                .setIncreaseInThePastYear(dataAccessResList.stream().mapToLong(DataAccessRes::getIncreaseInThePastYear).sum())
+                .setIncreaseInThePastMonth(dataAccessResList.stream().mapToLong(DataAccessRes::getIncreaseInThePastMonth).sum());
     }
 
     @Override
     public DataManagementRes queryDataManagement(QueryProductServicesParam param) {
-        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
         AtomicLong total = new AtomicLong();
         Optional.ofNullable(projectInfoCacheList).ifPresent(set -> set.forEach(pro -> {
             String key = RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pro.getID();
@@ -234,7 +248,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
 
     @Override
     public DeviceMaintenanceRes queryDeviceMaintenance(QueryProductServicesParam param) {
-        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null);
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
         Set<Integer> projectIDSet = projectInfoCacheList.stream().map(ProjectInfoCache::getID).collect(Collectors.toSet());
         if (CollectionUtil.isEmpty(projectIDSet))
             return null;
@@ -249,7 +263,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         AtomicLong execSuccessCount = new AtomicLong();
         AtomicLong onlineCount = new AtomicLong();
         AtomicLong offlineCount = new AtomicLong();
-        projectListResultList.forEach(result -> {
+        projectListResultList.stream().parallel().forEach(result -> {
             activeCount.addAndGet(result.getActiveCount());
             activeSuccessCount.addAndGet(result.getActiveSuccessCount());
             otaCount.addAndGet(result.getOtaCount());
@@ -273,6 +287,42 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     }
 
     /**
+     * 获取设备近7日在线统计率。没有值补0
+     *
+     * @param param
+     * @return
+     */
+    @Override
+    public List<DeviceOnlineRes> queryDeviceOnlineRate(QueryProductServicesParam param) {
+        List<DeviceOnlineRes> deviceOnlineResList = new ArrayList<>();
+        List<DeviceOnlineCache> deviceOnlineCacheList = new ArrayList<>();
+        List<ProjectInfoCache> projectInfoCacheList = filterIndustry(param.getProjectMainType(), null, param.getProjectIDSet());
+        Set<Integer> projectIDSet = projectInfoCacheList.stream().map(ProjectInfoCache::getID).collect(Collectors.toSet());
+        Map<String, String> onlineCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_DEVICE_ONLINE_RATE_KEY);
+        onlineCacheMap.forEach((cacheKey, cacheValue) -> {
+            if (projectIDSet.contains(Integer.parseInt(cacheKey)))
+                deviceOnlineCacheList.addAll(JSONUtil.toList(cacheValue, DeviceOnlineCache.class));
+        });
+        Map<String, List<DeviceOnlineCache>> map = deviceOnlineCacheList.stream().collect(Collectors.groupingBy(DeviceOnlineCache::getDate));
+        // 获取当前时间的前7天（包括当前天）
+        String[] previousDays = TimeUtil.getPreviousDays(7);
+        // 保证返回数据有最近七天
+        for (String day : previousDays) {
+            if (!map.containsKey(day)) {
+                deviceOnlineResList.add(new DeviceOnlineRes().setDate(day).setOnlineRate(0D));
+            }
+        }
+        map.forEach((k, v) -> {
+            long onlineSum = v.stream().mapToLong(DeviceOnlineCache::getOnline).sum();
+            long offlineSum = v.stream().mapToLong(DeviceOnlineCache::getOffline).sum();
+            double deviceOnlineRate = Double.parseDouble(decimalFormat.format((double) onlineSum / (onlineSum + offlineSum)));
+            DeviceOnlineRes deviceOnlineRes = new DeviceOnlineRes().setDate(k).setOnlineRate(deviceOnlineRate);
+            deviceOnlineResList.add(deviceOnlineRes);
+        });
+        return deviceOnlineResList.stream().sorted(Comparator.comparing(DeviceOnlineRes::getDate)).collect(Collectors.toList());
+    }
+
+    /**
      * 处理QueryDeviceStatisticByMonitorProjectList接口在时间和查询条件上的限制
      *
      * @param companyID    公司ID
@@ -284,7 +334,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         List<List<Integer>> seperatorList = cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil.seperatorList(new ArrayList<>(projectIDSet), 100);
         seperatorList.parallelStream().forEach(seperator -> {
             QueryDeviceStatisticByMonitorProjectListParam monitorProjectListParam = new QueryDeviceStatisticByMonitorProjectListParam(
-                    companyID, seperator, startTime, Timestamp.valueOf(LocalDateTime.now()));
+                    companyID, seperator, TimeUtil.DEFAULT_START_TIME, Timestamp.valueOf(LocalDateTime.now()));
             ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> resultWrapper = iotService.queryDeviceStatisticByMonitorProjectList(
                     monitorProjectListParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
             if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
@@ -299,9 +349,10 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
      *
      * @param projectMainType 行业类型
      * @param provinceCode    省份code码
+     * @param projectIDSet    用于过滤用户有权限的项目
      * @return 项目列表
      */
-    private List<ProjectInfoCache> filterIndustry(Byte projectMainType, Integer provinceCode) {
+    private List<ProjectInfoCache> filterIndustry(Byte projectMainType, Integer provinceCode, Set<Integer> projectIDSet) {
         // 项目信息
         Map<String, ProjectInfoCache> projectInfoCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_KEY, ProjectInfoCache.class);
         // 项目类型
@@ -318,6 +369,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
                         return true;
                     }
                 })
+                .filter(v -> projectIDSet.contains(v.getID()))
                 .filter(v -> Objects.isNull(provinceCode) || v.getLocationInfo().getProvince().equals(provinceCode)).collect(Collectors.toList());
     }
 
