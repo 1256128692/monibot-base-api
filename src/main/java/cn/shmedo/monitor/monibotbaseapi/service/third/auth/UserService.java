@@ -8,8 +8,10 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeptSimpleInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -90,10 +92,17 @@ public interface UserService {
                                               @Param("appSecret") String appSecret);
 
     /**
+     * 分页查询系统通知列表
+     */
+    @RequestLine("POST /QueryNotifyPageList")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, @Param("accessToken") String accessToken);
+
+    /**
      * 批量查询用户联系方式
      */
     @RequestLine("POST /QueryUserContact")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<Map<Integer, String>> queryUserContact(QueryUserContactParam param, @Param("appKey") String appKey,
-                                                  @Param("appSecret") String appSecret);
+                                                         @Param("appSecret") String appSecret);
 }

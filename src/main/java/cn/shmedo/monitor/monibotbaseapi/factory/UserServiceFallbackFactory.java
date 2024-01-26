@@ -10,9 +10,11 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeptSimpleInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -86,6 +88,11 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<List<Integer>> addSysNotify(SysNotify request, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, String accessToken) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 

@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyConfigProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
@@ -17,14 +18,18 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformPa
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnThresholdConfigEnableBatchParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryWarnNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DataWarnConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DeviceWarnConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.WarnNotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Nonnull;
@@ -47,6 +52,7 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     private final FileConfig fileConfig;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbNotifyConfigProjectRelationMapper tbNotifyConfigProjectRelationMapper;
+    private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
 
     @Override
     public WarnNotifyConfigDetail queryWarnNotifyConfigDetail(QueryWarnNotifyConfigDetailParam param) {
@@ -132,6 +138,37 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
             item.setMethods(JSONUtil.toList(config.getNotifyMethod(), Integer.class));
             return item;
         }
+        return null;
+    }
+
+    @Override
+    public PageUtil.Page<WarnNotifyPageInfo> queryWarnNotifyPage(QueryWarnNotifyPageParam param, String accessToken) {
+        PageUtil.Page<NotifyPageInfo> page = Optional.ofNullable(param.build())
+                .map(u -> userService.queryNotifyPageList(u, accessToken))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).orElse(PageUtil.Page.empty());
+        Map<Integer, TbWarnNotifyRelation> warnNotifyRelationMap = Optional.of(page).map(PageUtil.Page::currentPageData)
+                .map(u -> u.stream().map(NotifyPageInfo::getNotifyID).toList()).filter(CollUtil::isNotEmpty)
+                .map(u -> new LambdaQueryWrapper<TbWarnNotifyRelation>().in(TbWarnNotifyRelation::getNotifyID, u))
+                .map(tbWarnNotifyRelationMapper::selectList).map(u -> u.stream().collect(Collectors
+                        .toMap(TbWarnNotifyRelation::getNotifyID, Function.identity()))).orElse(Map.of());
+        List<WarnNotifyPageInfo> list = page.currentPageData().stream().map(u -> {
+            WarnNotifyPageInfo info = new WarnNotifyPageInfo();
+            BeanUtil.copyProperties(u, info);
+            Optional.ofNullable(info.getNotifyID()).map(warnNotifyRelationMap::get).ifPresent(w -> {
+                info.setWarnLogID(w.getWarnLogID());
+                info.setWarnType(w.getType());
+            });
+            return info;
+        }).toList();
+        return new PageUtil.Page<>(page.totalPage(), list, page.totalCount());
+    }
+
+    @Override
+    public Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param) {
+        //TODO 获取到最新未读设备/数据报警
+        List<Integer> notifyIDList = List.of(1, 2);
+
+
         return null;
     }
 
