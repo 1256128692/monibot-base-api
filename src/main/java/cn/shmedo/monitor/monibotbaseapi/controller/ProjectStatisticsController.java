@@ -98,6 +98,7 @@ public class ProjectStatisticsController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Object[]}   data   数据
      * @apiSuccess (返回结果) {Int}   data.monitorItemID   监测项目ID
+     * @apiSuccess (返回结果) {Int}   data.monitorType   监测类型
      * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   data.monitorPointCount   监测点数量
      * @apiSampleRequest off

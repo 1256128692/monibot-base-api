@@ -8,6 +8,7 @@ public class MonitorItemCountStatisticsInfo {
 
 
     private Integer monitorItemID;
+    private Integer monitorType;
     private String monitorItemName;
     private Long monitorPointCount;
 

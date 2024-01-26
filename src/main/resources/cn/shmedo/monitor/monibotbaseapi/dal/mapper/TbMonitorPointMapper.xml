@@ -984,6 +984,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo">
         select tmp.monitorItemID,
                tmi.NAME      AS monitorItemName,
+               tmi.monitorType,
                count(tmp.ID) as monitorPointCount
         from tb_monitor_point tmp
                  left join tb_monitor_item tmi on tmi.ID = tmp.MonitorItemID
