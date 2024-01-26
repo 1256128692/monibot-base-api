@@ -206,6 +206,9 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   data.monitorPointName   监测点名称
      * @apiSuccess (返回结果) {Int}   data.monitorType   监测类型
      * @apiSuccess (返回结果) {String}   data.gpsLocation   监测点位置
+     * @apiSuccess (返回结果) {String}   data.imageLocation   监测点底图位置
+     * @apiSuccess (返回结果) {String}   data.overallViewLocation   监测点全景位置
+     * @apiSuccess (返回结果) {String}   data.spatialLocation   监测点三维位置
      * @apiSuccess (返回结果) {Int}   data.monitorItemID   监测项目ID
      * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   data.monitorGroupID   监测组ID
@@ -252,6 +255,9 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   currentPageData.monitorPointName   监测点名称
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorType   监测类型
      * @apiSuccess (返回结果) {String}   currentPageData.gpsLocation   监测点位置
+     * @apiSuccess (返回结果) {String}   currentPageData.imageLocation   监测点底图位置
+     * @apiSuccess (返回结果) {String}   currentPageData.overallViewLocation   监测点全景位置
+     * @apiSuccess (返回结果) {String}   currentPageData.spatialLocation   监测点三维位置
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorItemID   监测项目ID
      * @apiSuccess (返回结果) {String}   currentPageData.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorGroupID   监测组ID
