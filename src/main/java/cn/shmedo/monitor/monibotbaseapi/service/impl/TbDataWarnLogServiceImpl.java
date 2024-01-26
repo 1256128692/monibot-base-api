@@ -118,17 +118,8 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                 param.setWarnCase(DOWNLEVEL);
             }
         } else {
-            //不存在报警，生成报警记录，发送通知
+            //不存在报警，生成报警记录，发送通知，记录历史
             param.setWarnCase(NEW);
-        }
-
-        //历史记录 (除了新生成的报警，均需要记录变更历史)
-        if (!NEW.equals(param.getWarnCase())) {
-            TbDataWarnLogHistory history = new TbDataWarnLogHistory();
-            history.setWarnLogID(existLog.getId());
-            history.setWarnLevel(existLog.getWarnLevel());
-            history.setWarnTime(existLog.getWarnTime());
-            Assert.isTrue(this.historyMapper.insert(history) > 0, "存储数据报警失败");
         }
 
         //查询阈值配置详情
@@ -190,11 +181,17 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
             }
         };
         this.saveOrUpdate(warnLog);
+        //记录变更历史
+        TbDataWarnLogHistory history = new TbDataWarnLogHistory();
+        history.setWarnLogID(warnLog.getId());
+        history.setWarnLevel(warnLog.getWarnLevel());
+        history.setWarnTime(warnLog.getWarnTime());
+        this.historyMapper.insert(history);
+        //更新传感器状态
         sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.getByWarnLevel(param.getWarnLevel()));
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
-            assert threshold != null;
             WarnNotifyConfig notifyConfig = notifyConfigService.queryByProjectIDAndPlatform(threshold.getProjectID(),
                     threshold.getPlatform(), 2);
             if (notifyConfig != null) {
