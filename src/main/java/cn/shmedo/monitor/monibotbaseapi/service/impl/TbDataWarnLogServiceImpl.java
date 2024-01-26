@@ -109,6 +109,10 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         if (existLog != null) {
             if (Objects.equals(existLog.getWarnLevel(), param.getWarnLevel())) {
                 //等级未变更，更新报警时间、通知内容，记录历史
+                if (existLog.getWarnTime().equals(param.getWarnTime())) {
+                    //同级别、同时间报警 直接忽略
+                    return;
+                }
                 param.setWarnCase(SAME);
             } else if (existLog.getWarnLevel() > param.getWarnLevel()) {
                 //报警升级，更新报警时间和内容，发送变更通知，记录历史
