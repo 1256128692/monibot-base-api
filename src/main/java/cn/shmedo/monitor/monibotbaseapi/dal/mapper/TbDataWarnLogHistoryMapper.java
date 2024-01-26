@@ -7,4 +7,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLogHistory;
  * @date 2024-01-11 14:43
  */
 public interface TbDataWarnLogHistoryMapper extends BasicMapper<TbDataWarnLogHistory> {
+
+    Integer insertOrUpdate(TbDataWarnLogHistory tbDataWarnLogHistory);
 }

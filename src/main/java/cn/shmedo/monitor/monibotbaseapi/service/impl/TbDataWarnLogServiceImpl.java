@@ -190,7 +190,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         history.setWarnLogID(warnLog.getId());
         history.setWarnLevel(warnLog.getWarnLevel());
         history.setWarnTime(warnLog.getWarnTime());
-        this.historyMapper.insert(history);
+        this.historyMapper.insertOrUpdate(history);
         //更新传感器状态
         sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.getByWarnLevel(param.getWarnLevel()));
 
