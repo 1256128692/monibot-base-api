@@ -565,9 +565,9 @@ public class TimeUtil {
         }
     }
 
-    public static Date previousYear() {
+    public static Date previousYear(int year) {
         Calendar calendar = Calendar.getInstance();
-        calendar.add(Calendar.YEAR, -1);
+        calendar.add(Calendar.YEAR, -year);
         return calendar.getTime();
     }
 

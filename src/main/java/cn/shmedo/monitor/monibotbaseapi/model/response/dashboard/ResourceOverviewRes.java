@@ -18,7 +18,7 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResourceOverviewRes {
-    private int companyCount;
-    private int areaCount;
-    private int projectCount;
+    private long companyCount;
+    private long areaCount;
+    private long projectCount;
 }

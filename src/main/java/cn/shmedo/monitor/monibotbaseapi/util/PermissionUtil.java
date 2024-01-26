@@ -64,11 +64,20 @@ public class PermissionUtil {
                                                      @Nonnull String serviceName,
                                                      @Nonnull String permissionToken,
                                                      @Nonnull ResourceType resourceType) {
+        return getResourceList(null, companyID, serviceName, permissionToken, resourceType);
+    }
+
+    public static Collection<String> getResourceList(Integer userID,
+                                                     Integer companyID,
+                                                     @Nonnull String serviceName,
+                                                     @Nonnull String permissionToken,
+                                                     @Nonnull ResourceType resourceType) {
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         Object extract = CurrentSubjectHolder.getCurrentSubjectExtractData();
         if (subject != null && extract instanceof String token) {
             PermissionService instance = ThirdHttpService.getInstance(PermissionService.class, ThirdHttpService.Auth);
             QueryResourceListByPermissionParameter pa = new QueryResourceListByPermissionParameter();
+            pa.setUserID(userID);
             pa.setCompanyID(companyID);
             pa.setServiceName(serviceName);
             pa.setPermissionToken(permissionToken);

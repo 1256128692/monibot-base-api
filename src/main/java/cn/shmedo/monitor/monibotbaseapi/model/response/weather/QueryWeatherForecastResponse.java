@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.weather;
 
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -17,8 +18,8 @@ import java.util.List;
  */
 @Data
 @Accessors(chain = true)
-public class QueryWeatherForecastResponse {
-    private TbProjectInfo tbProjectInfo;
+public class QueryWeatherForecastResponse<T extends TbProjectInfo> {
+    private T tbProjectInfo;
     private Now now;
     private List<Hour> hourly;
     private List<Day> daily;

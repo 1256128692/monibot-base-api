@@ -1,10 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.third.auth;
 
 public class QueryResourceListByPermissionParameter {
+    private Integer userID;
     private Integer companyID;
     private String serviceName;
     private String permissionToken;
     private Integer resourceType;
+
+    public Integer getUserID() {
+        return userID;
+    }
+
+    public void setUserID(Integer userID) {
+        this.userID = userID;
+    }
 
     public Integer getCompanyID() {
         return companyID;

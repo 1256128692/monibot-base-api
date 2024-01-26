@@ -41,6 +41,16 @@ public class WeatherController {
      * @apiSuccess (返回结果) {DateTime} projectInfo.expiryDate 项目有效期
      * @apiSuccess (返回结果) {Bool} projectInfo.enable 是否有效
      * @apiSuccess (返回结果) {String} projectInfo.projectAddress 项目地址
+     * @apiSuccess (返回结果) {String} projectInfo.location 行政区划code码
+     * @apiSuccess (返回结果) {Object[]} projectInfo.locationInfo 行政区划
+     * @apiSuccess (返回结果) {Int} projectInfo.locationInfo.province 省份code
+     * @apiSuccess (返回结果) {String} projectInfo.locationInfo.provinceName 省份名称
+     * @apiSuccess (返回结果) {Int} projectInfo.locationInfo.city 城市code
+     * @apiSuccess (返回结果) {String} projectInfo.locationInfo.cityName 城市名称
+     * @apiSuccess (返回结果) {Int} projectInfo.locationInfo.area 区code
+     * @apiSuccess (返回结果) {String} projectInfo.locationInfo.areaName 区名称
+     * @apiSuccess (返回结果) {Int} projectInfo.locationInfo.town 镇code
+     * @apiSuccess (返回结果) {String} projectInfo.locationInfo.townName 镇名称
      * @apiSuccess (返回结果) {Double} projectInfo.longitude 项目经度
      * @apiSuccess (返回结果) {Double} projectInfo.latitude 项目纬度
      * @apiSuccess (返回结果) {String} projectInfo.[imagePath] 项目图片地址
