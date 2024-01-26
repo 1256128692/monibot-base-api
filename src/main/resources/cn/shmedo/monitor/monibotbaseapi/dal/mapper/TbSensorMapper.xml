@@ -1050,4 +1050,16 @@
             </foreach>
         </if>
     </select>
+
+    <select id="listSensorWithIot" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot">
+        SELECT ts.ProjectID,
+               ts.MonitorType,
+               SUBSTRING_INDEX(tsds.DataSourceToken, '@', 1)   AS iotUniqueToken,
+               SUBSTRING_INDEX(tsds.DataSourceToken, '@', - 1) AS iotSensorName
+        FROM `tb_sensor` ts
+                 LEFT JOIN tb_sensor_data_source tsds ON ts.DataSourceID = tsds.DataSourceID
+            AND tsds.DataSourceType = 1
+        WHERE tsds.DataSourceToken IS NOT NULL
+          AND tsds.DataSourceComposeType = 1
+    </select>
 </mapper>

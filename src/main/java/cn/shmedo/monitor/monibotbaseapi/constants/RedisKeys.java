@@ -126,6 +126,11 @@ public class RedisKeys {
      * 报警监测点数量按监测类型统计
      */
     public static final String WARN_POINT_STATS = "cn.shmedo.monitor.warnPointStats:";
+
+    /**
+     * 设备在线统计
+     */
+    public static final String DEVICE_ONLINE_STATS = "cn.shmedo.monitor.deviceOnlineStats:";
 }
 
     

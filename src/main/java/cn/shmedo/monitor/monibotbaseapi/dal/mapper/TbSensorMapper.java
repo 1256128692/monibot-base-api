@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.watermeasure.WaterMeasurePointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
@@ -129,4 +130,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     void updateStatusById(Integer id, SensorStatusDesc status);
 
     List<SensorBaseInfoV4> selectListByCondition(Integer projectID, List<Integer> monitorItemIDList, String monitorPointName);
+
+    List<SensorWithIot> listSensorWithIot();
 }

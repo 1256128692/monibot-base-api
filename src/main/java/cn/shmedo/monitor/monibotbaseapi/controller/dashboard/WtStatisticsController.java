@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.dashboard;
 
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import jakarta.validation.Valid;
@@ -29,6 +31,7 @@ public class WtStatisticsController {
      * @apiDescription 实时报警统计
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} [projectID] 项目id
+     * @apiParam (请求参数) {Int} [platform] 平台id
      * @apiSuccess (返回结果) {Object} dict 等级字典
      * @apiSuccess (返回结果) {String} dict.level1 等级1名称
      * @apiSuccess (返回结果) {String} dict.level2 等级2名称
@@ -51,11 +54,11 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} monitorType.detail.level4 等级4数量
      * @apiSuccess (返回结果) {Int} monitorType.detail.offline 离线报警数量
      * @apiSuccessExample {json} Success-Response
-     *                    {"dict": {"level1": "红色报警","level2": "橙色报警","level3": "黄色报警","level4": "蓝色报警","offline": "离线报警"},"overview": {"level1": 12,"level2": 1,"level3": 1,"level4": 0,"offline": 47},"monitorType": [{"monitorType": 2,"typeName": "水位","detail": {"level1": 0,"level2": 0,"level3": 0,"level4": 0,"offline": 5}}]}
+     * {"dict": {"level1": "红色报警","level2": "橙色报警","level3": "黄色报警","level4": "蓝色报警","offline": "离线报警"},"overview": {"level1": 12,"level2": 1,"level3": 1,"level4": 0,"offline": 47},"monitorType": [{"monitorType": 2,"typeName": "水位","detail": {"level1": 0,"level2": 0,"level3": 0,"level4": 0,"offline": 5}}]}
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
+     * @apiPermission 项目权限 mdmbase:DescribeWtStatistics
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeWtStatistics")
     @PostMapping("ReservoirWarnStatistics")
     public Object queryWarnStats(@Valid @RequestBody QueryReservoirWarnStatsParam param) {
         return wtStatisticsService.queryWarnStats(param);
@@ -66,16 +69,33 @@ public class WtStatisticsController {
      * @api {Get} /CacheReservoirWarnStatistics 缓存实时报警统计数据
      * @apiVersion 1.0.0
      * @apiGroup 水库大屏统计模块
-     * @apiName WarnStatistics
+     * @apiName CacheReservoirWarnStatistics
      * @apiDescription 缓存实时报警统计数据 (仅限服务内部调用)
      * @apiSuccess (返回结果) {String} none
      * @apiSampleRequest off
-     * @apiPermission 应用权限 mdmbase:DescribeBaseDashboard
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics")
     @GetMapping("CacheReservoirWarnStatistics")
     public Object cacheWarnStats() {
-         wtStatisticsService.cacheWarnStats();
+        wtStatisticsService.cacheWarnStats();
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {Get} /CacheDeviceOnlineStatistics 缓存设备在线统计数据
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName CacheDeviceOnlineStatistics
+     * @apiDescription 缓存设备在线统计数据 (仅限服务内部调用)
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics")
+    @GetMapping("CacheDeviceOnlineStatistics")
+    public Object cacheDeviceOnlineStats() {
+        wtStatisticsService.cacheDeviceOnlineStats();
         return ResultWrapper.successWithNothing();
     }
 
@@ -91,20 +111,20 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} online 在线数
      * @apiSuccess (返回结果) {Int} offline 离线数
      * @apiSuccess (返回结果) {Object[]} monitorType 监测类型分类
-     * @apiSuccess (返回结果) {String} monitorType.name 监测类型名称
+     * @apiSuccess (返回结果) {String} monitorType.typeName 监测类型名称
      * @apiSuccess (返回结果) {Int} monitorType.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} monitorType.count 总量
      * @apiSuccess (返回结果) {Int} monitorType.online 在线数
      * @apiSuccess (返回结果) {Int} monitorType.offline 离线数
      * @apiSuccessExample {json} Success-Response:
-     *                    {"count": 99,"online": 90,"offline": 10,"monitorType": [{"name": "流量","monitorType": 1,"count": 99,"online": 90,"offline": 10}]}
+     * {"count": 99,"online": 90,"offline": 10,"monitorType": [{"name": "流量","monitorType": 1,"count": 99,"online": 90,"offline": 10}]}
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
+     * @apiPermission 项目权限 mdmbase:DescribeWtStatistics
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
-    @PostMapping("QueryDeviceOnlineStats")
-    public Object deviceOnlineStats() {
-        return null;
+    @Permission(permissionName = "mdmbase:DescribeWtStatistics")
+    @PostMapping("DeviceOnlineStatistics")
+    public Object deviceOnlineStats(@Valid @RequestBody QueryDeviceOnlineStatsParam param) {
+        return wtStatisticsService.queryDeviceOnlineStats(param);
     }
 
     /**

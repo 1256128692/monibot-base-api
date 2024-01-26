@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Chengfs on 2024/1/25
@@ -16,12 +17,9 @@ import java.util.List;
 @NoArgsConstructor
 public class ReservoirWarnStatsResponse {
 
-    private Dict dict;
+    private Map<String, Object> dict;
     private Item overview;
     private List<MonitorType> monitorType;
-
-    public record Dict(String level1, String level2, String level3, String level4, String offline) {
-    }
 
     public record Item(Integer level1, Integer level2, Integer level3, Integer level4, Integer offline) {
 

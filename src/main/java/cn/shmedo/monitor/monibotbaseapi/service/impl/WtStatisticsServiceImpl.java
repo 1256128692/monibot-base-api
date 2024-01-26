@@ -4,29 +4,37 @@ import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnBaseConfigMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineStats;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.wtstats.WarnPointStats;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.DeviceOnlineStatsResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
+import static cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys.DEVICE_ONLINE_STATS;
 import static cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys.WARN_POINT_STATS;
-import static cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse.*;
+import static cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse.Item;
+import static cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse.MonitorType;
 
 /**
  * @author Chengfs on 2024/1/25
@@ -40,11 +48,13 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private final TbSensorMapper sensorMapper;
     private final TbMonitorTypeMapper monitorTypeMapper;
     private final TbWarnBaseConfigMapper warnBaseConfigMapper;
+    private final IotService iotService;
 
     @Override
     public ReservoirWarnStatsResponse queryWarnStats(QueryReservoirWarnStatsParam param) {
         WarnTag warnTag = WarnTag.TYPE1;
         WarnLevelStyle style = WarnLevelStyle.COLOR;
+        int levelNum = 4;
         if (param.getPlatform() != null) {
             TbWarnBaseConfig config = warnBaseConfigMapper.selectOne(Wrappers.<TbWarnBaseConfig>lambdaQuery()
                     .eq(TbWarnBaseConfig::getPlatform, param.getPlatform())
@@ -53,11 +63,14 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
             if (config != null) {
                 warnTag = WarnTag.fromCode(config.getWarnTag());
                 style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
+                levelNum = config.getWarnLevelType() == 1 ? 4 : 3;
             }
         }
         String[] split = style.getDesc().split(StrUtil.COMMA);
-        Dict dict = new Dict(split[0] + warnTag.getDesc(), split[1] + warnTag.getDesc(),
-                split[2] + warnTag.getDesc(), split[3] + warnTag.getDesc(), "离线" + warnTag.getDesc());
+        final String tag = warnTag.getDesc();
+        Map<String, Object> dict = new HashMap<>(4);
+        dict.put("offline", "离线" + tag);
+        IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
 
         List<WarnPointStats> data = param.getProjects().stream()
                 .flatMap(e -> monitorRedisService.getAll(WARN_POINT_STATS + e, WarnPointStats.class)
@@ -121,6 +134,75 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                                 return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
                             });
                 }).collect(Collectors.groupingBy(t -> WARN_POINT_STATS + t.getT1(), Collectors.toMap(Tuple3::getT2, Tuple3::getT3)));
+        cacheMap.forEach(monitorRedisService::putAll);
+        cacheMap.clear();
+    }
+
+    @Override
+    public DeviceOnlineStatsResponse queryDeviceOnlineStats(QueryDeviceOnlineStatsParam param) {
+        List<DeviceOnlineStats> data = param.getProjects().stream()
+                .flatMap(e -> monitorRedisService.getAll(DEVICE_ONLINE_STATS + e, DeviceOnlineStats.class)
+                        .values().stream()).toList();
+
+        DeviceOnlineStatsResponse result = new DeviceOnlineStatsResponse();
+        result.setCount(data.stream().mapToLong(DeviceOnlineStats::getCount).sum());
+        result.setOnline(data.stream().mapToLong(DeviceOnlineStats::getOnline).sum());
+        result.setOffline(data.stream().mapToLong(DeviceOnlineStats::getOffline).sum());
+
+        Map<Integer, String> monitorTypeMap;
+        if (!data.isEmpty()) {
+            monitorTypeMap = monitorTypeMapper.selectList(Wrappers.<TbMonitorType>lambdaQuery()
+                            .in(TbMonitorType::getMonitorType, data.stream().map(DeviceOnlineStats::getMonitorType).distinct().toList())
+                            .select(TbMonitorType::getMonitorType, TbMonitorType::getTypeName)).stream()
+                    .collect(Collectors.toMap(TbMonitorType::getMonitorType, TbMonitorType::getTypeName));
+        } else {
+            monitorTypeMap = Map.of();
+        }
+
+        List<DeviceOnlineStatsResponse.MonitorType> monitorType = data.stream()
+                .collect(Collectors.groupingBy(DeviceOnlineStats::getMonitorType))
+                .entrySet().stream().map(item -> {
+                    String typeName = monitorTypeMap.get(item.getKey());
+                    return new DeviceOnlineStatsResponse.MonitorType(item.getKey(), typeName,
+                            item.getValue().stream().mapToLong(DeviceOnlineStats::getCount).sum(),
+                            item.getValue().stream().mapToLong(DeviceOnlineStats::getOnline).sum(),
+                            item.getValue().stream().mapToLong(DeviceOnlineStats::getOffline).sum());
+                }).toList();
+        result.setMonitorType(monitorType);
+        return result;
+    }
+
+    @Override
+    public void cacheDeviceOnlineStats() {
+        List<SensorWithIot> list = sensorMapper.listSensorWithIot();
+        if (list.isEmpty()) {
+            return;
+        }
+
+        List<String> uniqueTokens = list.stream().map(SensorWithIot::getIotUniqueToken).distinct().toList();
+        Map<String, Boolean> onlineMap = Optional.ofNullable(iotService
+                        .queryDeviceInfoByUniqueTokens(new QueryDeviceInfoByUniqueTokensParam(uniqueTokens)).getData())
+                .orElse(List.of())
+                .stream().collect(Collectors.toMap(DeviceInfo::getUniqueToken, DeviceInfo::getOnline));
+
+        Map<String, Map<Integer, DeviceOnlineStats>> cacheMap = list.stream().collect(Collectors.groupingBy(SensorWithIot::getProjectID))
+                .entrySet().stream().flatMap(entry -> {
+                    //项目 监测类型  设备
+                    return entry.getValue().stream()
+                            .collect(Collectors.groupingBy(SensorWithIot::getMonitorType))
+                            .entrySet().stream().map(typeGroup -> {
+                                Map<Boolean, Long> collect = typeGroup.getValue().stream()
+                                        .map(SensorWithIot::getIotUniqueToken)
+                                        .map(e -> onlineMap.getOrDefault(e, Boolean.FALSE))
+                                        .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
+
+                                DeviceOnlineStats cacheObj = new DeviceOnlineStats(collect.getOrDefault(Boolean.TRUE, 0L),
+                                        collect.getOrDefault(Boolean.TRUE, 0L),
+                                        collect.values().stream().mapToLong(e -> e).count(), typeGroup.getKey());
+                                return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
+                            });
+                }).collect(Collectors.groupingBy(t -> DEVICE_ONLINE_STATS + t.getT1(), Collectors.toMap(Tuple3::getT2, Tuple3::getT3)));
+
         cacheMap.forEach(monitorRedisService::putAll);
         cacheMap.clear();
     }
