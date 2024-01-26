@@ -57,7 +57,6 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     private RedisService iotRedisService;
 
     private final IotService iotService;
-    private final FileConfig fileConfig;
     Map<Long, RegionArea> provincialCapitalMap;
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.00");
 
@@ -336,7 +335,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
             QueryDeviceStatisticByMonitorProjectListParam monitorProjectListParam = new QueryDeviceStatisticByMonitorProjectListParam(
                     companyID, seperator, TimeUtil.DEFAULT_START_TIME, Timestamp.valueOf(LocalDateTime.now()));
             ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> resultWrapper = iotService.queryDeviceStatisticByMonitorProjectList(
-                    monitorProjectListParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                    monitorProjectListParam);
             if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
                 resultList.addAll(resultWrapper.getData());
             }

@@ -10,7 +10,9 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
@@ -26,7 +28,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorWithDataSourceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
-import cn.shmedo.monitor.monibotbaseapi.service.SensorDataService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -61,7 +62,6 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     private final TbSensorMapper tbSensorMapper;
 
     private final TbSensorDataSourceMapper tbSensorDataSourceMapper;
-    private final FileConfig fileConfig;
 
     private final TbUserFollowMonitorPointMapper tbUserFollowMonitorPointMapper;
 
@@ -373,9 +373,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
         }
 
         ResultWrapper<List<DeviceInfo>> result = iotService.queryDeviceInfoByUniqueTokens(
-                new QueryDeviceInfoByUniqueTokensParam(uniqueTokenList),
-                fileConfig.getAuthAppKey(),
-                fileConfig.getAuthAppSecret());
+                new QueryDeviceInfoByUniqueTokensParam(uniqueTokenList));
 
         if (result.apiSuccess()) {
             if (CollectionUtils.isNotEmpty(result.getData())) {

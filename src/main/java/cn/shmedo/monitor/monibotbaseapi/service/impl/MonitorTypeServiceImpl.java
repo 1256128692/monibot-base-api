@@ -14,7 +14,6 @@ import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -34,7 +33,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.Query;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -66,7 +64,6 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     private final TbTemplateScriptMapper tbTemplateScriptMapper;
     private final TbTemplateFormulaMapper tbTemplateFormulaMapper;
     private final TbParameterMapper tbParameterMapper;
-    private final FileConfig fileConfig;
     private final RedisService redisService;
     private final TbMonitorItemMapper tbMonitorItemMapper;
 
@@ -158,7 +155,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 if (ObjectUtil.isNotEmpty(modelTokenList)) {
                     IotService iotService = ThirdHttpService.getInstance(IotService.class, ThirdHttpService.Iot);
                     var thirdParam = new QueryModelFieldBatchParam(companyID, new ArrayList<>(modelTokenList));
-                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thirdParam, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                    ResultWrapper<Map<String, List<ModelField>>> resultWrapper = iotService.queryModelFieldBatch(thirdParam);
                     if (!resultWrapper.apiSuccess()) {
                         throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
                     } else if (resultWrapper.getData() != null) {

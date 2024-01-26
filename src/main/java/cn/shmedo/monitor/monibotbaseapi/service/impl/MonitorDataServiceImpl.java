@@ -247,6 +247,10 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                     i.setDisplayDensity(monitorTypeConfigV1.getDisplayDensity());
                     i.setStatisticalMethods(monitorTypeConfigV1.getStatisticalMethods());
                 }
+            } else {
+                // 没有配置的,默认全部
+                i.setDisplayDensity(List.of(1,2,3,4,5,6));
+                i.setStatisticalMethods(List.of(1,2,3,4,5));
             }
         });
 

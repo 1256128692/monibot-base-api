@@ -19,10 +19,7 @@ import java.util.Map;
  **/
 public interface IotService {
     @RequestLine("POST /QueryModelFieldBatch")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo,
-                                                                      @Param("appKey") String appKey,
-                                                                      @Param("appSecret") String appSecret);
+    ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo);
 
     @RequestLine("POST /QueryDeviceAndSensorList")
     ResultWrapper<List<DeviceWithSensor>> queryDeviceAndSensorList(QueryDeviceAndSensorRequest request);
@@ -66,10 +63,8 @@ public interface IotService {
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /CreateMultipleDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}", "Authorization: Bearer {accessToken}"})
+    @Headers({"Authorization: Bearer {accessToken}"})
     ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
-                                                @Param("appKey") String appKey,
-                                                @Param("appSecret") String appSecret,
                                                 @Param("accessToken") String accessToken);
 
 
@@ -78,22 +73,13 @@ public interface IotService {
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /DeleteDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
-                                        @Param("appKey") String appKey,
-                                        @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param);
 
     @RequestLine("POST /UpdateDeviceInfoBatch")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
-                                                 @Param("appKey") String appKey,
-                                                 @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param);
 
     @RequestLine("POST /TransferDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
-                                           @Param("appKey") String appKey,
-                                           @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param);
 
     /**
      * 批量下发透传指令
@@ -113,20 +99,11 @@ public interface IotService {
     ResultWrapper<List<DeviceSimple>> queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam param);
 
     @RequestLine("POST /QueryDeviceStateList")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param,
-                                                              @Param("appKey") String appKey,
-                                                              @Param("appSecret") String appSecret);
+    ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param);
 
     @RequestLine("POST /GetDeviceInfoByUniqueTokens")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam queryDeviceInfoByUniqueTokensParam,
-                                                                  @Param("appKey") String appKey,
-                                                                  @Param("appSecret") String appSecret);
+    ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam queryDeviceInfoByUniqueTokensParam);
 
     @RequestLine("POST /QueryDeviceStatisticByMonitorProjectList")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param,
-                                                                                                            @Param("appKey") String appKey,
-                                                                                                            @Param("appSecret") String appSecret);
+    ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param);
 }

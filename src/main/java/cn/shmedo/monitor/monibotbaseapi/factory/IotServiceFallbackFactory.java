@@ -34,8 +34,7 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
         return new IotService() {
             @Override
-            public ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo,
-                                                                                     String appKey, String appSecret) {
+            public ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
@@ -71,28 +70,22 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
 
             @Override
             public ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
-                                                               String appKey,
-                                                               String appSecret,
                                                                String accessToken) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
-            public ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
-                                                       String appKey,
-                                                       String appSecret) {
+            public ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
-            public ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
-                                                                String appKey,
-                                                                String appSecret) {
+            public ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
-            public ResultWrapper<Boolean> transferDevice(TransferDeviceParam param, String appKey, String appSecret) {
+            public ResultWrapper<Boolean> transferDevice(TransferDeviceParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
@@ -107,17 +100,17 @@ public class IotServiceFallbackFactory implements FallbackFactory<IotService> {
             }
 
             @Override
-            public ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param, String appKey, String appSecret) {
+            public ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
-            public ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param, String appKey, String appSecret) {
+            public ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
-            public ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam param, String appKey, String appSecret) {
+            public ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam param) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 

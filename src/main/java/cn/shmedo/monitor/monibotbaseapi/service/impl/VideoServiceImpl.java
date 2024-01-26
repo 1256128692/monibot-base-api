@@ -22,18 +22,15 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
@@ -351,8 +348,7 @@ public class VideoServiceImpl implements VideoService {
                         v.getDeviceToken(), v.getDeviceName()));
             });
         }
-        iotService.createMultipleDevice(iotRequest,
-                fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
+        iotService.createMultipleDevice(iotRequest, pa.getToken());
 
         ResultWrapper<List<DeviceBaseInfo>> deviceBaseInfoWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
                 .companyID(pa.getCompanyID())
@@ -584,9 +580,7 @@ public class VideoServiceImpl implements VideoService {
                     .idList(listResultWrapper.getData().stream().map(DeviceBaseInfo::getDeviceID).collect(Collectors.toList()))
                     .saveData(false)
                     .build();
-            iotService.deleteDevice(build,
-                    fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret());
+            iotService.deleteDevice(build);
         }
 
 
@@ -635,7 +629,7 @@ public class VideoServiceImpl implements VideoService {
         });
         param.setList(deviceInfoV1List);
         // 2. 修改物联网数据库
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param);
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改物联网视频设备失败,原因:" + booleanResultWrapper.getMsg());
         }
@@ -1421,9 +1415,7 @@ public class VideoServiceImpl implements VideoService {
                 .originalCompanyID(transferVideoDeviceList.get(0).getCompanyID())
                 .build();
 
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param,
-                fileConfig.getAuthAppKey(),
-                fileConfig.getAuthAppSecret());
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
         } else {

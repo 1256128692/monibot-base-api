@@ -17,6 +17,11 @@ public class SensorBaseInfoV4 {
     private Integer monitorType;
     private String monitorPointName;
     private String gpsLocation;
+
+    private String imageLocation;
+    private String overallViewLocation;
+    private String spatialLocation;
+
     private Integer monitorItemID;
     private String monitorItemName;
     private Integer monitorGroupID;

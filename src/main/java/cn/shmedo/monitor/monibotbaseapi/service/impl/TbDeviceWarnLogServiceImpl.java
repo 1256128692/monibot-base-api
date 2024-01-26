@@ -198,7 +198,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         info.setWarnEndTime(tbDeviceWarnLog.getWarnEndTime());
         Optional.of(QueryDeviceStateListParam.builder().deviceToken(tbDeviceWarnLog.getDeviceSerial())
                         .begin(DateUtil.offsetDay(warnTime, -3)).end(DateUtil.offsetDay(warnTime, 3)).build())
-                .map(u -> iotService.queryDeviceStateList(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .map(iotService::queryDeviceStateList)
                 .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u -> {
                     List<Map<String, Object>> fourGSignalList = new ArrayList<>();
                     List<Map<String, Object>> extPowerVoltList = new ArrayList<>();
