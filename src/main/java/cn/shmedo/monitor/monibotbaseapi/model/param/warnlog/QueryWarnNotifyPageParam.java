@@ -1,10 +1,13 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.warnlog;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyPageListParam;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -38,5 +41,13 @@ public class QueryWarnNotifyPageParam implements ParameterValidator, ResourcePer
     @Override
     public Resource parameter() {
         return new Resource(companyID.toString(), ResourceType.COMPANY);
+    }
+
+    public QueryNotifyPageListParam build() {
+        QueryNotifyPageListParam param = new QueryNotifyPageListParam();
+        BeanUtil.copyProperties(this, param);
+        param.setType(SysNotify.Type.ALARM.getCode());
+        param.setQueryKey(queryCode);
+        return param;
     }
 }

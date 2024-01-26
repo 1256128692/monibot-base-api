@@ -8,9 +8,14 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.IWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +37,7 @@ public class WarnLogController {
     private final IWarnLogService warnLogService;
     private final ITbDataWarnLogService dataWarnLogService;
     private final ITbDeviceWarnLogService deviceWarnLogService;
+    private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
 
     /**
      * @api {POST} /QueryWarnNotifyPage 报警消息分页
@@ -53,15 +59,15 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} currentPageData.content 通知内容
      * @apiSuccess (返回结果) {Int} currentPageData.status 通知状态 0.未读 1.已读 2.待办
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 接收时间
-     * @apiSuccess (返回结果) {Int} currentPageData.warnLogID 报警记录ID
-     * @apiSuccess (返回结果) {Int} currentPageData.warnType 报警类型,1.数据报警 2.设备报警
+     * @apiSuccess (返回结果) {Int} [currentPageData.warnLogID] 报警记录ID,如果该项为空则不可跳转
+     * @apiSuccess (返回结果) {Int} [currentPageData.warnType] 报警类型,1.数据报警 2.设备报警
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryWarnNotifyPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWarnNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param) {
-        return ResultWrapper.successWithNothing();
+    public Object queryWarnNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param, HttpServletRequest request) {
+        return tbWarnNotifyConfigService.queryWarnNotifyPage(param,request.getHeader("Authorization"));
     }
 
     /**
@@ -99,7 +105,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param) {
-        return ResultWrapper.successWithNothing();
+        return tbWarnNotifyConfigService.queryUnreadWarnLatest(param);
     }
 
     /**
