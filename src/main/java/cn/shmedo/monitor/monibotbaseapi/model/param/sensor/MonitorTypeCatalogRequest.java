@@ -1,14 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
 import cn.hutool.core.lang.Assert;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.monitor.enums.DataSourceComposeType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
+import java.util.Optional;
 
 /**
  * 监测类型目录查询
@@ -17,6 +17,9 @@ import lombok.Data;
  */
 @Data
 public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePermissionProvider<Resource> {
+
+    @Positive
+    private Integer companyID;
 
     /**
      * 项目ID
@@ -41,6 +44,9 @@ public class MonitorTypeCatalogRequest implements ParameterValidator, ResourcePe
         } else {
             dataSourceComposeType = DataSourceComposeType.SINGLE_IOT.getCode();
         }
+
+        this.companyID = Optional.ofNullable(companyID)
+                .orElse(CurrentSubjectHolder.getCurrentSubject().getCompanyID());
         return null;
     }
 

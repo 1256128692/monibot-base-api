@@ -146,10 +146,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .stream().map(TbMonitorTypeTemplate::getMonitorType).collect(Collectors.toSet());
 
         if (!monitorTypes.isEmpty()) {
-            CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
             return monitorTypeMapper.selectList(Wrappers.lambdaQuery(TbMonitorType.class)
                             .in(TbMonitorType::getMonitorType, monitorTypes)
-                            .in(TbMonitorType::getCompanyID, List.of(-1, subject.getCompanyID())))
+                            .in(TbMonitorType::getCompanyID, List.of(-1, request.getCompanyID())))
                     .stream().map(MonitorTypeCatalogResponse::valueOf).toList();
         }
         return List.of();
