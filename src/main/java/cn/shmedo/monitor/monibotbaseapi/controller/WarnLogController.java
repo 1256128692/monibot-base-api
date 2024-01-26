@@ -8,13 +8,10 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.IWarnLogService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
-import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -67,7 +64,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryWarnNotifyPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param, HttpServletRequest request) {
-        return tbWarnNotifyConfigService.queryWarnNotifyPage(param,request.getHeader("Authorization"));
+        return tbWarnNotifyConfigService.queryWarnNotifyPage(param, request.getHeader("Authorization"));
     }
 
     /**
@@ -105,7 +102,7 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param) {
-        return tbWarnNotifyConfigService.queryUnreadWarnLatest(param);
+        return warnLogService.queryUnreadWarnLatest(param);
     }
 
     /**

@@ -96,4 +96,27 @@
         </if>
         ORDER BY dwl.`WarnTime` DESC
     </select>
+    <select id="selectDataWarnBaseInfoByID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnLatestInfo">
+        SELECT
+            dwl.ID warnLogID,
+            wtc.WarnName warnName,
+            dwl.WarnTime warnTime,
+            pi.ID projectID,
+            pi.ProjectName projectName,
+            pi.ShortName projectShortName,
+            mi.ID monitorItemID,
+            mi.`Name` monitorItemName,
+            mi.Alias monitorItemAlias,
+            mp.ID monitorPointID,
+            mp.`Name` monitorPointName
+        FROM
+            tb_data_warn_log dwl
+            LEFT JOIN tb_warn_threshold_config wtc ON wtc.ID = dwl.WarnThresholdID
+            LEFT JOIN tb_sensor s ON s.ID = wtc.SensorID
+            LEFT JOIN tb_monitor_point mp ON mp.ID = s.MonitorPointID
+            LEFT JOIN tb_monitor_item mi ON mi.ID = wtc.MonitorItemID
+            LEFT JOIN tb_project_info pi ON pi.ID = mi.ProjectID
+        WHERE dwl.ID =#{id}
+    </select>
 </mapper>

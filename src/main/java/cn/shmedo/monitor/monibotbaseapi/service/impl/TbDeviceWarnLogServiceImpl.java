@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStateListParam;
@@ -254,16 +255,17 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                     () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                     DeviceWarnPageInfo::getDeviceToken,
                     (e, device) -> {
+                        e.setWarnName("设备离线");
                         e.setGpsLocation(device.getGpsLocation());
                         e.setFirmwareVersion(device.getFirmwareVersion());
                         e.setProductID(device.getProductID());
                         e.setUniqueToken(device.getUniqueToken());
                         String deviceToken = e.getDeviceToken();
                         if (deviceTokenMap.containsKey(deviceToken)) {
-                            e.setDeviceType(2);
+                            e.setDeviceType(DeviceWarnDeviceType.VIDEO_DEVICE.getCode());
                             Optional.of(deviceToken).map(deviceTokenMap::get).map(TbVideoDevice::getDeviceType).ifPresent(e::setDeviceModel);
                         } else {
-                            e.setDeviceType(1);
+                            e.setDeviceType(DeviceWarnDeviceType.IOT_DEVICE.getCode());
                             e.setDeviceModel(device.getProductName());
                         }
                     });

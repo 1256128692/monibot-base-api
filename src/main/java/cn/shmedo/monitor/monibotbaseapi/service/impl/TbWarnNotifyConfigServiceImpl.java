@@ -17,7 +17,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptLi
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnThresholdConfigEnableBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryWarnNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
@@ -161,15 +160,6 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
             return info;
         }).toList();
         return new PageUtil.Page<>(page.totalPage(), list, page.totalCount());
-    }
-
-    @Override
-    public Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param) {
-        //TODO 获取到最新未读设备/数据报警
-        List<Integer> notifyIDList = List.of(1, 2);
-
-
-        return null;
     }
 
     private void setWarnNotifyConfigProjectInfo(WarnNotifyConfigInfo info, final Integer companyID, final Integer platform) {

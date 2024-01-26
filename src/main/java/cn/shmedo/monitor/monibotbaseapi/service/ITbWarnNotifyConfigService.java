@@ -15,7 +15,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.annotation.Nonnull;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -36,6 +35,4 @@ public interface ITbWarnNotifyConfigService extends IService<TbWarnNotifyConfig>
                                                  @Nonnull Integer platform, @Nonnull Integer notifyType);
 
     PageUtil.Page<WarnNotifyPageInfo> queryWarnNotifyPage(QueryWarnNotifyPageParam param, String accessToken);
-
-    Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param);
 }
