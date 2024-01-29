@@ -15,6 +15,8 @@ public class ProjectBaseInfo extends TbProjectInfo{
 
     private String projectMainTypeName;
 
+    private Integer projectStatus;
+
 
     @Override
     public void setProjectType(Byte projectType) {

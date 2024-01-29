@@ -52,11 +52,11 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Int}   projectTotalCount   工程下设备总数量
      * @apiSuccess (返回结果) {Int}   intelligenceCount   智能设备总数量
      * @apiSuccess (返回结果) {Int}   intelligenceOnlineCount   智能设备在线数量
-     * @apiSuccess (返回结果) {Int}   intelligenceOffOnlineCount   智能设备离线数量
+     * @apiSuccess (返回结果) {Int}   intelligenceOfflineCount   智能设备离线数量
      * @apiSuccess (返回结果) {Double}   intelligenceRate   智能设备在线率
      * @apiSuccess (返回结果) {Int}   videoCount   视频设备总数量
      * @apiSuccess (返回结果) {Int}   videoOnlineCount   视频设备在线数量
-     * @apiSuccess (返回结果) {Int}   videoOffOnlineCount   视频设备离线数量
+     * @apiSuccess (返回结果) {Int}   videoOfflineCount   视频设备离线数量
      * @apiSuccess (返回结果) {Double}   videoRate   视频设备在线率
      * @apiSuccess (返回结果) {Int}   otherCount   其它设备总数量
      * @apiSampleRequest off

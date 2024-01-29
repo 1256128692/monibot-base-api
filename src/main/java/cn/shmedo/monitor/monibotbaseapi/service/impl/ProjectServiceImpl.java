@@ -836,6 +836,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 ProjectBaseInfo result = new ProjectBaseInfo();
                 BeanUtil.copyProperties(item, result);
                 handlerImagePathToRealPath(result);
+                result.setProjectStatus(0);
                 projectBaseInfoList.add(result);
             });
 
