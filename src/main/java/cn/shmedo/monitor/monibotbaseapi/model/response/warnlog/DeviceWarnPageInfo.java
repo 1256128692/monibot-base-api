@@ -23,6 +23,8 @@ public class DeviceWarnPageInfo {
     private Date warnTime;
     private Date warnEndTime;
     private Integer deviceType;
+    private String deviceSerial;
+    @JsonIgnore
     private String deviceToken;
     private Integer productID;
     private String deviceModel;

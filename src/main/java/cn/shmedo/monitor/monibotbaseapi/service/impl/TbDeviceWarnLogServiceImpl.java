@@ -242,7 +242,6 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         List<DeviceWarnPageInfo> deviceWarnPageInfoList = tbDeviceWarnLogList.stream().map(u -> {
             DeviceWarnPageInfo info = new DeviceWarnPageInfo();
             BeanUtil.copyProperties(u, info);
-            info.setDeviceToken(u.getDeviceSerial());
             return info;
         }).toList();
         Set<String> deviceTokens = deviceWarnPageInfoList.stream().map(DeviceWarnPageInfo::getDeviceToken)
@@ -251,7 +250,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
             List<TbVideoDevice> tbVideoDeviceList = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>()
                     .in(TbVideoDevice::getDeviceToken, deviceTokens));
             Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceList.stream().collect(Collectors
-                    .toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
+                    .toMap(TbVideoDevice::getDeviceToken, Function.identity()));
             TransferUtil.applyDeviceBase(deviceWarnPageInfoList,
                     () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                     DeviceWarnPageInfo::getDeviceToken,

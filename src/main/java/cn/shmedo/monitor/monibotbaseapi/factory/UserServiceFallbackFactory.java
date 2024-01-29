@@ -9,10 +9,7 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourcePa
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeptSimpleInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.hystrix.FallbackFactory;
@@ -98,6 +95,11 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<Map<Integer, String>> queryUserContact(QueryUserContactParam param, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<DepartmentIncludeUserInfo> queryDepartmentIncludeUserInfoList(QueryDepartmentIncludeUserInfoListParameter parameter, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

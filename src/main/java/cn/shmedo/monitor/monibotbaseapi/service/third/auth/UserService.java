@@ -7,10 +7,7 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourcePa
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeptSimpleInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.Headers;
 import feign.Param;
@@ -105,4 +102,10 @@ public interface UserService {
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<Map<Integer, String>> queryUserContact(QueryUserContactParam param, @Param("appKey") String appKey,
                                                          @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDepartmentIncludeUserInfoList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<DepartmentIncludeUserInfo> queryDepartmentIncludeUserInfoList(QueryDepartmentIncludeUserInfoListParameter parameter,
+                                                                                @Param("appKey") String appKey,
+                                                                                @Param("appSecret") String appSecret);
 }

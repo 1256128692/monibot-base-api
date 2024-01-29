@@ -207,7 +207,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} currentPageData.projectList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} currentPageData.projectList.gpsLocation 监测点位置
      * @apiSuccess (返回结果) {Int} currentPageData.deviceType 设备类型 1.物联网设备 2.视频设备
-     * @apiSuccess (返回结果) {String} currentPageData.deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} currentPageData.deviceSerial 设备SN
      * @apiSuccess (返回结果) {Int} currentPageData.productID 产品ID
      * @apiSuccess (返回结果) {String} currentPageData.deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
      * @apiSuccess (返回结果) {String} currentPageData.gpsLocation 设备位置
@@ -300,7 +300,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {String} projectList.monitorPointName 监测点名称
      * @apiSuccess (返回结果) {String} projectList.gpsLocation 监测点位置
      * @apiSuccess (返回结果) {Int} deviceType 设备类型 1.物联网设备 2.视频设备
-     * @apiSuccess (返回结果) {String} deviceToken 设备SN
+     * @apiSuccess (返回结果) {String} deviceSerial 设备SN
      * @apiSuccess (返回结果) {Int} productID 产品ID
      * @apiSuccess (返回结果) {String} deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
      * @apiSuccess (返回结果) {String} gpsLocation 设备位置
