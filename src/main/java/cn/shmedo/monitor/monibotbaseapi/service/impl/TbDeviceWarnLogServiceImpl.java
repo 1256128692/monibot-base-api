@@ -152,7 +152,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
             }
         } else {
             if (param.getStatus() != null && param.getStatus()) {
-                param.getTbDeviceWarnLog().setWarnTime(param.getTime());
+                param.getTbDeviceWarnLog().setWarnEndTime(param.getTime());
                 param.getTbDeviceWarnLog().setDataStatus(0);
                 tbDeviceWarnLogMapper.updateById(param.getTbDeviceWarnLog());
             }

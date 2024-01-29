@@ -250,7 +250,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             } else {
                 // 没有配置的,默认全部
                 i.setDisplayDensity(List.of(1,2,3,4,5,6));
-                i.setStatisticalMethods(List.of(1,2,3,4,5));
+                i.setStatisticalMethods(List.of(1,2,3,4));
             }
         });
 
