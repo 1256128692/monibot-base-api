@@ -2,7 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.weather.QueryWeatherForecastParameter;
@@ -41,7 +40,7 @@ public class WeatherServiceImpl implements WeatherService {
         Object obj = redisTemplate.opsForHash().get(RedisKeys.PROJECT_KEY, String.valueOf(tbProjectInfo.getID()));
         ProjectInfoCache projectInfoCache = JSONUtil.toBean((String) obj, ProjectInfoCache.class);
         forecastResponse.setTbProjectInfo(projectInfoCache);
-        String areaValue = projectInfoCache.getLocationInfo().getAreaName();
+        String areaValue = projectInfoCache.getLocationInfo().getArea().toString();
         Object now = redisTemplate.opsForHash().get(REDIS_KEY_OF_WEATHER_NOW, areaValue);
         Object hourly = redisTemplate.opsForHash().get(REDIS_KEY_OF_WEATHER_HOURLY, areaValue);
         Object daily = redisTemplate.opsForHash().get(REDIS_KEY_OF_WEATHER_DAILY, areaValue);
