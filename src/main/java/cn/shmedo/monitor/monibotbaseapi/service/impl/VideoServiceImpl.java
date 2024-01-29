@@ -992,7 +992,7 @@ public class VideoServiceImpl implements VideoService {
                                 platformIDList.forEach(platform -> {
                                     DateTime date = DateUtil.date();
                                     TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream()
-                                            .filter(deviceWarn -> deviceWarn.getDeviceSerial().equals(v.getDeviceToken())
+                                            .filter(deviceWarn -> deviceWarn.getDeviceToken().equals(v.getDeviceToken())
                                                     && deviceWarn.getPlatform().equals(platform)
                                                     && deviceWarn.getProjectID().equals(v.getProjectID())
                                                     && deviceWarn.getWarnEndTime() == null).findFirst().orElse(null);
