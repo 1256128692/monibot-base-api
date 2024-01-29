@@ -75,7 +75,7 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
      */
-    @Permission(permissionName = "mdmbase:UpdateWtStatistics")
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
     @GetMapping("CacheReservoirWarnStatistics")
     public Object cacheWarnStats() {
         wtStatisticsService.cacheWarnStats();
@@ -92,7 +92,7 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
      */
-    @Permission(permissionName = "mdmbase:UpdateWtStatistics")
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
     @GetMapping("CacheDeviceOnlineStatistics")
     public Object cacheDeviceOnlineStats() {
         wtStatisticsService.cacheDeviceOnlineStats();
