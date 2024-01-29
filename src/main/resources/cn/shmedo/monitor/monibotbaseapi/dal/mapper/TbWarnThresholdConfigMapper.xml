@@ -120,7 +120,10 @@
             mp.GpsLocation gpsLocation,
             mtf.ID fieldID,
             mtf.FieldName fieldName,
-            mtf.FieldToken fieldToken
+            mtf.FieldToken fieldToken,
+            s.ID sensorID,
+            s.Name sensorName,
+            s.Alias sensorAlias
         FROM
             tb_warn_threshold_config wtc
             LEFT JOIN tb_project_info pi ON pi.ID = wtc.ProjectID

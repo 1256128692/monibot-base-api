@@ -37,4 +37,7 @@ public class DataWarnDetailInfo extends WarnBaseConfigInfo {
     private Integer fieldID;
     private String fieldName;
     private String fieldToken;
+    private Integer sensorID;
+    private String sensorName;
+    private String sensorAlias;
 }

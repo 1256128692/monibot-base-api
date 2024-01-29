@@ -257,6 +257,9 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Int} fieldID 监测属性ID
      * @apiSuccess (返回结果) {String} fieldName 监测属性名称
      * @apiSuccess (返回结果) {String} fieldToken 监测属性token
+     * @apiSuccess (返回结果) {Int} sensorID 传感器ID
+     * @apiSuccess (返回结果) {String} sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} sensorAlias 传感器别称
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:
      */
