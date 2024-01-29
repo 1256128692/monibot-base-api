@@ -998,8 +998,8 @@ public class VideoServiceImpl implements VideoService {
                                                     && deviceWarn.getWarnEndTime() == null).findFirst().orElse(null);
                                     tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
                                             v.getCompanyID(), platform, v.getProjectID(), date, v.getDeviceType(),
-                                            v.getDeviceToken(), v.getProjectName(), "视频设备", tbDeviceWarnLog,
-                                            videoDeviceBaseInfoV1.getStatus()
+                                            v.getDeviceToken(), v.getDeviceSerial(), v.getProjectName(), "视频设备",
+                                            tbDeviceWarnLog, videoDeviceBaseInfoV1.getStatus()
                                     ));
 
                                 });

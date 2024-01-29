@@ -37,11 +37,17 @@ public class TbDeviceWarnLog {
 
     @TableField("ProjectID")
     private Integer projectID;
+
     /**
-     * 设备Token
+     * 设备序列号
      */
     @TableField("DeviceSerial")
     private String deviceSerial;
+    /**
+     * 设备Token
+     */
+    @TableField("DeviceToken")
+    private String deviceToken;
     /**
      * 报警时间
      */

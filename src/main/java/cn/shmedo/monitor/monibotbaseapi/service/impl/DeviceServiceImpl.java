@@ -81,8 +81,8 @@ public class DeviceServiceImpl implements IDeviceService {
                                         tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
                                                 projectWithServiceInfo.getCompanyID(), p,
                                                 projectWithServiceInfo.getID(), DateUtil.date(), device.getProductName(),
-                                                device.getDeviceToken(), projectWithServiceInfo.getProjectName(), "IoT设备", tbDeviceWarnLog,
-                                                device.getOnlineStatus()));
+                                                device.getDeviceToken(), device.getDeviceToken(), projectWithServiceInfo.getProjectName(),
+                                                "IoT设备", tbDeviceWarnLog, device.getOnlineStatus()));
                                     });
                                 }
                             }

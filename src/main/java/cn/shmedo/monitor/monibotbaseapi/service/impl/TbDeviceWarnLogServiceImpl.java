@@ -77,12 +77,13 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
         String content = StrUtil.format(WARN_CONTENT_FORMAT,
                 param.getProjectName(), param.getDeviceSource(),
-                param.getTime(), param.getDeviceType(), param.getDeviceToken());
+                param.getTime(), param.getDeviceType(), param.getDeviceSerial());
 
         if (param.getTbDeviceWarnLog() == null) {
             TbDeviceWarnLog tbDeviceWarnLog = new TbDeviceWarnLog(null, param.getCompanyID(), param.getPlatform(),
-                    param.getProjectID(), param.getDeviceToken(), param.getTime(), null, content, null, 0,
-                    null, null, null, null, null, null);
+                    param.getProjectID(), param.getDeviceSerial(), param.getDeviceToken(), param.getTime(), null,
+                    content, null, 0, null, null, null, null,
+                    null, null);
 
             if (param.getStatus() != null && !param.getStatus()) {
                 TbWarnNotifyConfig warnNotifyConfig = tbWarnNotifyConfigMapper.queryByCompanyIDAndPlatformID(param.getCompanyID(),
@@ -109,10 +110,10 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                                 "deviceModel", param.getDeviceSource(),
                                                 "time", param.getTime(),
                                                 "deviceType", param.getDeviceType(),
-                                                "deviceSn", param.getDeviceToken()), phoneMap.values().toArray(String[]::new));
+                                                "deviceSn", param.getDeviceSerial()), phoneMap.values().toArray(String[]::new));
                                 assert result;
                             } catch (Exception e) {
-                                log.info("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceToken(),
+                                log.info("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
                                         param.getPlatform(), e.getMessage());
                             }
                         }
@@ -129,7 +130,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                                 content, SysNotify.Status.UNREAD, param.getTime())),
                                         phoneUserMap.keySet().toArray(Integer[]::new));
                             } catch (Exception e) {
-                                log.info("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceToken(),
+                                log.info("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceSerial(),
                                         param.getPlatform(), e.getMessage());
                             }
 

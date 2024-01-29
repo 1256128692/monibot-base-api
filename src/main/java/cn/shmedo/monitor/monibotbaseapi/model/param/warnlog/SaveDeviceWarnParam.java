@@ -20,6 +20,7 @@ public class SaveDeviceWarnParam {
     private Date time;
     private String deviceType;
     private String deviceToken;
+    private String deviceSerial;
     private String projectName;
 
     private String deviceSource;
