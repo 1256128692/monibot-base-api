@@ -1,13 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnBaseConfigMapper;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineStats;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.wtstats.WarnPointStats;
@@ -15,14 +21,21 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.DeviceOnlineStatsResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirNewSensorDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -48,8 +61,12 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private final TbSensorMapper sensorMapper;
     private final TbMonitorTypeMapper monitorTypeMapper;
     private final TbWarnBaseConfigMapper warnBaseConfigMapper;
+    private final TbProjectInfoMapper projectInfoMapper;
+    private final TbProjectPropertyMapper projectPropertyMapper;
     private final IotService iotService;
-
+    private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
+    private final SensorDataDao sensorDataDao;
+    private final RedisService redisService;
     @Override
     public ReservoirWarnStatsResponse queryWarnStats(QueryReservoirWarnStatsParam param) {
         WarnTag warnTag = WarnTag.TYPE1;
@@ -207,4 +224,88 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         cacheMap.clear();
     }
 
+    @Override
+    public ReservoirNewSensorDataResponse queryReservoirNewSensorData(ReservoirNewSensorDataParam pa) {
+
+        TbProjectInfo tbProjectInfo = projectInfoMapper.selectOne(Wrappers.<TbProjectInfo>lambdaQuery()
+                .eq(TbProjectInfo::getID, pa.getProjectID()));
+        if (!ObjectUtil.isNotNull(tbProjectInfo)) {
+            return null;
+        }
+
+        List<TbProjectProperty> tbProjectProperties = projectPropertyMapper.selectList(Wrappers.<TbProjectProperty>lambdaQuery()
+                .eq(TbProjectProperty::getSubjectType, 0)
+                .eq(TbProjectProperty::getProjectID, pa.getProjectID())
+        );
+
+
+        List<Map<String, Object>> resultList = new LinkedList<Map<String, Object>>();
+        List<SensorBaseInfoV4> sensorBaseInfoV4List = sensorMapper.selectListByCondition(pa.getProjectID(), null, null);
+        if (!CollectionUtil.isNullOrEmpty(sensorBaseInfoV4List)) {
+
+            // 查询监测类型为2:水位, 31:降雨量的监测点
+            List<SensorBaseInfoV4> includeMonitorTypeSensorList = sensorBaseInfoV4List.stream().filter(s -> s.getMonitorType().equals(2) || s.getMonitorType().equals(31)).collect(Collectors.toList());
+            if (!CollectionUtil.isNullOrEmpty(includeMonitorTypeSensorList)) {
+                // 根据监测类型再去分类,然后查询最新时间的数据
+                // 最后根据监测类型再去分组这些监测点,然后遍历监测类型,去查该类型下监测点的传感器的最新数据,封装打包
+                Map<Integer, List<SensorBaseInfoV4>> monitorTypeList = includeMonitorTypeSensorList.stream()
+                        .collect(Collectors.groupingBy(SensorBaseInfoV4::getMonitorType));
+
+                monitorTypeList.forEach((monitorType, sensors) -> {
+
+                    List<FieldBaseInfo> monitorTypeFields = tbMonitorTypeFieldMapper.selectListByType(monitorType);
+
+                    List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(monitorTypeFields);
+                    List<Integer> sensorIDList = sensors.stream().map(SensorBaseInfoV4::getSensorID).collect(Collectors.toList());
+                    List<Map<String, Object>> maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
+
+                    sensors.forEach(s -> {
+                        s.setMonitorTypeFields(monitorTypeFields);
+                        if (CollectionUtils.isNotEmpty(maps)) {
+                            s.setSensorData(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).findFirst().orElse(null));
+                            if (ObjectUtil.isNotNull(s.getSensorData())) {
+                                s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
+                            }
+                            resultList.add(s.getSensorData());
+                        }
+                    });
+
+                });
+
+            }
+        }
+
+        if (StringUtils.isNotBlank(tbProjectInfo.getLocation())){
+            if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {
+                JSONObject json = JSONUtil.parseObj(tbProjectInfo.getLocation());
+                tbProjectInfo.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+            }
+        }
+        Collection<Object> areas = List.of(tbProjectInfo.getLocation());
+        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+
+        return ReservoirNewSensorDataResponse.toNewVo(tbProjectInfo,
+                tbProjectProperties, resultList, areaMap.get(tbProjectInfo.getLocation()));
+    }
+
+
+
+    /**
+     * @param list 监测点子类型字段列表
+     * @return 统一格式的子类型字段列表
+     */
+    public List<FieldSelectInfo> getFieldSelectInfoListFromModleTypeFieldList(List<FieldBaseInfo> list) {
+        List<FieldSelectInfo> fieldSelectInfos = new ArrayList<>();
+        list.forEach(modelField -> {
+            if (modelField.getFieldClass().equals(FieldClass.EXTEND_CONFIG.getCode())) {
+                return;
+            }
+            FieldSelectInfo fieldSelectInfo = new FieldSelectInfo();
+            fieldSelectInfo.setFieldToken(modelField.getFieldToken());
+            fieldSelectInfo.setFieldName(modelField.getFieldName());
+            fieldSelectInfos.add(fieldSelectInfo);
+        });
+        return fieldSelectInfos;
+    }
 }

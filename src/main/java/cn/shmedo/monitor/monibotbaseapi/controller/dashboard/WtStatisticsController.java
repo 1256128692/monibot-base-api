@@ -2,15 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.controller.dashboard;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * 水库大屏统计模块
@@ -217,12 +216,13 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Double} periodRainValue 时段降水量
      * @apiSuccess (返回结果) {Double} currentRainValue 当前降水量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
+     * @apiPermission 系统权限 mdmbase:DescribeBaseDashboard
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
-    @PostMapping("ReservoirNewSensorData")
-    public Object reservoirNewSensorData() {
-        return null;
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @RequestMapping(value = "/ReservoirNewSensorData", method = RequestMethod.POST,
+            produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object reservoirNewSensorData(@Valid @RequestBody ReservoirNewSensorDataParam pa) {
+        return wtStatisticsService.queryReservoirNewSensorData(pa);
     }
 
     /**
