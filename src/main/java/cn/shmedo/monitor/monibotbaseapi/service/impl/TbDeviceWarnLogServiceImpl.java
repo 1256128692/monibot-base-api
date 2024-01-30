@@ -168,7 +168,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                 "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle());
 
         LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>()
-                .eq(TbDeviceWarnLog::getPlatform, param.getPlatform()).orderByDesc(TbDeviceWarnLog::getWarnTime);
+                .eq(TbDeviceWarnLog::getPlatform, param.getPlatform()).orderByDesc(TbDeviceWarnLog::getWarnTime, TbDeviceWarnLog::getId);
         if (param.getIsRealTime()) {
             wrapper.isNull(TbDeviceWarnLog::getWarnEndTime);
         } else {
@@ -335,8 +335,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                             String location = u.getLocation();
                             item.setProjectList(List.of(DeviceProjectInfo.builder().projectID(u.getID())
                                     .projectName(u.getProjectName()).projectShortName(u.getShortName()).regionArea(location)
-                                    .regionAreaName(regionNameMap.get(location))
-                                    .build()));
+                                    .regionAreaName(regionNameMap.get(location)).build()));
                         });
                     }
                 }).filter(u -> Optional.ofNullable(deviceType).filter(ObjectUtil::isNotEmpty).map(w ->
