@@ -108,7 +108,7 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
             Optional.of(updateList).filter(CollUtil::isNotEmpty).map(u -> u.stream().map(TbWarnThresholdConfig::getId).toList())
                     .ifPresent(u -> this.update(new LambdaUpdateWrapper<TbWarnThresholdConfig>()
                             .in(TbWarnThresholdConfig::getId, u).set(TbWarnThresholdConfig::getEnable, enable)
-                            .set(TbWarnThresholdConfig::getUpdateTime, userID).set(TbWarnThresholdConfig::getUpdateTime, updateTime)));
+                            .set(TbWarnThresholdConfig::getUpdateUserID, userID).set(TbWarnThresholdConfig::getUpdateTime, updateTime)));
         });
     }
 }

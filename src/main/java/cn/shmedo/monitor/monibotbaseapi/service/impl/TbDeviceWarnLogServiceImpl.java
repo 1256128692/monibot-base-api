@@ -179,6 +179,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                 wrapper.and(wr -> wr.like(TbDeviceWarnLog::getDeviceSerial, u));
             }
         });
+        Optional.ofNullable(param.getProjectID()).ifPresent(u -> wrapper.eq(TbDeviceWarnLog::getProjectID, u));
         Optional.ofNullable(param.getStartTime()).ifPresent(u -> wrapper.ge(TbDeviceWarnLog::getWarnTime, u));
         Optional.ofNullable(param.getEndTime()).ifPresent(u -> wrapper.le(TbDeviceWarnLog::getWarnTime, u));
         Optional.ofNullable(param.getDealStatus()).ifPresent(u -> wrapper.eq(TbDeviceWarnLog::getDealStatus, u));
