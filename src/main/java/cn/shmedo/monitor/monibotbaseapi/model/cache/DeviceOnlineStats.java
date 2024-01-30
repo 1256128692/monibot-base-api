@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DeviceOnlineStats {
 
+    private Integer projectID;
     private Long count;
     private Long online;
     private Long offline;

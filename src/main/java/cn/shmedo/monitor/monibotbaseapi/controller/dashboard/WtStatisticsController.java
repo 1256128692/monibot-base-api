@@ -4,6 +4,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsByProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
@@ -23,11 +24,11 @@ public class WtStatisticsController {
     private final WtStatisticsService wtStatisticsService;
 
     /**
-     * @api {POST} /ReservoirWarnStatistics 实时报警统计
+     * @api {POST} /ReservoirWarnStatistics 实时报警统计(按监测类型分类)
      * @apiVersion 1.0.0
      * @apiGroup 水库大屏统计模块
      * @apiName ReservoirWarnStatistics
-     * @apiDescription 实时报警统计
+     * @apiDescription 实时报警统计，统计监测类型下各等级报警监测点数量
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [platform] 平台id
@@ -44,7 +45,7 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} overview.level4 等级4数量
      * @apiSuccess (返回结果) {Int} overview.offline 离线报警数量
      * @apiSuccess (返回结果) {Object[]} monitorType 监测类型分类信息
-     * @apiSuccess (返回结果) {Int} monitorType.monitorType 监测点id
+     * @apiSuccess (返回结果) {Int} monitorType.monitorType 监测类型
      * @apiSuccess (返回结果) {String} monitorType.typeName 监测类型名称
      * @apiSuccess (返回结果) {Object} monitorType.detail 报警统计信息
      * @apiSuccess (返回结果) {Int} monitorType.detail.level1 等级1数量
@@ -59,10 +60,49 @@ public class WtStatisticsController {
      */
     @Permission(permissionName = "mdmbase:DescribeWtStatistics")
     @PostMapping("ReservoirWarnStatistics")
-    public Object queryWarnStats(@Valid @RequestBody QueryReservoirWarnStatsParam param) {
+    public Object queryWarnStatsByMonitorType(@Valid @RequestBody QueryReservoirWarnStatsParam param) {
         return wtStatisticsService.queryWarnStats(param);
     }
 
+    /**
+     * @api {POST} /ReservoirWarnStatisticsByProject 实时报警统计(按工程项目分类)
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName ReservoirWarnStatisticsByProject
+     * @apiDescription 实时报警统计，统计项目下各等级报警监测点数量
+     * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int} [platform] 平台id
+     * @apiSuccess (返回结果) {Object} dict 等级字典
+     * @apiSuccess (返回结果) {String} dict.level1 等级1名称
+     * @apiSuccess (返回结果) {String} dict.level2 等级2名称
+     * @apiSuccess (返回结果) {String} dict.level3 等级3名称
+     * @apiSuccess (返回结果) {String} dict.level4 等级4名称
+     * @apiSuccess (返回结果) {String} dict.offline 离线报警
+     * @apiSuccess (返回结果) {Object} overview 总览
+     * @apiSuccess (返回结果) {Int} overview.level1 等级1数量
+     * @apiSuccess (返回结果) {Int} overview.level2 等级2数量
+     * @apiSuccess (返回结果) {Int} overview.level3 等级3数量
+     * @apiSuccess (返回结果) {Int} overview.level4 等级4数量
+     * @apiSuccess (返回结果) {Int} overview.offline 离线报警数量
+     * @apiSuccess (返回结果) {Object[]} project 监测类型分类信息
+     * @apiSuccess (返回结果) {Int} project.id 工程id
+     * @apiSuccess (返回结果) {String} project.projectName 工程名称
+     * @apiSuccess (返回结果) {Object} project.detail 报警统计信息
+     * @apiSuccess (返回结果) {Int} project.detail.level1 等级1数量
+     * @apiSuccess (返回结果) {Int} project.detail.level2 等级2数量
+     * @apiSuccess (返回结果) {Int} project.detail.level3 等级3数量
+     * @apiSuccess (返回结果) {Int} project.detail.level4 等级4数量
+     * @apiSuccess (返回结果) {Int} project.detail.offline 离线报警数量
+     * @apiSuccessExample {json} Success-Response
+     * {"dict": {"level1": "红色报警","level2": "橙色报警","level3": "黄色报警","level4": "蓝色报警","offline": "离线报警"},"overview": {"level1": 12,"level2": 1,"level3": 1,"level4": 0,"offline": 47},"project": [{"id": 2,"projectName": "测试项目","detail": {"level1": 0,"level2": 0,"level3": 0,"level4": 0,"offline": 5}}]}
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:DescribeWtStatistics")
+    @PostMapping("ReservoirWarnStatisticsByProject")
+    public Object queryWarnStatsByProject(@Valid @RequestBody QueryReservoirWarnStatsByProjectParam param) {
+        return wtStatisticsService.queryWarnStatsByProject(param);
+    }
 
     /**
      * @api {Get} /CacheReservoirWarnStatistics 缓存实时报警统计数据

@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.dashboard;
 
-import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.ParameterValidator;
 import cn.shmedo.iot.entity.api.Resource;
@@ -8,11 +7,9 @@ import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
-import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectServiceRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectServiceRelation;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -21,23 +18,21 @@ import lombok.Data;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * @author Chengfs on 2024/1/25
+ * @author Chengfs on 2024/1/30
  */
 @Data
-public class QueryReservoirWarnStatsParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class QueryReservoirWarnStatsByProjectParam implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
     @NotNull
     @Positive
     private Integer companyID;
 
     @Positive
-    private Integer projectID;
-
-    @Positive
+    @NotNull
     private Integer platform;
 
     @JsonIgnore
@@ -45,26 +40,11 @@ public class QueryReservoirWarnStatsParam implements ParameterValidator, Resourc
 
     @Override
     public ResultWrapper<?> validate() {
-        if (platform != null)  {
-            TbProjectServiceRelationMapper relationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
-            LambdaQueryWrapper<TbProjectServiceRelation> query = Wrappers.<TbProjectServiceRelation>lambdaQuery()
-                    .eq(TbProjectServiceRelation::getServiceID, platform);
-            Optional.ofNullable(projectID).ifPresent(pid -> query.eq(TbProjectServiceRelation::getProjectID, pid));
-
-            this.projects = relationMapper.selectList(query)
-                    .stream().map(TbProjectServiceRelation::getProjectID).collect(Collectors.toSet());
-
-            Optional.ofNullable(projectID).ifPresent(pid -> Assert.isTrue(projects.contains(pid),
-                    () -> new InvalidParameterException("项目 " + pid + " 不属于平台" + platform)));
-
-            if (projects.isEmpty()) {
-                return null;
-            }
-        } else if (projectID != null) {
-            this.projects = List.of(projectID);
-        }
-
-        projects = PermissionUtil.getHavePermissionProjectList(companyID, projects);
+        TbProjectServiceRelationMapper relationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
+        Set<Integer> platformProjectIds = relationMapper.selectList(Wrappers.<TbProjectServiceRelation>lambdaQuery()
+                        .eq(TbProjectServiceRelation::getServiceID, platform))
+                .stream().map(TbProjectServiceRelation::getProjectID).collect(Collectors.toSet());
+        this.projects = PermissionUtil.getHavePermissionProjectList(companyID, platformProjectIds);
         return null;
     }
 

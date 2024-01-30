@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class WarnPointStats {
 
+    private Integer projectID;
     private Integer level1;
     private Integer level2;
     private Integer level3;

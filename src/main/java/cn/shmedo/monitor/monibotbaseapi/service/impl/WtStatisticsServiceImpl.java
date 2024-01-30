@@ -13,6 +13,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineStats;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot;
@@ -20,11 +21,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.wtstats.WarnPointStats;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsByProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.DeviceOnlineStatsResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirNewSensorDataResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsByProjectResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4;
@@ -66,38 +69,18 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private final IotService iotService;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final SensorDataDao sensorDataDao;
-    private final RedisService redisService;
+
     @Override
     public ReservoirWarnStatsResponse queryWarnStats(QueryReservoirWarnStatsParam param) {
-        WarnTag warnTag = WarnTag.TYPE1;
-        WarnLevelStyle style = WarnLevelStyle.COLOR;
-        int levelNum = 4;
-        if (param.getPlatform() != null) {
-            TbWarnBaseConfig config = warnBaseConfigMapper.selectOne(Wrappers.<TbWarnBaseConfig>lambdaQuery()
-                    .eq(TbWarnBaseConfig::getPlatform, param.getPlatform())
-                    .eq(TbWarnBaseConfig::getCompanyID, param.getCompanyID()));
-
-            if (config != null) {
-                warnTag = WarnTag.fromCode(config.getWarnTag());
-                style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
-                levelNum = config.getWarnLevelType() == 1 ? 4 : 3;
-            }
+        Map<String, Object> dict = getWarnDict(param.getCompanyID(), param.getPlatform());
+        if (param.getProjects().isEmpty()) {
+            return new ReservoirWarnStatsResponse(dict, Item.empty(), List.of());
         }
-        String[] split = style.getDesc().split(StrUtil.COMMA);
-        final String tag = warnTag.getDesc();
-        Map<String, Object> dict = new HashMap<>(4);
-        dict.put("offline", "离线" + tag);
-        IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
 
         List<WarnPointStats> data = param.getProjects().stream()
                 .flatMap(e -> monitorRedisService.getAll(WARN_POINT_STATS + e, WarnPointStats.class)
                         .values().stream()).toList();
-
         Item overview = Item.from(data);
-
-        if (data.isEmpty()) {
-            return new ReservoirWarnStatsResponse(dict, overview, List.of());
-        }
 
         Map<Integer, String> monitorTypeMap = monitorTypeMapper.selectList(Wrappers.<TbMonitorType>lambdaQuery()
                         .in(TbMonitorType::getMonitorType, data.stream().map(WarnPointStats::getMonitorType).distinct().toList())
@@ -146,7 +129,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                                         offline++;
                                     }
                                 }
-                                WarnPointStats cacheObj = new WarnPointStats(level1, level2, level3, level4,
+                                WarnPointStats cacheObj = new WarnPointStats(entry.getKey(), level1, level2, level3, level4,
                                         offline, typeGroup.getKey());
                                 return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
                             });
@@ -213,7 +196,8 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                                         .map(e -> onlineMap.getOrDefault(e, Boolean.FALSE))
                                         .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
-                                DeviceOnlineStats cacheObj = new DeviceOnlineStats(collect.getOrDefault(Boolean.TRUE, 0L),
+                                DeviceOnlineStats cacheObj = new DeviceOnlineStats(entry.getKey(),
+                                        collect.getOrDefault(Boolean.TRUE, 0L),
                                         collect.getOrDefault(Boolean.TRUE, 0L),
                                         collect.values().stream().mapToLong(e -> e).count(), typeGroup.getKey());
                                 return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
@@ -275,20 +259,48 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
             }
         }
 
-        if (StringUtils.isNotBlank(tbProjectInfo.getLocation())){
+        if (StringUtils.isNotBlank(tbProjectInfo.getLocation())) {
             if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {
                 JSONObject json = JSONUtil.parseObj(tbProjectInfo.getLocation());
                 tbProjectInfo.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
             }
         }
         Collection<Object> areas = List.of(tbProjectInfo.getLocation());
-        Map<String, String> areaMap = redisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+        Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
                 .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
 
         return ReservoirNewSensorDataResponse.toNewVo(tbProjectInfo,
                 tbProjectProperties, resultList, areaMap.get(tbProjectInfo.getLocation()));
     }
 
+    @Override
+    public ReservoirWarnStatsByProjectResponse queryWarnStatsByProject(QueryReservoirWarnStatsByProjectParam param) {
+
+        Map<String, Object> dict = getWarnDict(param.getCompanyID(), param.getPlatform());
+        if (param.getProjects().isEmpty()) {
+            return new ReservoirWarnStatsByProjectResponse(dict, ReservoirWarnStatsByProjectResponse.Item.empty(), List.of());
+        }
+
+        Map<Integer, List<WarnPointStats>> dataMap = param.getProjects().stream()
+                .flatMap(e -> monitorRedisService.getAll(WARN_POINT_STATS + e, WarnPointStats.class)
+                        .values().stream()).toList()
+                .stream().collect(Collectors.groupingBy(WarnPointStats::getProjectID));
+
+        Map<Integer, String> projectMap = monitorRedisService.multiGet(RedisKeys.PROJECT_KEY,
+                        param.getProjects().stream().map(Object::toString).collect(Collectors.toList()), ProjectInfoCache.class)
+                .stream().collect(Collectors.toMap(TbProjectInfo::getID, TbProjectInfo::getProjectName));
+
+        ReservoirWarnStatsByProjectResponse.Item overview = ReservoirWarnStatsByProjectResponse.Item
+                .from(dataMap.values().stream().flatMap(Collection::stream).toList());
+        List<ReservoirWarnStatsByProjectResponse.Project> projects = projectMap.entrySet().stream()
+                .map(project -> {
+                    String projectName = project.getValue();
+                    List<WarnPointStats> list = dataMap.getOrDefault(project.getKey(), List.of());
+                    return new ReservoirWarnStatsByProjectResponse.Project(project.getKey(), projectName,
+                            ReservoirWarnStatsByProjectResponse.Item.from(list));
+                }).toList();
+        return new ReservoirWarnStatsByProjectResponse(dict, overview, projects);
+    }
 
 
     /**
@@ -307,5 +319,28 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
             fieldSelectInfos.add(fieldSelectInfo);
         });
         return fieldSelectInfos;
+    }
+
+    protected Map<String, Object> getWarnDict(Integer companyID, Integer platform) {
+        WarnTag warnTag = WarnTag.TYPE1;
+        WarnLevelStyle style = WarnLevelStyle.COLOR;
+        int levelNum = 4;
+        if (platform != null) {
+            TbWarnBaseConfig config = warnBaseConfigMapper.selectOne(Wrappers.<TbWarnBaseConfig>lambdaQuery()
+                    .eq(TbWarnBaseConfig::getPlatform, platform)
+                    .eq(TbWarnBaseConfig::getCompanyID, companyID));
+
+            if (config != null) {
+                warnTag = WarnTag.fromCode(config.getWarnTag());
+                style = WarnLevelStyle.fromCode(config.getWarnLevelStyle());
+                levelNum = config.getWarnLevelType() == 1 ? 4 : 3;
+            }
+        }
+        String[] split = style.getDesc().split(StrUtil.COMMA);
+        final String tag = warnTag.getDesc();
+        Map<String, Object> dict = new HashMap<>(4);
+        dict.put("offline", "离线" + tag);
+        IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
+        return dict;
     }
 }

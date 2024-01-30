@@ -10,16 +10,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Chengfs on 2024/1/25
+ * @author Chengfs on 2024/1/30
  */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ReservoirWarnStatsResponse {
+public class ReservoirWarnStatsByProjectResponse {
 
     private Map<String, Object> dict;
     private Item overview;
-    private List<MonitorType> monitorType;
+    private List<Project> project;
 
     public record Item(Integer level1, Integer level2, Integer level3, Integer level4, Integer offline) {
 
@@ -36,6 +36,6 @@ public class ReservoirWarnStatsResponse {
         }
     }
 
-    public record MonitorType(Integer monitorType, String typeName, Item detail) {
+    public record Project(Integer id, String projectName, Item detail) {
     }
 }
