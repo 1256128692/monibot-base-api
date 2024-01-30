@@ -185,6 +185,7 @@ public class WarnLogController {
      * @apiSuccess (返回结果) {Object} map 包含报警标签等数据,格式为:{"warnTag":1,"warnLevelType":1,"warnLevelStyle":1}
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.id 报警记录ID
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (返回结果) {String} currentPageData.warnName 报警名称
      * @apiSuccess (返回结果) {Int} [currentPageData.workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [currentPageData.dealContent] 处理意见,若未填报为null
@@ -230,6 +231,7 @@ public class WarnLogController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} warnLogID 报警记录ID
      * @apiSuccess (返回结果) {Int} id 报警记录ID
+     * @apiSuccess (返回结果) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {String} warnName 报警名称
      * @apiSuccess (返回结果) {Int} [workOrderID] 工单ID,若未派发为null
      * @apiSuccess (返回结果) {String} [dealContent] 处理意见,若未填报为null

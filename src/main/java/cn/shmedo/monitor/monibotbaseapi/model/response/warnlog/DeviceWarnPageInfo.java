@@ -33,6 +33,5 @@ public class DeviceWarnPageInfo {
     private List<DeviceProjectInfo> projectList;
     @JsonIgnore
     private String uniqueToken;
-    @JsonIgnore
     private Integer projectID;
 }
