@@ -58,12 +58,13 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
         WarnThresholdConfigListInfo info = new WarnThresholdConfigListInfo();
         BeanUtil.copyProperties(tbWarnBaseConfig, info);
         List<WarnThresholdMonitorPointInfo> dataList = this.baseMapper.selectWarnThresholdConfigList(param)
-                .stream().peek(u -> u.getSensorList().stream().peek(w -> w.getFieldList().stream().peek(s -> {
+                .stream().peek(u -> u.getSensorList().stream().peek(w -> w.setFieldList(w.getFieldList().stream().peek(s -> {
                     if (Objects.isNull(s.getConfigID())) {
                         s.setWarnName(s.getFieldName() + "异常");
                         s.setCompareMode(CompareMode.GT.getCode());
                     }
-                }).toList()).toList()).toList();
+                }).sorted(Comparator.comparing(WarnFieldThresholdConfigInfo::getDisplayOrder, Comparator.nullsLast(Integer::compareTo))
+                        .thenComparing(WarnFieldThresholdConfigInfo::getFieldID, Integer::compareTo)).toList())).toList()).toList();
         final Boolean status = param.getStatus();
         if (Objects.nonNull(status)) {
             final Function<String, Boolean> func = value -> {
@@ -75,8 +76,8 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
                     return false;
                 }
             };
-            dataList.stream().peek(u -> u.getSensorList().stream().peek(w -> w.setFieldList(
-                    w.getFieldList().stream().filter(s -> func.apply(s.getValue())).toList())).toList()).toList();
+            dataList.stream().peek(u -> u.getSensorList().stream().peek(w -> w.setFieldList(w.getFieldList().stream()
+                    .filter(s -> func.apply(s.getValue())).toList())).toList()).toList();
         }
         info.setDataList(dataList);
         return info;

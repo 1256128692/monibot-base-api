@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 /**
@@ -11,6 +12,8 @@ public class WarnFieldThresholdConfigInfo {
     private Integer fieldID;
     private String fieldName;
     private String fieldToken;
+    @JsonIgnore
+    private Integer displayOrder;
     private Integer configID;
     private String warnName;
     private Integer compareMode;

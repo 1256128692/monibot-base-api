@@ -12,6 +12,7 @@
                 <id column="fieldID" jdbcType="INTEGER" property="fieldID"/>
                 <result column="fieldName" jdbcType="VARCHAR" property="fieldName"/>
                 <result column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+                <result column="displayOrder" jdbcType="VARCHAR" property="displayOrder"/>
                 <result column="configID" jdbcType="INTEGER" property="configID"/>
                 <result column="warnName" jdbcType="VARCHAR" property="warnName"/>
                 <result column="compareMode" jdbcType="INTEGER" property="compareMode"/>
@@ -81,6 +82,7 @@
             mtf.`ID` fieldID,
             mtf.`FieldName` fieldName,
             mtf.`FieldToken` fieldToken,
+            mtf.DisplayOrder displayOrder,
             wtc.`ID` configID,
             wtc.`WarnName` warnName,
             wtc.`CompareMode` compareMode,
