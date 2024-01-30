@@ -73,7 +73,7 @@ public class DeviceServiceImpl implements IDeviceService {
                                 if (!CollectionUtil.isNullOrEmpty(platformIDList)) {
                                     platformIDList.forEach(p -> {
                                         TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream().filter(deviceWarn ->
-                                                        deviceWarn.getDeviceSerial().equals(device.getDeviceToken())
+                                                        deviceWarn.getDeviceToken().equals(device.getDeviceToken())
                                                                 && deviceWarn.getPlatform().equals(p)
                                                                 && deviceWarn.getProjectID().equals(Integer.valueOf(serviceID))
                                                                 && deviceWarn.getWarnEndTime() == null)
@@ -81,7 +81,7 @@ public class DeviceServiceImpl implements IDeviceService {
                                         tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
                                                 projectWithServiceInfo.getCompanyID(), p,
                                                 projectWithServiceInfo.getID(), DateUtil.date(), device.getProductName(),
-                                                device.getDeviceToken(), device.getDeviceToken(), projectWithServiceInfo.getProjectName(),
+                                                device.getDeviceToken(), device.getDeviceToken(), projectWithServiceInfo.getProjectName(), 
                                                 "IoT设备", tbDeviceWarnLog, device.getOnlineStatus()));
                                     });
                                 }
