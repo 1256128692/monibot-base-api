@@ -18,5 +18,5 @@ public class SensorWithDataSourceInfo {
 
     private String uniqueToken;
 
-    private Boolean onlineStatus;
+    private Integer onlineStatus;
 }

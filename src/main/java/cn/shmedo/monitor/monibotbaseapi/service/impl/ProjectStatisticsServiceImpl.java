@@ -384,7 +384,11 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                 sensorWithDataSourceInfoList.forEach(s -> {
                     DeviceInfo deviceInfo = result.getData().stream().filter(r -> r.getUniqueToken().equals(s.getUniqueToken())).findFirst().orElse(null);
                     if (deviceInfo != null && deviceInfo.getOnline() != null) {
-                        s.setOnlineStatus(deviceInfo.getOnline());
+                        if (deviceInfo.getOnline()) {
+                            s.setOnlineStatus(1);
+                        } else {
+                            s.setOnlineStatus(0);
+                        }
                     }
                 });
 
