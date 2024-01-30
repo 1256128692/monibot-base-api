@@ -132,4 +132,9 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     List<SensorBaseInfoV4> selectListByCondition(Integer projectID, List<Integer> monitorItemIDList, String monitorPointName);
 
     List<SensorWithIot> listSensorWithIot();
+
+    /**
+     * 自动根据数据预警更新传感器状态
+     */
+    Integer autoUpdateStatusById(Integer id);
 }

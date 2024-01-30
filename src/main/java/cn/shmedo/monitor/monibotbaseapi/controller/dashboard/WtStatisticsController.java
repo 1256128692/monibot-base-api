@@ -84,7 +84,7 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} overview.level3 等级3数量
      * @apiSuccess (返回结果) {Int} overview.level4 等级4数量
      * @apiSuccess (返回结果) {Int} overview.offline 离线报警数量
-     * @apiSuccess (返回结果) {Object[]} project 监测类型分类信息
+     * @apiSuccess (返回结果) {Object[]} project 工程项目分类信息
      * @apiSuccess (返回结果) {Int} project.id 工程id
      * @apiSuccess (返回结果) {String} project.projectName 工程名称
      * @apiSuccess (返回结果) {Object} project.detail 报警统计信息

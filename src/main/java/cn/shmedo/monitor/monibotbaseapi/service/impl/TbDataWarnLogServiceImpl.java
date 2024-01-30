@@ -21,14 +21,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigClearDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorStatusDesc;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.CancelDataWarnParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDataWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDataWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.ThresholdBaseConfigFieldInfo;
@@ -94,7 +93,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                     .set(TbDataWarnLog::getDataStatus, 0)
                     .set(TbDataWarnLog::getWarnEndTime, param.getWarnTime()));
 
-            sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.NORMAL);
+            sensorMapper.autoUpdateStatusById(param.getSensorID());
             return;
         }
 
@@ -192,7 +191,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         history.setWarnTime(warnLog.getWarnTime());
         this.historyMapper.insertOrUpdate(history);
         //更新传感器状态
-        sensorMapper.updateStatusById(param.getSensorID(), SensorStatusDesc.getByWarnLevel(param.getWarnLevel()));
+        sensorMapper.autoUpdateStatusById(param.getSensorID());
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
