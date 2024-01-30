@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryDepartmentIncludeUserInfoListParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
@@ -19,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyCo
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryWarnNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.DepartmentIncludeUserInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DataWarnConfigInfo;
@@ -186,26 +188,14 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     private void setWarnNotifyConfigUserInfo(WarnNotifyConfigInfo info, final Integer companyID) {
         Map<Integer, UserNoPageInfo.TbUserEx> userMap = new HashMap<>();
         Map<Integer, Map<Integer, UserNoPageInfo.TbUserEx>> deptIDUsersMap = new HashMap<>();
-
         fillUserAndDeptMap(info.getDeviceWarnList(), userMap, deptIDUsersMap);
         fillUserAndDeptMap(info.getDataWarnList(), userMap, deptIDUsersMap);
 
-        // get user and dept info then
-        Optional.of(deptIDUsersMap).filter(CollUtil::isNotEmpty).map(u -> {
-                    QueryUserInDeptListNoPageParam userNoPageParam = new QueryUserInDeptListNoPageParam();
-                    userNoPageParam.setCompanyID(companyID);
-                    userNoPageParam.setFollowChildDept(true);
-                    userNoPageParam.setDeptIDList(new ArrayList<>(u.keySet()));
-                    return userNoPageParam;
-                }).map(u -> userService.queryUserInDeptListNoPage(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
-                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u -> {
-                    u.stream().peek(w -> {
-                        UserNoPageInfo.TbUserEx user = w.getUser();
-                        w.getDepartments().stream().peek(s -> Optional.ofNullable(deptIDUsersMap.get(s.getId()))
-                                .ifPresent(n -> n.putIfAbsent(user.getUserID(), user))).toList();
-                    }).toList();
-                    u.stream().map(UserNoPageInfo::getUser).peek(w -> userMap.putIfAbsent(w.getUserID(), w)).toList();
-                });
+        List<DepartmentIncludeUserInfo.DeptResponse> deptResponseList = Optional.of(deptIDUsersMap).filter(CollUtil::isNotEmpty)
+                .map(u -> new QueryDepartmentIncludeUserInfoListParameter(companyID, null, 3, null))
+                .map(u -> userService.queryDepartmentIncludeUserInfoList(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
+                .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).map(DepartmentIncludeUserInfo::getDepts)
+                .orElse(List.of());
         Optional.of(userMap.keySet()).filter(CollUtil::isNotEmpty).map(u -> {
                     QueryUserInDeptListNoPageParam userNoPageParam = new QueryUserInDeptListNoPageParam();
                     userNoPageParam.setCompanyID(companyID);
@@ -215,7 +205,7 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
                 }).map(u -> userService.queryUserInDeptListNoPage(u, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret()))
                 .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).ifPresent(u ->
                         u.stream().map(UserNoPageInfo::getUser).peek(w -> userMap.putIfAbsent(w.getUserID(), w)).toList());
-        info.setUserName(companyID, userMap, deptIDUsersMap);
+        info.setUserName(companyID, userMap, deptResponseList);
     }
 
     /**
