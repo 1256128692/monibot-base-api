@@ -174,6 +174,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setKind(isManual ? SensorKindEnum.MANUAL_KIND.getCode() : SensorKindEnum.AUTO_KIND.getCode());
         sensor.setConfigFieldValue(request.getConfigFieldValue());
         sensor.setDisplayOrder(0);
+        sensor.setOnlineStatus(isManual? 1: null);
         sensor.setCreateUserID(subject.getSubjectID());
         sensor.setUpdateUserID(subject.getSubjectID());
         if (StrUtil.isNotBlank(request.getImagePath())) {
