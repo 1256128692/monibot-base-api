@@ -80,8 +80,11 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         List<WarnPointStats> data = param.getProjects().stream()
                 .flatMap(e -> monitorRedisService.getAll(WARN_POINT_STATS + e, WarnPointStats.class)
                         .values().stream()).toList();
-        Item overview = Item.from(data);
+        if (data.isEmpty()) {
+            return new ReservoirWarnStatsResponse(dict, Item.empty(), List.of());
+        }
 
+        Item overview = Item.from(data);
         Map<Integer, String> monitorTypeMap = monitorTypeMapper.selectList(Wrappers.<TbMonitorType>lambdaQuery()
                         .in(TbMonitorType::getMonitorType, data.stream().map(WarnPointStats::getMonitorType).distinct().toList())
                         .select(TbMonitorType::getMonitorType, TbMonitorType::getTypeName)).stream()
@@ -142,7 +145,8 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     public DeviceOnlineStatsResponse queryDeviceOnlineStats(QueryDeviceOnlineStatsParam param) {
         List<DeviceOnlineStats> data = param.getProjects().stream()
                 .flatMap(e -> monitorRedisService.getAll(DEVICE_ONLINE_STATS + e, DeviceOnlineStats.class)
-                        .values().stream()).toList();
+                        .values().stream())
+                .filter(e -> e != null && e.getMonitorType() != null).toList();
 
         DeviceOnlineStatsResponse result = new DeviceOnlineStatsResponse();
         result.setCount(data.stream().mapToLong(DeviceOnlineStats::getCount).sum());

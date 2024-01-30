@@ -1065,13 +1065,13 @@
 
     <select id="autoUpdateStatusById" resultType="java.lang.Integer">
         UPDATE `tb_sensor`
-        SET `Status` = IFNULL(SELECT WarnLevel
-                              FROM `tb_warn_threshold_config` twtc
-                              LEFT JOIN `tb_data_warn_log` tdwl ON tdwl.WarnThresholdID = twtc.ID
-                              WHERE twtc.SensorID = #{id}
-                              ORDER BY WarnTime DESC,
-                              WarnLevel ASC
-                              LIMIT 1, 0)
+        SET `Status` = IFNULL((SELECT WarnLevel
+                               FROM `tb_warn_threshold_config` twtc
+                                        LEFT JOIN `tb_data_warn_log` tdwl ON tdwl.WarnThresholdID = twtc.ID
+                               WHERE twtc.SensorID = #{id}
+                               ORDER BY WarnTime DESC,
+                                        WarnLevel ASC
+                               LIMIT 1), 0)
         WHERE `ID` = #{id}
     </select>
 </mapper>
