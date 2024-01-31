@@ -33,7 +33,7 @@ public class UpdateWarnNotifyConfigParam extends QueryWarnNotifyConfigDetailPara
     private Boolean allProject;
     private List<Integer> projectIDList;
     private List<Integer> warnLevel;
-    private List<@Valid @Range(min = 1, max = 2, message = "通知方式(多选),枚举值: 1.平台消息 2.短信") Integer> notifyMethod;
+    private List<@Valid @Range(min = 1, max = 3, message = "通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件") Integer> notifyMethod;
     private List<Integer> deptList;
     private List<Integer> userList;
     private List<Integer> roleList;

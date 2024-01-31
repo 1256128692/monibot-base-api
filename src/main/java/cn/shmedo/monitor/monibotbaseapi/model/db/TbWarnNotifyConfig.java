@@ -45,7 +45,7 @@ public class TbWarnNotifyConfig {
     @TableField("WarnLevel")
     private String warnLevel;
     /**
-     * 通知方式(多选), 1.平台消息 2.短信
+     * 通知方式(多选), 1.平台消息 2.短信 3.邮件
      */
     @TableField("NotifyMethod")
     private String notifyMethod;

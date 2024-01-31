@@ -105,7 +105,7 @@ public class WarnConfigController {
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
      * @apiSuccess (返回结果) {Object[]} deviceWarnList 设备报警通知配置列表
      * @apiSuccess (返回结果) {Int} deviceWarnList.id 设备报警通知配置ID
-     * @apiSuccess (返回结果) {Int[]} [deviceWarnList.notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiSuccess (返回结果) {Int[]} [deviceWarnList.notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件
      * @apiSuccess (返回结果) {Boolean} deviceWarnList.allProject 是否是全部工程 true:是; false: 否
      * @apiSuccess (返回结果) {Object[]} [deviceWarnList.projectList] 关联工程List,关联全部工程时,该项为null
      * @apiSuccess (返回结果) {Int} deviceWarnList.projectList.projectID 工程ID
@@ -119,7 +119,7 @@ public class WarnConfigController {
      * @apiSuccess (返回结果) {String} deviceWarnList.externalList.userName 用户名
      * @apiSuccess (返回结果) {Object[]} dataWarnList 数据报警通知配置列表
      * @apiSuccess (返回结果) {Int} dataWarnList.id 数据报警通知配置ID
-     * @apiSuccess (返回结果) {Int[]} [dataWarnList.notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiSuccess (返回结果) {Int[]} [dataWarnList.notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件
      * @apiSuccess (返回结果) {Boolean} dataWarnList.allProject 是否是全部工程 true:是; false: 否
      * @apiSuccess (返回结果) {Object[]} [dataWarnList.projectList] 关联工程List,关联全部工程时,该项为null
      * @apiSuccess (返回结果) {Int} dataWarnList.projectList.projectID 工程ID
@@ -153,7 +153,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Boolean} [allProject] 是否是全部工程,默认false true:全部工程,false:指定工程
      * @apiParam (请求参数) {Int[]} [projectIDList] 工程ID list,若allProject参数为true时,该项值将被忽略
      * @apiParam (请求参数) {Int} notifyType 通知配置类型 1.设备报警通知 2.数据报警通知
-     * @apiParam (请求参数) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiParam (请求参数) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件
      * @apiParam (请求参数) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口,仅noticeType==2时有该项
      * @apiParam (请求参数) {Int[]} [deptList] 选中的部门
      * @apiParam (请求参数) {Int[]} [userList] 选中的用户
@@ -186,7 +186,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int} platform 平台key
      * @apiParam (请求参数) {Int} notifyConfigID 报警通知配置ID
      * @apiSuccess (返回结果) {Boolean} allProject 是否是全部工程, true:全部工程,false:指定工程
-     * @apiSuccess (返回结果) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiSuccess (返回结果) {Int[]} notifyMethod 通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件
      * @apiSuccess (返回结果) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口,仅noticeType==2时有该项
      * @apiSuccess (返回结果) {Int[]} projectIDList 工程ID list
      * @apiSuccess (返回结果) {Int[]} deptIDList 部门IDList
@@ -213,7 +213,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Boolean} [allProject] 是否是全部工程 true:全部工程,false:指定工程
      * @apiParam (请求参数) {Int[]} [projectIDList] 工程ID list,当allProject参数为true,该项值将被忽略
      * @apiParam (请求参数) {Int[]} [warnLevel] 报警等级枚举key(多选),枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口,仅noticeType==2时有该项
-     * @apiParam (请求参数) {Int[]} [notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信
+     * @apiParam (请求参数) {Int[]} [notifyMethod] 通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件
      * @apiParam (请求参数) {Int[]} [deptList] 选中的部门(如果数据不变,需要将之前的数据传过来)
      * @apiParam (请求参数) {Int[]} [userList] 选中的用户(如果数据不变,需要将之前的数据传过来)
      * @apiParam (请求参数) {Int[]} [roleList] 选中的角色,目前暂不支持添加角色

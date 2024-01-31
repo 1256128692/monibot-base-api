@@ -38,7 +38,7 @@ public class AddWarnNotifyConfigParam extends CompanyPlatformParam implements IN
     @Range(min = 1, max = 2, message = "通知配置类型 1.设备报警通知 2.数据报警通知")
     private Integer notifyType;
     @NotEmpty(message = "通知方式不能为空")
-    private List<@Valid @Range(min = 1, max = 2, message = "通知方式(多选),枚举值: 1.平台消息 2.短信") Integer> notifyMethod;
+    private List<@Valid @Range(min = 1, max = 3, message = "通知方式(多选),枚举值: 1.平台消息 2.短信 3.邮件") Integer> notifyMethod;
     private List<Integer> warnLevel;
     private List<Integer> deptList;
     private List<Integer> userList;

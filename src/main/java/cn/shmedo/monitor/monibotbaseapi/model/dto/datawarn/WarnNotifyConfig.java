@@ -25,7 +25,7 @@ public class WarnNotifyConfig {
 
     /**
      * 通知方式 <br/>
-     * 1.平台消息 2.短信
+     * 1.平台消息 2.短信 3.邮件
      */
     private List<Integer> methods;
 
