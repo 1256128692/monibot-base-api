@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn;
 
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import lombok.Data;
 
 import java.util.List;
@@ -19,9 +20,9 @@ public class WarnNotifyConfig {
 
     /**
      * 通知用户 联系方式<br/>
-     * t1: 用户id  t2: 手机号
+     * key: 用户id  value: {@link UserContact}
      */
-    private Map<Integer, String> contacts;
+    private Map<Integer, UserContact> contacts;
 
     /**
      * 通知方式 <br/>

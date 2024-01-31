@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigClearDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
@@ -67,6 +68,9 @@ import static cn.shmedo.monitor.monibotbaseapi.model.enums.DataWarnCase.*;
 public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, TbDataWarnLog> implements ITbDataWarnLogService {
 
     private static final String WARN_CONTENT_FORMAT = "{} 内 {} {} 发生 {} — {}，实测数据：{} {} {}，请关注！";
+    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n\n在 {} 中，我们监测到以下重要事件：\n\n" +
+            "时间：{}\n事件：{}\n级别：{}\n\n" +
+            "实测数据显示，当前 {} 已达到 {} {}，请务必密切关注并及时采取相应措施。\n\n感谢您的配合与支持！";
 
     private final TbWarnLevelAliasMapper tbWarnLevelAliasMapper;
     private final TbWarnThresholdConfigMapper thresholdConfigMapper;
@@ -243,10 +247,30 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         try {
                             boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME,
                                     fileConfig.getDataWarnTemplateCode(), paramMap,
-                                    notifyConfig.getContacts().values().toArray(String[]::new));
+                                    notifyConfig.getContacts().values().stream().map(UserContact::getCellphone)
+                                            .filter(Objects::nonNull).distinct().toArray(String[]::new));
                             Assert.isTrue(result);
                         } catch (Exception e) {
                             log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(),
+                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
+                        }
+                    }
+
+                    if (notifyConfig.getMethods().contains(3)) {
+                        // 邮件
+                        try {
+                            boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
+                                    true, () -> StrUtil.format(WARN_EMAIL_FORMAT, threshold.getMonitorPointName(),
+                                            DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
+                                            threshold.getWarnName(), param.getWarnLevelName(), threshold.getFieldName(),
+                                            param.getWarnValue().toString(),
+                                            Optional.ofNullable(threshold.getFieldUnitEng()).filter(e -> !e.isEmpty()).orElse(StrUtil.EMPTY)),
+                                    notifyConfig.getContacts().values()
+                                            .stream().map(UserContact::getEmail).filter(Objects::nonNull)
+                                            .toArray(String[]::new));
+                            Assert.isTrue(result);
+                        } catch (Exception e) {
+                            log.error("规则:{} 项目: {}, 平台: {} 数据报警邮件发送失败: {}", threshold.getId(),
                                     threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
                         }
                     }

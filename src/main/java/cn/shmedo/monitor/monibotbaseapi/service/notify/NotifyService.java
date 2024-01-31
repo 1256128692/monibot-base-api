@@ -47,12 +47,12 @@ public interface NotifyService {
     /**
      * 发送邮件通知
      *
-     * @param mailTag      企业id
-     * @param isHtml 内容提供器
-     * @param contentSupplier 内容提供器        目标用户id
-     * @param mailAddresses  目标邮箱
+     * @param mailTag         邮件标签
+     * @param isHtml          内容是否为html
+     * @param contentSupplier 内容提供器
+     * @param mailAddresses   目标邮箱
      * @return 是否成功
      */
-    boolean mailNotify(String mailTag, Boolean isHtml, Supplier<String> contentSupplier,
-                            @Nonnull String... mailAddresses);
+    boolean mailNotify(String mailTag, boolean isHtml, Supplier<String> contentSupplier,
+                       @Nonnull String... mailAddresses);
 }

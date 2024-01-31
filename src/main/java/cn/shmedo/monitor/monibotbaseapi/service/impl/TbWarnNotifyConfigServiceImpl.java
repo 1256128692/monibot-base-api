@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryDepartmentIncludeUserInfoListParameter;
@@ -127,7 +128,7 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
                                                         @Nonnull Integer notifyType) {
         TbWarnNotifyConfig config = baseMapper.queryByProjectIDAndPlatform(projectID, platform, notifyType);
         if (config != null) {
-            ResultWrapper<Map<Integer, String>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
+            ResultWrapper<Map<Integer, UserContact>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
                     .depts(JSONUtil.toList(config.getDepts(), Integer.class))
                     .roles(JSONUtil.toList(config.getRoles(), Integer.class))
                     .users(JSONUtil.toList(config.getUsers(), Integer.class))

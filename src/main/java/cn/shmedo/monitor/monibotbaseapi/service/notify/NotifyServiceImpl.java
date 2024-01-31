@@ -68,7 +68,7 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public boolean mailNotify(String mailTag, Boolean isHtml, Supplier<String> contentSupplier, @NotNull String... mailAddresses) {
+    public boolean mailNotify(String mailTag, boolean isHtml, Supplier<String> contentSupplier, @NotNull String... mailAddresses) {
         MailNotify param = MailNotify.builder().mailTag(mailTag)
                 .isHtml(isHtml)
                 .mailContent(contentSupplier.get())

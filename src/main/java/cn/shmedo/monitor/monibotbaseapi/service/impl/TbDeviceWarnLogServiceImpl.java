@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
@@ -94,7 +95,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                     //通知 (需要发送通知)
                     if (warnNotifyConfig.getNotifyMethod() != null) {
 
-                        ResultWrapper<Map<Integer, String>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
+                        ResultWrapper<Map<Integer, UserContact>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
                                 .depts(JSONUtil.toList(warnNotifyConfig.getDepts(), Integer.class))
                                 .roles(JSONUtil.toList(warnNotifyConfig.getRoles(), Integer.class))
                                 .users(JSONUtil.toList(warnNotifyConfig.getUsers(), Integer.class))
@@ -102,7 +103,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
                         // 短信推送
                         if (warnNotifyConfig.getNotifyMethod().contains("2")) {
-                            Map<Integer, String> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                            Map<Integer, UserContact> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
 
                             try {
                                 boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDeviceWarnTemplateCode(),
@@ -110,7 +111,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                                 "deviceModel", param.getDeviceSource(),
                                                 "time", param.getTime(),
                                                 "deviceType", param.getDeviceType(),
-                                                "deviceSn", param.getDeviceSerial()), phoneMap.values().toArray(String[]::new));
+                                                "deviceSn", param.getDeviceSerial()), phoneMap.values().stream().map(UserContact::getCellphone)
+                                                .filter(Objects::nonNull).distinct().toArray(String[]::new));
                                 assert result;
                             } catch (Exception e) {
                                 log.info("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
@@ -123,7 +125,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                             // 绑定通知ID与设备预警日志
                             final String warnName = "设备下线";
                             List<Integer> notifyIds = null;
-                            Map<Integer, String> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                            Map<Integer, UserContact> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
                             try {
                                 notifyIds = notifyService.sysNotify(param.getCompanyID(),
                                         () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
