@@ -13,6 +13,8 @@ public class SensorBaseInfoV4 {
 
     private Integer sensorID;
     private String sensorName;
+
+    private String configFieldValue;
     private Integer monitorPointID;
     private Integer monitorType;
     private String monitorPointName;

@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
@@ -343,6 +344,12 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                         s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
                     }
                 }
+                // 墒情单独处理
+                if (monitorType == 9) {
+                    if (StringUtils.isNotBlank(s.getConfigFieldValue())) {
+                        s.getSensorData().put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(s.getConfigFieldValue()).getByPath("$.埋深"));
+                    }
+                }
             });
 
         });
@@ -473,6 +480,12 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                     s.setSensorData(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).findFirst().orElse(null));
                     if (ObjectUtil.isNotNull(s.getSensorData())) {
                         s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
+                    }
+                }
+                // 墒情单独处理
+                if (monitorType == 9) {
+                    if (StringUtils.isNotBlank(s.getConfigFieldValue())) {
+                        s.getSensorData().put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(s.getConfigFieldValue()).getByPath("$.埋深"));
                     }
                 }
             });

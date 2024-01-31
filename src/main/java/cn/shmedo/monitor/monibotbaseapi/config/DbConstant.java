@@ -22,7 +22,7 @@ public class DbConstant {
 
     public static final String SENSOR_ID_FIELD_TOKEN = "sensorID";
 
-    public static final String SHANGQING_DEEP = "deep";
+    public static final String SHANGQING_DEEP = "埋深";
 
     public static final String RESERVOIR_AREA = "area";
     public static final String RESERVOIR_FLOW = "flow";
