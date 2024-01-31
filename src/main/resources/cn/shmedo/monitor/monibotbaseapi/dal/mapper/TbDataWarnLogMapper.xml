@@ -94,7 +94,7 @@
         <if test="param.warnLevel != null">
             AND dwl.`WarnLevel` =#{param.warnLevel}
         </if>
-        ORDER BY dwl.`WarnTime`,dwl.`ID` DESC
+        ORDER BY dwl.`WarnTime` DESC,dwl.`ID` DESC
     </select>
     <select id="selectDataWarnBaseInfoByID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnLatestInfo">
