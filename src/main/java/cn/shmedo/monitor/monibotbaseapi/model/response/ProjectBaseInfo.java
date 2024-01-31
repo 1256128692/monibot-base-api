@@ -15,7 +15,7 @@ public class ProjectBaseInfo extends TbProjectInfo{
 
     private String projectMainTypeName;
 
-    private Integer projectStatus;
+    private Integer waterWarn;
 
 
     @Override

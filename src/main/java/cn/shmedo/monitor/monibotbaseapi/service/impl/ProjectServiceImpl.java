@@ -90,6 +90,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     private final TbProjectRelationMapper tbProjectRelationMapper;
     private final TbDocumentFileMapper tbDocumentFileMapper;
     private final TbProjectServiceRelationMapper tbProjectServiceRelationMapper;
+
+    private final TbSensorMapper tbSensorMapper;
     private final RegionArea defaultRegionArea = new RegionArea();
     private Map<String, RegionArea> regionAreaMap;
     @SuppressWarnings("all")
@@ -831,12 +833,49 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
         if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
 
+            Map<Integer, List<TbSensor>> sensorsGroupedByProject;
+            List<Integer> projectIDList = tbProjectInfos.stream().filter(pro -> pro.getProjectType()== 1).map(TbProjectInfo::getID).collect(Collectors.toList());
+            if (CollectionUtil.isNotEmpty(projectIDList)) {
+                List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(
+                        TbSensor::getProjectID, projectIDList));
+
+                List<TbSensor> filteredSensors = tbSensors.stream()
+                        .filter(sensor -> sensor.getStatus() != null)
+                        .collect(Collectors.toList());
+
+                if (CollectionUtil.isNotEmpty(filteredSensors)) {
+                    sensorsGroupedByProject = filteredSensors.stream()
+                            .collect(Collectors.groupingBy(TbSensor::getProjectID));
+                } else {
+                    sensorsGroupedByProject = null;
+                }
+
+            } else {
+                sensorsGroupedByProject = null;
+            }
+
+
             List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
             tbProjectInfos.forEach(item -> {
                 ProjectBaseInfo result = new ProjectBaseInfo();
                 BeanUtil.copyProperties(item, result);
                 handlerImagePathToRealPath(result);
-                result.setProjectStatus(0);
+                // 水库类型
+                if (item.getProjectType() == 1) {
+                    if (CollectionUtil.isNotEmpty(sensorsGroupedByProject)) {
+                        List<TbSensor> tbSensors = sensorsGroupedByProject.get(item.getID());
+                        if (CollectionUtil.isNotEmpty(tbSensors)) {
+                            if (tbSensors.get(0).getStatus() == 0) {
+                                result.setWaterWarn(0);
+                            }
+                            if (tbSensors.get(0).getStatus() == 1 || tbSensors.get(0).getStatus() == 2
+                                    || tbSensors.get(0).getStatus() == 3 || tbSensors.get(0).getStatus() == 4) {
+                                result.setWaterWarn(1);
+                            }
+                        }
+                    }
+                }
+
                 projectBaseInfoList.add(result);
             });
 
