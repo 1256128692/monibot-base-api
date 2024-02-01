@@ -207,9 +207,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     public DataCountStatisticsInfo queryDataCountStatistics(ProjectConditionParam pa) {
         DataCountStatisticsInfo vo = new DataCountStatisticsInfo();
 
-        Integer dataCount = redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY,
-                pa.getProjectID().toString(), Integer.class);
-        vo.setDataCount(dataCount == null ? 0 : dataCount);
+        vo.setDataCount(Integer.valueOf(redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pa.getProjectID().toString())));
 
         // 查询含有传感器的监测点
         List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(), null, null);
