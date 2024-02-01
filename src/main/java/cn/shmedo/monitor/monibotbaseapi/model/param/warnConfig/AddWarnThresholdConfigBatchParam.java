@@ -103,9 +103,6 @@ public class AddWarnThresholdConfigBatchParam implements ParameterValidator, Res
         final Set<Integer> warnLevelSet = ContextHolder.getBean(ITbWarnBaseConfigService.class).getWarnLevelSet(companyID, platform);
         try {
             dataList.stream().peek(u -> {
-                if (ObjectUtil.isEmpty(u.getWarnName())) {
-                    u.setWarnName(fieldIDNameMap.get(u.getFieldID()) + "异常");
-                }
                 if (Objects.isNull(u.getEnable())) {
                     u.setEnable(false);
                 }
