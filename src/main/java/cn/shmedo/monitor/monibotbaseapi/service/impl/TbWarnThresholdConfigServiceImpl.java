@@ -25,6 +25,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
@@ -84,7 +85,8 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
     }
 
     @Override
-    public void updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID) {
+    @Transactional(rollbackFor = Exception.class)
+    public List<TbWarnThresholdConfig> updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID) {
         Date updateTime = new Date();
         Boolean enable = param.getEnable();
         List<Integer> configIDList = queryWarnThresholdConfigList(param, null).getDataList().stream()
@@ -92,8 +94,8 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
                         .map(WarnFieldThresholdConfigInfo::getConfigID).toList()).toList())
                 .flatMap(Collection::stream).flatMap(Collection::stream).toList();
 
-        Optional.of(configIDList).map(u -> new LambdaQueryWrapper<TbWarnThresholdConfig>().in(TbWarnThresholdConfig::getId, u)
-                .ne(TbWarnThresholdConfig::getEnable, enable)).map(this::list).filter(CollUtil::isNotEmpty).ifPresent(updateList -> {
+        return Optional.of(configIDList).map(u -> new LambdaQueryWrapper<TbWarnThresholdConfig>().in(TbWarnThresholdConfig::getId, u)
+                .ne(TbWarnThresholdConfig::getEnable, enable)).map(this::list).filter(CollUtil::isNotEmpty).flatMap(updateList -> {
             if (enable) {
                 final Function<String, Boolean> func = value -> {
                     try {
@@ -106,10 +108,13 @@ public class TbWarnThresholdConfigServiceImpl extends ServiceImpl<TbWarnThreshol
                 };
                 updateList = updateList.stream().filter(u -> func.apply(u.getValue())).toList();
             }
-            Optional.of(updateList).filter(CollUtil::isNotEmpty).map(u -> u.stream().map(TbWarnThresholdConfig::getId).toList())
-                    .ifPresent(u -> this.update(new LambdaUpdateWrapper<TbWarnThresholdConfig>()
-                            .in(TbWarnThresholdConfig::getId, u).set(TbWarnThresholdConfig::getEnable, enable)
-                            .set(TbWarnThresholdConfig::getUpdateUserID, userID).set(TbWarnThresholdConfig::getUpdateTime, updateTime)));
-        });
+            return Optional.of(updateList).filter(CollUtil::isNotEmpty).map(u -> {
+                        List<Integer> updateConfigIDList = u.stream().map(TbWarnThresholdConfig::getId).toList();
+                        this.update(new LambdaUpdateWrapper<TbWarnThresholdConfig>()
+                                .in(TbWarnThresholdConfig::getId, updateConfigIDList).set(TbWarnThresholdConfig::getEnable, enable)
+                                .set(TbWarnThresholdConfig::getUpdateUserID, userID).set(TbWarnThresholdConfig::getUpdateTime, updateTime));
+                        return u;
+                    });
+        }).orElse(List.of());
     }
 }

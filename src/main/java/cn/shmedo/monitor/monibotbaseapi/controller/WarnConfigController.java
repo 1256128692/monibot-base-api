@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
@@ -432,7 +433,8 @@ public class WarnConfigController {
         }
         // TODO 加上权限校验注解后将上文替换成本注解
         // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        tbWarnThresholdConfigService.updateWarnThresholdConfigEnableBatch(param, userID);
+        List<TbWarnThresholdConfig> tbWarnThresholdConfigList = tbWarnThresholdConfigService.updateWarnThresholdConfigEnableBatch(param, userID);
+        publishThresholdConfigMsg(tbWarnThresholdConfigList);
         return ResultWrapper.successWithNothing();
     }
 
@@ -502,8 +504,10 @@ public class WarnConfigController {
 
     private void publishThresholdConfigMsg(List<TbWarnThresholdConfig> configList) {
         Set<Integer> sensorIDSet = configList.stream().map(TbWarnThresholdConfig::getSensorID).collect(Collectors.toSet());
-        List<TbWarnThresholdConfig> list = tbWarnThresholdConfigService.list(new LambdaQueryWrapper<TbWarnThresholdConfig>()
-                .in(TbWarnThresholdConfig::getSensorID, sensorIDSet));
-        warnConfigService.publishThresholdConfigMsg(list);
+        Optional.of(sensorIDSet).filter(CollUtil::isNotEmpty).ifPresent(u -> {
+            List<TbWarnThresholdConfig> list = tbWarnThresholdConfigService.list(new LambdaQueryWrapper<TbWarnThresholdConfig>()
+                    .in(TbWarnThresholdConfig::getSensorID, u));
+            warnConfigService.publishThresholdConfigMsg(list);
+        });
     }
 }

@@ -20,5 +20,5 @@ public interface ITbWarnThresholdConfigService extends IService<TbWarnThresholdC
 
     WarnThresholdConfigListInfo queryWarnThresholdConfigList(QueryWarnThresholdConfigListParam param, TbWarnBaseConfig tbWarnBaseConfig);
 
-    void updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID);
+    List<TbWarnThresholdConfig> updateWarnThresholdConfigEnableBatch(UpdateWarnThresholdConfigEnableBatchParam param, Integer userID);
 }
