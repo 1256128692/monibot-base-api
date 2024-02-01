@@ -6,8 +6,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
+import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
@@ -15,26 +17,29 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineStats;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorWithIot;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.wtstats.WarnPointStats;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsByProjectParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.DeviceOnlineStatsResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirNewSensorDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsByProjectResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.ReservoirWarnStatsResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceSimpleBySenderAddressParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryReservoirResponsibleListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.wt.QueryReservoirResponsibleListResponseItem;
+import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.wt.WtReportService;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +49,7 @@ import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -69,7 +75,14 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private final IotService iotService;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final SensorDataDao sensorDataDao;
-
+    private static final String STR_RESERVOIR_SCALE = "水库规模";
+    private static final String STR_RESERVOIR_SCALE_ONE = "小(Ⅰ)型";
+    private static final String STR_RESERVOIR_SCALE_TWO = "小(Ⅱ)型";
+    private static final String STR_RESERVOIR_SCALE_THREE = "中型";
+    private static final String STR_RESERVOIR_SCALE_FOUR = "大(Ⅰ)型";
+    private static final String STR_RESERVOIR_SCALE_FIVE = "大(Ⅱ)型";
+    private final TbMonitorPointMapper tbMonitorPointMapper;
+    private final WtReportService wtReportService;
     @Override
     public ReservoirWarnStatsResponse queryWarnStats(QueryReservoirWarnStatsParam param) {
         Map<String, Object> dict = getWarnDict(param.getCompanyID(), param.getPlatform());
@@ -304,6 +317,189 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                             ReservoirWarnStatsByProjectResponse.Item.from(list));
                 }).toList();
         return new ReservoirWarnStatsByProjectResponse(dict, overview, projects);
+    }
+
+    @Override
+    public ReservoirProjectStatisticsResult reservoirProjectStatistics(Integer companyID) {
+        List<TbProjectInfo> tbProjectInfos = projectInfoMapper.selectList(
+                new LambdaQueryWrapper<TbProjectInfo>()
+                        .eq(TbProjectInfo::getCompanyID, companyID)
+                        .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
+        );
+        List<PropertyDto> propertyDtos = projectPropertyMapper.queryPropertyByProjectID(
+                tbProjectInfos.stream().map(TbProjectInfo::getID).toList(), null,
+                PropertySubjectType.Project.getType()
+        );
+        Map<Integer, String> map = propertyDtos.stream()
+                .filter(e -> e.getName().equals(STR_RESERVOIR_SCALE))
+                .collect(Collectors.toMap(PropertyDto::getProjectID, PropertyDto::getValue));
+        Map<String, List<TbProjectInfo>> locationMap = tbProjectInfos.stream().collect(Collectors.groupingBy(
+                e -> {
+                    if (JSONUtil.isTypeJSON(e.getLocation())) {
+                        JSONObject json = JSONUtil.parseObj(e.getLocation());
+                        return json.isEmpty() ? null : CollUtil.getLast(json.values()).toString();
+                    } else {
+                        return null;
+                    }
+                }
+        ));
+        Map<String, RegionArea> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY,
+                        locationMap.keySet().stream().filter(Objects::nonNull).collect(Collectors.toSet()), RegionArea.class)
+                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), Function.identity()));
+        ReservoirProjectStatisticsResult result = ReservoirProjectStatisticsResult.builder().reservoirCount(tbProjectInfos.size())
+                .build();
+        result.setTypeOneCount((int) map.values().stream().filter(e -> e.equals(STR_RESERVOIR_SCALE_ONE)).count());
+        result.setTypeTwoCount((int) map.values().stream().filter(e -> e.equals(STR_RESERVOIR_SCALE_TWO)).count());
+        result.setTypeThreeCount((int) map.values().stream().filter(e -> e.equals(STR_RESERVOIR_SCALE_THREE)).count());
+        result.setTypeFourCount((int) map.values().stream().filter(e -> e.equals(STR_RESERVOIR_SCALE_FOUR)).count());
+        result.setTypeFiveCount((int) map.values().stream().filter(e -> e.equals(STR_RESERVOIR_SCALE_FIVE)).count());
+        result.setAreaStatisticsList(
+                areaMap.entrySet().stream().map(e ->
+                        {
+                            ReservoirProjectStatisticsResult.AreaStatItem obj = ReservoirProjectStatisticsResult.AreaStatItem.builder()
+                                    .areaCode(e.getKey())
+                                    .areaName(e.getValue().getName())
+                                    .build();
+                            obj.setReservoirCount(locationMap.getOrDefault(e.getKey(), List.of()).size());
+                            obj.setTypeOneCount((int) locationMap.getOrDefault(e.getKey(), List.of()).stream()
+                                    .map(ee -> map.get(ee.getID())).filter(Objects::nonNull).filter(i -> i.equals(STR_RESERVOIR_SCALE_ONE)).count());
+                            obj.setTypeTwoCount((int) locationMap.getOrDefault(e.getKey(), List.of()).stream()
+                                    .map(ee -> map.get(ee.getID())).filter(Objects::nonNull).filter(i -> i.equals(STR_RESERVOIR_SCALE_TWO)).count());
+                            obj.setTypeThreeCount((int) locationMap.getOrDefault(e.getKey(), List.of()).stream()
+                                    .map(ee -> map.get(ee.getID())).filter(Objects::nonNull).filter(i -> i.equals(STR_RESERVOIR_SCALE_THREE)).count());
+                            obj.setTypeFourCount((int) locationMap.getOrDefault(e.getKey(), List.of()).stream()
+                                    .map(ee -> map.get(ee.getID())).filter(Objects::nonNull).filter(i -> i.equals(STR_RESERVOIR_SCALE_FOUR)).count());
+                            obj.setTypeFiveCount((int) locationMap.getOrDefault(e.getKey(), List.of()).stream()
+                                    .map(ee -> map.get(ee.getID())).filter(Objects::nonNull).filter(i -> i.equals(STR_RESERVOIR_SCALE_FIVE)).count());
+                            return obj;
+                        }
+                ).toList()
+        );
+        return result;
+    }
+
+    @Override
+    public ReservoirMonitorStatisticsResult reservoirMonitorStatistics(Integer companyID) {
+        List<Integer> pIDList = projectInfoMapper.selectList(
+                new LambdaQueryWrapper<TbProjectInfo>()
+                        .eq(TbProjectInfo::getCompanyID, companyID)
+                        .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
+        ).stream().map(TbProjectInfo::getID).toList();
+        Map<Integer, Long> typeCoutMap = tbMonitorPointMapper.selectList(
+                new LambdaQueryWrapper<TbMonitorPoint>()
+                        .in(TbMonitorPoint::getProjectID, pIDList)
+        ).stream().collect(Collectors.groupingBy(
+                TbMonitorPoint::getMonitorType,
+                Collectors.counting()
+        ));
+        Map<Integer, String> typeANameMap = monitorTypeMapper.selectList(
+                new LambdaQueryWrapper<TbMonitorType>()
+                        .in(TbMonitorType::getMonitorType, typeCoutMap.keySet())
+        ).stream().collect(Collectors.toMap(TbMonitorType::getMonitorType, TbMonitorType::getTypeName));
+        ReservoirMonitorStatisticsResult result = ReservoirMonitorStatisticsResult.builder()
+                .monitorPointCount((int) typeCoutMap.values().stream().mapToLong(e -> e).sum())
+                .build();
+        result.setMonitorTypeStatisticsList(
+                typeCoutMap.entrySet().stream().map(e -> ReservoirMonitorStatisticsResult.TypeStatItem.builder()
+                        .monitorType(e.getKey())
+                        .monitorTypeName(typeANameMap.get(e.getKey()))
+                        .count(e.getValue().intValue())
+                        .build()).toList());
+        return result;
+    }
+
+    @Override
+    public ReservoirDetail reservoirProjectDetail(TbProjectInfo tbProjectInfo) {
+        ReservoirDetail result = ReservoirDetail.builder()
+                .projectID(tbProjectInfo.getID())
+                .projectName(tbProjectInfo.getProjectName())
+                .shortName(tbProjectInfo.getShortName())
+                .build();
+        // 基础属性
+        List<PropertyDto> propertyDtos = projectPropertyMapper.queryPropertyByProjectID(
+                List.of(tbProjectInfo.getID()), null,
+                PropertySubjectType.Project.getType()
+        );
+        System.err.println(
+                propertyDtos.stream().map(PropertyDto::getName).collect(Collectors.toList())
+        );
+        // 远程调用获取别的属性
+        ResultWrapper<List<QueryReservoirResponsibleListResponseItem>> wrapper = wtReportService.queryReservoirResponsibleList(
+                QueryReservoirResponsibleListRequest.builder()
+                        .companyID(tbProjectInfo.getCompanyID())
+                        .projectID(tbProjectInfo.getID())
+                        .build()
+        );
+        if (!wrapper.apiSuccess()) {
+            throw new CustomBaseException(wrapper.getCode(), wrapper.getMsg());
+        }
+
+        return result;
+    }
+
+    @Override
+    public List<PointWithProjectInfo> reservoirVideoMonitorPoint(Integer companyID, TbProjectInfo tbProjectInfo) {
+        Map<Integer, TbProjectInfo> projectIDANameMap;
+        if (tbProjectInfo != null) {
+            projectIDANameMap = Map.of(tbProjectInfo.getID(), tbProjectInfo);
+        } else {
+            projectIDANameMap = projectInfoMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectInfo>()
+                            .eq(TbProjectInfo::getCompanyID, companyID)
+                            .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
+            ).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
+        }
+        List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectList(
+                new LambdaQueryWrapper<TbMonitorPoint>()
+                        .in(TbMonitorPoint::getProjectID, projectIDANameMap.keySet())
+                        .eq(TbMonitorPoint::getMonitorType, cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType.VIDEO.getKey())
+        );
+        return tbMonitorPoints.stream().map(e ->
+                PointWithProjectInfo.builder()
+                        .projectID(e.getProjectID())
+                        .projectName(projectIDANameMap.get(e.getProjectID()).getProjectName())
+                        .shortName(projectIDANameMap.get(e.getProjectID()).getShortName())
+                        .monitorPointID(e.getID())
+                        .monitorPointName(e.getName())
+                        .build()
+        ).sorted(Comparator.comparingInt(PointWithProjectInfo::getMonitorPointID).reversed()).toList();
+    }
+
+    @Override
+    public ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Integer projectID) {
+        List<Integer> pidList;
+        if (projectID != null) {
+            pidList = List.of(projectID);
+        } else {
+            pidList = projectInfoMapper.selectList(
+                    new LambdaQueryWrapper<TbProjectInfo>()
+                            .eq(TbProjectInfo::getCompanyID, companyID)
+                            .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
+            ).stream().map(TbProjectInfo::getID).toList();
+        }
+        ReservoirDeviceStatisticsResult result = new ReservoirDeviceStatisticsResult();
+        result.setVideoDeviceCount(
+                tbMonitorPointMapper.selectVideoPointListByCondition(pidList,
+                        null, null, null, null, null, cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType.VIDEO.getKey(),
+                        null, null).size()
+        );
+        QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
+                .companyID(companyID)
+                .sendType(SendType.MDMBASE.toInt())
+                .sendAddressList(pidList.stream().map(String::valueOf).toList())
+                .sendEnable(true)
+                .deviceToken(null)
+                .online(null)
+                .productID(null)
+                .build();
+        ResultWrapper<List<SimpleDeviceV5>> resultWrapper = iotService.queryDeviceSimpleBySenderAddress(request);
+        if (!resultWrapper.apiSuccess()) {
+            throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
+        }
+        result.setIotDeviceCount(
+                ObjectUtil.isEmpty(resultWrapper.getData()) ? 0 : resultWrapper.getData().size()
+        );
+        return result;
     }
 
 

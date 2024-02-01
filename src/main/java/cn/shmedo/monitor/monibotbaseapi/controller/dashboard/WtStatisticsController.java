@@ -3,10 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.controller.dashboard;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryDeviceOnlineStatsParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsByProjectParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarnStatsParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -191,10 +188,10 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirProjectStatistics")
-    public Object reservoirProjectStatistics() {
-        return null;
+    public Object reservoirProjectStatistics(@Valid @RequestBody ReservoirProjectStatisticsParam pa) {
+        return wtStatisticsService.reservoirProjectStatistics(pa.getCompanyID());
     }
 
     /**
@@ -210,10 +207,10 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirDeviceStatistics")
-    public Object reservoirDeviceStatistics() {
-        return null;
+    public Object reservoirDeviceStatistics(@Valid @RequestBody ReservoirDeviceStatisticsParam pa) {
+        return wtStatisticsService.reservoirDeviceStatistics(pa.getCompanyID(), pa.getProjectID());
     }
 
     /**
@@ -231,10 +228,10 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirMonitorStatistics")
-    public Object reservoirMonitorStatistics() {
-        return null;
+    public Object reservoirMonitorStatistics(@Valid @RequestBody ReservoirMonitorStatisticsParam pa) {
+        return wtStatisticsService.reservoirMonitorStatistics(pa.getCompanyID());
     }
 
     /**
@@ -273,18 +270,19 @@ public class WtStatisticsController {
      * @apiDescription 水库视频监测点列表
      * @apiParam (请求参数) {Int} companyID 企业ID
      * @apiParam (请求参数) {Int} [projectID] 工程项目ID
-     * @apiSuccess (返回结果) {Int} monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} monitorPointName 监测点名称
-     * @apiSuccess (返回结果) {Int} projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} projectName 工程项目名称
-     * @apiSuccess (返回结果) {String} shortName 工程项目短名称
+     * @apiSuccess (返回结果) {Json[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} dataList.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} dataList.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} dataList.shortName 工程项目短名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirVideoMonitorPoint")
-    public Object reservoirVideoMonitorPoint() {
-        return null;
+    public Object reservoirVideoMonitorPoint(@Valid @RequestBody ReservoirVideoMonitorPointParam pa) {
+        return wtStatisticsService.reservoirVideoMonitorPoint(pa.getCompanyID(), pa.getTbProjectInfo());
     }
 
     /**
@@ -313,9 +311,9 @@ public class WtStatisticsController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-//    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
+    @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirProjectDetail")
-    public Object reservoirProjectDetail() {
-        return null;
+    public Object reservoirProjectDetail(@Valid @RequestBody ReservoirProjectDetailParam pa) {
+        return wtStatisticsService.reservoirProjectDetail(pa.getTbProjectInfo());
     }
 }
