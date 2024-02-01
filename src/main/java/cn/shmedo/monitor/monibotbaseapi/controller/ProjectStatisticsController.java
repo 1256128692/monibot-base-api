@@ -198,7 +198,7 @@ public class ProjectStatisticsController {
      * @apiName QuerySingleProjectMonitorPointInfoList
      * @apiDescription 查询单工程下监测点下传感器最新数据列表
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,红:1,橙:2,黄:3,蓝:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
@@ -244,7 +244,7 @@ public class ProjectStatisticsController {
      * @apiName QuerySingleProjectMonitorPointNewDataPage
      * @apiDescription 查询单工程下监测点下传感器最新数据分页
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiParam (请求体) {Int[]} [monitorStatusList] 监测状态,[正常:0,红:1,橙:2,黄:3,蓝:4,无数据:-1]
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目ID列表
      * @apiParam (请求体) {String} [monitorPointName] 监测点名称,模糊查询
      * @apiParam (请求体) {Boolean} [monitorPointCollection] 监测点收藏,null查全部,true查该用户已收藏,false查全部
