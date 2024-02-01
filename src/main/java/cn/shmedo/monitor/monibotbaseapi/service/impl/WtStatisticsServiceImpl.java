@@ -81,6 +81,22 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private static final String STR_RESERVOIR_SCALE_THREE = "中型";
     private static final String STR_RESERVOIR_SCALE_FOUR = "大(Ⅰ)型";
     private static final String STR_RESERVOIR_SCALE_FIVE = "大(Ⅱ)型";
+
+
+    private static final String STR_RESERVOIR_PROPERTY_NAME_CHECKFLOODWATER = "校核洪水位";
+    private static final String STR_RESERVOIR_PROPERTY_NAME_DESIGNFLOODWATER = "设计洪水位";
+    private static final String STR_RESERVOIR_PROPERTY_NAME_NORMALSTORAGEWATER = "正常蓄水位";
+    private static final String STR_RESERVOIR_PROPERTY_NAME_PERIODLIMITWATER = "期限制水位";
+    private static final String STR_RESERVOIR_PROPERTY_NAME_TOTALCAPACITY = "总库容";
+
+    private static final String STR_RESERVOIR_PROPERTY_NAME_MANAGEUNIT = "主管部门";
+    private static final String STR_RESERVOIR_PROPERTY_NAME_CONTACTSPHONE = "主管部门联系电话";
+
+    private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_ADMINISTRATIONDIRECTOR = 21;
+    private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_MAINMANAGEMENTDIRECTOR = 12;
+    private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_MANAGEMENTDIRECTOR = 13;
+    private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_PATROLDIRECTOR = 23;
+    private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_ECHNICALDIRECTOR = 22;
     private final TbMonitorPointMapper tbMonitorPointMapper;
     private final WtReportService wtReportService;
     @Override
@@ -419,9 +435,30 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         List<PropertyDto> propertyDtos = projectPropertyMapper.queryPropertyByProjectID(
                 List.of(tbProjectInfo.getID()), null,
                 PropertySubjectType.Project.getType()
+        ).stream().filter(e -> ObjectUtil.isNotEmpty(e.getValue())).toList();
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_SCALE)).findFirst().ifPresent(
+                e -> result.setReservoirScale(e.getValue())
         );
-        System.err.println(
-                propertyDtos.stream().map(PropertyDto::getName).collect(Collectors.toList())
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_CHECKFLOODWATER)).findFirst().ifPresent(
+                e -> result.setCheckFloodWater(Double.valueOf(e.getValue()))
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_DESIGNFLOODWATER)).findFirst().ifPresent(
+                e -> result.setCheckFloodWater(Double.valueOf(e.getValue()))
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_NORMALSTORAGEWATER)).findFirst().ifPresent(
+                e -> result.setNormalStorageWater(Double.valueOf(e.getValue()))
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_PERIODLIMITWATER)).findFirst().ifPresent(
+                e -> result.setPeriodLimitWater(Double.valueOf(e.getValue()))
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_TOTALCAPACITY)).findFirst().ifPresent(
+                e -> result.setTotalCapacity(Double.valueOf(e.getValue()))
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_MANAGEUNIT)).findFirst().ifPresent(
+                e -> result.setManageUnit(e.getValue())
+        );
+        propertyDtos.stream().filter(e -> e.getName().equals(STR_RESERVOIR_PROPERTY_NAME_CONTACTSPHONE)).findFirst().ifPresent(
+                e -> result.setContactsPhone(e.getValue())
         );
         // 远程调用获取别的属性
         ResultWrapper<List<QueryReservoirResponsibleListResponseItem>> wrapper = wtReportService.queryReservoirResponsibleList(
@@ -433,7 +470,18 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         if (!wrapper.apiSuccess()) {
             throw new CustomBaseException(wrapper.getCode(), wrapper.getMsg());
         }
-
+        if (ObjectUtil.isNotEmpty(wrapper.getData())) {
+            wrapper.getData().stream().filter(e -> e.getType().equals(STR_RESERVOIR_RESPONSIBLE_TYPE_ADMINISTRATIONDIRECTOR)).findFirst()
+                    .ifPresent(e -> result.setAdministrationDirector(e.getUser()));
+            wrapper.getData().stream().filter(e -> e.getType().equals(STR_RESERVOIR_RESPONSIBLE_TYPE_MAINMANAGEMENTDIRECTOR)).findFirst()
+                    .ifPresent(e -> result.setMainManagementDirector(e.getUser()));
+            wrapper.getData().stream().filter(e -> e.getType().equals(STR_RESERVOIR_RESPONSIBLE_TYPE_MANAGEMENTDIRECTOR)).findFirst()
+                    .ifPresent(e -> result.setManagementDirector(e.getUser()));
+            wrapper.getData().stream().filter(e -> e.getType().equals(STR_RESERVOIR_RESPONSIBLE_TYPE_PATROLDIRECTOR)).findFirst()
+                    .ifPresent(e -> result.setPatrolDirector(e.getUser()));
+            wrapper.getData().stream().filter(e -> e.getType().equals(STR_RESERVOIR_RESPONSIBLE_TYPE_ECHNICALDIRECTOR)).findFirst()
+                    .ifPresent(e -> result.setTechnicalDirector(e.getUser()));
+        }
         return result;
     }
 

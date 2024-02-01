@@ -295,7 +295,7 @@ public class WtStatisticsController {
      * @apiSuccess (返回结果) {Int} projectID 工程项目ID
      * @apiSuccess (返回结果) {String} projectName 工程项目名称
      * @apiSuccess (返回结果) {String} shortName 工程项目短名称
-     * @apiSuccess (返回结果) {Int} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
+     * @apiSuccess (返回结果) {String} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
      * @apiSuccess (返回结果) {Double} checkFloodWater 校核洪水位
      * @apiSuccess (返回结果) {Double} designFloodWater 设计洪水位
      * @apiSuccess (返回结果) {Double} normalStorageWater 正常蓄水位

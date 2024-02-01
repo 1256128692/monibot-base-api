@@ -16,7 +16,7 @@ public class ReservoirDetail {
     private Integer projectID;
     private String projectName;
     private String shortName;
-    private Integer reservoirScale;
+    private String reservoirScale;
     private Double checkFloodWater;
     private Double designFloodWater;
     private Double normalStorageWater;
