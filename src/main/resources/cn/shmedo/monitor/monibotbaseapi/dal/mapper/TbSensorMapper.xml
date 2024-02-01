@@ -1018,6 +1018,7 @@
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4">
         select ts.ID           as sensorID,
                ts.Name         as sensorName,
+               ts.Alias        as sensorAlias,
                ts.configFieldValue,
                ts.monitorType,
                ts.monitorPointID,

@@ -205,6 +205,8 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Object[]}   data   数据
      * @apiSuccess (返回结果) {Int}   data.monitorPointID   监测点ID
      * @apiSuccess (返回结果) {String}   data.monitorPointName   监测点名称
+     * @apiSuccess (返回结果) {String}   data.sensorName   传感器名称
+     * @apiSuccess (返回结果) {String}   data.sensorAlias   传感器别名
      * @apiSuccess (返回结果) {Int}   data.monitorType   监测类型
      * @apiSuccess (返回结果) {String}   data.gpsLocation   监测点位置
      * @apiSuccess (返回结果) {String}   data.imageLocation   监测点底图位置
@@ -255,6 +257,8 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorPointID   监测点ID
      * @apiSuccess (返回结果) {String}   currentPageData.monitorPointName   监测点名称
+     * @apiSuccess (返回结果) {String}   currentPageData.sensorName   传感器名称
+     * @apiSuccess (返回结果) {String}   currentPageData.sensorAlias   传感器别名
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorType   监测类型
      * @apiSuccess (返回结果) {String}   currentPageData.gpsLocation   监测点位置
      * @apiSuccess (返回结果) {String}   currentPageData.imageLocation   监测点底图位置
