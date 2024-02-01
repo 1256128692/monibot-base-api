@@ -142,7 +142,7 @@ public class FeignBeans {
 
     @Bean
     public MdNotifyService mdNotifyService() {
-        SetterFactory timeoutCommandKey = (target, method) -> HystrixCommand.Setter
+        SetterFactory factory = (target, method) -> HystrixCommand.Setter
                 .withGroupKey(HystrixCommandGroupKey.Factory.asKey(MdNotifyService.class.getSimpleName()))
                 .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
                 .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
@@ -150,6 +150,7 @@ public class FeignBeans {
         return FeignFactory.hystrixClient(MdNotifyService.class, config.getNotifyServiceAddress(), mdNotifyServiceFallbackFactory,
                 value -> value.encoder(new JacksonEncoder(objectMapper))
                         .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(factory)
                         .options(new Request.Options(2, TimeUnit.SECONDS, 3, TimeUnit.SECONDS, true))
                         .requestInterceptor(template -> template
                                 .header(DefaultConstant.APP_KEY, config.getNotifyAppKey())
