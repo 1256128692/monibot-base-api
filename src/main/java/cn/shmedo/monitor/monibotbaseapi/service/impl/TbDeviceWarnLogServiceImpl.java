@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONException;
@@ -58,6 +60,15 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
     private static final String WARN_CONTENT_FORMAT = "{} 内 {} 于 {} 发生离线报警，设备型号: {} ，设备SN: {}，请关注！";
 
+    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n\n"+
+            "   您好!\n\n" +
+            "在 {} 中，我们监测到：\n\n" +
+            "有 {} 于时间：{} 发生离线报警!\n\n" +
+            "设备型号：{} \n\n" +
+            "设备SN：{}\n\n" +
+            "请务必关注并采取相应措施,感谢您的配合";
+
+
     private final TbDeviceWarnLogMapper tbDeviceWarnLogMapper;
     private final NotifyService notifyService;
     private final TbWarnNotifyRelationMapper notifyRelationMapper;
@@ -101,6 +112,23 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                 .users(JSONUtil.toList(warnNotifyConfig.getUsers(), Integer.class))
                                 .build(), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
 
+                        // 邮件
+                        if (warnNotifyConfig.getNotifyMethod().contains("3")) {
+                            Map<Integer, UserContact> emailMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                            try {
+                                boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
+                                        true, () -> StrUtil.format(WARN_EMAIL_FORMAT, param.getProjectName(),
+                                                param.getDeviceSource(), DateUtil.format(param.getTime(), DatePattern.NORM_DATETIME_FORMAT),
+                                                param.getDeviceType(), param.getDeviceSerial()), emailMap.values()
+                                                .stream().map(UserContact::getEmail).filter(Objects::nonNull)
+                                                .toArray(String[]::new));
+                                Assert.isTrue(result);
+                            } catch (Exception e) {
+                                log.error(" 项目: {}, 平台: {} 设备报警邮件发送失败: {}",
+                                        param.getProjectID(), param.getPlatform(), e.getMessage());
+                            }
+                        }
+
                         // 短信推送
                         if (warnNotifyConfig.getNotifyMethod().contains("2")) {
                             Map<Integer, UserContact> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
@@ -115,7 +143,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                                 .filter(Objects::nonNull).distinct().toArray(String[]::new));
                                 assert result;
                             } catch (Exception e) {
-                                log.info("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
+                                log.error("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
                                         param.getPlatform(), e.getMessage());
                             }
                         }
@@ -132,7 +160,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                                                 content, SysNotify.Status.UNREAD, param.getTime())),
                                         phoneUserMap.keySet().toArray(Integer[]::new));
                             } catch (Exception e) {
-                                log.info("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceSerial(),
+                                log.error("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceSerial(),
                                         param.getPlatform(), e.getMessage());
                             }
 
@@ -149,7 +177,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
                         }
                     } else {
-                        log.info("设备SN:{}  平台: {} 未配置通知人, 无法发送通知", param.getDeviceToken(), param.getPlatform());
+                        log.error("设备SN:{}  平台: {} 未配置通知人, 无法发送通知", param.getDeviceToken(), param.getPlatform());
                     }
                 }
             }
