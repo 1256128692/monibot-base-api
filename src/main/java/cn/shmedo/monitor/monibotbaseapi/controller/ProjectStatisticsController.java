@@ -120,10 +120,10 @@ public class ProjectStatisticsController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiSuccess (返回结果) {Int}   noDataCount   无数据状态下监测点数量
      * @apiSuccess (返回结果) {Int}   normalCount   正常状态下监测点数量
-     * @apiSuccess (返回结果) {Int}   LevelOneCount   预警级别1下监测点数量(蓝色)
-     * @apiSuccess (返回结果) {Int}   LevelTwoCount   预警级别2下监测点数量(黄色)
-     * @apiSuccess (返回结果) {Int}   LevelThreeCount   预警级别3下监测点数量(橙色)
-     * @apiSuccess (返回结果) {Int}   LevelFourCount   预警级别4下监测点数量(红色)
+     * @apiSuccess (返回结果) {Int}   LevelOneCount   预警级别1下监测点数量(红色)
+     * @apiSuccess (返回结果) {Int}   LevelTwoCount   预警级别2下监测点数量(橙色)
+     * @apiSuccess (返回结果) {Int}   LevelThreeCount   预警级别3下监测点数量(黄色)
+     * @apiSuccess (返回结果) {Int}   LevelFourCount   预警级别4下监测点数量(蓝色)
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeProjectInfo
      */
@@ -214,9 +214,10 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   data.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   data.monitorGroupID   监测组ID
      * @apiSuccess (返回结果) {String}   data.monitorGroupName   监测组名称
+     * @apiSuccess (返回结果) {String}   data.configFieldValue   额外配置
      * @apiSuccess (返回结果) {Date}   data.dataTime   最新接收数据时间
      * @apiSuccess (返回结果) {Boolean}   data.multiSensor 是否为多传感器
-     * @apiSuccess (返回结果) {Int}   data.dataWarnStatus   监测点预警状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiSuccess (返回结果) {Int}   data.dataWarnStatus   监测点预警状态,[正常:0,红:1,橙:2,黄:3,蓝:4,无数据:-1]
      * @apiSuccess (返回结果) {Int}   data.deviceOnlineStatus   设备在线状态,0:离线,1:在线,按规则如果全部在线则为在线,反正则为离线
      * @apiSuccess (返回结果) {Boolean}   data.monitorPointCollection   当前用户是否收藏该监测点
      * @apiSuccess (返回结果) {T}   data.snsorData   监测点下单个传感器最新数据对象,包含传感器ID,基础属性,监测值
@@ -263,9 +264,10 @@ public class ProjectStatisticsController {
      * @apiSuccess (返回结果) {String}   currentPageData.monitorItemName   监测项目名称
      * @apiSuccess (返回结果) {Int}   currentPageData.monitorGroupID   监测组ID
      * @apiSuccess (返回结果) {String}   currentPageData.monitorGroupName   监测组名称
+     * @apiSuccess (返回结果) {String}   currentPageData.configFieldValue   额外配置
      * @apiSuccess (返回结果) {Date}   currentPageData.dataTime   最新接收数据时间
      * @apiSuccess (返回结果) {Boolean}   currentPageData.multiSensor 是否为多传感器
-     * @apiSuccess (返回结果) {Int}   currentPageData.dataWarnStatus   监测点预警状态,[正常:0,蓝:1,黄:2,橙:3,红:4,无数据:-1]
+     * @apiSuccess (返回结果) {Int}   currentPageData.dataWarnStatus   监测点预警状态,[正常:0,红:1,橙:2,黄:3,蓝:4,无数据:-1]
      * @apiSuccess (返回结果) {Boolean}   currentPageData.deviceOnlineStatus   设备在线状态,0:离线,1:在线,按规则如果全部在线则为在线,反正则为离线
      * @apiSuccess (返回结果) {T}   currentPageData.snsorData   监测点下单个传感器最新数据对象,包含传感器ID,基础属性,监测值
      * @apiSuccess (返回结果) {Object[]}   currentPageData.monitorTypeFields   监测属性

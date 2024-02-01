@@ -306,14 +306,22 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             });
 
             // 只取一个传感器,取的规则按照当前点的传感器最高预警的一个即可
-            SensorBaseInfoV4 maxStatusSensor = sensors.stream()
-                    .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+            SensorBaseInfoV4 minStatusSensor = sensors.stream()
+                    .filter(sensor -> sensor.getDataWarnStatus() > 0)
+                    .min(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
                     .orElse(null);
 
             // 将找到的传感器添加到结果列表中
-            if (maxStatusSensor != null) {
+            if (minStatusSensor != null) {
+                finalResultList.add(minStatusSensor);
+            } else {
+                SensorBaseInfoV4 maxStatusSensor = sensors.stream()
+                        .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+                        .orElse(null);
                 finalResultList.add(maxStatusSensor);
             }
+
+
         });
 
         if (pa.getMonitorPointCollection() != null && pa.getMonitorPointCollection()) {
@@ -345,11 +353,11 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                     }
                 }
                 // 墒情单独处理
-                if (monitorType == 9) {
-                    if (StringUtils.isNotBlank(s.getConfigFieldValue())) {
-                        s.getSensorData().put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(s.getConfigFieldValue()).getByPath("$.埋深"));
-                    }
-                }
+//                if (monitorType == 9) {
+//                    if (StringUtils.isNotBlank(s.getConfigFieldValue())) {
+//                        s.getSensorData().put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(s.getConfigFieldValue()).getByPath("$.埋深"));
+//                    }
+//                }
             });
 
         });
@@ -443,13 +451,19 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                 }
             });
 
-            // 只取一个传感器,取的规则按照当前点的传感器最高预警的一个即可
-            SensorBaseInfoV4 maxStatusSensor = sensors.stream()
-                    .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+            // 只取一个传感器,取的规则按照当前点的传感器最高预警的一个即可,数字越小,级别越高
+            SensorBaseInfoV4 minStatusSensor = sensors.stream()
+                    .filter(sensor -> sensor.getDataWarnStatus() > 0)
+                    .min(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
                     .orElse(null);
 
             // 将找到的传感器添加到结果列表中
-            if (maxStatusSensor != null) {
+            if (minStatusSensor != null) {
+                finalResultList.add(minStatusSensor);
+            } else {
+                SensorBaseInfoV4 maxStatusSensor = sensors.stream()
+                        .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+                        .orElse(null);
                 finalResultList.add(maxStatusSensor);
             }
         });
@@ -480,12 +494,6 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                     s.setSensorData(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).findFirst().orElse(null));
                     if (ObjectUtil.isNotNull(s.getSensorData())) {
                         s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
-                    }
-                }
-                // 墒情单独处理
-                if (monitorType == 9) {
-                    if (StringUtils.isNotBlank(s.getConfigFieldValue())) {
-                        s.getSensorData().put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(s.getConfigFieldValue()).getByPath("$.埋深"));
                     }
                 }
             });
