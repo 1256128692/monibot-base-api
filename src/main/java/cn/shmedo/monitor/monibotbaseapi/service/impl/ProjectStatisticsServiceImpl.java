@@ -314,7 +314,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                 finalResultList.add(minStatusSensor);
             } else {
                 SensorBaseInfoV4 maxStatusSensor = sensors.stream()
-                        .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+                        .min(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
                         .orElse(null);
                 finalResultList.add(maxStatusSensor);
             }
@@ -460,7 +460,7 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
                 finalResultList.add(minStatusSensor);
             } else {
                 SensorBaseInfoV4 maxStatusSensor = sensors.stream()
-                        .max(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
+                        .min(Comparator.comparingInt(SensorBaseInfoV4::getDataWarnStatus))
                         .orElse(null);
                 finalResultList.add(maxStatusSensor);
             }

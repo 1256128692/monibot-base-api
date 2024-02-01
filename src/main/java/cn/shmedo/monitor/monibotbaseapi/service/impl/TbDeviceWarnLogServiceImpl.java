@@ -60,12 +60,12 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
     private static final String WARN_CONTENT_FORMAT = "{} 内 {} 于 {} 发生离线报警，设备型号: {} ，设备SN: {}，请关注！";
 
-    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n\n"+
+    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n"+
             "   您好!\n\n" +
-            "在 {} 中，我们监测到：\n\n" +
-            "有 {} 于时间：{} 发生离线报警!\n\n" +
-            "设备型号：{} \n\n" +
-            "设备SN：{}\n\n" +
+            "   在 {} 中，我们监测到：\n" +
+            "   有 {} 于时间：{} 发生离线报警!\n" +
+            "   设备型号：{} \n" +
+            "   设备SN：{}\n\n" +
             "请务必关注并采取相应措施,感谢您的配合";
 
 
