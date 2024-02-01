@@ -207,7 +207,11 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
     public DataCountStatisticsInfo queryDataCountStatistics(ProjectConditionParam pa) {
         DataCountStatisticsInfo vo = new DataCountStatisticsInfo();
 
-        vo.setDataCount(Integer.valueOf(redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pa.getProjectID().toString())));
+        String count = redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pa.getProjectID().toString());
+        if (StringUtils.isNotEmpty(count)) {
+            vo.setDataCount(Integer.valueOf(redisService.get(RedisKeys.DEVICE_DATA_COUNT_KEY + ":" + pa.getProjectID().toString())));
+        }
+
 
         // 查询含有传感器的监测点
         List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(), null, null);
@@ -230,6 +234,10 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
 
         // 查询含有传感器的监测点
         List<SensorBaseInfoV4> sensorBaseInfoV4List = tbSensorMapper.selectListByCondition(pa.getProjectID(), null, null);
+
+        if (CollectionUtils.isEmpty(sensorBaseInfoV4List)){
+            return Collections.emptyList();
+        }
 
         // 查询含有监测点(且携带传感器) 的监测项目数量
         List<TbMonitorPoint> tbMonitorPoints = tbMonitorPointMapper.selectPointListByIDList(
