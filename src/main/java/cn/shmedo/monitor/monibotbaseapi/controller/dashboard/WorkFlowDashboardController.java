@@ -1,6 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.dashboard;
 
-import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.ResultWrapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,10 +39,10 @@ public class WorkFlowDashboardController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-    @Permission(permissionName = "DescribeBaseDashboard")
+//    @Permission(permissionName = "DescribeBaseDashboard")
     @PostMapping("QueryInspectionTask")
     public Object queryInspectionTask(@RequestBody @Valid Object object){
-        return null;
+        return ResultWrapper.successWithNothing();
     }
 
 
@@ -65,10 +65,10 @@ public class WorkFlowDashboardController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDashboard
      */
-    @Permission(permissionName = "DescribeBaseDashboard")
+//    @Permission(permissionName = "DescribeBaseDashboard")
     @PostMapping("QueryProblemHandling")
     public Object queryProblemHandling(@RequestBody @Valid Object object){
-        return null;
+        return ResultWrapper.successWithNothing();
     }
 
 }
