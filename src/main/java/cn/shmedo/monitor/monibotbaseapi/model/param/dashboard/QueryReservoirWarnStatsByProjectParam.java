@@ -32,7 +32,6 @@ public class QueryReservoirWarnStatsByProjectParam implements ParameterValidator
     private Integer companyID;
 
     @Positive
-    @NotNull
     private Integer platform;
 
     @JsonIgnore
@@ -41,10 +40,14 @@ public class QueryReservoirWarnStatsByProjectParam implements ParameterValidator
     @Override
     public ResultWrapper<?> validate() {
         TbProjectServiceRelationMapper relationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
-        Set<Integer> platformProjectIds = relationMapper.selectList(Wrappers.<TbProjectServiceRelation>lambdaQuery()
-                        .eq(TbProjectServiceRelation::getServiceID, platform))
-                .stream().map(TbProjectServiceRelation::getProjectID).collect(Collectors.toSet());
-        this.projects = PermissionUtil.getHavePermissionProjectList(companyID, platformProjectIds);
+        if (platform == null) {
+            this.projects = PermissionUtil.getHavePermissionProjectList(companyID);
+        } else {
+            Set<Integer> platformProjectIds = relationMapper.selectList(Wrappers.<TbProjectServiceRelation>lambdaQuery()
+                            .eq(TbProjectServiceRelation::getServiceID, platform))
+                    .stream().map(TbProjectServiceRelation::getProjectID).collect(Collectors.toSet());
+            this.projects = PermissionUtil.getHavePermissionProjectList(companyID, platformProjectIds);
+        }
         return null;
     }
 
