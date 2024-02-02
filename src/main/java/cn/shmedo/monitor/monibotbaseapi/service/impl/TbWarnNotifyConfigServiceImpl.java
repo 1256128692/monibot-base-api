@@ -153,15 +153,15 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
                 .map(u -> new LambdaQueryWrapper<TbWarnNotifyRelation>().in(TbWarnNotifyRelation::getNotifyID, u))
                 .map(tbWarnNotifyRelationMapper::selectList).map(u -> u.stream().collect(Collectors
                         .toMap(TbWarnNotifyRelation::getNotifyID, Function.identity()))).orElse(Map.of());
-        List<WarnNotifyPageInfo> list = page.currentPageData().stream().map(u -> {
+        List<WarnNotifyPageInfo> list = Optional.ofNullable(page.currentPageData()).map(u -> u.stream().map(w -> {
             WarnNotifyPageInfo info = new WarnNotifyPageInfo();
-            BeanUtil.copyProperties(u, info);
-            Optional.ofNullable(info.getNotifyID()).map(warnNotifyRelationMap::get).ifPresent(w -> {
-                info.setWarnLogID(w.getWarnLogID());
-                info.setWarnType(w.getType());
+            BeanUtil.copyProperties(w, info);
+            Optional.ofNullable(info.getNotifyID()).map(warnNotifyRelationMap::get).ifPresent(s -> {
+                info.setWarnLogID(s.getWarnLogID());
+                info.setWarnType(s.getType());
             });
             return info;
-        }).toList();
+        }).toList()).orElse(List.of());
         return new PageUtil.Page<>(page.totalPage(), list, page.totalCount());
     }
 
