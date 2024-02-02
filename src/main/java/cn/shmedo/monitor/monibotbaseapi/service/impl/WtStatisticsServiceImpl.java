@@ -520,7 +520,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     public void cacheTypePointStatistics() {
         Map<String, List<CacheTypePointStatItem>> cacheMap = tbMonitorPointMapper.selectList(
                         Wrappers.<TbMonitorPoint>lambdaQuery()
-                                .select(TbMonitorPoint::getProjectID, TbMonitorPoint::getMonitorType, TbMonitorPoint::getProjectID)
+                                .select(TbMonitorPoint::getProjectID, TbMonitorPoint::getMonitorType)
                 ).stream().collect(Collectors.groupingBy(TbMonitorPoint::getProjectID))
                 .entrySet().stream().map(entry -> {
                     List<CacheTypePointStatItem> collect = entry.getValue().stream().collect(Collectors.groupingBy(
@@ -531,9 +531,9 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                             .count(e.getValue().intValue())
                             .build()
                     ).toList();
-                    return new Tuple<Integer, List<CacheTypePointStatItem>>(entry.getKey(), collect);
+                    return new Tuple<>(entry.getKey(), collect);
                 }).collect(Collectors.toMap(
-                        e -> e.getItem2().toString(),
+                        e -> e.getItem1().toString(),
                         Tuple::getItem2
                 ));
         monitorRedisService.putAll(TYPE_POINT_STATS, cacheMap);
@@ -765,6 +765,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     ApplicationRunner applicationRunner() {
         return args -> {
             cacheDeviceOnlineStats();
+            cacheTypePointStatistics();
         };
     }
 }
