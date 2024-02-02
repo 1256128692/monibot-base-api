@@ -37,7 +37,7 @@ public class WarnLogController {
     private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
 
     /**
-     * @api {POST} /QueryWarnNotifyPage 报警消息分页
+     * @api {POST} /QueryWarnNotifyPage 报警消息分页(TODO 接口暂未实现,等消息中台需求)
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryWarnNotifyPage
@@ -64,11 +64,12 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryWarnNotifyPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryWarnNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param, HttpServletRequest request) {
-        return tbWarnNotifyConfigService.queryWarnNotifyPage(param, request.getHeader("Authorization"));
+//        return tbWarnNotifyConfigService.queryWarnNotifyPage(param, request.getHeader("Authorization"));
+        return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /QueryUnreadWarnLatest 查询最新未读报警消息
+     * @api {POST} /QueryUnreadWarnLatest 查询最新未读报警消息(TODO 接口暂未实现,等消息中台需求)
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
      * @apiName QueryUnreadWarnLatest
@@ -101,8 +102,9 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param) {
-        return warnLogService.queryUnreadWarnLatest(param);
+    public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param,HttpServletRequest request) {
+//        return warnLogService.queryUnreadWarnLatest(param,request.getHeader("Authorization"));
+        return ResultWrapper.successWithNothing();
     }
 
     /**

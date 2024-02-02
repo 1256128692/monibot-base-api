@@ -381,7 +381,7 @@ public class WarnConfigController {
      * @apiParam (请求参数) {Int[]} sensorIDList 传感器ID List
      * @apiParam (请求参数) {Object[]} dataList 数据列表
      * @apiParam (请求参数) {Int} dataList.fieldID 监测属性ID
-     * @apiParam (请求参数) {String} dataList.warnName 报警名称
+     * @apiParam (请求参数) {String} [dataList.warnName] 报警名称
      * @apiParam (请求参数) {Int} dataList.compareMode 比较方式 1.在区间内 2.偏离区间 3.大于 4.大于等于 5.小于 6.小于等于
      * @apiParam (请求参数) {Boolean} [dataList.enable] 是否启用 true.启用 false.不作修改(默认false.不作修改)
      * @apiParam (请求参数) {String} [dataList.value] 报警等级阈值配置json,格式{"1":{"upper":100,"lower":50},"2":{"upper":50,"lower":25}}（json字符串）,其中key为报警等级枚举key,枚举值参考<a href="#api-报警配置模块-QueryWarnNotifyConfigList">/QueryWarnNotifyConfigList</a>接口;<br>如果比较方式为区间,则value里有upper和lower两个值,否则只有一个upper值

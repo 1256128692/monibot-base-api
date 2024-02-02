@@ -13,7 +13,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLogDealStatus;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLogDealType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.workflow.StartWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnWorkFlowTaskParam;
@@ -21,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.FillDealOpinionParam
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.IWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.WorkFlowTemplateService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -39,6 +42,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class WarnLogServiceImpl implements IWarnLogService {
+    private final UserService userService;
     private final WorkFlowTemplateService workFlowTemplateService;
     private final TbDataWarnLogMapper tbDataWarnLogMapper;
     private final TbDeviceWarnLogMapper tbDeviceWarnLogMapper;
@@ -84,35 +88,36 @@ public class WarnLogServiceImpl implements IWarnLogService {
     }
 
     @Override
-    public Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param) {
+    public Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param, String accessToken) {
         Map<String, Object> result = new HashMap<>();
-        //TODO 获取到最新未读设备/数据报警通知ID
-        List<Integer> notifyIDList = List.of(1, 2);
-        Map<DataDeviceWarnType, List<TbWarnNotifyRelation>> typeMap = tbWarnNotifyRelationMapper.selectList(
-                        new LambdaQueryWrapper<TbWarnNotifyRelation>().in(TbWarnNotifyRelation::getNotifyID, notifyIDList))
-                .stream().collect(Collectors.groupingBy(u -> DataDeviceWarnType.fromCode(u.getType())));
-        typeMap.forEach((k, v) -> {
-            TbWarnNotifyRelation tbWarnNotifyRelation = v.stream().findAny().orElseThrow();
-            Integer warnLogID = tbWarnNotifyRelation.getWarnLogID();
-            Integer notifyID = tbWarnNotifyRelation.getNotifyID();
-            switch (k) {
-                case DATA -> {
-                    DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(warnLogID);
-                    info.setNotifyID(notifyID);
-                    result.put("dataWarn", info);
-                }
-                case DEVICE -> {
-                    DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
-                    TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(warnLogID);
-                    info.setWarnLogID(tbDeviceWarnLog.getId());
-                    info.setWarnName("设备离线");
-                    info.setWarnTime(tbDeviceWarnLog.getWarnTime());
-                    info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
-                    info.setNotifyID(notifyID);
-                    fillDeviceInfo(info, param.getCompanyID());
-                    result.put("deviceWarn", info);
-                }
-            }
+        TbWarnNotifyRelation relation = tbWarnNotifyRelationMapper.selectRealTimeWarnNotify(param);
+        Optional.ofNullable(relation).ifPresent(u -> {
+            final Integer companyID = param.getCompanyID();
+            final Integer warnLogID = u.getWarnLogID();
+            final Integer notifyID = u.getNotifyID();
+            Optional.of(new QueryNotifyDetailParam(companyID, notifyID))
+                    .map(w -> userService.queryNotifyDetail(w, accessToken))
+                    .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
+                    .filter(w -> SysNotify.Status.UNREAD.equals(w.getStatus())).ifPresent(w -> {
+                        switch (DataDeviceWarnType.fromCode(relation.getType())) {
+                            case DATA -> {
+                                DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(warnLogID);
+                                info.setNotifyID(notifyID);
+                                result.put("dataWarn", info);
+                            }
+                            case DEVICE -> {
+                                DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
+                                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(warnLogID);
+                                info.setWarnLogID(tbDeviceWarnLog.getId());
+                                info.setWarnName("设备离线");
+                                info.setWarnTime(tbDeviceWarnLog.getWarnTime());
+                                info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
+                                info.setNotifyID(notifyID);
+                                fillDeviceInfo(info, companyID);
+                                result.put("deviceWarn", info);
+                            }
+                        }
+                    });
         });
         return result;
     }

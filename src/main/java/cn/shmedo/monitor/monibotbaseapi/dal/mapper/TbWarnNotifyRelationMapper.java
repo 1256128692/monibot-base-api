@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyRelation;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -9,4 +10,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface TbWarnNotifyRelationMapper extends BasicMapper<TbWarnNotifyRelation> {
     void insertVo(@Param("tbWarnNotifyRelation") TbWarnNotifyRelation tbWarnNotifyRelation);
+
+    TbWarnNotifyRelation selectRealTimeWarnNotify(@Param("param") CompanyPlatformParam param);
 }

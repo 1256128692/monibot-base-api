@@ -11,9 +11,9 @@ import java.util.Map;
  * @date 2024-01-22 14:20
  */
 public interface IWarnLogService {
-    void addWarnWorkFlowTask(Integer userID,AddWarnWorkFlowTaskParam param);
+    void addWarnWorkFlowTask(Integer userID, AddWarnWorkFlowTaskParam param);
 
     void fillDealOpinion(Integer userID, FillDealOpinionParam param);
 
-    Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param);
+    Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param, String accessToken);
 }

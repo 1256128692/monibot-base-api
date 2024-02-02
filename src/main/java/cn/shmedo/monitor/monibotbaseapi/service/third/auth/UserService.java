@@ -96,6 +96,10 @@ public interface UserService {
     @Headers("Authorization: {accessToken}")
     ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, @Param("accessToken") String accessToken);
 
+    @RequestLine("POST /QueryNotifyDetail")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<NotifyDetailInfo> queryNotifyDetail(QueryNotifyDetailParam param, @Param("accessToken") String accessToken);
+
     /**
      * 批量查询用户联系方式
      */
