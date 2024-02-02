@@ -191,7 +191,7 @@ public class WtStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirProjectStatistics")
     public Object reservoirProjectStatistics(@Valid @RequestBody ReservoirProjectStatisticsParam pa) {
-        return wtStatisticsService.reservoirProjectStatistics(pa.getCompanyID());
+        return wtStatisticsService.reservoirProjectStatistics(pa.getCompanyID(), pa.getHavePermissionProjectList());
     }
 
     /**
@@ -210,7 +210,7 @@ public class WtStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirDeviceStatistics")
     public Object reservoirDeviceStatistics(@Valid @RequestBody ReservoirDeviceStatisticsParam pa) {
-        return wtStatisticsService.reservoirDeviceStatistics(pa.getCompanyID(), pa.getProjectID());
+        return wtStatisticsService.reservoirDeviceStatistics(pa.getCompanyID(), pa.getHavePermissionProjectList());
     }
 
     /**
@@ -231,7 +231,7 @@ public class WtStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirMonitorStatistics")
     public Object reservoirMonitorStatistics(@Valid @RequestBody ReservoirMonitorStatisticsParam pa) {
-        return wtStatisticsService.reservoirMonitorStatistics(pa.getCompanyID());
+        return wtStatisticsService.reservoirMonitorStatistics(pa.getCompanyID(), pa.getHavePermissionProjectList());
     }
 
     /**
@@ -282,7 +282,7 @@ public class WtStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirVideoMonitorPoint")
     public Object reservoirVideoMonitorPoint(@Valid @RequestBody ReservoirVideoMonitorPointParam pa) {
-        return wtStatisticsService.reservoirVideoMonitorPoint(pa.getCompanyID(), pa.getTbProjectInfo());
+        return wtStatisticsService.reservoirVideoMonitorPoint(pa.getCompanyID(), pa.getHavePermissionProjectList());
     }
 
     /**
@@ -315,5 +315,74 @@ public class WtStatisticsController {
     @PostMapping("ReservoirProjectDetail")
     public Object reservoirProjectDetail(@Valid @RequestBody ReservoirProjectDetailParam pa) {
         return wtStatisticsService.reservoirProjectDetail(pa.getTbProjectInfo());
+    }
+
+
+    /**
+     * @api {Get} /CacheTypePointStatistics 缓存类型下点数量统计数据
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName CacheTypePointStatistics
+     * @apiDescription 缓存类型下点数量统计数据 (仅限服务内部调用)
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
+    @GetMapping("CacheTypePointStatistics")
+    public Object cacheTypePointStatistics() {
+        wtStatisticsService.cacheTypePointStatistics();
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {Get} /CacheVideoPointIDStatistics 缓存视频点ID
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName CacheVideoPointIDStatistics
+     * @apiDescription 缓存视频点ID，仅有传感器的点 (仅限服务内部调用)
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
+    @GetMapping("CacheVideoPointIDStatistics")
+    public Object cacheVideoPointIDStatistics() {
+        wtStatisticsService.cacheVideoPointIDStatistics();
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {Get} /CachedIntelDeviceStatistics 缓存智能设备统计个数
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName CacheVideoPointIDStatistics
+     * @apiDescription 缓缓存智能设备统计个数，视频和IOT设备 (仅限服务内部调用)
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
+    @GetMapping("CachedIntelDeviceStatistics")
+    public Object cachedIntelDeviceStatistics() {
+        wtStatisticsService.cachedIntelDeviceStatistics();
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {Get} /CachedReservoirDetail 缓存水库详情
+     * @apiVersion 1.0.0
+     * @apiGroup 水库大屏统计模块
+     * @apiName CachedReservoirDetail
+     * @apiDescription 缓存水库详情 (仅限服务内部调用)
+     * @apiSuccess (返回结果) {String} none
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:UpdateWtStatistics
+     */
+    @Permission(permissionName = "mdmbase:UpdateWtStatistics", allowApplication = true, allowUser = false)
+    @GetMapping("CachedReservoirDetail")
+    public Object CachedReservoirDetail() {
+        wtStatisticsService.cachedReservoirDetail();
+        return ResultWrapper.successWithNothing();
     }
 }

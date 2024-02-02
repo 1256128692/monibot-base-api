@@ -131,6 +131,23 @@ public class RedisKeys {
      * 设备在线统计
      */
     public static final String DEVICE_ONLINE_STATS = "cn.shmedo.monitor.deviceOnlineStats:";
+
+    /**
+     * 类型下监测点统计
+     */
+    public static final String TYPE_POINT_STATS = "cn.shmedo.monitor.typePointStats";
+    /**
+     * 视频监测点ID
+     */
+    public static final String VIDEO_POINT_ID = "cn.shmedo.monitor.videoPointID";
+    /**
+     * 视频监测点ID
+     */
+    public static final String INTEL_DEVICE_STATS = "cn.shmedo.monitor.intelDeviceStats";
+    /**
+     * 水库详情
+     */
+    public static final String RESERVOIR_DETAIL = "cn.shmedo.monitor.reservoirDetail";
 }
 
     

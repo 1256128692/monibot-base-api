@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryReservoirWarn
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.ReservoirNewSensorDataParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface WtStatisticsService {
@@ -23,13 +24,21 @@ public interface WtStatisticsService {
 
     ReservoirWarnStatsByProjectResponse queryWarnStatsByProject(QueryReservoirWarnStatsByProjectParam param);
 
-    ReservoirProjectStatisticsResult reservoirProjectStatistics(Integer companyID);
+    ReservoirProjectStatisticsResult reservoirProjectStatistics(Integer companyID, Collection<Integer> havePermissionProjectList);
 
-    ReservoirMonitorStatisticsResult reservoirMonitorStatistics(Integer companyID);
+    ReservoirMonitorStatisticsResult reservoirMonitorStatistics(Integer companyID, Collection<Integer> havePermissionProjectList);
 
     ReservoirDetail reservoirProjectDetail(TbProjectInfo tbProjectInfo);
 
-    List<PointWithProjectInfo> reservoirVideoMonitorPoint(Integer companyID, TbProjectInfo tbProjectInfo);
+    List<PointWithProjectInfo> reservoirVideoMonitorPoint(Integer companyID, Collection<Integer> havePermissionProjectList);
 
-    ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Integer projectID);
+    ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList);
+
+    void cacheTypePointStatistics();
+
+    void cacheVideoPointIDStatistics();
+
+    void cachedIntelDeviceStatistics();
+
+    void cachedReservoirDetail();
 }

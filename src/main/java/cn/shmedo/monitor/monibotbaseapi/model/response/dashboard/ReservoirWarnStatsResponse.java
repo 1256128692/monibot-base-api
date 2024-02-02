@@ -19,7 +19,7 @@ public class ReservoirWarnStatsResponse {
 
     private Map<String, Object> dict;
     private Item overview;
-    private List<MonitorType> monitorType;
+    private List<MonitorTypeRecord> monitorType;
 
     public record Item(Integer level1, Integer level2, Integer level3, Integer level4, Integer offline) {
 
@@ -36,6 +36,6 @@ public class ReservoirWarnStatsResponse {
         }
     }
 
-    public record MonitorType(Integer monitorType, String typeName, Item detail) {
+    public record MonitorTypeRecord(Integer monitorType, String typeName, Item detail) {
     }
 }

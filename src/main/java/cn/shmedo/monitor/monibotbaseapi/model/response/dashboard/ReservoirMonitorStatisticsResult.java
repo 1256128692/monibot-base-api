@@ -15,14 +15,14 @@ import java.util.List;
 public class ReservoirMonitorStatisticsResult {
     private Integer monitorPointCount;
 
-    private List<TypeStatItem> monitorTypeStatisticsList;
+    private List<TypePointItem> monitorTypeStatisticsList;
 
-    @Data
     @Builder
-    public static class TypeStatItem {
+    @Data
+    public static class TypePointItem {
         private Integer monitorType;
-        private String monitorTypeName;
+        private String typeName;
         private Integer count;
-    }
 
+    }
 }
