@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineStats;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.PropertyDto;
@@ -427,6 +428,8 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         if (pIDList.isEmpty()) {
             return ReservoirMonitorStatisticsResult.builder().build();
         }
+        Map<Integer, MonitorTypeCacheData> allType = monitorRedisService.getAll(MONITOR_TYPE_KEY,
+                Integer.class, MonitorTypeCacheData.class);
         // 使用缓存
         List<ReservoirMonitorStatisticsResult.TypePointItem> itemList =
                 monitorRedisService.getAll(TYPE_POINT_STATS, List.class)
@@ -437,7 +440,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                         ))).entrySet().stream().map(
                                 e -> ReservoirMonitorStatisticsResult.TypePointItem.builder()
                                         .monitorType(e.getKey())
-                                        .typeName(MonitorType.getValueByKey(e.getKey()))
+                                        .typeName(allType.getOrDefault(e.getKey(), new MonitorTypeCacheData()).getTypeName())
                                         .count(e.getValue())
                                         .build()
                         ).toList();
