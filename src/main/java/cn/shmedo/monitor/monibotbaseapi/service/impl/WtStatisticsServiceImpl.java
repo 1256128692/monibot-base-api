@@ -44,6 +44,8 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -99,6 +101,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private static final Integer STR_RESERVOIR_RESPONSIBLE_TYPE_ECHNICALDIRECTOR = 22;
     private final TbMonitorPointMapper tbMonitorPointMapper;
     private final WtReportService wtReportService;
+
     @Override
     public ReservoirWarnStatsResponse queryWarnStats(QueryReservoirWarnStatsParam param) {
         Map<String, Object> dict = getWarnDict(param.getCompanyID(), param.getPlatform());
@@ -166,7 +169,11 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                                 return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
                             });
                 }).collect(Collectors.groupingBy(t -> WARN_POINT_STATS + t.getT1(), Collectors.toMap(Tuple3::getT2, Tuple3::getT3)));
-        cacheMap.forEach(monitorRedisService::putAll);
+
+        monitorRedisService.transaction(operations -> {
+            operations.delete(cacheMap.keySet());
+            cacheMap.forEach((k, v) -> operations.opsForHash().putAll(k, RedisService.serializeMap(v)));
+        });
         cacheMap.clear();
     }
 
@@ -208,17 +215,19 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     @Override
     public void cacheDeviceOnlineStats() {
         List<SensorWithIot> list = sensorMapper.listSensorWithIot();
+        Map<String, Boolean> onlineMap;
         if (list.isEmpty()) {
-            return;
+            onlineMap = Map.of();
+        } else {
+            List<String> uniqueTokens = list.stream().map(SensorWithIot::getIotUniqueToken).distinct().toList();
+            onlineMap = Optional.ofNullable(iotService
+                            .queryDeviceInfoByUniqueTokens(new QueryDeviceInfoByUniqueTokensParam(uniqueTokens)).getData())
+                    .orElse(List.of())
+                    .stream().collect(Collectors.toMap(DeviceInfo::getUniqueToken, DeviceInfo::getOnline));
         }
 
-        List<String> uniqueTokens = list.stream().map(SensorWithIot::getIotUniqueToken).distinct().toList();
-        Map<String, Boolean> onlineMap = Optional.ofNullable(iotService
-                        .queryDeviceInfoByUniqueTokens(new QueryDeviceInfoByUniqueTokensParam(uniqueTokens)).getData())
-                .orElse(List.of())
-                .stream().collect(Collectors.toMap(DeviceInfo::getUniqueToken, DeviceInfo::getOnline));
-
-        Map<String, Map<Integer, DeviceOnlineStats>> cacheMap = list.stream().collect(Collectors.groupingBy(SensorWithIot::getProjectID))
+        Map<String, Map<Integer, DeviceOnlineStats>> cacheMap = list.stream()
+                .collect(Collectors.groupingBy(SensorWithIot::getProjectID))
                 .entrySet().stream().flatMap(entry -> {
                     //项目 监测类型  设备
                     return entry.getValue().stream()
@@ -230,14 +239,18 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                                         .collect(Collectors.groupingBy(e -> e, Collectors.counting()));
 
                                 DeviceOnlineStats cacheObj = new DeviceOnlineStats(entry.getKey(),
+                                        collect.values().stream().mapToLong(e -> e).count(),
                                         collect.getOrDefault(Boolean.TRUE, 0L),
-                                        collect.getOrDefault(Boolean.TRUE, 0L),
-                                        collect.values().stream().mapToLong(e -> e).count(), typeGroup.getKey());
+                                        collect.getOrDefault(Boolean.FALSE, 0L),
+                                        typeGroup.getKey());
                                 return Tuples.of(entry.getKey(), typeGroup.getKey(), cacheObj);
                             });
                 }).collect(Collectors.groupingBy(t -> DEVICE_ONLINE_STATS + t.getT1(), Collectors.toMap(Tuple3::getT2, Tuple3::getT3)));
 
-        cacheMap.forEach(monitorRedisService::putAll);
+        monitorRedisService.transaction(operations -> {
+            operations.delete(cacheMap.keySet());
+            cacheMap.forEach((k, v) -> operations.opsForHash().putAll(k, RedisService.serializeMap(v)));
+        });
         cacheMap.clear();
     }
 
@@ -590,5 +603,12 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         dict.put("offline", "离线" + tag);
         IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
         return dict;
+    }
+
+    @Bean
+    ApplicationRunner applicationRunner() {
+        return args -> {
+            cacheDeviceOnlineStats();
+        };
     }
 }
