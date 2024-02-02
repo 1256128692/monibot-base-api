@@ -135,11 +135,8 @@ public class AddWarnThresholdConfigBatchParam implements ParameterValidator, Res
                         final Integer compareMode = u.getCompareMode();
                         final String oldValue = w.getValue();
                         try {
-                            if (isEmptyCoverage) {
-                                if (ObjectUtil.isEmpty(u.getWarnName())) {
-                                    u.setWarnName(fieldIDNameMap.get(u.getFieldID()) + "异常");
-                                }
-                            } else {
+                            if (!isEmptyCoverage) {
+                                // 如果未选择'空值覆盖'并且用户没填{@code warnName}时,才会获取原来的报警名称并填充进来（这里的数据都是已经配置过的）
                                 if (ObjectUtil.isEmpty(u.getWarnName())) {
                                     u.setWarnName(w.getWarnName());
                                 }
@@ -160,6 +157,9 @@ public class AddWarnThresholdConfigBatchParam implements ParameterValidator, Res
                         }
                     })).toList();
         }
+        // 确保新增的和空值覆盖的记录都有对应的报警名称
+        tbWarnThresholdConfigList.stream().filter(u -> ObjectUtil.isEmpty(u.getWarnName())).peek(u ->
+                u.setWarnName(fieldIDNameMap.get(u.getFieldID()) + "异常")).toList();
         return null;
     }
 
