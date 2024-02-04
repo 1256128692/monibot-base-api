@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDeviceIntelLocationMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceIntelLocation">
+    <!--@mbg.generated-->
+    <!--@Table tb_device_intel_location-->
+    <id column="DeviceToken" jdbcType="VARCHAR" property="deviceToken" />
+    <id column="Type" jdbcType="TINYINT" property="type" />
+    <result column="LocationJson" jdbcType="VARCHAR" property="locationJson" />
+    <result column="Address" jdbcType="VARCHAR" property="address" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="CreateUserID" jdbcType="INTEGER" property="createUserID" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    <!--@mbg.generated-->
+    DeviceToken, `Type`, LocationJson, Address, CreateTime, CreateUserID, UpdateTime, 
+    UpdateUserID
+  </sql>
+
+  <update id="updateByTypeAndToken">
+    update tb_device_intel_location
+    set
+        LocationJson = #{locationJson,jdbcType=VARCHAR},
+        Address = #{address,jdbcType=VARCHAR},
+        UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
+        UpdateUserID = #{updateUserID,jdbcType=INTEGER}
+        where DeviceToken = #{deviceToken,jdbcType=VARCHAR}
+        and Type = #{type,jdbcType=TINYINT}
+  </update>
+</mapper>

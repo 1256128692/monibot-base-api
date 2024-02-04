@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -62,6 +64,10 @@ public class TbVideoDevice implements Serializable {
      * 项目ID
      */
     private Integer projectID;
+
+    @JsonIgnore
+    @TableField(exist = false)
+    private String projectName;
 
     /**
      * 存储类型 本地:0 云端:1 (暂时不用)

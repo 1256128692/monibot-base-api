@@ -58,11 +58,96 @@ public class RedisKeys {
     public static final String PROJECT_TYPE_KEY = "cn.shmedo.mdmbse.projectTypeCache";
 
     /**
+     * 工程项目缓存
+     */
+    public static final String PROJECT_KEY = "cn.shmedo.mdmbse.projectCache";
+
+    /**
+     * 大屏产品服务设备统计
+     */
+    public static final String MONITOR_TYPE_DEVICE_COUNT = "cn.shmedo.monitor.monitorType.deviceCount";
+
+    /**
      * 表单模板缓存
      */
     public static final String FORM_MODEL_KEY = "cn.shmedo.mdmbse.formModel";
 
     public static final String ASSET_HOUSE_KEY = "cn.shmedo.monitor.assetHouse";
+
+    /**
+     * 报警阈值配置 缓存<br/>
+     * 类型：分组k-v
+     */
+    public static final String WARN_THRESHOLD = "cn.shmedo.monitor.warn.threshold:";
+
+    /**
+     * 报警触发配置 缓存<br/>
+     * 类型：分组+ hash，hKey:{projectID}:{monitorItemID}<br/>
+     * 示例：cn.shmedo.iot.monitor.warnTrigger:{platform}
+     */
+    public static final String WARN_TRIGGER = "cn.shmedo.monitor.warn.global:";
+
+    /**
+     * 沉默周期配置 缓存<br/>
+     * 类型: 分组
+     * 示例: cn.shmedo.iot.monitor.warn.silenceCycle:{thresholdID}
+     */
+    public static final String WARN_SILENCE_CYCLE = "cn.shmedo.monitor.warn.silenceCycle:";
+
+    /**
+     * 报警连续触发计数器 缓存<br/>
+     * 类型: 分组 <br/>
+     * 示例：cn.shmedo.monitor.warn.hit:{thresholdID}
+     */
+    public static final String WARN_HIT = "cn.shmedo.monitor.warn.hit:";
+
+    /**
+     * 设备资产
+     */
+    public static final String DEVICE_ASSET_KEY = "cn.shmedo.monitor.project.deviceAsset";
+
+
+    /**
+     * 设备数据量
+     */
+    public static final String DEVICE_DATA_COUNT_KEY = "cn.shmedo.monitor.project.dataCount";
+
+    /**
+     * 设备在线率统计
+     */
+    public static final String PROJECT_DEVICE_ONLINE_RATE_KEY = "cn.shmedo.monitor.project.deviceOnline";
+
+    /**
+     * 数据接入
+     */
+    public static final String PROJECT_DEVICE_MANAGEMENT_DATA_ACCESS = "cn.shmedo.monitor.project.device.dataAccess";
+
+    /**
+     * 报警监测点数量按监测类型统计
+     */
+    public static final String WARN_POINT_STATS = "cn.shmedo.monitor.warnPointStats:";
+
+    /**
+     * 设备在线统计
+     */
+    public static final String DEVICE_ONLINE_STATS = "cn.shmedo.monitor.deviceOnlineStats:";
+
+    /**
+     * 类型下监测点统计
+     */
+    public static final String TYPE_POINT_STATS = "cn.shmedo.monitor.typePointStats";
+    /**
+     * 视频监测点ID
+     */
+    public static final String VIDEO_POINT_ID = "cn.shmedo.monitor.videoPointID";
+    /**
+     * 视频监测点ID
+     */
+    public static final String INTEL_DEVICE_STATS = "cn.shmedo.monitor.intelDeviceStats";
+    /**
+     * 水库详情
+     */
+    public static final String RESERVOIR_DETAIL = "cn.shmedo.monitor.reservoirDetail";
 }
 
     

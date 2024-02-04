@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.video;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class VideoDevicePageInfo {
@@ -28,6 +29,8 @@ public class VideoDevicePageInfo {
     private Date createTime;
     private Integer updateUserID;
     private Date updateTime;
+
+    private List<Integer> channelNoList;
 
 
 }

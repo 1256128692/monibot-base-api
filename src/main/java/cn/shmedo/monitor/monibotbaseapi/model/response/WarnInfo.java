@@ -6,10 +6,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorSatusType;
 import com.alibaba.nacos.client.naming.utils.CollectionUtils;
 import lombok.Data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -40,12 +37,14 @@ public class WarnInfo {
 
             // 拿到最差的预警警报
             if (!CollectionUtils.isEmpty(sensorsForMonitorPoint)) {
-                byte maxStatus = -1;
-                for (TbSensor sensor : sensorsForMonitorPoint) {
-                    if (sensor.getStatus() > maxStatus) {
-                        maxStatus = sensor.getStatus();
-                    }
-                }
+                sensorsForMonitorPoint.sort(Comparator.comparingInt(sensor -> {
+                    int status = sensor.getStatus();
+                    // 优先按照1,2,3,4,-1,0排序
+                    return status == 1 ? 0 : (status == 2 ? 1 : (status == 3 ? 2 : (status == 4 ? 3 : (status == -1 ? 4 : 5))));
+                }));
+
+                TbSensor maxStatusSensor = sensorsForMonitorPoint.get(0);
+                int maxStatus = maxStatusSensor.getStatus();
                 switch (maxStatus) {
                     case -1:
                         vo.setNoDataCount(vo.getNoDataCount() + 1);

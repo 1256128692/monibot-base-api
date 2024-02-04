@@ -98,6 +98,11 @@ public class TbSensor implements Serializable {
     private Byte status;
 
     /**
+     * 设备在线情况,0:离线 1:正常 null:离线
+     */
+    private Integer OnlineStatus;
+
+    /**
      * 无数据报警是否开启
      */
     private Boolean warnNoData;

@@ -1,20 +1,21 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.map.MapUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created 2015/12/15
@@ -25,6 +26,8 @@ public class TimeUtil {
     private static final String MILLI_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String STANDARD_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String MILLI_TIME_FORMAT_TZ = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
+    public static final Timestamp DEFAULT_START_TIME = Timestamp.valueOf("1970-01-01 00:00:00");
+    public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat(DatePattern.NORM_DATE_PATTERN);
     /**
      * 海康视频设备回放的时间格式
      */
@@ -169,7 +172,7 @@ public class TimeUtil {
         return Timestamp.valueOf(timeStr);
     }
 
-    public static Date getDate(LocalDateTime localDateTime){
+    public static Date getDate(LocalDateTime localDateTime) {
         ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
         Instant instant2 = zonedDateTime.toInstant();
         return Date.from(instant2);
@@ -537,5 +540,58 @@ public class TimeUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 展示密度formatter
+     */
+    public interface DestinyFormatter {
+        DateTimeFormatter HOUR_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:00:00");
+        DateTimeFormatter DAILY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd 00:00:00");
+        DateTimeFormatter MONTHLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
+        DateTimeFormatter YEARLY_FORMATTER = DateTimeFormatter.ofPattern("yyyy");
+
+        static DateTimeFormatter getFormatter(DisplayDensity densityType) {
+            DateTimeFormatter formatter;
+            switch (densityType) {
+                case ALL -> formatter = getDefaultDateTimeFormatter();
+                case HOUR -> formatter = HOUR_FORMATTER;
+                case DAY, WEEK -> formatter = DAILY_FORMATTER;
+                case MONTH -> formatter = MONTHLY_FORMATTER;
+                case YEAR -> formatter = YEARLY_FORMATTER;
+                default -> throw new RuntimeException("无法处理的展示密度,密度:" + densityType.name());
+            }
+            return formatter;
+        }
+    }
+
+    public static Date previousYear(int year) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.YEAR, -year);
+        return calendar.getTime();
+    }
+
+    public static String getDate(DateTimeFormatter formatter) {
+        // 获取当前日期和时间
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        // 从日期和时间中提取日期部分
+        return currentDateTime.format(formatter);
+    }
+
+    /**
+     * 获取当前的前N天
+     *
+     * @param days 前多少天
+     * @return
+     */
+    public static String[] getPreviousDays(int days) {
+        String[] res = new String[days];
+        for (int i = 0; i < days; i++) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_MONTH, -i);
+            String date = simpleDateFormat.format(calendar.getTime());
+            res[i] = date;
+        }
+        return res;
     }
 }

@@ -11,10 +11,8 @@ import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AvgDensityType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.QueryType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -31,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,6 +53,29 @@ public class SensorDataDaoImpl implements SensorDataDao {
                                                         List<FieldSelectInfo> fieldSelectInfoList,
                                                         boolean raw, Integer monitorType) {
         return querySensorNewDataByCondition(sensorIDList, fieldSelectInfoList, raw, null, monitorType);
+    }
+
+    @Override
+    public List<Map<String, Object>> querySensorNewDataBefore(List<Integer> sensorIDList, Timestamp end, List<FieldSelectInfo> fieldSelectInfoList, boolean raw, Integer monitorType) {
+        // 根据monitorType组建要查询传感器类型的表名,例如:流量流速:11 ,influxdb表名最终为:tb_11_data
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
+
+        List<String> selectField = new LinkedList<>();
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
+        fieldSelectInfoList.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
+        String fieldString = String.join(",", selectField);
+        StringBuilder sqlBuilder = new StringBuilder();
+        sensorIDList.forEach(sid -> {
+            String sidSql = " select  " + fieldString + " from  " + measurement + " where sid='" + sid.toString() +
+                    "' and time < '" + TimeUtil.formatInfluxTimeString(end) + "' order by time desc limit 1 tz('Asia/Shanghai') ; ";
+            sqlBuilder.append(sidSql);
+        });
+        String sql = sqlBuilder.toString();
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
     }
 
     @Override
@@ -82,33 +104,202 @@ public class SensorDataDaoImpl implements SensorDataDao {
     @Override
     public List<Map<String, Object>> querySensorDayStatisticsData(List<Integer> sensorIDList, Timestamp begin,
                                                                   Timestamp end, List<FieldSelectInfo> fieldSelectInfoList,
-                                                                  boolean raw, Integer monitorType) {
+                                                                  boolean raw, Integer monitorType, SensorStatisticsType sensorStatisticsType) {
         String measurement = MonitorTypeUtil.getMeasurement(monitorType, raw, false);
         String beginString = TimeUtil.formatInfluxTimeString(begin);
         String endString = TimeUtil.formatInfluxTimeString(end);
         String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
                 .collect(Collectors.joining(" or "));
-        List<String> selectField = new LinkedList<>();
-        List<String> resultField = new LinkedList<>();
-        fieldSelectInfoList.forEach(item -> {
-            selectField.add(String.format(" mean(%s) as %s", item.getFieldToken(), item.getFieldToken()));
-            resultField.add(item.getFieldToken());
-        });
 
-        StringBuilder sqlBuilder = new StringBuilder();
-        String selectFieldString = String.join(",", selectField);
-        sqlBuilder.append(" select ");
-        sqlBuilder.append(selectFieldString);
-        sqlBuilder.append(" from  ").append(measurement);
-        sqlBuilder.append(" where time>='" + beginString + "' and time<'" + endString + "' ");
-        sqlBuilder.append(" and ( ");
-        sqlBuilder.append(sidOrString).append(" ) ");
-        sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1d) fill(none) ");
-        sqlBuilder.append(" order by time asc ");
-        sqlBuilder.append(" tz('Asia/Shanghai') ");
-        String sql = sqlBuilder.toString();
-        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
-        return InfluxSensorDataUtil.parseResult(queryResult, resultField);
+
+        if (sensorStatisticsType.getCode().equals(SensorStatisticsType.DIFF.getCode())) {
+            List<String> selectFieldHead = new LinkedList<>();
+            List<String> selectFieldTail = new LinkedList<>();
+            // 返回结果会进一步处理
+            List<String> resultField = new LinkedList<>();
+            fieldSelectInfoList.forEach(item -> {
+                selectFieldHead.add(String.format("first(%s) as %s", item.getFieldToken(), item.getFieldToken()) + " ");
+                selectFieldTail.add(String.format("last(%s) as %s", item.getFieldToken(), item.getFieldToken()) + " ");
+                resultField.add(item.getFieldToken());
+            });
+            String selectFieldHeadString = String.join(",", selectFieldHead);
+            String selectFieldTailString = String.join(",", selectFieldTail);
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append(" select  count(" + fieldSelectInfoList.get(0).getFieldToken() + ") as count ,  %s  ");
+            sqlBuilder.append(" from  ").append(measurement);
+            sqlBuilder.append(" where time>='" + beginString + "' and time<'" + endString + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) ");
+            sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1d) fill(none) ");
+            sqlBuilder.append(" order by time asc ");
+            sqlBuilder.append(" tz('Asia/Shanghai') ");
+            String sqlF = sqlBuilder.toString();
+            String headSql = String.format(sqlF, selectFieldHeadString);
+            String tailSql = String.format(sqlF, selectFieldTailString);
+            QueryResult headTemp = influxDB.query(new Query(headSql), TimeUnit.MILLISECONDS);
+            List<Map<String, Object>> headList = InfluxSensorDataUtil.parseResult(headTemp, resultField);
+            QueryResult tailTemp = influxDB.query(new Query(tailSql), TimeUnit.MILLISECONDS);
+            List<Map<String, Object>> tailList = InfluxSensorDataUtil.parseResult(tailTemp, resultField);
+            return handleDiffData(headList, tailList);
+        } else if (sensorStatisticsType.getCode().equals(SensorStatisticsType.MEAN1.getCode())) {
+            // 处理时间,调整小时数
+            Date beginOfHour = DateUtil.offsetHour(DateUtil.beginOfDay(DateUtil.date(begin)), 8);
+            Date endOfHour = DateUtil.offsetHour(DateUtil.endOfDay(DateUtil.date(end)), -3);
+            String beginString1 = TimeUtil.formatInfluxTimeString(new Timestamp(beginOfHour.getTime()));
+            String endString1 = TimeUtil.formatInfluxTimeString(new Timestamp(endOfHour.getTime()));
+            List<String> selectField = new LinkedList<>();
+            // 返回结果会进一步处理
+            List<String> resultField = new LinkedList<>();
+            fieldSelectInfoList.forEach(item -> {
+                selectField.add(String.format("first" + "(%s) as %s", item.getFieldToken(), item.getFieldToken()) + " ");
+                resultField.add(item.getFieldToken());
+            });
+            // 仅查这时间段内的4个瞬时数据
+            String selectFieldString = String.join(",", selectField);
+            StringBuilder sqlBuilder = new StringBuilder();
+            sqlBuilder.append(" select ");
+            sqlBuilder.append(selectFieldString);
+            sqlBuilder.append(" from  ").append(measurement);
+            sqlBuilder.append(" where time>='" + beginString1 + "' and time<'" + endString1 + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) ");
+            sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(4h) fill(none) ");
+            sqlBuilder.append(" order by time asc ");
+            sqlBuilder.append(" tz('Asia/Shanghai') ");
+            String sql = sqlBuilder.toString();
+            QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+            List<Map<String, Object>> mapList = InfluxSensorDataUtil.parseResult(queryResult, resultField);
+            List<Map<String, Object>> maps = handleSpecialMean(mapList,
+                    fieldSelectInfoList.stream().map(FieldSelectInfo::getFieldToken).collect(Collectors.toList()));
+            return maps;
+
+        } else {
+            List<String> selectField = new LinkedList<>();
+            // 返回结果会进一步处理
+            List<String> resultField = new LinkedList<>();
+            fieldSelectInfoList.forEach(item -> {
+                selectField.add(String.format(sensorStatisticsType.getStat() + "(%s) as %s", item.getFieldToken(), item.getFieldToken()) + " ");
+                resultField.add(item.getFieldToken());
+            });
+            StringBuilder sqlBuilder = new StringBuilder();
+            String selectFieldString = String.join(",", selectField);
+            sqlBuilder.append(" select ");
+            sqlBuilder.append(selectFieldString);
+            sqlBuilder.append(" from  ").append(measurement);
+            sqlBuilder.append(" where time>='" + beginString + "' and time<'" + endString + "' ");
+            sqlBuilder.append(" and ( ");
+            sqlBuilder.append(sidOrString).append(" ) ");
+            sqlBuilder.append(" group by ").append(DbConstant.SENSOR_ID_TAG).append(",time(1d) fill(none) ");
+            sqlBuilder.append(" order by time asc ");
+            sqlBuilder.append(" tz('Asia/Shanghai') ");
+            String sql = sqlBuilder.toString();
+            QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+            return InfluxSensorDataUtil.parseResult(queryResult, resultField);
+        }
+    }
+
+
+    /**
+     * 处理特殊监测类型的日平均统计方式
+     * 将不同传感器,当日的4个时刻的瞬时值作为平均值的计算
+     *
+     * @param mapList
+     * @return
+     */
+    private List<Map<String, Object>> handleSpecialMean(List<Map<String, Object>> mapList, List<String> fields) {
+        Map<Integer, Map<String, Object>> sensorDataMap = new HashMap<>();
+
+        for (Map<String, Object> data : mapList) {
+            int sensorID = (int) data.get("sensorID");
+            sensorDataMap.computeIfAbsent(sensorID, k -> new HashMap<>());
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    Object value = data.get(field);
+                    sensorDataMap.get(sensorID).put(field, value);
+                }
+            }
+        }
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<Integer, Map<String, Object>> entry : sensorDataMap.entrySet()) {
+            int sensorID = entry.getKey();
+
+            int count = 0;
+            Map<String, Double> fieldTotal = new HashMap<>();
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    fieldTotal.put(field, 0.0);
+                }
+            }
+            for (Map<String, Object> data : mapList) {
+                if ((int) data.get("sensorID") == sensorID) {
+                    count++;
+
+                    for (String field : fields) {
+                        if (!field.equals("sensorID") && !field.equals("time")) {
+                            Object value = data.get(field);
+                            if (value instanceof Number) {
+                                double total = fieldTotal.get(field) + ((Number) value).doubleValue();
+                                fieldTotal.put(field, total);
+                            }
+                        }
+                    }
+                }
+            }
+            Map<String, Object> meanData = new HashMap<>();
+            meanData.put("sensorID", sensorID);
+
+            if (!mapList.isEmpty()) {
+                meanData.put("time", mapList.get(0).get("time").toString().substring(0,10) + " 00:00:00.000");
+            }
+
+            for (String field : fields) {
+                if (!field.equals("sensorID") && !field.equals("time")) {
+                    double meanValue = fieldTotal.get(field) / count;
+                    meanData.put(field, meanValue);
+                }
+            }
+            result.add(meanData);
+        }
+
+        return result;
+    }
+
+    /**
+     * 处理期间变化
+     *
+     * @param headList
+     * @param tailList
+     * @return
+     */
+    private List<Map<String, Object>> handleDiffData(List<Map<String, Object>> headList, List<Map<String, Object>> tailList) {
+        if (CollectionUtil.isNullOrEmpty(headList)
+                || CollectionUtil.isNullOrEmpty(tailList)
+                || headList.size() != tailList.size()) {
+            return Collections.emptyList();
+        }
+        Map<String, Map<String, Object>> headMap = headList.stream().
+                collect(Collectors.toMap(e -> e.get(DbConstant.TIME_FIELD) + "_" + e.get(DbConstant.SENSOR_ID_FIELD_TOKEN),
+                        Function.identity()));
+        return tailList.stream().map(
+                e -> {
+                    String key = e.get(DbConstant.TIME_FIELD) + "_" + e.get(DbConstant.SENSOR_ID_FIELD_TOKEN);
+                    Map<String, Object> stringObjectMap = headMap.get(key);
+                    if ((Double) e.get(DbConstant.COUNT_FIELD) < 2) {
+                        return null;
+                    }
+                    e.entrySet().forEach(entry -> {
+                        if (!entry.getKey().equals(DbConstant.TIME_FIELD)
+                                && !entry.getKey().equals(DbConstant.SENSOR_ID_FIELD_TOKEN)
+                                && !entry.getKey().equals(DbConstant.COUNT_FIELD)) {
+                            Object o = stringObjectMap.get(entry.getKey());
+                            entry.setValue((Double) entry.getValue() - (Double) o);
+                        }
+                    });
+                    e.remove(DbConstant.COUNT_FIELD);
+                    return e;
+                }
+        ).filter(Objects::nonNull).toList();
     }
 
     @Override
@@ -339,10 +530,12 @@ public class SensorDataDaoImpl implements SensorDataDao {
 
 
     @Override
-    public void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType) {
+    public void insertSensorData(List<Map<String, Object>> sensorDataList, boolean avg, boolean raw, List<FieldSelectInfo> fieldSelectInfoList, Integer monitorType, String tableSuffix) {
+        if (ObjectUtil.isEmpty(sensorDataList)) {
+            return;
+        }
         List<Tuple<FieldType, Integer>> fieldTypeCount = FieldUtil.getFieldTypeCount(fieldSelectInfoList);
-        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, avg);
-
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, tableSuffix);
         BatchPoints batchPoints = BatchPoints.database(fileConfig.getInfluxDatabase()).build();
         for (Map<String, Object> item : sensorDataList) {
 
@@ -537,6 +730,147 @@ public class SensorDataDaoImpl implements SensorDataDao {
         selectField.add(DbConstant.TIME_FIELD);
         selectField.add(DbConstant.SENSOR_ID_TAG);
         return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
+
+    @Override
+    public List<Map<String, Object>> queryCommonSensorDataList(List<Integer> sensorIDList,
+                                                               Date begin, Date end, Integer densityType,
+                                                               Integer statisticsType, List<FieldBaseInfo> fieldList,
+                                                               Integer monitorType) {
+
+        String beginString = TimeUtil.formatInfluxTimeString(new Timestamp(begin.getTime()));
+        String endString = TimeUtil.formatInfluxTimeString(new Timestamp(end.getTime()));
+
+        String measurement = MonitorTypeUtil.getMeasurementByStatisticsTypeAndDensityType(monitorType, statisticsType, densityType);
+        List<String> selectField = new LinkedList<>();
+        fieldList.forEach(item -> {
+            selectField.add(item.getFieldToken());
+        });
+
+        String sql = null;
+        switch (densityType) {
+            case 1:
+                sql = getAllSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
+                break;
+            case 2:
+            case 3:
+            case 7:
+            case 8:
+            case 9:
+            case 10:
+                sql = getHourSensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField, statisticsType, densityType);
+                break;
+            case 4:
+            case 5:
+            case 6:
+            case 11:
+                sql = getDaylySensorCommonDataSql(sensorIDList, beginString, endString, measurement, selectField);
+                break;
+        }
+        QueryResult queryResult = influxDB.query(new Query(sql), TimeUnit.MILLISECONDS);
+        return InfluxSensorDataUtil.parseResult(queryResult, selectField);
+    }
+
+    @Override
+    public void insertSensorCommonData(List<Map<String, Object>> sensorDataList, List<FieldBaseInfo> fieldInfoList, Integer monitorType, String tableSuffix) {
+
+        if (ObjectUtil.isEmpty(sensorDataList)) {
+            return;
+        }
+        String measurement = MonitorTypeUtil.getMeasurement(monitorType, false, tableSuffix);
+        BatchPoints batchPoints = BatchPoints.database(fileConfig.getInfluxDatabase()).build();
+        for (Map<String, Object> item : sensorDataList) {
+
+            Map<String, Object> collect = fieldInfoList.stream()
+                    .filter(e -> item.containsKey(e.getFieldToken()) && ObjectUtil.isNotEmpty(item.get(e.getFieldToken())))
+                    .collect(Collectors.toMap(
+                            FieldBaseInfo::getFieldToken,
+                            fieldSelectInfo -> item.get(fieldSelectInfo.getFieldToken())));
+            if (collect.size() > 0) {
+                Point.Builder builder = Point.measurement(measurement);
+                builder.fields(collect);
+                builder.time(((Date) item.get("time")).getTime(),
+                        TimeUnit.MILLISECONDS);
+                builder.tag("sid", item.get("sensorID").toString());
+                batchPoints.point(builder.build());
+            }
+        }
+        influxDB.write(batchPoints);
+    }
+
+
+    /**
+     * 查询全部传感器的最新值
+     */
+    private String getAllSensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString, String measurement, List<String> selectField) {
+        selectField.add(DbConstant.TIME_FIELD);
+        selectField.add(DbConstant.SENSOR_ID_TAG);
+        String fieldString = String.join(",", selectField);
+        StringBuilder sqlBuilder = new StringBuilder();
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+        String sidSql = " select  " + fieldString + " from  " + measurement + " where " + sidOrString +
+                " and time >= '" + beginString + "' and time <= '" + endString + "' order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        sqlBuilder.append(sidSql);
+        return sidSql;
+    }
+
+    /**
+     * 查询全部传感器的根据小时密度的统计方式
+     * 查询的是tb_data表,而不是后缀_avg,_diff等表
+     */
+    private String getHourSensorCommonDataSql(List<Integer> sensorIDList, String beginString,
+                                              String endString, String measurement, List<String> selectField,
+                                              Integer statisticsType, Integer densityType) {
+
+        StringBuilder selectFieldBuilder = new StringBuilder();
+        selectField.forEach(s -> {
+            if (statisticsType == StatisticalMethods.CHANGE.getValue()) {
+                selectFieldBuilder.append("last(").append(s).append(") - first(").append(s);
+                selectFieldBuilder.append(") as ").append(s).append(",");
+            } else if (statisticsType == StatisticalMethods.AVERAGE.getValue()) {
+                selectFieldBuilder.append("mean");
+                selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+            } else {
+                selectFieldBuilder.append(StatisticalMethods.fromValue(statisticsType).getName());
+                selectFieldBuilder.append("(").append(s).append(") as ").append(s).append(",");
+            }
+
+        });
+        selectFieldBuilder.append(DbConstant.TIME_FIELD);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid, time(" + DisplayDensity.fromValue(densityType).getName() + ") "
+                + " order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        return sidSql;
+    }
+
+
+    /**
+     * 查询每日通用的传感器数据,在日统计表的基础上
+     *
+     * @return
+     */
+    private String getDaylySensorCommonDataSql(List<Integer> sensorIDList, String beginString, String endString, String measurement,
+                                               List<String> selectField) {
+
+        StringBuilder selectFieldBuilder = new StringBuilder();
+        selectField.forEach(s -> {
+            selectFieldBuilder.append(s);
+            selectFieldBuilder.append(",");
+        });
+        selectFieldBuilder.append(DbConstant.TIME_FIELD);
+        String sidOrString = sensorIDList.stream().map(sid -> DbConstant.SENSOR_ID_TAG + "='" + sid.toString() + "'")
+                .collect(Collectors.joining(" or "));
+
+        String sidSql = " select " + selectFieldBuilder.toString() + " from  " + measurement + " where ("
+                + sidOrString + ") and time >= '" + beginString + "' and time <= '" + endString
+                + "' GROUP BY sid order by time desc limit 50000 tz('Asia/Shanghai') ; ";
+        return sidSql;
+
     }
 
 

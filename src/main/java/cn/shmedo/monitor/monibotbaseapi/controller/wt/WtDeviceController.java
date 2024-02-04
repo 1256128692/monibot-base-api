@@ -1,6 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.wt;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.wtdevice.*;
 import cn.shmedo.monitor.monibotbaseapi.service.WtDeviceService;
@@ -257,7 +261,7 @@ public class WtDeviceController {
      * @api {POST} /QueryDeviceDetail 查询设备详情
      * @apiVersion 1.0.0
      * @apiGroup 水利设备列表模块
-     * @apiName QueryProductSimpleList
+     * @apiName QueryDeviceDetail
      * @apiDescription 产品简要信息列表
      * @apiParam (请求参数) {Int[]} projectIDList 工程项目ID列表
      * @apiParam (请求参数) {Int} [companyID] 公司ID,为null则获取当前用户所在公司ID
@@ -296,6 +300,9 @@ public class WtDeviceController {
      * @apiSuccess (返回结果) {Double} [state.rebootCode] 设备重启代码
      * @apiSuccess (返回结果) {Double} [state.loraUpSignal] LORA上行信号强度，单位dbm
      * @apiSuccess (返回结果) {Double} [state.loraDownSignal] LORA下行信号强度，单位dbm
+     * @apiSuccess (返回结果) {Json} [location] 位置信息
+     * @apiSuccess (返回结果) {String} location.address 地址
+     * @apiSuccess (返回结果) {String} [location.locationJson] 位置扩展，json字符串
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseDevice
      */
@@ -303,5 +310,28 @@ public class WtDeviceController {
     @PostMapping(value = "/QueryDeviceDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deviceInfo(@Valid @RequestBody QueryDeviceDetailParam param) {
         return wtDeviceService.deviceDetail(param);
+    }
+
+    /**
+     * @api {POST} /SetIntelDeviceLocationInSys 设置智能设备位置信息
+     * @apiVersion 1.0.0
+     * @apiGroup 水利设备列表模块
+     * @apiName SetIntelDeviceLocationInSys
+     * @apiDescription 设置智能设备位置信息，仅在当前系统中
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {String} deviceToken 设备SN或者视频设备的Serial
+     * @apiParam (请求参数) {Int} type 类型，0,1对应iot，视频设备
+     * @apiParam (请求参数) {String} address 地址
+     * @apiParam (请求参数) {String} [locationJson] 位置扩展，json字符串
+     * @apiSuccess (返回结果) {String} none 无返回值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:SetIntelDeviceInfoInSys
+     */
+    @Permission(permissionName = "mdmbase:SetIntelDeviceInfoInSys")
+    @LogParam(moduleName = "水利设备列表模块", operationName = "设置物联网设备位置信息", operationProperty = OperationProperty.UPDATE)
+    @PostMapping(value = "/SetIntelDeviceLocationInSys", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object setIntelDeviceLocationInSys(@Valid @RequestBody SetIntelDeviceLocationInSysParam pa) {
+        wtDeviceService.setIntelDeviceLocationInSys(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        return ResultWrapper.successWithNothing();
     }
 }

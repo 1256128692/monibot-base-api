@@ -186,6 +186,7 @@ public class PropertyController {
      * @apiParam (请求体) {Int} [modelType] 模板类型（0-工程项目（默认值）；1-设备；2-工作流）
      * @apiParam (请求体) {Int} [modelTypeSubType] 模板类型子分类（冗余字段，当且仅当ModelType为2-工作流时候，有值<0-工单、1-巡检、2-调度>）
      * @apiParam (请求体) {Int} [groupID] 模板组ID（当modelType为0或空时，groupID对应projectType）
+     * @apiParam (请求体) {Int[]} [groupIDList] 模板组ID列表（处理根据指定组过滤）
      * @apiParam (请求体) {String} [platform] 所属平台（冗余字段，当且仅当ModelType为2-工作流时候，有值）
      * @apiParam (请求体) {Int} [createType] 创建类型
      * @apiParam (请求体) {Boolean} [excludeFileProperty] 排除包含文件属性（6图片， 7 文件）的模板
@@ -197,6 +198,7 @@ public class PropertyController {
      * @apiSuccess (返回结果) {Int} modelList.groupName  模板组名称（当modelType为0时，group对应projectName）
      * @apiSuccess (返回结果) {String} modelList.name  模板名称
      * @apiSuccess (返回结果) {Int} modelList.createType  模板创建类型
+     * @apiSuccess (返回结果) {Bool} modelList.editor  是否允许编辑
      * @apiSuccess (返回结果) {Object[]} modelList.propertyList  模板的属性列表
      * @apiSuccess (返回结果) {Int} modelList.propertyList.propertyID  属性ID
      * @apiSuccess (返回结果) {String} modelList.propertyList.name  模板的属性名称

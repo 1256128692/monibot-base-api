@@ -2,12 +2,16 @@ package cn.shmedo.monitor.monibotbaseapi.model.db;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 /**
  * 参数表
  */
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 public class TbParameter {
     /**
      * 主键

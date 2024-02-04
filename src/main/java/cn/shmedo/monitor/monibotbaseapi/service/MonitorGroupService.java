@@ -2,8 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.QueryManualSensorListByMonitorParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupParentBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 
@@ -34,4 +36,6 @@ public interface MonitorGroupService {
     List<SimpleMonitorInfo> queryMonitorGroupItemNameList(QueryMonitorGroupItemNameListParam pa);
 
     List<MonitorGroupParentBaseInfo> queryProjectGroupInfoList(QueryProjectGroupInfoParam param);
+
+    List<MonitorGroupPointBaseInfo> queryMonitorTypeGroupPoint(QueryManualSensorListByMonitorParam pa);
 }

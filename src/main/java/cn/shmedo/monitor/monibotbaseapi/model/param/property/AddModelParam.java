@@ -66,7 +66,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
         groupID = PropertyModelType.BASE_PROJECT.getCode().equals(modelType) ? this.projectType : this.groupID;
 
         // 校验表单类型是否正确
-        if(!PropertyModelType.getModelTypeValues().contains(modelType)){
+        if (!PropertyModelType.getModelTypeValues().contains(modelType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板类型不合法");
         }
 
@@ -75,7 +75,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "项目类型不合法");
         }
 
-        if(Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())){
+        if (Objects.nonNull(platform) && !redisTemplate.opsForHash().hasKey(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, platform.toString())) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所属平台不合法");
         }
 
@@ -85,6 +85,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
                 .eq(TbPropertyModel::getModelType, this.modelType)
                 .eq(TbPropertyModel::getPlatform, this.platform)
                 .eq(TbPropertyModel::getGroupID, this.groupID)
+                .eq(Objects.nonNull(modelTypeSubType), TbPropertyModel::getModelType, modelType)
                 .eq(TbPropertyModel::getName, this.modelName));
         if (!CollectionUtil.isNullOrEmpty(tbPropertyModelList)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的名称已存在");

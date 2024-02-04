@@ -5,6 +5,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.UpdateFieldItem;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorTypeFieldV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.TbMonitorTypeFieldWithItemID;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.MonitorTypeFieldV2;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
@@ -26,6 +29,8 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes, Boolean allFiled);
 
+    List<MonitorTypeFieldV2> queryByMonitorTypesV2(List<Integer> monitorTypes, Boolean allFiled);
+
     void insertBatch(List<TbMonitorTypeField> list);
 
     List<MonitorTypeFieldWithFormula> queryMonitorTypeFieldWithFormula(Integer monitorType, Integer templateID);
@@ -39,4 +44,10 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
     List<MonitorTypeFieldV1> queryMonitorTypeFieldV1ByMonitorItems(List<Integer> monitorItemIDList);
 
     List<TbMonitorTypeField> selectListByMonitorID(Integer monitorPointID);
+
+    List<MonitorTypeFieldBaseInfo> selectListByMonitorItemIDList(List<Integer> monitorItemIDList);
+
+    List<FieldBaseInfo> selectListByMonitorType(Integer monitorType);
+
+    List<FieldBaseInfo> selectListByType(Integer monitorType);
 }

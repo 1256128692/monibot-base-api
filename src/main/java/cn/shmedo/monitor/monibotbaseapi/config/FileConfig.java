@@ -60,4 +60,20 @@ public class FileConfig {
 
     @Value("${iot.ysProductID}")
     private Integer ysProductID;
+
+    @Value("${service.notifyServiceAddress}")
+    private String notifyServiceAddress;
+
+    @Value("${service.notifyAppKey}")
+    private String notifyAppKey;
+
+    @Value("${service.notifyAppSecret}")
+    private String notifyAppSecret;
+
+    @Value("${service.warn.data.templateCode}")
+    private String dataWarnTemplateCode;
+
+    @Value("${service.warn.device.templateCode}")
+    private String deviceWarnTemplateCode;
+
 }

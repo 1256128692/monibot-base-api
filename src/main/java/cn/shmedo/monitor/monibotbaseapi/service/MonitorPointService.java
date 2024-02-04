@@ -1,13 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.IDNameAlias;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemWithPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: monibot-base-api
@@ -32,4 +34,12 @@ public interface MonitorPointService {
     void addMonitorPointBatch(AddMonitorPointBatchParam pa, Integer userID);
 
     void updateMonitorPointBatch(UpdateMonitorPointBatchParam pa, Integer userID);
+
+    Object queryMonitorGroupPointList(QueryMonitorGroupPointParam pa);
+
+    Map<Integer, List<MonitorPointSimple>> queryMonitorPointWithProjectType(QueryMonitorPointWithProjectTypeParam pa);
+
+    Object queryMonitorPointIncludeSensorList(QueryMonitorPointIncludeSensorParam pa);
+
+    List<MonitorPoint4Web> queryMonitorPointList(QueryMonitorPointListParam pa);
 }

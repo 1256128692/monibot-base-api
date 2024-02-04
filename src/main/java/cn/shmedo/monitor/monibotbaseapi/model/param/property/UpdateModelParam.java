@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
@@ -28,11 +29,10 @@ import lombok.Data;
 import lombok.ToString;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -83,6 +83,9 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
     @JsonIgnore
     private List<ModelItem> updateModelItemList;
 
+    @JsonIgnore
+    Set<Integer> removeModelItemIDSet;
+
     @Override
     public ResultWrapper<?> validate() {
         modelType = Objects.isNull(this.modelType) ? PropertyModelType.BASE_PROJECT.getCode() : this.modelType;
@@ -113,8 +116,10 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         if (StringUtils.isNotEmpty(modelName)) {
             LambdaQueryWrapper<TbPropertyModel> checkNameQueryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
                     .ne(TbPropertyModel::getID, this.ID)
-                    .eq(TbPropertyModel::getModelType, this.modelType)
                     .eq(TbPropertyModel::getCompanyID, this.companyID)
+                    .eq(TbPropertyModel::getModelType, this.modelType)
+                    .eq(Objects.nonNull(this.groupID), TbPropertyModel::getGroupID, this.groupID)
+                    .eq(Objects.nonNull(this.modelTypeSubType), TbPropertyModel::getModelTypeSubType, this.modelTypeSubType)
                     .eq(TbPropertyModel::getName, this.modelName);
             if (Objects.nonNull(this.modelTypeSubType)) {
                 checkNameQueryWrapper.eq(TbPropertyModel::getModelTypeSubType, this.modelTypeSubType);
@@ -142,38 +147,43 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
                 return OperationProperty.UPDATE.name();
             }
         }));
+
+        tbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda()
+                .eq(TbProperty::getModelID, this.ID));
+
+        // -- 模板下属性删除
+        Set<Integer> updateModelItemIDSet = modelPropertyList.stream().map(ModelItem::getID).collect(Collectors.toSet());
+        removeModelItemIDSet = tbPropertyList.stream().map(TbProperty::getID).filter(id -> !updateModelItemIDSet.contains(id)).collect(Collectors.toSet());
+
+        // -- 模板下属性编辑校验
+        updateModelItemList = recordStateMap.get(OperationProperty.UPDATE.name());
+        allPropertyIdAndNameMap = tbPropertyList.stream().collect(Collectors.toMap(TbProperty::getID, TbProperty::getName));
+        if (CollectionUtil.isNotEmpty(updateModelItemList) && CollectionUtil.isNotEmpty(tbPropertyList)) {
+            // 校验模板下是否已经有相同模板名称
+            for (ModelItem item : updateModelItemList) {
+                // 先排除自身Name
+                String value = allPropertyIdAndNameMap.remove(item.getID());
+                if (allPropertyIdAndNameMap.containsValue(item.getName()) && removeModelItemIDSet.contains(item.getID())) {
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
+                }
+                // 还原自身Name
+                allPropertyIdAndNameMap.put(item.getID(), value);
+            }
+        }
+
         // -- 模板下属性新增校验
         addModelItemList = recordStateMap.get(OperationProperty.ADD.name());
         if (CollectionUtil.isNotEmpty(addModelItemList)) {
             // 查询模板下是否已经有相同模板属性名称
-            LambdaQueryWrapper<TbProperty> addCheckNameQueryWrapper = new QueryWrapper<TbProperty>().lambda()
+            List<TbProperty> addTbPropertyList = tbPropertyMapper.selectList(new QueryWrapper<TbProperty>().lambda()
                     .in(TbProperty::getName, addModelItemList.stream().map(ModelItem::getName).collect(Collectors.toList()))
-                    .eq(TbProperty::getModelID, this.ID);
-            List<TbProperty> addTbPropertyList = tbPropertyMapper.selectList(addCheckNameQueryWrapper);
-            if(CollectionUtil.isNotEmpty(addTbPropertyList)){
+                    .eq(TbProperty::getModelID, this.ID)
+                    .notIn(CollectionUtil.isNotEmpty(removeModelItemIDSet), TbProperty::getID, removeModelItemIDSet));
+            if (CollectionUtil.isNotEmpty(addTbPropertyList)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
             }
         }
-        // -- 模板下属性编辑校验
-        updateModelItemList = recordStateMap.get(OperationProperty.UPDATE.name());
-        LambdaQueryWrapper<TbProperty> propertyQueryWrapper = new QueryWrapper<TbProperty>().lambda()
-                .eq(TbProperty::getModelID, this.ID);
-        tbPropertyList = tbPropertyMapper.selectList(propertyQueryWrapper);
-        allPropertyIdAndNameMap = tbPropertyList.stream().collect(Collectors.toMap(TbProperty::getID, TbProperty::getName));
-        if(CollectionUtil.isNotEmpty(updateModelItemList)){
-            // 校验模板下是否已经有相同模板名称
-            if(CollectionUtil.isNotEmpty(tbPropertyList)){
-                for(ModelItem item : updateModelItemList) {
-                    // 先排除自身Name
-                    String value = allPropertyIdAndNameMap.remove(item.getID());
-                    if(allPropertyIdAndNameMap.containsValue(item.getName())){
-                        return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性名称存在重复");
-                    }
-                    // 还原自身Name
-                    allPropertyIdAndNameMap.put(item.getID(), value);
-                }
-            }
-        }
+
         // json校验
         if (modelPropertyList.stream().anyMatch(item -> ObjectUtil.isNotEmpty(item.getExValue()) && !JSONUtil.isTypeJSON(item.getExValue()))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "模板的属性的额外属性应为json字符串");
@@ -191,7 +201,7 @@ public class UpdateModelParam implements ParameterValidator, ResourcePermissionP
         return ResourcePermissionType.SINGLE_RESOURCE_SINGLE_PERMISSION;
     }
 
-    public TbPropertyModel getTbPropertyModel(){
+    public TbPropertyModel getTbPropertyModel() {
         TbPropertyModel newTbPropertyModel = new TbPropertyModel();
         newTbPropertyModel.setID(ID);
         newTbPropertyModel.setCompanyID(companyID);

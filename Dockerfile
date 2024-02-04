@@ -1,16 +1,16 @@
-FROM node:12 AS buildDoc
+FROM registry-vpc.cn-hangzhou.aliyuncs.com/medo/node:12 AS buildDoc
 WORKDIR /app
 COPY . .
 RUN npm --registry https://registry.npmmirror.com install apidoc@0.24.0 -g
 RUN apidoc -i src/main/java -o src/main/resources/static/apidoc
 
-FROM gradle:7.6-jdk17-alpine AS build
+FROM registry-vpc.cn-hangzhou.aliyuncs.com/medo/gradle:7.6-jdk17-alpine AS build
 WORKDIR /app
 COPY --from=buildDoc  /app .
 RUN gradle bootJar
 
 
-FROM openjdk:17.0.2-jdk
+FROM registry-vpc.cn-hangzhou.aliyuncs.com/medo/openjdk:17.0.2-jdk
 ENV TZ=PRC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN mkdir /app

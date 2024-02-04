@@ -8,7 +8,9 @@ import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorGroupPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointBaseInfoListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryCompanyMonitorPointNewDataListParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import lombok.AllArgsConstructor;
@@ -188,7 +190,7 @@ public class MonitorPointController {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
-     * @apiParam (请求参数) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
+     * @apiParam (请求体) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -227,6 +229,52 @@ public class MonitorPointController {
     public Object queryMonitorPointPageList(@Validated @RequestBody QueryMonitorPointPageListParam pa) {
         return monitorPointService.queryMonitorPointPageList(pa);
     }
+
+    /**
+     * @api {POST} /QueryMonitorPointList 查询监测点
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorPointList
+     * @apiDescription 查询监测点
+     * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
+     * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
+     * @apiSuccess (返回结果) {Object[]} dataList 监测点列表
+     * @apiSuccess (返回结果) {Int} dataList.id 监测点ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeName 监测类型名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorTypeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Boolean} dataList.monitorTypeMultiSensor 监测类型是否多传感器
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {String} dataList.name 监测点名称
+     * @apiSuccess (返回结果) {String} [dataList.installLocation] 安装位置
+     * @apiSuccess (返回结果) {String} [dataList.gpsLocation] 地图位置
+     * @apiSuccess (返回结果) {String} [dataList.imageLocation] 底图位置
+     * @apiSuccess (返回结果) {String} [dataList.overallViewLocation] 全景位置
+     * @apiSuccess (返回结果) {String} [dataList.spatialLocation] 三维位置
+     * @apiSuccess (返回结果) {Bool} dataList.enable 是否启用
+     * @apiSuccess (返回结果) {String} [dataList.exValues] 拓展字段
+     * @apiSuccess (返回结果) {Int} dataList.displayOrder 排序字段
+     * @apiSuccess (返回结果) {Object[]} dataList.sensorList 监测传感器列表
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.id 传感器ID
+     * @apiSuccess (返回结果) {String} dataList.sensorList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorList.alias 传感器别名
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.kind 传感器类型
+     * @apiSuccess (返回结果) {Int} dataList.sensorList.status 传感器状态
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @PostMapping(value = "/QueryMonitorPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+
+    public Object queryMonitorPointList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+        return monitorPointService.queryMonitorPointList(pa);
+    }
+
 
     /**
      * @api {POST} /QueryMonitorPointSimpleList 查询监测点简要信息列表
@@ -276,6 +324,15 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Bool} list.monitorPointList.enable 是否启用
      * @apiSuccess (返回结果) {String} [list.monitorPointList.exValues] 拓展字段
      * @apiSuccess (返回结果) {Int} [list.monitorPointList.displayOrder] 排序字段
+     * @apiSuccess (返回结果) {Object[]} list.monitorTypeFieldList 监测点列表
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.monitorTypeFieldID 监测子类型ID
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldToken 类型token
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.fieldClass 属性类型 1 - 基础属性  2 - 扩展属性 3 - 扩展配置
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.fieldName 类型名称
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {Int} list.monitorTypeFieldList.fieldUnitID 监测子类型ID
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.engUnit 英文单位标识
+     * @apiSuccess (返回结果) {String} list.monitorTypeFieldList.chnUnit 中文单位标识
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
@@ -351,7 +408,62 @@ public class MonitorPointController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @PostMapping(value = "/QueryMonitorGroupPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorGroupPointList(@Validated @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorGroupPointList(@Validated @RequestBody QueryMonitorGroupPointParam pa) {
+        return monitorPointService.queryMonitorGroupPointList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorPointWithProjectType 查询项目类型下监测点列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorPointWithProjectType
+     * @apiDescription 查询项目类型下监测点列表
+     * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int[]} [projectTypes] 项目类型列表
+     * @apiSuccess (返回结果) {Object} data 结果集(Map)
+     * @apiSuccess (返回结果) {String} data.key 项目类型
+     * @apiSuccess (返回结果) {Object[]} data.value 监测点列表
+     * @apiSuccess (返回结果) {Int} data.value.id 监测点id
+     * @apiSuccess (返回结果) {Int} data.value.projectID 项目id
+     * @apiSuccess (返回结果) {Int} data.value.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.value.monitorItemID 监测项id
+     * @apiSuccess (返回结果) {String} data.value.name 监测点名称
+     * @apiSuccess (返回结果) {Int} data.value.projectType 项目类型
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 响应示例
+     *                    {"1": [{"id": 1,"projectID": 1,"monitorType": 1,"monitorItemID": 1,"name": 1,"enable": 0}]}
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @PostMapping(value = "/QueryMonitorPointWithProjectType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorPointWithProjectType(@Validated @RequestBody QueryMonitorPointWithProjectTypeParam pa) {
+        return monitorPointService.queryMonitorPointWithProjectType(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorPointIncludeSensorList 查询项目类型下含有传感器的监测点列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测点模块
+     * @apiName QueryMonitorPointIncludeSensorList
+     * @apiDescription 查询项目类型下监测点列表,过滤出来含有传感器的监测点
+     * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int} [projectType] 项目类型
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型
+     * @apiSuccess (返回结果) {Object[]} data 结果集
+     * @apiSuccess (返回结果) {Int} data.id 监测点id
+     * @apiSuccess (返回结果) {Int} data.projectID 工程id
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.monitorItemID 监测项目id
+     * @apiSuccess (返回结果) {String} data.name 监测点名称
+     * @apiSuccess (返回结果) {Int} data.projectType 工程类型
+     * @apiSuccess (返回结果) {String} data.projectTypeName 工程类型名称
+     * @apiSuccess (返回结果) {String} data.projectName 工程名称
+     * @apiSampleRequest off
+     * @apiPermission 系统权限+应用权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint", allowApplication = true)
+    @PostMapping(value = "/QueryMonitorPointIncludeSensorList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorPointIncludeSensorList(@Validated @RequestBody QueryMonitorPointIncludeSensorParam pa) {
+        return monitorPointService.queryMonitorPointIncludeSensorList(pa);
     }
 }

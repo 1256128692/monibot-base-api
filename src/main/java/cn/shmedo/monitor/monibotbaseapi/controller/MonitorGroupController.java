@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.QueryManualSensorListByMonitorParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -298,5 +299,31 @@ public class MonitorGroupController {
     @PostMapping(value = "/QueryProjectGroupInfoList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryProjectGroupInfoList(@RequestBody @Validated QueryProjectGroupInfoParam pa) {
         return monitorGroupService.queryProjectGroupInfoList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorTypeGroupPoint 根据监测类型查询对应监测点组和监测点
+     * @apiDescription 根据监测类型查询对应监测点组和监测点，监测点为监测点组下该监测类型的监测点（不是全部）
+     * @apiVersion 1.0.0
+     * @apiGroup 监测组模块
+     * @apiName QueryMonitorTypeGroupPoint
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测点组ID
+     * @apiSuccess (返回结果) {String} dataList.monitorGroupName 监测点组名称
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorPointList 监测点数据
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorPointName 监测点名称
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorItemID 监测项目ID
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemName 监测项目名称
+     * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemAlias 监测项目别称
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
+    @PostMapping(value = "/QueryMonitorTypeGroupPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeGroupPoint(@Validated @RequestBody QueryManualSensorListByMonitorParam pa){
+        return monitorGroupService.queryMonitorTypeGroupPoint(pa);
     }
 }

@@ -60,7 +60,10 @@ public class BatchSetProjectConfigParam implements ParameterValidator, ResourceP
     public ResultWrapper validate() {
         //如果只有一个，按单个校验处理
         if (dataList.size() == 1) {
-            return dataList.get(0).validate();
+            // 这里的校验会改变对应的group、key（拼接问题）,所以必须先进行校验
+            ResultWrapper<?> validate = dataList.get(0).validate();
+            build = build();
+            return validate;
         }
         if (!ContextHolder.getBean(TbProjectInfoMapper.class).exists(new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getID, projectID))) {

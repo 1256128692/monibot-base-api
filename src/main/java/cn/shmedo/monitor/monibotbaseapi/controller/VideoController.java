@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
+import cn.shmedo.monitor.monibotbaseapi.service.IDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import jakarta.validation.Valid;
@@ -18,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 public class VideoController {
     private final VideoService videoService;
     private final ITbVideoDeviceService tbVideoDeviceService;
+
+    private final IDeviceService deviceService;
 
     /**
      * @api {POST} /QueryVideoMonitorPointLiveInfo 查询视频类型监测点直播地址信息
@@ -224,7 +227,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.displayOrder 监测分组展示顺序
      * @apiSuccess (返回结果) {Object[]} [dataList.monitorGroupDataList.monitorPointDataList] 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorItemID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupDataList.monitorPointDataList.displayOrder 监测点展示顺序
      * @apiSuccess (返回结果) {String} dataList.monitorGroupDataList.monitorPointDataList.monitorPointName 监测点名称
@@ -273,7 +276,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Int} dataList.displayOrder 监测分组展示顺序
      * @apiSuccess (返回结果) {Object[]} [dataList.monitorPointDataList] 监测点数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.monitorType 监测类型
      * @apiSuccess (返回结果) {Int} dataList.monitorPointDataList.displayOrder 监测点展示顺序
      * @apiSuccess (返回结果) {String} dataList.monitorPointDataList.monitorPointName 监测点名称
@@ -540,7 +543,7 @@ public class VideoController {
      * @apiParam (请求体) {Boolean} [deviceStatus]  设备在线状态
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.videoDeviceID 视频设备ID
-     * @apiSuccess (返回结果) {Int} dataList.companyID 视频设备ID
+     * @apiSuccess (返回结果) {Int} dataList.companyID 公司ID
      * @apiSuccess (返回结果) {String} dataList.deviceSerial 设备序列号/监控点唯一标识
      * @apiSuccess (返回结果) {String} dataList.deviceType 视频设备类型
      * @apiSuccess (返回结果) {String} dataList.deviceName 视频设备名称
@@ -832,6 +835,7 @@ public class VideoController {
      * @apiSuccess (返回结果) {Date} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {Int} currentPageData.updateUserID 最后更新用户ID
      * @apiSuccess (返回结果) {Date} currentPageData.updateTime 最后更新时间
+     * @apiSuccess (返回结果) {Int[]} currentPageData.channelNoList 视频设备通道号列表
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBaseVideoDevice
      */
@@ -954,6 +958,9 @@ public class VideoController {
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.monitorItemName] 监测项目名称
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.gpsLocation] 监测点位置
      * @apiSuccess (返回结果) {String} [videoDeviceSourceList.location] 行政区划
+     * @apiSuccess (返回结果) {Json} [location] 位置信息
+     * @apiSuccess (返回结果) {String} location.address 地址
+     * @apiSuccess (返回结果) {String} [location.locationJson] 位置扩展，json字符串
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseVideo
      */
@@ -981,5 +988,22 @@ public class VideoController {
         return videoService.batchUpdateVideoDeviceStatus(pa);
     }
 
+
+    /**
+     * @api {POST} /BatchHandlerIotDeviceStatusChange 批量处理Iot设备在线离线状态变化
+     * @apiVersion 1.0.0
+     * @apiGroup 视频模块
+     * @apiDescription 批量处理Iot设备在线离线状态变化,设备由在线转变为离线后,发送预警通知
+     * @apiName BatchHandlerIotDeviceStatusChange
+     * @apiParam (请求体) {Int} companyID  公司ID
+     * @apiSuccess (返回结果) {Boolean} data 数据
+     * @apiSampleRequest off
+     * @apiPermission 系统权限+应用权限 mdmbase:UpdateVideoDevice
+     */
+    @Permission(permissionName = "mdmbase:UpdateVideoDevice", allowApplication = true)
+    @RequestMapping(value = "/BatchHandlerIotDeviceStatusChange", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object batchHandlerIotDeviceStatusChange(@Validated @RequestBody BatchUpdateVideoDeviceStatusParam pa) {
+        return deviceService.batchHandlerIotDeviceStatusChange(pa);
+    }
 
 }

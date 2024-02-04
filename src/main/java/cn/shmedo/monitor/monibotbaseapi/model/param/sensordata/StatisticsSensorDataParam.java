@@ -51,13 +51,14 @@ public class StatisticsSensorDataParam implements ParameterValidator, ResourcePe
 
     @Override
     public Resource parameter() {
-        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        if (subjectID == -1) {
-            // 应用访问
-            return null;
-        } else {
-            return new Resource(subjectID.toString(), ResourceType.COMPANY);
-        }
+        return null;
+//        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+//        if (subjectID == -1) {
+//            // 应用访问
+//            return null;
+//        } else {
+//            return new Resource(subjectID.toString(), ResourceType.COMPANY);
+//        }
 
     }
 
@@ -104,5 +105,13 @@ public class StatisticsSensorDataParam implements ParameterValidator, ResourcePe
 
     public Integer getMonitorType() {
         return monitorType;
+    }
+
+    public void setSensorList(List<TbSensor> sensorList) {
+        this.sensorList = sensorList;
+    }
+
+    public void setMonitorType(Integer monitorType) {
+        this.monitorType = monitorType;
     }
 }

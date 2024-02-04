@@ -167,7 +167,7 @@ public class WtMonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseSensorData")
     @RequestMapping(value = "/QueryCompanyMonitorPointNewDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
+    public Object queryCompanyMonitorPointNewDataList(@Validated @RequestBody QueryCompanyMonitorPointNewDataListParam pa) {
         return wtMonitorService.queryMonitorPointList(pa);
     }
 

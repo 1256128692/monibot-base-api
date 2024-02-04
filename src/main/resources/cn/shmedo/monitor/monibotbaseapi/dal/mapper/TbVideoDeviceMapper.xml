@@ -462,4 +462,26 @@
             and deviceSerial like concat('%', #{queryContent}, '%') or deviceName like concat('%', #{queryContent}, '%')
         </if>
     </select>
+
+    <select id="selectAllList" resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice">
+        select tvd.*, tpi.ProjectName
+        from tb_video_device tvd
+                 left join tb_project_info tpi on tpi.ID = tvd.ProjectID
+    </select>
+
+    <select id="queryOnlineCountByProjectIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.DeviceAssetsStatisticsInfo">
+        SELECT ProjectID,
+               SUM(CASE WHEN deviceStatus = TRUE THEN 1 ELSE 0 END)  AS videoOnlineCount,
+               SUM(CASE WHEN deviceStatus = FALSE THEN 1 ELSE 0 END) AS videoOfflineCount,
+               COUNT(*)                                              AS videoCount
+        FROM tb_video_device
+        WHERE ProjectID IN
+        <foreach collection="projectIDList" item="projectID" open="(" separator="," close=")">
+            <if test="projectID != null and projectID != -1">
+                #{projectID}
+            </if>
+        </foreach>
+        GROUP BY ProjectID
+    </select>
 </mapper>

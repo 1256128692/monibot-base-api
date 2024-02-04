@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -116,4 +117,13 @@ public interface SensorService extends IService<TbSensor> {
     void updateSensorStatusAndMonitorBeginTime(UpdateSensorStatusRequest request);
 
     Map<Integer, List<Integer>> queryAllSensorID();
+
+    /**
+     * 查询监测类型下的全部人工传感器
+     */
+    List<SensorNameResponse> queryManualSensorListByMonitor(QueryManualSensorListByMonitorParam param);
+
+    List<SensorSimple> querySimpleList(QuerySensorSimpleListRequest param);
+
+    TryingResponse calculateField(CalculateFieldRequest request);
 }

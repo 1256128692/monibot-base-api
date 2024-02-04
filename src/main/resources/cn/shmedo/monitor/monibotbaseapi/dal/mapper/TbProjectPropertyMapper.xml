@@ -105,4 +105,74 @@
         </foreach>
         and subjectType = #{propertySubjectType}
     </delete>
+
+    <select id="queryPidByProps" resultType="java.lang.Integer">
+        SELECT ProjectID
+        FROM
+        (SELECT tpp.ProjectID, COUNT(1) size
+         FROM `tb_project_property` tpp
+                  LEFT JOIN tb_property tp ON tpp.PropertyID = tp.ID
+        <where>
+            <trim suffixOverrides="AND">
+                <if test="projectIDList != null and projectIDList.size() > 0">
+                    tpp.ProjectID IN
+                    <foreach open="(" close=") AND" collection="projectIDList" item="item" separator=",">
+                        #{item}
+                    </foreach>
+                </if>
+                <if test="subjectType != null">
+                    tpp.subjectType = #{subjectType.type}
+                      AND
+                </if>
+                <if test="props != null and props.size() != 0">
+                    <foreach collection="props" item="item" index="index" separator="OR" open="(" close=") AND">
+                        <foreach collection="item.t1" item="name" separator="OR" open="(" close=")">
+                            (tp.`Name` = #{name} AND
+                            <choose>
+                                <when test="item.t3 != null and item.t3">
+                                        tpp.`Value` LIKE CONCAT('%', #{item.t2}, '%')
+                                </when>
+                                <otherwise>
+                                    tpp.`Value` = #{item.t2}
+                                </otherwise>
+                            </choose>
+                            )
+                        </foreach>
+                    </foreach>
+                </if>
+            </trim>
+            GROUP BY tpp.ProjectID
+        </where>
+        )t
+        WHERE size = ${props.size()}
+    </select>
+
+    <select id="queryPropByPids" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.PropWithValue">
+        SELECT tpp.ProjectID projectID,
+               tp.`Name`     name,
+               tp.GroupID    groupID,
+               tp.Type       type,
+               tpp.`Value`   value
+        FROM `tb_project_property` tpp
+                 LEFT JOIN tb_property tp ON tp.ID = tpp.PropertyID
+        WHERE
+        <trim suffixOverrides="AND">
+            <if test="subjectType != null">
+                tpp.subjectType = #{subjectType.type} AND
+            </if>
+            <if test="projectIDList != null and projectIDList.size() != 0">
+                <foreach collection="projectIDList" item="item" index="index" separator="," open="tpp.ProjectID IN  ("
+                         close=") AND">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="propNames != null and propNames.size() != 0">
+                <foreach collection="propNames" item="item" index="index" separator="," open="tp.`Name` IN  ("
+                         close=") AND">
+                    #{item}
+                </foreach>
+            </if>
+        </trim>
+        ORDER BY tpp.ProjectID DESC
+    </select>
 </mapper>

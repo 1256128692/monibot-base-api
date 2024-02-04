@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithNext;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryNextLevelAndAvailableProjectResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryWtProjectResponse;
@@ -29,7 +30,7 @@ public interface ProjectService {
      * 查询项目类型
      * @return
      */
-    List<TbProjectType> getProjectType();
+    List<TbProjectType> getProjectType(Integer serviceID);
 
     void transferProject(TransferProjectParam param, CurrentSubject currentSubject);
 
@@ -73,4 +74,8 @@ public interface ProjectService {
     QueryNextLevelAndAvailableProjectResult queryNextLevelProjectAndCanUsed(QueryNextLevelAndAvailableProjectParam pa);
 
     void removeProjectRelation(RemoveProjectRelationParam pa, Integer subjectID);
+
+    List<ProjectWithNext> queryProjectWithNextList(QueryProjectWithNextListParam pa);
+
+    Object queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
 }

@@ -2,7 +2,10 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectListRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryProjectWithRaiseCropsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithIrrigationInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.project.ProjectWithServiceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.project.QueryProjectBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.projectconfig.ConfigBaseResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.ProjectVideoInfo;
@@ -27,7 +30,7 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     IPage<ProjectInfo> getProjectPage(IPage<ProjectInfo> page,
                                       @Param("pa") QueryProjectListRequest pa);
 
-    int countByNameExcludeID(String projectName, Integer projectID);
+    int countByNameExcludeID(@Param("projectName") String projectName, @Param("projectID") Integer projectID);
 
     int countByProjectIDList(List<Integer> idList, Integer companyID);
 
@@ -35,7 +38,8 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
 
     int deleteProjectInfoList(List idList);
 
-    List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(Integer companyID, List<Integer> projectIDList);
+    List<TbProjectInfo> selectListByCompanyIDAndProjectIDList(@Param("companyID") Integer companyID,
+                                                              @Param("projectIDList") List<Integer> projectIDList);
 
     List<QueryProjectBaseInfoResponse> selectListByCompanyIDAndMonitorItemName(Integer companyID, String monitorItemName, List<String> platformTypeSet);
 
@@ -60,4 +64,10 @@ public interface TbProjectInfoMapper extends BaseMapper<TbProjectInfo> {
     void updateLevel2Unallocatedwhennorealtion();
 
     List<ProjectVideoInfo> selectListByIDs(List<Integer> projectIDs);
+
+    List<ProjectWithIrrigationInfo> queryProjectWithRaiseCrops(QueryProjectWithRaiseCropsParam pa);
+
+    List<Integer> selectPlatformListByProjectID(Integer projectID);
+
+    List<ProjectWithServiceInfo> selectAllIncludeServiceID();
 }

@@ -4,8 +4,14 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorPointListParam;
-import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.QueryDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.UpdateDataEventParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.eigenValue.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeConfigurationParam;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -18,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class MonitorDataController {
 
-    private WtMonitorService wtMonitorService;
+    private MonitorDataService monitorDataService;
 
     /**
      * @api {POST} /QueryMonitorPointDataList 查询监测点数据列表
@@ -32,9 +38,11 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Int} densityType 密度,(0:全部 1:小时 2:日 3:周 4:月 5:年),查询最新数据默认传0
-     * @apiParam (请求体) {Int} statisticsType 统计方式,(0:最新一条 1:平均值 2:阶段累积 3:阶段变化),查询最新数据默认传0
-     * @apiParam (请求体) {Int[]} [eigenvalueIDList] 特征值ID列表
+     * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
+     * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
+     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
+     * @apiParam (请求体) {Int[]} [eigenValueIDList] 特征值ID列表
      * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
@@ -46,19 +54,16 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
      * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
      * @apiSuccess (响应结果) {Object[]} [data.sensorList]      传感器信息
-     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
+     * @apiSuccess (响应结果) {Int} data.sensorList.sensorID    传感器ID
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
-     * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Bool} [data.multiSensor]        是否为关联多传感器
-     * @apiSuccess (响应结果) {Object} data.sensorData       单传感器数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {Int} data.sensorData.sensorID        传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorData.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorData.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.multiSensorData   多传感器数据
-     * @apiSuccess (响应结果) {Int} data.multiSensorData.sensorID   传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.multiSensorData.time  数据采集时间
-     * @apiSuccess (响应结果) {T} data.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {String} data.sensorList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.multiSensorData   多传感器数据
+     * @apiSuccess (响应结果) {Int} data.sensorList.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.multiSensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {T} data.sensorList.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Bool} [data.multiSensor]   是否为关联多传感器
+     * @apiSuccess (响应结果) {Int} data.sensorDataCount  数据总量
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -66,19 +71,19 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} data.fieldList.chnUnit 中文单位
      * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
      * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
-     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
+     * @apiSuccess (响应结果) {Object[]} [data.eigenValueList] 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.id 特征值列表
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.projectID 工程ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.scope 使用范围,0:专题分析 1:历史数据
+     * @apiSuccess (响应结果) {String} [data.eigenValueList.scopeStr] 使用范围描述
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} data.eigenValueList.monitorTypeFieldName 属性名称
+     * @apiSuccess (响应结果) {String} data.eigenValueList.name 特征值名称
+     * @apiSuccess (响应结果) {Double} data.eigenValueList.value 数值
+     * @apiSuccess (响应结果) {Int} data.eigenValueList.fieldUnitID 单位ID
+     * @apiSuccess (响应结果) {String} data.eigenValueList.engUnit 单位英文描述
+     * @apiSuccess (响应结果) {String} data.eigenValueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
      * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
      * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
@@ -90,9 +95,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    public Object queryMonitorPointDataList(@Validated @RequestBody QueryMonitorPointDataParam pa) {
+        return monitorDataService.queryMonitorPointDataList(pa);
     }
 
 
@@ -101,15 +105,17 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryMonitorPointFilterDataList
-     * @apiDescription 查询监测点过滤值列表,包含传感器每个属性在一段时间内的最大值,最小值统计
+     * @apiDescription 查询监测点过滤值列表, 包含传感器每个属性在一段时间内的最大值, 最小值统计
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} monitorItemID 监测项目ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Int} densityType 密度,(0:全部 1:小时 2:日 3:周 4:月 5:年)
-     * @apiParam (请求体) {Int} statisticsType 统计方式,(0:最新一条 1:平均值 2:阶段累积 3:阶段变化)
+     * @apiParam (请求体) {Boolean} [filterEmptyData]  是否过滤空数据,默认为false(不过滤),true(过滤空数据)
+     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
+     * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6)
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4)
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
      * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":2,"statisticsType":0}
@@ -124,12 +130,17 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目id
      * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
      * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.maxSensorDataList 传感器最大数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.maxSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorList.minSensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList 传感器最大数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.maxSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.maxSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.maxSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.maxSensorDataList.fieldToken.value   数值
+     * @apiSuccess (响应结果) {Object[]} data.sensorList.minSensorDataList 传感器最小数据
+     * @apiSuccess (响应结果) {Object} data.sensorList.minSensorDataList.fieldToken   监测子类型
+     * @apiSuccess (响应结果) {DateTime} data.sensorList.minSensorDataList.fieldToken.time  数据采集时间
+     * @apiSuccess (响应结果) {Int} data.sensorList.minSensorDataList.fieldToken.sensorID   传感器ID
+     * @apiSuccess (响应结果) {Double} data.sensorList.minSensorDataList.fieldToken.value   数值
+     * @apiSuccess (响应结果) {Int} data.sensorDataCount  数据总量
      * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
      * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
      * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
@@ -142,80 +153,43 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointFilterDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    public Object queryMonitorPointFilterDataList(@Validated @RequestBody QueryMonitorPointDataParam pa) {
+        return monitorDataService.queryMonitorPointFilterDataList(pa);
     }
-
 
     /**
-     * @api {POST} /QueryRainMonitorPointDataList 查询雨量监测点数据列表
+     * @api {POST} /AddEigenValueList 批量新增数据特征值
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
-     * @apiName QueryRainMonitorPointDataList
-     * @apiDescription 查询雨量监测点数据列表
+     * @apiName AddEigenValueList
+     * @apiDescription 新增数据特征值
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int} monitorType 监测类型
-     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
-     * @apiParam (请求体) {DateTime} begin 开始时间
-     * @apiParam (请求体) {DateTime} end   结束时间
-     * @apiParam (请求体) {Int} rainDensityType 密度,(0:2h 1:4h 2:6h 3:12h)
+     * @apiParam (请求体) {Object[]} dataList 参数列表
+     * @apiParam (请求体) {Int} dataList.scope 作用范围,0:专题分析 1:历史数据
+     * @apiParam (请求体) {Int} dataList.monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} dataList.monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {Int} dataList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiParam (请求体) {String} dataList.name 特征值名称
+     * @apiParam (请求体) {Double} dataList.value 数值
+     * @apiParam (请求体) {Int} dataList.unitID 单位ID
+     * @apiParam (请求体) {String} [dataList.exValue] 拓展属性
      * @apiParamExample 请求体示例
-     * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","rainDensityType":"1"}
-     * @apiSuccess (响应结果) {Object[]} data                 结果列表
-     * @apiSuccess (响应结果) {Int} data.monitorPointID       监测点ID
-     * @apiSuccess (响应结果) {String} data.monitorPointName  监测点名称
-     * @apiSuccess (响应结果) {Int} data.monitorType          监测类型
-     * @apiSuccess (响应结果) {String} data.monitorTypeName   监测类型名称
-     * @apiSuccess (响应结果) {String} data.monitorTypeAlias  监测类型别名
-     * @apiSuccess (响应结果) {Date} data.time  数据采集时间
-     * @apiSuccess (响应结果) {Object[]} data.sensorList      传感器信息
-     * @apiSuccess (响应结果) {Int} data.sensorList.id        传感器ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.projectID 项目ID
-     * @apiSuccess (响应结果) {Int} data.sensorList.monitorPointID  监测点ID
-     * @apiSuccess (响应结果) {String} data.sensorList.name  传感器名称
-     * @apiSuccess (响应结果) {Object[]} data.sensorDataList       传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
-     * @apiSuccess (响应结果) {Int} data.sensorDataList.sensorID         传感器ID
-     * @apiSuccess (响应结果) {DateTime} data.sensorDataList.time       数据采集时间
-     * @apiSuccess (响应结果) {T} data.sensorDataList.data              传感器数据(动态值)，参考监测项目属性字段列表
-     * @apiSuccess (响应结果) {Object[]} data.fieldList   监测类型属性字段列表
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldToken  字段标志
-     * @apiSuccess (响应结果) {String} data.fieldList.fieldName   字段名称
-     * @apiSuccess (响应结果) {String} data.fieldList.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} data.fieldList.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} data.fieldList.unitClass  单位类型
-     * @apiSuccess (响应结果) {String} data.fieldList.unitDesc  单位类型描述
-     * @apiSuccess (响应结果) {Object[]} [data.eigenvalueList] 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.id 特征值列表
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.projectID 工程ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
-     * @apiSuccess (响应结果) {String} [data.eigenvalueList.scopeStr] 使用范围描述
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorItemID 监测项目ID
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.monitorTypeFieldName 属性名称
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.name 特征值名称
-     * @apiSuccess (响应结果) {Double} data.eigenvalueList.value 数值
-     * @apiSuccess (响应结果) {Int} data.eigenvalueList.unitID 单位ID
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.engUnit 单位英文描述
-     * @apiSuccess (响应结果) {String} data.eigenvalueList.chnUnit 单位中文描述
-     * @apiSuccess (响应结果) {Object[]} [data.eventList] 大事记列表
-     * @apiSuccess (响应结果) {Int} data.eventList.id 大事记id
-     * @apiSuccess (响应结果) {String} data.eventList.eventName 大事记名称
-     * @apiSuccess (响应结果) {Int} data.eventList.frequency 频率
-     * @apiSuccess (响应结果) {String} data.eventList.frequencyStr 频率描述
-     * @apiSuccess (响应结果) {String} data.eventList.timeRange 时间范围
+     * {"projectID":1,"dataList":[
+     * {
+     *   "scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     *      * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"
+     * }
+     * ]}
+     * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     * @apiPermission 项目权限 mdmbase:AddEigenValue
      */
-    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
-    @RequestMapping(value = "/QueryRainMonitorPointDataList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryRainMonitorPointDataList(@Validated @RequestBody QueryMonitorPointListParam pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
-        return null;
+    @Permission(permissionName = "mdmbase:AddEigenValue")
+    @RequestMapping(value = "/AddEigenValueList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object addEigenValueList(@Validated @RequestBody AddEigenValueListParam pa) {
+        monitorDataService.addEigenValueList(pa);
+        return ResultWrapper.successWithNothing();
     }
-
 
 
     /**
@@ -242,8 +216,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:AddEigenValue")
     @RequestMapping(value = "/AddEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addEigenValue(@Validated @RequestBody Object pa) {
-//        return wtMonitorService.queryMonitorPointList(pa);
+    public Object addEigenValue(@Validated @RequestBody AddEigenValueParam pa) {
+        monitorDataService.addEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -253,7 +227,7 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName UpdateEigenValue
-     * @apiDescription 新增数据特征值
+     * @apiDescription 更新数据特征值
      * @apiParam (请求体) {Int} eigenValueID 特征ID
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} scope 作用范围,0:专题分析 1:历史数据
@@ -273,7 +247,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:UpdateEigenValue")
     @RequestMapping(value = "/UpdateEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateEigenValue(@Validated @RequestBody Object pa) {
+    public Object updateEigenValue(@Validated @RequestBody UpdateEigenValueParam pa) {
+        monitorDataService.updateEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -290,11 +265,12 @@ public class MonitorDataController {
      * {"projectID":1,"eigenValueIDList":[1,2]}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DescribeBaseProject
+     * @apiPermission 项目权限 mdmbase:DeleteEigenValue
      */
     @Permission(permissionName = "mdmbase:DeleteEigenValue")
     @RequestMapping(value = "/DeleteBatchEigenValue", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteBatchEigenValue(@Validated @RequestBody Object pa) {
+    public Object deleteBatchEigenValue(@Validated @RequestBody DeleteBatchEigenValueParam pa) {
+        monitorDataService.deleteBatchEigenValue(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -307,6 +283,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
+     * @apiParam (请求体) {Int} [scope] 数据范围
      * @apiParamExample 请求体示例
      * {"projectID":1}
      * @apiSuccess (响应结果) {Object[]} eigenvalueList 特征值列表
@@ -315,7 +292,9 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.scope 使用范围,0:专题分析 1:历史数据
      * @apiSuccess (响应结果) {String} eigenvalueList.scopeStr 使用范围描述
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorItemName 监测项目名称
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorTypeFieldID 属性(监测子类型ID)
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorTypeFieldToken 属性标识
      * @apiSuccess (响应结果) {String} [eigenvalueList.monitorTypeFieldName] 属性名称
      * @apiSuccess (响应结果) {String} eigenvalueList.name 特征值
      * @apiSuccess (响应结果) {Double} eigenvalueList.value 数值
@@ -327,15 +306,17 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.updateUserID 修改人ID
      * @apiSuccess (响应结果) {Date} eigenvalueList.createTime 创建时间
      * @apiSuccess (响应结果) {Date} eigenvalueList.updateTime 修改时间
+     * @apiSuccess (响应结果) {Object[]} eigenvalueList.monitorPointList 监测点ID列表
+     * @apiSuccess (响应结果) {Int} eigenvalueList.monitorPointList.monitorPointID 监测点ID
+     * @apiSuccess (响应结果) {String} eigenvalueList.monitorPointList.monitorPointName 监测点名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryEigenValueList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryEigenValueList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryEigenValueList(@Validated @RequestBody QueryEigenValueParam pa) {
+        return monitorDataService.queryEigenValueList(pa);
     }
-
 
 
     /**
@@ -349,29 +330,25 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性
+     * @apiParam (请求体) {Int[]} monitorItemIDList 监测项目ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":1,"name":"1","frequency":1,
-     * "timeRange": [
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     }
-     *   ]}
+     * {
+     * "projectID": 623,
+     * "name": "台风事件",
+     * "frequency": 1,
+     * "monitorItemIDList": [
+     * 12702
+     * ],
+     * "timeRange": "[{\"startTime\": \"2023-10-18 16:02:52\", \"endTime\": \"2023-10-18 16:02:52\"}, {\"startTime\": \"2023-11-18 16:02:52\", \"endTime\": \"2023-11-18 16:02:52\"}, {\"startTime\": \"2023-12-18 16:02:52\", \"endTime\": \"2023-12-18 16:02:52\"}]"
+     * }
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:AddDataEvent
      */
     @Permission(permissionName = "mdmbase:AddDataEvent")
     @RequestMapping(value = "/AddDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object addDataEvent(@Validated @RequestBody Object pa) {
+    public Object addDataEvent(@Validated @RequestBody AddDataEventParam pa) {
+        monitorDataService.addDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -392,7 +369,8 @@ public class MonitorDataController {
      */
     @Permission(permissionName = "mdmbase:DeleteDataEvent")
     @RequestMapping(value = "/DeleteBatchDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteBatchDataEvent(@Validated @RequestBody Object pa) {
+    public Object deleteBatchDataEvent(@Validated @RequestBody DeleteBatchDataEventParam pa) {
+        monitorDataService.deleteBatchDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -406,6 +384,8 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
+     * @apiParam (请求体) {DateTime} [begin] 开始时间
+     * @apiParam (请求体) {DateTime} [end]   结束时间
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorItemID":1}
      * @apiSuccess (返回结果) {Object[]} dataList 大事件ID
@@ -413,15 +393,20 @@ public class MonitorDataController {
      * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
      * @apiSuccess (返回结果) {String} dataList.name 大事件名称
      * @apiSuccess (返回结果) {Int} dataList.frequency 频率,0:单次  1:每年
+     * @apiSuccess (返回结果) {String} dataList.frequencyStr 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
      * @apiSuccess (返回结果) {String} [dataList.exValue] 拓展属性
+     * @apiSuccess (响应结果) {Object[]} dataList.monitorItemList 监测项目列表
+     * @apiSuccess (响应结果) {Int} dataList.monitorItemList.monitorItemID 监测项目ID
+     * @apiSuccess (响应结果) {String} dataList.monitorItemList.name 监测项目名称
+     * @apiSuccess (响应结果) {Date} dataList.monitorItemList.createTime 创建时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeBaseProject
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryDataEventList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryDataEventList(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryDataEventList(@Validated @RequestBody QueryDataEventParam pa) {
+        return monitorDataService.queryDataEventList(pa);
     }
 
 
@@ -437,32 +422,20 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性
+     * @apiParam (请求体) {Int[]} monitorItemIDList 监测项目ID列表
      * @apiParamExample 请求体示例
-     * {"projectID":1,"id":1,"name":"1","frequency":1,
-     * "timeRange": [
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     },
-     *     {
-     *       "startTime": "2023-10-18 16:02:52",
-     *       "endTime": "2023-10-18 16:02:52"
-     *     }
-     *   ]}
+     * {"projectID":1,"id":1,"name":"1","frequency":1,"monitorItemIDList":[1,2],
+     * "timeRange": "[{\"startTime\": \"2023-10-18 16:02:52\", \"endTime\": \"2023-10-18 16:02:52\"}, {\"startTime\": \"2023-11-18 16:02:52\", \"endTime\": \"2023-11-18 16:02:52\"}, {\"startTime\": \"2023-12-18 16:02:52\", \"endTime\": \"2023-12-18 16:02:52\"}]"}
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateDataEvent
      */
     @Permission(permissionName = "mdmbase:UpdateDataEvent")
     @RequestMapping(value = "/UpdateDataEvent", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object updateDataEvent(@Validated @RequestBody Object pa) {
+    public Object updateDataEvent(@Validated @RequestBody UpdateDataEventParam pa) {
+        monitorDataService.updateDataEvent(pa);
         return ResultWrapper.successWithNothing();
     }
-
 
 
     /**
@@ -470,12 +443,12 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryMonitorPointHasDataCount
-     * @apiDescription 查询监测点有无数据日期时间列表,最低支持到日
+     * @apiDescription 查询监测点有无数据日期时间列表, 最低支持到日
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100],必须为同一种监测类型
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end 结束时间
-     * @apiParam (请求体) {Int} density 密度,(0:全部 2:日 3:周 4:月 5:年)
+     * @apiParam (请求体) {Int} density 密度,(日:3 月:5 年:6)
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorPointIDList":[1,2],"begin":"2023-10-18 16:02:52","end":"2023-10-18 16:02:52","density":1}
      * @apiSuccess (返回结果) {Object} data 结果
@@ -486,10 +459,35 @@ public class MonitorDataController {
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryMonitorPointHasDataCount", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorPointHasDataCount(@Valid @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorPointHasDataCount(@Valid @RequestBody QueryMonitorPointHasDataCountParam pa) {
+        return monitorDataService.queryMonitorPointHasDataCount(pa);
     }
 
+
+    /**
+     * @api {POST} /QueryDisMonitorTypeHasDataCountByMonitorPoints 查询通用监测点有无数据日期时间列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryDisMonitorTypeHasDataCountByMonitorPoints
+     * @apiDescription 查询通用监测点有无数据日期时间列表,可以跨监测类型, 最低支持到日
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100]
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end 结束时间
+     * @apiParam (请求体) {Int} density 密度,(日:3 月:5 年:6)
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorPointIDList":[1,2],"begin":"2023-10-18 16:02:52","end":"2023-10-18 16:02:52","density":1}
+     * @apiSuccess (返回结果) {Object} data 结果
+     * @apiSuccess (返回结果) {String[]} data.dataList 监测点有数据列表，日格式:yyyy-MM-dd,月格式:yyyy-MM,年格式:yyyy
+     * @apiSampleRequest off
+     * @apiPermission 项目权限:mdmbase:DescribeBaseProject
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseProject")
+    @RequestMapping(value = "/QueryDisMonitorTypeHasDataCountByMonitorPoints", method = RequestMethod.POST,
+            produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryDisMonitorTypeHasDataCountByMonitorPoints(@Valid @RequestBody QueryDisMonitorTypeHasDataCountByMonitorPointsParam pa) {
+        return monitorDataService.queryDisMonitorTypeHasDataCountByMonitorPoints(pa);
+    }
 
     /**
      * @api {POST} /QueryMonitorTypeConfiguration 查询监测类型的预定义密度与统计方式
@@ -498,20 +496,101 @@ public class MonitorDataController {
      * @apiName QueryMonitorTypeConfiguration
      * @apiDescription 查询监测类型的预定义密度与统计方式
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParamExample 请求体示例
      * {"companyID":1,"monitorType":1}
-     * @apiSuccess (返回结果) {Int} monitorType 监测类型标识
-     * @apiSuccess (返回结果) {String} typeName 监测类型名称
-     * @apiSuccess (返回结果) {Int[]} displayDensity 预定义密度,(全部:0 小时:1 日:2 周:3 月:4 年:5)
-     * @apiSuccess (返回结果) {Int[]} statisticalMethods 统计方式,(最新一条:0 平均:1 阶段累积:2 阶段变化:3)
+     * @apiSuccess (返回结果) {Object[]} data 监测类型标识
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型标识
+     * @apiSuccess (返回结果) {String} data.typeName 监测类型名称
+     * @apiSuccess (返回结果) {Int[]} [data.displayDensity] 预定义密度,(全部:1 小时:2 日:3 周:4 月:5 年:6)
+     * @apiSuccess (返回结果) {Int[]} [data.statisticalMethods] 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4)
      * @apiSampleRequest off
      * @apiPermission 系统权限:mdmbase:DescribeBaseProject
      */
     @Permission(permissionName = "mdmbase:DescribeBaseProject")
     @RequestMapping(value = "/QueryMonitorTypeConfiguration", method = RequestMethod.POST,
             produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypeConfiguration(@Valid @RequestBody Object pa) {
-        return null;
+    public Object queryMonitorTypeConfiguration(@Valid @RequestBody QueryMonitorTypeConfigurationParam pa) {
+        return monitorDataService.queryMonitorTypeConfiguration(pa);
     }
+
+    /**
+     * @api {POST} /QueryMonitorTypeFieldList 查询监测项目绑定的监测子类型
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorTypeFieldList
+     * @apiDescription 查询监测项目绑定的监测子类型
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorItemID":1}
+     * @apiSuccess (响应结果) {Object[]} data   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} data.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} data.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} data.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} data.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} data.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} data.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorTypeFieldList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorTypeFieldList(@Validated @RequestBody QueryMonitorTypeFieldParam pa) {
+        return monitorDataService.queryMonitorTypeFieldList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorPointDataPage 查询监测点数据列表分页
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorPointDataPage
+     * @apiDescription 查询监测点数据列表
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end   结束时间
+     * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
+     * @apiParam (请求体) {Int} pageSize 页大小
+     * @apiParam (请求体) {Int} currentPage 当前页
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0,
+     * "pageSize":10, "currentPage":1}
+     * @apiSuccess (返回结果) {Int} totalCount 总数量
+     * @apiSuccess (返回结果) {Int} totalPage 总页数
+     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID       监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.monitorPointName  监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorType          监测类型
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeName   监测类型名称
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeAlias  监测类型别名
+     * @apiSuccess (响应结果) {Object[]} [currentPageData.sensorList]      传感器信息
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.sensorID    传感器ID
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.projectID 项目ID
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.monitorPointID  监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.sensorList.sensorName  传感器名称
+     * @apiSuccess (响应结果) {Object[]} currentPageData.sensorList.multiSensorData   多传感器数据
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorList.multiSensorData.sensorID   传感器ID
+     * @apiSuccess (响应结果) {DateTime} currentPageData.sensorList.multiSensorData.time  数据采集时间
+     * @apiSuccess (响应结果) {T} currentPageData.sensorList.multiSensorData.data  传感器数据(动态值)，参考监测项目属性字段列表,如:土壤含水量(%)等
+     * @apiSuccess (响应结果) {Object[]} currentPageData.fieldList   监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldToken  字段标志
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.fieldName   字段名称
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.unitClass  单位类型
+     * @apiSuccess (响应结果) {String} currentPageData.fieldList.unitDesc  单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorPointDataPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointDataPage(@Validated @RequestBody QueryMonitorPointDataPageParam pa) {
+        return monitorDataService.queryMonitorPointDataPage(pa);
+    }
+
 }

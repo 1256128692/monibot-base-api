@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util.sensor;
 
 import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.base.Tuple;
@@ -8,6 +9,7 @@ import cn.shmedo.iot.entity.util.FieldUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.util.TimeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.influxdb.dto.QueryResult;
 
 import java.sql.Timestamp;
@@ -72,12 +74,15 @@ public class InfluxSensorDataUtil {
             for (int i = 0; i < row.size(); i++) {
                 String columnName = columns.get(i);
                 Object value = row.get(i);
-
-                if (DbConstant.TIME_FIELD.equals(columnName)) {
+                if (DbConstant.COUNT_FIELD.equals(columnName)) {
+                    data.put(DbConstant.COUNT_FIELD, Double.parseDouble(value.toString()));
+                } else if (DbConstant.TIME_FIELD.equals(columnName)) {
                     String timeString = parseInfluxTime(value);
                     data.put(DbConstant.TIME_FIELD, timeString);
                 } else if (DbConstant.SENSOR_ID_TAG.equals(columnName)) {
-                    data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
+                    if (ObjectUtil.isNotNull(value)) {
+                        data.put(DbConstant.SENSOR_ID_FIELD_TOKEN, Integer.parseInt(value.toString()));
+                    }
                 } else {
                     boolean contains = selectField.contains(columnName);
                     if (contains) {
@@ -133,7 +138,7 @@ public class InfluxSensorDataUtil {
         if (CollectionUtil.isNullOrEmpty(queryResult.getResults())) {
             return Collections.emptyList();
         }
-        if (CollectionUtil.isNullOrEmpty(queryResult.getResults().get(0).getSeries())){
+        if (CollectionUtil.isNullOrEmpty(queryResult.getResults().get(0).getSeries())) {
             return Collections.emptyList();
         }
 

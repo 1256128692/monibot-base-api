@@ -1,9 +1,10 @@
 package cn.shmedo.monitor.monibotbaseapi.service.third.iot;
 
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
@@ -18,10 +19,7 @@ import java.util.Map;
  **/
 public interface IotService {
     @RequestLine("POST /QueryModelFieldBatch")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo,
-                                                                      @Param("appKey") String appKey,
-                                                                      @Param("appSecret") String appSecret);
+    ResultWrapper<Map<String, List<ModelField>>> queryModelFieldBatch(QueryModelFieldBatchParam pojo);
 
     @RequestLine("POST /QueryDeviceAndSensorList")
     ResultWrapper<List<DeviceWithSensor>> queryDeviceAndSensorList(QueryDeviceAndSensorRequest request);
@@ -65,10 +63,8 @@ public interface IotService {
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /CreateMultipleDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}", "Authorization: Bearer {accessToken}"})
+    @Headers({"Authorization: Bearer {accessToken}"})
     ResultWrapper<Boolean> createMultipleDevice(CreateMultipleDeviceParam param,
-                                                @Param("appKey") String appKey,
-                                                @Param("appSecret") String appSecret,
                                                 @Param("accessToken") String accessToken);
 
 
@@ -77,20 +73,37 @@ public interface IotService {
      * @return {@link ResultWrapper<Boolean>}
      */
     @RequestLine("POST /DeleteDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param,
-                                        @Param("appKey") String appKey,
-                                        @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean> deleteDevice(DeleteDeviceParam param);
 
     @RequestLine("POST /UpdateDeviceInfoBatch")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param,
-                                                 @Param("appKey") String appKey,
-                                                 @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean> updateDeviceInfoBatch(UpdateDeviceInfoBatchParam param);
 
     @RequestLine("POST /TransferDevice")
-    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param,
-                                           @Param("appKey") String appKey,
-                                           @Param("appSecret") String appSecret);
+    ResultWrapper<Boolean>  transferDevice(TransferDeviceParam param);
+
+    /**
+     * 批量下发透传指令
+     *
+     * @param request {@link BatchDispatchRequest}
+     * @return {@link ResultWrapper}
+     */
+    @RequestLine("POST /BatchDispatchCmdCommon")
+    ResultWrapper<List<TokenAndMsgID>> batchDispatchCmd(BatchDispatchRequest request);
+
+    /**
+     * 根据uniqueTokens查询设备的简单信息
+     * @param param {@link QueryDeviceSimpleByUniqueTokensParam}
+     * @return {@code ResultWrapper<List<DeviceSimple>>}
+     */
+    @RequestLine("POST /GetDeviceSimpleByUniqueTokens")
+    ResultWrapper<List<DeviceSimple>> queryDeviceSimpleByUniqueTokens(QueryDeviceSimpleByUniqueTokensParam param);
+
+    @RequestLine("POST /QueryDeviceStateList")
+    ResultWrapper<List<DeviceStateInfo>> queryDeviceStateList(QueryDeviceStateListParam param);
+
+    @RequestLine("POST /GetDeviceInfoByUniqueTokens")
+    ResultWrapper<List<DeviceInfo>> queryDeviceInfoByUniqueTokens(QueryDeviceInfoByUniqueTokensParam queryDeviceInfoByUniqueTokensParam);
+
+    @RequestLine("POST /QueryDeviceStatisticByMonitorProjectList")
+    ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> queryDeviceStatisticByMonitorProjectList(QueryDeviceStatisticByMonitorProjectListParam param);
 }

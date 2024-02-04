@@ -36,6 +36,7 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorID] 传感器ID
      * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
      * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
+     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.人工数据 4.视频数据
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.id 传感器ID
      * @apiSuccess (响应结果) {Int} data.monitorType 监测类型 (Code)
@@ -47,6 +48,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.monitorPointName 关联监测点名称
      * @apiSuccess (响应结果) {String} data.exValues 拓展信息
      * @apiSuccess (响应结果) {Boolean} data.enable 是否启用, 不启用将不会接收数据
+     * @apiSuccess (响应结果) {String} data.dataSourceKey 数据来源筛选描述
      * @apiPermission mdmbase:ListSensor
      */
     @Permission(permissionName = "mdmbase:ListBaseSensor")
@@ -71,6 +73,7 @@ public class SensorController {
      * @apiParam (请求体) {String} [sensorID] 传感器ID
      * @apiParam (请求体) {String} [monitorTypeID] 监测类型ID
      * @apiParam (请求体) {String} [monitorPointID] 关联监测点ID
+     * @apiParam (请求体) {Int} [dataSourceKey] 数据来源筛选 0.全部 1.物联网数据 2.API外部数据 3.人工数据 4.视频数据
      * @apiSuccess (响应结果) {Object} data
      * @apiSuccess (响应结果) {Int} data.totalCount 总条数
      * @apiSuccess (响应结果) {Int} data.totalPage 总页数
@@ -85,8 +88,9 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.currentPageData.monitorPointName 关联监测点名称
      * @apiSuccess (响应结果) {String} data.currentPageData.exValues 拓展信息
      * @apiSuccess (响应结果) {Boolean} data.currentPageData.enable 是否启用, 不启用将不会接收数据
+     * @apiSuccess (响应结果) {String} data.currentPageData.dataSourceKey 数据来源筛选描述
      * @apiSuccessExample {json} 响应结果示例
-     * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"id": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false}]}}
+     * {"code": 0,"msg": null,"data": {"totalPage": 1,"totalCount": 1,"currentPageData": [{"id": 0,"monitorType": 0,"monitorTypeName": "","name": "","alias": "","displayOrder": 0,"monitorPointID": 0,"monitorPointName": 0,"exValues": "","enable": false,"dataSourceKey":"物联网数据"}]}}
      * @apiPermission mdmbase:ListSensor
      */
     @Permission(permissionName = "mdmbase:ListBaseSensor")
@@ -151,6 +155,7 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName MonitorTypeCatalog
      * @apiParam (请求参数) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} [companyID] 公司ID，默认当前用户所在公司ID
      * @apiParam (请求参数) {String} [dataSourceComposeType] 模板数据来源类型 默认为1 <br/>1单一物模型单一传感器 <br/>2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>3物联网传感器+监测传感器<br/>4单个监测传感器<br/>5多个监测传感器<br/>100API 推送
      * @apiParam (请求参数) {String} [templateDataSourceID] 监测类型模板分布式唯一ID
      * @apiSuccess (响应结果) {Object} data
@@ -231,12 +236,12 @@ public class SensorController {
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiParam (请求体) {Int} [templateID] 监测类型模板ID, 仅当dataSourceComposeType为100时不需要
-     * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API 推送
+     * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API推送<br/>      500人工传感器
      * @apiParam (请求体) {Object[]} [dataSourceList] 数据源列表, 仅当dataSourceComposeType为100时不需要
      * @apiParam (请求体) {Int} dataSourceList.dataSourceType 数据源类型 1-物联网传感器 2-监测传感器
-     * @apiParam (请求体) {String} dataSourceList.templateDataSourceToken 模板数据源标识
-     * @apiParam (请求体) {String} dataSourceList.sensorName (监测/物联网)传感器名称
-     * @apiParam (请求体) {String} dataSourceList.uniqueToken 设备传感器标识 数据源类型为1时必填
+     * @apiParam (请求体) {String} [dataSourceList.templateDataSourceToken] 模板数据源标识；人工传感器不填该项
+     * @apiParam (请求体) {String} [dataSourceList.sensorName] (监测/物联网)传感器名称；人工传感器不填该项
+     * @apiParam (请求体) {String} [dataSourceList.uniqueToken] 设备传感器标识 数据源类型为1时必填；人工传感器不填该项
      * @apiParam (请求体) {String} dataSourceList.exValues 数据源拓展信息
      * @apiParam (请求体) {Object[]} [exFields] 扩展配置列表，由监测类型决定是否需要
      * @apiParam (请求体) {Int} exFields.id 扩展配置参数ID
@@ -420,6 +425,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {String} data.paramList.exValues 参数扩展字段
      * @apiSuccess (响应结果) {String} data.paramList.dataType 参数数据类型
      * @apiSuccess (响应结果) {String} data.paramList.type 参数类型 IOT-物模型数据源类型、MON-监测传感器数据类型、SLEF-自身数据、HISTORY-自身历史数据、CONS-常量、PARAM-参数、EX-扩展配置
+     * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": {"calType": 0,"fieldList": [{"value": "","formula": "${iot:201_a.Temp} - ${param:pvalue}","id": 0,"monitorType": 0,"fieldToken": "","fieldName": "","fieldDataType": "","fieldClass": 0,"fieldDesc": "","fieldUnitID": 0,"parentID": 0,"createType": 0,"exValues": "","displayOrder": 0}],"script": "","paramList": [{"name": "字段中文名","unit": "mm","origin": "${iot:201_a.Temp}","token": "Temp","type": "IOT"}]}}
      * @apiPermission mdmbase:DescribeSensor
@@ -446,6 +452,7 @@ public class SensorController {
      * @apiSuccess (响应结果) {Object[]} data
      * @apiSuccess (响应结果) {Double} data.value
      * @apiSuccess (响应结果) {String} data.fieldToken
+     * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
      * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
      * @apiPermission mdmbase:DescribeSensor
@@ -546,13 +553,69 @@ public class SensorController {
      * @apiParam (请求体) {Int} monitorType 监测类型
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.sensorID 传感器ID
-     * @apiSuccess (返回结果) {Name} dataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorName 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.sensorAlias 传感器名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:
      */
-    //@Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:ListBaseSensor")
     @PostMapping(value = "/QueryManualSensorListByMonitor", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryManualSensorListByMonitor(@Valid @RequestBody Object param) {
-        return null;
+    public Object queryManualSensorListByMonitor(@Valid @RequestBody QueryManualSensorListByMonitorParam param) {
+        return sensorService.queryManualSensorListByMonitor(param);
+    }
+
+    /**
+     * @api {POST} /QuerySensorSimpleList 查询传感器简单信息列表
+     * @apiDescription 查询传感器简单信息列表
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QuerySensorSimpleList
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} [idList] 传感器id集合
+     * @apiParam (请求体) {Int[]} [projectIDList] 工程项目id集合
+     * @apiParam (请求体) {Int[]} [monitorTypeList] 监测类型集合
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.id 传感器id
+     * @apiSuccess (返回结果) {Int} dataList.projectID 所属工程ID
+     * @apiSuccess (返回结果) {String} dataList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.alias 传感器别名
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.kind 传感器类型 1-自动化传感器 2-融合传感器 3-人工传感器
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointID 关联监测点id
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensor
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensor", allowApplication = true)
+    @PostMapping(value = "/QuerySensorSimpleList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySensorSimpleList(@Valid @RequestBody QuerySensorSimpleListRequest param) {
+        return sensorService.querySimpleList(param);
+    }
+
+    /**
+     * @api {POST} /CalculateField 计算传感器指定字段
+     * @apiDescription 计算传感器指定字段 (通常用于计算扩展字段)
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName CalculateField
+     * @apiParam (请求体) {Int} projectID 项目id
+     * @apiParam (请求体) {Int} sensorID 监测传感器id
+     * @apiParam (请求体) {String} targetFieldToken 待计算的目标字段token
+     * @apiParam (请求体) {Object[]} [paramList] 参数列表
+     * @apiParam (请求体) {Double} paramList.value 参数值
+     * @apiParam (请求体) {String} paramList.fieldToken 参数字段token
+     * @apiSuccess (响应结果) {Object} data
+     * @apiSuccess (响应结果) {Double} data.value 计算结果
+     * @apiSuccess (响应结果) {String} data.fieldToken 字段标识
+     * @apiSuccess (响应结果) {Int} data.fieldID 字段id
+     * @apiSampleRequest off
+     * @apiSuccessExample {json} 响应结果示例
+     * {"code": 0,"msg": null,"data": [{"value": "11.5","fieldToken": "Q"}]}
+     * @apiPermission mdmbase:DescribeSensor
+     */
+    @Permission(permissionName = "mdmbase:DescribeBaseSensor")
+    @PostMapping(value = "/CalculateField", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object calculate(@RequestBody @Validated CalculateFieldRequest request) {
+        return sensorService.calculateField(request);
     }
 }

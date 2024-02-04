@@ -41,10 +41,10 @@ public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator,
                 .eq(TbProjectMonitorClass::getMonitorClass, MonitorQueryType.VIDEO.getValue())
                 .eq(TbProjectMonitorClass::getEnable, true);
         // 先查询当前工程ID 是否配置了视频监测,如果没有配置则返回错误
-        List<TbProjectMonitorClass> projectMonitorClassList = projectMonitorClassMapper.selectList(wrapper);
-        if (CollectionUtil.isNullOrEmpty(projectMonitorClassList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
-        }
+//        List<TbProjectMonitorClass> projectMonitorClassList = projectMonitorClassMapper.selectList(wrapper);
+//        if (CollectionUtil.isNullOrEmpty(projectMonitorClassList)) {
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
+//        }
 
         liveInfos = tbMonitorPointMapper.selectListByIDList(monitorPointIDList);
         if (!CollectionUtil.isNullOrEmpty(liveInfos)){

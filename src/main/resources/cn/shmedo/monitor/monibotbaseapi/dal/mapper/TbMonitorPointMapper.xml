@@ -22,6 +22,67 @@
         <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime"/>
         <result column="UpdateUserID" jdbcType="INTEGER" property="updateUserID"/>
     </resultMap>
+    <resultMap id="ThematicGroupPointMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo">
+        <id column="monitorGroupID" jdbcType="INTEGER" property="monitorGroupID"/>
+        <result column="monitorGroupName" jdbcType="VARCHAR" property="monitorGroupName"/>
+        <result column="monitorGroupEnable" jdbcType="BIT" property="monitorGroupEnable"/>
+        <collection property="monitorPointDataList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicPointListInfo">
+            <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+            <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+            <result column="monitorPointEnable" jdbcType="BIT" property="monitorPointEnable"/>
+            <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+            <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+            <result column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+        </collection>
+    </resultMap>
+    <resultMap id="ThematicWetLineConfigMap" type="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.WetLineConfigInfo">
+        <id column="monitorGroupID" jdbcType="INTEGER" property="monitorGroupID"/>
+        <result column="monitorGroupName" jdbcType="VARCHAR" property="monitorGroupName"/>
+        <result column="monitorGroupEnable" jdbcType="BIT" property="monitorGroupEnable"/>
+        <result column="monitorGroupImagePath" jdbcType="VARCHAR" property="monitorGroupImagePath"/>
+        <collection property="monitorGroupConfigList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicProjectConfigInfo">
+            <id column="gConfigID" jdbcType="INTEGER" property="configID"/>
+            <result column="gProjectID" jdbcType="INTEGER" property="projectID"/>
+            <result column="gGroup" jdbcType="VARCHAR" property="group"/>
+            <result column="gKey" jdbcType="VARCHAR" property="key"/>
+            <result column="gValue" jdbcType="VARCHAR" property="value"/>
+        </collection>
+        <collection property="monitorPointList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicPointListInfoV2">
+            <id column="monitorPointID" jdbcType="INTEGER" property="monitorPointID"/>
+            <result column="monitorPointName" jdbcType="VARCHAR" property="monitorPointName"/>
+            <result column="monitorPointEnable" jdbcType="BIT" property="monitorPointEnable"/>
+            <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+            <result column="monitorItemID" jdbcType="INTEGER" property="monitorItemID"/>
+            <result column="sensorID" jdbcType="INTEGER" property="sensorID"/>
+            <result column="sensorExValues" jdbcType="VARCHAR" property="sensorExValues"/>
+            <collection property="monitorPointConfigList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicProjectConfigInfo">
+                <id column="pConfigID" jdbcType="INTEGER" property="configID"/>
+                <result column="pProjectID" jdbcType="INTEGER" property="projectID"/>
+                <result column="pGroup" jdbcType="VARCHAR" property="group"/>
+                <result column="pKey" jdbcType="VARCHAR" property="key"/>
+                <result column="pValue" jdbcType="VARCHAR" property="value"/>
+            </collection>
+            <collection property="eigenValueList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicEigenValueData">
+                <id column="eigenValueID" jdbcType="INTEGER" property="eigenValueID"/>
+                <id column="eigenValueName" jdbcType="VARCHAR" property="eigenValueName"/>
+                <id column="eigenValue" jdbcType="DOUBLE" property="eigenValue"/>
+                <id column="chnUnit" jdbcType="VARCHAR" property="chnUnit"/>
+                <id column="engUnit" jdbcType="VARCHAR" property="engUnit"/>
+            </collection>
+            <collection property="paramFieldList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicSensorParamField">
+                <id column="paramFieldID" jdbcType="INTEGER" property="id"/>
+                <result column="paramFieldSubjectID" jdbcType="INTEGER" property="subjectID"/>
+                <result column="paramFieldSubjectType" jdbcType="INTEGER" property="subjectType"/>
+                <result column="paramFieldDataType" jdbcType="VARCHAR" property="dataType"/>
+                <result column="paramFieldToken" jdbcType="VARCHAR" property="token"/>
+                <result column="paramFieldName" jdbcType="VARCHAR" property="name"/>
+                <result column="paramFieldPaValue" jdbcType="VARCHAR" property="paValue"/>
+                <result column="paramFieldPaDesc" jdbcType="VARCHAR" property="paDesc"/>
+                <result column="paramFieldChnUnit" jdbcType="VARCHAR" property="chnUnit"/>
+                <result column="paramFieldEngUnit" jdbcType="VARCHAR" property="engUnit"/>
+            </collection>
+        </collection>
+    </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
         ID,
@@ -671,8 +732,268 @@
         SELECT *
         FROM tb_monitor_point tmp
                  LEFT JOIN tb_monitor_item tmi ON tmi.ID = tmp.MonitorItemID
-        WHERE 1= 1
+        WHERE 1 = 1
           AND tmi.ProjectID = #{projectID}
           AND tmi.MonitorClass = #{monitorClass}
+    </select>
+
+    <select id="selectPointListByMonitorItemIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointBaseInfoV1">
+        select tmp.ID as monitorPointID, tmp.monitorItemID, tmp.name, tmp.enable, mgp.MonitorGroupID as groupID
+        FROM tb_monitor_point tmp
+                 LEFT JOIN tb_monitor_group_point mgp ON tmp.ID = mgp.MonitorPointID
+        where tmp.monitorItemID in
+        <foreach collection="monitorItemIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectPointListByIDList" resultMap="BaseResultMap">
+        select *
+        from tb_monitor_point where
+            ID in
+        <foreach collection="monitorPointIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectThematicGroupPointList" resultMap="ThematicGroupPointMap"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicGroupPointListInfo">
+        SELECT
+            tmg.`ID` monitorGroupID,
+            tmg.`Name` monitorGroupName,
+            tmg.`Enable` monitorGroupEnable,
+            tmp.`ID` monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmp.`Enable` monitorPointEnable,
+            tmp.`MonitorType` monitorType,
+            tmp.`MonitorItemID` monitorItemID,
+            ts.`ID` sensorID
+        FROM
+            tb_monitor_group tmg
+            LEFT JOIN tb_monitor_group_point tmgp ON tmgp.`MonitorGroupID` = tmg.`ID`
+            LEFT JOIN tb_monitor_point tmp ON tmp.`ID` = tmgp.`MonitorPointID`
+            LEFT JOIN tb_monitor_item tmi ON tmi.`ID` = tmp.`MonitorItemID`
+            LEFT JOIN tb_sensor ts ON ts.`MonitorPointID` = tmp.`ID`
+        WHERE tmg.`ProjectID` =#{param.projectID}
+        <if test="param.monitorType != null">
+            AND tmi.`MonitorType` =#{param.monitorType}
+        </if>
+        <if test="param.monitorGroupIDList != null and param.monitorGroupIDList.size != 0">
+            AND tmg.`ID` IN
+            <foreach collection="param.monitorGroupIDList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectItemIDsByIDs" resultType="java.lang.Integer">
+        select distinct MonitorItemID
+        from tb_monitor_point where ID in
+        <foreach collection="monitorPointIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+
+
+    <select id="selectMonitorPointDataInfoListByIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo">
+        select mp.ID        as monitorPointID,
+               mp.Name      as monitorPointName,
+               mp.monitorType,
+               mt.TypeAlias as monitorTypeAlias,
+               mt.TypeName  as monitorTypeName,
+               mt.multiSensor
+        from tb_monitor_point mp
+                 left join tb_monitor_type mt on mp.monitorType = mt.monitorType
+        where mp.ID in
+        <foreach collection="monitorPointIDList" item="item" separator="," index="index" open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectMonitorTypeExValuesByPointIDList" resultType="java.util.Map">
+        SELECT tmp.ID monitorPointID,tmp.MonitorType monitorType,tmt.ExValues exValues FROM tb_monitor_point tmp LEFT JOIN tb_monitor_type tmt ON tmp.MonitorType = tmt.MonitorType WHERE tmp.ID IN
+        <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+    <select id="selectWetLineConfig" resultMap="ThematicWetLineConfigMap"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.WetLineConfigInfo">
+        SELECT
+            tmg.`ID` monitorGroupID,
+            tmg.`Name` monitorGroupName,
+            tmg.`Enable` monitorGroupEnable,
+            tmg.`ImagePath` monitorGroupImagePath,
+            tpc_g.`ID` gConfigID,
+            tpc_g.`ProjectID` gProjectID,
+            tpc_g.`Group` gGroup,
+            tpc_g.`Key` gKey,
+            tpc_g.`Value` gValue,
+            tmp.`ID` monitorPointID,
+            tmp.`Name` monitorPointName,
+            tmp.`Enable` monitorPointEnable,
+            tmp.`MonitorType` monitorType,
+            tmp.`MonitorItemID` monitorItemID,
+            ts.`ID` sensorID,
+            ts.`ExValues` sensorExValues,
+            tp.`ID` paramFieldID,
+            tp.`SubjectID` paramFieldSubjectID,
+            tp.`SubjectType` paramFieldSubjectType,
+            tp.`DataType` paramFieldDataType,
+            tp.`Token` paramFieldToken,
+            tp.`Name` paramFieldName,
+            tp.`PaValue` paramFieldPaValue,
+            tp.`PaDesc` paramFieldPaDesc,
+            tdu_p.`ChnUnit` paramFieldChnUnit,
+            tdu_p.`EngUnit` paramFieldEngUnit,
+            tpc_p.`ID` pConfigID,
+            tpc_p.`ProjectID` pProjectID,
+            tpc_p.`Group` pGroup,
+            tpc_p.`Key` pKey,
+            tpc_p.`Value` pValue,
+            tev.`ID` eigenValueID,
+            tev.`Name` eigenValueName,
+            tev.`Value` eigenValue,
+            tdu.`ChnUnit` chnUnit,
+            tdu.`EngUnit` engUnit
+        FROM
+            tb_monitor_group tmg
+            LEFT JOIN tb_project_config tpc_g ON tmg.ProjectID = tpc_g.ProjectID AND tpc_g.`Group` = 'monitorGroup' AND tpc_g.`Key` LIKE CONCAT( '%::', tmg.ID )
+            LEFT JOIN tb_monitor_group_point tmgp ON tmgp.`MonitorGroupID` = tmg.`ID`
+            LEFT JOIN tb_monitor_point tmp ON tmp.`ID` = tmgp.`MonitorPointID`
+            LEFT JOIN tb_project_config tpc_p ON tmp.ProjectID = tpc_p.ProjectID AND tpc_p.`Group` = 'monitorPoint' AND tpc_p.`Key` LIKE CONCAT( '%::', tmp.ID )
+            LEFT JOIN tb_sensor ts ON ts.MonitorPointID = tmp.ID
+            LEFT JOIN tb_parameter tp ON tp.SubjectID = ts.ID
+            LEFT JOIN tb_data_unit tdu_p ON tdu_p.ID = tp.PaUnitID
+            LEFT JOIN tb_eigen_value_relation tevr ON tevr.`MonitorPointID` = tmp.`ID`
+            LEFT JOIN tb_eigen_value tev ON tev.`ID` = tevr.`EigenValueID` AND tev.`Scope` = 0
+            LEFT JOIN tb_data_unit tdu ON tdu.`ID` = tev.`UnitID`
+        WHERE tmg.ID=#{param.monitorGroupID} AND tmp.MonitorType=#{param.monitorType} AND tmp.ID IN
+        <foreach collection="param.monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="selectListByEigenValueIDList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2">
+        select mp.ID     as monitorPointID,
+               mp.name   as monitorPointName,
+               mp.Enable as monitorPointEnable,
+               mp.monitorItemID,
+               mp.monitorType,
+               evr.eigenValueID
+        from tb_monitor_point as mp
+                 left join tb_eigen_value_relation evr on evr.monitorPointID = mp.ID
+        where 1 = 1
+        <if test="eigenValueIDList != null and eigenValueIDList.size != 0">
+            and mp.ID in
+            (select monitorPointID
+             from tb_eigen_value_relation where eigenValueID in
+            <foreach collection="eigenValueIDList" item="eigenValueID" index="index" open="(" close=")" separator=",">
+                #{eigenValueID}
+            </foreach>
+            )
+        </if>
+    </select>
+
+    <select id="listByProjectType"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple">
+        SELECT tmp.ID, tmp.ProjectID, tmp.MonitorType, tmp.MonitorItemID, tmp.`Name`,tpi.ProjectType
+        FROM `tb_monitor_point` tmp
+                 LEFT JOIN `tb_project_info` tpi ON tmp.ProjectID = tpi.ID
+        <where>
+            <trim suffixOverrides="AND">
+                <choose>
+                    <when test="projectIDList != null and projectIDList.size() != 0">
+                        <foreach collection="projectIDList" open="tpi.ID IN (" close=") AND" item="item" separator=",">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        FALSE AND
+                    </otherwise>
+                </choose>
+                tmp.`Enable` = 1 AND
+                <if test="monitorTypeList != null and monitorTypeList.size() != 0">
+                    <foreach collection="monitorTypeList" separator="," item="item" open=" tpi.ProjectType IN (" close=") AND">
+                        #{item}
+                    </foreach>
+                </if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="listByProjectTypeAndMonitorType"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple">
+        SELECT tmp.ID,
+               tmp.ProjectID,
+               tmp.MonitorType,
+               tmp.MonitorItemID,
+               tmp.`Name`,
+               tpi.ProjectType,
+               tpt.TypeName as projectTypeName,
+               tpi.ProjectName
+        FROM `tb_monitor_point` tmp
+                 LEFT JOIN `tb_project_info` tpi ON tmp.ProjectID = tpi.ID
+                 LEFT JOIN `tb_project_type` tpt ON tpt.ID = tpi.ProjectType
+                 right join tb_sensor ts on tmp.ID = ts.MonitorPointID
+        <where>
+            <trim suffixOverrides="AND">
+                tmp.`Enable` = 1
+                  and tpi.companyID = #{companyID}
+                <if test="projectType != null">
+                    and ts.ProjectID in (select ID from `tb_project_info` where ProjectType = #{projectType})
+                </if>
+                <if test="monitorType != null">
+                    and tmp.MonitorType = #{monitorType}
+                </if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="queryList" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web">
+        select p.*,
+        t.ID          as monitorTypeID,
+        t.TypeName    as monitorTypeName,
+        t.TypeAlias   as monitorTypeAlias,
+        t.MultiSensor as monitorTypeMultiSensor,
+        it.Name       as monitorItemName,
+        it.Alias      as monitorItemAlias
+        from tb_monitor_point as p
+        left join tb_monitor_type as t on t.MonitorType = p.MonitorType
+        left join tb_monitor_item as it on it.id = p.MonitorItemID
+        where p.ProjectID = #{projectID}
+        <if test="monitorType != null">
+            and p.MonitorType = #{monitorType}
+        </if>
+        <if test="monitorItemID != null">
+            and p.MonitorItemID = #{monitorItemID}
+        </if>
+        <if test="queryCode != null and queryCode != ''">
+            and (
+            p.Name like concat('%', #{queryCode}, '%')
+            or p.id in (select distinct MonitorPointID
+            from tb_sensor
+            where Name like concat('%', #{queryCode}, '%')
+            or Alias like concat('%', #{queryCode}, '%'))
+            )
+        </if>
+        order by p.ID desc
+    </select>
+
+    <select id="selectItemCountByProjectID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.project.MonitorItemCountStatisticsInfo">
+        select tmp.monitorItemID,
+               tmi.NAME      AS monitorItemName,
+               tmi.monitorType,
+               count(tmp.ID) as monitorPointCount
+        from tb_monitor_point tmp
+                 left join tb_monitor_item tmi on tmi.ID = tmp.MonitorItemID
+        WHERE tmp.ProjectID = #{projectID}
+        <if test="monitorIDList != null and monitorIDList.size() != 0">
+            <foreach collection="monitorIDList" separator="," item="item" open=" AND tmp.ID IN (" close=") ">
+                #{item}
+            </foreach>
+        </if>
+        GROUP BY tmi.ID
     </select>
 </mapper>

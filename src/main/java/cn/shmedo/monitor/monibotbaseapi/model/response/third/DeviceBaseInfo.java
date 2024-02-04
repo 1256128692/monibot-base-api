@@ -36,6 +36,14 @@ public class DeviceBaseInfo {
      * 设备唯一标识
      */
     private String uniqueToken;
+    /**
+     * 设备定位信息
+     */
+    private String gpsLocation;
+    /**
+     * 固件版本
+     */
+    private String firmwareVersion;
 
     public void setProductType(String productType) {
         this.productType = ProductType.valueOfEngName(productType);

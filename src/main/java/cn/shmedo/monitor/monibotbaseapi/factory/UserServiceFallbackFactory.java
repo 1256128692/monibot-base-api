@@ -7,15 +7,18 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户服务远程调用 熔断降级
@@ -62,12 +65,47 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
             }
 
             @Override
-            public ResultWrapper<Object> queryUserIDName(QueryUserIDNameParameter pa, String appKey, String appSecret) {
+            public ResultWrapper<List<UserIDName>> queryUserIDName(QueryUserIDNameParameter pa, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
             public ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<DeptSimpleInfo>> queryDeptSimpleList(QueryDeptSimpleListParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<UserNoPageInfo>> queryUserInDeptListNoPage(QueryUserInDeptListNoPageParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<Integer>> addSysNotify(SysNotify request, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, String accessToken) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<NotifyDetailInfo> queryNotifyDetail(QueryNotifyDetailParam param, String accessToken) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<Map<Integer, UserContact>> queryUserContact(QueryUserContactParam param, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<DepartmentIncludeUserInfo> queryDepartmentIncludeUserInfoList(QueryDepartmentIncludeUserInfoListParameter parameter, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
         };

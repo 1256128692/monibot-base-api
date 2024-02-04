@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.config;
 
 
 import cn.shmedo.monitor.monibotbaseapi.factory.*;
+import cn.shmedo.monitor.monibotbaseapi.service.third.notify.MdNotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoFileService;
@@ -45,6 +46,7 @@ public class FeignBeans {
     private final YsServiceFallbackFactory ysServiceFallbackFactory;
     private final MdInfoFileServiceFallbackFactory mdInfoFileServiceFallbackFactory;
     private final WorkFlowTemplateServiceFallbackFactory workFlowTemplateServiceFallbackFactory;
+    private final MdNotifyServiceFallbackFactory mdNotifyServiceFallbackFactory;
 
     @Bean
     @Primary
@@ -136,6 +138,24 @@ public class FeignBeans {
                                 .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                                 .header(DefaultConstant.APP_KEY, config.getAuthAppKey())
                                 .header(DefaultConstant.APP_SECRET, config.getAuthAppSecret())));
+    }
+
+    @Bean
+    public MdNotifyService mdNotifyService() {
+        SetterFactory factory = (target, method) -> HystrixCommand.Setter
+                .withGroupKey(HystrixCommandGroupKey.Factory.asKey(MdNotifyService.class.getSimpleName()))
+                .andCommandKey(HystrixCommandKey.Factory.asKey(method.getName()))
+                .andCommandPropertiesDefaults(HystrixCommandProperties.Setter()
+                        .withExecutionTimeoutInMilliseconds(5000));
+        return FeignFactory.hystrixClient(MdNotifyService.class, config.getNotifyServiceAddress(), mdNotifyServiceFallbackFactory,
+                value -> value.encoder(new JacksonEncoder(objectMapper))
+                        .decoder(new JacksonDecoder(objectMapper))
+                        .setterFactory(factory)
+                        .options(new Request.Options(2, TimeUnit.SECONDS, 3, TimeUnit.SECONDS, true))
+                        .requestInterceptor(template -> template
+                                .header(DefaultConstant.APP_KEY, config.getNotifyAppKey())
+                                .header(DefaultConstant.APP_SECRET, config.getNotifyAppSecret())
+                                .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)));
     }
 }
 

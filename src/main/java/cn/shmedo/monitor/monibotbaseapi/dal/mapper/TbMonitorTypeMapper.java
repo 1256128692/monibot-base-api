@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.MonitorTypeWithField;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -43,4 +44,8 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
      */
     List<MonitorTypeWithField> queryMonitorTypeWithField(@Param(Constants.WRAPPER) Wrapper<Void> wrapper);
     TbMonitorType queryByType(Integer type);
+
+    List<MonitorTypeBaseInfoV1> selectByMonitorTypeList(List<Integer> monitorTypeList);
+
+    List<MonitorTypeBaseInfoV1> selectAllMonitorTypeBaseInfoV1();
 }

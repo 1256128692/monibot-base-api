@@ -7,9 +7,11 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.QueryMonitorItemSimpleListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -289,5 +291,33 @@ public class MonitorItemController {
     @PostMapping(value = "/QueryMonitorItemNameList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryMonitorItemNameList(@RequestBody @Validated QueryWorkOrderStatisticsParam pa) {
         return monitorItemService.queryMonitorItemNameList(pa);
+    }
+
+    /**
+     * @api {POST} /QueryMonitorItemSimpleList 监测项目简单信息列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测项目模块
+     * @apiName QueryMonitorItemSimpleList
+     * @apiDescription 监测项目简单信息列表
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Int} [monitorType] 监测类型
+     * @apiParam (请求参数) {Int} [createType] 创建类型 0:预定义,1:自定义
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用 (默认true)
+     * @apiSuccess (返回结果) {Object[]} data 监测项目列表
+     * @apiSuccess (返回结果) {Int} data.id 监测项目id
+     * @apiSuccess (返回结果) {String} data.name 名称
+     * @apiSuccess (返回结果) {String} data.alias 别名
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.projectID 工程项目ID
+     * @apiSuccess (返回结果) {Int} data.createType 创建类型 0:预定义,1:自定义
+     * @apiSuccess (返回结果) {Boolean} data.enable 是否启用
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorItem
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorItem")
+    @PostMapping(value = "/QueryMonitorItemSimpleList", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object listMonitorItemSimple(@Validated @RequestBody QueryMonitorItemSimpleListParam param) {
+        return monitorItemService.listMonitorItemSimple(param);
     }
 }

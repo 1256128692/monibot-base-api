@@ -3,14 +3,20 @@ package cn.shmedo.monitor.monibotbaseapi.service.redis;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import jakarta.annotation.Nonnull;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Range;
 import org.springframework.data.redis.connection.Limit;
 import org.springframework.data.redis.core.*;
 import org.springframework.util.Assert;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -275,7 +281,7 @@ public class RedisService {
      * @param keysAndValues k-v存储
      * @return {@code true} 成功
      */
-    public <K, V> boolean multiSetIfAbsent(Object... keysAndValues) {
+    public boolean multiSetIfAbsent(Object... keysAndValues) {
         Map<String, String> data = serializeKeysAndValuesToMap(keysAndValues);
         Boolean result = template.opsForValue().multiSetIfAbsent(data);
         data.clear();
@@ -289,7 +295,7 @@ public class RedisService {
      * @param decrement 减少值
      * @return 减少后的值
      */
-    public <T> long decrement(String key, long decrement) {
+    public long decrement(String key, long decrement) {
         Long result = template.opsForValue().decrement(key, decrement);
         return result == null ? 0 : result;
     }
@@ -300,7 +306,7 @@ public class RedisService {
      * @param key key
      * @return 减1后的值
      */
-    public <T> long decrement(String key) {
+    public long decrement(String key) {
         return decrement(key, 1);
     }
 
@@ -311,7 +317,7 @@ public class RedisService {
      * @param increment 增加值
      * @return 增加后的值
      */
-    public <T> long increment(String key, long increment) {
+    public long increment(String key, long increment) {
         Long result = template.opsForValue().increment(key, increment);
         return result == null ? 0 : result;
     }
@@ -322,7 +328,7 @@ public class RedisService {
      * @param key key
      * @return 加1后的值
      */
-    public <T> long increment(String key) {
+    public long increment(String key) {
         return increment(key, 1);
     }
 
@@ -1188,23 +1194,43 @@ public class RedisService {
     }
 
     /**
-     * 将对象序列化为json串，不会处理 {@link CharSequence}、{@link Number}、{@link Boolean}
+     * 将对象序列化为字符串<br/>
+     * <br/>
+     * <pre>
+     * CharSequence -> toString
+     * Number -> toString
+     * Boolean -> toString
+     * Date -> yyyy-MM-dd HH:mm:ss
+     * LocalDateTime -> yyyy-MM-dd HH:mm:ss
+     * LocalDate -> yyyy-MM-dd
+     * LocalTime -> HH:mm:ss
+     * Other -> toJsonStr
+     * </pre>
      *
      * @param o 对象
      * @return json串
      */
-    public static String serialize(Object o) {
+    public static String serialize(@Nonnull Object o) {
         Assert.notNull(o, "序列化对象不能为null");
         if (o instanceof CharSequence || o instanceof Number || o instanceof Boolean) {
             return o.toString();
+        } else if (o instanceof Date date) {
+            return DatePattern.NORM_DATETIME_FORMAT.format(date);
+        } else if (o instanceof LocalDateTime localDateTime) {
+            return DatePattern.NORM_DATETIME_FORMATTER.format(localDateTime);
+        } else if (o instanceof LocalDate localDate) {
+            return DatePattern.NORM_DATE_FORMATTER.format(localDate);
+        } else if (o instanceof LocalTime localTime) {
+            return DatePattern.NORM_TIME_FORMATTER.format(localTime);
         }
         return JSONUtil.toJsonStr(o);
     }
 
     /**
      * 将map中的key和value序列化为json串
-     * @param dataMap   map
-     * @return  {@link Map<String, String>}
+     *
+     * @param dataMap map
+     * @return {@link Map<String, String>}
      */
     public static <K, V> Map<String, String> serializeMap(Map<K, V> dataMap) {
         Assert.notNull(dataMap, "序列化对象不能为null");
@@ -1221,10 +1247,17 @@ public class RedisService {
      * @return 结果
      */
     public static <T> T deserialize(String str, Class<T> clazz) {
-        if (JSONUtil.isTypeJSONArray(str) && clazz.isAssignableFrom(Iterator.class)) {
+        if (str == null || str.isEmpty()) {
+            return null;
+        }
+
+        // json array
+        if (clazz.isAssignableFrom(Iterator.class) && StrUtil.isWrap(StrUtil.trim(str), '[', ']')) {
             return JSONUtil.parseArray(str).toBean(clazz);
         }
-        if (JSONUtil.isTypeJSONObject(str)) {
+
+        // json object
+        if (StrUtil.isWrap(StrUtil.trim(str), '{', '}')) {
             return JSONUtil.toBean(str, clazz);
         }
         return Convert.convert(clazz, str);

@@ -3,8 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONArray;
-import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.cache.FormModelCache;
@@ -36,8 +34,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.support.DefaultMultipartHttpServletRequest;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -150,7 +150,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
     @Override
     public List<Model4Web> queryModelList(QueryModelListParam param) {
-        // 查询分组时。测试企业可需要返回米度企业的预定义模板，不能返回米度企业的自定义模板
+        // 查询分组时。测试企业可需要返回米度企业的预定义模板，不能返回米度企业的自定义模板，以及自己企业下自定义模板
         boolean groupParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.isNull(param.getProjectType());
         boolean selectParamFlag = Objects.nonNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType());
         // 模板ID非空时，根据模板ID精确查询
@@ -164,25 +164,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 模糊查询
-        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
-                .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
-                .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
-                .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
-                // 分组和下拉框需要展示预定义模板
-                .eq(Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag,
-                        TbPropertyModel::getCreateType, param.getCreateType())
-                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
-        if (!(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
-            queryWrapper.eq(Objects.nonNull(param.getCompanyID()), TbPropertyModel::getCompanyID, param.getCompanyID());
-        }
-        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
-            if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
-                queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
-            } else {
-                queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
-            }
-        }
-
+        LambdaQueryWrapper<TbPropertyModel> queryWrapper = getListQueryParam(param, groupParamFlag, selectParamFlag);
         List<TbPropertyModel> tbPropertyModelList = tbPropertyModelMapper.selectList(queryWrapper);
         List<Model4Web> model4WebList = Lists.newArrayList();
         Map<Integer, List<TbPropertyModel>> modelGroup = Maps.newHashMap();
@@ -235,7 +217,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         }
 
         // 工程项目模板组下没有模板，也要显示
-        if (groupParamFlag && StringUtils.isEmpty(param.getName()) && PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+        if (groupParamFlag && StringUtils.isEmpty(param.getName()) &&
+                CollectionUtil.isEmpty(param.getGroupIDList()) &&
+                PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
             Set<Integer> groupIDSet;
             if (modelGroup.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
                 groupIDSet = modelGroup.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getGroupID).collect(Collectors.toSet());
@@ -257,6 +241,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
 
         // 非工程项目模板组下没有模板，也要显示
         if (StringUtils.isEmpty(param.getName()) &&
+                CollectionUtil.isEmpty(param.getGroupIDList()) &&
                 (PropertyModelType.DEVICE.getCode().equals(param.getModelType()) || PropertyModelType.WORK_FLOW.getCode().equals(param.getModelType()))) {
             Set<Integer> groupIDSet = model4WebList.stream().map(Model4Web::getGroupID).collect(Collectors.toSet());
             if (!groupIDSet.contains(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP)) {
@@ -266,7 +251,7 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
                 model4Web.setGroupName(DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP_NAME);
                 model4WebList.add(model4Web);
             }
-            if(CollectionUtil.isNotEmpty(unProjectGroupMap)) {
+            if (CollectionUtil.isNotEmpty(unProjectGroupMap)) {
                 Stream<TbPropertyModel> modelStream = modelGroup.get(PropertyModelType.UN_BASE_PROJECT.getCode()).stream();
                 if (Objects.nonNull(param.getModelType()) && !PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
                     modelStream = modelStream.filter(m -> param.getModelType().equals(m.getModelType()));
@@ -287,14 +272,69 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         if (param.getExcludeFileProperty() != null && param.getExcludeFileProperty()) {
             model4WebList = model4WebList.stream().filter(
                     e -> {
-                        if (ObjectUtil.isEmpty(e.getPropertyList()))
+                        if (ObjectUtil.isEmpty(e.getPropertyList())) {
                             return true;
+                        }
                         return e.getPropertyList().stream().noneMatch(
                                 p -> FormPropertyType.FILE.getCode().equals(p.getType().intValue()) || FormPropertyType.PICTURE.getCode().equals(p.getType().intValue()));
                     }
             ).toList();
         }
-        return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID)).toList();
+        batchModelCheck(param.getCompanyID(), model4WebList);
+        return model4WebList.stream().sorted(Comparator.comparing(Model4Web::getGroupID).reversed()
+                .thenComparing(Model4Web::getCreateTime).reversed()).toList();
+    }
+
+    /**
+     * 组装模板查询条件
+     *
+     * @param param           参数
+     * @param groupParamFlag  是否是分组
+     * @param selectParamFlag 是否是下拉查询
+     * @return
+     */
+    private LambdaQueryWrapper<TbPropertyModel> getListQueryParam(QueryModelListParam param, boolean groupParamFlag, boolean selectParamFlag) {
+        // 测试企业查分组列表条件
+        boolean testCompanyGroupFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
+                CreateType.CUSTOMIZED.getType().equals(param.getCreateType()) && Objects.isNull(param.getProjectType());
+        // 测试企业查下拉列表条件
+        boolean testCompanySelectFlag = !Objects.equals(param.getCompanyID(), DefaultConstant.MD_ID) &&
+                Objects.nonNull(param.getProjectType()) && Objects.nonNull(param.getModelType()) &&
+                Objects.nonNull(param.getGroupID()) && Objects.isNull(param.getCreateType());
+        // 工程项目列表高级搜索过滤条件
+        boolean filterFlag = Objects.isNull(param.getCompanyID()) && Objects.nonNull(param.getProjectType()) && Objects.nonNull(param.getCreateType());
+
+        LambdaQueryWrapper<TbPropertyModel> queryWrapper = new QueryWrapper<TbPropertyModel>().lambda()
+                .like(StringUtils.isNotEmpty(param.getName()), TbPropertyModel::getName, param.getName())
+                .eq(Objects.nonNull(param.getModelType()), TbPropertyModel::getModelType, param.getModelType())
+                .eq(Objects.nonNull(param.getModelTypeSubType()), TbPropertyModel::getModelTypeSubType, param.getModelTypeSubType())
+                .eq(Objects.nonNull(param.getPlatform()), TbPropertyModel::getPlatform, param.getPlatform());
+        // 分组和下拉框需要展示预定义模板（补丁）
+        if (testCompanyGroupFlag || testCompanySelectFlag) {
+            // 处理测试企业下情况
+            queryWrapper.and(query ->
+                    query.eq(TbPropertyModel::getCompanyID, DefaultConstant.MD_ID)
+                            .eq(TbPropertyModel::getCreateType, CreateType.PREDEFINED.getType())
+                            .or().eq(TbPropertyModel::getCompanyID, param.getCompanyID()));
+        } else {
+            if (Objects.nonNull(param.getCreateType()) && !groupParamFlag && !selectParamFlag) {
+                queryWrapper.eq(TbPropertyModel::getCreateType, param.getCreateType());
+            }
+            if (!filterFlag && !(selectParamFlag && CreateType.PREDEFINED.getType().equals(param.getCreateType()))) {
+                queryWrapper.eq(TbPropertyModel::getCompanyID, param.getCompanyID());
+            }
+        }
+        if (Objects.nonNull(param.getGroupID()) && Objects.nonNull(param.getModelType())) {
+            if (PropertyModelType.BASE_PROJECT.getCode().equals(param.getModelType())) {
+                queryWrapper.eq(TbPropertyModel::getGroupID, param.getGroupID());
+            } else {
+                queryWrapper.in(TbPropertyModel::getGroupID, List.of(param.getGroupID(), DefaultConstant.PROPERTY_MODEL_DEFAULT_GROUP));
+            }
+        }
+        if (CollectionUtil.isNotEmpty(param.getGroupIDList())) {
+            queryWrapper.in(TbPropertyModel::getGroupID, param.getGroupIDList());
+        }
+        return queryWrapper;
     }
 
     @Override
@@ -305,19 +345,9 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         TbPropertyModel tbPropertyModel = param.getTbPropertyModel();
         int row = tbPropertyModelMapper.updateById(tbPropertyModel);
 
-        // 更新模板下属性
-        Set<Integer> keySet = param.getAllPropertyIdAndNameMap().keySet();
-        if (CollectionUtil.isNotEmpty(param.getAddModelItemList())) {
-            Set<Integer> addModelItemIdSet = param.getAddModelItemList().stream().map(ModelItem::getID).collect(Collectors.toSet());
-            keySet.removeAll(addModelItemIdSet);
-        }
-        if (CollectionUtil.isNotEmpty(param.getUpdateModelItemList())) {
-            Set<Integer> updateModelItemIdSet = param.getUpdateModelItemList().stream().map(ModelItem::getID).collect(Collectors.toSet());
-            keySet.removeAll(updateModelItemIdSet);
-        }
         // --1-- 删除属性模板
-        if (CollectionUtil.isNotEmpty(keySet)) {
-            tbPropertyMapper.deleteBatchIds(keySet);
+        if (CollectionUtil.isNotEmpty(param.getRemoveModelItemIDSet())) {
+            tbPropertyMapper.deleteBatchIds(param.getRemoveModelItemIDSet());
         }
         // --2-- 修改属性模板
         if (CollectionUtil.isNotEmpty(param.getUpdateModelItemList())) {
@@ -335,6 +365,59 @@ public class PropertyServiceImpl extends ServiceImpl<TbPropertyMapper, TbPropert
         // 同步刷新缓存
         formModelCache.putBatch(List.of(tbPropertyModel), newTbPropertyList);
         return 1 == row;
+    }
+
+    public void batchModelCheck(Integer companyID, List<Model4Web> model4WebList) {
+        List<Integer> modelIDList;
+        Map<Integer, List<TbPropertyModel>> modelTypeGroupMap = model4WebList.stream().collect(Collectors.groupingBy(TbPropertyModel::getModelType));
+        // 工程项目类型校验表单模板是否有被项目使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.BASE_PROJECT.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.BASE_PROJECT.getCode()).stream().map(TbPropertyModel::getID).toList();
+            List<TbProjectInfo> tbProjectInfoList = tbProjectInfoMapper.selectList(new QueryWrapper<TbProjectInfo>().lambda()
+                    .in(TbProjectInfo::getModelID, modelIDList));
+            if (CollectionUtil.isNotEmpty(tbProjectInfoList)) {
+                List<Integer> useModelIDList = tbProjectInfoList.stream().map(TbProjectInfo::getModelID).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        // 设备类型校验表单模板是否有被设备使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.DEVICE.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.DEVICE.getCode()).stream().map(TbPropertyModel::getID).toList();
+            List<TbOtherDevice> tbOtherDeviceList = tbOtherDeviceMapper.selectList(new QueryWrapper<TbOtherDevice>().lambda()
+                    .in(TbOtherDevice::getTemplateID, modelIDList));
+            if (CollectionUtil.isNotEmpty(tbOtherDeviceList)) {
+                List<Integer> useModelIDList = tbOtherDeviceList.stream().map(TbOtherDevice::getTemplateID).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        // 工作流类型校验表单模板是否有被工作流使用
+        if (modelTypeGroupMap.containsKey(PropertyModelType.WORK_FLOW.getCode())) {
+            modelIDList = modelTypeGroupMap.get(PropertyModelType.WORK_FLOW.getCode()).stream().map(TbPropertyModel::getID).toList();
+            ResultWrapper<List<DescribeWorkFlowTemplateResponse>> resultWrapper = workFlowTemplateService
+                    .searchWorkFlowTemplateList(new SearchWorkFlowTemplateListParam(companyID, modelIDList));
+            if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
+                List<Integer> useModelIDList = resultWrapper.getData().stream().map(r -> r.getID().intValue()).distinct().toList();
+                model4WebList.forEach(mw -> {
+                    if (useModelIDList.contains(mw.getID())) {
+                        mw.setEdit(false);
+                    }
+                });
+            }
+        }
+        //处理预定义模板
+        model4WebList.forEach(mw -> {
+            if (mw.getCreateType() != null && mw.getCreateType().equals(CreateType.PREDEFINED.getType().intValue())) {
+                mw.setEdit(false);
+            }
+        });
     }
 
     public Boolean deleteModelCheck(DeleteModelCheckParam param) {

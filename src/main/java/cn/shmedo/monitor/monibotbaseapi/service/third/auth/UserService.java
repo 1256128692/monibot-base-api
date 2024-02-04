@@ -5,14 +5,17 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.Headers;
 import feign.Param;
 import feign.RequestLine;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
     @RequestLine("GET /GetCurrentSubject")
@@ -59,12 +62,55 @@ public interface UserService {
      */
     @RequestLine("POST /QueryUserIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
-    ResultWrapper<Object> queryUserIDName(QueryUserIDNameParameter pa,
-                                          @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+    ResultWrapper<List<UserIDName>> queryUserIDName(QueryUserIDNameParameter pa,
+                                                    @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
 
     @RequestLine("POST /ListCompanyIDName")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa,
                                                               @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDeptSimpleList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<DeptSimpleInfo>> queryDeptSimpleList(QueryDeptSimpleListParam pa,
+                                                            @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryUserInDeptListNoPage")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<UserNoPageInfo>> queryUserInDeptListNoPage(QueryUserInDeptListNoPageParam pa,
+                                                                  @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    /**
+     * 批量添加系统通知
+     */
+    @RequestLine("POST /AddNotify")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<Integer>> addSysNotify(SysNotify request, @Param("appKey") String appKey,
+                                              @Param("appSecret") String appSecret);
+
+    /**
+     * 分页查询系统通知列表
+     */
+    @RequestLine("POST /QueryNotifyPageList")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, @Param("accessToken") String accessToken);
+
+    @RequestLine("POST /QueryNotifyDetail")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<NotifyDetailInfo> queryNotifyDetail(QueryNotifyDetailParam param, @Param("accessToken") String accessToken);
+
+    /**
+     * 批量查询用户联系方式
+     */
+    @RequestLine("POST /QueryUserContact")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<Map<Integer, UserContact>> queryUserContact(QueryUserContactParam param, @Param("appKey") String appKey,
+                                                              @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryDepartmentIncludeUserInfoList")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<DepartmentIncludeUserInfo> queryDepartmentIncludeUserInfoList(QueryDepartmentIncludeUserInfoListParameter parameter,
+                                                                                @Param("appKey") String appKey,
+                                                                                @Param("appSecret") String appSecret);
 }

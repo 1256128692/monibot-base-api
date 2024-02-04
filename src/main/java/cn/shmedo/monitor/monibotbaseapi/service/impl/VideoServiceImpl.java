@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.ListUtil;
+import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.util.ObjectUtil;
@@ -21,10 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessPlatformType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.AccessProtocolType;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.HikPtzCommandEnum;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
@@ -33,19 +31,20 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDListPara
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
-import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV2;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.HkVideoService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.ys.YsService;
-import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.device.ys.YsUtil;
@@ -57,7 +56,6 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,7 +93,17 @@ public class VideoServiceImpl implements VideoService {
     private final TbProjectInfoMapper projectInfoMapper;
 
     private UserService userService;
+    private final TbDeviceIntelLocationMapper tbDeviceIntelLocationMapper;
 
+    private final TbDeviceWarnLogMapper tbDeviceWarnLogMapper;
+    private final ITbWarnNotifyConfigService iTbWarnNotifyConfigService;
+    private final TbWarnNotifyConfigMapper tbWarnNotifyConfigMapper;
+
+    private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
+
+    private final NotifyService notifyService;
+
+    private final ITbDeviceWarnLogService tbDeviceWarnLogService;
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private RedisService monitorRedisService;
 
@@ -340,8 +348,7 @@ public class VideoServiceImpl implements VideoService {
                         v.getDeviceToken(), v.getDeviceName()));
             });
         }
-        iotService.createMultipleDevice(iotRequest,
-                fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret(), pa.getToken());
+        iotService.createMultipleDevice(iotRequest, pa.getToken());
 
         ResultWrapper<List<DeviceBaseInfo>> deviceBaseInfoWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
                 .companyID(pa.getCompanyID())
@@ -393,7 +400,14 @@ public class VideoServiceImpl implements VideoService {
             companyInfoList = null;
         }
 
+        List<VideoDeviceSourceBaseInfo> videoDeviceSourceBaseInfos = videoDeviceSourceMapper.selectByDeviceSerialList(pageData.getRecords().stream().map(VideoDevicePageInfo::getDeviceSerial).collect(Collectors.toList()));
+
         pageData.getRecords().forEach(record -> {
+            if (!CollectionUtil.isNullOrEmpty(videoDeviceSourceBaseInfos)) {
+                record.setChannelNoList(videoDeviceSourceBaseInfos.stream()
+                        .filter(v -> v.getDeviceSerial().equals(record.getDeviceSerial()))
+                        .map(VideoDeviceSourceBaseInfo::getChannelCode).collect(Collectors.toList()));
+            }
             record.setAccessPlatformStr(AccessPlatformType.getDescriptionByValue(record.getAccessPlatform()));
             record.setAccessProtocolStr(AccessProtocolType.getDescriptionByValue(record.getAccessProtocol()));
             if (!CollectionUtil.isNullOrEmpty(companyInfoList)) {
@@ -566,13 +580,11 @@ public class VideoServiceImpl implements VideoService {
                     .idList(listResultWrapper.getData().stream().map(DeviceBaseInfo::getDeviceID).collect(Collectors.toList()))
                     .saveData(false)
                     .build();
-            iotService.deleteDevice(build,
-                    fileConfig.getAuthAppKey(),
-                    fileConfig.getAuthAppSecret());
+            iotService.deleteDevice(build);
         }
 
 
-        // TODO,因为目前没有验证码,暂时不验证删除萤石云设备
+        // ,因为目前没有验证码,暂时不验证删除萤石云设备
 //        pa.getTbVideoDevices().forEach(d -> {
 //            if (d.getAccessPlatform().equals(AccessPlatformType.YING_SHI.getValue())) {
 //                ysService.deleteDevice(getYsToken(), d.getDeviceSerial());
@@ -617,7 +629,7 @@ public class VideoServiceImpl implements VideoService {
         });
         param.setList(deviceInfoV1List);
         // 2. 修改物联网数据库
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param, fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.updateDeviceInfoBatch(param);
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "修改物联网视频设备失败,原因:" + booleanResultWrapper.getMsg());
         }
@@ -961,17 +973,46 @@ public class VideoServiceImpl implements VideoService {
         allVideoDevices.addAll(ysAllVideoDevices);
         allVideoDevices.addAll(hkAllVideoDevices);
 
-
-        List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectList(null);
+        List<TbDeviceWarnLog> tbDeviceWarnLogs = tbDeviceWarnLogMapper.selectList(null);
+        List<TbVideoDevice> tbVideoDevices = videoDeviceMapper.selectAllList();
         if (CollectionUtil.isNullOrEmpty(tbVideoDevices) || CollectionUtil.isNullOrEmpty(allVideoDevices)) {
             return true;
         } else {
-            tbVideoDevices.forEach(v -> {
-                VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream().filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
-                if (videoDeviceBaseInfoV1 != null) {
-                    v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
-                }
+            // 使用CompletableFuture来异步执行比对任务
+            CompletableFuture<Void> compareFuture = CompletableFuture.runAsync(() -> {
+                tbVideoDevices.forEach(v -> {
+                    VideoDeviceBaseInfoV1 videoDeviceBaseInfoV1 = allVideoDevices.stream()
+                            .filter(total -> total.getDeviceSerial().equals(v.getDeviceSerial())).findFirst().orElse(null);
+
+                    if (videoDeviceBaseInfoV1 != null) {
+
+                        if ((videoDeviceBaseInfoV1.getStatus() != null && v.getProjectID() != null && v.getProjectID() != -1)) {
+                            List<Integer> platformIDList = projectInfoMapper.selectPlatformListByProjectID(v.getProjectID());
+                            if (!CollectionUtil.isNullOrEmpty(platformIDList)) {
+                                platformIDList.forEach(platform -> {
+                                    DateTime date = DateUtil.date();
+                                    TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogs.stream()
+                                            .filter(deviceWarn -> deviceWarn.getDeviceToken().equals(v.getDeviceToken())
+                                                    && deviceWarn.getPlatform().equals(platform)
+                                                    && deviceWarn.getProjectID().equals(v.getProjectID())
+                                                    && deviceWarn.getWarnEndTime() == null).findFirst().orElse(null);
+                                    tbDeviceWarnLogService.saveDeviceWarnLog(new SaveDeviceWarnParam(
+                                            v.getCompanyID(), platform, v.getProjectID(), date, v.getDeviceType(),
+                                            v.getDeviceToken(), v.getDeviceSerial(), v.getProjectName(), "视频设备",
+                                            tbDeviceWarnLog, videoDeviceBaseInfoV1.getStatus()
+                                    ));
+
+                                });
+                            }
+                        }
+
+                        v.setDeviceStatus(videoDeviceBaseInfoV1.getStatus());
+                    }
+                });
             });
+
+            // 等待异步任务完成
+            compareFuture.join();
 
             if (tbVideoDevices.size() > 100) {
 
@@ -1142,8 +1183,9 @@ public class VideoServiceImpl implements VideoService {
                     }
                     v.setDeviceChannelNum(0);
                 } else {
+                    v.setDeviceChannelNum(sensorList.size());
                     if (!CollectionUtil.isNullOrEmpty(notGenerateSensorList)) {
-                        v.setDeviceChannelNum(sensorList.size());
+//                        v.setDeviceChannelNum(sensorList.size());
                         for (int i = 0; i < notGenerateSensorList.size(); i++) {
                             // 添加到 singleVideoSensorList
                             singleVideoSensorList.add(VideoCaptureBaseInfo.fromChannelInfo(notGenerateSensorList.get(i), v.getDeviceName()));
@@ -1263,6 +1305,15 @@ public class VideoServiceImpl implements VideoService {
                 }
             });
         }
+        // 设置设备状态
+        info.setLocation(
+                tbDeviceIntelLocationMapper.selectOne(
+                        new LambdaQueryWrapper<TbDeviceIntelLocation>()
+                                .eq(TbDeviceIntelLocation::getDeviceToken, info.getDeviceSerial())
+                                .eq(TbDeviceIntelLocation::getType, IntelDeviceType4Location.VIDEO.getType())
+
+                )
+        );
         return info;
     }
 
@@ -1364,9 +1415,7 @@ public class VideoServiceImpl implements VideoService {
                 .originalCompanyID(transferVideoDeviceList.get(0).getCompanyID())
                 .build();
 
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param,
-                fileConfig.getAuthAppKey(),
-                fileConfig.getAuthAppSecret());
+        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
         if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
             return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
         } else {

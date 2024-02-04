@@ -3,7 +3,6 @@ package cn.shmedo.monitor.monibotbaseapi.interceptor;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.exceptions.ExceptionUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.*;
@@ -32,6 +31,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 权限拦截器，根据 {@link Permission} 注解进行权限校验
@@ -52,12 +52,15 @@ public class PermissionInterceptor {
 
         //校验权限
         ResultWrapper<Boolean> result;
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         try {
-            MethodSignature signature = (MethodSignature) joinPoint.getSignature();
-            result = validatePermission(signature.getMethod(), joinPoint.getArgs(), permission);
-            Assert.notNull(result);
+            result = Optional.ofNullable(validatePermission(signature.getMethod(),
+                            joinPoint.getArgs(), permission)).orElse(ResultWrapper.success(Boolean.FALSE));
         } catch (Exception e) {
-            log.info("校验权限出错: {}", ExceptionUtil.stacktraceToString(e));
+            Class<?> tClass = signature.getMethod().getDeclaringClass();
+            String tName = signature.getMethod().getName();
+            log.info("类: {} 方法: {} 校验权限出错: {}", tClass.getName(), tName, e.getMessage());
+            log.error(ExceptionUtil.stacktraceToString(e));
             throw new CustomBaseException(ResultCode.SERVER_EXCEPTION.toInt(), "校验权限出错");
         }
 
