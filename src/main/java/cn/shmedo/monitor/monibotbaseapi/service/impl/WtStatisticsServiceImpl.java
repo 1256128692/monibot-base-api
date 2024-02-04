@@ -472,7 +472,8 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         List<Integer> pidList = projectInfoList.stream().map(TbProjectInfo::getID).toList();
         Map<Integer, TbProjectInfo> pMap = projectInfoList.stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         List<Integer> pointIDList = monitorRedisService.getAll(VIDEO_POINT_ID, Integer.class, List.class)
-                .values().stream().filter(pidList::contains)
+                .entrySet().stream().filter(e -> pidList.contains(e.getKey()))
+                .map(Map.Entry::getValue)
                 .flatMap(list -> list.stream()).map(e -> Integer.valueOf(e.toString())).toList();
         if (ObjectUtil.isEmpty(pointIDList)) {
             return List.of();
