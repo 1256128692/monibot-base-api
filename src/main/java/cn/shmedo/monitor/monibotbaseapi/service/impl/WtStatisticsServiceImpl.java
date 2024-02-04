@@ -51,8 +51,6 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -759,12 +757,5 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         dict.put("offline", "离线" + tag);
         IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
         return dict;
-    }
-
-    @Bean
-    ApplicationRunner applicationRunner() {
-        return args -> {
-            cacheDeviceOnlineStats();
-        };
     }
 }
