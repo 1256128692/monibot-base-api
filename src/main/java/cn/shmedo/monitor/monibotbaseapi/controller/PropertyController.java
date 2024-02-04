@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.property.*;
 import cn.shmedo.monitor.monibotbaseapi.service.PropertyService;
+import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -16,10 +17,12 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class PropertyController {
     private PropertyService propertyService;
+    private SensorService sensorService;
 
     @Autowired
-    public PropertyController(PropertyService propertyService) {
+    public PropertyController(PropertyService propertyService, SensorService sensorService) {
         this.propertyService = propertyService;
+        this.sensorService = sensorService;
     }
 
     /**
@@ -109,7 +112,7 @@ public class PropertyController {
     @LogParam(moduleName = "属性管理模块", operationName = "复制模板", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddModel")
     @RequestMapping(value = "CopyModel", method = RequestMethod.POST, produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object copyModel(@RequestBody @Valid CopyModelParam param){
+    public Object copyModel(@RequestBody @Valid CopyModelParam param) {
         return propertyService.copyModel(param);
     }
 
@@ -136,7 +139,6 @@ public class PropertyController {
 
     /**
      * @api {POST} /DeleteModelCheck 删除模板校验
-     *
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName DeleteModelCheck
@@ -155,7 +157,6 @@ public class PropertyController {
 
     /**
      * @api {POST} /DeleteModel 删除模板
-     *
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
      * @apiName DeleteModel
@@ -337,4 +338,22 @@ public class PropertyController {
         return propertyService.queryPropertyValues(param);
     }
 
+    /**
+     * @api {POST} /ProjectPropertyTrying 项目属性配置试运行
+     * @apiVersion 1.0.0
+     * @apiGroup 项目属性管理模块
+     * @apiName ProjectPropertyTrying
+     * @apiDescription 项目属性配置试运行
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Double} distance 库水位
+     * @apiSuccess (返回结果) {String} fieldToken 库容属性Token
+     * @apiSuccess (返回结果) {Double} value 库容值
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DescribeModel
+     */
+    @Permission(permissionName = "mdmbase:DescribeModel", allowApplication = true)
+    @PostMapping(value = "ProjectPropertyTrying", consumes = DefaultConstant.JSON)
+    public Object projectPropertyTrying(@RequestBody @Validated ProjectPropertyTryingParam param) {
+        return sensorService.trying(param.getTryingRequest());
+    }
 }
