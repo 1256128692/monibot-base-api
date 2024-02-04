@@ -56,6 +56,7 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +71,7 @@ import java.util.stream.Stream;
  * @author: gaoxu
  * @create: 2023-02-22 13:24
  **/
+@DependsOn("projectTypeCache")
 @EnableTransactionManagement
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))

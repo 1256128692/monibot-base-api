@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * @author: gaoxu
  * @create: 2023-02-23 17:14
  **/
-@Component
+@Component("projectTypeCache")
 public class ProjectTypeCache {
 
     private static List<TbProjectType> projectTypeList;
