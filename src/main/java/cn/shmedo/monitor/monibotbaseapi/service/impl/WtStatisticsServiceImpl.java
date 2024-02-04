@@ -550,7 +550,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 Wrappers.<TbMonitorPoint>lambdaQuery()
                         .eq(TbMonitorPoint::getMonitorType, cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType.VIDEO.getKey())
                         .in(!list.isEmpty(), TbMonitorPoint::getID, list)
-                        .select(TbMonitorPoint::getProjectID, TbMonitorPoint::getProjectID)
+                        .select(TbMonitorPoint::getProjectID, TbMonitorPoint::getID)
         ).stream().collect(Collectors.groupingBy(e -> e.getProjectID().toString(), Collectors.collectingAndThen(
                 Collectors.toList(), pointList -> pointList.stream().map(TbMonitorPoint::getID).toList()
         )));
@@ -765,7 +765,6 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     ApplicationRunner applicationRunner() {
         return args -> {
             cacheDeviceOnlineStats();
-            cacheTypePointStatistics();
         };
     }
 }
