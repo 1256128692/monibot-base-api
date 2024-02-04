@@ -28,7 +28,7 @@ import static cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant.ThematicFi
  * @date 2024-02-04 11:21
  */
 @Data
-public class ProjectPropertyTryingParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class ProjectPropertyCapacityTryingParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;
     @NotNull(message = "库水位值不能为空")

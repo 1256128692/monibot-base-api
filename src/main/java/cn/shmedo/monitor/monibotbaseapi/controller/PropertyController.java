@@ -339,11 +339,11 @@ public class PropertyController {
     }
 
     /**
-     * @api {POST} /ProjectPropertyTrying 项目属性配置试运行
+     * @api {POST} /ProjectPropertyCapacityTrying 项目属性水位库容试运行
      * @apiVersion 1.0.0
      * @apiGroup 项目属性管理模块
-     * @apiName ProjectPropertyTrying
-     * @apiDescription 项目属性配置试运行
+     * @apiName ProjectPropertyCapacityTrying
+     * @apiDescription 项目属性水位库容试运行
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Double} distance 库水位
      * @apiSuccess (返回结果) {String} fieldToken 库容属性Token
@@ -352,8 +352,8 @@ public class PropertyController {
      * @apiPermission 项目权限 mdmbase:DescribeModel
      */
     @Permission(permissionName = "mdmbase:DescribeModel", allowApplication = true)
-    @PostMapping(value = "ProjectPropertyTrying", consumes = DefaultConstant.JSON)
-    public Object projectPropertyTrying(@RequestBody @Validated ProjectPropertyTryingParam param) {
+    @PostMapping(value = "ProjectPropertyCapacityTrying", consumes = DefaultConstant.JSON)
+    public Object projectPropertyCapacityTrying(@RequestBody @Validated ProjectPropertyCapacityTryingParam param) {
         return sensorService.trying(param.getTryingRequest());
     }
 }
