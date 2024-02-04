@@ -248,6 +248,10 @@ public class DefaultConstant {
          * 水位
          */
         String DISTANCE = "distance";
+        /**
+         * 库容
+         */
+        String CAPACITY = "capacity";
 
         /**
          * 根据{@code density}获取降雨量token,仅水利可能会用到
