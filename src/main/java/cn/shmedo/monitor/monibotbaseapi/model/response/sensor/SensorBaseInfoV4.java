@@ -39,6 +39,6 @@ public class SensorBaseInfoV4 {
 
     private List<FieldBaseInfo> monitorTypeFields;
 
-
+    private Integer projectID;
 
 }

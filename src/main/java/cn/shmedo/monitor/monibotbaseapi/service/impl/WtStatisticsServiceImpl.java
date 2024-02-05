@@ -255,22 +255,22 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     }
 
     @Override
-    public ReservoirNewSensorDataResponse queryReservoirNewSensorData(ReservoirNewSensorDataParam pa) {
+    public List<ReservoirNewSensorDataResponse> queryReservoirNewSensorData(ReservoirNewSensorDataParam pa) {
 
-        TbProjectInfo tbProjectInfo = projectInfoMapper.selectOne(Wrappers.<TbProjectInfo>lambdaQuery()
-                .eq(TbProjectInfo::getID, pa.getProjectID()));
-        if (!ObjectUtil.isNotNull(tbProjectInfo)) {
-            return null;
+        List<TbProjectInfo> tbProjectInfoList = projectInfoMapper.selectList(Wrappers.<TbProjectInfo>lambdaQuery()
+                .in(TbProjectInfo::getID, pa.getProjectIDList()));
+        if (CollectionUtil.isNullOrEmpty(tbProjectInfoList)) {
+            return Collections.emptyList();
         }
 
         List<TbProjectProperty> tbProjectProperties = projectPropertyMapper.selectList(Wrappers.<TbProjectProperty>lambdaQuery()
                 .eq(TbProjectProperty::getSubjectType, 0)
-                .eq(TbProjectProperty::getProjectID, pa.getProjectID())
+                .in(TbProjectProperty::getProjectID, pa.getProjectIDList())
         );
 
 
         List<Map<String, Object>> resultList = new LinkedList<Map<String, Object>>();
-        List<SensorBaseInfoV4> sensorBaseInfoV4List = sensorMapper.selectListByCondition(pa.getProjectID(), null, null);
+        List<SensorBaseInfoV4> sensorBaseInfoV4List = sensorMapper.selectListByProjectIDList(pa.getProjectIDList());
         if (!CollectionUtil.isNullOrEmpty(sensorBaseInfoV4List)) {
 
             // 查询监测类型为2:水位, 31:降雨量的监测点
@@ -294,6 +294,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                         if (CollectionUtils.isNotEmpty(maps)) {
                             s.setSensorData(maps.stream().filter(m -> m.get("sensorID").equals(s.getSensorID())).findFirst().orElse(null));
                             if (ObjectUtil.isNotNull(s.getSensorData())) {
+                                s.getSensorData().put("projectID", s.getProjectID());
                                 s.setDataTime(DateUtil.parse((String) s.getSensorData().get(DbConstant.TIME_FIELD)));
                             }
                             resultList.add(s.getSensorData());
@@ -305,18 +306,27 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
             }
         }
 
-        if (StringUtils.isNotBlank(tbProjectInfo.getLocation())) {
-            if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {
-                JSONObject json = JSONUtil.parseObj(tbProjectInfo.getLocation());
-                tbProjectInfo.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
-            }
-        }
-        Collection<Object> areas = List.of(tbProjectInfo.getLocation());
-        Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
-                .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+        List<ReservoirNewSensorDataResponse> proList = new LinkedList<>();
 
-        return ReservoirNewSensorDataResponse.toNewVo(tbProjectInfo,
-                tbProjectProperties, resultList, areaMap.get(tbProjectInfo.getLocation()));
+        tbProjectInfoList.forEach(projectInfo -> {
+            if (StringUtils.isNotBlank(projectInfo.getLocation())) {
+                if (JSONUtil.isTypeJSON(projectInfo.getLocation())) {
+                    JSONObject json = JSONUtil.parseObj(projectInfo.getLocation());
+                    projectInfo.setLocation(json.isEmpty() ? null : CollUtil.getLast(json.values()).toString());
+                }
+            }
+            Collection<Object> areas = List.of(projectInfo.getLocation());
+            Map<String, String> areaMap = monitorRedisService.multiGet(RedisKeys.REGION_AREA_KEY, areas, RegionArea.class)
+                    .stream().collect(Collectors.toMap(e -> e.getAreaCode().toString(), RegionArea::getName));
+
+            proList.add(ReservoirNewSensorDataResponse.toNewVo(projectInfo,
+                    tbProjectProperties.stream().filter(o -> Integer.valueOf(Math.toIntExact(o.getProjectID())).equals(projectInfo.getID())).collect(Collectors.toList()),
+                    resultList.stream().filter(Objects::nonNull)
+                            .filter(r -> Integer.valueOf(r.get("projectID").toString()).equals(projectInfo.getID())).collect(Collectors.toList()),
+                    areaMap.get(projectInfo.getLocation())));
+        });
+
+        return proList;
     }
 
     @Override

@@ -137,4 +137,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
      * 自动根据数据预警更新传感器状态
      */
     Integer autoUpdateStatusById(Integer id);
+
+    List<SensorBaseInfoV4> selectListByProjectIDList(List<Integer> projectIDList);
 }

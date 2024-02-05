@@ -45,14 +45,6 @@ public class ReservoirNewSensorDataResponse {
         vo.setAreaCode(tbProjectInfo.getLocation());
         vo.setAreaName(areaName);
 
-        String latestTimeString = getLatestTimeString(resultList);
-        if (latestTimeString != null) {
-            DateTime latestTime = DateUtil.parse(latestTimeString);
-            vo.setDataTime(latestTime);
-        } else {
-            vo.setDataTime(null);
-        }
-
         // 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
         if (!CollectionUtil.isNullOrEmpty(tbProjectProperties)) {
             tbProjectProperties.forEach(p -> {
@@ -77,18 +69,26 @@ public class ReservoirNewSensorDataResponse {
             });
         }
 
-        Map<String, Object> latestWaterValueData = getLatestDataWithItem(resultList, "distance");
-        Map<String, Object> latestPeriodRainfallData = getLatestDataWithItem(resultList, "periodRainfall");
+        if (!CollectionUtil.isNullOrEmpty(resultList)) {
+            String latestTimeString = getLatestTimeString(resultList);
+            if (latestTimeString != null) {
+                DateTime latestTime = DateUtil.parse(latestTimeString);
+                vo.setDataTime(latestTime);
+            } else {
+                vo.setDataTime(null);
+            }
+            Map<String, Object> latestWaterValueData = getLatestDataWithItem(resultList, "distance");
+            Map<String, Object> latestPeriodRainfallData = getLatestDataWithItem(resultList, "periodRainfall");
 
-        if (ObjectUtil.isNotNull(latestWaterValueData)) {
-            vo.setWaterValue((Double) latestWaterValueData.get("distance"));
+            if (ObjectUtil.isNotNull(latestWaterValueData)) {
+                vo.setWaterValue((Double) latestWaterValueData.get("distance"));
+            }
+
+            if (ObjectUtil.isNotNull(latestPeriodRainfallData)) {
+                vo.setCurrentRainValue((Double) latestPeriodRainfallData.get("currentRainfall"));
+                vo.setPeriodRainValue((Double) latestPeriodRainfallData.get("periodRainfall"));
+            }
         }
-
-        if (ObjectUtil.isNotNull(latestPeriodRainfallData)) {
-            vo.setCurrentRainValue((Double) latestPeriodRainfallData.get("currentRainfall"));
-            vo.setPeriodRainValue((Double) latestPeriodRainfallData.get("periodRainfall"));
-        }
-
 
         return vo;
     }

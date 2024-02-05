@@ -20,7 +20,7 @@ public interface WtStatisticsService {
 
     void cacheDeviceOnlineStats();
 
-    ReservoirNewSensorDataResponse queryReservoirNewSensorData(ReservoirNewSensorDataParam pa);
+    List<ReservoirNewSensorDataResponse> queryReservoirNewSensorData(ReservoirNewSensorDataParam pa);
 
     ReservoirWarnStatsByProjectResponse queryWarnStatsByProject(QueryReservoirWarnStatsByProjectParam param);
 
