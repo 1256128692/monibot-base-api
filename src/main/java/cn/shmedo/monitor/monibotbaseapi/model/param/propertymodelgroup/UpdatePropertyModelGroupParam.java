@@ -56,7 +56,7 @@ public class UpdatePropertyModelGroupParam implements ParameterValidator, Resour
     private TbPropertyModelGroup tbPropertyModelGroup;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_TEMPLATE);
 
     @Override
     public ResultWrapper<?> validate() {

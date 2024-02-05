@@ -50,7 +50,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     private Boolean excludeFileProperty;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_TEMPLATE);
 
     @Override
     public ResultWrapper<?> validate() {

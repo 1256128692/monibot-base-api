@@ -59,7 +59,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     private List<@NotNull ModelItem> modelPropertyList;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_TEMPLATE);
 
     @Override
     public ResultWrapper<?> validate() {

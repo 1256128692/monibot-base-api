@@ -241,17 +241,18 @@ public class WtStatisticsController {
      * @apiName ReservoirNewSensorData
      * @apiDescription 水库最新传感器数据
      * @apiParam (请求参数) {Int} companyID 企业ID
-     * @apiParam (请求参数) {Int} projectID 工程项目ID
-     * @apiSuccess (返回结果) {Int} projectID 工程项目ID
-     * @apiSuccess (返回结果) {String} projectName 工程项目名称
-     * @apiSuccess (返回结果) {String} shortName 工程项目短名称
-     * @apiSuccess (返回结果) {Int} reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
-     * @apiSuccess (返回结果) {String} areaCode 行政区划code
-     * @apiSuccess (返回结果) {String} areaName 行政区划名称
-     * @apiSuccess (返回结果) {DateTime} dataTime 最新数据时间
-     * @apiSuccess (返回结果) {Double} waterValue 水位值
-     * @apiSuccess (返回结果) {Double} periodRainValue 时段降水量
-     * @apiSuccess (返回结果) {Double} currentRainValue 当前降水量
+     * @apiParam (请求参数) {Int[]} projectIDList 工程项目ID
+     * @apiParam (请求参数) {Object[]} data 数据列表
+     * @apiSuccess (返回结果) {Int} data.projectID 工程项目ID
+     * @apiSuccess (返回结果) {String} data.projectName 工程项目名称
+     * @apiSuccess (返回结果) {String} data.shortName 工程项目短名称
+     * @apiSuccess (返回结果) {Int} data.reservoirScale 水库规模,1:小(Ⅰ)型水库,2:小(Ⅱ)型水库,3:中型水库,4:大(Ⅰ)型水库,5:大(Ⅱ)型水库
+     * @apiSuccess (返回结果) {String} data.areaCode 行政区划code
+     * @apiSuccess (返回结果) {String} data.areaName 行政区划名称
+     * @apiSuccess (返回结果) {DateTime} data.dataTime 最新数据时间
+     * @apiSuccess (返回结果) {Double} data.waterValue 水位值
+     * @apiSuccess (返回结果) {Double} data.periodRainValue 时段降水量
+     * @apiSuccess (返回结果) {Double} data.currentRainValue 当前降水量
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBaseDashboard
      */

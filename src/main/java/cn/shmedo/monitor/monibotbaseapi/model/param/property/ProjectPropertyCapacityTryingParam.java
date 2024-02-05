@@ -37,7 +37,7 @@ public class ProjectPropertyCapacityTryingParam implements ParameterValidator, R
     @JsonIgnore
     private TryingRequest tryingRequest;
     /**
-     * 水位库容关系,该<b>模板基础信息名称</b>和<b>工程</b>唯一确定配置的公式
+     * 模板基础信息名称,<b>模板基础信息名称</b>和<b>工程</b>唯一确定配置的公式
      */
     private final static String PROPERTY_NAME = "水位库容关系";
     /**
@@ -45,6 +45,14 @@ public class ProjectPropertyCapacityTryingParam implements ParameterValidator, R
      * 因为这个水位是用户输入的水位,所以它既没有关联模板,也没有相应的公式,需要暂时写死在这里
      */
     private final static String DISTANCE_FORMULA = "${iot:x.waterValue}";
+    /**
+     * 用户提供的公式里,<b>水位</b>值的占位符,需要替换成下面的{@code FORMULA_PLACEHOLDER}
+     */
+    private final static String USER_FORMULA_PLACEHOLDER = "${X}";
+    /**
+     * 需要被替换成的占位符,替换后才能被正常解析
+     */
+    private final static String REPLACE_FORMULA_PLACEHOLDER = "${self:self.distance}";
 
     @Override
     public ResultWrapper<?> validate() {
@@ -60,6 +68,7 @@ public class ProjectPropertyCapacityTryingParam implements ParameterValidator, R
         if (StrUtil.isBlank(formula)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "工程未配置" + PROPERTY_NAME);
         }
+        formula = formula.replace(USER_FORMULA_PLACEHOLDER, REPLACE_FORMULA_PLACEHOLDER);
         tryingRequest = new TryingRequest();
         tryingRequest.setFieldID(1);
         tryingRequest.setCalType(CalType.FORMULA);
