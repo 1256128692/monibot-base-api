@@ -159,6 +159,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
 
 
         //报警实体
+        // 报警上来时,不再更新原报警的时间
         TbDataWarnLog warnLog = switch (param.getWarnCase()) {
             case NEW -> {
                 TbDataWarnLog entity = new TbDataWarnLog();
@@ -174,12 +175,12 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
             }
             case SAME -> {
                 existLog.setWarnContent(param.getWarnContent());
-                existLog.setWarnTime(param.getWarnTime());
+//                existLog.setWarnTime(param.getWarnTime());
                 existLog.setDataStatus(1);
                 yield existLog;
             }
             case UPGRADE, DOWNLEVEL -> {
-                existLog.setWarnTime(param.getWarnTime());
+//                existLog.setWarnTime(param.getWarnTime());
                 existLog.setWarnContent(param.getWarnContent());
                 existLog.setWarnLevel(param.getWarnLevel());
                 existLog.setDataStatus(1);
@@ -191,7 +192,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         TbDataWarnLogHistory history = new TbDataWarnLogHistory();
         history.setWarnLogID(warnLog.getId());
         history.setWarnLevel(warnLog.getWarnLevel());
-        history.setWarnTime(warnLog.getWarnTime());
+        history.setWarnTime(param.getWarnTime());
         this.historyMapper.insertOrUpdate(history);
         //更新传感器状态
         sensorMapper.autoUpdateStatusById(param.getSensorID());
