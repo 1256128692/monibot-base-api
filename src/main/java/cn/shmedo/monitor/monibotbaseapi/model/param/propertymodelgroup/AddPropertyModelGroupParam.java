@@ -5,12 +5,12 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModelGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -53,7 +53,7 @@ public class AddPropertyModelGroupParam implements ParameterValidator, ResourceP
     private String exValue;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
 
     @Override
     public ResultWrapper<?> validate() {

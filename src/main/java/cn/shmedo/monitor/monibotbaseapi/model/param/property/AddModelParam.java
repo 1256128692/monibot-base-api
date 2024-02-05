@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbPropertyModelMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
@@ -58,7 +59,7 @@ public class AddModelParam implements ParameterValidator, ResourcePermissionProv
     private List<@NotNull ModelItem> modelPropertyList;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
 
     @Override
     public ResultWrapper<?> validate() {

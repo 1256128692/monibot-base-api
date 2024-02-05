@@ -6,13 +6,12 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.ToString;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import java.util.List;
@@ -51,7 +50,7 @@ public class QueryModelListParam implements ParameterValidator, ResourcePermissi
     private Boolean excludeFileProperty;
 
     @JsonIgnore
-    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisTemplate.class);
+    RedisTemplate<String, String> redisTemplate = ContextHolder.getBean(RedisConstant.AUTH_REDIS_SERVICE);
 
     @Override
     public ResultWrapper<?> validate() {
