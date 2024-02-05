@@ -242,7 +242,7 @@ public class WtStatisticsController {
      * @apiDescription 水库最新传感器数据
      * @apiParam (请求参数) {Int} companyID 企业ID
      * @apiParam (请求参数) {Int[]} projectIDList 工程项目ID
-     * @apiParam (请求参数) {Object[]} data 数据列表
+     * @apiSuccess (返回结果) {Object[]} data 数据列表
      * @apiSuccess (返回结果) {Int} data.projectID 工程项目ID
      * @apiSuccess (返回结果) {String} data.projectName 工程项目名称
      * @apiSuccess (返回结果) {String} data.shortName 工程项目短名称
