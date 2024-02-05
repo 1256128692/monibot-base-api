@@ -46,7 +46,7 @@ public class ProjectPropertyCapacityTryingParam implements ParameterValidator, R
      */
     private final static String DISTANCE_FORMULA = "${iot:x.waterValue}";
     /**
-     * 用户提供的公式里,<b>水位</b>值的占位符,需要替换成下面的{@code FORMULA_PLACEHOLDER}
+     * 用户提供的公式里,<b>水位</b>值的占位符,需要替换成下面的{@code REPLACE_FORMULA_PLACEHOLDER}
      */
     private final static String USER_FORMULA_PLACEHOLDER = "${X}";
     /**

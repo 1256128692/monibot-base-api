@@ -36,9 +36,9 @@ public class CancelDataWarnParam implements ParameterValidator, ResourcePermissi
     public ResultWrapper<?> validate() {
         List<TbDataWarnLog> tbDataWarnLogList = ContextHolder.getBean(TbDataWarnLogMapper.class)
                 .selectList(new LambdaQueryWrapper<TbDataWarnLog>().eq(TbDataWarnLog::getId, warnLogID)
-                        .eq(TbDataWarnLog::getDealStatus, 0).isNull(TbDataWarnLog::getWarnEndTime));
+                        .isNull(TbDataWarnLog::getWarnEndTime));
         if (CollUtil.isEmpty(tbDataWarnLogList)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "报警记录不存在,或者已处理,或者报警已结束");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "报警记录不存在,或者报警已结束");
         }
         tbDataWarnLog = tbDataWarnLogList.stream().findAny().orElseThrow();
         return null;
