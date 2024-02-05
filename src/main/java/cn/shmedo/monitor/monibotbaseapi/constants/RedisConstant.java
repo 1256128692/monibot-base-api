@@ -31,6 +31,11 @@ public class RedisConstant {
     public static final String MONITOR_REDIS_TEMPLATE = "monitorRedisTemplate";
 
     /**
+     * 权限平台redisTemplate
+     */
+    public static final String AUTH_REDIS_TEMPLATE = "authRedisTemplate";
+
+    /**
      * 监测平台redisService
      */
     public static final String MONITOR_REDIS_SERVICE = "monitorRedisService";
