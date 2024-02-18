@@ -994,6 +994,6 @@
                 #{item}
             </foreach>
         </if>
-        GROUP BY tmi.ID
+        GROUP BY tmp.MonitorItemID, tmi.NAME, tmi.monitorType
     </select>
 </mapper>
