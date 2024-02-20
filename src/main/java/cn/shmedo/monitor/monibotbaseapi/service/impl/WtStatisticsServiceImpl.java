@@ -223,7 +223,8 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
             onlineMap = Optional.ofNullable(iotService
                             .queryDeviceInfoByUniqueTokens(new QueryDeviceInfoByUniqueTokensParam(uniqueTokens)).getData())
                     .orElse(List.of())
-                    .stream().collect(Collectors.toMap(DeviceInfo::getUniqueToken, DeviceInfo::getOnline));
+                    .stream().filter(e -> e.getUniqueToken() != null && e.getOnline() != null)
+                    .collect(Collectors.toMap(DeviceInfo::getUniqueToken, DeviceInfo::getOnline));
         }
 
         Map<String, Map<Integer, DeviceOnlineStats>> cacheMap = list.stream()
