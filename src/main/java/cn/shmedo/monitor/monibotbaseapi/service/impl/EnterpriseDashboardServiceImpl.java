@@ -83,7 +83,11 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         // 从缓存获取工程项目信息
         Map<String, ProjectInfoCache> projectInfoCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_KEY, ProjectInfoCache.class);
         // 按照行业类型分组
-        Map<String, List<ProjectInfoCache>> groupMap = projectInfoCacheMap.values().stream().collect(Collectors.groupingBy(ProjectInfoCache::getProjectMainTypeName));
+        Map<String, List<ProjectInfoCache>> groupMap = projectInfoCacheMap.values().stream()
+                .filter(v -> {
+                    return !v.getCompanyID().equals(138) && param.getTokenSet().contains(v.getID());
+                    })
+                .collect(Collectors.groupingBy(ProjectInfoCache::getProjectMainTypeName));
         // 处理空数据（大屏暂未将MDNET平台纳入）
         Arrays.stream(PlatformType.values())
                 .filter(p -> !PlatformType.MDNET.getType().equals(p.getType()))
