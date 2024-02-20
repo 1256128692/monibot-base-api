@@ -6,7 +6,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
@@ -16,7 +15,6 @@ import java.util.Objects;
  * @author youxian.kong@shmedo.cn
  * @date 2024-01-19 11:46
  */
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class WarnConfigListener {

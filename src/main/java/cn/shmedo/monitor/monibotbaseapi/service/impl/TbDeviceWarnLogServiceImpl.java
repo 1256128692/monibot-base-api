@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.UpdateDeviceGroupSenderDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
@@ -28,6 +29,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.warn.QueryWtTerminalWarnLogP
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.UpdateDeviceGroupSenderEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warn.WtTerminalWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DeviceWarnHistoryInfo;
@@ -45,6 +47,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,7 +63,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
 
     private static final String WARN_CONTENT_FORMAT = "{} 内 {} 于 {} 发生离线报警，设备型号: {} ，设备SN: {}，请关注！";
 
-    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n"+
+    private static final String WARN_EMAIL_FORMAT = "尊敬的用户：\n" +
             "   您好!\n\n" +
             "   在 {} 中，我们监测到：\n" +
             "   有 {} 于时间：{} 发生离线报警!\n" +
@@ -73,6 +76,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
     private final NotifyService notifyService;
     private final TbWarnNotifyRelationMapper notifyRelationMapper;
     private final FileConfig fileConfig;
+    private final ApplicationEventPublisher publisher;
 
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbWarnNotifyConfigMapper tbWarnNotifyConfigMapper;
@@ -190,15 +194,18 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public PageUtil.PageWithMap<DeviceWarnPageInfo> queryDeviceWarnPage(QueryDeviceWarnPageParam param) {
+        Integer companyID = param.getCompanyID();
         TbWarnBaseConfig tbWarnBaseConfig = param.getTbWarnBaseConfig();
         Map<String, Object> warnBaseInfo = Map.of("warnTag", tbWarnBaseConfig.getWarnTag(),
                 "warnLevelType", tbWarnBaseConfig.getWarnLevelType(),
                 "warnLevelStyle", tbWarnBaseConfig.getWarnLevelStyle());
 
         LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>()
-                .eq(TbDeviceWarnLog::getPlatform, param.getPlatform()).orderByDesc(TbDeviceWarnLog::getWarnTime, TbDeviceWarnLog::getId);
+                .eq(TbDeviceWarnLog::getCompanyID, companyID).eq(TbDeviceWarnLog::getPlatform, param.getPlatform())
+                .orderByDesc(TbDeviceWarnLog::getWarnTime, TbDeviceWarnLog::getId);
         if (param.getIsRealTime()) {
             wrapper.isNull(TbDeviceWarnLog::getWarnEndTime);
         } else {
@@ -214,7 +221,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
         Optional.ofNullable(param.getEndTime()).ifPresent(u -> wrapper.le(TbDeviceWarnLog::getWarnTime, u));
         Optional.ofNullable(param.getDealStatus()).ifPresent(u -> wrapper.eq(TbDeviceWarnLog::getDealStatus, u));
         List<TbDeviceWarnLog> tbDeviceWarnLogList = this.list(wrapper);
-        List<DeviceWarnPageInfo> deviceWarnPageInfoList = queryDeviceWarnList(tbDeviceWarnLogList, param.getCompanyID(), param.build(), param.getDeviceType());
+        List<DeviceWarnPageInfo> deviceWarnPageInfoList = queryDeviceWarnList(tbDeviceWarnLogList, companyID, param.build(), param.getDeviceType());
         if (CollUtil.isNotEmpty(deviceWarnPageInfoList)) {
             PageUtil.Page<DeviceWarnPageInfo> page = PageUtil.page(deviceWarnPageInfoList, param.getPageSize(), param.getCurrentPage());
             return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), warnBaseInfo);
@@ -250,6 +257,11 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
     public DeviceWarnPageInfo queryDeviceWarnDetail(QueryDeviceWarnDetailParam param) {
         return queryDeviceWarnList(List.of(param.getTbDeviceWarnLog()), param.getCompanyID(), new QueryWtTerminalWarnLogPageParam(), null)
                 .stream().findAny().orElseThrow(() -> new RuntimeException("Unreachable Exception"));
+    }
+
+    @Override
+    public void updateDeviceGroupSenderEvent(List<UpdateDeviceGroupSenderEventParam> param) {
+        this.publisher.publishEvent(new UpdateDeviceGroupSenderDto(this, param));
     }
 
     public @Nullable String getLowestAreaCode(final String areaJson) {
@@ -352,9 +364,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                         item.setProjectList(uniqueTokenProjectInfoMap.get(item.getUniqueToken()).getProjectList()
                                 .stream().map(u -> u.getMonitorPointList().stream().map(w -> {
                                     String regionArea = u.getRegionArea();
-                                    String projectName = u.getProjectName();
-                                    return DeviceProjectInfo.builder().projectID(u.getProjectID()).projectName(projectName)
-                                            .projectShortName(projectName).gpsLocation(w.getMonitorPointLocation())
+                                    return DeviceProjectInfo.builder().projectID(u.getProjectID()).projectName(u.getProjectName())
+                                            .projectShortName(u.getProjectShortName()).gpsLocation(w.getMonitorPointLocation())
                                             .regionArea(regionArea).regionAreaName(regionNameMap.get(regionArea))
                                             .monitorPointID(w.getMonitorPointID()).monitorPointName(w.getMonitorPointName())
                                             .monitorItemID(w.getMonitorItemID()).monitorItemName(w.getMonitorItemName())

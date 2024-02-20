@@ -47,6 +47,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -89,6 +90,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Resource
     private TbVideoDeviceSourceMapper videoDeviceSourceMapper;
+
+    @Resource
+    private ApplicationEventPublisher publisher;
 
 
     @Override
@@ -174,7 +178,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         sensor.setKind(isManual ? SensorKindEnum.MANUAL_KIND.getCode() : SensorKindEnum.AUTO_KIND.getCode());
         sensor.setConfigFieldValue(request.getConfigFieldValue());
         sensor.setDisplayOrder(0);
-        sensor.setOnlineStatus(isManual? 1: null);
+        sensor.setOnlineStatus(isManual ? 1 : null);
         sensor.setCreateUserID(subject.getSubjectID());
         sensor.setUpdateUserID(subject.getSubjectID());
         if (StrUtil.isNotBlank(request.getImagePath())) {
@@ -286,6 +290,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 request.getSensorIDList().stream().map(String::valueOf).toArray(String[]::new));
         //删除传感器
         removeBatchByIds(request.getSensorIDList());
+        // 处理传感器相关数据
+        publisher.publishEvent(new DeleteSensorEventDto(this, request.getSensorIDList()));
     }
 
     @Override

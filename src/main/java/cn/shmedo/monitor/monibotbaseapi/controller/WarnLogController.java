@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -102,7 +103,7 @@ public class WarnLogController {
      */
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param,HttpServletRequest request) {
+    public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param, HttpServletRequest request) {
 //        return warnLogService.queryUnreadWarnLatest(param,request.getHeader("Authorization"));
         return ResultWrapper.successWithNothing();
     }
@@ -452,6 +453,25 @@ public class WarnLogController {
         return ResultWrapper.successWithNothing();
     }
 
+    /**
+     * @api {POST} /UpdateDeviceGroupSenderEvent 更新设备数据推送配置回调
+     * @apiVersion 1.0.0
+     * @apiGroup 报警管理模块
+     * @apiName UpdateDeviceGroupSenderEvent
+     * @apiDescription 更新设备数据推送配置后, 需要调用该接口 (仅限服务内部调用)
+     * @apiParam (请求参数) {Object[]} dataList 数据列表
+     * @apiParam (请求参数) {String} dataList.deviceToken 设备sn
+     * @apiParam (请求参数) {Int[]} dataList.projectIDList 更新后推送工程的IDList(删除设备时,该项为空list)
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 应用权限, 不允许用户调用 mdmbase:WriteBaseWarn
+     */
+    @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
+    @PostMapping(value = "/UpdateDeviceGroupSenderEvent", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updateDeviceGroupSenderEvent(@Valid @NotNull @RequestBody List<UpdateDeviceGroupSenderEventParam> param) {
+        deviceWarnLogService.updateDeviceGroupSenderEvent(param);
+        return ResultWrapper.successWithNothing();
+    }
 
     /**
      * @api {POST} /SaveDataWarn 写入数据报警
