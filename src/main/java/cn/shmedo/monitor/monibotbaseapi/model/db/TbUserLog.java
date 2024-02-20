@@ -1,115 +1,52 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
-import java.util.Date;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.Data;
 
+import java.time.LocalDateTime;
+
+@Data
 public class TbUserLog {
+
+    @TableId(type = IdType.AUTO, value = "ID")
     private Integer ID;
 
+    @TableField(value = "CompanyID")
     private Integer companyID;
 
+    @TableField(value = "UserID")
     private Integer userID;
 
+    @TableField(value = "UserName")
     private String userName;
 
-    private Date operationDate;
+    @TableField(value = "OperationDate")
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime operationDate;
 
+    @TableField(value = "OperationIP")
     private String operationIP;
 
+    @TableField(value = "ModuleName")
     private String moduleName;
 
+    @TableField(value = "OperationName")
     private String operationName;
 
+    @TableField(value = "OperationProperty")
     private String operationProperty;
 
+    @TableField(value = "OperationPath")
     private String operationPath;
 
+    @TableField(value = "OperationParams")
     private String operationParams;
 
-    public Integer getID() {
-        return ID;
-    }
-
-    public void setID(Integer ID) {
-        this.ID = ID;
-    }
-
-    public Integer getCompanyID() {
-        return companyID;
-    }
-
-    public void setCompanyID(Integer companyID) {
-        this.companyID = companyID;
-    }
-
-    public Integer getUserID() {
-        return userID;
-    }
-
-    public void setUserID(Integer userID) {
-        this.userID = userID;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public Date getOperationDate() {
-        return operationDate;
-    }
-
-    public void setOperationDate(Date operationDate) {
-        this.operationDate = operationDate;
-    }
-
-    public String getOperationIP() {
-        return operationIP;
-    }
-
-    public void setOperationIP(String operationIP) {
-        this.operationIP = operationIP;
-    }
-
-    public String getModuleName() {
-        return moduleName;
-    }
-
-    public void setModuleName(String moduleName) {
-        this.moduleName = moduleName;
-    }
-
-    public String getOperationName() {
-        return operationName;
-    }
-
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    public String getOperationProperty() {
-        return operationProperty;
-    }
-
-    public void setOperationProperty(String operationProperty) {
-        this.operationProperty = operationProperty;
-    }
-
-    public String getOperationPath() {
-        return operationPath;
-    }
-
-    public void setOperationPath(String operationPath) {
-        this.operationPath = operationPath;
-    }
-
-    public String getOperationParams() {
-        return operationParams;
-    }
-
-    public void setOperationParams(String operationParams) {
-        this.operationParams = operationParams;
-    }
 }

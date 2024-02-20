@@ -33,17 +33,6 @@
     delete from tb_user_log
     where ID = #{ID,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog" useGeneratedKeys="true">
-    <!--@mbg.generated-->
-    insert into tb_user_log (CompanyID, UserID, UserName, 
-      OperationDate, OperationIP, ModuleName, 
-      OperationName, OperationProperty, OperationPath, 
-      OperationParams)
-    values (#{companyID,jdbcType=INTEGER}, #{userID,jdbcType=INTEGER}, #{userName,jdbcType=VARCHAR}, 
-      #{operationDate,jdbcType=TIMESTAMP}, #{operationIP,jdbcType=VARCHAR}, #{moduleName,jdbcType=VARCHAR}, 
-      #{operationName,jdbcType=VARCHAR}, #{operationProperty,jdbcType=VARCHAR}, #{operationPath,jdbcType=VARCHAR}, 
-      #{operationParams,jdbcType=VARCHAR})
-  </insert>
   <insert id="insertSelective" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbUserLog" useGeneratedKeys="true">
     <!--@mbg.generated-->
     insert into tb_user_log

@@ -15,7 +15,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 /**
@@ -64,7 +64,7 @@ public class UserLogInterceptor {
             userLog.setCompanyID(currentSubject.getCompanyID() == null ? -1 : currentSubject.getCompanyID());
             userLog.setUserID(currentSubject.getSubjectID());
             userLog.setUserName(currentSubject.getSubjectName());
-            userLog.setOperationDate(new Timestamp(System.currentTimeMillis()));
+            userLog.setOperationDate(LocalDateTime.now());
             userLog.setOperationIP(NO_IP);
             userLog.setModuleName(logParam.moduleName());
             userLog.setOperationName(logParam.operationName());
