@@ -372,7 +372,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         // 项目类型
         Map<String, TbProjectType> projectTypeCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_TYPE_KEY, TbProjectType.class);
 
-        Integer companyID = CurrentSubjectHolder.getCurrentSubject().getCompanyID();
+//        Integer companyID = CurrentSubjectHolder.getCurrentSubject().getCompanyID();
 
         return projectInfoCacheMap.values().stream()
                 // 行业过滤
@@ -386,13 +386,13 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
                         return true;
                     }
                 })
-                // 非米度企业（企业大屏默认只有米度用户能查看，这里就直接获取米度用户的所在公司），及用户项目权限过滤
+                // 非米度企业（不管是米度用户还是非米度用户,全部只统计非米度企业），及用户项目权限过滤
                 .filter(v -> {
-                    if (companyID.equals(138)) {
-                        return tokenSet.contains(v.getID());
-                    } else {
-                        return v.getCompanyID().equals(companyID) && tokenSet.contains(v.getID());
-                    }
+//                    if (companyID.equals(138)) {
+//                        return tokenSet.contains(v.getID());
+//                    } else {
+                    return !v.getCompanyID().equals(138) && tokenSet.contains(v.getID());
+//                    }
                 })
                 // 省份code码过滤
                 .filter(v -> Objects.isNull(provinceCode) || v.getLocationInfo().getProvince().equals(provinceCode)).collect(Collectors.toList());
