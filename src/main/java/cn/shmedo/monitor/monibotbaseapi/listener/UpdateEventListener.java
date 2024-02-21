@@ -40,12 +40,14 @@ public class UpdateEventListener {
      * @see UpdateDeviceGroupSenderDto
      */
     private void clearDeviceWarnLog(final List<UpdateDeviceGroupSenderEventParam> dataList) {
-        LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>().nested(wr ->
-                dataList.forEach(data -> wr.or(u -> {
-                    u.eq(TbDeviceWarnLog::getDeviceToken, data.getDeviceToken());
-                    Optional.ofNullable(data.getProjectIDList()).filter(CollUtil::isNotEmpty)
-                            .ifPresent(w -> u.notIn(TbDeviceWarnLog::getProjectID, w));
-                })));
-        tbDeviceWarnLogMapper.delete(wrapper);
+        if (CollUtil.isNotEmpty(dataList)) {
+            LambdaQueryWrapper<TbDeviceWarnLog> wrapper = new LambdaQueryWrapper<TbDeviceWarnLog>().nested(wr ->
+                    dataList.forEach(data -> wr.or(u -> {
+                        u.eq(TbDeviceWarnLog::getDeviceToken, data.getDeviceToken());
+                        Optional.ofNullable(data.getProjectIDList()).filter(CollUtil::isNotEmpty)
+                                .ifPresent(w -> u.notIn(TbDeviceWarnLog::getProjectID, w));
+                    })));
+            tbDeviceWarnLogMapper.delete(wrapper);
+        }
     }
 }
