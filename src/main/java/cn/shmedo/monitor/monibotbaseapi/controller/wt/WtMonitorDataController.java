@@ -487,6 +487,7 @@ public class WtMonitorDataController {
      * @apiParam (请求体) {DateTime} begin 开始时间
      * @apiParam (请求体) {DateTime} end   结束时间
      * @apiParam (请求体) {String} [density] 密度,(2h:2小时一组的密度  2d:2天一组的密度   30m:30分钟一组的密度),null:查全部, 不为null时,结尾必须是h或者d,前面数字可以任意改变
+     * @apiParam (请求体) {Int} [queryType] 统计方式,(0:平均值  1:最新值)
      * @apiParamExample 请求体示例
      * {"pointIDList":[1,2,3],"density":"2h","begin":"2021-09-27 00:00:00","end":"2021-09-28 00:00:00","projectID":66}
      * @apiSuccess (响应结果) {Object[]} monitorPointList 监测点信息

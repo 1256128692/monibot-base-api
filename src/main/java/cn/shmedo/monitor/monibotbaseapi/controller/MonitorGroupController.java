@@ -318,8 +318,11 @@ public class MonitorGroupController {
      * @apiSuccess (返回结果) {Int} dataList.monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} dataList.monitorPointList.monitorItemAlias 监测项目别称
+     * @apiSuccess (返回结果) {Object[]} dataList.fieldInfoList 监测属性信息列表
+     * @apiSuccess (返回结果) {String} dataList.fieldInfoList.fieldToken 监测属性token
+     * @apiSuccess (返回结果) {String} dataList.fieldInfoList.fieldName 监测属性名称
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorGroup
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorGroup")
     @PostMapping(value = "/QueryMonitorTypeGroupPoint", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)

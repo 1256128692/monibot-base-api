@@ -19,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.mdinfo.MdInfoService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.ParamBuilder;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -286,6 +287,12 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
 
     @Override
     public List<MonitorGroupPointBaseInfo> queryMonitorTypeGroupPoint(QueryManualSensorListByMonitorParam pa) {
-        return tbMonitorGroupMapper.queryMonitorTypeGroupPoint(pa);
+        List<MonitorGroupPointBaseInfo> monitorGroupPointBaseInfos = tbMonitorGroupMapper.queryMonitorTypeGroupPoint(pa);
+        if (!CollectionUtil.isNullOrEmpty(monitorGroupPointBaseInfos)) {
+            monitorGroupPointBaseInfos.forEach(m -> {
+                // TODO:判断监测类型为 位移结果数据(相对) 时, 如果监测组下的监测项目名称为[水位位移,垂直位移]
+            });
+        }
+        return monitorGroupPointBaseInfos;
     }
 }

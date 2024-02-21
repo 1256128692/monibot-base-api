@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.QueryType;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -35,6 +36,8 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
     private Timestamp end;
 
     private String density;
+
+    private Integer queryType;
 
     @JsonIgnore
     private List<TbMonitorPoint> tbMonitorPointList;
@@ -94,6 +97,13 @@ public class QueryMonitorPointsSensorDataListParam implements ParameterValidator
             // 传输条件为all时,置空查询密度,即可查询全部数据
             if (density.equals("all")){
                 density = null;
+            }
+        }
+
+        if (queryType != null) {
+            boolean validDensity = QueryType.isValidDensity(queryType);
+            if (!validDensity) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前统计方式条件错误");
             }
         }
         return null;

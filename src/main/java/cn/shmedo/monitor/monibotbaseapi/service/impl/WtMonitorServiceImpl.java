@@ -971,7 +971,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         // 通用类型的传感器数据
         List<Map<String, Object>> maps = sensorDataDao.querySensorData(sensorIDList, pa.getBegin(), pa.getEnd(), pa.getDensity(),
-                fieldList, false, pa.getMonitorType(), null);
+                fieldList, false, pa.getMonitorType(), pa.getQueryType());
 
         List<Map<String, Object>> resultMaps = new LinkedList<>();
         maps.forEach(map -> {

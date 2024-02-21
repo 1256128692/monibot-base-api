@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup;
 
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import lombok.Data;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public class MonitorGroupPointBaseInfo {
     private Integer monitorGroupID;
     private String monitorGroupName;
     private List<MonitorGroupPointItemBaseInfo> monitorPointList;
+    private List<FieldBaseInfo> fieldInfoList;
 }
