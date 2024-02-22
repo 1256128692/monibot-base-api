@@ -37,5 +37,9 @@ public class ReservoirWarnStatsByProjectResponse {
     }
 
     public record Project(Integer id, String projectName, Item detail) {
+
+        public Integer warnCount() {
+            return detail.level1 + detail.level2 + detail.level3 + detail.level4 + detail.offline;
+        }
     }
 }

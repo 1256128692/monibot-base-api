@@ -349,13 +349,15 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
 
         ReservoirWarnStatsByProjectResponse.Item overview = ReservoirWarnStatsByProjectResponse.Item
                 .from(dataMap.values().stream().flatMap(Collection::stream).toList());
-        List<ReservoirWarnStatsByProjectResponse.Project> projects = projectMap.entrySet().stream()
-                .map(project -> {
+        List<ReservoirWarnStatsByProjectResponse.Project> projects = projectMap.entrySet().stream().map(project -> {
                     String projectName = project.getValue();
                     List<WarnPointStats> list = dataMap.getOrDefault(project.getKey(), List.of());
                     return new ReservoirWarnStatsByProjectResponse.Project(project.getKey(), projectName,
                             ReservoirWarnStatsByProjectResponse.Item.from(list));
-                }).toList();
+                })
+                .sorted(Comparator.comparingInt(ReservoirWarnStatsByProjectResponse.Project::warnCount).reversed())
+                .limit(5)
+                .toList();
         return new ReservoirWarnStatsByProjectResponse(dict, overview, projects);
     }
 
