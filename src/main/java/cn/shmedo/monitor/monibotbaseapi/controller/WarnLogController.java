@@ -373,6 +373,7 @@ public class WarnLogController {
     }
 
     /**
+     * @apiDeprecated use now (#报警管理模块:AddWarnLogBindWorkFlowTask).
      * @api {POST} /AddWarnWorkFlowTask 派发工单
      * @apiVersion 1.0.0
      * @apiGroup 报警管理模块
@@ -390,13 +391,40 @@ public class WarnLogController {
 //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddWarnWorkFlowTask", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addWarnWorkFlowTask(@Valid @RequestBody AddWarnWorkFlowTaskParam param) {
+//        final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
+//        if (Objects.isNull(userID)) {
+//            return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
+//        }
+//        // TODO 加上权限校验注解后将上文替换成本注解
+//        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+//        warnLogService.addWarnWorkFlowTask(userID, param);
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /AddWarnLogBindWorkFlowTask 派发工单
+     * @apiVersion 1.0.0
+     * @apiGroup 报警管理模块
+     * @apiName AddWarnLogBindWorkFlowTask
+     * @apiDescription 派发工单
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} workOrderID 工单ID
+     * @apiParam (请求参数) {Int} warnLogID 报警记录ID
+     * @apiParam (请求参数) {Int} warnType 报警类型,1.数据报警 2.设备报警
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:
+     */
+//    @Permission(permissionName = "mdmbase:")
+    @PostMapping(value = "/AddWarnLogBindWorkFlowTask", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object addWarnLogBindWorkFlowTask(@Valid @RequestBody AddWarnLogBindWorkFlowTaskParam param) {
         final Integer userID = Optional.ofNullable(CurrentSubjectHolder.getCurrentSubject()).map(CurrentSubject::getSubjectID).orElse(null);
         if (Objects.isNull(userID)) {
             return ResultWrapper.withCode(ResultCode.SERVICE_NOT_AUTHENTICATION);
         }
-        // TODO 加上权限校验注解后将上文替换成本注解
-        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        warnLogService.addWarnWorkFlowTask(userID, param);
+//        // TODO 加上权限校验注解后将上文替换成本注解
+//        // final Integer userID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
+        warnLogService.addWarnLogBindWorkFlowTask(userID, param);
         return ResultWrapper.successWithNothing();
     }
 

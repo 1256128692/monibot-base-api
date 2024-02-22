@@ -33,6 +33,7 @@ public class WarnHandleParam implements ParameterValidator, ResourcePermissionPr
     @Range(min = 1, max = 2, message = "报警类型 1.数据报警 2.设备报警")
     @NotNull(message = "报警类型不能为空")
     private Integer warnType;
+    @JsonIgnore
     private DataDeviceWarnType dataDeviceWarnType;
     @JsonIgnore
     private TbDataWarnLog tbDataWarnLog;

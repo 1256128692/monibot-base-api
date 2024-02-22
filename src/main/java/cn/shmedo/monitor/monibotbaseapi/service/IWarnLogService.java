@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnLogBindWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.FillDealOpinionParam;
 
@@ -16,4 +17,6 @@ public interface IWarnLogService {
     void fillDealOpinion(Integer userID, FillDealOpinionParam param);
 
     Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param, String accessToken);
+
+    void addWarnLogBindWorkFlowTask(Integer userID, AddWarnLogBindWorkFlowTaskParam param);
 }

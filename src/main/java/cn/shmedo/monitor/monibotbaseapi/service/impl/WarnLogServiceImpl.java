@@ -18,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInf
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.workflow.StartWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnLogBindWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.FillDealOpinionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnLatestInfo;
@@ -52,22 +53,22 @@ public class WarnLogServiceImpl implements IWarnLogService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWarnWorkFlowTask(Integer userID, AddWarnWorkFlowTaskParam param) {
-        ResultWrapper<Integer> wrapper = workFlowTemplateService.startWorkFlowTask(new StartWorkFlowTaskParam(
-                param.getCompanyID(), param.getProjectID(), param.getTemplateID(), param.getStartBpmnNodeID()));
-        Integer data = wrapper.getData();
-        Date current = new Date();
-        switch (param.getDataDeviceWarnType()) {
-            case DATA -> {
-                TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
-                tbDataWarnLog.setWorkOrderID(data);
-                dealAndSaveDataWarnLog(tbDataWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
-            }
-            case DEVICE -> {
-                TbDeviceWarnLog tbDeviceWarnLog = param.getTbDeviceWarnLog();
-                tbDeviceWarnLog.setWorkOrderID(data);
-                dealAndSaveDeviceWarnLog(tbDeviceWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
-            }
-        }
+//        ResultWrapper<Integer> wrapper = workFlowTemplateService.startWorkFlowTask(new StartWorkFlowTaskParam(
+//                param.getCompanyID(), param.getProjectID(), param.getTemplateID(), param.getStartBpmnNodeID()));
+//        Integer data = wrapper.getData();
+//        Date current = new Date();
+//        switch (param.getDataDeviceWarnType()) {
+//            case DATA -> {
+//                TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
+//                tbDataWarnLog.setWorkOrderID(data);
+//                dealAndSaveDataWarnLog(tbDataWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
+//            }
+//            case DEVICE -> {
+//                TbDeviceWarnLog tbDeviceWarnLog = param.getTbDeviceWarnLog();
+//                tbDeviceWarnLog.setWorkOrderID(data);
+//                dealAndSaveDeviceWarnLog(tbDeviceWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
+//            }
+//        }
     }
 
     @Override
@@ -120,6 +121,25 @@ public class WarnLogServiceImpl implements IWarnLogService {
                     });
         });
         return result;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void addWarnLogBindWorkFlowTask(Integer userID, AddWarnLogBindWorkFlowTaskParam param) {
+        Integer data = param.getWorkOrderID();
+        Date current = new Date();
+        switch (param.getDataDeviceWarnType()) {
+            case DATA -> {
+                TbDataWarnLog tbDataWarnLog = param.getTbDataWarnLog();
+                tbDataWarnLog.setWorkOrderID(data);
+                dealAndSaveDataWarnLog(tbDataWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
+            }
+            case DEVICE -> {
+                TbDeviceWarnLog tbDeviceWarnLog = param.getTbDeviceWarnLog();
+                tbDeviceWarnLog.setWorkOrderID(data);
+                dealAndSaveDeviceWarnLog(tbDeviceWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
+            }
+        }
     }
 
     private void fillDeviceInfo(DeviceWarnLatestInfo info, Integer companyID) {
