@@ -21,8 +21,6 @@ public class CheckProjectNameParam implements ParameterValidator, ResourcePermis
     @NotNull
     private Integer companyID;
     @NotBlank
-//    @Size(max = 50)
-//    @Pattern(regexp = "^[\\u4e00-\\u9fa5A-Za-z0-9]+$", message = "只允许数字字母和中文")
     private String projectName;
 
     @Override
