@@ -42,7 +42,8 @@ public class SensorDataDaoImpl implements SensorDataDao {
     private InfluxDB influxDB;
     private FileConfig fileConfig;
 
-    public SensorDataDaoImpl(@Autowired InfluxDB influxDB, FileConfig fileConfig) {
+    @Autowired
+    public SensorDataDaoImpl(InfluxDB influxDB, FileConfig fileConfig) {
         this.influxDB = influxDB;
         this.fileConfig = fileConfig;
     }

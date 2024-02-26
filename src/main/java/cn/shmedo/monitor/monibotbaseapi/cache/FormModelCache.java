@@ -11,6 +11,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.Model4Web;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,7 @@ public class FormModelCache {
     private final TbPropertyMapper tbPropertyMapper;
     private final RedisTemplate<String, String> redisTemplate;
 
+    @Autowired
     public FormModelCache(TbPropertyModelMapper tbPropertyModelMapper,
                           TbPropertyMapper tbPropertyMapper,
                           RedisTemplate<String, String> redisTemplate) {
