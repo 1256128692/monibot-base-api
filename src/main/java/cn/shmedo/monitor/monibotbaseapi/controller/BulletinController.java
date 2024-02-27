@@ -104,6 +104,9 @@ public class BulletinController {
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
      * @apiSuccess (返回结果) {String} updateUser 作者信息
+     * @apiSuccess (返回结果) {Object[]} attachmentDataList 附件列表
+     * @apiSuccess (返回结果) {String} attachmentDataList.fileName 文件名称
+     * @apiSuccess (返回结果) {String} attachmentDataList.filePath 文件绝对路径
      * @apiSampleRequest off
      * @apiPermission 系统权限 user:
      */
