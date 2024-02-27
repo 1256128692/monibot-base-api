@@ -94,7 +94,7 @@ public class BulletinController {
      * @apiName QueryBulletinDetail
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} bulletinID 公告ID
-     * @apiSuccess (返回结果) {Int} currentPageData.companyID 公司ID
+     * @apiSuccess (返回结果) {Int} companyID 公司ID
      * @apiSuccess (返回结果) {Int[]} platform 平台key(多选)
      * @apiSuccess (返回结果) {String} platformDesc 平台描述,多个平台间用逗号分隔
      * @apiSuccess (返回结果) {Int} type 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
@@ -129,10 +129,10 @@ public class BulletinController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.ID 附件ID
-     * @apiSuccess (返回结果) {String} currentPageData.fileName 文件名
-     * @apiSuccess (返回结果) {String} currentPageData.fileType 文件类型
-     * @apiSuccess (返回结果) {Int} currentPageData.fileSize 文件大小
-     * @apiSuccess (返回结果) {String} currentPageData.fileSizeDesc 文件大小描述,例: 3.81KB 2.81MB
+     * @apiSuccess (返回结果) {String} currentPageData.fileName 附件文件名
+     * @apiSuccess (返回结果) {String} currentPageData.fileType 附件文件类型
+     * @apiSuccess (返回结果) {Int} currentPageData.fileSize 附件文件大小
+     * @apiSuccess (返回结果) {String} currentPageData.fileSizeDesc 附件文件大小描述,例: 3.81KB 2.81MB
      * @apiSuccess (返回结果) {String} currentPageData.createUser 创建人名称
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {String} currentPageData.filePath 文件绝对路径
@@ -147,22 +147,23 @@ public class BulletinController {
     }
 
     /**
-     * @api {POST} /UploadBulletinAttachment 上传公告附件
-     * @apiDescription 上传公告附件,附件上传完成后必须绑定公告,绑定公告接口<a href="#api-公告模块-AddBulletinAttachmentBindBatch">/AddBulletinAttachmentBindBatch</a>接口
+     * @api {POST} /UploadBulletinFile 上传公告文件
+     * @apiDescription 上传公告文件
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
-     * @apiName UploadBulletinAttachment
+     * @apiName UploadBulletinFile
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {String} fileName 附件文件名称
-     * @apiParam (请求参数) {String} fileContent 附件文件内容(Base64字符串)
-     * @apiParam (请求参数) {String} fileType 附件文件类型(文件拓展名)，例如jpg,pdf
-     * @apiSuccess (返回结果) {Int} data 附件ID
+     * @apiParam (请求参数) {Int} type 文件类型 1.公告文件附件; 2.公告内嵌文件
+     * @apiParam (请求参数) {String} fileName 文件名称
+     * @apiParam (请求参数) {String} fileContent 文件内容(Base64字符串)
+     * @apiParam (请求参数) {String} fileType 文件类型(文件拓展名)，例如jpg,pdf
+     * @apiSuccess (返回结果) {String} filePath 文件类型是 1.公告文件附件,返参是oss-key; 文件类型是 2.公告内嵌文件,返参是文件真实地址
      * @apiSampleRequest off
      * @apiPermission 系统权限 user:
      */
     //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/UploadBulletinAttachment", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object uploadBulletinAttachment(@Valid @RequestBody Object param) {
+    @PostMapping(value = "/UploadBulletinFile", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object uploadBulletinFile(@Valid @RequestBody Object param) {
         //
         return ResultWrapper.successWithNothing();
     }
@@ -187,26 +188,6 @@ public class BulletinController {
     }
 
     /**
-     * @api {POST} /AddBulletinAttachmentBindBatch 批量公告附件绑定公告
-     * @apiDescription 批量公告附件绑定公告
-     * @apiVersion 1.0.0
-     * @apiGroup 公告模块
-     * @apiName AddBulletinAttachmentBindBatch
-     * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} bulletinID 公告ID
-     * @apiParam (请求参数) {Int[]} attachmentIDList 附件IDList
-     * @apiSuccess (返回结果) {String} none 无
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
-     */
-    //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/AddBulletinAttachmentBindBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addBulletinAttachmentBindBatch(@Valid @RequestBody Object param) {
-        //
-        return ResultWrapper.successWithNothing();
-    }
-
-    /**
      * @api {POST} /AddBulletinData 新增公告
      * @apiDescription 新增公告
      * @apiVersion 1.0.0
@@ -214,17 +195,20 @@ public class BulletinController {
      * @apiName AddBulletinData
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int[]} platform 平台key(多选)
+     * @apiParam (请求参数) {Int} status 发布状态 0.未发布(仅保存); 1.已发布(保存并发布)
+     * @apiParam (请求参数) {Boolean} topMost 公告置顶 true:置顶 | false:不置顶
      * @apiParam (请求参数) {Int} type 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiParam (请求参数) {String} name 公告名称(标题),限制100个字符
      * @apiParam (请求参数) {String} content 公告内容
-     * @apiSuccess (返回结果) {Int} data 公告ID
+     * @apiParam (请求参数) {String[]} [filePathList] 公告关联的文件。如果文件是附件则传oss-key;如果文件是文章中内嵌的图片则传文件真实地址
+     * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 user:
      */
     //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/AddBulletinData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addBulletinData(@Valid @RequestBody Object param) {
-        //
+        // 通过filePath的前缀判断attachment记录的文件类型
         return ResultWrapper.successWithNothing();
     }
 
@@ -237,10 +221,12 @@ public class BulletinController {
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} bulletinID 公告ID
      * @apiParam (请求参数) {Int[]} [platform] 平台key(多选)
+     * @apiParam (请求参数) {Int} [status] 发布状态 0.未发布(仅保存); 1.已发布(保存并发布)
      * @apiParam (请求参数) {Int} [type] 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiParam (请求参数) {String} [name] 公告名称(标题),限制100个字符
      * @apiParam (请求参数) {String} [content] 公告内容
-     * @apiParam (请求参数) {Boolean} [topMost] 公告置顶 true:置顶; false:取消置顶
+     * @apiParam (请求参数) {Boolean} [topMost] 公告置顶 true:置顶 | false:取消置顶
+     * @apiParam (请求参数) {String[]} [filePathList] 新增的公告关联文件,增量编辑(需要删除时走<a href="#api-公告模块-DeleteBulletinAttachmentBatch">/DeleteBulletinAttachmentBatch</a>接口)。<br>如果文件是附件则传oss-key;如果文件是文章中内嵌的图片则传文件真实地址
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 user:
@@ -253,39 +239,22 @@ public class BulletinController {
     }
 
     /**
-     * @api {POST} /PublishBulletinDataBatch 批量发布公告
-     * @apiDescription 批量发布公告
+     * @api {POST} /UpdatePublishBulletinDataBatch 批量编辑公告发布状态
+     * @apiDescription 批量编辑公告发布状态, 根据发布状态发布公告或撤销公告
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
-     * @apiName PublishBulletinDataBatch
+     * @apiName UpdatePublishBulletinDataBatch
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} status 发布状态 0.已发布公告撤销; 1.未发布公告发布
      * @apiParam (请求参数) {Int[]} bulletinIDList 公告IDList
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 user:
      */
     //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/PublishBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object publishBulletinDataBatch(@Valid @RequestBody Object param) {
+    @PostMapping(value = "/UpdatePublishBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object updatePublishBulletinDataBatch(@Valid @RequestBody Object param) {
         // 发布时,更新UpdateTime但是不更新UpdateUser,因为UpdateTime将被视为发布时间
-        return ResultWrapper.successWithNothing();
-    }
-
-    /**
-     * @api {POST} /RevertBulletinDataBatch 批量撤销公告
-     * @apiDescription 批量撤销公告
-     * @apiVersion 1.0.0
-     * @apiGroup 公告模块
-     * @apiName RevertBulletinDataBatch
-     * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int[]} bulletinIDList 公告IDList
-     * @apiSuccess (返回结果) {String} none 无
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
-     */
-    //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/RevertBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object revertBulletinDataBatch(@Valid @RequestBody Object param) {
         // 撤销时,取消置顶
         return ResultWrapper.successWithNothing();
     }

@@ -360,6 +360,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} monitorPointList.sensorID 传感器ID
      * @apiSuccess (返回结果) {String} monitorPointList.sensorExValues 传感器拓展信息(e.g. {"安装高程":200})
+     * @apiSuccess (返回结果) {Double} monitorPointList.distanceValue 库水位-TODO 暂未实现
      * @apiSuccess (返回结果) {Double} monitorPointList.emptyPipeDistance 空管距离
      * @apiSuccess (返回结果) {Double} monitorPointList.levelElevation 水位高程
      * @apiSuccess (返回结果) {Double} monitorPointList.nozzleElevation 管口高程
@@ -411,6 +412,9 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int[]} cutoffWallConfig.monitorPointIDList 防渗墙两侧监测点IDList<br>防渗墙两侧监测点monitorPointIDList必定是监测点组下的监测点。如果不是,否则说明该监测点已经从监测点组中删除,此时需要重新配置防渗效果监测的数据
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.time 时间
+     * @apiSuccess (返回结果) {Int} dataList.distanceID 库水位监测点ID-TODO 暂未实现
+     * @apiSuccess (返回结果) {String} dataList.distanceName 库水位监测点名称-TODO 暂未实现
+     * @apiSuccess (返回结果) {Double} dataList.distanceValue 库水位监测点值(m)-TODO 暂未实现
      * @apiSuccess (返回结果) {Object[]} dataList.pipeDataList 管道数据列表
      * @apiSuccess (返回结果) {Int} dataList.pipeDataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} dataList.pipeDataList.monitorPointName 监测点名称
