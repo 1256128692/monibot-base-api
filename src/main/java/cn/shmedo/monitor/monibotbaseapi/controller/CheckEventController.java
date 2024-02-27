@@ -191,7 +191,7 @@ public class CheckEventController {
      */
     @LogParam(moduleName = "事件模块", operationName = "编辑事件", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateEvent")
-    @PostMapping(value = "/AddEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    @PostMapping(value = "/UpdateEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateEventInfo(@RequestBody @Validated Object pa) {
 //        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
