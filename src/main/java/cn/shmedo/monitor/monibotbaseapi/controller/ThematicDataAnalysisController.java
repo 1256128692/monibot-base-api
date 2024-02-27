@@ -459,6 +459,9 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
+     * @apiSuccess (返回结果) {Int} currentPageData.distanceID 库水位监测点ID-TODO 暂未实现
+     * @apiSuccess (返回结果) {String} currentPageData.distanceName 库水位监测点名称-TODO 暂未实现
+     * @apiSuccess (返回结果) {Double} currentPageData.distanceValue 库水位监测点值(m)-TODO 暂未实现
      * @apiSuccess (返回结果) {Object[]} currentPageData.pipeDataList 管道数据列表
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
