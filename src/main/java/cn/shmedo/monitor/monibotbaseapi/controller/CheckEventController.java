@@ -215,9 +215,9 @@ public class CheckEventController {
      * @apiParam (请求体) {Date} [end] 结束时间
      * @apiParam (请求体) {Int} pageSize 页大小
      * @apiParam (请求体) {Int} currentPage 当前页
-     * @apiSuccess (返回结果) {Int} totalCount 总数量
-     * @apiSuccess (返回结果) {Int} totalPage 总页数
-     * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (响应结果) {Int} totalCount 总数量
+     * @apiSuccess (响应结果) {Int} totalPage 总页数
+     * @apiSuccess (响应结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (响应结果) {Int} currentPageData.eventID  事件ID
      * @apiSuccess (响应结果) {Int} currentPageData.status  事件状态 0-未处理 1-已处理
      * @apiSuccess (响应结果) {String} currentPageData.eventSerialNumber 事件编码
@@ -309,7 +309,7 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} queryType 查询方式,(全部日程:0 个人视角:1)
      * @apiParam (请求体) {Date} begin 开始时间
      * @apiParam (请求体) {Date} end 结束时间
-     * @apiSuccess (返回结果) {Object[]} data 数据
+     * @apiSuccess (响应结果) {Object[]} data 数据
      * @apiSuccess (响应结果) {Int} data.taskID  任务ID
      * @apiSuccess (响应结果) {String} data.taskName  任务名称
      * @apiSuccess (响应结果) {String} data.taskSerialNumber 任务编号
