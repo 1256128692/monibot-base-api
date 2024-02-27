@@ -24,7 +24,7 @@ public class CheckEventController {
     /**
      * @api {POST} /AddEventType 新建事件类型
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName AddEventType
      * @apiDescription 新建事件类型
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -46,7 +46,7 @@ public class CheckEventController {
     /**
      * @api {POST} /DeleteEventType 删除事件类型
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName DeleteEventType
      * @apiDescription 删除事件类型,有未处理事件的时候,不可删除,事件类型擅长后,同类型的事件要同步删除
      * @apiParam (请求体) {Int} id 事件id
@@ -66,7 +66,7 @@ public class CheckEventController {
     /**
      * @api {POST} /UpdateEventType 编辑事件类型
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName UpdateEventType
      * @apiDescription 编辑事件类型
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -89,7 +89,7 @@ public class CheckEventController {
     /**
      * @api {POST} /QueryEventTypeList 查询事件类型列表
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName QueryEventTypeList
      * @apiDescription 查询事件类型列表
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -116,7 +116,7 @@ public class CheckEventController {
     /**
      * @api {POST} /AddEventInfo 新增事件信息
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName AddEventInfo
      * @apiDescription 新增事件信息,事件编码 形如 E2024020200001,最后00001要逐次+1,ReportUserID提报人ID就是当前用户ID
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -148,7 +148,7 @@ public class CheckEventController {
     /**
      * @api {POST} /DeleteEventInfo 删除事件信息
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName DeleteEventInfo
      * @apiDescription 删除事件信息
      * @apiParam (请求体) {Int[]} eventIDList 事件ID列表
@@ -168,7 +168,7 @@ public class CheckEventController {
     /**
      * @api {POST} /UpdateEventInfo 编辑事件信息
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName UpdateEventInfo
      * @apiDescription 编辑事件信息,ReportUserID提报人ID就是当前用户ID
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -202,7 +202,7 @@ public class CheckEventController {
     /**
      * @api {POST} /QueryEventInfoPage 查询事件分页
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName QueryEventInfoPage
      * @apiDescription 查询事件分页
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -251,7 +251,7 @@ public class CheckEventController {
     /**
      * @api {POST} /QueryEventInfoDetail 查询事件详情
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName QueryEventInfoDetail
      * @apiDescription 查询事件详情
      * @apiParam (请求体) {Int} companyID 公司ID
@@ -300,7 +300,7 @@ public class CheckEventController {
     /**
      * @api {POST} /QueryDailyTaskList 查询日巡检任务列表
      * @apiVersion 1.0.0
-     * @apiGroup 事件模块
+     * @apiGroup 水库-巡检事件模块
      * @apiName QueryDailyTaskList
      * @apiDescription 查询日巡检任务列表
      * @apiParam (请求体) {Int} companyID 公司ID
