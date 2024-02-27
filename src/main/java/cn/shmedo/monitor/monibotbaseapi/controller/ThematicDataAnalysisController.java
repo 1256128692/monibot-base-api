@@ -342,6 +342,7 @@ public class ThematicDataAnalysisController {
      * @apiName QueryWetLineConfig
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
+     * @apiParam (请求体) {Int} distanceID 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiSuccess (返回结果) {Int} monitorGroupID 监测点组ID
      * @apiSuccess (返回结果) {String} monitorGroupName 监测点组名称
@@ -402,6 +403,7 @@ public class ThematicDataAnalysisController {
      * @apiName QueryLongitudinalList
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
+     * @apiParam (请求体) {Int} distanceID 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
@@ -445,6 +447,7 @@ public class ThematicDataAnalysisController {
      * @apiName QueryLongitudinalPage
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
+     * @apiParam (请求体) {Int} [distanceID] 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
@@ -459,7 +462,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
-     * @apiSuccess (返回结果) {Int} currentPageData.distanceID 库水位监测点ID-TODO 暂未实现
+     * @apiSuccess (返回结果) {Int} [currentPageData.distanceID] 库水位监测点ID-TODO 暂未实现
      * @apiSuccess (返回结果) {String} currentPageData.distanceName 库水位监测点名称-TODO 暂未实现
      * @apiSuccess (返回结果) {Double} currentPageData.distanceValue 库水位监测点值(m)-TODO 暂未实现
      * @apiSuccess (返回结果) {Object[]} currentPageData.pipeDataList 管道数据列表
@@ -784,7 +787,7 @@ public class ThematicDataAnalysisController {
 
     /**
      * @api {POST} /FlushWetLineConfig 刷新浸润线配置
-     * @apiDescription 刷新浸润线配置,查询浸润线配置前调用该接口。<br>如果对应监测点组、监测点被删除,此时的浸润线配置中的对应监测点组、监测点的ID会从字符串中被删掉
+     * @apiDescription 刷新浸润线配置, 查询浸润线配置前调用该接口。<br>如果对应监测点组、监测点被删除,此时的浸润线配置中的对应监测点组、监测点的ID会从字符串中被删掉
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName FlushWetLineConfig

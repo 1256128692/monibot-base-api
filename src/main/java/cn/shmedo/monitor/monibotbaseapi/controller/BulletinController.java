@@ -147,28 +147,6 @@ public class BulletinController {
     }
 
     /**
-     * @api {POST} /UploadBulletinFile 上传公告文件
-     * @apiDescription 上传公告文件
-     * @apiVersion 1.0.0
-     * @apiGroup 公告模块
-     * @apiName UploadBulletinFile
-     * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} type 文件类型 1.公告文件附件; 2.公告内嵌文件
-     * @apiParam (请求参数) {String} fileName 文件名称
-     * @apiParam (请求参数) {String} fileContent 文件内容(Base64字符串)
-     * @apiParam (请求参数) {String} fileType 文件类型(文件拓展名)，例如jpg,pdf
-     * @apiSuccess (返回结果) {String} filePath 文件类型是 1.公告文件附件,返参是oss-key; 文件类型是 2.公告内嵌文件,返参是文件真实地址
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
-     */
-    //    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/UploadBulletinFile", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object uploadBulletinFile(@Valid @RequestBody Object param) {
-        //
-        return ResultWrapper.successWithNothing();
-    }
-
-    /**
      * @api {POST} /DeleteBulletinAttachmentBatch 批量删除公告附件
      * @apiDescription 批量删除公告附件
      * @apiVersion 1.0.0
