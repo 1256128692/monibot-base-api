@@ -54,7 +54,7 @@
             tvd.`CompanyID` companyID,
             tvd.`ProjectID` projectID,
             tvd.`StorageType` storageType,
-            tvc.`ImageCapture` captureStatus,
+            MAX(tvc.`ImageCapture`) captureStatus,
             tvd.`AllocationStatus` allocationStatus,
             GROUP_CONCAT(tvds.ChannelNo) channelDesc
         FROM
