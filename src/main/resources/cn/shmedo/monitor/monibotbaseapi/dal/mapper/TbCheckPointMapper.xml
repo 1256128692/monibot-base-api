@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint">
+    <!--@Table tb_check_point-->
+    <id column="ID" property="ID" />
+    <result column="ProjectID" property="projectID" />
+    <result column="SerialNumber" property="serialNumber" />
+    <result column="Name" property="name" />
+    <result column="Enable" property="enable" />
+    <result column="GroupID" property="groupID" />
+    <result column="Address" property="address" />
+    <result column="Location" property="location" />
+    <result column="LastCheckTime" property="lastCheckTime" />
+    <result column="ExValue" property="exValue" />
+    <result column="CreateUserID" property="createUserID" />
+    <result column="CreateTime" property="createTime" />
+    <result column="UpdateUserID" property="updateUserID" />
+    <result column="UpdateTime" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, ProjectID, SerialNumber, `Name`, `Enable`, GroupID, Address, `Location`, LastCheckTime, 
+    ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
+  </sql>
+</mapper>

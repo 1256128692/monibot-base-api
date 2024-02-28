@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckEventMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent">
+    <!--@mbg.generated-->
+    <!--@Table tb_check_event-->
+    <id column="ID" property="ID" />
+    <result column="ProjectID" property="projectID" />
+    <result column="OrderID" property="orderID" />
+    <result column="TaskID" property="taskID" />
+    <result column="TypeID" property="typeID" />
+    <result column="SerialNumber" property="serialNumber" />
+    <result column="Address" property="address" />
+    <result column="Location" property="location" />
+    <result column="Describe" property="describe" />
+    <result column="Annexes" property="annexes" />
+    <result column="ReportUserID" property="reportUserID" />
+    <result column="ReportTime" property="reportTime" />
+    <result column="HandleTime" property="handleTime" />
+    <result column="Status" property="status" />
+    <result column="Comment" property="comment" />
+    <result column="ExValue" property="exValue" />
+    <result column="CreateUserID" property="createUserID" />
+    <result column="CreateTime" property="createTime" />
+    <result column="UpdateUserID" property="updateUserID" />
+    <result column="UpdateTime" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, ProjectID, OrderID, TaskID, TypeID, SerialNumber, Address, `Location`, `Describe`,
+    Annexes, ReportUserID, ReportTime, HandleTime, `Status`, `Comment`, ExValue, CreateUserID,
+    CreateTime, UpdateUserID, UpdateTime
+  </sql>
+</mapper>

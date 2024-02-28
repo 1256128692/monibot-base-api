@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckTaskMapper">
+  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTask">
+    <!--@Table tb_check_task-->
+    <id column="ID" property="ID" />
+    <result column="ProjectID" property="projectID" />
+    <result column="SerialNumber" property="serialNumber" />
+    <result column="CheckType" property="checkType" />
+    <result column="Name" property="name" />
+    <result column="Status" property="status" />
+    <result column="TaskDate" property="taskDate" />
+    <result column="BeginTime" property="beginTime" />
+    <result column="EndTime" property="endTime" />
+    <result column="CheckerID" property="checkerID" />
+    <result column="Trajectory" property="trajectory" />
+    <result column="Evaluate" property="evaluate" />
+    <result column="ExValue" property="exValue" />
+    <result column="CreateUserID" property="createUserID" />
+    <result column="CreateTime" property="createTime" />
+    <result column="UpdateUserID" property="updateUserID" />
+    <result column="UpdateTime" property="updateTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    ID, ProjectID, SerialNumber, CheckType, `Name`, `Status`, TaskDate, BeginTime, EndTime, 
+    CheckerID, Trajectory, Evaluate, ExValue, CreateUserID, CreateTime, UpdateUserID, 
+    UpdateTime
+  </sql>
+</mapper>
