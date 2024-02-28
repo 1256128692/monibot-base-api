@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbBulletinAttachmentMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinAttachment;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.BulletinAttachmentType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.QueryBulletinAttachmentPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinAttachmentPageInfo;
@@ -35,6 +36,7 @@ public class TbBulletinAttachmentServiceImpl extends ServiceImpl<TbBulletinAttac
     @Override
     public PageUtil.Page<BulletinAttachmentPageInfo> queryBulletinAttachmentPage(QueryBulletinAttachmentPageParam param) {
         return Optional.of(this.list(new LambdaQueryWrapper<TbBulletinAttachment>()
+                .eq(TbBulletinAttachment::getType, BulletinAttachmentType.OSS_FILE.getCode())
                 .eq(TbBulletinAttachment::getBulletinID, param.getBulletinID()))).filter(CollUtil::isNotEmpty).map(dataList -> {
             List<String> filePathList = dataList.stream().map(TbBulletinAttachment::getFilePath).distinct().toList();
             Map<String, FileInfoResponse> filePathMap = Optional.ofNullable(fileService.getFileUrlList(filePathList, param.getCompanyID()))

@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.bulletin;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -13,6 +14,10 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -28,9 +33,14 @@ public class DeleteBulletinAttachmentBatchParam implements ParameterValidator, R
 
     @Override
     public ResultWrapper<?> validate() {
-        if (attachmentIDList.size() == 1 && !ContextHolder.getBean(TbBulletinAttachmentMapper.class)
-                .exists(new LambdaQueryWrapper<TbBulletinAttachment>().in(TbBulletinAttachment::getId, attachmentIDList)
-                        .eq(TbBulletinAttachment::getType, BulletinAttachmentType.OSS_FILE.getCode()))) {
+        //.eq(TbBulletinAttachment::getType, BulletinAttachmentType.OSS_FILE.getCode())
+        Map<Integer, TbBulletinAttachment> attachmentIDMap = ContextHolder.getBean(TbBulletinAttachmentMapper.class)
+                .selectList(new LambdaQueryWrapper<TbBulletinAttachment>().in(TbBulletinAttachment::getId, attachmentIDList))
+                .stream().collect(Collectors.toMap(TbBulletinAttachment::getId, Function.identity()));
+        if (attachmentIDMap.values().stream().anyMatch(u -> !BulletinAttachmentType.OSS_FILE.getCode().equals(u.getType()))) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的附件IDList里存在其他文件的ID");
+        }
+        if (attachmentIDList.size() == 1 && CollUtil.isEmpty(attachmentIDMap)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "要删除的附件不存在");
         }
         return null;
