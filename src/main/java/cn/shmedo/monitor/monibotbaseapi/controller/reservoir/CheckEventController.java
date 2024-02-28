@@ -1,14 +1,13 @@
-package cn.shmedo.monitor.monibotbaseapi.controller;
+package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
 
 import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.monitorgroup.AddMonitorGroupParam;
-import cn.shmedo.monitor.monibotbaseapi.service.MonitorGroupService;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class CheckEventController {
 
-    private final MonitorGroupService monitorGroupService;
+    private final CheckEventService checkEventService;
 
     /**
      * @api {POST} /AddEventType 新建事件类型
@@ -28,17 +27,17 @@ public class CheckEventController {
      * @apiName AddEventType
      * @apiDescription 新建事件类型
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} name 事件名称
+     * @apiParam (请求体) {String} name 事件类型名称
      * @apiParam (请求体) {String} [exValue] 备注
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddEvent
      */
     @LogParam(moduleName = "事件模块", operationName = "新建事件类型", operationProperty = OperationProperty.ADD)
-    @Permission(permissionName = "mdmbase:AddEventType")
+    @Permission(permissionName = "mdmbase:AddEvent")
     @PostMapping(value = "/AddEventType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addEventType(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    public Object addEventType(@RequestBody @Validated AddEventTypeParam pa) {
+        checkEventService.addEventType(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -48,17 +47,18 @@ public class CheckEventController {
      * @apiVersion 1.0.0
      * @apiGroup 水库-巡检事件模块
      * @apiName DeleteEventType
-     * @apiDescription 删除事件类型,有未处理事件的时候,不可删除,事件类型擅长后,同类型的事件要同步删除
-     * @apiParam (请求体) {Int} id 事件id
+     * @apiDescription 删除事件类型,有关联事件的时候,不可删除
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} idList 事件id
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DeleteEvent
      */
     @LogParam(moduleName = "事件模块", operationName = "删除事件类型", operationProperty = OperationProperty.DELETE)
-    @Permission(permissionName = "mdmbase:DeleteEventType")
+    @Permission(permissionName = "mdmbase:DeleteEvent")
     @PostMapping(value = "/DeleteEventType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteEventType(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+//        checkEventService.deleteEventType(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -71,7 +71,7 @@ public class CheckEventController {
      * @apiDescription 编辑事件类型
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} id 事件id
-     * @apiParam (请求体) {String} name 事件名称
+     * @apiParam (请求体) {String} name 事件类型名称
      * @apiParam (请求体) {String} [exValue] 备注
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -93,7 +93,7 @@ public class CheckEventController {
      * @apiName QueryEventTypeList
      * @apiDescription 查询事件类型列表
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {String} [name] 事件名称,模糊匹配
+     * @apiParam (请求体) {String} [name] 事件类型名称,模糊匹配
      * @apiSuccess (响应结果) {Object[]} data   事件类型列表
      * @apiSuccess (响应结果) {Int} data.id  事件类型ID
      * @apiSuccess (响应结果) {String} data.name   名称
@@ -127,10 +127,10 @@ public class CheckEventController {
      * @apiParam (请求体) {String} address 事件位置
      * @apiParam (请求体) {String} location 事件经纬度
      * @apiParam (请求体) {String} describe 事件描述
-     * @apiParam (请求体) {String} [annexes] 附件文件osskey,json格式的["ali-oss-e2bd4f11-8b07-45ef-9e96-9005665b2148"]
+     * @apiParam (请求体) {String[]} [annexes] 附件文件osskey列表
      * @apiParam (请求体) {Date}   handleTime 处理时间
      * @apiParam (请求体) {Int} status 事件状态 0-未处理 1-已处理
-     * @apiParam (请求体) {String} comment 结束批注
+     * @apiParam (请求体) {String} [comment] 结束批注
      * @apiParam (请求体) {String} [exValue] 备注
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -180,7 +180,7 @@ public class CheckEventController {
      * @apiParam (请求体) {String} [address] 事件位置
      * @apiParam (请求体) {String} [location] 事件经纬度
      * @apiParam (请求体) {String} [describe] 事件描述
-     * @apiParam (请求体) {String} [annexes] 附件文件osskey,json格式的["ali-oss-e2bd4f11-8b07-45ef-9e96-9005665b2148"]
+     * @apiParam (请求体) {String[]} [annexes] 附件文件osskey列表
      * @apiParam (请求体) {Date}   [handleTime] 处理时间
      * @apiParam (请求体) {Int} [status] 事件状态 0-未处理 1-已处理
      * @apiParam (请求体) {String} [comment] 结束批注
@@ -227,7 +227,7 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {String} currentPageData.taskName  关联巡检任务名称
      * @apiSuccess (响应结果) {String} currentPageData.taskSerialNumber  任务编码
      * @apiSuccess (响应结果) {Int} currentPageData.typeID 事件类型ID
-     * @apiSuccess (响应结果) {String} currentPageData.typeName  事件名称
+     * @apiSuccess (响应结果) {String} currentPageData.typeName  事件类型名称
      * @apiSuccess (响应结果) {String} currentPageData.address   事件位置
      * @apiSuccess (响应结果) {String} currentPageData.location 事件经纬度
      * @apiSuccess (响应结果) {String} currentPageData.describe 事件描述
@@ -270,7 +270,7 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {String}  taskEndTime  关联巡检任务结束时间
      * @apiSuccess (响应结果) {Int}  orderID  工单ID
      * @apiSuccess (响应结果) {Int}  typeID 事件类型ID
-     * @apiSuccess (响应结果) {String}  typeName  事件名称
+     * @apiSuccess (响应结果) {String}  typeName  事件类型名称
      * @apiSuccess (响应结果) {String}  address   事件位置
      * @apiSuccess (响应结果) {String}  location 事件经纬度
      * @apiSuccess (响应结果) {String}  describe 事件描述
@@ -310,13 +310,14 @@ public class CheckEventController {
      * @apiParam (请求体) {Date} begin 开始时间
      * @apiParam (请求体) {Date} end 结束时间
      * @apiSuccess (响应结果) {Object[]} data 数据
-     * @apiSuccess (响应结果) {Int} data.taskID  任务ID
-     * @apiSuccess (响应结果) {String} data.taskName  任务名称
-     * @apiSuccess (响应结果) {String} data.taskSerialNumber 任务编号
-     * @apiSuccess (响应结果) {Int} data.checkType   任务类型
-     * @apiSuccess (响应结果) {Int} data.status 任务状态
      * @apiSuccess (响应结果) {Date} data.taskDate 任务日期
-     * @apiSuccess (响应结果) {String} data.projectID  关联项目ID
+     * @apiSuccess (响应结果) {Int} data.taskInfo.taskID  任务ID
+     * @apiSuccess (响应结果) {String} data.taskInfo.taskName  任务名称
+     * @apiSuccess (响应结果) {String} data.taskInfo.taskSerialNumber 任务编号
+     * @apiSuccess (响应结果) {Int} data.taskInfo.checkType   任务类型
+     * @apiSuccess (响应结果) {Int} data.taskInfo.status 任务状态
+     * @apiSuccess (响应结果) {Date} data.taskInfo.taskDate 任务日期
+     * @apiSuccess (响应结果) {String} data.taskInfo.projectID  关联项目ID
      * @apiSuccess (响应结果) {Object} data.taskStatusInfo  任务状态统计
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.unpreparedCount  未开始任务数量
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.underwayCount  进行中任务数量
