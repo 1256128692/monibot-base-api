@@ -114,10 +114,11 @@ public class CheckPointController {
      * @apiDescription 查询巡检点分页
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(巡检点编码/巡检点名称/巡检组)
-     * @apiParam (请求参数) {String} [serviceID] 所属平台id
+     * @apiParam (请求参数) {Int} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [groupID] 巡检组id
+     * @apiParam (请求参数) {Boolean} [allowUngrouped] 是否查询未分组的点，默认为true
      * @apiParam (请求参数) {Int} currentPage 当前页(>0)
      * @apiParam (请求参数) {Int} pageSize 记录条数(1-100)
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -157,6 +158,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [groupID] 巡检组id
+     * @apiParam (请求参数) {Boolean} [allowUngrouped] 是否查询未分组的点，默认为true
      * @apiSuccess (返回结果) {Object[]} data 数据集
      * @apiSuccess (返回结果) {Int} data.id 巡检点id
      * @apiSuccess (返回结果) {String} data.serialNumber 巡检点编码

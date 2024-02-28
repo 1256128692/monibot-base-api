@@ -96,8 +96,6 @@ public class CheckTaskController {
      * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [checkType] 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
-     * @apiParam (请求参数) {String} [name] 任务名称(模糊)
-     * @apiParam (请求参数) {String} [checkerName] 巡检人员名称(模糊)
      * @apiParam (请求参数) {Int} [status] 任务状态(0-未开始 1-进行中 2-已过期 3-已结束)
      * @apiParam (请求参数) {Int} currentPage 当前页(>0)
      * @apiParam (请求参数) {Int} pageSize 记录条数(1-100)
@@ -144,8 +142,6 @@ public class CheckTaskController {
      * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [checkType] 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
-     * @apiParam (请求参数) {String} [name] 任务名称(模糊)
-     * @apiParam (请求参数) {String} [checkerName] 巡检人员名称(模糊)
      * @apiParam (请求参数) {Int} [status] 任务状态(0-未开始 1-进行中 2-已过期 3-已结束)
      * @apiSuccess (返回结果) {Object[]} data 数据集
      * @apiSuccess (返回结果) {Int} data.id 巡检任务id
@@ -232,8 +228,6 @@ public class CheckTaskController {
      * @apiGroup 水库-巡检任务模块
      * @apiName StartCheckTask
      * @apiDescription 开始巡检任务 (!仅能开始当天属于自己且未开始的任务)
-     * @apiParam (请求参数) {Int} companyID 公司id
-     * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {Int} taskID 巡检任务id
      * @apiParam (请求参数) {DateTime} [startTime] 任务开始时间(yyyy-MM-dd HH:mm:ss, 默认为当前时间)
      * @apiSuccess (返回结果) {String} none 无
@@ -254,8 +248,6 @@ public class CheckTaskController {
      * @apiGroup 水库-巡检任务模块
      * @apiName EndCheckTask
      * @apiDescription 结束巡检任务 (!仅能结束自己正在进行中的任务)
-     * @apiParam (请求参数) {Int} companyID 公司id
-     * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {Int} taskID 巡检任务id
      * @apiParam (请求参数) {Object[]} notes 巡检记录
      * @apiParam (请求参数) {Int} notes.pointID 关联巡检点id
