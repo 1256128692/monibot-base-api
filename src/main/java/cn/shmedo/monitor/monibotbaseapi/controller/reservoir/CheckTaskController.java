@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +25,7 @@ public class CheckTaskController {
      * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {Int} checkType 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiParam (请求参数) {String} name 任务名称
-     * @apiParam (请求参数) {DateTime} [beginTime] 任务开始时间(yyyy-MM-dd HH:mm:ss, 默认为当天0点)
-     * @apiParam (请求参数) {DateTime} [endTime] 任务结束时间(yyyy-MM-dd HH:mm:ss, 默认为当天24点)
+     * @apiParam (请求参数) {Date} [taskDate] 任务日期(yyyy-MM-dd, 默认为当天)
      * @apiParam (请求参数) {String} [checkerID] 巡检人id(默认为当前用户)
      * @apiParam (请求参数) {Int[]} pointIDList 关联巡检点id列表(巡检点必须为启用状态)
      * @apiParam (请求参数) {String} [exValue] 扩展字段
@@ -33,6 +34,7 @@ public class CheckTaskController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @LogParam(moduleName = "巡检管理", operationName = "新建巡检任务", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object add(@Valid @RequestBody Void body) {
@@ -48,9 +50,8 @@ public class CheckTaskController {
      * @apiParam (请求参数) {Int} id 巡检任务id
      * @apiParam (请求参数) {Int} checkType 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiParam (请求参数) {String} name 任务名称
-     * @apiParam (请求参数) {DateTime} [beginTime] 任务开始时间(yyyy-MM-dd HH:mm:ss, 默认为当天0点)
-     * @apiParam (请求参数) {DateTime} [endTime] 任务结束时间(yyyy-MM-dd HH:mm:ss, 默认为当天24点)
-     * @apiParam (请求参数) {String} [checkerID] 巡检人id(默认为当前用户)
+     * @apiParam (请求参数) {Date} [taskDate] 任务日期(yyyy-MM-dd)
+     * @apiParam (请求参数) {String} [checkerID] 巡检人id
      * @apiParam (请求参数) {Int[]} pointIDList 关联巡检点id列表(巡检点必须为启用状态)
      * @apiParam (请求参数) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {String} none 无
@@ -58,6 +59,7 @@ public class CheckTaskController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @LogParam(moduleName = "巡检管理", operationName = "修改巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object update(@Valid @RequestBody Void body) {
@@ -76,6 +78,7 @@ public class CheckTaskController {
      * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
      */
 //    @Permission(permissionName = "mdmbase:DeleteCheckTask")
+    @LogParam(moduleName = "巡检管理", operationName = "删除巡检任务", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object delete(@Valid @RequestBody Void body) {
@@ -152,6 +155,7 @@ public class CheckTaskController {
      * @apiSuccess (返回结果) {Int} data.checkType 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiSuccess (返回结果) {String} data.name 巡检任务名称
      * @apiSuccess (返回结果) {Int} data.status 任务状态 0-未开始 1-进行中 2-已过期 3-已结束
+     * @apiSuccess (返回结果) {Date} taskDate 任务日期
      * @apiSuccess (返回结果) {DateTime} [data.beginTime] 任务开始时间
      * @apiSuccess (返回结果) {DateTime} [data.endTime] 任务结束时间
      * @apiSuccess (返回结果) {Int} data.checkerID 巡检人id
@@ -188,7 +192,7 @@ public class CheckTaskController {
      * @apiSuccess (返回结果) {String} checkerName 巡检人员名称
      * @apiSuccess (返回结果) {String} [trajectory] 巡检轨迹
      * @apiSuccess (返回结果) {Int} [evaluate] 巡检评价  0-正常 1-异常
-     * @apiSuccess (返回结果) {String} [data.exValue] 扩展字段
+     * @apiSuccess (返回结果) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {String} createUserName 创建人
      * @apiSuccess (返回结果) {Int} createUserID 创建人id
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
@@ -237,6 +241,7 @@ public class CheckTaskController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @LogParam(moduleName = "巡检管理", operationName = "开始巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "StartCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object startTask(@Valid @RequestBody Void body) {
@@ -248,23 +253,24 @@ public class CheckTaskController {
      * @apiVersion 1.0.0
      * @apiGroup 水库-巡检任务模块
      * @apiName EndCheckTask
-     * @apiDescription 结束巡检任务 (!仅能结束自己进行中的任务)
+     * @apiDescription 结束巡检任务 (!仅能结束自己正在进行中的任务)
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {Int} taskID 巡检任务id
      * @apiParam (请求参数) {Object[]} notes 巡检记录
+     * @apiParam (请求参数) {Int} notes.pointID 关联巡检点id
      * @apiParam (请求参数) {String[]} notes.annexes 巡检记录附件集合(osskey, 最多9)
      * @apiParam (请求参数) {String} notes.remark 巡检记录备注
      * @apiParam (请求参数) {Int} evaluate 巡检评价  0-正常 1-异常
+     * @apiParam (请求参数) {String} [trajectory] 巡检轨迹
      * @apiParam (请求参数) {DateTime} endTime 任务结束时间(yyyy-MM-dd HH:mm:ss)
-     * @apiParam (请求参数) {String} [checkerID] 巡检人id(默认为当前用户)
-     * @apiParam (请求参数) {Int[]} pointIDList 关联巡检点id列表(巡检点必须为启用状态)
      * @apiParam (请求参数) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @LogParam(moduleName = "巡检管理", operationName = "结束巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "EndCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object endTask(@Valid @RequestBody Void body) {

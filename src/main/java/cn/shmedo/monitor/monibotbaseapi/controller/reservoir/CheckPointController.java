@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
+import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.OperationProperty;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -33,6 +35,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @LogParam(moduleName = "巡检管理", operationName = "新增巡检点", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object add(@Valid @RequestBody Void body) {
@@ -56,6 +59,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @LogParam(moduleName = "巡检管理", operationName = "更新巡检点", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object update(@Valid @RequestBody Void body) {
@@ -76,6 +80,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @LogParam(moduleName = "巡检管理", operationName = "更新巡检点", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "BatchUpdateCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object batchUpdate(@Valid @RequestBody Void body) {
@@ -94,6 +99,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
      */
 //    @Permission(permissionName = "mdmbase:DeleteCheckPoint")
+    @LogParam(moduleName = "巡检管理", operationName = "删除巡检任务", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object delete(@Valid @RequestBody Void body) {
@@ -111,6 +117,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
+     * @apiParam (请求参数) {Int} [groupID] 巡检组id
      * @apiParam (请求参数) {Int} currentPage 当前页(>0)
      * @apiParam (请求参数) {Int} pageSize 记录条数(1-100)
      * @apiSuccess (返回结果) {Int} totalCount 总条数
@@ -149,6 +156,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
+     * @apiParam (请求参数) {Int} [groupID] 巡检组id
      * @apiSuccess (返回结果) {Object[]} data 数据集
      * @apiSuccess (返回结果) {Int} data.id 巡检点id
      * @apiSuccess (返回结果) {String} data.serialNumber 巡检点编码
@@ -222,6 +230,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
+    @LogParam(moduleName = "巡检管理", operationName = "新增巡检组", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object addGroup(@Valid @RequestBody Void body) {
@@ -242,6 +251,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
      */
 //    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
+    @LogParam(moduleName = "巡检管理", operationName = "更新巡检组", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object updateGroup(@Valid @RequestBody Void body) {
@@ -260,6 +270,7 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:DeleteCheckPointGroup
      */
 //    @Permission(permissionName = "mdmbase:DeleteCheckPointGroup")
+    @LogParam(moduleName = "巡检管理", operationName = "删除巡检组", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object deleteGroup(@Valid @RequestBody Void body) {
