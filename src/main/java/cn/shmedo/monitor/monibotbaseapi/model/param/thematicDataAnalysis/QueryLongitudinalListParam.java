@@ -40,6 +40,7 @@ public class QueryLongitudinalListParam extends WetLineBaseParam {
 
     @Override
     public List<Integer> getInspectedPointIDList() {
+        // 产品说'浸润线'是'水位'的延申,所以浸润线支持的'显示密度'和'统计方式'就必然是水位支持的,所以这里没有额外对水位监测点做这两块的校验
         List<Integer> list = new ArrayList<>(getMonitorPointIDList());
         if (Objects.nonNull(cutoffWallConfig)) {
             list.addAll(cutoffWallConfig.getMonitorPointIDList());

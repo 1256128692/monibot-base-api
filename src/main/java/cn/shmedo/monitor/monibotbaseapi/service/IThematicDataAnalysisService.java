@@ -9,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author: youxian.kong@shmedo.cn
@@ -36,7 +35,7 @@ public interface IThematicDataAnalysisService {
 
     WetLineConfigInfo queryWetLineConfig(QueryWetLineConfigParam param);
 
-    List<Map<String, Object>> queryLongitudinalList(QueryLongitudinalListParam param);
+    List<LongitudinalDataInfo> queryLongitudinalList(QueryLongitudinalListParam param);
 
     ThematicRainWaterAnalysisInfo queryRainWaterData(QueryRainWaterDataParam param);
 

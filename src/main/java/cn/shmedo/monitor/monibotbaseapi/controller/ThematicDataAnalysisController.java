@@ -8,6 +8,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryMonitorClassPar
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.*;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorpoint.QueryMonitorItemPointListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.LongitudinalDataInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicDryBeachInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.ThematicQueryTransverseInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.IThematicDataAnalysisService;
@@ -250,7 +251,7 @@ public class ThematicDataAnalysisController {
 
     /**
      * @api {POST} /QueryTransverseList 浸润线分析-横剖面(不分页)
-     * @apiDescription 浸润线分析-横剖面(不分页)
+     * @apiDescription 浸润线分析-横剖面(不分页),按时间升序排序
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryTransverseList
@@ -290,7 +291,7 @@ public class ThematicDataAnalysisController {
 
     /**
      * @api {POST} /QueryTransversePage 浸润线分析-横剖面(分页)
-     * @apiDescription 浸润线分析-横剖面(分页)
+     * @apiDescription 浸润线分析-横剖面(分页),按时间降序排序
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryTransversePage
@@ -342,12 +343,13 @@ public class ThematicDataAnalysisController {
      * @apiName QueryWetLineConfig
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
-     * @apiParam (请求体) {Int} distanceID 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
+     * @apiParam (请求体) {Int} [wtPointID] 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
      * @apiSuccess (返回结果) {Int} monitorGroupID 监测点组ID
      * @apiSuccess (返回结果) {String} monitorGroupName 监测点组名称
      * @apiSuccess (返回结果) {Boolean} monitorGroupEnable 监测点组是否启用
      * @apiSuccess (返回结果) {String} monitorGroupImagePath 监测点组底图配置
+     * @apiSuccess (返回结果) {Double} [wtPointValue] 库水位
      * @apiSuccess (返回结果) {Object[]} monitorGroupConfigList 监测点组自定义配置列表
      * @apiSuccess (返回结果) {Int} monitorGroupConfigList.configID 配置ID
      * @apiSuccess (返回结果) {String} monitorGroupConfigList.group 分组
@@ -361,7 +363,6 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} monitorPointList.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {Int} monitorPointList.sensorID 传感器ID
      * @apiSuccess (返回结果) {String} monitorPointList.sensorExValues 传感器拓展信息(e.g. {"安装高程":200})
-     * @apiSuccess (返回结果) {Double} monitorPointList.distanceValue 库水位-TODO 暂未实现
      * @apiSuccess (返回结果) {Double} monitorPointList.emptyPipeDistance 空管距离
      * @apiSuccess (返回结果) {Double} monitorPointList.levelElevation 水位高程
      * @apiSuccess (返回结果) {Double} monitorPointList.nozzleElevation 管口高程
@@ -397,13 +398,13 @@ public class ThematicDataAnalysisController {
 
     /**
      * @api {POST} /QueryLongitudinalList 浸润线分析-纵剖面(不分页)
-     * @apiDescription 浸润线分析-纵剖面(不分页)
+     * @apiDescription 浸润线分析-纵剖面(不分页),按时间升序排序
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryLongitudinalList
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
-     * @apiParam (请求体) {Int} distanceID 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
+     * @apiParam (请求体) {Int} [wtPointID] 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
@@ -414,9 +415,9 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int[]} cutoffWallConfig.monitorPointIDList 防渗墙两侧监测点IDList<br>防渗墙两侧监测点monitorPointIDList必定是监测点组下的监测点。如果不是,否则说明该监测点已经从监测点组中删除,此时需要重新配置防渗效果监测的数据
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} dataList.time 时间
-     * @apiSuccess (返回结果) {Int} dataList.distanceID 库水位监测点ID-TODO 暂未实现
-     * @apiSuccess (返回结果) {String} dataList.distanceName 库水位监测点名称-TODO 暂未实现
-     * @apiSuccess (返回结果) {Double} dataList.distanceValue 库水位监测点值(m)-TODO 暂未实现
+     * @apiSuccess (返回结果) {Int} [dataList.wtPointID] 库水位监测点ID
+     * @apiSuccess (返回结果) {String} [dataList.wtPointName] 库水位监测点名称
+     * @apiSuccess (返回结果) {Double} [dataList.wtPointValue] 库水位监测点值(m)
      * @apiSuccess (返回结果) {Object[]} dataList.pipeDataList 管道数据列表
      * @apiSuccess (返回结果) {Int} dataList.pipeDataList.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} dataList.pipeDataList.monitorPointName 监测点名称
@@ -441,13 +442,13 @@ public class ThematicDataAnalysisController {
 
     /**
      * @api {POST} /QueryLongitudinalPage 浸润线分析-纵剖面(分页)
-     * @apiDescription 浸润线分析-纵剖面(分页)
+     * @apiDescription 浸润线分析-纵剖面(分页),按时间降序排序
      * @apiVersion 1.0.0
      * @apiGroup 专题模块
      * @apiName QueryLongitudinalPage
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} monitorGroupID 监测点组ID
-     * @apiParam (请求体) {Int} [distanceID] 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息-TODO 暂未实现
+     * @apiParam (请求体) {Int} [wtPointID] 水位监测点ID,必须是该监测点组下的水位监测点,如果无该项则返参中无库水位信息
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
@@ -462,9 +463,9 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 时间
-     * @apiSuccess (返回结果) {Int} [currentPageData.distanceID] 库水位监测点ID-TODO 暂未实现
-     * @apiSuccess (返回结果) {String} currentPageData.distanceName 库水位监测点名称-TODO 暂未实现
-     * @apiSuccess (返回结果) {Double} currentPageData.distanceValue 库水位监测点值(m)-TODO 暂未实现
+     * @apiSuccess (返回结果) {Int} [currentPageData.wtPointID] 库水位监测点ID
+     * @apiSuccess (返回结果) {String} [currentPageData.wtPointName] 库水位监测点名称
+     * @apiSuccess (返回结果) {Double} [currentPageData.wtPointValue] 库水位监测点值(m)
      * @apiSuccess (返回结果) {Object[]} currentPageData.pipeDataList 管道数据列表
      * @apiSuccess (返回结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (返回结果) {String} currentPageData.monitorPointName 监测点名称
@@ -484,7 +485,7 @@ public class ThematicDataAnalysisController {
     //@Permission(permissionName = "")
     @PostMapping(value = "/QueryLongitudinalPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryLongitudinalPage(@Valid @RequestBody QueryLongitudinalPageParam param) {
-        List<Map<String, Object>> dataList = new ArrayList<>(thematicDataAnalysisService.queryLongitudinalList(param));
+        ArrayList<LongitudinalDataInfo> dataList = new ArrayList<>(thematicDataAnalysisService.queryLongitudinalList(param));
         Collections.reverse(dataList);
         return ResultWrapper.success(PageUtil.page(dataList, param.getPageSize(), param.getCurrentPage()));
     }

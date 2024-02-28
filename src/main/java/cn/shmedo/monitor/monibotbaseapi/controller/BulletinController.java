@@ -3,6 +3,9 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.*;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbBulletinAttachmentService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbBulletinDataService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class BulletinController {
+    private final ITbBulletinDataService tbBulletinDataService;
+    private final ITbBulletinAttachmentService tbBulletinAttachmentService;
+
     /**
      * @api {POST} /QueryBulletinList 查询公告列表(不分页)
      * @apiDescription 查询公告列表(不分页)
@@ -131,7 +137,7 @@ public class BulletinController {
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
-     * @apiSuccess (返回结果) {Int} currentPageData.ID 附件ID
+     * @apiSuccess (返回结果) {Int} currentPageData.id 附件ID
      * @apiSuccess (返回结果) {String} currentPageData.fileName 附件文件名
      * @apiSuccess (返回结果) {String} currentPageData.fileType 附件文件类型
      * @apiSuccess (返回结果) {Int} currentPageData.fileSize 附件文件大小
@@ -144,9 +150,8 @@ public class BulletinController {
      */
     //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/QueryBulletinAttachmentPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryBulletinAttachmentPage(@Valid @RequestBody Object param) {
-        //
-        return ResultWrapper.successWithNothing();
+    public Object queryBulletinAttachmentPage(@Valid @RequestBody QueryBulletinAttachmentPageParam param) {
+        return tbBulletinAttachmentService.queryBulletinAttachmentPage(param);
     }
 
     /**
@@ -163,8 +168,8 @@ public class BulletinController {
      */
     //    @Permission(permissionName = "mdmbase:")
     @PostMapping(value = "/DeleteBulletinAttachmentBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteBulletinAttachmentBatch(@Valid @RequestBody Object param) {
-        //
+    public Object deleteBulletinAttachmentBatch(@Valid @RequestBody DeleteBulletinAttachmentBatchParam param) {
+        this.tbBulletinAttachmentService.removeBatchByIds(param.getAttachmentIDList());
         return ResultWrapper.successWithNothing();
     }
 

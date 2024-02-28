@@ -1,14 +1,17 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,6 +21,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -33,12 +37,20 @@ public class QueryWetLineConfigParam implements ParameterValidator, ResourcePerm
     private Integer monitorGroupID;
     @NotEmpty(message = "监测点ID列表不能为空")
     private List<Integer> monitorPointIDList;
+    @Positive(message = "库水位监测点ID不能小于1")
+    private Integer wtPointID;
+    @JsonIgnore
+    private TbSensor wtSensor;
+    @JsonIgnore
+    private TbMonitorPoint wtMonitorPoint;
     @JsonIgnore
     private Integer monitorType = MonitorType.WET_LINE.getKey();
 
     @Override
     public ResultWrapper<?> validate() {
-        if (ContextHolder.getBean(TbMonitorPointMapper.class).selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
+        final TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+        final TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
+        if (tbMonitorPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorPoint>()
                 .in(TbMonitorPoint::getID, monitorPointIDList).eq(TbMonitorPoint::getMonitorType, monitorType)).intValue()
                 != monitorPointIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不是浸润线监测点!");
@@ -47,10 +59,32 @@ public class QueryWetLineConfigParam implements ParameterValidator, ResourcePerm
                 .eq(TbMonitorGroup::getID, monitorGroupID).eq(TbMonitorGroup::getProjectID, projectID))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点组不存在!");
         }
-        if (ContextHolder.getBean(TbMonitorGroupPointMapper.class).selectCount(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+        if (tbMonitorGroupPointMapper.selectCount(new LambdaQueryWrapper<TbMonitorGroupPoint>()
                 .eq(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupID)
                 .in(TbMonitorGroupPoint::getMonitorPointID, monitorPointIDList)) != monitorPointIDList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有部分监测点不属于该监测点组!");
+        }
+        if (Objects.nonNull(wtPointID)) {
+            List<TbMonitorPoint> tbWtMonitorPointList = tbMonitorPointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
+                    .eq(TbMonitorPoint::getID, wtPointID).eq(TbMonitorPoint::getMonitorType, MonitorType.WATER_LEVEL.getKey()));
+            if (CollUtil.isEmpty(tbWtMonitorPointList)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选中的库水位监测点不存在或者不是库水位监测点");
+            } else {
+                this.wtMonitorPoint = tbWtMonitorPointList.stream().findAny().orElseThrow();
+            }
+            if (!tbMonitorGroupPointMapper.exists(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                    .eq(TbMonitorGroupPoint::getMonitorGroupID, getMonitorGroupID()).eq(TbMonitorGroupPoint::getMonitorPointID, wtPointID))) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "库水位监测点不属于该监测点组");
+            }
+            List<TbSensor> sensorList = ContextHolder.getBean(TbSensorMapper.class)
+                    .selectList(new LambdaQueryWrapper<TbSensor>().eq(TbSensor::getMonitorPointID, wtPointID));
+            if (CollUtil.isEmpty(sensorList)) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "库水位监测点未绑定传感器");
+            }
+            if (sensorList.size() > 1) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "库水位监测点绑定了多个传感器");
+            }
+            this.wtSensor = sensorList.stream().findAny().orElseThrow();
         }
         return null;
     }

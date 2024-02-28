@@ -17,6 +17,7 @@ import java.util.Optional;
 @JsonIgnoreProperties
 public class WetLineConfigInfo extends ThematicGroupPointListInfo {
     private String monitorGroupImagePath;
+    private Double wtPointValue;
     private List<ThematicProjectConfigInfo> monitorGroupConfigList;
     private List<ThematicPointListInfoV2> monitorPointList;
     /**

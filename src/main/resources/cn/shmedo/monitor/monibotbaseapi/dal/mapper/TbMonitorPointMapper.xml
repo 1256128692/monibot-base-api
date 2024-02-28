@@ -775,8 +775,11 @@
             LEFT JOIN tb_monitor_item tmi ON tmi.`ID` = tmp.`MonitorItemID`
             LEFT JOIN tb_sensor ts ON ts.`MonitorPointID` = tmp.`ID`
         WHERE tmg.`ProjectID` =#{param.projectID}
-        <if test="param.monitorType != null">
-            AND tmi.`MonitorType` =#{param.monitorType}
+        <if test="param.monitorTypeList != null and param.monitorTypeList.size>0">
+            AND tmi.`MonitorType` IN
+            <foreach collection="param.monitorTypeList" item="item" index="index" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
         </if>
         <if test="param.monitorGroupIDList != null and param.monitorGroupIDList.size != 0">
             AND tmg.`ID` IN
