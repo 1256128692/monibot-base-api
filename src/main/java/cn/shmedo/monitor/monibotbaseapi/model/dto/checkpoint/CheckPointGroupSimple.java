@@ -19,6 +19,7 @@ public class CheckPointGroupSimple {
     private Integer projectID;
     private String name;
     private String exValue;
+    private Integer pointCount;
 
     public static CheckPointGroupSimple valueOf(TbCheckPointGroup entity) {
         return CheckPointGroupSimple.builder()

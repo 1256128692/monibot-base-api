@@ -18,7 +18,6 @@ import cn.shmedo.monitor.monibotbaseapi.service.CheckPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -61,6 +60,10 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void batchUpdate(BatchUpdateCheckPointRequest request) {
+        Optional.ofNullable(request.getGroupID())
+                .ifPresent(groupID -> this.update(Wrappers.lambdaUpdate(TbCheckPoint.class)
+                        .set(TbCheckPoint::getGroupID, null)
+                        .eq(TbCheckPoint::getGroupID, request.getGroupID())));
         this.updateBatchById(request.toEntitys());
     }
 
@@ -126,12 +129,7 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
 
     @Override
     public List<CheckPointGroupSimple> listGroup(QueryCheckPointGroupListRequest request) {
-        LambdaQueryWrapper<TbCheckPointGroup> query = Wrappers.<TbCheckPointGroup>lambdaQuery()
-                .in(TbCheckPointGroup::getProjectID, request.getProjectID())
-                .select(TbCheckPointGroup::getID, TbCheckPointGroup::getName,
-                        TbCheckPointGroup::getProjectID, TbCheckPointGroup::getExValue);
-        Optional.ofNullable(request.getKeyword()).ifPresent(k -> query.like(TbCheckPointGroup::getName, k.trim()));
-        return groupMapper.selectList(query).stream().map(CheckPointGroupSimple::valueOf).toList();
+        return groupMapper.list(request);
     }
 
     /**

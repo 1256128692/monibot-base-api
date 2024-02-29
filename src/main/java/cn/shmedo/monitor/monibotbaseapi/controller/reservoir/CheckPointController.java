@@ -302,6 +302,7 @@ public class CheckPointController {
      * @apiSuccess (返回结果) {Int} data.projectID 工程id
      * @apiSuccess (返回结果) {String} data.name 巡检组名称
      * @apiSuccess (返回结果) {String} [data.exValue] 扩展字段
+     * @apiSuccess (返回结果) {Int} [data.pointCount] 下属巡检点数量
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckPointGroup
      */

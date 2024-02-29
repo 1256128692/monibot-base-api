@@ -24,7 +24,7 @@ public class CheckTaskController {
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {Int} checkType 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
-     * @apiParam (请求参数) {String} name 任务名称
+     * @apiParam (请求参数) {String} [name] 任务名称
      * @apiParam (请求参数) {Date} [taskDate] 任务日期(yyyy-MM-dd, 默认为当天)
      * @apiParam (请求参数) {String} [checkerID] 巡检人id(默认为当前用户)
      * @apiParam (请求参数) {Int[]} pointIDList 关联巡检点id列表(巡检点必须为启用状态)

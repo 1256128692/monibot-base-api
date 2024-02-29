@@ -64,8 +64,7 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
                                     .orElseThrow(() -> new InvalidParameterException("存在巡检点已绑定其他巡检组"));
                         }
                         return true;
-                    })
-                    .orElseThrow(() -> new InvalidParameterException("存在巡检点不存在或未启用"));
+                    }).orElseThrow(() -> new InvalidParameterException("存在巡检点不存在或未启用"));
             return null;
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "缺少有效参数");
