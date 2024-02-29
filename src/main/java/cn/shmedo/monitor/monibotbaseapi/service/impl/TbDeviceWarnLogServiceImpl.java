@@ -105,8 +105,9 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                 TbWarnNotifyConfig warnNotifyConfig = tbWarnNotifyConfigMapper.queryByCompanyIDAndPlatformID(param.getCompanyID(),
                         param.getPlatform(), 1, param.getProjectID());
 
+                tbDeviceWarnLogMapper.insert(tbDeviceWarnLog);
+
                 if (ObjectUtil.isNotNull(warnNotifyConfig)) {
-                    tbDeviceWarnLogMapper.insert(tbDeviceWarnLog);
                     //通知 (需要发送通知)
                     if (warnNotifyConfig.getNotifyMethod() != null) {
 
