@@ -19,7 +19,78 @@
     <result column="UpdateTime" property="updateTime" />
   </resultMap>
   <sql id="Base_Column_List">
-    ID, ProjectID, SerialNumber, `Name`, `Enable`, GroupID, Address, `Location`, LastCheckTime, 
+    ID, ProjectID, SerialNumber, `Name`, `Enable`, GroupID, Address, `Location`, LastCheckTime,
     ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
   </sql>
+
+    <select id="lastSerialNumber" resultType="java.lang.Integer">
+        SELECT RIGHT(SerialNumber, 5)
+        FROM tb_check_point
+        WHERE `SerialNumber` LIKE CONCAT(#{serialNumber}, '%')
+        ORDER BY `ID` DESC
+        LIMIT 1
+    </select>
+
+    <sql id="list_sql">
+        SELECT tcp.ID,
+               tcp.SerialNumber,
+               tcp.ProjectID,
+               tpi.ProjectName,
+               tcp.Name,
+               tcp.Enable,
+               tcp.GroupID,
+               tcpg.Name groupName,
+               tcp.Address,
+               tcp.LastCheckTime,
+               tcp.ExValue
+        FROM `tb_check_point` tcp
+                 LEFT JOIN `tb_check_point_group` tcpg ON tcp.GroupID = tcpg.ID
+                 LEFT JOIN `tb_project_info` tpi ON tcp.ProjectID = tpi.ID
+                 LEFT JOIN `tb_project_service_relation` tpsr ON tcp.ProjectID = tpsr.ProjectID
+        <where>
+            <trim prefixOverrides="AND">
+                <choose>
+                    <when test="param.projectList != null and param.projectList.size() != 0">
+                        <foreach collection="param.projectList" item="item" separator="," open="AND tcp.ProjectID IN ("
+                                 close=")">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        AND FALSE
+                    </otherwise>
+                </choose>
+                <if test="param.keyword != null and param.keyword != ''">
+                    AND (tcp.SerialNumber LIKE CONCAT('%', #{param.keyword}, '%')
+                        OR tcp.`Name` LIKE CONCAT('%', #{param.keyword}, '%')
+                        OR tcpg.`Name` LIKE CONCAT('%', #{param.keyword}, '%'))
+                </if>
+                <if test="param.serviceID != null">
+                    AND tpsr.ServiceID = #{param.serviceID}
+                </if>
+                <if test="param.enable != null">
+                    AND tcp.`Enable` = #{param.enable}
+                </if>
+                <if test="param.groupID != null">
+                    AND ( tcp.GroupID = #{param.groupID}
+                    <if test="param.allowUngrouped != null and param.allowUngrouped">
+                        OR tcp.GroupID IS NULL
+                    </if>
+                    )
+                </if>
+                <if test="param.allowUngrouped != null and !param.allowUngrouped">
+                    AND tcp.GroupID IS NOT NULL
+                </if>
+            </trim>
+        </where>
+        ORDER BY tcp.UpdateTime DESC
+    </sql>
+
+    <select id="page" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple">
+        <include refid="list_sql"/>
+    </select>
+
+    <select id="list" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple">
+        <include refid="list_sql"/>
+    </select>
 </mapper>

@@ -16,7 +16,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLogDealType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.workflow.StartWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnLogBindWorkFlowTaskParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.AddWarnWorkFlowTaskParam;
@@ -148,7 +147,7 @@ public class WarnLogServiceImpl implements IWarnLogService {
         Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>()
                 .in(TbVideoDevice::getDeviceToken, deviceTokens)).stream().collect(Collectors
                 .toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
-        TransferUtil.applyDeviceBase(infoList,
+        TransferUtil.INSTANCE.applyDeviceBase(infoList,
                 () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                 DeviceWarnLatestInfo::getDeviceToken,
                 (e, device) -> {

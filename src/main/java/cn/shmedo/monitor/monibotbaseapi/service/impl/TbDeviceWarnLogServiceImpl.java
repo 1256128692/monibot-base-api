@@ -294,7 +294,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                     .in(TbVideoDevice::getDeviceToken, deviceTokens));
             Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceList.stream().collect(Collectors
                     .toMap(TbVideoDevice::getDeviceToken, Function.identity()));
-            TransferUtil.applyDeviceBase(deviceWarnPageInfoList,
+            TransferUtil.INSTANCE.applyDeviceBase(deviceWarnPageInfoList,
                     () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
                     DeviceWarnPageInfo::getDeviceToken,
                     (e, device) -> {

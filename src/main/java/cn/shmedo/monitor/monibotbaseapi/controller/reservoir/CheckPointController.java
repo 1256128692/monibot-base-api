@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.service.CheckPointService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -19,6 +22,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CheckPointController {
 
+    private final CheckPointService service;
+
     /**
      * @api {POST} /AddCheckPoint 新增巡检点
      * @apiVersion 1.0.0
@@ -34,12 +39,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
     @LogParam(moduleName = "巡检管理", operationName = "新增巡检点", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object add(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object add(@Valid @RequestBody AddCheckPointRequest body) {
+        return service.save(body);
     }
 
     /**
@@ -58,11 +63,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
     @LogParam(moduleName = "巡检管理", operationName = "更新巡检点", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object update(@Valid @RequestBody Void body) {
+    public Object update(@Valid @RequestBody UpdateCheckPointRequest body) {
+        service.update(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -79,11 +85,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
     @LogParam(moduleName = "巡检管理", operationName = "更新巡检点", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "BatchUpdateCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object batchUpdate(@Valid @RequestBody Void body) {
+    public Object batchUpdate(@Valid @RequestBody BatchUpdateCheckPointRequest body) {
+        service.batchUpdate(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -98,11 +105,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:DeleteCheckPoint")
+    @Permission(permissionName = "mdmbase:DeleteCheckPoint")
     @LogParam(moduleName = "巡检管理", operationName = "删除巡检任务", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object delete(@Valid @RequestBody Void body) {
+    public Object delete(@Valid @RequestBody DeleteCheckPointRequest body) {
+        service.delete(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -139,11 +147,11 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:ListCheckPoint")
+    @Permission(permissionName = "mdmbase:ListCheckPoint")
     @PostMapping(value = "/QueryCheckPointPage", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object page(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object page(@Valid @RequestBody QueryCheckPointPageRequest body) {
+        return service.page(body);
     }
 
     /**
@@ -175,11 +183,11 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:ListCheckPoint")
+    @Permission(permissionName = "mdmbase:ListCheckPoint")
     @PostMapping(value = "/QueryCheckPointList", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object list(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object list(@Valid @RequestBody QueryCheckPointListRequest body) {
+        return service.list(body);
     }
 
     /**
@@ -210,11 +218,11 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeCheckPoint
      */
-//    @Permission(permissionName = "mdmbase:DescribeCheckPoint")
+    @Permission(permissionName = "mdmbase:DescribeCheckPoint")
     @PostMapping(value = "/QueryCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object single(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object single(@Valid @RequestBody QueryCheckPointRequest body) {
+        return service.single(body);
     }
 
     /**
@@ -223,7 +231,6 @@ public class CheckPointController {
      * @apiGroup 水库-巡检点模块
      * @apiName AddCheckPointGroup
      * @apiDescription 新增巡检组
-     * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} projectID 项目id
      * @apiParam (请求参数) {String} name 巡检组名称(10)
      * @apiParam (请求参数) {String} [exValue] 扩展字段
@@ -231,12 +238,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
+    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "新增巡检组", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object addGroup(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object addGroup(@Valid @RequestBody AddCheckPointGroupRequest body) {
+        return service.saveGroup(body);
     }
 
     /**
@@ -252,11 +259,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
+    @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "更新巡检组", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object updateGroup(@Valid @RequestBody Void body) {
+    public Object updateGroup(@Valid @RequestBody UpdateCheckPointGroupRequest body) {
+        service.updateGroup(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -271,11 +279,12 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DeleteCheckPointGroup
      */
-//    @Permission(permissionName = "mdmbase:DeleteCheckPointGroup")
+    @Permission(permissionName = "mdmbase:DeleteCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "删除巡检组", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckPointGroup", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object deleteGroup(@Valid @RequestBody Void body) {
+    public Object deleteGroup(@Valid @RequestBody DeleteCheckPointGroupRequest body) {
+        service.deleteGroup(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -296,10 +305,10 @@ public class CheckPointController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckPointGroup
      */
-//    @Permission(permissionName = "mdmbase:ListCheckPointGroup")
+    @Permission(permissionName = "mdmbase:ListCheckPointGroup")
     @PostMapping(value = "/QueryCheckPointGroupList", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object listGroup(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object listGroup(@Valid @RequestBody QueryCheckPointGroupListRequest body) {
+        return service.listGroup(body);
     }
 }

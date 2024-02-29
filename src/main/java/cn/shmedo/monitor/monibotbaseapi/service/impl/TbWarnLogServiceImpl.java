@@ -55,7 +55,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                 page = this.baseMapper.queryCameraWarnPage(new Page<>(param.getCurrentPage(), param.getPageSize()), param);
                 //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
                 List<WtWarnLogInfo> data = page.getRecords();
-                TransferUtil.applyProductName(data,
+                TransferUtil.INSTANCE.applyProductName(data,
                         () -> QueryDeviceBaseInfoParam.builder()
                                 .deviceTokens(data.stream().map(WtWarnLogInfo::getDeviceToken).collect(Collectors.toSet()))
                                 .companyID(param.getCompanyID()).build(),
@@ -82,7 +82,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
                 });
                 //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
                 Optional.ofNullable(cameraWarn.getDeviceToken()).filter(e -> !e.isBlank())
-                        .ifPresent(deviceToken -> TransferUtil.applyProductName(List.of(cameraWarn),
+                        .ifPresent(deviceToken -> TransferUtil.INSTANCE.applyProductName(List.of(cameraWarn),
                                 () -> QueryDeviceBaseInfoParam.builder()
                                         .deviceTokens(Set.of(deviceToken))
                                         .companyID(param.getCompanyID()).build(),
@@ -115,7 +115,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
         List<WtWarnLogInfo> wtWarnLogInfos = baseMapper.queryTerminalWarnList(param);
         Set<String> deviceTokens = wtWarnLogInfos.stream()
                 .map(WtWarnLogInfo::getDeviceToken).filter(StrUtil::isNotEmpty).collect(Collectors.toSet());
-        TransferUtil.applyDeviceBase(wtWarnLogInfos,
+        TransferUtil.INSTANCE.applyDeviceBase(wtWarnLogInfos,
                 () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(param.getCompanyID()).build(),
                 WtWarnLogInfo::getDeviceToken,
                 (e, device) -> {
@@ -150,7 +150,7 @@ public class TbWarnLogServiceImpl extends ServiceImpl<TbWarnLogMapper, TbWarnLog
         //使用deviceToken查询设备信息填充deviceTypeName(设备类型名)
         Optional.ofNullable(base.getDeviceToken()).filter(e -> !e.isBlank())
                 .ifPresent(deviceToken -> {
-                    TransferUtil.applyDeviceBase(List.of(base),
+                    TransferUtil.INSTANCE.applyDeviceBase(List.of(base),
                             () -> QueryDeviceBaseInfoParam.builder().deviceTokens(Set.of(deviceToken)).companyID(param.getCompanyID()).build(),
                             WtTerminalWarnDetailInfo::getDeviceToken,
                             (e, device) -> {

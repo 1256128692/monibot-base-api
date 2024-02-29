@@ -19,4 +19,16 @@
     ID, TaskID, PointID, Annexes, Remark, PointInfo, ExValue, CreateUserID, CreateTime, 
     UpdateUserID, UpdateTime
   </sql>
+
+  <select id="existStatusByPointIds" resultType="boolean">
+    SELECT EXISTS
+             (SELECT 1
+              FROM `tb_check_task_point` tctp
+                     LEFT JOIN `tb_check_task` tct ON tctp.TaskID = tct.ID
+              WHERE tct.`Status` = #{status.code}
+    <foreach collection="pointIds" open="AND tctp.ID IN (" close="))" separator="," item="item" index="index">
+      #{item}
+    </foreach>
+
+  </select>
 </mapper>
