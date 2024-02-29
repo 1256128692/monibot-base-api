@@ -7,6 +7,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -57,8 +58,8 @@ public class CheckEventController {
     @LogParam(moduleName = "事件模块", operationName = "删除事件类型", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeleteEvent")
     @PostMapping(value = "/DeleteEventType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteEventType(@RequestBody @Validated Object pa) {
-//        checkEventService.deleteEventType(pa);
+    public Object deleteEventType(@RequestBody @Validated DeleteEventTypeParam pa) {
+        checkEventService.deleteEventType(pa);
         return ResultWrapper.successWithNothing();
     }
 
