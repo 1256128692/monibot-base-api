@@ -26,4 +26,27 @@
     CheckerID, Trajectory, Evaluate, ExValue, CreateUserID, CreateTime, UpdateUserID, 
     UpdateTime
   </sql>
+
+
+  <select id="selectListByCondition" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskInfo">
+      select ID,
+             `Name`       as taskName,
+             SerialNumber as taskSerialNumber,
+             CheckType,
+             `Status`,
+             TaskDate,
+             ProjectID
+      from tb_check_task
+      where TaskDate &gt;= #{param.begin}
+        AND TaskDate &lt;= #{param.end}
+      <if test="param.serviceID != null">
+          AND projectID in (select ProjectID from tb_project_service_relation where serviceID = #{param.serviceID})
+      </if>
+      <if test="param.projectID != null">
+          AND projectID = #{param.projectID}
+      </if>
+      <if test="userID != null">
+          AND CheckerID = #{userID}
+      </if>
+  </select>
 </mapper>

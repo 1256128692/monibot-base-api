@@ -7,10 +7,7 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.QueryEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.*;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -331,8 +328,7 @@ public class CheckEventController {
      */
     @Permission(permissionName = "mdmbase:ListEventInfo")
     @PostMapping(value = "/QueryDailyTaskList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryDailyTaskList(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+    public Object queryDailyTaskList(@RequestBody @Validated QueryDailyTaskParam pa) {
+        return checkEventService.queryDailyTaskList(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
     }
 }

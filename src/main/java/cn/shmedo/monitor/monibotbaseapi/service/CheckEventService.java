@@ -1,10 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.QueryEventTypeParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDataResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDateAndStatisticsInfo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 public interface CheckEventService extends IService<TbCheckEvent>{
@@ -17,4 +16,6 @@ public interface CheckEventService extends IService<TbCheckEvent>{
     void updateEventType(UpdateEventTypeParam pa);
 
     Object queryEventTypeList(QueryEventTypeParam pa);
+
+    TaskDateAndStatisticsInfo queryDailyTaskList(QueryDailyTaskParam pa, Integer subjectID);
 }
