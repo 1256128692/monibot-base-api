@@ -34,7 +34,7 @@ public class FileService {
     private final MdInfoFileService mdInfoFileService;
 
     private static final String BASE64_FLAG = ";base64,";
-
+    private static final String OSS_PREFIX = "ali-oss";
 
     /**
      * base64 文件上传
@@ -114,7 +114,7 @@ public class FileService {
         userID = Optional.ofNullable(userID).orElse(subject.getSubjectID());
         companyID = Optional.ofNullable(companyID).orElse(subject.getCompanyID());
         ResultWrapper<FilePathResponse> info = mdInfoFileService.streamUploadFile(file, companyID, DefaultConstant.MD_INFO_BUCKETNAME, fileName, fileType, fileSecret,
-                fileDesc, userID, folderID, exValue );
+                fileDesc, userID, folderID, exValue);
         if (!info.apiSuccess()) {
             return ErrorConstant.IMAGE_INSERT_FAIL;
         } else {
@@ -167,6 +167,15 @@ public class FileService {
             }
         }
         return null;
+    }
+
+    /**
+     * {@code filePath}是否是oss-key
+     *
+     * @param filePath filePath
+     */
+    public static boolean isOssFilePath(final String filePath) {
+        return Optional.ofNullable(filePath).map(u -> u.startsWith(OSS_PREFIX)).orElse(false);
     }
 }
 

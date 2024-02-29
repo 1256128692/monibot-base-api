@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.*;
@@ -41,12 +42,12 @@ public class BulletinController {
      * @apiSuccess (返回结果) {Int} dataList.type 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiSuccess (返回结果) {String} dataList.name 公告标题
      * @apiSuccess (返回结果) {String} dataList.content 公告内容
+     * @apiSuccess (返回结果) {String} dataList.createUser 作者信息
      * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
-     * @apiSuccess (返回结果) {String} dataList.updateUser 作者信息
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:ListBulletinData")
     @PostMapping(value = "/QueryBulletinList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryBulletinList(@Valid @RequestBody Object param) {
         // 按置顶、发布时间排序
@@ -80,12 +81,12 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} currentPageData.name 公告标题
      * @apiSuccess (返回结果) {String} currentPageData.content 公告内容
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
+     * @apiSuccess (返回结果) {String} currentPageData.createUser 作者信息
      * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
-     * @apiSuccess (返回结果) {String} currentPageData.updateUser 作者信息
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
-//    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:ListBulletinData")
     @PostMapping(value = "/QueryBulletinPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryBulletinPage(@Valid @RequestBody Object param) {
         // 按置顶、发布时间排序
@@ -107,16 +108,17 @@ public class BulletinController {
      * @apiSuccess (返回结果) {Int} status 发布状态 0.未发布 1.已发布
      * @apiSuccess (返回结果) {String} name 公告标题
      * @apiSuccess (返回结果) {String} content 公告内容
+     * @apiSuccess (返回结果) {String} createUser 作者信息
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
      * @apiSuccess (返回结果) {DateTime} updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
-     * @apiSuccess (返回结果) {String} updateUser 作者信息
      * @apiSuccess (返回结果) {Object[]} attachmentDataList 附件列表
      * @apiSuccess (返回结果) {String} attachmentDataList.fileName 文件名称
+     * @apiSuccess (返回结果) {String} attachmentDataList.fileType 文件类型
      * @apiSuccess (返回结果) {String} attachmentDataList.filePath 文件绝对路径
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:DescribeBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DescribeBulletinData")
     @PostMapping(value = "/QueryBulletinDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryBulletinDetail(@Valid @RequestBody Object param) {
         //
@@ -146,9 +148,9 @@ public class BulletinController {
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {String} currentPageData.filePath 文件绝对路径
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:ListBulletinData")
     @PostMapping(value = "/QueryBulletinAttachmentPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryBulletinAttachmentPage(@Valid @RequestBody QueryBulletinAttachmentPageParam param) {
         return tbBulletinAttachmentService.queryBulletinAttachmentPage(param);
@@ -164,9 +166,9 @@ public class BulletinController {
      * @apiParam (请求参数) {Int[]} attachmentIDList 附件IDList
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:DeleteBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DeleteBulletinData")
     @PostMapping(value = "/DeleteBulletinAttachmentBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteBulletinAttachmentBatch(@Valid @RequestBody DeleteBulletinAttachmentBatchParam param) {
         this.tbBulletinAttachmentService.removeBatchByIds(param.getAttachmentIDList());
@@ -181,20 +183,20 @@ public class BulletinController {
      * @apiName AddBulletinData
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int[]} platform 平台key(多选)
-     * @apiParam (请求参数) {Int} status 发布状态 0.未发布(仅保存); 1.已发布(保存并发布)
-     * @apiParam (请求参数) {Boolean} topMost 公告置顶 true:置顶 | false:不置顶
-     * @apiParam (请求参数) {Int} type 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
+     * @apiParam (请求参数) {Int} [status] 发布状态 0.未发布(仅保存); 1.已发布(保存并发布). 默认 0.未发布
+     * @apiParam (请求参数) {Boolean} [topMost] 公告置顶 true:置顶 | false:不置顶. 默认 false:不置顶
+     * @apiParam (请求参数) {Int} type 公告类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiParam (请求参数) {String} name 公告名称(标题),限制100个字符
      * @apiParam (请求参数) {String} content 公告内容
      * @apiParam (请求参数) {String[]} [filePathList] 公告关联的文件。如果文件是附件则传oss-key;如果文件是文章中内嵌的图片则传文件真实地址
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:AddBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:AddBulletinData")
     @PostMapping(value = "/AddBulletinData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addBulletinData(@Valid @RequestBody Object param) {
-        // 通过filePath的前缀判断attachment记录的文件类型
+    public Object addBulletinData(@Valid @RequestBody AddBulletinDataParam param) {
+        tbBulletinDataService.addBulletinData(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -215,12 +217,12 @@ public class BulletinController {
      * @apiParam (请求参数) {String[]} [filePathList] 新增的公告关联文件,增量编辑(需要删除时走<a href="#api-公告模块-DeleteBulletinAttachmentBatch">/DeleteBulletinAttachmentBatch</a>接口)。<br>如果文件是附件则传oss-key;如果文件是文章中内嵌的图片则传文件真实地址
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:UpdateBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:UpdateBulletinData")
     @PostMapping(value = "/UpdateBulletinData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateBulletinData(@Valid @RequestBody Object param) {
-        //
+    public Object updateBulletinData(@Valid @RequestBody UpdateBulletinData param) {
+        this.tbBulletinDataService.updateBulletinData(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -235,12 +237,11 @@ public class BulletinController {
      * @apiParam (请求参数) {Int[]} bulletinIDList 公告IDList
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:UpdateBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:UpdateBulletinData")
     @PostMapping(value = "/UpdatePublishBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updatePublishBulletinDataBatch(@Valid @RequestBody Object param) {
-        // 发布时,更新UpdateTime但是不更新UpdateUser,因为UpdateTime将被视为发布时间
         // 撤销时,取消置顶
         return ResultWrapper.successWithNothing();
     }
@@ -255,12 +256,13 @@ public class BulletinController {
      * @apiParam (请求参数) {Int[]} bulletinIDList 公告IDList
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:
+     * @apiPermission 系统权限 mdmbase:DeleteBulletinData
      */
-    //    @Permission(permissionName = "mdmbase:")
+    @Permission(permissionName = "mdmbase:DeleteBulletinData")
     @PostMapping(value = "/DeleteBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteBulletinDataBatch(@Valid @RequestBody Object param) {
-        //
+        // 校验时,如果有'已发布'的公告,需要提示异常
+        // 关联删除对应的公告附件
         return ResultWrapper.successWithNothing();
     }
 }

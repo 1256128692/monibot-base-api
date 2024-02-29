@@ -15,7 +15,6 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,7 +32,6 @@ public class DeleteBulletinAttachmentBatchParam implements ParameterValidator, R
 
     @Override
     public ResultWrapper<?> validate() {
-        //.eq(TbBulletinAttachment::getType, BulletinAttachmentType.OSS_FILE.getCode())
         Map<Integer, TbBulletinAttachment> attachmentIDMap = ContextHolder.getBean(TbBulletinAttachmentMapper.class)
                 .selectList(new LambdaQueryWrapper<TbBulletinAttachment>().in(TbBulletinAttachment::getId, attachmentIDList))
                 .stream().collect(Collectors.toMap(TbBulletinAttachment::getId, Function.identity()));

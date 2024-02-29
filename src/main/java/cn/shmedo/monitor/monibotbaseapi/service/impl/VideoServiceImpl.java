@@ -546,7 +546,6 @@ public class VideoServiceImpl implements VideoService {
         return list;
     }
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Object deleteVideoDeviceList(DeleteVideoDeviceParam pa) {
@@ -568,6 +567,11 @@ public class VideoServiceImpl implements VideoService {
 
         // 删除通道视频设备
         videoDeviceSourceMapper.deleteByDeviceSerialList(pa.getDeviceSerialList());
+
+        // 视频设备报警是中台直接产生的,没有走物联网平台那一套 device_group -> device_group_sender 推送,因此在物联网平台无法获取到这套推送的逻辑
+        // 中台绑定的逻辑是一台视频设备直接通过`tb_video_device`表的`ProjectID`字段绑定到一个工程
+        // 生成报警的接口 @see #batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam)
+        tbDeviceWarnLogService.remove(new LambdaQueryWrapper<TbDeviceWarnLog>().in(TbDeviceWarnLog::getDeviceSerial, pa.getDeviceSerialList()));
 
         // 4. 删除物联网平台设备
         ResultWrapper<List<DeviceBaseInfo>> listResultWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
