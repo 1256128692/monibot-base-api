@@ -7,6 +7,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,11 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     @Override
     public void deleteEventType(DeleteEventTypeParam pa) {
         tbCheckEventTypeMapper.deleteBatchIds(pa.getIdList());
+    }
+
+    @Override
+    public void updateEventType(UpdateEventTypeParam pa) {
+        tbCheckEventTypeMapper.updateSelectFieldById(pa);
     }
 
 

@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import lombok.AllArgsConstructor;
 import org.springframework.validation.annotation.Validated;
@@ -79,10 +80,10 @@ public class CheckEventController {
      * @apiPermission 系统权限 mdmbase:UpdateEvent
      */
     @LogParam(moduleName = "事件模块", operationName = "更新事件类型", operationProperty = OperationProperty.UPDATE)
-    @Permission(permissionName = "mdmbase:UpdateEventType")
+    @Permission(permissionName = "mdmbase:UpdateEvent")
     @PostMapping(value = "/UpdateEventType", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateEventType(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    public Object updateEventType(@RequestBody @Validated UpdateEventTypeParam pa) {
+        checkEventService.updateEventType(pa);
         return ResultWrapper.successWithNothing();
     }
 

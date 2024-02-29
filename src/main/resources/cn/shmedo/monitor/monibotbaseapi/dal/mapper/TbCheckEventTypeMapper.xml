@@ -1,17 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckEventTypeMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType">
-    <!--@Table tb_check_event_type-->
-    <id column="ID" property="ID" />
-    <result column="Name" property="name" />
-    <result column="ExValue" property="exValue" />
-    <result column="CreateUserID" property="createUserID" />
-    <result column="CreateTime" property="createTime" />
-    <result column="UpdateUserID" property="updateUserID" />
-    <result column="UpdateTime" property="updateTime" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    ID, `Name`, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
-  </sql>
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType">
+        <!--@Table tb_check_event_type-->
+        <id column="ID" property="ID"/>
+        <result column="Name" property="name"/>
+        <result column="ExValue" property="exValue"/>
+        <result column="CreateUserID" property="createUserID"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateUserID" property="updateUserID"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID,
+        `Name`,
+        ExValue,
+        CreateUserID,
+        CreateTime,
+        UpdateUserID,
+        UpdateTime
+    </sql>
+
+    <update id="updateSelectFieldById"
+            parameterType="cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam">
+        update tb_check_event_type
+        <set>
+            <if test="name != null">
+                `Name` = #{name},
+            </if>
+            <if test="exValue != null">
+                ExValue = #{exValue},
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID = #{updateUserID},
+            </if>
+            <if test="updateTime != null">
+                UpdateTime = #{updateTime},
+            </if>
+        </set>
+        where ID = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>
