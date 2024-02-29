@@ -3,11 +3,13 @@ package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.AddEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.DeleteEventTypeParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.QueryEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.UpdateEventTypeParam;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import lombok.AllArgsConstructor;
@@ -109,9 +111,8 @@ public class CheckEventController {
      */
     @Permission(permissionName = "mdmbase:ListEventInfo")
     @PostMapping(value = "/QueryEventTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryEventTypeList(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+    public Object queryEventTypeList(@RequestBody @Validated QueryEventTypeParam pa) {
+        return checkEventService.queryEventTypeList(pa);
     }
 
 
