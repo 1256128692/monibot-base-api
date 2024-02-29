@@ -51,7 +51,6 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
             TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
             this.original = mapper.selectList(Wrappers.<TbCheckPoint>lambdaQuery()
                     .in(TbCheckPoint::getID, idList)
-                    .eq(TbCheckPoint::getEnable, true)
                     .select(TbCheckPoint::getID, TbCheckPoint::getGroupID, TbCheckPoint::getProjectID));
 
 
@@ -64,7 +63,7 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
                                     .orElseThrow(() -> new InvalidParameterException("存在巡检点已绑定其他巡检组"));
                         }
                         return true;
-                    }).orElseThrow(() -> new InvalidParameterException("存在巡检点不存在或未启用"));
+                    }).orElseThrow(() -> new InvalidParameterException("包含不存在的巡检点"));
             return null;
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "缺少有效参数");
