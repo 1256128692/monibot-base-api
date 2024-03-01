@@ -151,6 +151,7 @@ public class CheckEventController {
      * @apiGroup 水库-巡检事件模块
      * @apiName DeleteEventInfo
      * @apiDescription 删除事件信息
+     * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} eventIDList 事件ID列表
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -159,8 +160,8 @@ public class CheckEventController {
     @LogParam(moduleName = "事件模块", operationName = "删除事件", operationProperty = OperationProperty.DELETE)
     @Permission(permissionName = "mdmbase:DeleteEvent")
     @PostMapping(value = "/DeleteEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteEventInfo(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    public Object deleteEventInfo(@RequestBody @Validated DeleteEventInfoParam pa) {
+        checkEventService.deleteEventInfo(pa);
         return ResultWrapper.successWithNothing();
     }
 

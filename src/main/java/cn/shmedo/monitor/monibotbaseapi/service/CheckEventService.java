@@ -20,4 +20,6 @@ public interface CheckEventService extends IService<TbCheckEvent>{
     TaskDateAndStatisticsInfo queryDailyTaskList(QueryDailyTaskParam pa, Integer subjectID);
 
     void addEventInfo(AddEventInfoParam pa);
+
+    void deleteEventInfo(DeleteEventInfoParam pa);
 }

@@ -71,6 +71,11 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
         this.baseMapper.insertSelectColumn(pa.toTbVo());
     }
 
+    @Override
+    public void deleteEventInfo(DeleteEventInfoParam pa) {
+        this.baseMapper.deleteBatchIds(pa.getEventIDList());
+    }
+
     /**
      * 统计任务状态数量
      * @param taskInfoList
