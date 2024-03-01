@@ -22,7 +22,11 @@ public class AddCheckPointGroupRequest implements ParameterValidator, ResourcePe
 
     @NotNull
     @Positive
-    private Integer projectID;
+    private Integer companyID;
+
+    @NotNull
+    @Positive
+    private Integer serviceID;
 
     @NotBlank
     @Size(max = 10)
@@ -34,7 +38,8 @@ public class AddCheckPointGroupRequest implements ParameterValidator, ResourcePe
     public ResultWrapper<?> validate() {
         TbCheckPointGroupMapper mapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
         Optional.of(mapper.exists(Wrappers.<TbCheckPointGroup>lambdaQuery()
-                        .eq(TbCheckPointGroup::getProjectID, projectID)
+                        .eq(TbCheckPointGroup::getCompanyID, companyID)
+                        .eq(TbCheckPointGroup::getServiceID, serviceID)
                         .eq(TbCheckPointGroup::getName, name)))
                 .filter(r -> !r)
                 .orElseThrow(() -> new IllegalArgumentException("巡检组名称已存在"));
@@ -43,13 +48,14 @@ public class AddCheckPointGroupRequest implements ParameterValidator, ResourcePe
 
     @Override
     public Resource parameter() {
-        return new Resource(projectID.toString(), ResourceType.BASE_PROJECT);
+        return new Resource(companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override
     public String toString() {
         return "AddCheckPointGroupRequest{" +
-                "projectID=" + projectID +
+                "companyID=" + companyID +
+                ", serviceID=" + serviceID +
                 ", name='" + name + '\'' +
                 ", exValue='" + exValue + '\'' +
                 '}';
@@ -58,7 +64,8 @@ public class AddCheckPointGroupRequest implements ParameterValidator, ResourcePe
     public TbCheckPointGroup toEntity() {
         TbCheckPointGroup entity = new TbCheckPointGroup();
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
-        entity.setProjectID(projectID);
+        entity.setCompanyID(companyID);
+        entity.setServiceID(serviceID);
         entity.setName(name);
         entity.setExValue(exValue);
         entity.setCreateUserID(subject.getSubjectID());

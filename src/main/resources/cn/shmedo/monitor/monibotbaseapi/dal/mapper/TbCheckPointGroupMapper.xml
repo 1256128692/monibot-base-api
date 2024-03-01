@@ -4,7 +4,8 @@
     <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup">
         <!--@Table tb_check_point_group-->
         <id column="ID" property="ID"/>
-        <result column="ProjectID" property="projectID"/>
+        <result column="CompanyID" property="companyID"/>
+        <result column="ServiceID" property="serviceID"/>
         <result column="Name" property="name"/>
         <result column="ExValue" property="exValue"/>
         <result column="CreateUserID" property="createUserID"/>
@@ -14,36 +15,30 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        ID, ProjectID, `Name`, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
+        ID, CompanyID, ServiceID, `Name`, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
     </sql>
 
     <select id="list" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointGroupSimple">
         SELECT tcpg.ID,
                tcpg.`Name`,
-               tcpg.ProjectID,
                tcpg.ExValue,
                COUNT(tcp.ID) pointCount
         FROM tb_check_point_group tcpg
                  LEFT JOIN tb_check_point tcp ON tcp.GroupID = tcpg.ID
         <where>
             <trim prefixOverrides="AND">
-                <choose>
-                    <when test="projectList != null and projectList.size() != 0">
-                        <foreach collection="projectList" open="AND tcpg.ProjectID IN (" close=")" item="item">
-                            #{item}
-                        </foreach>
-                    </when>
-                    <otherwise>
-                        AND FALSE
-                    </otherwise>
-                </choose>
+                <if test="companyID != null">
+                    AND tcpg.CompanyID = #{companyID}
+                </if>
+                <if test="serviceID != null">
+                    AND tcpg.ServiceID = #{serviceID}
+                </if>
                 <if test="keyword != null and keyword != ''">
                     AND tcpg.`Name` LIKE CONCAT('%', #{keyword}, '%')
                 </if>
             </trim>
             GROUP BY tcpg.ID,
                      tcpg.`Name`,
-                     tcpg.ProjectID,
                      tcpg.ExValue
             ORDER BY tcpg.ID DESC
         </where>

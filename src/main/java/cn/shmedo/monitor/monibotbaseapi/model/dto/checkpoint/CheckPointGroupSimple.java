@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 public class CheckPointGroupSimple {
 
     private Integer id;
-    private Integer projectID;
     private String name;
     private String exValue;
     private Integer pointCount;
@@ -24,7 +23,6 @@ public class CheckPointGroupSimple {
     public static CheckPointGroupSimple valueOf(TbCheckPointGroup entity) {
         return CheckPointGroupSimple.builder()
                 .id(entity.getID())
-                .projectID(entity.getProjectID())
                 .name(entity.getName())
                 .exValue(entity.getExValue())
                 .build();

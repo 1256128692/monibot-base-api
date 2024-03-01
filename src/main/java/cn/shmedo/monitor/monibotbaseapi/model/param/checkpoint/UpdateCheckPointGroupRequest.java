@@ -42,7 +42,8 @@ public class UpdateCheckPointGroupRequest implements ParameterValidator, Resourc
             if (!name.isBlank() && !name.equals(original.getName())) {
                 Optional.of(mapper.exists(Wrappers.<TbCheckPointGroup>lambdaQuery()
                                 .eq(TbCheckPointGroup::getName, name)
-                                .ne(TbCheckPointGroup::getProjectID, original.getProjectID())))
+                                .eq(TbCheckPointGroup::getCompanyID, original.getCompanyID())
+                                .eq(TbCheckPointGroup::getServiceID, original.getServiceID())))
                         .filter(r -> !r)
                         .orElseThrow(() -> new IllegalArgumentException("巡检组名称已存在"));
             }
@@ -53,7 +54,7 @@ public class UpdateCheckPointGroupRequest implements ParameterValidator, Resourc
 
     @Override
     public Resource parameter() {
-        return new Resource(original.getProjectID().toString(), ResourceType.BASE_PROJECT);
+        return new Resource(original.getCompanyID().toString(), ResourceType.COMPANY);
     }
 
     @Override

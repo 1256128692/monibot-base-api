@@ -27,10 +27,16 @@ public class TbCheckPointGroup {
     private Integer ID;
 
     /**
-     * 关联项目ID
+     * 关联企业ID
      */
-    @TableField(value = "ProjectID")
-    private Integer projectID;
+    @TableField(value = "CompanyID")
+    private Integer companyID;
+
+    /**
+     * 关联平台ID
+     */
+    @TableField(value = "ServiceID")
+    private Integer serviceID;
 
     /**
      * 巡检组名称

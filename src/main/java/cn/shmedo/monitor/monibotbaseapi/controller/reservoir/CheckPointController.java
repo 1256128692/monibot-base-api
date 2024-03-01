@@ -231,12 +231,13 @@ public class CheckPointController {
      * @apiGroup 水库-巡检点模块
      * @apiName AddCheckPointGroup
      * @apiDescription 新增巡检组
-     * @apiParam (请求参数) {Int} projectID 项目id
+     * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int} serviceID 平台id
      * @apiParam (请求参数) {String} name 巡检组名称(10)
      * @apiParam (请求参数) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {Int} data 巡检组id
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
+     * @apiPermission 系统权限 mdmbase:UpdateCheckPointGroup
      */
     @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "新增巡检组", operationProperty = OperationProperty.ADD)
@@ -257,7 +258,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {String} [exValue] 扩展字段
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:UpdateCheckPointGroup
+     * @apiPermission 系统权限 mdmbase:UpdateCheckPointGroup
      */
     @Permission(permissionName = "mdmbase:UpdateCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "更新巡检组", operationProperty = OperationProperty.UPDATE)
@@ -277,7 +278,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {Int[]} idList 巡检组id集合
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DeleteCheckPointGroup
+     * @apiPermission 系统权限 mdmbase:DeleteCheckPointGroup
      */
     @Permission(permissionName = "mdmbase:DeleteCheckPointGroup")
     @LogParam(moduleName = "巡检管理", operationName = "删除巡检组", operationProperty = OperationProperty.DELETE)
@@ -295,7 +296,7 @@ public class CheckPointController {
      * @apiName QueryCheckPointGroupList
      * @apiDescription 查询巡检组列表
      * @apiParam (请求参数) {Int} companyID 公司id
-     * @apiParam (请求参数) {Int} [projectID] 项目id
+     * @apiParam (请求参数) {Int} serviceID 平台id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(巡检组名称)
      * @apiSuccess (返回结果) {Object[]} data 结果集合
      * @apiSuccess (返回结果) {Int} data.id 巡检点id
@@ -304,7 +305,7 @@ public class CheckPointController {
      * @apiSuccess (返回结果) {String} [data.exValue] 扩展字段
      * @apiSuccess (返回结果) {Int} [data.pointCount] 下属巡检点数量
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:ListCheckPointGroup
+     * @apiPermission 系统权限 mdmbase:ListCheckPointGroup
      */
     @Permission(permissionName = "mdmbase:ListCheckPointGroup")
     @PostMapping(value = "/QueryCheckPointGroupList", produces = MediaType.APPLICATION_JSON_VALUE,

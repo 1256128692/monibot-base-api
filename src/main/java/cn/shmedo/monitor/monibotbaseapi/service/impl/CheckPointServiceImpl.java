@@ -108,7 +108,9 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Integer saveGroup(AddCheckPointGroupRequest request) {
-        return groupMapper.insert(request.toEntity());
+        TbCheckPointGroup entity = request.toEntity();
+        groupMapper.insert(entity);
+        return entity.getID();
     }
 
     @Override

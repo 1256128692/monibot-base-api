@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
@@ -41,29 +42,22 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
     public ResultWrapper<?> validate() {
         if (enable != null || groupID != null) {
 
-            Optional.ofNullable(groupID).ifPresent(e -> {
-                TbCheckPointGroupMapper mapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
-                Optional.of(mapper.exists(Wrappers.<TbCheckPointGroup>lambdaQuery()
-                                .eq(TbCheckPointGroup::getID, e))).filter(r -> r)
-                        .orElseThrow(() -> new InvalidParameterException("巡检组不存在"));
-            });
-
             TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
             this.original = mapper.selectList(Wrappers.<TbCheckPoint>lambdaQuery()
                     .in(TbCheckPoint::getID, idList)
                     .select(TbCheckPoint::getID, TbCheckPoint::getGroupID, TbCheckPoint::getProjectID));
+            Assert.isTrue(original.size() == idList.size(), () -> new InvalidParameterException("包含不存在的巡检点"));
+            original.forEach(item -> Assert.isTrue(item.getGroupID()==null || item.getGroupID().equals(groupID),
+                    () -> new InvalidParameterException("包含巡检点已绑定其他巡检组")));
 
+            Optional.ofNullable(groupID).ifPresent(e -> {
+                TbCheckPointGroupMapper groupMapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
+                TbCheckPointGroup group = groupMapper.selectById(e);
+                Assert.notNull(group, () -> new InvalidParameterException("巡检组不存在"));
 
-            Optional.of(original)
-                    .filter(e -> e.size() == idList.size())
-                    .filter(e -> {
-                        if (groupID != null) {
-                            Optional.of(e).filter(list -> list.stream().allMatch(e1 -> e1.getGroupID() == null ||
-                                            e1.getGroupID().equals(groupID)))
-                                    .orElseThrow(() -> new InvalidParameterException("存在巡检点已绑定其他巡检组"));
-                        }
-                        return true;
-                    }).orElseThrow(() -> new InvalidParameterException("包含不存在的巡检点"));
+                //TODO 校验巡检点所属服务 与 巡检组所属服务是否一致
+            });
+
             return null;
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "缺少有效参数");

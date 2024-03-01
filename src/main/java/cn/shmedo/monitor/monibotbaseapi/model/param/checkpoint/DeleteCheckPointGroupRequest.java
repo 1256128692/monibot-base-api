@@ -6,7 +6,6 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -23,28 +22,34 @@ import java.util.Set;
  * @author Chengfs on 2024/2/28
  */
 @Data
-public class DeleteCheckPointGroupRequest implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+public class DeleteCheckPointGroupRequest implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
     @NotEmpty
     private Set<@NotNull @Positive Integer> idList;
 
     @JsonIgnore
-    private List<TbCheckPointGroup> groupList;
+    private Integer companyID;
 
     @Override
     public ResultWrapper<?> validate() {
         TbCheckPointGroupMapper mapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
-        this.groupList = mapper.selectBatchIds(idList);
+        List<TbCheckPointGroup> groupList = mapper.selectBatchIds(idList);
 
         Optional.of(groupList).filter(r -> r.size() == idList.size())
                 .orElseThrow(() -> new IllegalArgumentException("存在巡检组不存在"));
 
+        List<Integer> list = groupList.stream().map(TbCheckPointGroup::getCompanyID).distinct().toList();
+        Optional.of(list)
+                .filter(r -> r.size() == 1)
+                .orElseThrow(() -> new IllegalArgumentException("存在巡检组不属于同一公司"));
+
+        this.companyID = list.get(0);
         return null;
     }
 
     @Override
-    public List<Resource> parameter() {
-        return groupList.stream().map(e -> new Resource(e.getProjectID().toString(), ResourceType.BASE_PROJECT)).toList();
+    public Resource parameter() {
+        return new Resource(this.companyID.toString(), ResourceType.COMPANY);
     }
 
     @Override
@@ -52,10 +57,5 @@ public class DeleteCheckPointGroupRequest implements ParameterValidator, Resourc
         return "DeleteCheckPointGroupRequest{" +
                 "idList=" + idList +
                 '}';
-    }
-
-    @Override
-    public ResourcePermissionType resourcePermissionType() {
-        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
     }
 }
