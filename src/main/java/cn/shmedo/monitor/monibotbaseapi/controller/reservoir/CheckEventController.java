@@ -309,15 +309,17 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} queryType 查询方式,(全部日程:0 个人视角:1)
      * @apiParam (请求体) {Date} begin 开始时间
      * @apiParam (请求体) {Date} end 结束时间
-     * @apiSuccess (响应结果) {Object[]} data 数据
-     * @apiSuccess (响应结果) {Date} data.taskDate 任务日期
-     * @apiSuccess (响应结果) {Int} data.taskInfo.taskID  任务ID
-     * @apiSuccess (响应结果) {String} data.taskInfo.taskName  任务名称
-     * @apiSuccess (响应结果) {String} data.taskInfo.taskSerialNumber 任务编号
-     * @apiSuccess (响应结果) {Int} data.taskInfo.checkType   任务类型
-     * @apiSuccess (响应结果) {Int} data.taskInfo.status 任务状态
-     * @apiSuccess (响应结果) {Date} data.taskInfo.taskDate 任务日期
-     * @apiSuccess (响应结果) {String} data.taskInfo.projectID  关联项目ID
+     * @apiSuccess (响应结果) {Object} data 数据
+     * @apiSuccess (响应结果) {Object[]} data.taskDataResponseList 日历数据
+     * @apiSuccess (响应结果) {Date} data.taskDataResponseList.taskDate 任务日期
+     * @apiSuccess (响应结果) {Object[]} data.taskDataResponseList.taskInfoList 数据
+     * @apiSuccess (响应结果) {Int} data.taskDataResponseList.taskInfoList.taskID  任务ID
+     * @apiSuccess (响应结果) {String} data.taskDataResponseList.taskInfoList.taskName  任务名称
+     * @apiSuccess (响应结果) {String} data.taskDataResponseList.taskInfoList.taskSerialNumber 任务编号
+     * @apiSuccess (响应结果) {Int} data.taskDataResponseList.taskInfoList.checkType   任务类型
+     * @apiSuccess (响应结果) {Int} data.taskDataResponseList.taskInfoList.status 任务状态
+     * @apiSuccess (响应结果) {Date} data.taskDataResponseList.taskInfoList.taskDate 任务日期
+     * @apiSuccess (响应结果) {String} data.taskDataResponseList.taskInfoList.projectID  关联项目ID
      * @apiSuccess (响应结果) {Object} data.taskStatusInfo  任务状态统计
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.unpreparedCount  未开始任务数量
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.underwayCount  进行中任务数量

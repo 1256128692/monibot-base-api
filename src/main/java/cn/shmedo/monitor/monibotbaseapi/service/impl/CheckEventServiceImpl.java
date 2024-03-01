@@ -118,6 +118,7 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
             TaskDataResponse taskDataResponse = new TaskDataResponse(entry.getKey(), entry.getValue());
             result.add(taskDataResponse);
         }
+        result.sort(Comparator.comparing(TaskDataResponse::getTaskDate));
         return result;
     }
 

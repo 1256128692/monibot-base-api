@@ -88,7 +88,7 @@
             twnc.CompanyID = #{companyID}
             and twnc.Platform = #{platform}
             and twnc.`NotifyType` = #{notifyType}
-            and tncpr.ProjectID = #{projectID}
+            and tncpr.ProjectID IN (#{projectID}, - 1)
         </where>
         ORDER BY tncpr.ProjectID DESC
         LIMIT 1
