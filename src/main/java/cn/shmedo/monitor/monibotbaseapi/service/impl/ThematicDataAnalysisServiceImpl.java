@@ -298,7 +298,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         final Date startTime = param.getStartTime();
         final Date endTime = param.getEndTime();
         final DateTimeFormatter formatter = TimeUtil.DestinyFormatter.getFormatter(displayDensity);
-
+        final Map<Integer, TbMonitorPoint> monitorPointIDMap = param.getTbMonitorPointList().stream().collect(
+                Collectors.toMap(TbMonitorPoint::getID, Function.identity()));
+        final Set<Integer> monitorIDSet = new HashSet<>(param.getMonitorPointIDList());
+        final Map<Integer, ThematicPipeData> alignMap = monitorPointIDMap.entrySet().stream().filter(u ->
+                monitorIDSet.contains(u.getKey())).collect(Collectors.toMap(Map.Entry::getKey,
+                v -> ThematicPipeData.builder().monitorPointID(v.getValue().getID()).monitorPointName(v.getValue().getName()).build()));
         List<TbSensor> sensorList = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(TbSensor::getMonitorPointID, param.getInspectedPointIDList()));
         // 库水位数据
         final Map<String, List<Map<String, Object>>> wtDataMap = Optional.ofNullable(param.getWtSensor()).map(List::of)
@@ -306,12 +311,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                         u.stream().collect(Collectors.groupingBy(w ->
                                 DateUtil.format(Convert.toDate(w.get(DbConstant.TIME_FIELD)), formatter)))).orElse(Map.of());
         if (CollUtil.isEmpty(sensorList)) {
-            return queryWtLongituinalList(wtDataMap, wtMonitorPoint, formatter);
+            return queryWtLongituinalList(wtDataMap, wtMonitorPoint, formatter, alignMap, orderMap);
         }
-        Map<Integer, TbMonitorPoint> monitorPointIDMap = param.getTbMonitorPointList().stream().collect(Collectors.toMap(TbMonitorPoint::getID, Function.identity()));
         Map<Integer, TbMonitorPoint> sensorPointMap = sensorList.stream().filter(u -> monitorPointIDMap.containsKey(u.getMonitorPointID()))
                 .collect(Collectors.toMap(TbSensor::getID, u -> monitorPointIDMap.get(u.getMonitorPointID())));
-        Map<Integer, List<ThematicEigenValueInfo>> pointIDEigenValueMap = tbEigenValueMapper.selectFieldInfoByPointIDList(param.getInspectedPointIDList()).stream().collect(Collectors.groupingBy(ThematicEigenValueInfo::getMonitorPointID));
+        Map<Integer, List<ThematicEigenValueInfo>> pointIDEigenValueMap = tbEigenValueMapper.selectFieldInfoByPointIDList(param.getInspectedPointIDList())
+                .stream().collect(Collectors.groupingBy(ThematicEigenValueInfo::getMonitorPointID));
         Double threshold = Optional.ofNullable(param.getCutoffWallConfig()).map(CutoffWallConfig::getValue).orElse(null);
         Set<Integer> bilateralMonitorIDSet = Optional.ofNullable(param.getCutoffWallConfig()).map(CutoffWallConfig::getMonitorPointIDList).map(HashSet::new).orElse(null);
 
@@ -322,12 +327,13 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
         List<Map<String, Object>> dataList = queryPointDataList(sensorList, displayDensity, statisticalMethod,
                 startTime, endTime);
         if (CollUtil.isEmpty(dataList)) {
-            return queryWtLongituinalList(wtDataMap, wtMonitorPoint, formatter);
+            return queryWtLongituinalList(wtDataMap, wtMonitorPoint, formatter, alignMap, orderMap);
         }
         Map<String, List<Map<String, Object>>> dataMap = dataList.stream().filter(u -> u.containsKey(DbConstant.SENSOR_ID_FIELD_TOKEN))
                 .filter(u -> sensorPointMap.containsKey(Convert.toInt(u.get(DbConstant.SENSOR_ID_FIELD_TOKEN))))
                 .collect(Collectors.groupingBy(u -> DateUtil.format(Convert.toDate(u.get(DbConstant.TIME_FIELD)), formatter)));
-        return CollUtil.unionDistinct(wtDataMap.keySet(), dataMap.keySet()).stream().map(u -> {
+
+        List<LongitudinalDataInfo> result = CollUtil.unionDistinct(wtDataMap.keySet(), dataMap.keySet()).stream().map(u -> {
             LongitudinalDataInfo.LongitudinalDataInfoBuilder builder = LongitudinalDataInfo.builder().time(DateUtil.parse(u, formatter));
             // 水位
             Optional.ofNullable(wtMonitorPoint).ifPresent(w -> builder.wtPointID(w.getID()).wtPointName(w.getName()));
@@ -378,6 +384,8 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             });
             return builder.build();
         }).sorted((o1, o2) -> DateUtil.compare(Convert.toDate(o1.getTime()), Convert.toDate(o2.getTime()))).toList();
+        handleLongitudinalAlign(result, alignMap, orderMap);
+        return result;
     }
 
     @Override
@@ -1049,14 +1057,18 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
      * @param wtDataMap 单个水位监测点查询出来按时间格式分组的{@code map},每个{@code value}里其实只有一个{@code object}对象
      */
     private List<LongitudinalDataInfo> queryWtLongituinalList(final Map<String, List<Map<String, Object>>> wtDataMap,
-                                                              final TbMonitorPoint wtMonitorPoint, final DateTimeFormatter formatter) {
-        return CollUtil.isEmpty(wtDataMap) ? List.of() : wtDataMap.entrySet().stream().map(u -> {
+                                                              final TbMonitorPoint wtMonitorPoint, final DateTimeFormatter formatter,
+                                                              final Map<Integer, ThematicPipeData> alignMap,
+                                                              final Map<Integer, Integer> orderMap) {
+        List<LongitudinalDataInfo> dataList = CollUtil.isEmpty(wtDataMap) ? List.of() : wtDataMap.entrySet().stream().map(u -> {
             LongitudinalDataInfo.LongitudinalDataInfoBuilder builder = LongitudinalDataInfo.builder()
                     .time(DateUtil.parse(u.getKey(), formatter)).wtPointValue(u.getValue().stream().map(w -> w.get(DISTANCE))
                             .map(Convert::toDouble).findAny().orElseThrow());
             Optional.ofNullable(wtMonitorPoint).ifPresent(w -> builder.wtPointID(w.getID()).wtPointName(w.getName()));
             return builder.build();
         }).sorted((o1, o2) -> DateUtil.compare(Convert.toDate(o1.getTime()), Convert.toDate(o2.getTime()))).toList();
+        handleLongitudinalAlign(dataList, alignMap, orderMap);
+        return dataList;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -1261,5 +1273,23 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         // unnecessary return
         return null;
+    }
+
+    /**
+     * 浸润线纵剖面对齐处理
+     */
+    private void handleLongitudinalAlign(List<LongitudinalDataInfo> dataList, final Map<Integer, ThematicPipeData> alignMap,
+                                         final Map<Integer, Integer> orderMap) {
+        dataList.forEach(u -> {
+            List<ThematicPipeData> pipeDataList = u.getPipeDataList();
+            if (Objects.isNull(pipeDataList) || pipeDataList.size() != alignMap.size()) {
+                Set<Integer> pointIDSet = Optional.ofNullable(pipeDataList).map(w ->
+                        w.stream().map(ThematicPipeData::getMonitorPointID).collect(Collectors.toSet())).orElse(Set.of());
+                List<ThematicPipeData> list = alignMap.entrySet().stream().filter(w -> !pointIDSet.contains(w.getKey()))
+                        .map(Map.Entry::getValue).toList();
+                u.setPipeDataList((Objects.isNull(pipeDataList) ? list : CollUtil.union(pipeDataList, list))
+                        .stream().sorted(Comparator.comparingInt(o -> orderMap.get(o.getMonitorPointID()))).toList());
+            }
+        });
     }
 }
