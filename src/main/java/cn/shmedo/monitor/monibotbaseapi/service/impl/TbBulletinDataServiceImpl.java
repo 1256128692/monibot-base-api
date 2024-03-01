@@ -1,30 +1,39 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbBulletinDataMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinAttachment;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinPlatformRelation;
-import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.AddBulletinDataParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.UpdateBulletinData;
+import cn.shmedo.monitor.monibotbaseapi.model.param.bulletin.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
+import cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserNoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbBulletinAttachmentService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbBulletinDataService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbBulletinPlatformRelationService;
+import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -33,6 +42,9 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper, TbBulletinData> implements ITbBulletinDataService {
+    @SuppressWarnings("all")
+    @Resource(name = RedisConstant.AUTH_REDIS_SERVICE)
+    private RedisService authRedisService;
     private final FileConfig fileConfig;
     private final UserService userService;
     private final ITbBulletinAttachmentService tbBulletinAttachmentService;
@@ -80,6 +92,31 @@ public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper,
 
         // save attachments
         saveAttachmentList(param.getTbBulletinAttachmentList(), bulletinID, currentUserStr);
+    }
+
+    @Override
+    public List<BulletinDataListInfo> queryBulletinList(QueryBulletinListParam param) {
+        List<BulletinDataListInfo> dataList = this.baseMapper.selectBulletinList(param);
+        handlePlatformDesc(dataList);
+        return dataList;
+    }
+
+    @Override
+    public PageUtil.Page<BulletinPageInfo> queryBulletinPage(QueryBulletinPageParam param) {
+        IPage<BulletinPageInfo> page = this.baseMapper.selectBulletinPage(new Page<BulletinPageInfo>(
+                param.getCurrentPage(), param.getPageSize()).addOrder(param.getOrderItemList()), param);
+        List<BulletinPageInfo> dataList = page.getRecords();
+        handlePlatformDesc(dataList);
+        return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
+    }
+
+    private void handlePlatformDesc(List<? extends BulletinDataListInfo> dataList) {
+        final Map<Integer, String> serviceIdNameMap = authRedisService.multiGet(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE,
+                        dataList.stream().map(BulletinDataListInfo::getPlatformStr).map(u -> u.split(","))
+                                .map(Arrays::asList).flatMap(Collection::stream).collect(Collectors.toSet()))
+                .stream().map(u -> JSONUtil.toBean(u, AuthService.class))
+                .collect(Collectors.toMap(AuthService::getId, AuthService::getServiceDesc));
+        dataList.forEach(u -> u.handlePlatform(serviceIdNameMap));
     }
 
     /**

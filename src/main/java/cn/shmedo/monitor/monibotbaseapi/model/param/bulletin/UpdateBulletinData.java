@@ -6,6 +6,7 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbBulletinDataMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinData;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.BulletinPublishStatus;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -50,7 +51,8 @@ public class UpdateBulletinData extends BaseBulletinData {
         if (tbBulletinData.getStatus() == 1) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "已发布的公告需要先撤销后才能编辑");
         }
-        if (Optional.ofNullable(this.topMost).orElse(false) && (Objects.isNull(this.status) || this.status == 0)) {
+        if (Optional.ofNullable(this.topMost).orElse(false) && (Objects.isNull(this.status) ||
+                BulletinPublishStatus.UNPUBLISHED.getCode().equals(this.status))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未发布的公告无法置顶");
         }
         Optional.ofNullable(status).ifPresent(tbBulletinData::setStatus);

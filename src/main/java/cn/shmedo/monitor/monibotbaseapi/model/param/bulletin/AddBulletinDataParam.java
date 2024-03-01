@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.bulletin;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinData;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.BulletinPublishStatus;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -41,7 +42,7 @@ public class AddBulletinDataParam extends BaseBulletinData {
         final Date current = getCurrent();
         this.status = Objects.isNull(this.status) ? 0 : this.status;
         this.topMost = Objects.nonNull(this.topMost) && this.topMost;
-        if (this.topMost && this.status == 0) {
+        if (this.topMost && BulletinPublishStatus.UNPUBLISHED.getCode().equals(this.status)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未发布的公告无法置顶");
         }
         setTbBulletinData(new TbBulletinData(null, getCompanyID(), type, name, content, null, status, topMost, current, null, current, null));

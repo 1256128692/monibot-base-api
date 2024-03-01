@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class DefaultConstant {
     public static final String JSON = "application/json;charset=UTF-8";
@@ -55,6 +56,14 @@ public class DefaultConstant {
     public static final int PROPERTY_MODEL_DEFAULT_GROUP = -1;
     public static final String PROPERTY_MODEL_DEFAULT_GROUP_NAME = "默认";
 
+    /**
+     * 忽略的平台key
+     * <p>
+     * 有些特殊的平台,作为平台筛选条件的时候需要忽略掉这个筛选条件(就是能看到全部平台的数据)<br>
+     * 目前暂时只有 9.监测业务中台
+     * </p>
+     */
+    public static final Set<Integer> IGNORE_SERVICE_LIMIT_ID_SET = Set.of(9);
     /**
      * 工程项目类型
      **/

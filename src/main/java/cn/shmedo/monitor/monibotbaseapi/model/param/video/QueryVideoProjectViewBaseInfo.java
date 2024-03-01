@@ -2,10 +2,6 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.video;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

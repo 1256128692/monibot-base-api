@@ -20,7 +20,6 @@ public class TbWarnNotifyRelation {
     /**
      * 主键
      */
-    @TableField("ID")
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer id;
     /**

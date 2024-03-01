@@ -26,37 +26,36 @@ public class BulletinController {
 
     /**
      * @api {POST} /QueryBulletinList 查询公告列表(不分页)
-     * @apiDescription 查询公告列表(不分页)
+     * @apiDescription 查询公告列表(不分页), 发布状态传参为 1.已发布 时将按照发布时间倒序排序,否则将按照创建时间倒序排序
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
      * @apiName QueryBulletinList
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} platform 平台key
-     * @apiParam (请求参数) {Int} [size] 数量限制
+     * @apiParam (请求参数) {Int} [size] 公告数量限制
      * @apiParam (请求参数) {Int} [status] 发布状态 0.未发布 1.已发布
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.bulletinID 公告ID
      * @apiSuccess (返回结果) {Int} dataList.companyID 公司ID
      * @apiSuccess (返回结果) {Int[]} dataList.platform 平台key(多选)
      * @apiSuccess (返回结果) {String} dataList.platformDesc 平台描述,多个平台间用逗号分隔
-     * @apiSuccess (返回结果) {Int} dataList.type 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
+     * @apiSuccess (返回结果) {Int} dataList.type 公告类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiSuccess (返回结果) {String} dataList.name 公告标题
      * @apiSuccess (返回结果) {String} dataList.content 公告内容
      * @apiSuccess (返回结果) {String} dataList.createUser 作者信息
-     * @apiSuccess (返回结果) {DateTime} dataList.updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
+     * @apiSuccess (返回结果) {DateTime} dataList.updateTime 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
     @Permission(permissionName = "mdmbase:ListBulletinData")
     @PostMapping(value = "/QueryBulletinList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryBulletinList(@Valid @RequestBody Object param) {
-        // 按置顶、发布时间排序
-        return ResultWrapper.successWithNothing();
+    public Object queryBulletinList(@Valid @RequestBody QueryBulletinListParam param) {
+        return tbBulletinDataService.queryBulletinList(param);
     }
 
     /**
      * @api {POST} /QueryBulletinPage 查询公告列表(分页)
-     * @apiDescription 查询公告列表(分页)
+     * @apiDescription 查询公告列表(分页), 发布状态传参为 1.已发布 时将按照置顶优先,发布时间倒序排序,否则将按照置顶优先,创建时间倒序排序
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
      * @apiName QueryBulletinPage
@@ -64,11 +63,12 @@ public class BulletinController {
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {Int} [platform] 平台key
-     * @apiParam (请求参数) {Int} [status] 发布状态 0.未发布 1.已发布. 发布状态传参为 1.已发布 时将按照发布时间倒序排序,否则将按照创建时间倒序排序
-     * @apiParam (请求参数) {String} [queryCode] 模糊查询关键字
-     * @apiParam (请求参数) {Int} [type] 类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
+     * @apiParam (请求参数) {Int} [status] 发布状态 0.未发布 1.已发布
+     * @apiParam (请求参数) {String} [queryCode] 模糊查询关键字,模糊匹配搜索公告标题、内容的文字
+     * @apiParam (请求参数) {Int} [type] 公告类型 0.其他 1.行业政策 2.重要新闻 3.工作公告
      * @apiParam (请求参数) {Datetime} [startTime] 开始时间
      * @apiParam (请求参数) {Datetime} [endTime] 结束时间
+     * @apiParam (请求参数) {Int} [orderType] 排序规则 1.创建时间降序排序(默认); 2.创建时间升序排序 3.置顶优先,发布时间降序排序(要求发布状态为1.已发布); 4.置顶优先,发布时间升序排序(要求发布状态为1.已发布);
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
@@ -82,15 +82,14 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} currentPageData.content 公告内容
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {String} currentPageData.createUser 作者信息
-     * @apiSuccess (返回结果) {DateTime} currentPageData.updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
+     * @apiSuccess (返回结果) {DateTime} [currentPageData.updateTime] 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间;否则为空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
     @Permission(permissionName = "mdmbase:ListBulletinData")
     @PostMapping(value = "/QueryBulletinPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryBulletinPage(@Valid @RequestBody Object param) {
-        // 按置顶、发布时间排序
-        return ResultWrapper.successWithNothing();
+    public Object queryBulletinPage(@Valid @RequestBody QueryBulletinPageParam param) {
+        return tbBulletinDataService.queryBulletinPage(param);
     }
 
     /**
