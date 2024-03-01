@@ -5,9 +5,7 @@ import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.DeviceOnlineCache;
@@ -18,14 +16,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryResourceListByPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStatisticByMonitorProjectListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import cn.shmedo.monitor.monibotbaseapi.service.EnterpriseDashboardService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
-import cn.shmedo.monitor.monibotbaseapi.service.third.auth.PermissionService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
@@ -84,9 +80,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         Map<String, ProjectInfoCache> projectInfoCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_KEY, ProjectInfoCache.class);
         // 按照行业类型分组
         Map<String, List<ProjectInfoCache>> groupMap = projectInfoCacheMap.values().stream()
-                .filter(v -> {
-                    return !v.getCompanyID().equals(138) && param.getTokenSet().contains(v.getID());
-                    })
+                .filter(v -> !v.getCompanyID().equals(138) && param.getTokenSet().contains(v.getID()))
                 .collect(Collectors.groupingBy(ProjectInfoCache::getProjectMainTypeName));
         // 处理空数据（大屏暂未将MDNET平台纳入）
         Arrays.stream(PlatformType.values())
@@ -375,9 +369,6 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         Map<String, ProjectInfoCache> projectInfoCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_KEY, ProjectInfoCache.class);
         // 项目类型
         Map<String, TbProjectType> projectTypeCacheMap = monitorRedisService.getAll(RedisKeys.PROJECT_TYPE_KEY, TbProjectType.class);
-
-//        Integer companyID = CurrentSubjectHolder.getCurrentSubject().getCompanyID();
-
         return projectInfoCacheMap.values().stream()
                 // 行业过滤
                 .filter(v -> {
@@ -391,18 +382,9 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
                     }
                 })
                 // 非米度企业（不管是米度用户还是非米度用户,全部只统计非米度企业），及用户项目权限过滤
-                .filter(v -> {
-//                    if (companyID.equals(138)) {
-//                        return tokenSet.contains(v.getID());
-//                    } else {
-                    return !v.getCompanyID().equals(138) && tokenSet.contains(v.getID());
-//                    }
-                })
+                .filter(v -> !v.getCompanyID().equals(138) && tokenSet.contains(v.getID()))
                 // 省份code码过滤
                 .filter(v -> Objects.isNull(provinceCode) || v.getLocationInfo().getProvince().equals(provinceCode)).collect(Collectors.toList());
 
     }
-
-
-
 }
