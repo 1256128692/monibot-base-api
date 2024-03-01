@@ -34,8 +34,7 @@
             LIMIT #{size}
         </if>
     </select>
-    <select id="selectBulletinPage"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinPageInfo">
+    <select id="selectBulletinPage" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinPageInfo">
         SELECT
             bd.ID bulletinID,
             bd.CompanyID companyID,
@@ -69,5 +68,24 @@
             AND bd.UpdateTime &lt;=#{param.endTime}
         </if>
         GROUP BY bd.ID
+    </select>
+    <select id="selectBulletinDetail"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinDetailInfo">
+        SELECT
+            bd.CompanyID companyID,
+            GROUP_CONCAT( bpr.`Platform` ORDER BY bpr.Platform ASC ) platformStr,
+            bd.`Type` 'type',
+            bd.`Name` 'name',
+            bd.`Content` content,
+            bd.`CreateUser` createUser,
+            bd.`UpdateTime` updateTime,
+            bd.`Status` 'status',
+            bd.`CreateTime` createTime,
+            GROUP_CONCAT( ba.FilePath  ORDER BY ba.CreateTime DESC ) attachmentStr
+        FROM tb_bulletin_data bd
+            LEFT JOIN tb_bulletin_platform_relation bpr ON bpr.`BulletinID` = bd.`ID`
+            LEFT JOIN tb_bulletin_attachment ba ON ba.`BulletinID` = bd.`ID`
+        WHERE bd.`ID`=#{bulletinID}
+        GROUP BY bd.`ID`
     </select>
 </mapper>

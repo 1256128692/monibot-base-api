@@ -119,9 +119,8 @@ public class BulletinController {
      */
     @Permission(permissionName = "mdmbase:DescribeBulletinData")
     @PostMapping(value = "/QueryBulletinDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryBulletinDetail(@Valid @RequestBody Object param) {
-        //
-        return ResultWrapper.successWithNothing();
+    public Object queryBulletinDetail(@Valid @RequestBody QueryBulletinDetailParam param) {
+        return tbBulletinDataService.queryBulletinDetail(param);
     }
 
     /**

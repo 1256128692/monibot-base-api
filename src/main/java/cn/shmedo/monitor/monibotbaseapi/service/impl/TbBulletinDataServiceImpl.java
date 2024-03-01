@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -97,7 +96,7 @@ public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper,
     @Override
     public List<BulletinDataListInfo> queryBulletinList(QueryBulletinListParam param) {
         List<BulletinDataListInfo> dataList = this.baseMapper.selectBulletinList(param);
-        handlePlatformDesc(dataList);
+        handlePlatform(dataList);
         return dataList;
     }
 
@@ -106,13 +105,20 @@ public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper,
         IPage<BulletinPageInfo> page = this.baseMapper.selectBulletinPage(new Page<BulletinPageInfo>(
                 param.getCurrentPage(), param.getPageSize()).addOrder(param.getOrderItemList()), param);
         List<BulletinPageInfo> dataList = page.getRecords();
-        handlePlatformDesc(dataList);
+        handlePlatform(dataList);
         return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
     }
 
-    private void handlePlatformDesc(List<? extends BulletinDataListInfo> dataList) {
+    @Override
+    public BulletinDetailInfo queryBulletinDetail(QueryBulletinDetailParam param) {
+        BulletinDetailInfo bulletinDetailInfo = this.baseMapper.selectBulletinDetail(param.getBulletinID());
+        handlePlatform(List.of(bulletinDetailInfo));
+        return bulletinDetailInfo;
+    }
+
+    private void handlePlatform(List<? extends BulletinDataBaseInfo> dataList) {
         final Map<Integer, String> serviceIdNameMap = authRedisService.multiGet(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE,
-                        dataList.stream().map(BulletinDataListInfo::getPlatformStr).map(u -> u.split(","))
+                        dataList.stream().map(BulletinDataBaseInfo::getPlatformStr).map(u -> u.split(","))
                                 .map(Arrays::asList).flatMap(Collection::stream).collect(Collectors.toSet()))
                 .stream().map(u -> JSONUtil.toBean(u, AuthService.class))
                 .collect(Collectors.toMap(AuthService::getId, AuthService::getServiceDesc));

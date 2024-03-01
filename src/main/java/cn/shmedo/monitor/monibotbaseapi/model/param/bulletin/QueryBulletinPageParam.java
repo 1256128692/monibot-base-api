@@ -56,17 +56,15 @@ public class QueryBulletinPageParam implements ParameterValidator, ResourcePermi
         if ((Objects.isNull(status) || BulletinPublishStatus.UNPUBLISHED.getCode().equals(status)) && (orderType == 3 || orderType == 4)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "按\"置顶优先,发布时间升序/降序\"排序时,发布状态必须为1.已发布");
         }
+        // param {@code lastIdOrder} is used to handle this situation that time equals between more than one records.
+        final String lastIdOrder = "bd.`ID`";
         orderItemList = switch (orderType) {
-            case 1 -> OrderItem.descs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime)
-                    , MybatisFieldUtil.columnToString(TbBulletinData::getId));
-            case 2 -> OrderItem.ascs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime),
-                    MybatisFieldUtil.columnToString(TbBulletinData::getId));
+            case 1 -> OrderItem.descs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime), lastIdOrder);
+            case 2 -> OrderItem.ascs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime), lastIdOrder);
             case 3 -> OrderItem.descs(MybatisFieldUtil.columnToString(TbBulletinData::getTopMost),
-                    MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime),
-                    MybatisFieldUtil.columnToString(TbBulletinData::getId));
+                    MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime), lastIdOrder);
             case 4 -> List.of(OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getTopMost)),
-                    OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime)),
-                    OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getId)));
+                    OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime)), OrderItem.asc(lastIdOrder));
             default -> throw new IllegalArgumentException();
         };
         return null;

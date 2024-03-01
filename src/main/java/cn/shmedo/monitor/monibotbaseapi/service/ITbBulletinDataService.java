@@ -20,4 +20,6 @@ public interface ITbBulletinDataService extends IService<TbBulletinData> {
     List<BulletinDataListInfo> queryBulletinList(QueryBulletinListParam param);
 
     PageUtil.Page<BulletinPageInfo> queryBulletinPage(QueryBulletinPageParam param);
+
+    BulletinDetailInfo queryBulletinDetail(QueryBulletinDetailParam param);
 }
