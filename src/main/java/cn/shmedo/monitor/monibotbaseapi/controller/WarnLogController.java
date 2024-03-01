@@ -38,72 +38,69 @@ public class WarnLogController {
     private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
 
     /**
-     * @api {POST} /QueryWarnNotifyPage 报警消息分页(TODO 接口暂未实现,等消息中台需求)
+     * @api {POST} /QueryNotifyPage 查询消息通知分页
      * @apiVersion 1.0.0
-     * @apiGroup 报警管理模块
-     * @apiName QueryWarnNotifyPage
-     * @apiDescription 报警消息分页
+     * @apiGroup 消息通知模块
+     * @apiName QueryNotifyPage
+     * @apiDescription 查询消息通知分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} pageSize 页大小
      * @apiParam (请求参数) {Int} currentPage 当前页
      * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索标题或内容
      * @apiParam (请求参数) {Int} [status] 0.未读 1.已读
+     * @apiParam (请求参数) {Int} [serviceID] 平台ID
+     * @apiParam (请求参数) {Int} [type] 消息类型 1.报警 2.事件 3.工单
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.notifyID 系统通知ID
-     * @apiSuccess (返回结果) {Int} currentPageData.type 类型，1.报警 2.事件 3.信息
+     * @apiSuccess (返回结果) {Int} currentPageData.serviceID 平台ID
+     * @apiSuccess (返回结果) {Int} currentPageData.serviceName 平台名称
+     * @apiSuccess (返回结果) {Int} currentPageData.type 类型，1.报警 2.事件 3.工单
      * @apiSuccess (返回结果) {String} currentPageData.name 通知名称
      * @apiSuccess (返回结果) {String} currentPageData.content 通知内容
      * @apiSuccess (返回结果) {Int} currentPageData.status 通知状态 0.未读 1.已读 2.待办
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 接收时间
-     * @apiSuccess (返回结果) {Int} [currentPageData.warnLogID] 报警记录ID,如果该项为空则不可跳转
-     * @apiSuccess (返回结果) {Int} [currentPageData.warnType] 报警类型,1.数据报警 2.设备报警
+     * @apiSuccess (返回结果) {Int} [currentPageData.relationID] 关联ID,如果该项为空则不可跳转
+     * @apiSuccess (返回结果) {Int} [currentPageData.relationType] 关联类型, 1.数据报警 2.设备报警 3.事件 4.工单
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeNotify
      */
-//    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/QueryWarnNotifyPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryWarnNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param, HttpServletRequest request) {
+    @Permission(permissionName = "mdmbase:DescribeNotify")
+    @PostMapping(value = "/QueryNotifyPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryNotifyPage(@Valid @RequestBody QueryWarnNotifyPageParam param, HttpServletRequest request) {
 //        return tbWarnNotifyConfigService.queryWarnNotifyPage(param, request.getHeader("Authorization"));
         return ResultWrapper.successWithNothing();
     }
 
     /**
-     * @api {POST} /QueryUnreadWarnLatest 查询最新未读报警消息(TODO 接口暂未实现,等消息中台需求)
+     * @api {POST} /QueryNotifyList 查询消息通知列表
      * @apiVersion 1.0.0
-     * @apiGroup 报警管理模块
-     * @apiName QueryUnreadWarnLatest
-     * @apiDescription 查询最新未读报警消息
+     * @apiGroup 消息通知模块
+     * @apiName QueryNotifyList
+     * @apiDescription 查询消息通知列表
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} platform 平台
-     * @apiSuccess (返回结果) {Object} deviceWarn 设备报警未读消息数据
-     * @apiSuccess (返回结果) {Int} deviceWarn.warnLogID 报警ID
-     * @apiSuccess (返回结果) {Int} deviceWarn.notifyID 系统通知ID
-     * @apiSuccess (返回结果) {String} deviceWarn.warnName 报警名称
-     * @apiSuccess (返回结果) {DateTime} deviceWarn.warnTime 报警时间
-     * @apiSuccess (返回结果) {Int} deviceWarn.deviceType 设备类型 1.物联网设备 2.视频设备
-     * @apiSuccess (返回结果) {String} deviceWarn.deviceModel 设备型号,对应'物联网设备产品名称'或'视频设备类型/型号'
-     * @apiSuccess (返回结果) {String} deviceWarn.deviceToken 设备sn
-     * @apiSuccess (返回结果) {Object} dataWarn 数据报警未读消息数据
-     * @apiSuccess (返回结果) {Int} dataWarn.warnLogID 报警ID
-     * @apiSuccess (返回结果) {Int} dataWarn.notifyID 系统通知ID
-     * @apiSuccess (返回结果) {String} dataWarn.warnName 报警名称
-     * @apiSuccess (返回结果) {DateTime} dataWarn.warnTime 报警时间
-     * @apiSuccess (返回结果) {Int} dataWarn.projectID 工程ID
-     * @apiSuccess (返回结果) {String} dataWarn.projectName 工程名称
-     * @apiSuccess (返回结果) {String} dataWarn.projectShortName 工程简称
-     * @apiSuccess (返回结果) {Int} dataWarn.monitorItemID 监测项目ID
-     * @apiSuccess (返回结果) {String} dataWarn.monitorItemName 监测项目名称
-     * @apiSuccess (返回结果) {String} dataWarn.monitorItemAlias 监测项目别称
-     * @apiSuccess (返回结果) {Int} dataWarn.monitorPointID 监测点ID
-     * @apiSuccess (返回结果) {String} dataWarn.monitorPointName 监测点名称
+     * @apiParam (请求参数) {String} [queryCode] 关键字,支持模糊搜索标题或内容
+     * @apiParam (请求参数) {Int} [status] 0.未读 1.已读
+     * @apiParam (请求参数) {Int} [serviceID] 平台ID
+     * @apiParam (请求参数) {Int} [type] 消息类型 1.报警 2.事件 3.工单
+     * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
+     * @apiSuccess (返回结果) {Int} dataList.notifyID 系统通知ID
+     * @apiSuccess (返回结果) {Int} dataList.serviceID 平台ID
+     * @apiSuccess (返回结果) {Int} dataList.serviceName 平台名称
+     * @apiSuccess (返回结果) {Int} dataList.type 类型，1.报警 2.事件 3.工单
+     * @apiSuccess (返回结果) {String} dataList.name 通知名称
+     * @apiSuccess (返回结果) {String} dataList.content 通知内容
+     * @apiSuccess (返回结果) {Int} dataList.status 通知状态 0.未读 1.已读 2.待办
+     * @apiSuccess (返回结果) {DateTime} dataList.time 接收时间
+     * @apiSuccess (返回结果) {Int} [dataList.relationID] 关联ID,如果该项为空则不可跳转
+     * @apiSuccess (返回结果) {Int} [dataList.relationType] 关联类型, 1.数据报警 2.设备报警 3.事件 4.工单
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:
+     * @apiPermission 系统权限 mdmbase:DescribeNotify
      */
-//    @Permission(permissionName = "mdmbase:")
-    @PostMapping(value = "/QueryUnreadWarnLatest", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryUnreadWarnLatest(@Valid @RequestBody CompanyPlatformParam param, HttpServletRequest request) {
+    @Permission(permissionName = "mdmbase:DescribeNotify")
+    @PostMapping(value = "/QueryNotifyList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryNotifyList(@Valid @RequestBody CompanyPlatformParam param, HttpServletRequest request) {
 //        return warnLogService.queryUnreadWarnLatest(param,request.getHeader("Authorization"));
         return ResultWrapper.successWithNothing();
     }
