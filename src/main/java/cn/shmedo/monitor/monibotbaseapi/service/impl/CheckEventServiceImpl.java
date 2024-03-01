@@ -66,6 +66,11 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
         return new TaskDateAndStatisticsInfo(taskDataResponses, taskStatusInfo);
     }
 
+    @Override
+    public void addEventInfo(AddEventInfoParam pa) {
+        this.baseMapper.insertSelectColumn(pa.toTbVo());
+    }
+
     /**
      * 统计任务状态数量
      * @param taskInfoList

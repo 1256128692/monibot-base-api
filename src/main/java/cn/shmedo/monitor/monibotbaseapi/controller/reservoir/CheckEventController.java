@@ -127,8 +127,8 @@ public class CheckEventController {
      * @apiParam (请求体) {String} address 事件位置
      * @apiParam (请求体) {String} location 事件经纬度
      * @apiParam (请求体) {String} describe 事件描述
-     * @apiParam (请求体) {String[]} [annexes] 附件文件osskey列表
-     * @apiParam (请求体) {Date}   handleTime 处理时间
+     * @apiParam (请求体) {String[]} [ossKeyList] 附件文件osskey列表
+     * @apiParam (请求体) {Date}   [handleTime] 处理时间
      * @apiParam (请求体) {Int} status 事件状态 0-未处理 1-已处理
      * @apiParam (请求体) {String} [comment] 结束批注
      * @apiParam (请求体) {String} [exValue] 备注
@@ -139,8 +139,8 @@ public class CheckEventController {
     @LogParam(moduleName = "事件模块", operationName = "新增事件", operationProperty = OperationProperty.ADD)
     @Permission(permissionName = "mdmbase:AddEvent")
     @PostMapping(value = "/AddEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object addEventInfo(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    public Object addEventInfo(@RequestBody @Validated AddEventInfoParam pa) {
+        checkEventService.addEventInfo(pa);
         return ResultWrapper.successWithNothing();
     }
 
@@ -306,6 +306,8 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} [serviceID] 所属平台ID
      * @apiParam (请求体) {Int} [projectID] 工程ID
+     * @apiParam (请求体) {Int[]} [checkTypeList] 巡检类型 0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查
+     * @apiParam (请求体) {Int[]} [statusList] 任务状态 0-未开始 1-进行中 2-已过期 3-已结束
      * @apiParam (请求体) {Int} queryType 查询方式,(全部日程:0 个人视角:1)
      * @apiParam (请求体) {Date} begin 开始时间
      * @apiParam (请求体) {Date} end 结束时间

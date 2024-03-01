@@ -5,4 +5,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface TbCheckEventMapper extends BasicMapper<TbCheckEvent> {
+    void insertSelectColumn(TbCheckEvent toTbVo);
 }

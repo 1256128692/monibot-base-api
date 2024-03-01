@@ -48,5 +48,17 @@
       <if test="userID != null">
           AND CheckerID = #{userID}
       </if>
+      <if test="param.checkTypeList != null and param.checkTypeList.size != 0">
+          AND CheckType in
+          <foreach collection="param.checkTypeList" item="item" separator="," index="index" open="(" close=")">
+              #{item}
+          </foreach>
+      </if>
+      <if test="param.statusList != null and param.statusList.size != 0">
+          AND `Status` in
+          <foreach collection="param.statusList" item="item" separator="," index="index" open="(" close=")">
+              #{item}
+          </foreach>
+      </if>
   </select>
 </mapper>
