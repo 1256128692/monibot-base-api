@@ -244,6 +244,47 @@ public class MonitorTypeController {
     }
 
     /**
+     * @api {POST} /QueryMonitorTypeFieldList 查询监测类型属性不分页
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryMonitorTypeList
+     * @apiDescription 查询监测类型分页
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} projectID 工程ID
+     * @apiParam (请求参数) {Boolean} [allFiled] 全属性，否则fieldClass只展示12
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.id 监测类型ID
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {String} dataList.typeName 监测类型名称
+     * @apiSuccess (返回结果) {String} dataList.typeAlias 监测类型别名
+     * @apiSuccess (返回结果) {Int} dataList.createType 定义类型
+     * @apiSuccess (返回结果) {Boolean} dataList.multiSensor 是否多传感器,true:多传感器 | false:单传感器
+     * @apiSuccess (返回结果) {String} [dataList.monitorTypeClass] 监测类型类别
+     * @apiSuccess (返回结果) {Object[]} dataList.fieldList 属性列表
+     * @apiSuccess (返回结果) {Int} dataList.fieldList.id 属性ID
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldName 属性名称
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldToken 属性标识
+     * @apiSuccess (返回结果) {Int} dataList.fieldList.fieldClass 属性分类  123基础属性，扩展属性，扩展配置
+     * @apiSuccess (返回结果) {String} dataList.fieldList.fieldDataType 属性数据类型，String，Double，Long  还可以是DateTime Enum
+     * @apiSuccess (返回结果) {Int} [dataList.fieldList.fieldUnitID] 属性单位ID
+     * @apiSuccess (返回结果) {Int} [dataList.fieldList.parentID] 父属性ID
+     * @apiSuccess (返回结果) {Int} dataList.fieldList.fieldCalOrder 属性计算排序
+     * @apiSuccess (返回结果) {Int} dataList.fieldList.createType 创建类型
+     * @apiSuccess (返回结果) {String} [dataList.fieldList.exValues] 额外属性
+     * @apiSuccess (返回结果) {String} [dataList.fieldList.fieldDesc] 描述
+     * @apiSuccess (返回结果) {String} [dataList.fieldList.engUnit] 属性英文名称
+     * @apiSuccess (返回结果) {String} [dataList.fieldList.chnUnit] 属性中文名称
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+    @PostMapping(value = "/QueryMonitorTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeList(@RequestBody @Validated Object request) {
+//        return monitorTypeService.queryMonitorTypeList(request);
+        return ResultWrapper.successWithNothing();
+    }
+
+    /**
      * @api {POST} /DeleteMonitorTypeBatch 批量删除监测类型
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
