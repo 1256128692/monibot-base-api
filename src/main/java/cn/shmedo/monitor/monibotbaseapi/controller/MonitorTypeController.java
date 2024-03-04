@@ -244,10 +244,10 @@ public class MonitorTypeController {
     }
 
     /**
-     * @api {POST} /QueryMonitorTypeFieldList 查询监测类型属性不分页
+     * @api {POST} /QueryMonitorTypeFieldListV2 查询监测类型属性不分页
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName QueryMonitorTypeList
+     * @apiName QueryMonitorTypeListV2
      * @apiDescription 查询监测类型分页
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} projectID 工程ID
@@ -278,8 +278,8 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorType")
-    @PostMapping(value = "/QueryMonitorTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypeList(@RequestBody @Validated Object request) {
+    @PostMapping(value = "/QueryMonitorTypeListV2", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeListV2(@RequestBody @Validated Object request) {
 //        return monitorTypeService.queryMonitorTypeList(request);
         return ResultWrapper.successWithNothing();
     }
