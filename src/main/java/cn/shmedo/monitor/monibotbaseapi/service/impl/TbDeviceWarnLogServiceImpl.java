@@ -161,7 +161,7 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                             Map<Integer, UserContact> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
                             try {
                                 notifyIds = notifyService.sysNotify(param.getCompanyID(),
-                                        () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
+                                        () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, param.getPlatform(), warnName,
                                                 content, SysNotify.Status.UNREAD, param.getTime())),
                                         phoneUserMap.keySet().toArray(Integer[]::new));
                             } catch (Exception e) {

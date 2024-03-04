@@ -209,7 +209,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         List<Integer> notifyIds = null;
                         try {
                             notifyIds = notifyService.sysNotify(threshold.getCompanyID(),
-                                    () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, warnName,
+                                    () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, threshold.getPlatform(), warnName,
                                             param.getWarnContent(), SysNotify.Status.UNREAD, param.getWarnTime())),
                                     notifyConfig.getContacts().keySet().toArray(Integer[]::new));
                         } catch (Exception e) {
