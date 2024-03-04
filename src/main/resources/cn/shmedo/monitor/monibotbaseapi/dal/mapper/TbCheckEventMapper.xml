@@ -1,157 +1,174 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckEventMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent">
-    <!--@mbg.generated-->
-    <!--@Table tb_check_event-->
-    <id column="ID" property="ID" />
-    <result column="ProjectID" property="projectID" />
-    <result column="OrderID" property="orderID" />
-    <result column="TaskID" property="taskID" />
-    <result column="TypeID" property="typeID" />
-    <result column="SerialNumber" property="serialNumber" />
-    <result column="Address" property="address" />
-    <result column="Location" property="location" />
-    <result column="Describe" property="describe" />
-    <result column="Annexes" property="annexes" />
-    <result column="ReportUserID" property="reportUserID" />
-    <result column="ReportTime" property="reportTime" />
-    <result column="HandleTime" property="handleTime" />
-    <result column="Status" property="status" />
-    <result column="Comment" property="comment" />
-    <result column="ExValue" property="exValue" />
-    <result column="CreateUserID" property="createUserID" />
-    <result column="CreateTime" property="createTime" />
-    <result column="UpdateUserID" property="updateUserID" />
-    <result column="UpdateTime" property="updateTime" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    ID, ProjectID, OrderID, TaskID, TypeID, SerialNumber, Address, `Location`, `Describe`,
-    Annexes, ReportUserID, ReportTime, HandleTime, `Status`, `Comment`, ExValue, CreateUserID,
-    CreateTime, UpdateUserID, UpdateTime
-  </sql>
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent">
+        <!--@mbg.generated-->
+        <!--@Table tb_check_event-->
+        <id column="ID" property="ID"/>
+        <result column="ProjectID" property="projectID"/>
+        <result column="OrderID" property="orderID"/>
+        <result column="TaskID" property="taskID"/>
+        <result column="TypeID" property="typeID"/>
+        <result column="SerialNumber" property="serialNumber"/>
+        <result column="Address" property="address"/>
+        <result column="Location" property="location"/>
+        <result column="Describe" property="describe"/>
+        <result column="Annexes" property="annexes"/>
+        <result column="ReportUserID" property="reportUserID"/>
+        <result column="ReportTime" property="reportTime"/>
+        <result column="HandleTime" property="handleTime"/>
+        <result column="Status" property="status"/>
+        <result column="Comment" property="comment"/>
+        <result column="ExValue" property="exValue"/>
+        <result column="CreateUserID" property="createUserID"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateUserID" property="updateUserID"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        ID,
+        ProjectID,
+        OrderID,
+        TaskID,
+        TypeID,
+        SerialNumber,
+        Address,
+        `Location`,
+        `Describe`,
+        Annexes,
+        ReportUserID,
+        ReportTime,
+        HandleTime,
+        `Status`,
+        `Comment`,
+        ExValue,
+        CreateUserID,
+        CreateTime,
+        UpdateUserID,
+        UpdateTime
+    </sql>
 
-  <insert id="insertSelectColumn">
-      insert into tb_check_event
-      <trim prefix="(" suffix=")" suffixOverrides=",">
-          <if test="projectID != null">
-              ProjectID,
-          </if>
-          <if test="orderID != null">
-              `OrderID`,
-          </if>
-          <if test="taskID != null">
-              TaskID,
-          </if>
-          <if test="typeID != null">
-              TypeID,
-          </if>
-          <if test="serialNumber != null">
-              `SerialNumber`,
-          </if>
-          <if test="address != null">
-              `Address`,
-          </if>
-          <if test="location != null">
-              Location,
-          </if>
-          <if test="describe != null">
-              `Describe`,
-          </if>
-          <if test="annexes != null">
-              Annexes,
-          </if>
-          <if test="reportUserID != null">
-              ReportUserID,
-          </if>
-          <if test="reportTime != null">
-              ReportTime,
-          </if>
-          <if test="handleTime != null">
-              handleTime,
-          </if>
-          <if test="status != null">
-              `Status`,
-          </if>
-          <if test="comment != null">
-              `Comment`,
-          </if>
-          <if test="exValue != null">
-              `ExValue`,
-          </if>
-          <if test="createUserID != null">
-              CreateUserID,
-          </if>
-          <if test="createTime != null">
-              CreateTime,
-          </if>
-          <if test="updateUserID != null">
-              UpdateUserID,
-          </if>
-          <if test="updateTime != null">
-              UpdateTime,
-          </if>
-      </trim>
-      <trim prefix="values (" suffix=")" suffixOverrides=",">
-          <if test="projectID != null">
-              #{projectID},
-          </if>
-          <if test="orderID != null">
-              #{orderID},
-          </if>
-          <if test="taskID != null">
-              #{taskID},
-          </if>
-          <if test="typeID != null">
-              #{typeID},
-          </if>
-          <if test="serialNumber != null">
-              #{serialNumber},
-          </if>
-          <if test="address != null">
-              #{address},
-          </if>
-          <if test="location != null">
-              #{location},
-          </if>
-          <if test="describe != null">
-              #{describe},
-          </if>
-          <if test="annexes != null">
-              #{annexes},
-          </if>
-          <if test="reportUserID != null">
-              #{reportUserID},
-          </if>
-          <if test="reportTime != null">
-              #{reportTime},
-          </if>
-          <if test="handleTime != null">
-              #{handleTime},
-          </if>
-          <if test="status != null">
-              #{status},
-          </if>
-          <if test="comment != null">
-              #{comment},
-          </if>
-          <if test="exValue != null">
-              #{exValue,jdbcType=VARCHAR},
-          </if>
-          <if test="createUserID != null">
-              #{createUserID,jdbcType=INTEGER},
-          </if>
-          <if test="createTime != null">
-              #{createTime,jdbcType=TIMESTAMP},
-          </if>
-          <if test="updateUserID != null">
-              #{updateUserID,jdbcType=INTEGER},
-          </if>
-          <if test="updateTime != null">
-              #{updateTime,jdbcType=TIMESTAMP},
-          </if>
-      </trim>
-  </insert>
+    <insert id="insertSelectColumn">
+        insert into tb_check_event
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                ProjectID,
+            </if>
+            <if test="orderID != null">
+                `OrderID`,
+            </if>
+            <if test="taskID != null">
+                TaskID,
+            </if>
+            <if test="typeID != null">
+                TypeID,
+            </if>
+            <if test="serialNumber != null">
+                `SerialNumber`,
+            </if>
+            <if test="address != null">
+                `Address`,
+            </if>
+            <if test="location != null">
+                Location,
+            </if>
+            <if test="describe != null">
+                `Describe`,
+            </if>
+            <if test="annexes != null">
+                Annexes,
+            </if>
+            <if test="reportUserID != null">
+                ReportUserID,
+            </if>
+            <if test="reportTime != null">
+                ReportTime,
+            </if>
+            <if test="handleTime != null">
+                handleTime,
+            </if>
+            <if test="status != null">
+                `Status`,
+            </if>
+            <if test="comment != null">
+                `Comment`,
+            </if>
+            <if test="exValue != null">
+                `ExValue`,
+            </if>
+            <if test="createUserID != null">
+                CreateUserID,
+            </if>
+            <if test="createTime != null">
+                CreateTime,
+            </if>
+            <if test="updateUserID != null">
+                UpdateUserID,
+            </if>
+            <if test="updateTime != null">
+                UpdateTime,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectID != null">
+                #{projectID},
+            </if>
+            <if test="orderID != null">
+                #{orderID},
+            </if>
+            <if test="taskID != null">
+                #{taskID},
+            </if>
+            <if test="typeID != null">
+                #{typeID},
+            </if>
+            <if test="serialNumber != null">
+                #{serialNumber},
+            </if>
+            <if test="address != null">
+                #{address},
+            </if>
+            <if test="location != null">
+                #{location},
+            </if>
+            <if test="describe != null">
+                #{describe},
+            </if>
+            <if test="annexes != null">
+                #{annexes},
+            </if>
+            <if test="reportUserID != null">
+                #{reportUserID},
+            </if>
+            <if test="reportTime != null">
+                #{reportTime},
+            </if>
+            <if test="handleTime != null">
+                #{handleTime},
+            </if>
+            <if test="status != null">
+                #{status},
+            </if>
+            <if test="comment != null">
+                #{comment},
+            </if>
+            <if test="exValue != null">
+                #{exValue,jdbcType=VARCHAR},
+            </if>
+            <if test="createUserID != null">
+                #{createUserID,jdbcType=INTEGER},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateUserID != null">
+                #{updateUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
 
     <update id="updateSelectColumn" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent">
         update tb_check_event
@@ -203,64 +220,98 @@
     </update>
 
 
-  <select id="selectEventInfoPage"
+    <select id="selectEventInfoPage"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.QueryEventInfoV1">
-      select ce.ID           eventID
-           , ce.`status`
-           , ce.SerialNumber eventSerialNumber
-           , ce.projectID
-           , p.projectName
-           , ce.taskID
-           , ct.Name         taskName
-           , ct.SerialNumber taskSerialNumber
-           , ce.typeID
-           , cet.Name        typeName
-           , ce.address
-           , ce.location
-           , ce.`describe`
-           , ce.reportUserID
-           , ce.reportTime
-           , ce.handleTime
-           , ce.`comment`
-           , ce.exValue
-      from tb_check_event ce
-               left join tb_check_event_type cet on ce.`typeID` = cet.ID
-               left join tb_check_task ct on ce.`taskID` = ct.ID
-               left join tb_project_info p on ce.`projectID` = p.ID
-      where 1 = 1
-      <if test="pa.eventTypeID != null">
-          and ce.typeID = #{pa.eventTypeID}
-      </if>
-      <if test="pa.eventStatus != null">
-          and ce.`status` = #{pa.eventStatus}
-      </if>
-      <if test="pa.projectID != null">
-          and ce.projectID = #{pa.projectID}
-      </if>
-      <if test="pa.serviceID != null">
-          and ce.projectID in (select ProjectID from tb_project_service_relation where serviceID = #{pa.serviceID})
-      </if>
-      <if test="pa.queryContent != null and pa.queryContent != ''">
-          and (
-          ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
-<!--          or Alias like concat('%', #{queryContent}, '%')-->
-          )
-      </if>
-  </select>
+        select ce.ID           eventID
+             , ce.`status`
+             , ce.SerialNumber eventSerialNumber
+             , ce.projectID
+             , p.projectName
+             , ce.taskID
+             , ct.Name         taskName
+             , ct.SerialNumber taskSerialNumber
+             , ce.typeID
+             , cet.Name        typeName
+             , ce.address
+             , ce.location
+             , ce.`describe`
+             , ce.reportUserID
+             , ce.reportTime
+             , ce.handleTime
+             , ce.`comment`
+             , ce.exValue
+        from tb_check_event ce
+                 left join tb_check_event_type cet on ce.`typeID` = cet.ID
+                 left join tb_check_task ct on ce.`taskID` = ct.ID
+                 left join tb_project_info p on ce.`projectID` = p.ID
+        where 1 = 1
+        <if test="pa.eventTypeID != null">
+            and ce.typeID = #{pa.eventTypeID}
+        </if>
+        <if test="pa.eventStatus != null">
+            and ce.`status` = #{pa.eventStatus}
+        </if>
+        <if test="pa.projectID != null">
+            and ce.projectID = #{pa.projectID}
+        </if>
+        <if test="pa.serviceID != null">
+            and ce.projectID in (select ProjectID from tb_project_service_relation where serviceID = #{pa.serviceID})
+        </if>
+        <if test="pa.queryContent != null and pa.queryContent != ''">
+            and (
+                ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
+            <!--          or Alias like concat('%', #{queryContent}, '%')-->
+            )
+        </if>
+    </select>
 
 
+    <select id="listByTaskID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkevent.CheckEventSimple">
+        SELECT tce.ID,
+               tce.TypeID,
+               tcet.`Name` typeName,
+               tce.Address,
+               tce.Location,
+               tce.`Describe`,
+               tce.Annexes
+        FROM `tb_check_event` tce
+                 LEFT JOIN `tb_check_event_type` tcet ON tce.TypeID = tcet.ID
+        WHERE tce.TaskID = #{taskID}
+    </select>
 
 
-  <select id="listByTaskID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkevent.CheckEventSimple">
-    SELECT tce.ID,
-           tce.TypeID,
-           tcet.`Name` typeName,
-           tce.Address,
-           tce.Location,
-           tce.`Describe`,
-           tce.Annexes
-    FROM `tb_check_event` tce
-           LEFT JOIN `tb_check_event_type` tcet ON tce.TypeID = tcet.ID
-    WHERE tce.TaskID = #{taskID}
-  </select>
+    <select id="selectDetailInfoByID"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.QueryEventInfoV2">
+        select ce.ID           eventID
+             , ce.`status`
+             , ce.SerialNumber eventSerialNumber
+             , ce.projectID
+             , p.projectName
+             , ce.taskID
+             , ct.Name         taskName
+             , ct.SerialNumber taskSerialNumber
+             , ce.typeID
+             , cet.Name        typeName
+             , ce.address
+             , ce.location
+             , ce.`describe`
+             , ce.reportUserID
+             , ce.reportTime
+             , ce.handleTime
+             , ce.`comment`
+             , ce.exValue
+             , ce.annexes
+             , ce.orderID
+             , ct.checkerID
+             , ct.BeginTime    taskBeginTime
+             , ct.EndTime      taskEndTime
+        from tb_check_event ce
+                 left join tb_check_event_type cet on ce.`typeID` = cet.ID
+                 left join tb_check_task ct on ce.`taskID` = ct.ID
+                 left join tb_project_info p on ce.`projectID` = p.ID
+        where 1 = 1
+        <if test="eventID != null">
+            and ce.ID = #{eventID}
+        </if>
+    </select>
 </mapper>

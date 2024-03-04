@@ -281,7 +281,8 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {String}  reportUserName  提报人姓名
      * @apiSuccess (响应结果) {Date}  reportTime  提报时间
      * @apiSuccess (响应结果) {Object[]}  fileInfoList  文件列表
-     * @apiSuccess (响应结果) {String}  fileInfoList.filePath  文件地址
+     * @apiSuccess (响应结果) {String}  fileInfoList.filePath  文件osskey地址
+     * @apiSuccess (响应结果) {String}  fileInfoList.absolutePath   文件绝对地址
      * @apiSuccess (响应结果) {String}  fileInfoList.fileName  文件名称
      * @apiSuccess (响应结果) {String}  fileInfoList.fileType  文件类型
      * @apiSuccess (响应结果) {String}  fileInfoList.fileSize  文件大小
@@ -291,9 +292,8 @@ public class CheckEventController {
      */
     @Permission(permissionName = "mdmbase:ListEventInfo")
     @PostMapping(value = "/QueryEventInfoDetail", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryEventInfoDetail(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+    public Object queryEventInfoDetail(@RequestBody @Validated QueryEventInfoDetailParam pa) {
+        return checkEventService.queryEventInfoDetail(pa);
     }
 
 

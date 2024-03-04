@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo;
 
+import java.util.Date;
+
 public class FileInfoResponse {
 
     private String fileName;
@@ -11,6 +13,7 @@ public class FileInfoResponse {
     private String filePath;
 
     private String absolutePath;
+    private Date createTime;
     public String getFileName() {
         return fileName;
     }
@@ -65,5 +68,13 @@ public class FileInfoResponse {
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 }

@@ -1,23 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
-import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.QueryEventInfoV1;
-import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDataResponse;
-import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDateAndStatisticsInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.*;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
+import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
@@ -39,6 +34,8 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     private final TbCheckTaskMapper tbCheckTaskMapper;
 
     private final TbSensorMapper tbSensorMapper;
+
+    private final FileService fileService;
 
     @Override
     public void addEventType(AddEventTypeParam pa) {
@@ -106,6 +103,23 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
                     }
                 });
         return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
+    }
+
+    @Override
+    public Object queryEventInfoDetail(QueryEventInfoDetailParam pa) {
+
+        QueryEventInfoV2 eventInfoV2 = this.baseMapper.selectDetailInfoByID(pa.getEventID());
+        if (!StringUtil.isNullOrEmpty(eventInfoV2.getAnnexes())) {
+            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(JSONUtil.toList(eventInfoV2.getAnnexes(), String.class), pa.getCompanyID());
+            eventInfoV2.setFileInfoList(fileUrlList);
+        }
+
+        TransferUtil.INSTANCE.getUserNameDict(List.of(eventInfoV2.getCheckerID(), eventInfoV2.getReportUserID()))
+                .ifPresent(dict -> {
+                    eventInfoV2.setCheckerName(dict.get(eventInfoV2.getCheckerID()));
+                    eventInfoV2.setReportUserName(dict.get(eventInfoV2.getReportUserID()));
+                });
+        return eventInfoV2;
     }
 
     /**
