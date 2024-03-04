@@ -22,4 +22,8 @@ public interface ITbBulletinDataService extends IService<TbBulletinData> {
     PageUtil.Page<BulletinPageInfo> queryBulletinPage(QueryBulletinPageParam param);
 
     BulletinDetailInfo queryBulletinDetail(QueryBulletinDetailParam param);
+
+    void updatePublishBulletinDataBatch(UpdatePublishBulletinDataBatchParam param, Integer subjectID);
+
+    void deleteBulletinDataBatch(DeleteBulletinDataBatchParam param);
 }

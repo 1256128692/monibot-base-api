@@ -116,6 +116,25 @@ public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper,
         return bulletinDetailInfo;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updatePublishBulletinDataBatch(UpdatePublishBulletinDataBatchParam param, Integer subjectID) {
+        final List<TbBulletinData> tbBulletinDataList = param.getTbBulletinDataList();
+        final String currentUserStr = getCurrentUserStr(param.getCompanyID(), subjectID);
+        tbBulletinDataList.forEach(u -> u.setUpdateUser(currentUserStr));
+        this.updateBatchById(tbBulletinDataList);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteBulletinDataBatch(DeleteBulletinDataBatchParam param) {
+        Optional.ofNullable(param.getAttachmentIDList()).filter(CollUtil::isNotEmpty)
+                .ifPresent(this.tbBulletinAttachmentService::removeBatchByIds);
+        Optional.ofNullable(param.getPlatformRelateIDList()).filter(CollUtil::isNotEmpty)
+                .ifPresent(this.tbBulletinPlatformRelationService::removeBatchByIds);
+        this.removeBatchByIds(param.getBulletinIDList());
+    }
+
     private void handlePlatform(List<? extends BulletinDataBaseInfo> dataList) {
         final Map<Integer, String> serviceIdNameMap = authRedisService.multiGet(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE,
                         dataList.stream().map(BulletinDataBaseInfo::getPlatformStr).map(u -> u.split(","))

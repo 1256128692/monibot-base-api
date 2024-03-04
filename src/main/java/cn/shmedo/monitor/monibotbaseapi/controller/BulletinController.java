@@ -239,8 +239,8 @@ public class BulletinController {
      */
     @Permission(permissionName = "mdmbase:UpdateBulletinData")
     @PostMapping(value = "/UpdatePublishBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updatePublishBulletinDataBatch(@Valid @RequestBody Object param) {
-        // 撤销时,取消置顶
+    public Object updatePublishBulletinDataBatch(@Valid @RequestBody UpdatePublishBulletinDataBatchParam param) {
+        tbBulletinDataService.updatePublishBulletinDataBatch(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }
 
@@ -258,9 +258,8 @@ public class BulletinController {
      */
     @Permission(permissionName = "mdmbase:DeleteBulletinData")
     @PostMapping(value = "/DeleteBulletinDataBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object deleteBulletinDataBatch(@Valid @RequestBody Object param) {
-        // 校验时,如果有'已发布'的公告,需要提示异常
-        // 关联删除对应的公告附件
+    public Object deleteBulletinDataBatch(@Valid @RequestBody DeleteBulletinDataBatchParam param) {
+        tbBulletinDataService.deleteBulletinDataBatch(param);
         return ResultWrapper.successWithNothing();
     }
 }
