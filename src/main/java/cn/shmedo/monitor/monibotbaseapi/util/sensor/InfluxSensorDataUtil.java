@@ -89,9 +89,13 @@ public class InfluxSensorDataUtil {
                         if (value == null) {
                             data.put(columnName, value);
                         } else {
-                            // 默认保留2位小数
-                            data.put(columnName, NumberUtil.round((Double) value, 2).doubleValue());
+                            // 直接赋值
+                            data.put(columnName, value);
                         }
+//                        else {
+//                            // 默认保留2位小数
+//                            data.put(columnName, NumberUtil.round((Double) value, 2).doubleValue());
+//                        }
 
                     }
                 }

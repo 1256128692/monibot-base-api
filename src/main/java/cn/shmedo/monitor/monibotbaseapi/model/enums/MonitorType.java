@@ -49,6 +49,8 @@ public enum MonitorType {
     @JsonProperty("17")
     DRY_BEACH(17, "干滩"),
 
+    @JsonProperty("18")
+    THREE_DIMENSIONAL_DISPLACEMENT_ABSOLUTE(18, "表面三维形变（绝对）"),
     @JsonProperty("19")
     THREE_DIMENSIONAL_DISPLACEMENT(19, "表面三维形变（相对）"),
 

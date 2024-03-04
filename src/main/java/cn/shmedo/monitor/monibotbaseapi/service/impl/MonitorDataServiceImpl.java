@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
@@ -43,6 +44,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -309,7 +312,6 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                             }
                         });
                     }
-
                     if (pa.getDensityType() == DisplayDensity.WEEK.getValue() || pa.getDensityType() == DisplayDensity.MONTH.getValue() ||
                             pa.getDensityType() == DisplayDensity.YEAR.getValue()) {
                         sensorInfo.setMultiSensorData(InfluxDBDataUtil.calculateStatistics(result, pa.getDensityType(), pa.getStatisticsType(), pa.getDataSort()));
