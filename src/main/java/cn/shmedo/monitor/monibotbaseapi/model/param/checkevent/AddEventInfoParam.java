@@ -22,8 +22,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Data
@@ -96,7 +94,7 @@ public class AddEventInfoParam implements ParameterValidator, ResourcePermission
         reportUserID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         reportTime = DateUtil.date().toLocalDateTime();
 
-        if (CollectionUtil.isNullOrEmpty(ossKeyList)) {
+        if (!CollectionUtil.isNullOrEmpty(ossKeyList)) {
             annexes = JSONUtil.toJsonStr(ossKeyList);
         }
         return null;

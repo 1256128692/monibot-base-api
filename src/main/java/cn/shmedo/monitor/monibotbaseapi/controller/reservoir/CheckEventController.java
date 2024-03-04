@@ -171,17 +171,17 @@ public class CheckEventController {
      * @apiVersion 1.0.0
      * @apiGroup 水库-巡检事件模块
      * @apiName UpdateEventInfo
-     * @apiDescription 编辑事件信息,ReportUserID提报人ID就是当前用户ID
+     * @apiDescription 编辑事件信息
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} [orderID] 事件ID
-     * @apiParam (请求体) {Int} [eventID] 事件ID
+     * @apiParam (请求体) {Int} eventID 事件ID
+     * @apiParam (请求体) {Int} [orderID] 订单ID
      * @apiParam (请求体) {Int} [projectID] 关联工程ID
      * @apiParam (请求体) {Int} [taskID] 关联巡检任务ID
      * @apiParam (请求体) {Int} [typeID] 事件类型ID
      * @apiParam (请求体) {String} [address] 事件位置
      * @apiParam (请求体) {String} [location] 事件经纬度
      * @apiParam (请求体) {String} [describe] 事件描述
-     * @apiParam (请求体) {String[]} [annexes] 附件文件osskey列表
+     * @apiParam (请求体) {String[]} [ossKeyList] 附件文件osskey列表
      * @apiParam (请求体) {Date}   [handleTime] 处理时间
      * @apiParam (请求体) {Int} [status] 事件状态 0-未处理 1-已处理
      * @apiParam (请求体) {String} [comment] 结束批注
@@ -193,8 +193,8 @@ public class CheckEventController {
     @LogParam(moduleName = "事件模块", operationName = "编辑事件", operationProperty = OperationProperty.UPDATE)
     @Permission(permissionName = "mdmbase:UpdateEvent")
     @PostMapping(value = "/UpdateEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateEventInfo(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+    public Object updateEventInfo(@RequestBody @Validated UpdateEventInfoParam pa) {
+        checkEventService.updateEventInfo(pa);
         return ResultWrapper.successWithNothing();
     }
 

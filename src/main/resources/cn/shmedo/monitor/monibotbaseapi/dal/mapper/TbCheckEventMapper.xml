@@ -152,4 +152,53 @@
           </if>
       </trim>
   </insert>
+
+    <update id="updateSelectColumn" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent">
+        update tb_check_event
+        <set>
+            <if test="projectID != null">
+                projectID = #{projectID},
+            </if>
+            <if test="orderID != null">
+                orderID = #{orderID},
+            </if>
+            <if test="taskID != null">
+                taskID = #{taskID},
+            </if>
+            <if test="typeID != null">
+                typeID = #{typeID},
+            </if>
+            <if test="address != null">
+                address = #{address},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="describe != null">
+                `describe` = #{describe},
+            </if>
+            <if test="annexes != null">
+                annexes = #{annexes},
+            </if>
+            <if test="handleTime != null">
+                handleTime = #{handleTime},
+            </if>
+            <if test="status != null">
+                `status` = #{status},
+            </if>
+            <if test="comment != null">
+                `comment` = #{comment},
+            </if>
+            <if test="exValue != null">
+                exValue = #{exValue,jdbcType=VARCHAR},
+            </if>
+            <if test="updateUserID != null">
+                updateUserID = #{updateUserID,jdbcType=INTEGER},
+            </if>
+            <if test="updateTime != null">
+                updateTime = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where ID = #{ID,jdbcType=INTEGER}
+    </update>
 </mapper>
