@@ -219,7 +219,7 @@ public class BulletinController {
      */
     @Permission(permissionName = "mdmbase:UpdateBulletinData")
     @PostMapping(value = "/UpdateBulletinData", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateBulletinData(@Valid @RequestBody UpdateBulletinData param) {
+    public Object updateBulletinData(@Valid @RequestBody UpdateBulletinDataParam param) {
         this.tbBulletinDataService.updateBulletinData(param, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         return ResultWrapper.successWithNothing();
     }

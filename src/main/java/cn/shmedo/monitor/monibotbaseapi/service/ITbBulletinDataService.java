@@ -15,7 +15,7 @@ import java.util.List;
 public interface ITbBulletinDataService extends IService<TbBulletinData> {
     void addBulletinData(AddBulletinDataParam param, Integer userID);
 
-    void updateBulletinData(UpdateBulletinData param, Integer userID);
+    void updateBulletinData(UpdateBulletinDataParam param, Integer userID);
 
     List<BulletinDataListInfo> queryBulletinList(QueryBulletinListParam param);
 

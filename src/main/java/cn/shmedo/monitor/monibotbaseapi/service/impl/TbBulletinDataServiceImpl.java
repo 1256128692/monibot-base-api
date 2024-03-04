@@ -72,7 +72,7 @@ public class TbBulletinDataServiceImpl extends ServiceImpl<TbBulletinDataMapper,
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void updateBulletinData(UpdateBulletinData param, Integer userID) {
+    public void updateBulletinData(UpdateBulletinDataParam param, Integer userID) {
         final Integer bulletinID = param.getBulletinID();
         final String currentUserStr = getCurrentUserStr(param.getCompanyID(), userID);
 
