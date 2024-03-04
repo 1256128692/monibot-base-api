@@ -7,9 +7,13 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourcePa
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyDetailInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import feign.Headers;
 import feign.Param;
@@ -96,6 +100,13 @@ public interface UserService {
     @RequestLine("POST /QueryNotifyPageList")
     @Headers("Authorization: {accessToken}")
     ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, @Param("accessToken") String accessToken);
+
+    /**
+     * 查询系统通知统计信息
+     */
+    @RequestLine("POST /QueryNotifyStatistics")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<NotifyStatisticsInfo> queryNotifyStatistics(QueryNotifyStatisticsParam param, @Param("accessToken") String accessToken);
 
     @RequestLine("POST /QueryNotifyDetail")
     @Headers("Authorization: {accessToken}")

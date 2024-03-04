@@ -16,7 +16,5 @@ public interface IWarnLogService {
 
     void fillDealOpinion(Integer userID, FillDealOpinionParam param);
 
-    Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param, String accessToken);
-
     void addWarnLogBindWorkFlowTask(Integer userID, AddWarnLogBindWorkFlowTaskParam param);
 }

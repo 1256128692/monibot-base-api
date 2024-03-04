@@ -42,6 +42,10 @@ public class QueryNotifyPageListParam {
     @Range(min = 1, max = 3, message = "类型，1.报警 2.事件 3.信息")
     private Integer type;
     /**
+     * 服务ID
+     */
+    private Integer serviceID;
+    /**
      * 超级搜索，对名称、内容联合查询，支持模糊查询
      */
     private String queryKey;

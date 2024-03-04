@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.response.third;
+package cn.shmedo.monitor.monibotbaseapi.model.response.third.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,6 +16,7 @@ import java.util.Date;
 public class NotifyPageInfo {
     private Integer notifyID;
     private Integer type;
+    private Integer serviceID;
     private String name;
     private String content;
     private Integer status;

@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.response.third;
+package cn.shmedo.monitor.monibotbaseapi.model.response.third.auth;
 
 import lombok.Builder;
 import lombok.Data;

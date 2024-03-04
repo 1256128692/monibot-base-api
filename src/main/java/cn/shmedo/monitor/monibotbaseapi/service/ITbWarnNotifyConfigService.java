@@ -5,12 +5,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.UpdateWarnNotifyConfigParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryWarnNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigDetail;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.WarnNotifyConfigInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.WarnNotifyPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import jakarta.annotation.Nonnull;
 
@@ -34,5 +31,4 @@ public interface ITbWarnNotifyConfigService extends IService<TbWarnNotifyConfig>
     WarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID,
                                                  @Nonnull Integer platform, @Nonnull Integer notifyType);
 
-    PageUtil.Page<WarnNotifyPageInfo> queryWarnNotifyPage(QueryWarnNotifyPageParam param, String accessToken);
 }

@@ -88,41 +88,6 @@ public class WarnLogServiceImpl implements IWarnLogService {
     }
 
     @Override
-    public Map<String, Object> queryUnreadWarnLatest(CompanyPlatformParam param, String accessToken) {
-        Map<String, Object> result = new HashMap<>();
-        TbWarnNotifyRelation relation = tbWarnNotifyRelationMapper.selectRealTimeWarnNotify(param);
-        Optional.ofNullable(relation).ifPresent(u -> {
-            final Integer companyID = param.getCompanyID();
-            final Integer warnLogID = u.getWarnLogID();
-            final Integer notifyID = u.getNotifyID();
-            Optional.of(new QueryNotifyDetailParam(companyID, notifyID))
-                    .map(w -> userService.queryNotifyDetail(w, accessToken))
-                    .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
-                    .filter(w -> SysNotify.Status.UNREAD.equals(w.getStatus())).ifPresent(w -> {
-                        switch (DataDeviceWarnType.fromCode(relation.getType())) {
-                            case DATA -> {
-                                DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(warnLogID);
-                                info.setNotifyID(notifyID);
-                                result.put("dataWarn", info);
-                            }
-                            case DEVICE -> {
-                                DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
-                                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(warnLogID);
-                                info.setWarnLogID(tbDeviceWarnLog.getId());
-                                info.setWarnName("设备离线");
-                                info.setWarnTime(tbDeviceWarnLog.getWarnTime());
-                                info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
-                                info.setNotifyID(notifyID);
-                                fillDeviceInfo(info, companyID);
-                                result.put("deviceWarn", info);
-                            }
-                        }
-                    });
-        });
-        return result;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public void addWarnLogBindWorkFlowTask(Integer userID, AddWarnLogBindWorkFlowTaskParam param) {
         Integer data = param.getWorkOrderID();
@@ -139,27 +104,6 @@ public class WarnLogServiceImpl implements IWarnLogService {
                 dealAndSaveDeviceWarnLog(tbDeviceWarnLog, WarnLogDealType.WORK_ORDER, userID, current);
             }
         }
-    }
-
-    private void fillDeviceInfo(DeviceWarnLatestInfo info, Integer companyID) {
-        List<DeviceWarnLatestInfo> infoList = List.of(info);
-        Set<String> deviceTokens = Set.of(info.getDeviceToken());
-        Map<String, TbVideoDevice> deviceTokenMap = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>()
-                .in(TbVideoDevice::getDeviceToken, deviceTokens)).stream().collect(Collectors
-                .toMap(TbVideoDevice::getDeviceSerial, Function.identity()));
-        TransferUtil.INSTANCE.applyDeviceBase(infoList,
-                () -> QueryDeviceBaseInfoParam.builder().deviceTokens(deviceTokens).companyID(companyID).build(),
-                DeviceWarnLatestInfo::getDeviceToken,
-                (e, device) -> {
-                    String deviceToken = e.getDeviceToken();
-                    if (deviceTokenMap.containsKey(e.getDeviceToken())) {
-                        e.setDeviceType(DeviceWarnDeviceType.VIDEO_DEVICE.getCode());
-                        Optional.of(deviceToken).map(deviceTokenMap::get).map(TbVideoDevice::getDeviceType).ifPresent(e::setDeviceModel);
-                    } else {
-                        e.setDeviceType(DeviceWarnDeviceType.IOT_DEVICE.getCode());
-                        e.setDeviceModel(device.getProductName());
-                    }
-                });
     }
 
     private void dealAndSaveDataWarnLog(TbDataWarnLog tbDataWarnLog, WarnLogDealType dealType, Integer userID, Date current) {

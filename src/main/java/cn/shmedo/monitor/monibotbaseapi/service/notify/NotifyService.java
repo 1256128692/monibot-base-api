@@ -1,7 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
@@ -55,4 +59,22 @@ public interface NotifyService {
      */
     boolean mailNotify(String mailTag, boolean isHtml, Supplier<String> contentSupplier,
                        @Nonnull String... mailAddresses);
+
+    /**
+     * 查询消息通知分页列表
+     *
+     * @param param       查询参数
+     * @param accessToken token
+     * @return 分页列表
+     */
+    NotifyPageResponse.Page<NotifyPageResponse> queryNotifyPage(QueryNotifyPageParam param, String accessToken);
+
+    /**
+     * 查询消息通知不分页列表
+     *
+     * @param param       查询参数
+     * @param accessToken token
+     * @return 不分页列表
+     */
+    Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken);
 }
