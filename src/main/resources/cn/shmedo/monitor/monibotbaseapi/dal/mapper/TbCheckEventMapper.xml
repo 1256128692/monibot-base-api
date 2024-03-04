@@ -201,4 +201,53 @@
         </set>
         where ID = #{ID,jdbcType=INTEGER}
     </update>
+
+
+  <select id="selectEventInfoPage"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.QueryEventInfoV1">
+      select ce.ID           eventID
+           , ce.`status`
+           , ce.SerialNumber eventSerialNumber
+           , ce.projectID
+           , p.projectName
+           , ce.taskID
+           , ct.Name         taskName
+           , ct.SerialNumber taskSerialNumber
+           , ce.typeID
+           , cet.Name        typeName
+           , ce.address
+           , ce.location
+           , ce.`describe`
+           , ce.reportUserID
+           , ce.reportTime
+           , ce.handleTime
+           , ce.`comment`
+           , ce.exValue
+      from tb_check_event ce
+               left join tb_check_event_type cet on ce.`typeID` = cet.ID
+               left join tb_check_task ct on ce.`taskID` = ct.ID
+               left join tb_project_info p on ce.`projectID` = p.ID
+      where 1 = 1
+      <if test="pa.eventTypeID != null">
+          and ce.typeID = #{pa.eventTypeID}
+      </if>
+      <if test="pa.eventStatus != null">
+          and ce.`status` = #{pa.eventStatus}
+      </if>
+      <if test="pa.projectID != null">
+          and ce.projectID = #{pa.projectID}
+      </if>
+      <if test="pa.serviceID != null">
+          and ce.projectID in (select ProjectID from tb_project_service_relation where serviceID = #{pa.serviceID})
+      </if>
+      <if test="pa.queryContent != null and pa.queryContent != ''">
+          and (
+          ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
+<!--          or Alias like concat('%', #{queryContent}, '%')-->
+          )
+      </if>
+  </select>
+
+
+
 </mapper>

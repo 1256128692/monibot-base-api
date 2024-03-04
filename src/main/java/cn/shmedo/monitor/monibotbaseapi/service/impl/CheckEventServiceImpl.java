@@ -1,14 +1,24 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.bulletin.BulletinPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.QueryEventInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDataResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskDateAndStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
+import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import io.netty.util.internal.StringUtil;
 import lombok.AllArgsConstructor;
@@ -16,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @EnableTransactionManagement
 @Service
@@ -79,6 +90,22 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     @Override
     public void updateEventInfo(UpdateEventInfoParam pa) {
         this.baseMapper.updateSelectColumn(pa.toTbVo());
+    }
+
+    @Override
+    public Object queryEventInfoPage(QueryEventInfoParam pa) {
+
+        IPage<QueryEventInfoV1> page = this.baseMapper.selectEventInfoPage(new Page<QueryEventInfoParam>(
+                pa.getCurrentPage(), pa.getPageSize()), pa);
+        List<QueryEventInfoV1> dataList = page.getRecords();
+
+        TransferUtil.INSTANCE.getUserNameDict(dataList.stream().map(QueryEventInfoV1::getReportUserID).collect(Collectors.toList()))
+                .ifPresent(dict -> {
+                    for (QueryEventInfoV1 d : dataList) {
+                        d.setReportUserName(dict.get(d.getReportUserID()));
+                    }
+                });
+        return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
     }
 
     /**

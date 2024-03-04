@@ -24,4 +24,6 @@ public interface CheckEventService extends IService<TbCheckEvent>{
     void deleteEventInfo(DeleteEventInfoParam pa);
 
     void updateEventInfo(UpdateEventInfoParam pa);
+
+    Object queryEventInfoPage(QueryEventInfoParam pa);
 }

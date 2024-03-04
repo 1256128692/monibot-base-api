@@ -243,9 +243,8 @@ public class CheckEventController {
      */
     @Permission(permissionName = "mdmbase:ListEventInfo")
     @PostMapping(value = "/QueryEventInfoPage", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryEventInfoPage(@RequestBody @Validated Object pa) {
-//        monitorGroupService.addMonitorGroup(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
-        return ResultWrapper.successWithNothing();
+    public Object queryEventInfoPage(@RequestBody @Validated QueryEventInfoParam pa) {
+       return checkEventService.queryEventInfoPage(pa);
     }
 
 
