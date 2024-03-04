@@ -55,8 +55,9 @@ public class UpdateBulletinDataParam extends BaseBulletinData {
                 StrUtil.isNotEmpty(content) || Objects.isNull(topMost))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "已发布的公告需要先撤销后才能编辑");
         }
-        if (Optional.ofNullable(this.topMost).map(u -> tbBulletinData.getTopMost().equals(u)).orElse(false)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "已经置顶的公告无法再次置顶");
+        final Boolean dataTopMost = tbBulletinData.getTopMost();
+        if (Optional.ofNullable(this.topMost).flatMap(u -> Optional.of(dataTopMost).map(u::equals)).orElse(false)) {
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "已经" + (dataTopMost ? "" : "取消") + "置顶的公告无法再次" + (dataTopMost ? "" : "取消") + "置顶");
         }
         if (Optional.ofNullable(this.topMost).orElse(false) && BulletinPublishStatus.UNPUBLISHED.getCode()
                 .equals(Objects.isNull(this.status) ? dataStatus : this.status)) {
