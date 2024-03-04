@@ -2,7 +2,9 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.MonitorTypeWithField;
+import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.QueryMonitorTypeFieldListV2Param;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldListV2Info;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
@@ -48,4 +50,6 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
     List<MonitorTypeBaseInfoV1> selectByMonitorTypeList(List<Integer> monitorTypeList);
 
     List<MonitorTypeBaseInfoV1> selectAllMonitorTypeBaseInfoV1();
+
+    List<MonitorTypeFieldListV2Info> selectMonitorTypeFieldListV2(@Param("param") QueryMonitorTypeFieldListV2Param param);
 }

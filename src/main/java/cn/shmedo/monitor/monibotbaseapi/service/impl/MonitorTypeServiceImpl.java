@@ -671,4 +671,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         });
         templateCacheDataMap.clear();
     }
+
+    @Override
+    public List<MonitorTypeFieldListV2Info> queryMonitorTypeFieldListV2(QueryMonitorTypeFieldListV2Param param) {
+        return baseMapper.selectMonitorTypeFieldListV2(param);
+    }
 }

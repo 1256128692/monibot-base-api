@@ -193,7 +193,7 @@ public class MonitorTypeController {
 
     @PostMapping(value = "/DeleteMonitorTypeFieldBatch", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object deleteMonitorTypeFieldBatch(@RequestBody @Validated DeleteMonitorTypeFieldBatchParam pa) {
-        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getMonitorType(),pa.getFieldIDList());
+        monitorTypeService.deleteMonitorTypeFieldBatch(pa.getMonitorType(), pa.getFieldIDList());
         return ResultWrapper.successWithNothing();
     }
 
@@ -247,10 +247,9 @@ public class MonitorTypeController {
      * @api {POST} /QueryMonitorTypeFieldListV2 查询监测类型属性不分页
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
-     * @apiName QueryMonitorTypeListV2
+     * @apiName QueryMonitorTypeFieldListV2
      * @apiDescription 查询监测类型分页
      * @apiParam (请求参数) {Int} companyID 公司ID
-     * @apiParam (请求参数) {Int} projectID 工程ID
      * @apiParam (请求参数) {Boolean} [allFiled] 全属性，否则fieldClass只展示12
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.id 监测类型ID
@@ -278,10 +277,9 @@ public class MonitorTypeController {
      * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorType")
-    @PostMapping(value = "/QueryMonitorTypeListV2", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object queryMonitorTypeListV2(@RequestBody @Validated Object request) {
-//        return monitorTypeService.queryMonitorTypeList(request);
-        return ResultWrapper.successWithNothing();
+    @PostMapping(value = "/QueryMonitorTypeFieldListV2", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object queryMonitorTypeFieldListV2(@RequestBody @Validated QueryMonitorTypeFieldListV2Param param) {
+        return monitorTypeService.queryMonitorTypeFieldListV2(param);
     }
 
     /**

@@ -16,6 +16,35 @@
     <result column="CompanyID" jdbcType="INTEGER" property="companyID" />
     <result column="ExValues" jdbcType="VARCHAR" property="exValues" />
   </resultMap>
+  <resultMap id="MonitorTypeFieldListV2Map" type="cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldListV2Info">
+    <id column="typeID" jdbcType="INTEGER" property="ID"/>
+    <result column="monitorType" jdbcType="INTEGER" property="monitorType"/>
+    <result column="typeName" jdbcType="VARCHAR" property="typeName"/>
+    <result column="typeAlias" jdbcType="VARCHAR" property="typeAlias"/>
+    <result column="displayOrder" jdbcType="INTEGER" property="displayOrder"/>
+    <result column="monitorTypeClass" jdbcType="VARCHAR" property="monitorTypeClass"/>
+    <result column="multiSensor" jdbcType="BIT" property="multiSensor"/>
+    <result column="apiDataSource" jdbcType="BIT" property="apiDataSource"/>
+    <result column="createType" jdbcType="TINYINT" property="createType"/>
+    <result column="companyID" jdbcType="INTEGER" property="companyID"/>
+    <result column="exValues" jdbcType="VARCHAR" property="exValues"/>
+    <collection property="fieldList" ofType="cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.MonitorTypeFieldV2">
+      <id column="fieldID" jdbcType="INTEGER" property="ID"/>
+      <result column="fieldMonitorType" jdbcType="INTEGER" property="monitorType"/>
+      <result column="fieldToken" jdbcType="VARCHAR" property="fieldToken"/>
+      <result column="fieldName" jdbcType="VARCHAR" property="fieldName"/>
+      <result column="fieldDataType" jdbcType="VARCHAR" property="fieldDataType"/>
+      <result column="fieldClass" jdbcType="INTEGER" property="fieldClass"/>
+      <result column="fieldDesc" jdbcType="VARCHAR" property="fieldDesc"/>
+      <result column="fieldUnitID" jdbcType="INTEGER" property="fieldUnitID"/>
+      <result column="parentID" jdbcType="INTEGER" property="parentID"/>
+      <result column="createType" jdbcType="INTEGER" property="createType"/>
+      <result column="exValues" jdbcType="VARCHAR" property="exValues"/>
+      <result column="displayOrder" jdbcType="INTEGER" property="displayOrder"/>
+      <result column="chnUnit" jdbcType="VARCHAR" property="chnUnit"/>
+      <result column="engUnit" jdbcType="VARCHAR" property="engUnit"/>
+    </collection>
+  </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
     ID, MonitorType, TypeName, TypeAlias, DisplayOrder, MonitorTypeClass, MultiSensor, 
@@ -282,4 +311,42 @@
       select monitorType, typeName, exValues
       from tb_monitor_type
   </select>
+    <select id="selectMonitorTypeFieldListV2" resultMap="MonitorTypeFieldListV2Map">
+      SELECT
+        mt.ID typeID,
+        mt.MonitorType monitorType,
+        mt.TypeName typeName,
+        mt.TypeAlias typeAlias,
+        mt.DisplayOrder displayOrder,
+        mt.MonitorTypeClass monitorTypeClass,
+        mt.MultiSensor multiSensor,
+        mt.ApiDataSource apiDataSource,
+        mt.CreateType createType,
+        mt.CompanyID companyID,
+        mt.ExValues exValues,
+        mtf.ID fieldID,
+        mtf.MonitorType fieldMonitorType,
+        mtf.FieldToken fieldToken,
+        mtf.FieldName fieldName,
+        mtf.FieldDataType fieldDataType,
+        mtf.FieldClass fieldClass,
+        mtf.FieldDesc fieldDesc,
+        mtf.FieldUnitID fieldUnitID,
+        mtf.ParentID parentID,
+        mtf.CreateType createType,
+        mtf.ExValues exValues,
+        mtf.DisplayOrder displayOrder,
+        du.ChnUnit chnUnit,
+        du.EngUnit engUnit
+      FROM tb_monitor_type mt
+          LEFT JOIN tb_monitor_type_field mtf ON mtf.MonitorType = mt.MonitorType
+          <if test="param.fieldClassList != null and param.fieldClassList.size > 0">
+            AND mtf.FieldClass IN
+            <foreach collection="param.fieldClassList" item="item" index="index" separator="," open="(" close=")">
+              #{item}
+            </foreach>
+          </if>
+          LEFT JOIN tb_data_unit du ON du.ID = mtf.FieldUnitID
+      WHERE mt.CompanyID IN (-1,#{param.companyID})
+    </select>
 </mapper>

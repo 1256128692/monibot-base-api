@@ -4,6 +4,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeDetail;
+import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldListV2Info;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula;
 import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
@@ -53,4 +54,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     QueryFormulaParamsResult queryFormulaParams(QueryFormulaParamsRequest request);
 
     void refreshMonitorTypeCache(RefreshMonitorTypeCacheParam pa);
+
+    List<MonitorTypeFieldListV2Info> queryMonitorTypeFieldListV2(QueryMonitorTypeFieldListV2Param param);
 }
