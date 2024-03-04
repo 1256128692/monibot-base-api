@@ -456,7 +456,7 @@
                       AND
                 </if>
                 <if test="pa.monitorTypeID != null">
-                    tmt.ID = #{pa.monitorTypeID}
+                    tmt.MonitorType = #{pa.monitorTypeID}
                       AND
                 </if>
                 <if test="pa.monitorPoint != null and pa.monitorPoint != ''">
