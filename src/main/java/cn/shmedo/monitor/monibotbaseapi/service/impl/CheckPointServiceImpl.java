@@ -9,10 +9,10 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckTaskPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTaskPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointGroupSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.reservoir.CheckTaskStatus;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.*;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
@@ -24,6 +24,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.util.function.Tuple2;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -70,8 +71,12 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delete(DeleteCheckPointRequest request) {
-        taskPointMapper.delete(Wrappers.<TbCheckTaskPoint>lambdaQuery()
-                .in(TbCheckTaskPoint::getPointID, request.getIdList()));
+        // 任务状态为未开始的点，直接从任务中移除
+        Optional.of(request.getPointStatus().stream()
+                        .filter(e -> CheckTaskStatus.UN_START.getCode().equals(e.getT3()))
+                        .map(Tuple2::getT1).distinct().toList())
+                .filter(e -> !e.isEmpty())
+                .ifPresent(taskPointMapper::deleteBatchIds);
         this.removeByIds(request.getIdList());
     }
 

@@ -48,17 +48,100 @@
       <if test="userID != null">
           AND CheckerID = #{userID}
       </if>
-      <if test="param.checkTypeList != null and param.checkTypeList.size != 0">
-          AND CheckType in
-          <foreach collection="param.checkTypeList" item="item" separator="," index="index" open="(" close=")">
-              #{item}
-          </foreach>
-      </if>
-      <if test="param.statusList != null and param.statusList.size != 0">
-          AND `Status` in
-          <foreach collection="param.statusList" item="item" separator="," index="index" open="(" close=")">
-              #{item}
-          </foreach>
-      </if>
   </select>
+
+    <select id="lastSerialNumber" resultType="java.lang.Integer">
+        SELECT RIGHT(SerialNumber, 5)
+        FROM `tb_check_task`
+        WHERE `SerialNumber` LIKE CONCAT(#{serialNumber}, '%')
+        ORDER BY `ID` DESC
+        LIMIT 1
+    </select>
+
+    <sql id="list_sql_part">
+        FROM `tb_check_task` tct
+                 LEFT JOIN tb_project_service_relation tpsr ON tct.ProjectID = tpsr.ProjectID
+                 LEFT JOIN tb_project_info tpi ON tct.ProjectID = tpi.ID
+        <where>
+            <trim prefixOverrides="AND">
+                <choose>
+                    <when test="param.projectList != null and param.projectList.size() != 0">
+                        <foreach collection="param.projectList" item="item" separator="," open="AND tct.ProjectID IN ("
+                                 close=")">
+                            #{item}
+                        </foreach>
+                    </when>
+                    <otherwise>
+                        AND FALSE
+                    </otherwise>
+                </choose>
+                <if test="param.serviceID != null">
+                    AND tpsr.ServiceID = #{param.serviceID}
+                </if>
+                <if test="param.checkType != null">
+                    AND tct.CheckType = #{param.checkType}
+                </if>
+                <if test="param.status != null">
+                    AND tct.Status = #{param.status}
+                </if>
+                <if test="param.keyword != null and param.keyword != ''">
+                    AND (
+                    <if test="param.checkerList != null and param.checkerList.size() != 0">
+                        <foreach collection="param.checkerList" item="item" separator="," open="tct.CheckerID IN ("
+                                 close=") OR">
+                            #{item}
+                        </foreach>
+                    </if>
+                    tct.SerialNumber LIKE CONCAT('%', #{param.keyword}, '%') OR
+                    tct.`Name` LIKE CONCAT('%', #{param.keyword}, '%'))
+                </if>
+            </trim>
+        </where>
+    </sql>
+
+    <select id="page" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak.CheckTaskSimple">
+        SELECT tct.ID,
+               tct.ProjectID,
+               tpi.ProjectName,
+               tct.SerialNumber,
+               tct.CheckType,
+               tct.`Name`,
+               tct.Status,
+               tct.TaskDate,
+               tct.BeginTime,
+               tct.EndTime,
+               tct.CheckerID,
+               tct.ExValue
+        <include refid="list_sql_part"/>
+        ORDER BY tct.TaskDate, tct.UpdateTime DESC
+    </select>
+
+    <select id="list" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak.CheckTaskSimple">
+        SELECT tct.ID,
+               tct.ProjectID,
+               tpi.ProjectName,
+               tct.SerialNumber,
+               tct.CheckType,
+               tct.`Name`,
+               tct.Status,
+               tct.TaskDate,
+               tct.BeginTime,
+               tct.EndTime,
+               tct.CheckerID,
+               tct.ExValue
+        <include refid="list_sql_part"/>
+        ORDER BY tct.TaskDate, tct.UpdateTime DESC
+    </select>
+
+    <resultMap id="statisMap" type="cn.shmedo.iot.entity.base.Tuple">
+        <result column="item1" property="item1" jdbcType="TINYINT" javaType="INTEGER"/>
+        <result column="item2" property="item2" jdbcType="INTEGER" javaType="LONG"/>
+    </resultMap>
+
+    <select id="statis" resultMap="statisMap">
+        SELECT tct.`Status` item1,
+               COUNT(1)     item2
+        <include refid="list_sql_part"/>
+        GROUP BY tct.`Status`
+    </select>
 </mapper>

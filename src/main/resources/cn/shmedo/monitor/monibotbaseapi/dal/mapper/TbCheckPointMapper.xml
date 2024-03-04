@@ -93,4 +93,17 @@
     <select id="list" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple">
         <include refid="list_sql"/>
     </select>
+
+    <update id="updateLastCheckTime">
+        UPDATE tb_check_point
+        <set>
+            <if test="lastCheckTime != null">
+                LastCheckTime = #{lastCheckTime,jdbcType=TIMESTAMP}
+            </if>
+        </set>
+        WHERE `ID` IN
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

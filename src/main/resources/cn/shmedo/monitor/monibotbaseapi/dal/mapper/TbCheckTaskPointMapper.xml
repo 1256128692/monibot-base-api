@@ -20,15 +20,98 @@
     UpdateUserID, UpdateTime
   </sql>
 
-  <select id="existStatusByPointIds" resultType="boolean">
-    SELECT EXISTS
-             (SELECT 1
-              FROM `tb_check_task_point` tctp
-                     LEFT JOIN `tb_check_task` tct ON tctp.TaskID = tct.ID
-              WHERE tct.`Status` = #{status.code}
-    <foreach collection="pointIds" open="AND tctp.ID IN (" close="))" separator="," item="item" index="index">
-      #{item}
+  <update id="updateBatchSelective" parameterType="java.util.List">
+    update tb_check_task_point
+    <trim prefix="set" suffixOverrides=",">
+      <trim prefix="TaskID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.taskID != null">
+            when ID = #{item.ID} then #{item.taskID}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="PointID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.pointID != null">
+            when ID = #{item.ID} then #{item.pointID}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="Annexes = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.annexes != null">
+            when ID = #{item.ID} then #{item.annexes}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="Remark = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.remark != null">
+            when ID = #{item.ID} then #{item.remark}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="PointInfo = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.pointInfo != null">
+            when ID = #{item.ID} then #{item.pointInfo}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="ExValue = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.exValue != null">
+            when ID = #{item.ID} then #{item.exValue}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="CreateUserID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.createUserID != null">
+            when ID = #{item.ID} then #{item.createUserID}
+          </if>
+        </foreach>
+      </trim>
+      <trim prefix="UpdateUserID = case" suffix="end,">
+        <foreach collection="list" index="index" item="item">
+          <if test="item.updateUserID != null">
+            when ID = #{item.ID} then #{item.updateUserID}
+          </if>
+        </foreach>
+      </trim>
+    </trim>
+    where ID in
+    <foreach close=")" collection="list" item="item" open="(" separator=", ">
+      #{item.ID}
     </foreach>
+  </update>
 
+  <insert id="batchInsert" keyColumn="ID" keyProperty="ID" parameterType="map" useGeneratedKeys="true">
+    insert into tb_check_task_point
+    (TaskID, PointID, Annexes, Remark, PointInfo, ExValue, CreateUserID, UpdateUserID)
+    values
+    <foreach collection="list" item="item" separator=",">
+      (#{item.taskID}, #{item.pointID}, #{item.annexes}, #{item.remark}, #{item.pointInfo},
+       #{item.exValue}, #{item.createUserID}, #{item.updateUserID})
+    </foreach>
+  </insert>
+
+  <resultMap id="listPointStatusMap" type="reactor.util.function.Tuple3">
+    <result column="t1" property="t1" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+    <result column="t2" property="t2" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+    <result column="t3" property="t3" jdbcType="TINYINT" javaType="java.lang.Integer"/>
+  </resultMap>
+
+  <select id="listPointStatus" resultMap="listPointStatusMap">
+    SELECT tct.`ID`     AS t1,
+           tctp.PointID AS t2,
+           tct.`Status` AS t3
+    FROM `tb_check_task_point` tctp
+           INNER JOIN tb_check_task tct ON tctp.TaskID = tct.ID
+    <where>
+      <foreach collection="collection" separator="," open="tctp.PointID IN (" close=")" item="item">
+        #{item}
+      </foreach>
+    </where>
   </select>
 </mapper>

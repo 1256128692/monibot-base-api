@@ -250,4 +250,17 @@
 
 
 
+
+  <select id="listByTaskID" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkevent.CheckEventSimple">
+    SELECT tce.ID,
+           tce.TypeID,
+           tcet.`Name` typeName,
+           tce.Address,
+           tce.Location,
+           tce.`Describe`,
+           tce.Annexes
+    FROM `tb_check_event` tce
+           LEFT JOIN `tb_check_event_type` tcet ON tce.TypeID = tcet.ID
+    WHERE tce.TaskID = #{taskID}
+  </select>
 </mapper>

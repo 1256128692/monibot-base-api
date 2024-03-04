@@ -1,0 +1,57 @@
+package cn.shmedo.monitor.monibotbaseapi.model.param.checktask;
+
+import cn.hutool.core.lang.Assert;
+import cn.hutool.extra.spring.SpringUtil;
+import cn.shmedo.iot.entity.api.ParameterValidator;
+import cn.shmedo.iot.entity.api.Resource;
+import cn.shmedo.iot.entity.api.ResourceType;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.iot.entity.exception.InvalidParameterException;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckTaskMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTask;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.reservoir.CheckTaskStatus;
+import com.alibaba.nacos.shaded.org.checkerframework.checker.index.qual.Positive;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+
+import java.util.List;
+import java.util.Set;
+
+/**
+ * @author Chengfs on 2024/3/1
+ */
+@Data
+public class DeleteCheckTaskRequest implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
+
+    @NotEmpty
+    private Set<@Positive Integer> idList;
+
+    @JsonIgnore
+    private  List<TbCheckTask> origins;
+
+    @Override
+    public ResultWrapper<?> validate() {
+        TbCheckTaskMapper mapper = SpringUtil.getBean(TbCheckTaskMapper.class);
+        this.origins = mapper.selectList(Wrappers.<TbCheckTask>lambdaQuery()
+                .in(TbCheckTask::getID, idList)
+                .select(TbCheckTask::getID, TbCheckTask::getProjectID, TbCheckTask::getStatus));
+
+        Assert.isTrue(origins.size() == idList.size(), () -> new InvalidParameterException("包含不存在的任务"));
+        origins.forEach(task -> Assert.isTrue(task.getStatus() == CheckTaskStatus.UN_START, () -> new InvalidParameterException("任务状态不允许删除")));
+        return null;
+    }
+
+    @Override
+    public List<Resource> parameter() {
+        return origins.stream().map(e -> new Resource(e.getProjectID().toString(), ResourceType.BASE_PROJECT)).toList();
+    }
+
+    @Override
+    public ResourcePermissionType resourcePermissionType() {
+        return ResourcePermissionType.BATCH_RESOURCE_SINGLE_PERMISSION;
+    }
+}

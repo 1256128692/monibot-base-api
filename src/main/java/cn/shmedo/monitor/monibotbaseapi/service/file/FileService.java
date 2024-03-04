@@ -166,7 +166,7 @@ public class FileService {
                 log.error("获取文件 {} 信息失败，{} => {}", ossPathList.stream().toList(), info.getCode(), info.getMsg());
             }
         }
-        return null;
+        return List.of();
     }
 
     /**

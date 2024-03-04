@@ -113,6 +113,11 @@ public class DefaultConstant {
     public static final String SMS_SIGN_NAME = "米度测控";
 
     /**
+     * 巡检任务/巡检点 编号头
+     */
+    public static final String XJ = "XJ";
+
+    /**
      * 海康视频参数key<br>
      * 这里仅注释它的含义,具体取值等需在对应接口上查看相应海康接口文档引用。
      */

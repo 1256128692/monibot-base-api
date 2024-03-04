@@ -14,6 +14,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+import reactor.util.function.Tuple3;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,9 @@ public class DeleteCheckPointRequest implements ParameterValidator, ResourcePerm
     @JsonIgnore
     private List<TbCheckPoint> original;
 
+    @JsonIgnore
+    private List<Tuple3<Integer, Integer, Integer>> pointStatus;
+
     @Override
     public ResultWrapper<?> validate() {
         TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
@@ -42,10 +46,15 @@ public class DeleteCheckPointRequest implements ParameterValidator, ResourcePerm
                 .orElseThrow(() -> new IllegalArgumentException("包含不存在的巡检点"));
 
         TbCheckTaskPointMapper taskPointMapper = SpringUtil.getBean(TbCheckTaskPointMapper.class);
-        if (taskPointMapper.existStatusByPointIds(idList, CheckTaskStatus.PROCESSING)) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所选的巡检点有正在执行的巡检任务，无法删除，请确认无正在执行的巡检任务再做删除。");
-        }
+        this.pointStatus = taskPointMapper.listPointStatus(idList);
 
+        // 巡检点有正在执行的巡检任务，则不允许删除
+        for (Tuple3<Integer, Integer, Integer> item : pointStatus) {
+            if (CheckTaskStatus.PROCESSING.getCode().equals(item.getT3())) {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER,
+                        "所选的巡检点有正在执行的巡检任务，无法删除，请确认无正在执行的巡检任务再做删除。");
+            }
+        }
         return null;
     }
 

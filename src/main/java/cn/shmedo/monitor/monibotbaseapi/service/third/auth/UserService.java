@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.auth.OpenAuthApplicationHasPermissionParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourceParameter;
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
@@ -113,4 +114,15 @@ public interface UserService {
     ResultWrapper<DepartmentIncludeUserInfo> queryDepartmentIncludeUserInfoList(QueryDepartmentIncludeUserInfoListParameter parameter,
                                                                                 @Param("appKey") String appKey,
                                                                                 @Param("appSecret") String appSecret);
+
+    /**
+     * 批量查询用户
+     *
+     * @return {@link List<UserBase>}
+     */
+    @RequestLine("POST /QueryUserBatch")
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<UserBase>> queryUserBatch(QueryUserBatchRequest request,
+                                                 @Param("appKey") String appKey,
+                                                 @Param("appSecret") String appSecret);
 }

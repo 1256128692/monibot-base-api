@@ -1,19 +1,28 @@
 package cn.shmedo.monitor.monibotbaseapi.controller.reservoir;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
+import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checktask.*;
+import cn.shmedo.monitor.monibotbaseapi.service.CheckTaskService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 水库巡检任务
  *
  * @author Chengfs on 2024/2/27
  */
+@RestController
+@RequiredArgsConstructor
 public class CheckTaskController {
+
+    private final CheckTaskService service;
 
     /**
      * @api {POST} /AddCheckTask 新增巡检任务
@@ -33,12 +42,12 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @Permission(permissionName = "mdmbase:UpdateCheckTask")
     @LogParam(moduleName = "巡检管理", operationName = "新建巡检任务", operationProperty = OperationProperty.ADD)
     @PostMapping(value = "AddCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object add(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object add(@Valid @RequestBody AddCheckTaskRequest body) {
+        return service.save(body);
     }
 
     /**
@@ -58,11 +67,12 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
+    @Permission(permissionName = "mdmbase:UpdateCheckPoint")
     @LogParam(moduleName = "巡检管理", operationName = "修改巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "UpdateCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object update(@Valid @RequestBody Void body) {
+    public Object update(@Valid @RequestBody UpdateCheckTaskRequest body) {
+        service.update(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -75,13 +85,14 @@ public class CheckTaskController {
      * @apiParam (请求参数) {Int[]} idList 巡检任务id集合
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
+     * @apiPermission 项目权限 mdmbase:DeleteCheckTask
      */
-//    @Permission(permissionName = "mdmbase:DeleteCheckTask")
+    @Permission(permissionName = "mdmbase:DeleteCheckTask")
     @LogParam(moduleName = "巡检管理", operationName = "删除巡检任务", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object delete(@Valid @RequestBody Void body) {
+    public Object delete(@Valid @RequestBody DeleteCheckTaskRequest body) {
+        service.delete(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -92,7 +103,7 @@ public class CheckTaskController {
      * @apiName QueryCheckTaskPage
      * @apiDescription 查询巡检任务分页
      * @apiParam (请求参数) {Int} companyID 公司id
-     * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(任务编码/巡检人员名称)
+     * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(任务编码/巡检人员/任务名称)
      * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [checkType] 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
@@ -124,11 +135,11 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckTask
      */
-//    @Permission(permissionName = "mdmbase:ListCheckTask")
+    @Permission(permissionName = "mdmbase:ListCheckTask")
     @PostMapping(value = "/QueryCheckTaskPage", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object page(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object page(@Valid @RequestBody QueryCheckTaskPageRequest body) {
+        return service.page(body);
     }
 
     /**
@@ -160,11 +171,11 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListCheckTask
      */
-//    @Permission(permissionName = "mdmbase:ListCheckTask")
+    @Permission(permissionName = "mdmbase:ListCheckTask")
     @PostMapping(value = "/QueryCheckTaskList", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object list(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object list(@Valid @RequestBody QueryCheckTaskListRequest body) {
+        return service.list(body);
     }
 
     /**
@@ -215,11 +226,11 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeCheckTask
      */
-//    @Permission(permissionName = "mdmbase:DescribeCheckTask")
+    @Permission(permissionName = "mdmbase:DescribeCheckTask")
     @PostMapping(value = "/QueryCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object single(@Valid @RequestBody Void body) {
-        return ResultWrapper.successWithNothing();
+    public Object single(@Valid @RequestBody QueryCheckTaskRequest body) {
+        return service.single(body);
     }
 
     /**
@@ -234,11 +245,12 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @Permission(permissionName = "mdmbase:UpdateCheckTask")
     @LogParam(moduleName = "巡检管理", operationName = "开始巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "StartCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object startTask(@Valid @RequestBody Void body) {
+    public Object startTask(@Valid @RequestBody StartTaskRequest body) {
+        service.startTask(body);
         return ResultWrapper.successWithNothing();
     }
 
@@ -261,11 +273,12 @@ public class CheckTaskController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckTask
      */
-//    @Permission(permissionName = "mdmbase:UpdateCheckTask")
+    @Permission(permissionName = "mdmbase:UpdateCheckTask")
     @LogParam(moduleName = "巡检管理", operationName = "结束巡检任务", operationProperty = OperationProperty.UPDATE)
     @PostMapping(value = "EndCheckTask", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object endTask(@Valid @RequestBody Void body) {
+    public Object endTask(@Valid @RequestBody EndTaskRequest body) {
+        service.endTask(body);
         return ResultWrapper.successWithNothing();
     }
 }
