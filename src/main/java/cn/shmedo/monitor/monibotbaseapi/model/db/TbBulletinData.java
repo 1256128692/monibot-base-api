@@ -1,9 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.db;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -79,4 +76,14 @@ public class TbBulletinData {
      */
     @TableField("UpdateUser")
     private String updateUser;
+    /**
+     * 发布时间
+     */
+    @TableField(value = "PublishTime",updateStrategy = FieldStrategy.IGNORED)
+    private Date publishTime;
+    /**
+     * 置顶时间
+     */
+    @TableField(value = "TopMostTime",updateStrategy = FieldStrategy.IGNORED)
+    private Date topMostTime;
 }

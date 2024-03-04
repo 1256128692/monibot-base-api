@@ -26,7 +26,7 @@ public class BulletinController {
 
     /**
      * @api {POST} /QueryBulletinList 查询公告列表(不分页)
-     * @apiDescription 查询公告列表(不分页), 发布状态传参为 1.已发布 时将按照发布时间倒序排序,否则将按照创建时间倒序排序
+     * @apiDescription 查询公告列表(不分页), 发布状态传参为 1.已发布 时将按照置顶优先、发布时间倒序排序,否则将按照创建时间倒序排序
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
      * @apiName QueryBulletinList
@@ -43,7 +43,7 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} dataList.name 公告标题
      * @apiSuccess (返回结果) {String} dataList.content 公告内容
      * @apiSuccess (返回结果) {String} dataList.createUser 作者信息
-     * @apiSuccess (返回结果) {DateTime} dataList.updateTime 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间
+     * @apiSuccess (返回结果) {DateTime} [dataList.publishTime] 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间;否则为空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
@@ -55,7 +55,7 @@ public class BulletinController {
 
     /**
      * @api {POST} /QueryBulletinPage 查询公告列表(分页)
-     * @apiDescription 查询公告列表(分页), 发布状态传参为 1.已发布 时将按照置顶优先,发布时间倒序排序,否则将按照置顶优先,创建时间倒序排序
+     * @apiDescription 查询公告列表(分页)
      * @apiVersion 1.0.0
      * @apiGroup 公告模块
      * @apiName QueryBulletinPage
@@ -82,7 +82,7 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} currentPageData.content 公告内容
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {String} currentPageData.createUser 作者信息
-     * @apiSuccess (返回结果) {DateTime} [currentPageData.updateTime] 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间;否则为空
+     * @apiSuccess (返回结果) {DateTime} [currentPageData.publishTime] 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间;否则为空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBulletinData
      */
@@ -109,7 +109,7 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} content 公告内容
      * @apiSuccess (返回结果) {String} createUser 作者信息
      * @apiSuccess (返回结果) {DateTime} createTime 创建时间
-     * @apiSuccess (返回结果) {DateTime} updateTime 修改时间,如果发布状态为1.已发布,那么就是对应的发布时间
+     * @apiSuccess (返回结果) {DateTime} [publishTime] 发布时间
      * @apiSuccess (返回结果) {Object[]} attachmentDataList 附件列表
      * @apiSuccess (返回结果) {String} attachmentDataList.fileName 文件名称
      * @apiSuccess (返回结果) {String} attachmentDataList.fileType 文件类型

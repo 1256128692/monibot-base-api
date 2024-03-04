@@ -48,19 +48,31 @@ public class UpdateBulletinData extends BaseBulletinData {
             return validate;
         }
         TbBulletinData tbBulletinData = tbBulletinDataList.stream().findAny().orElseThrow();
-        if (tbBulletinData.getStatus() == 1) {
+        // 对于已发布的公告,编辑接口只允许编辑置顶状态
+        if (tbBulletinData.getStatus() == 1 && CollUtil.isEmpty(getFilePathList()) && CollUtil.isEmpty(platform) &&
+                Objects.isNull(status) && Objects.isNull(type) && StrUtil.isEmpty(name) && StrUtil.isEmpty(content) &&
+                Objects.nonNull(topMost)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "已发布的公告需要先撤销后才能编辑");
         }
         if (Optional.ofNullable(this.topMost).orElse(false) && (Objects.isNull(this.status) ||
                 BulletinPublishStatus.UNPUBLISHED.getCode().equals(this.status))) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未发布的公告无法置顶");
         }
-        Optional.ofNullable(status).ifPresent(tbBulletinData::setStatus);
+        final Date current = getCurrent();
+        Optional.ofNullable(status).ifPresent(u -> {
+            tbBulletinData.setStatus(u);
+            if (BulletinPublishStatus.PUBLISHED.getCode().equals(u)) {
+                tbBulletinData.setPublishTime(current);
+            }
+        });
         Optional.ofNullable(type).ifPresent(tbBulletinData::setType);
-        Optional.ofNullable(topMost).ifPresent(tbBulletinData::setTopMost);
+        Optional.ofNullable(topMost).ifPresent(u -> {
+            tbBulletinData.setTopMost(u);
+            tbBulletinData.setTopMostTime(u ? current : null);
+        });
         Optional.ofNullable(name).filter(StrUtil::isNotEmpty).ifPresent(tbBulletinData::setName);
         Optional.ofNullable(content).filter(StrUtil::isNotEmpty).ifPresent(tbBulletinData::setContent);
-        tbBulletinData.setUpdateTime(getCurrent());
+        tbBulletinData.setUpdateTime(current);
         setTbBulletinData(tbBulletinData);
         Optional.ofNullable(getPlatformRelationList()).filter(CollUtil::isNotEmpty).ifPresent(u ->
                 u.forEach(w -> w.setBulletinID(bulletinID)));

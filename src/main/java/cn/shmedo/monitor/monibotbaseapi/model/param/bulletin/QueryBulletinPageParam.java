@@ -59,12 +59,14 @@ public class QueryBulletinPageParam implements ParameterValidator, ResourcePermi
         // param {@code lastIdOrder} is used to handle this situation that time equals between more than one records.
         final String lastIdOrder = "bd.`ID`";
         orderItemList = switch (orderType) {
-            case 1 -> OrderItem.descs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime), lastIdOrder);
-            case 2 -> OrderItem.ascs(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime), lastIdOrder);
-            case 3 -> OrderItem.descs(MybatisFieldUtil.columnToString(TbBulletinData::getTopMost),
-                    MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime), lastIdOrder);
+            case 1 -> List.of(OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime)), OrderItem.asc(lastIdOrder));
+            case 2 -> List.of(OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getCreateTime)), OrderItem.asc(lastIdOrder));
+            case 3 -> List.of(OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getTopMost)),
+                    OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getTopMostTime)),
+                    OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getPublishTime)), OrderItem.asc(lastIdOrder));
             case 4 -> List.of(OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getTopMost)),
-                    OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getUpdateTime)), OrderItem.asc(lastIdOrder));
+                    OrderItem.desc(MybatisFieldUtil.columnToString(TbBulletinData::getTopMostTime)),
+                    OrderItem.asc(MybatisFieldUtil.columnToString(TbBulletinData::getPublishTime)), OrderItem.asc(lastIdOrder));
             default -> throw new IllegalArgumentException();
         };
         return null;

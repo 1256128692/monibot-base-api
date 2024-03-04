@@ -21,7 +21,7 @@ public class BulletinDataBaseInfo {
     private String name;
     private String content;
     private String createUser;
-    private Date updateTime;
+    private Date publishTime;
 
     /**
      * 处理平台描述

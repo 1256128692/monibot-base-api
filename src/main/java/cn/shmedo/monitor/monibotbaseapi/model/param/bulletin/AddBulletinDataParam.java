@@ -45,7 +45,9 @@ public class AddBulletinDataParam extends BaseBulletinData {
         if (this.topMost && BulletinPublishStatus.UNPUBLISHED.getCode().equals(this.status)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "未发布的公告无法置顶");
         }
-        setTbBulletinData(new TbBulletinData(null, getCompanyID(), type, name, content, null, status, topMost, current, null, current, null));
+        setTbBulletinData(new TbBulletinData(null, getCompanyID(), type, name, content, null, status,
+                topMost, current, null, current, null,
+                BulletinPublishStatus.PUBLISHED.getCode().equals(this.status) ? current : null, topMost ? current : null));
         return null;
     }
 }

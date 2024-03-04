@@ -10,7 +10,7 @@
             bd.`Name` 'name',
             bd.Content content,
             bd.CreateUser createUser,
-            bd.UpdateTime updateTime,
+            bd.PublishTime publishTime,
             GROUP_CONCAT( bpr.Platform ) platformStr
         FROM tb_bulletin_data bd
             LEFT JOIN tb_bulletin_platform_relation bpr ON bd.ID = bpr.BulletinID
@@ -24,10 +24,10 @@
         GROUP BY bd.ID
         <choose>
             <when test="status != null and status == 1">
-                ORDER BY bd.`TopMost` DESC,bd.UpdateTime DESC,bd.`ID` DESC
+                ORDER BY bd.`TopMost` DESC,bd.TopMostTime DESC,bd.PublishTime DESC,bd.`ID` DESC
             </when>
             <otherwise>
-                ORDER BY bd.`TopMost` DESC,bd.CreateTime DESC,bd.`ID` DESC
+                ORDER BY bd.CreateTime DESC,bd.`ID` DESC
             </otherwise>
         </choose>
         <if test="size != null and size>0">
@@ -44,7 +44,7 @@
             bd.Content content,
             bd.CreateUser createUser,
             bd.CreateTime createTime,
-            bd.UpdateTime updateTime,
+            bd.PublishTime publishTime,
             GROUP_CONCAT( bpr.Platform ) platformStr
         FROM tb_bulletin_data bd
             LEFT JOIN tb_bulletin_platform_relation bpr ON bd.ID = bpr.BulletinID
@@ -62,10 +62,10 @@
             AND bd.`Status`=#{param.status}
         </if>
         <if test="param.startTime != null and param.status != null and param.status == 1">
-            AND bd.UpdateTime &gt;=#{param.startTime}
+            AND bd.PublishTime &gt;=#{param.startTime}
         </if>
         <if test="param.endTime != null and param.status != null and param.status == 1">
-            AND bd.UpdateTime &lt;=#{param.endTime}
+            AND bd.PublishTime &lt;=#{param.endTime}
         </if>
         GROUP BY bd.ID
     </select>
@@ -78,7 +78,7 @@
             bd.`Name` 'name',
             bd.`Content` content,
             bd.`CreateUser` createUser,
-            bd.`UpdateTime` updateTime,
+            bd.`PublishTime` publishTime,
             bd.`Status` 'status',
             bd.`CreateTime` createTime,
             GROUP_CONCAT( ba.FilePath  ORDER BY ba.CreateTime DESC ) attachmentStr
