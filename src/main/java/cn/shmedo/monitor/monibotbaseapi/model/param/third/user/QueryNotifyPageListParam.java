@@ -62,4 +62,8 @@ public class QueryNotifyPageListParam {
      * 结束时间
      */
     private Date end;
+    /**
+     * 创建时间排序 0.降序（默认） 1.升序
+     */
+    private int timeOrder;
 }

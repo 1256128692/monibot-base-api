@@ -28,8 +28,6 @@ public class QueryNotifyStatisticsParam {
     private String queryCode;
     @Range(min = 0, max = 1, message = "已读/未读状态 0.未读 1.已读")
     private Integer status;
-    @JsonProperty("begin")
-    private Date startTime;
-    @JsonProperty("end")
-    private Date endTime;
+    private Date begin;
+    private Date end;
 }

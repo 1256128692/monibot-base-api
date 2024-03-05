@@ -36,14 +36,13 @@ public class QueryNotifyPageParam implements ParameterValidator, ResourcePermiss
     /** 1.报警 2.事件 3.工单 */
     private Integer type;
     private Integer serviceID;
-    @JsonProperty("queryKey")
     private String queryCode;
     @Range(min = 0, max = 1, message = "已读/未读状态 0.未读 1.已读")
     private Integer status;
-    @JsonProperty("begin")
-    private Date startTime;
-    @JsonProperty("end")
-    private Date endTime;
+    @JsonProperty("startTime")
+    private Date begin;
+    @JsonProperty("endTime")
+    private Date end;
 
     /** 时间排序 0.降序（默认） 1.升序 */
     private Integer timeOrder;
