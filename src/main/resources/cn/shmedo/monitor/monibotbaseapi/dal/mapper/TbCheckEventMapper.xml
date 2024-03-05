@@ -246,6 +246,12 @@
                  left join tb_check_task ct on ce.`taskID` = ct.ID
                  left join tb_project_info p on ce.`projectID` = p.ID
         where 1 = 1
+        <if test="pa.begin != null">
+            AND ce.reportTime &gt;= #{pa.begin}
+        </if>
+        <if test="pa.end != null">
+            AND ce.reportTime &lt;= #{pa.end}
+        </if>
         <if test="pa.eventTypeID != null">
             and ce.typeID = #{pa.eventTypeID}
         </if>
@@ -262,12 +268,12 @@
             and (
                 ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
                 )
-        </if>
-        <if test="pa.reportUserIDs != null and pa.reportUserIDs.size != 0">
-            and ce.reportUserID in
-            <foreach collection="pa.reportUserIDs" item="reportUserID" separator="," index="index" open="(" close=")">
-                #{reportUserID}
-            </foreach>
+            <if test="pa.reportUserIDs != null and pa.reportUserIDs.size != 0">
+                or ce.reportUserID in
+                <foreach collection="pa.reportUserIDs" item="reportUserID" separator="," index="index" open="(" close=")">
+                    #{reportUserID}
+                </foreach>
+            </if>
         </if>
     </select>
 
