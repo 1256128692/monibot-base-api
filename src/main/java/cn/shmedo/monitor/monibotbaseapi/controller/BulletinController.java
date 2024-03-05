@@ -82,6 +82,7 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} currentPageData.content 公告内容
      * @apiSuccess (返回结果) {DateTime} currentPageData.createTime 创建时间
      * @apiSuccess (返回结果) {String} currentPageData.createUser 作者信息
+     * @apiSuccess (返回结果) {Boolean} currentPageData.topMost 是否置顶 true:置顶 | false:未置顶
      * @apiSuccess (返回结果) {DateTime} [currentPageData.publishTime] 发布时间,如果发布状态为1.已发布,那么就是对应的发布时间;否则为空
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:ListBulletinData

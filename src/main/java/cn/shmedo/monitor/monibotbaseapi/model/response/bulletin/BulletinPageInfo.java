@@ -14,4 +14,5 @@ import java.util.Date;
 public class BulletinPageInfo extends BulletinDataListInfo {
     private Integer status;
     private Date createTime;
+    private Boolean topMost;
 }

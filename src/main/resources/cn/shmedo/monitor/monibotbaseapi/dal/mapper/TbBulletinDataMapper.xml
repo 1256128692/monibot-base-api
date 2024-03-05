@@ -45,6 +45,7 @@
             bd.CreateUser createUser,
             bd.CreateTime createTime,
             bd.PublishTime publishTime,
+            bd.TopMost topMost,
             GROUP_CONCAT( bpr.Platform ) platformStr
         FROM tb_bulletin_data bd
             LEFT JOIN tb_bulletin_platform_relation bpr ON bd.ID = bpr.BulletinID
