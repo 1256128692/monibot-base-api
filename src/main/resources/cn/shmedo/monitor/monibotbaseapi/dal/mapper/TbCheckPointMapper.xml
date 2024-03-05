@@ -1,27 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper">
-  <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint">
-    <!--@Table tb_check_point-->
-    <id column="ID" property="ID" />
-    <result column="ProjectID" property="projectID" />
-    <result column="SerialNumber" property="serialNumber" />
-    <result column="Name" property="name" />
-    <result column="Enable" property="enable" />
-    <result column="GroupID" property="groupID" />
-    <result column="Address" property="address" />
-    <result column="Location" property="location" />
-    <result column="LastCheckTime" property="lastCheckTime" />
-    <result column="ExValue" property="exValue" />
-    <result column="CreateUserID" property="createUserID" />
-    <result column="CreateTime" property="createTime" />
-    <result column="UpdateUserID" property="updateUserID" />
-    <result column="UpdateTime" property="updateTime" />
-  </resultMap>
-  <sql id="Base_Column_List">
-    ID, ProjectID, SerialNumber, `Name`, `Enable`, GroupID, Address, `Location`, LastCheckTime,
-    ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime
-  </sql>
+    <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint">
+        <!--@Table tb_check_point-->
+        <id column="ID" property="ID"/>
+        <result column="ProjectID" property="projectID"/>
+        <result column="ServiceID" property="serviceID"/>
+        <result column="SerialNumber" property="serialNumber"/>
+        <result column="Name" property="name"/>
+        <result column="Enable" property="enable"/>
+        <result column="GroupID" property="groupID"/>
+        <result column="Address" property="address"/>
+        <result column="Location" property="location"/>
+        <result column="LastCheckTime" property="lastCheckTime"/>
+        <result column="ExValue" property="exValue"/>
+        <result column="CreateUserID" property="createUserID"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateUserID" property="updateUserID"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `ID`,ProjectID,ServiceID,SerialNumber,`Name`,`Enable`,GroupID,Address,`Location`,LastCheckTime,
+        ExValue,CreateUserID,CreateTime,UpdateUserID,UpdateTime
+    </sql>
 
     <select id="lastSerialNumber" resultType="java.lang.Integer">
         SELECT RIGHT(SerialNumber, 5)
@@ -46,7 +48,6 @@
         FROM `tb_check_point` tcp
                  LEFT JOIN `tb_check_point_group` tcpg ON tcp.GroupID = tcpg.ID
                  LEFT JOIN `tb_project_info` tpi ON tcp.ProjectID = tpi.ID
-                 LEFT JOIN `tb_project_service_relation` tpsr ON tcp.ProjectID = tpsr.ProjectID
         <where>
             <trim prefixOverrides="AND">
                 <choose>
@@ -66,7 +67,7 @@
                         OR tcpg.`Name` LIKE CONCAT('%', #{param.keyword}, '%'))
                 </if>
                 <if test="param.serviceID != null">
-                    AND tpsr.ServiceID = #{param.serviceID}
+                    AND tcp.ServiceID = #{param.serviceID}
                 </if>
                 <if test="param.enable != null">
                     AND tcp.`Enable` = #{param.enable}

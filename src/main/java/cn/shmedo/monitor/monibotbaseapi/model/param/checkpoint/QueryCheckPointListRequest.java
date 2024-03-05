@@ -31,6 +31,7 @@ public class QueryCheckPointListRequest implements ParameterValidator, ResourceP
     private String keyword;
 
     @Positive
+    @NotNull
     private Integer serviceID;
 
     @Positive

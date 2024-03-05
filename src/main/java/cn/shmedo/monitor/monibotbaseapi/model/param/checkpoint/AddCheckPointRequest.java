@@ -1,11 +1,14 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectServiceRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectServiceRelation;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,6 +32,10 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
     @Positive
     private Integer projectID;
 
+    @NotNull
+    @Positive
+    private Integer serviceID;
+
     @NotBlank
     @Size(max = 10)
     private String name;
@@ -50,8 +57,15 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
         TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
         boolean exists = mapper.exists(Wrappers.<TbCheckPoint>lambdaQuery()
                 .eq(TbCheckPoint::getProjectID, projectID)
+                .eq(TbCheckPoint::getServiceID, serviceID)
                 .eq(TbCheckPoint::getName, name));
         Optional.of(exists).filter(r -> !r).orElseThrow(() -> new InvalidParameterException("名称: " + name + " 已存在"));
+
+        TbProjectServiceRelationMapper projectRelationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
+        Assert.isTrue(projectRelationMapper.exists(Wrappers.<TbProjectServiceRelation>lambdaQuery()
+                        .eq(TbProjectServiceRelation::getProjectID, projectID)
+                        .eq(TbProjectServiceRelation::getServiceID, serviceID)),
+                () -> new InvalidParameterException("项目不属于该平台"));
         return null;
     }
 
@@ -65,6 +79,7 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
         return "AddCheckPointRequest{" +
                 "companyID=" + companyID +
                 ", projectID=" + projectID +
+                ", serviceID=" + serviceID +
                 ", name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", location='" + location + '\'' +
@@ -75,6 +90,7 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         TbCheckPoint entity = new TbCheckPoint();
         entity.setProjectID(projectID);
+        entity.setServiceID(serviceID);
         entity.setName(name);
         entity.setAddress(address);
         entity.setLocation(location);

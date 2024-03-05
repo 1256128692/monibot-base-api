@@ -32,6 +32,7 @@ public class CheckPointController {
      * @apiDescription 新增巡检点
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} projectID 项目id
+     * @apiParam (请求参数) {Int} serviceID 平台id
      * @apiParam (请求参数) {String} name 巡检点名称(10)
      * @apiParam (请求参数) {String} address 巡检点地址
      * @apiParam (请求参数) {String} location 巡检点地址经纬度
@@ -121,8 +122,8 @@ public class CheckPointController {
      * @apiName QueryCheckPointPage
      * @apiDescription 查询巡检点分页
      * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {Int} serviceID 所属平台id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(巡检点编码/巡检点名称/巡检组)
-     * @apiParam (请求参数) {Int} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [groupID] 巡检组id
@@ -161,8 +162,8 @@ public class CheckPointController {
      * @apiName QueryCheckPointList
      * @apiDescription 查询巡检点列表
      * @apiParam (请求参数) {Int} companyID 公司id
+     * @apiParam (请求参数) {String} serviceID 所属平台id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(巡检点编码/巡检点名称/巡检组)
-     * @apiParam (请求参数) {String} [serviceID] 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Boolean} [enable] 是否启用
      * @apiParam (请求参数) {Int} [groupID] 巡检组id

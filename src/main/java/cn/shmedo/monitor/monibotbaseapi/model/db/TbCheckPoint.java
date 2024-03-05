@@ -34,6 +34,12 @@ public class TbCheckPoint {
     private Integer projectID;
 
     /**
+     * 关联平台ID
+     */
+    @TableField(value = "ServiceID")
+    private Integer serviceID;
+
+    /**
      * 巡检点编码 形如XJ202400001
      */
     @TableField(value = "SerialNumber")

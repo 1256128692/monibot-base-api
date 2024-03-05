@@ -1,12 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointGroupMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -61,10 +64,20 @@ public class UpdateCheckPointRequest implements ParameterValidator, ResourcePerm
             if (!name.isBlank() && !original.getName().equals(name)) {
                 Optional.of(mapper.exists(Wrappers.<TbCheckPoint>lambdaQuery()
                                 .eq(TbCheckPoint::getProjectID, original.getProjectID())
+                                .eq(TbCheckPoint::getServiceID, original.getServiceID())
                                 .eq(TbCheckPoint::getName, name)))
                         .filter(r -> !r)
                         .orElseThrow(() -> new InvalidParameterException("名称:" + name + "已存在"));
             }
+
+            //
+            Optional.ofNullable(groupID).ifPresent(id -> {
+                TbCheckPointGroupMapper groupMapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
+                TbCheckPointGroup group = groupMapper.selectById(id);
+                Assert.isTrue(group != null, () -> new InvalidParameterException("分组不存在"));
+                Assert.isTrue(group.getServiceID().equals(original.getServiceID()), () -> new InvalidParameterException("分组不属于该平台"));
+            });
+
             return null;
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER);

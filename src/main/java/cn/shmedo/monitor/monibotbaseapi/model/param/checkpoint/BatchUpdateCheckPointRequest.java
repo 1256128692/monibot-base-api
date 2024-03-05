@@ -44,10 +44,10 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
 
             TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
             this.original = mapper.selectList(Wrappers.<TbCheckPoint>lambdaQuery()
-                    .in(TbCheckPoint::getID, idList)
-                    .select(TbCheckPoint::getID, TbCheckPoint::getGroupID, TbCheckPoint::getProjectID));
+                    .in(TbCheckPoint::getID, idList).select(TbCheckPoint::getID, TbCheckPoint::getGroupID,
+                            TbCheckPoint::getProjectID, TbCheckPoint::getServiceID));
             Assert.isTrue(original.size() == idList.size(), () -> new InvalidParameterException("包含不存在的巡检点"));
-            original.forEach(item -> Assert.isTrue(item.getGroupID()==null || item.getGroupID().equals(groupID),
+            original.forEach(item -> Assert.isTrue(item.getGroupID() == null || item.getGroupID().equals(groupID),
                     () -> new InvalidParameterException("包含巡检点已绑定其他巡检组")));
 
             Optional.ofNullable(groupID).ifPresent(e -> {
@@ -55,7 +55,9 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
                 TbCheckPointGroup group = groupMapper.selectById(e);
                 Assert.notNull(group, () -> new InvalidParameterException("巡检组不存在"));
 
-                //TODO 校验巡检点所属服务 与 巡检组所属服务是否一致
+                //校验巡检点所属服务 与 巡检组所属服务是否一致
+                this.original.forEach(item -> Assert.isTrue(item.getServiceID().equals(group.getServiceID()),
+                        () -> new InvalidParameterException("巡检点所属服务与巡检组所属服务不一致")));
             });
 
             return null;
