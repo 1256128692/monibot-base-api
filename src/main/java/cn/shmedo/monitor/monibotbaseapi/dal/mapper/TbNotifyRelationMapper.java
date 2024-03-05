@@ -1,7 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import org.apache.ibatis.annotations.Param;
 
 /**

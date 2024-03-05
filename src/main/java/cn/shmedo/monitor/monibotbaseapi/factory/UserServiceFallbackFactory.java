@@ -9,9 +9,12 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourcePa
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
@@ -96,6 +99,16 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, String accessToken) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, String accessToken) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, String accessToken) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 

@@ -1,4 +1,4 @@
-package cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig;
+package cn.shmedo.monitor.monibotbaseapi.model.param.notify;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+
+import java.util.Objects;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -17,13 +19,17 @@ public class QueryNotifyListParam implements ParameterValidator, ResourcePermiss
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID必须为正值")
     private Integer companyID;
-    @JsonProperty("serviceID")
-    private Integer platform;
+    private Integer serviceID;
     private Integer status;
 
     @Override
+    public Integer getPlatform() {
+        return serviceID;
+    }
+
+    @Override
     public ResultWrapper<?> validate() {
-        if (!validPlatform()) {
+        if (Objects.nonNull(serviceID) && !validPlatform()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "平台不存在!");
         }
         return null;

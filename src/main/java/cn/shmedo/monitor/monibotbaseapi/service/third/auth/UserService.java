@@ -7,9 +7,12 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionInBatchResourcePa
 import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyDetailInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
@@ -100,6 +103,20 @@ public interface UserService {
     @RequestLine("POST /QueryNotifyPageList")
     @Headers("Authorization: {accessToken}")
     ResultWrapper<PageUtil.Page<NotifyPageInfo>> queryNotifyPageList(QueryNotifyPageListParam param, @Param("accessToken") String accessToken);
+
+    /**
+     * 不分页查询系统通知列表
+     */
+    @RequestLine("POST /QueryNotifyList")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, @Param("accessToken") String accessToken);
+
+    /**
+     * 设置消息通知状态
+     */
+    @RequestLine("POST /SetNotifyStatus")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, @Param("accessToken") String accessToken);
 
     /**
      * 查询系统通知统计信息
