@@ -13,13 +13,12 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPointGroup;
 import com.alibaba.nacos.shaded.org.checkerframework.checker.index.qual.Positive;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
-import lombok.NonNull;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Chengfs on 2024/2/28
@@ -27,8 +26,7 @@ import java.util.Set;
 @Data
 public class BatchUpdateCheckPointRequest implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
-    @NotEmpty
-    private Set<@NonNull @Positive Integer> idList;
+    private Set<Integer> idList;
 
     private Boolean enable;
 
@@ -42,24 +40,32 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
     public ResultWrapper<?> validate() {
         if (enable != null || groupID != null) {
 
-            TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
-            this.original = mapper.selectList(Wrappers.<TbCheckPoint>lambdaQuery()
-                    .in(TbCheckPoint::getID, idList).select(TbCheckPoint::getID, TbCheckPoint::getGroupID,
-                            TbCheckPoint::getProjectID, TbCheckPoint::getServiceID));
-            Assert.isTrue(original.size() == idList.size(), () -> new InvalidParameterException("包含不存在的巡检点"));
-            original.forEach(item -> Assert.isTrue(item.getGroupID() == null || item.getGroupID().equals(groupID),
-                    () -> new InvalidParameterException("包含巡检点已绑定其他巡检组")));
+            this.idList = Optional.ofNullable(idList).orElse(Set.of()).stream()
+                    .filter(e -> e != null && e > 0).collect(Collectors.toSet());
 
-            Optional.ofNullable(groupID).ifPresent(e -> {
-                TbCheckPointGroupMapper groupMapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
-                TbCheckPointGroup group = groupMapper.selectById(e);
+            //当 enable 不为null时，必须指定巡检点
+            Assert.isTrue(enable == null || !idList.isEmpty(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
+            this.original = idList.isEmpty() ? List.of() :
+                    SpringUtil.getBean(TbCheckPointMapper.class).selectList(Wrappers.<TbCheckPoint>lambdaQuery()
+                            .in(TbCheckPoint::getID, idList)
+                            .select(TbCheckPoint::getID, TbCheckPoint::getGroupID,
+                                    TbCheckPoint::getProjectID, TbCheckPoint::getServiceID));
+
+            //检查选中的巡检点是否存在
+            Assert.isTrue(original.size() == idList.size(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
+
+
+            if (groupID != null) {
+                TbCheckPointGroup group = SpringUtil.getBean(TbCheckPointGroupMapper.class).selectById(groupID);
+                //校验巡检组是否存在、巡检组是否已绑定巡检组、巡检点和巡检组所属服务是否一致
                 Assert.notNull(group, () -> new InvalidParameterException("巡检组不存在"));
-
-                //校验巡检点所属服务 与 巡检组所属服务是否一致
-                this.original.forEach(item -> Assert.isTrue(item.getServiceID().equals(group.getServiceID()),
-                        () -> new InvalidParameterException("巡检点与巡检分组不属于同一平台")));
-            });
-
+                this.original.forEach(item -> {
+                    Assert.isTrue(item.getGroupID() == null || item.getGroupID().equals(groupID),
+                            () -> new InvalidParameterException("不能包含属于其他巡检组的点"));
+                    Assert.isTrue(item.getServiceID().equals(group.getServiceID()),
+                            () -> new InvalidParameterException("巡检点与巡检分组必须属于同一平台"));
+                });
+            }
             return null;
         }
         return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "缺少有效参数");

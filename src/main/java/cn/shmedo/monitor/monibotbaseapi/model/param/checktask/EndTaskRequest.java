@@ -16,7 +16,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -26,10 +25,7 @@ import org.hibernate.validator.constraints.Range;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,7 +39,7 @@ public class EndTaskRequest implements ParameterValidator, ResourcePermissionPro
     private Integer taskID;
 
     @NotEmpty
-    private Set<@Valid @NotNull Note> notes;
+    private Set<Note> notes;
 
     @NotNull
     @Range(min = 0, max = 1)
@@ -102,6 +98,16 @@ public class EndTaskRequest implements ParameterValidator, ResourcePermissionPro
         LocalDate today = LocalDate.now();
         Assert.isTrue(this.endTime.toLocalDate().equals(today),
                 () -> new InvalidParameterException("结束时间不能超出任务日期"));
+
+        this.notes = Optional.ofNullable(notes).orElse(Set.of()).stream()
+                .filter(Objects::nonNull).collect(Collectors.toSet());
+        Assert.isFalse(notes.isEmpty(), () -> new InvalidParameterException("notes 必须包含有效元素且不能为空"));
+        notes.forEach(note -> {
+            note.setAnnexes(Optional.ofNullable(note.getAnnexes()).orElse(Set.of()).stream()
+                    .filter(e -> e!= null && !e.isBlank()).collect(Collectors.toSet()));
+            Assert.isFalse(note.getAnnexes().isEmpty(),
+                    () -> new InvalidParameterException("annexes 必须包含有效元素且不能为空"));
+        });
 
 
         this.subject = CurrentSubjectHolder.getCurrentSubject();

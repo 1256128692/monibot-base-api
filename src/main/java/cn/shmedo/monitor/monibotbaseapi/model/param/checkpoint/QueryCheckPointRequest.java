@@ -33,7 +33,7 @@ public class QueryCheckPointRequest implements ParameterValidator, ResourcePermi
     public ResultWrapper<?> validate() {
         this.entity = SpringUtil.getBean(TbCheckPointMapper.class)
                 .selectById(id);
-        Optional.ofNullable(entity).orElseThrow(() -> new InvalidParameterException("记录不存在"));
+        Optional.ofNullable(entity).orElseThrow(() -> new InvalidParameterException("巡检点不存在"));
         return null;
     }
 

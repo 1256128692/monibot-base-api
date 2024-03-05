@@ -79,8 +79,8 @@ public class CheckPointController {
      * @apiGroup 水库-巡检点模块
      * @apiName BatchUpdateCheckPoint
      * @apiDescription 批量更新巡检点(为空的字段不会更新)
-     * @apiParam (请求参数) {Int[]} idList 巡检点id集合
-     * @apiParam (请求参数) {Boolean} [enable] 是否启用
+     * @apiParam (请求参数) {Int[]} [idList] 巡检点id集合
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用(当此参数不为空时，必须提供idList)
      * @apiParam (请求参数) {Int} [groupID] 巡检点分组
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off

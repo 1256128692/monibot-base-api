@@ -53,7 +53,8 @@ public class QueryCheckTaskListRequest implements ParameterValidator, ResourcePe
     @Override
     public ResultWrapper<?> validate() {
         this.keyword = Optional.ofNullable(this.keyword).map(String::trim).orElse(null);
-        this.projectList = PermissionUtil.getHavePermissionProjectList(this.companyID, projectID == null ? null : List.of(projectID));
+        this.projectList = PermissionUtil.getHavePermissionProjectList(this.companyID,
+                projectID == null ? null : List.of(projectID));
 
         return null;
     }

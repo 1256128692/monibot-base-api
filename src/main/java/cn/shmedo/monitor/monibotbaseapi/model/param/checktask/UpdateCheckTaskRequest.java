@@ -26,6 +26,8 @@ import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Chengfs on 2024/3/1
@@ -52,7 +54,7 @@ public class UpdateCheckTaskRequest implements ParameterValidator, ResourcePermi
     private Integer checkerID;
 
     @NotEmpty
-    private List<@Positive Integer> pointIDList;
+    private Set<@Positive Integer> pointIDList;
 
     private String exValue;
 
@@ -67,20 +69,25 @@ public class UpdateCheckTaskRequest implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper<?> validate() {
+        this.pointIDList = Optional.ofNullable(pointIDList).orElse(Set.of()).stream()
+                .filter(e -> e != null && e > 0).collect(Collectors.toSet());
+        Assert.isFalse(pointIDList.isEmpty(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
+
+
         TbCheckTaskMapper taskMapper = SpringUtil.getBean(TbCheckTaskMapper.class);
         this.task = taskMapper.selectById(id);
-        Assert.notNull(task, () -> new InvalidParameterException("任务不存在"));
+        Assert.notNull(task, () -> new InvalidParameterException("巡检任务不存在"));
         Assert.isTrue(CheckTaskStatus.UN_START.equals(task.getStatus()),
-                () -> new InvalidParameterException("任务不处于未开始状态"));
+                () -> new InvalidParameterException("巡检任务不处于未开始状态"));
 
         TbCheckPointMapper pointMapper = SpringUtil.getBean(TbCheckPointMapper.class);
         this.points = pointMapper.selectBatchIds(pointIDList);
         Assert.isTrue(points.size() == pointIDList.size(),
-                () -> new InvalidParameterException("包含不存在的巡检点"));
+                () -> new InvalidParameterException("巡检点必须有效且不能为空"));
         points.forEach(p -> {
             Assert.isTrue(p.getProjectID().equals(task.getProjectID()),
-                    () -> new InvalidParameterException("包含不属于当前项目的巡检点"));
-            Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("包含未启用的巡检点"));
+                    () -> new InvalidParameterException("巡检点必须位于同一项目中"));
+            Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("巡检点必须为启用状态"));
         });
         this.subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         return null;

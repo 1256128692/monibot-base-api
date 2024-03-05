@@ -80,16 +80,16 @@ public class AddCheckTaskRequest implements ParameterValidator, ResourcePermissi
         this.project = projectMapper.selectOne(Wrappers.<TbProjectInfo>lambdaQuery()
                 .eq(TbProjectInfo::getID, projectID)
                 .select(TbProjectInfo::getProjectName, TbProjectInfo::getID));
-        Assert.notNull(project, () -> new InvalidParameterException("项目不存在"));
+        Assert.notNull(project, () -> new InvalidParameterException("工程项目必须有效且不能为空"));
 
         TbCheckPointMapper pointMapper = SpringUtil.getBean(TbCheckPointMapper.class);
         this.points = pointMapper.selectBatchIds(pointIDList);
         Assert.isTrue(points.size() == pointIDList.size(),
-                () -> new InvalidParameterException("包含不存在的巡检点"));
+                () -> new InvalidParameterException("巡检点必须有效且不能为空"));
         points.forEach(p -> {
             Assert.isTrue(p.getProjectID().equals(projectID),
-                    () -> new InvalidParameterException("包含不属于当前项目的巡检点"));
-            Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("包含未启用的巡检点"));
+                    () -> new InvalidParameterException("巡检点必须属于当前工程项目"));
+            Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
         });
         this.subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         return null;

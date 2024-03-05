@@ -75,6 +75,8 @@ public class UpdateCheckPointRequest implements ParameterValidator, ResourcePerm
                 TbCheckPointGroupMapper groupMapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
                 TbCheckPointGroup group = groupMapper.selectById(id);
                 Assert.isTrue(group != null, () -> new InvalidParameterException("分组不存在"));
+                Assert.isTrue(original.getGroupID() == null || original.getGroupID().equals(groupID),
+                        () -> new InvalidParameterException("巡检点已绑定其他巡检组"));
                 Assert.isTrue(group.getServiceID().equals(original.getServiceID()),
                         () -> new InvalidParameterException("巡检点与巡检分组不属于同一平台"));
             });

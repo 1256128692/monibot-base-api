@@ -59,13 +59,13 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
                 .eq(TbCheckPoint::getProjectID, projectID)
                 .eq(TbCheckPoint::getServiceID, serviceID)
                 .eq(TbCheckPoint::getName, name));
-        Optional.of(exists).filter(r -> !r).orElseThrow(() -> new InvalidParameterException("名称: " + name + " 已存在"));
+        Optional.of(exists).filter(r -> !r).orElseThrow(() -> new InvalidParameterException("巡检组名称已存在"));
 
         TbProjectServiceRelationMapper projectRelationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
         Assert.isTrue(projectRelationMapper.exists(Wrappers.<TbProjectServiceRelation>lambdaQuery()
                         .eq(TbProjectServiceRelation::getProjectID, projectID)
                         .eq(TbProjectServiceRelation::getServiceID, serviceID)),
-                () -> new InvalidParameterException("项目不属于该平台"));
+                () -> new InvalidParameterException("所选项目必须属于所选平台"));
         return null;
     }
 

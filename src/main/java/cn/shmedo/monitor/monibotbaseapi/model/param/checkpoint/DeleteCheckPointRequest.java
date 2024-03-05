@@ -1,9 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint;
 
+import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
+import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckTaskPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
@@ -11,14 +13,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.reservoir.CheckTaskStatus;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import reactor.util.function.Tuple3;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Chengfs on 2024/2/28
@@ -27,7 +28,7 @@ import java.util.Set;
 public class DeleteCheckPointRequest implements ParameterValidator, ResourcePermissionProvider<List<Resource>> {
 
     @NotEmpty
-    private Set<@NotNull @Positive Integer> idList;
+    private Set<Integer> idList;
 
     @JsonIgnore
     private List<TbCheckPoint> original;
@@ -37,13 +38,14 @@ public class DeleteCheckPointRequest implements ParameterValidator, ResourcePerm
 
     @Override
     public ResultWrapper<?> validate() {
-        TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
-        this.original = mapper.selectList(Wrappers.<TbCheckPoint>lambdaQuery()
-                .in(TbCheckPoint::getID, idList)
-                .select(TbCheckPoint::getProjectID));
+        this.idList = Optional.ofNullable(idList).orElse(Set.of()).stream()
+                .filter(e -> e != null && e > 0).collect(Collectors.toSet());
+        Assert.isFalse(idList.isEmpty(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
 
+        this.original = SpringUtil.getBean(TbCheckPointMapper.class).selectList(Wrappers.<TbCheckPoint>lambdaQuery()
+                .in(TbCheckPoint::getID, idList).select(TbCheckPoint::getProjectID));
         Optional.of(original).filter(r -> r.size() == idList.size())
-                .orElseThrow(() -> new IllegalArgumentException("包含不存在的巡检点"));
+                .orElseThrow(() -> new IllegalArgumentException("巡检点必须有效且不能为空"));
 
         TbCheckTaskPointMapper taskPointMapper = SpringUtil.getBean(TbCheckTaskPointMapper.class);
         this.pointStatus = taskPointMapper.listPointStatus(idList);
@@ -60,7 +62,8 @@ public class DeleteCheckPointRequest implements ParameterValidator, ResourcePerm
 
     @Override
     public List<Resource> parameter() {
-        return this.original.stream().map(e -> new Resource(e.getProjectID().toString(), ResourceType.BASE_PROJECT)).toList();
+        return this.original.stream()
+                .map(e -> new Resource(e.getProjectID().toString(), ResourceType.BASE_PROJECT)).toList();
     }
 
     @Override

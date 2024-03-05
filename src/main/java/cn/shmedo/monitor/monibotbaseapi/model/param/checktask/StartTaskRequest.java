@@ -60,15 +60,15 @@ public class StartTaskRequest implements ParameterValidator, ResourcePermissionP
                 .select(TbCheckTask::getProjectID, TbCheckTask::getCheckerID, TbCheckTask::getTaskDate));
 
         Assert.isTrue(task.getCheckerID().equals(subject.getSubjectID()),
-                () -> new InvalidParameterException("任务不属于当前用户"));
+                () -> new InvalidParameterException("巡检任务必须属于当前用户"));
 
         Assert.isTrue(task.getTaskDate().equals(today),
-                () -> new InvalidParameterException("任务不属于当天"));
+                () -> new InvalidParameterException("巡检任务必须属于当天"));
 
         TbCheckTaskPointMapper taskPointMapper = SpringUtil.getBean(TbCheckTaskPointMapper.class);
         Assert.isTrue(taskPointMapper.selectCount(Wrappers.<TbCheckTaskPoint>lambdaQuery()
                 .eq(TbCheckTaskPoint::getTaskID, taskID)) > 0,
-                () -> new InvalidParameterException("任务没有绑定任何巡检点"));
+                () -> new InvalidParameterException("巡检任务需要至少关联1个巡检点"));
 
         this.projectID = task.getProjectID();
         return null;

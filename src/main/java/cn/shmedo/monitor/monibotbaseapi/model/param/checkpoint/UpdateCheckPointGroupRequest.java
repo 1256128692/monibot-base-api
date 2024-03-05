@@ -36,7 +36,7 @@ public class UpdateCheckPointGroupRequest implements ParameterValidator, Resourc
         if (StrUtil.isNotBlank(name) || StrUtil.isNotBlank(exValue)) {
             TbCheckPointGroupMapper mapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
             this.original = mapper.selectById(id);
-            Optional.ofNullable(original).orElseThrow(() -> new IllegalArgumentException("巡检组不存在"));
+            Optional.ofNullable(original).orElseThrow(() -> new IllegalArgumentException("巡检组必须有效且不能为空"));
 
             this.name = Optional.ofNullable(name).map(String::trim).orElse(StrUtil.EMPTY);
             if (!name.isBlank() && !name.equals(original.getName())) {
@@ -45,7 +45,7 @@ public class UpdateCheckPointGroupRequest implements ParameterValidator, Resourc
                                 .eq(TbCheckPointGroup::getCompanyID, original.getCompanyID())
                                 .eq(TbCheckPointGroup::getServiceID, original.getServiceID())))
                         .filter(r -> !r)
-                        .orElseThrow(() -> new IllegalArgumentException("巡检组名称已存在"));
+                        .orElseThrow(() -> new IllegalArgumentException("巡检组名称不能重复"));
             }
             return null;
         }

@@ -19,7 +19,9 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Chengfs on 2024/3/1
@@ -35,13 +37,19 @@ public class DeleteCheckTaskRequest implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper<?> validate() {
+        this.idList = Optional.ofNullable(idList).orElse(Set.of()).stream()
+                .filter(e -> e != null && e > 0).collect(Collectors.toSet());
+        Assert.isFalse(idList.isEmpty(), () -> new InvalidParameterException("巡检任务必须有效且不能为空"));
+
+
         TbCheckTaskMapper mapper = SpringUtil.getBean(TbCheckTaskMapper.class);
         this.origins = mapper.selectList(Wrappers.<TbCheckTask>lambdaQuery()
                 .in(TbCheckTask::getID, idList)
                 .select(TbCheckTask::getID, TbCheckTask::getProjectID, TbCheckTask::getStatus));
 
-        Assert.isTrue(origins.size() == idList.size(), () -> new InvalidParameterException("包含不存在的任务"));
-        origins.forEach(task -> Assert.isTrue(task.getStatus() == CheckTaskStatus.UN_START, () -> new InvalidParameterException("任务状态不允许删除")));
+        Assert.isTrue(origins.size() == idList.size(), () -> new InvalidParameterException("巡检任务必须有效且不能为空"));
+        origins.forEach(task -> Assert.isTrue(task.getStatus() == CheckTaskStatus.UN_START,
+                () -> new InvalidParameterException("只能删除未开始的巡检任务")));
         return null;
     }
 

@@ -65,7 +65,8 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
                 .ifPresent(groupID -> this.update(Wrappers.lambdaUpdate(TbCheckPoint.class)
                         .set(TbCheckPoint::getGroupID, null)
                         .eq(TbCheckPoint::getGroupID, request.getGroupID())));
-        this.updateBatchById(request.toEntitys());
+
+        Optional.of(request.toEntitys()).filter(e -> !e.isEmpty()).ifPresent(this::updateBatchById);
     }
 
     @Override
