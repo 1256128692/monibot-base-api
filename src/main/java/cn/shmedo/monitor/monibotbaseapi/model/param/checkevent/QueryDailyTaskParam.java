@@ -23,10 +23,10 @@ public class QueryDailyTaskParam implements ParameterValidator, ResourcePermissi
     private Integer serviceID;
     private Integer projectID;
 
-    @Size(min = 0, max = 4)
+    @Size(min = 0, max = 5)
     private List<@NotNull @Min(0) @Max(4) Integer> checkTypeList;
 
-    @Size(min = 0, max = 3)
+    @Size(min = 0, max = 4)
     private List<@NotNull @Min(0) @Max(3) Integer> statusList;
     @NotNull
     @Min(0)
