@@ -54,7 +54,7 @@ public class UpdateCheckPointRequest implements ParameterValidator, ResourcePerm
             TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
             this.original = mapper.selectOne(Wrappers.<TbCheckPoint>lambdaQuery()
                     .eq(TbCheckPoint::getID, id)
-                    .select(TbCheckPoint::getProjectID, TbCheckPoint::getName));
+                    .select(TbCheckPoint::getProjectID, TbCheckPoint::getName, TbCheckPoint::getServiceID));
             Optional.ofNullable(original).orElseThrow(() -> new IllegalArgumentException("巡检点不存在"));
 
             //校验名称
@@ -75,7 +75,8 @@ public class UpdateCheckPointRequest implements ParameterValidator, ResourcePerm
                 TbCheckPointGroupMapper groupMapper = SpringUtil.getBean(TbCheckPointGroupMapper.class);
                 TbCheckPointGroup group = groupMapper.selectById(id);
                 Assert.isTrue(group != null, () -> new InvalidParameterException("分组不存在"));
-                Assert.isTrue(group.getServiceID().equals(original.getServiceID()), () -> new InvalidParameterException("分组不属于该平台"));
+                Assert.isTrue(group.getServiceID().equals(original.getServiceID()),
+                        () -> new InvalidParameterException("巡检点与巡检分组不属于同一平台"));
             });
 
             return null;

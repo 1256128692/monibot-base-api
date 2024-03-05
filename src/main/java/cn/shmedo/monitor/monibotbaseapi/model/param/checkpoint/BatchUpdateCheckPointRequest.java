@@ -57,7 +57,7 @@ public class BatchUpdateCheckPointRequest implements ParameterValidator, Resourc
 
                 //校验巡检点所属服务 与 巡检组所属服务是否一致
                 this.original.forEach(item -> Assert.isTrue(item.getServiceID().equals(group.getServiceID()),
-                        () -> new InvalidParameterException("巡检点所属服务与巡检组所属服务不一致")));
+                        () -> new InvalidParameterException("巡检点与巡检分组不属于同一平台")));
             });
 
             return null;
