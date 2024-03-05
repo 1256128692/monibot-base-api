@@ -7,6 +7,7 @@
         <id column="ID" property="ID"/>
         <result column="ProjectID" property="projectID"/>
         <result column="OrderID" property="orderID"/>
+        <result column="ServiceID" property="serviceID"/>
         <result column="TaskID" property="taskID"/>
         <result column="TypeID" property="typeID"/>
         <result column="SerialNumber" property="serialNumber"/>
@@ -29,6 +30,7 @@
         ID,
         ProjectID,
         OrderID,
+        ServiceID,
         TaskID,
         TypeID,
         SerialNumber,
@@ -59,6 +61,9 @@
             </if>
             <if test="taskID != null">
                 TaskID,
+            </if>
+            <if test="serviceID != null">
+                ServiceID,
             </if>
             <if test="typeID != null">
                 TypeID,
@@ -118,6 +123,9 @@
             </if>
             <if test="taskID != null">
                 #{taskID},
+            </if>
+            <if test="serviceID != null">
+                #{serviceID},
             </if>
             <if test="typeID != null">
                 #{typeID},
@@ -181,6 +189,9 @@
             </if>
             <if test="taskID != null">
                 taskID = #{taskID},
+            </if>
+            <if test="serviceID != null">
+                serviceID = #{serviceID},
             </if>
             <if test="typeID != null">
                 typeID = #{typeID},
@@ -262,7 +273,7 @@
             and ce.projectID = #{pa.projectID}
         </if>
         <if test="pa.serviceID != null">
-            and ce.projectID in (select ProjectID from tb_project_service_relation where serviceID = #{pa.serviceID})
+            and ce.serviceID = #{pa.serviceID}
         </if>
         <if test="pa.queryContent != null and pa.queryContent != ''">
             and (

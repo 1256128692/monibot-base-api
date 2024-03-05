@@ -31,6 +31,8 @@ public class AddEventInfoParam implements ParameterValidator, ResourcePermission
     private Integer companyID;
     @NotNull
     private Integer projectID;
+    @NotNull
+    private Integer serviceID;
     private Integer taskID;
     private Integer orderID;
     @NotNull
@@ -117,6 +119,7 @@ public class AddEventInfoParam implements ParameterValidator, ResourcePermission
         vo.setProjectID(this.projectID);
         vo.setOrderID(this.orderID);
         vo.setTaskID(this.taskID);
+        vo.setServiceID(this.serviceID);
         vo.setTypeID(this.typeID);
         vo.setSerialNumber(this.serialNumber);
         vo.setAddress(this.address);

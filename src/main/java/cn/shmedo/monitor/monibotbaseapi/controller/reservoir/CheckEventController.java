@@ -121,6 +121,7 @@ public class CheckEventController {
      * @apiDescription 新增事件信息,事件编码 形如 E2024020200001,最后00001要逐次+1,ReportUserID提报人ID就是当前用户ID
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 关联工程ID
+     * @apiParam (请求体) {Int} serviceID 服务ID
      * @apiParam (请求体) {Int} [taskID] 关联巡检任务ID
      * @apiParam (请求体) {Int} [orderID] 工单ID
      * @apiParam (请求体) {Int} typeID 事件类型ID
@@ -174,6 +175,7 @@ public class CheckEventController {
      * @apiDescription 编辑事件信息
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} eventID 事件ID
+     * @apiParam (请求体) {Int} [serviceID] 服务ID
      * @apiParam (请求体) {Int} [orderID] 订单ID
      * @apiParam (请求体) {Int} [projectID] 关联工程ID
      * @apiParam (请求体) {Int} [taskID] 关联巡检任务ID

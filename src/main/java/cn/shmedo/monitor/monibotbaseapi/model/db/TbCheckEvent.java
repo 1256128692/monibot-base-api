@@ -38,6 +38,9 @@ public class TbCheckEvent {
     @TableField(value = "OrderID")
     private Integer orderID;
 
+    @TableField(value = "ServiceID")
+    private Integer serviceID;
+
     /**
      * 关联巡检任务ID
      */

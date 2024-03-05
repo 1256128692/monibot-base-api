@@ -25,6 +25,7 @@ public class UpdateEventInfoParam implements ParameterValidator, ResourcePermiss
     private Integer projectID;
     private Integer orderID;
     private Integer taskID;
+    private Integer serviceID;
     private Integer typeID;
     private String address;
     private String location;
@@ -67,6 +68,7 @@ public class UpdateEventInfoParam implements ParameterValidator, ResourcePermiss
         vo.setProjectID(this.projectID);
         vo.setOrderID(this.orderID);
         vo.setTaskID(this.taskID);
+        vo.setServiceID(this.serviceID);
         vo.setTypeID(this.typeID);
         vo.setAddress(this.address);
         vo.setLocation(this.location);
