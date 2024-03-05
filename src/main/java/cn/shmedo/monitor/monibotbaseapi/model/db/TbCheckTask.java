@@ -39,6 +39,12 @@ public class TbCheckTask {
     private Integer projectID;
 
     /**
+     * 关联平台ID
+     */
+    @TableField(value = "ServiceID")
+    private Integer serviceID;
+
+    /**
      * 任务编号 形如：XJ202310020001
      */
     @TableField(value = "SerialNumber")

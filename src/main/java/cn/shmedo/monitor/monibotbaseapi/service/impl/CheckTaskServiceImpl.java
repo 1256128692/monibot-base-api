@@ -149,7 +149,7 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
                     List<CheckTaskInfo.Annexe> annexes = Optional
                             .ofNullable(JSONUtil.toList(e.getAnnexes(), String.class)).orElse(List.of())
                             .stream().map(i -> new CheckTaskInfo.Annexe(i, null)).toList();
-                    return new CheckTaskInfo.Note(e.getID(), point.getName(), annexes, e.getRemark());
+                    return new CheckTaskInfo.Note(point.getID(), point.getName(), annexes, e.getRemark());
                 }).toList();
 
         List<CheckTaskInfo.Event> events = eventMapper.listByTaskID(request.getId()).stream().map(e -> {

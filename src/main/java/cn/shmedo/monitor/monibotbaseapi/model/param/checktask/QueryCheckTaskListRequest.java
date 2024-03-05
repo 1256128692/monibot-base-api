@@ -34,6 +34,7 @@ public class QueryCheckTaskListRequest implements ParameterValidator, ResourcePe
 
     private String keyword;
 
+    @NotNull
     @Positive
     private Integer serviceID;
 

@@ -8,10 +8,8 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTask;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTaskPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectServiceRelationMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.reservoir.CheckTaskType;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -42,6 +40,10 @@ public class AddCheckTaskRequest implements ParameterValidator, ResourcePermissi
     @NotNull
     @Positive
     private Integer projectID;
+
+    @NotNull
+    @Positive
+    private Integer serviceID;
 
     @NotNull
     private CheckTaskType checkType;
@@ -90,7 +92,16 @@ public class AddCheckTaskRequest implements ParameterValidator, ResourcePermissi
             Assert.isTrue(p.getProjectID().equals(projectID),
                     () -> new InvalidParameterException("巡检点必须属于当前工程项目"));
             Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("巡检点必须有效且不能为空"));
+            Assert.isTrue(p.getServiceID().equals(serviceID),
+                    () -> new InvalidParameterException("巡检点必须属于当前服务"));
         });
+
+        TbProjectServiceRelationMapper projectRelationMapper = SpringUtil.getBean(TbProjectServiceRelationMapper.class);
+        Assert.isTrue(projectRelationMapper.exists(Wrappers.<TbProjectServiceRelation>lambdaQuery()
+                        .eq(TbProjectServiceRelation::getProjectID, projectID)
+                        .eq(TbProjectServiceRelation::getServiceID, serviceID)),
+                () -> new InvalidParameterException("所选项目必须属于所选平台"));
+
         this.subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         return null;
     }
@@ -104,6 +115,7 @@ public class AddCheckTaskRequest implements ParameterValidator, ResourcePermissi
     public String toString() {
         return "AddCheckTaskRequest{" +
                 "companyID=" + companyID +
+                ", serviceID=" + serviceID +
                 ", projectID=" + projectID +
                 ", checkType=" + checkType +
                 ", name='" + name + '\'' +
@@ -117,6 +129,7 @@ public class AddCheckTaskRequest implements ParameterValidator, ResourcePermissi
     public TbCheckTask toEntity() {
         TbCheckTask entity = new TbCheckTask();
         entity.setProjectID(projectID);
+        entity.setServiceID(serviceID);
         entity.setCheckType(checkType);
         entity.setName(Optional.ofNullable(name).filter(e -> !e.isEmpty())
                 .orElse(project.getProjectName() + checkType.getDesc() + "任务"));

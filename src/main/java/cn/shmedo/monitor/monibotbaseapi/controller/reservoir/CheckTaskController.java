@@ -32,6 +32,7 @@ public class CheckTaskController {
      * @apiDescription 新增巡检任务
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {Int} projectID 项目id
+     * @apiParam (请求参数) {Int} serviceID 平台id
      * @apiParam (请求参数) {Int} checkType 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiParam (请求参数) {String} [name] 任务名称
      * @apiParam (请求参数) {Date} [taskDate] 任务日期(yyyy-MM-dd, 默认为当天)
@@ -104,7 +105,7 @@ public class CheckTaskController {
      * @apiDescription 查询巡检任务分页
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(任务编码/巡检人员/任务名称)
-     * @apiParam (请求参数) {String} [serviceID] 所属平台id
+     * @apiParam (请求参数) {String} serviceID 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [checkType] 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiParam (请求参数) {Int} [status] 任务状态(0-未开始 1-进行中 2-已过期 3-已结束)
@@ -150,7 +151,7 @@ public class CheckTaskController {
      * @apiDescription 查询巡检任务列表
      * @apiParam (请求参数) {Int} companyID 公司id
      * @apiParam (请求参数) {String} [keyword] 模糊搜索关键字(任务编码/巡检人员名称)
-     * @apiParam (请求参数) {String} [serviceID] 所属平台id
+     * @apiParam (请求参数) {String} serviceID 所属平台id
      * @apiParam (请求参数) {Int} [projectID] 项目id
      * @apiParam (请求参数) {Int} [checkType] 巡检类型(0-其他 1-日常巡检 2-设备巡查 3-隐患点检查 4-安全检查)
      * @apiParam (请求参数) {Int} [status] 任务状态(0-未开始 1-进行中 2-已过期 3-已结束)
