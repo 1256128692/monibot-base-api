@@ -14,7 +14,9 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.third.TbService;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
@@ -23,6 +25,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInf
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
@@ -111,6 +114,11 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public NotifyPageResponse.Page<NotifyPageResponse> queryNotifyPage(QueryNotifyPageParam param, String accessToken) {
+        // 工程级别过滤
+        NotifyByProjectID notifyByProjectID = Optional.ofNullable(param.getProjectID())
+                .map(this::filterProject).orElse(null);
+
+        param.setNotifyByProjectID(notifyByProjectID);
         // 分页查询通知信息（条件过滤）
         PageUtil.Page<NotifyPageInfo> page = Optional.ofNullable(param.build())
                 .map(u -> userService.queryNotifyPageList(u, accessToken))
@@ -118,7 +126,7 @@ public class NotifyServiceImpl implements NotifyService {
 
         // 查询系统通知统计信息
         QueryNotifyStatisticsParam notifyStatisticsParam = BeanUtil.toBean(param, QueryNotifyStatisticsParam.class);
-        NotifyStatisticsInfo notifyStatisticsInfo = Optional.of(userService.queryNotifyStatistics(notifyStatisticsParam, accessToken))
+        NotifyStatisticsInfo notifyStatisticsInfo = Optional.ofNullable(userService.queryNotifyStatistics(notifyStatisticsParam, accessToken))
                 .filter(ResultWrapper::apiSuccess)
                 .map(ResultWrapper::getData).orElse(new NotifyStatisticsInfo());
 
@@ -152,11 +160,38 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken) {
+        // 工程级别过滤
+        NotifyByProjectID notifyByProjectID = Optional.ofNullable(param.getProjectID())
+                .map(this::filterProject).orElse(null);
+
+        param.setNotifyByProjectID(notifyByProjectID);
         ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, accessToken);
         return Optional.ofNullable(resultWrapper)
                 .filter(ResultWrapper::apiSuccess)
                 .map(ResultWrapper::getData)
                 .filter(CollectionUtil::isNotEmpty).orElse(Collections.emptyList());
+    }
+
+    /**
+     * 根据工程ID过滤消息通知
+     *
+     * @param projectID 工程ID
+     * @return 消息ID列表
+     */
+    private NotifyByProjectID filterProject(Integer projectID) {
+        List<NotifyListByProjectID> notifyListByProjectIDList = tbNotifyRelationMapper.selectNotifyByProjectID(projectID);
+        return Optional.ofNullable(notifyListByProjectIDList)
+                .map(n -> n.stream().collect(Collectors.groupingBy(NotifyListByProjectID::getType)))
+                .map(n -> new NotifyByProjectID()
+                        .setDataList(Optional.ofNullable(n.get(DataDeviceWarnType.DATA.getCode()))
+                                .map(m -> m.stream().map(NotifyListByProjectID::getProjectID).toList()).orElse(null))
+                        .setDeviceList(Optional.ofNullable(n.get(DataDeviceWarnType.DEVICE.getCode()))
+                                .map(m -> m.stream().map(NotifyListByProjectID::getProjectID).toList()).orElse(null))
+                        .setEventList(Optional.ofNullable(n.get(DataDeviceWarnType.EVENT.getCode()))
+                                .map(m -> m.stream().map(NotifyListByProjectID::getProjectID).toList()).orElse(null))
+                        .setWorkOrderList(Optional.ofNullable(n.get(DataDeviceWarnType.WORK_ORDER.getCode()))
+                                .map(m -> m.stream().map(NotifyListByProjectID::getProjectID).toList()).orElse(null)))
+                .orElse(null);
     }
 
     @Override

@@ -42,6 +42,7 @@ public class NotifyController {
      * @apiParam (请求参数) {Date} [startTime] 开始时间
      * @apiParam (请求参数) {Date} [endTime] 结束时间
      * @apiParam (请求参数) {Int} [timeOrder] 时间排序 0.降序（默认） 1.升序
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
      * @apiParam (请求参数) {Int} [serviceID] 平台ID
      * @apiParam (请求参数) {Int} [type] 消息类型 1.报警 2.事件 3.工单
      * @apiSuccess (返回结果) {Int} totalCount 数据总量
@@ -75,6 +76,7 @@ public class NotifyController {
      * @apiDescription 查询消息通知列表
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [status] 0.未读 1.已读
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
      * @apiParam (请求参数) {Int} [serviceID] 平台ID
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
      * @apiSuccess (返回结果) {Int} dataList.notifyID 系统通知ID

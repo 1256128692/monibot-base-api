@@ -23,7 +23,6 @@ import java.util.Collections;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class NotifyPageResponse extends NotifyPageInfo {
-    private Integer serviceID;
     private String serviceName;
     private Integer relationID;
     private Integer relationType;

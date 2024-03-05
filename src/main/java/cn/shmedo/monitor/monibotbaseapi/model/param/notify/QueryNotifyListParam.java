@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.notify;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IPlatformCheck;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
@@ -19,8 +20,10 @@ public class QueryNotifyListParam implements ParameterValidator, ResourcePermiss
     @NotNull(message = "公司ID不能为空")
     @Positive(message = "公司ID必须为正值")
     private Integer companyID;
+    private Integer projectID;
     private Integer serviceID;
     private Integer status;
+    private NotifyByProjectID notifyByProjectID;
 
     @Override
     public Integer getPlatform() {

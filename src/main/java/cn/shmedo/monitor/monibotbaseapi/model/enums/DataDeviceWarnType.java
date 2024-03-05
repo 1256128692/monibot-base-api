@@ -13,7 +13,10 @@ import java.util.Optional;
 @Getter
 @RequiredArgsConstructor
 public enum DataDeviceWarnType {
-    DATA(1, "数据报警"), DEVICE(2, "设备报警");
+    DATA(1, "数据报警"),
+    DEVICE(2, "设备报警"),
+    EVENT(3, "事件"),
+    WORK_ORDER(4, "工单");
     private final Integer code;
     private final String desc;
 
