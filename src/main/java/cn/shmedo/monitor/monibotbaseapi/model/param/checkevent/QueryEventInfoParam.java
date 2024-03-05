@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.apache.commons.lang.ObjectUtils;
@@ -24,6 +25,9 @@ public class QueryEventInfoParam implements ParameterValidator, ResourcePermissi
     private Integer projectID;
     private Date begin;
     private Date end;
+
+    @JsonIgnore
+    private List<Integer> reportUserIDs;
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")
     @NotNull(message = "pageSize不能为空")
     private Integer pageSize;
@@ -36,12 +40,7 @@ public class QueryEventInfoParam implements ParameterValidator, ResourcePermissi
     public ResultWrapper<?> validate() {
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
 
-//        TransferUtil.INSTANCE.getUserNameDict(dataList.stream().map(QueryEventInfoV1::getReportUserID).collect(Collectors.toList()))
-//                .ifPresent(dict -> {
-//                    for (QueryEventInfoV1 d : dataList) {
-//                        d.setReportUserName(dict.get(d.getReportUserID()));
-//                    }
-//                });
+        this.queryContent = Optional.ofNullable(this.queryContent).map(String::trim).orElse(null);
 
         if (ObjectUtils.notEqual(begin,end)) {
             if (begin.after(end)) {

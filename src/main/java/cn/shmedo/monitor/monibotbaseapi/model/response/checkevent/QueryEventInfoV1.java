@@ -26,5 +26,6 @@ public class QueryEventInfoV1 {
     private Date handleTime;
     private String comment;
     private String exValue;
+    private Integer orderID;
 
 }

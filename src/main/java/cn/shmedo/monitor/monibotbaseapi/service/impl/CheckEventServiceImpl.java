@@ -1,14 +1,20 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkevent.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checktask.QueryCheckTaskListRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserBatchRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.*;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,6 +42,8 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     private final TbSensorMapper tbSensorMapper;
 
     private final FileService fileService;
+    private final UserService userService;
+    private final FileConfig fileConfig;
 
     @Override
     public void addEventType(AddEventTypeParam pa) {
@@ -92,6 +100,7 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     @Override
     public Object queryEventInfoPage(QueryEventInfoParam pa) {
 
+        transformKeyword(pa);
         IPage<QueryEventInfoV1> page = this.baseMapper.selectEventInfoPage(new Page<QueryEventInfoParam>(
                 pa.getCurrentPage(), pa.getPageSize()), pa);
         List<QueryEventInfoV1> dataList = page.getRecords();
@@ -103,6 +112,19 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
                     }
                 });
         return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
+    }
+
+    /**
+     * 将 {@link QueryCheckTaskListRequest} 中 keyword 转换为 用户id 用于搜索
+     */
+    protected void transformKeyword(QueryEventInfoParam request) {
+        Optional.ofNullable(request.getQueryContent()).ifPresent(k -> {
+            ResultWrapper<List<UserBase>> wrapper = userService.queryUserBatch(QueryUserBatchRequest.builder()
+                            .companyID(request.getCompanyID()).name(request.getQueryContent()).build(),
+                    fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+            request.setReportUserIDs(Optional.ofNullable(wrapper.getData()).orElse(List.of()).stream()
+                    .map(UserBase::getUserID).distinct().toList());
+        });
     }
 
     @Override
