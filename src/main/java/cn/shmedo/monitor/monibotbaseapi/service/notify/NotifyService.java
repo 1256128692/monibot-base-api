@@ -1,11 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
-import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import jakarta.annotation.Nonnull;
 
 import java.util.Collection;
@@ -76,5 +76,10 @@ public interface NotifyService {
      * @param accessToken token
      * @return 不分页列表
      */
-    Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken);
+    List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken);
+
+    /**
+     * 设置消息通知状态
+     */
+    void setNotifyStatus(SetNotifyStatusParam pa, String accessToken);
 }

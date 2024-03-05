@@ -2,34 +2,30 @@ package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
-import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.third.TbService;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyDetailParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DataWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -155,39 +151,53 @@ public class NotifyServiceImpl implements NotifyService {
     }
 
     @Override
-    public Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken) {
-        Map<String, Object> result = new HashMap<>();
-        TbNotifyRelation relation = tbNotifyRelationMapper.selectNotifyList(param);
-        Optional.ofNullable(relation).ifPresent(u -> {
-            final Integer companyID = param.getCompanyID();
-            final Integer relationID = u.getRelationID();
-            final Integer notifyID = u.getNotifyID();
-            Optional.of(new QueryNotifyDetailParam(companyID, notifyID))
-                    .map(w -> userService.queryNotifyDetail(w, accessToken))
-                    .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
-                    .filter(w -> SysNotify.Status.UNREAD.equals(w.getStatus())).ifPresent(w -> {
-                        switch (DataDeviceWarnType.fromCode(relation.getType())) {
-                            case DATA -> {
-                                DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(relationID);
-                                info.setNotifyID(notifyID);
-                                result.put("dataWarn", info);
-                            }
-                            case DEVICE -> {
-                                DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
-                                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(relationID);
-                                info.setWarnLogID(tbDeviceWarnLog.getId());
-                                info.setWarnName("设备离线");
-                                info.setWarnTime(tbDeviceWarnLog.getWarnTime());
-                                info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
-                                info.setNotifyID(notifyID);
-                                fillDeviceInfo(info, companyID);
-                                result.put("deviceWarn", info);
-                            }
-                        }
-                    });
-        });
-        return result;
+    public List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken) {
+        ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, accessToken);
+        return Optional.ofNullable(resultWrapper)
+                .filter(ResultWrapper::apiSuccess)
+                .map(ResultWrapper::getData)
+                .filter(CollectionUtil::isNotEmpty).orElse(Collections.emptyList());
     }
+
+    @Override
+    public void setNotifyStatus(SetNotifyStatusParam pa, String accessToken) {
+        userService.setNotifyStatus(pa, accessToken);
+    }
+
+//    @Override
+//    public Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken) {
+//        Map<String, Object> result = new HashMap<>();
+//        TbNotifyRelation relation = tbNotifyRelationMapper.selectNotifyList(param);
+//        Optional.ofNullable(relation).ifPresent(u -> {
+//            final Integer companyID = param.getCompanyID();
+//            final Integer relationID = u.getRelationID();
+//            final Integer notifyID = u.getNotifyID();
+//            Optional.of(new QueryNotifyDetailParam(companyID, notifyID))
+//                    .map(w -> userService.queryNotifyDetail(w, accessToken))
+//                    .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
+//                    .filter(w -> SysNotify.Status.UNREAD.equals(w.getStatus())).ifPresent(w -> {
+//                        switch (DataDeviceWarnType.fromCode(relation.getType())) {
+//                            case DATA -> {
+//                                DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(relationID);
+//                                info.setNotifyID(notifyID);
+//                                result.put("dataWarn", info);
+//                            }
+//                            case DEVICE -> {
+//                                DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
+//                                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(relationID);
+//                                info.setWarnLogID(tbDeviceWarnLog.getId());
+//                                info.setWarnName("设备离线");
+//                                info.setWarnTime(tbDeviceWarnLog.getWarnTime());
+//                                info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
+//                                info.setNotifyID(notifyID);
+//                                fillDeviceInfo(info, companyID);
+//                                result.put("deviceWarn", info);
+//                            }
+//                        }
+//                    });
+//        });
+//        return result;
+//    }
 
     /**
      * 格式化短信参数内容，防止超过20个字符

@@ -2,20 +2,17 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryNotifyListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryWarnNotifyPageParam;
-import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author wuxl
@@ -97,5 +94,26 @@ public class NotifyController {
     @PostMapping(value = "/QueryNotifyList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object queryNotifyList(@Valid @RequestBody QueryNotifyListParam param, HttpServletRequest request) {
         return notifyService.queryNotifyList(param, request.getHeader("Authorization"));
+    }
+
+
+    /**
+     * @api {post} /SetNotifyStatus 设置消息通知状态
+     * @apiDescription 设置消息通知状态，仅限当前用户
+     * @apiVersion 1.0.0
+     * @apiGroup 消息通知模块
+     * @apiName SetNotifyStatus
+     * @apiParam {Int} companyID 公司ID
+     * @apiParam {Int[]} [notifyIDList] 通知ID列表，为空设置所有
+     * @apiParam {Int} status 通知状态 0.未读 1.已读 2.待办
+     * @apiSuccess (返回结果) {String} none 空
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 user:ChangeNotify
+     */
+    @Permission(permissionName = "mdmbase:ChangeNotify")
+    @RequestMapping(value = "/SetNotifyStatus", method = RequestMethod.POST, consumes = CommonVariable.JSON, produces = CommonVariable.JSON)
+    public Object setNotifyStatus(@RequestBody @Valid @NotNull SetNotifyStatusParam pa, HttpServletRequest request) {
+        notifyService.setNotifyStatus(pa, request.getHeader("Authorization"));
+        return ResultWrapper.successWithNothing();
     }
 }
