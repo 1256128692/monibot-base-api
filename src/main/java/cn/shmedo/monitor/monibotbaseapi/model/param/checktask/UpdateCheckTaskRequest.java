@@ -85,8 +85,10 @@ public class UpdateCheckTaskRequest implements ParameterValidator, ResourcePermi
         Assert.isTrue(points.size() == pointIDList.size(),
                 () -> new InvalidParameterException("巡检点必须有效且不能为空"));
         points.forEach(p -> {
+            Assert.isTrue(p.getServiceID().equals(task.getServiceID()),
+                    () -> new InvalidParameterException("巡检点和任务必须位于同一平台中"));
             Assert.isTrue(p.getProjectID().equals(task.getProjectID()),
-                    () -> new InvalidParameterException("巡检点必须位于同一项目中"));
+                    () -> new InvalidParameterException("巡检点和任务必须位于同一项目中"));
             Assert.isTrue(p.getEnable(), () -> new InvalidParameterException("巡检点必须为启用状态"));
         });
         this.subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();

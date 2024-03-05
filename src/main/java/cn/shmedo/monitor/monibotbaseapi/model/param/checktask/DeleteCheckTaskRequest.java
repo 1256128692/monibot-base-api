@@ -48,8 +48,8 @@ public class DeleteCheckTaskRequest implements ParameterValidator, ResourcePermi
                 .select(TbCheckTask::getID, TbCheckTask::getProjectID, TbCheckTask::getStatus));
 
         Assert.isTrue(origins.size() == idList.size(), () -> new InvalidParameterException("巡检任务必须有效且不能为空"));
-        origins.forEach(task -> Assert.isTrue(task.getStatus() == CheckTaskStatus.UN_START,
-                () -> new InvalidParameterException("只能删除未开始的巡检任务")));
+        origins.forEach(task -> Assert.isFalse(task.getStatus() == CheckTaskStatus.PROCESSING,
+                () -> new InvalidParameterException("不能删除进行中的巡检任务")));
         return null;
     }
 

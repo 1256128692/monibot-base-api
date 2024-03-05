@@ -7,10 +7,7 @@ import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTask;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTaskPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak.CheckTaskInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak.CheckTaskSimple;
@@ -81,6 +78,8 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
     public void delete(DeleteCheckTaskRequest request) {
         taskPointMapper.delete(Wrappers.<TbCheckTaskPoint>lambdaQuery()
                 .eq(TbCheckTaskPoint::getTaskID, request.getIdList()));
+        eventMapper.delete(Wrappers.<TbCheckEvent>lambdaQuery()
+                .eq(TbCheckEvent::getTaskID, request.getIdList()));
         this.removeByIds(request.getIdList());
     }
 
