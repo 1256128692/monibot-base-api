@@ -89,6 +89,13 @@ public class TbCheckEvent {
     @TableField(value = "ReportUserID")
     private Integer reportUserID;
 
+
+    /**
+     * 处置人
+     */
+    @TableField(value = "HandleUserID")
+    private Integer handleUserID;
+
     /**
      * 提报时间
      */

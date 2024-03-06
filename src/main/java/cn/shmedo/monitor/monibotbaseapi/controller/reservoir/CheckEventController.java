@@ -180,7 +180,7 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} eventID 事件ID
      * @apiParam (请求体) {Int} [serviceID] 服务ID
-     * @apiParam (请求体) {Int} [orderID] 订单ID
+     * @apiParam (请求体) {Int} [orderID] 工单ID
      * @apiParam (请求体) {Int} [projectID] 关联工程ID
      * @apiParam (请求体) {Int} [taskID] 关联巡检任务ID
      * @apiParam (请求体) {Int} [typeID] 事件类型ID
@@ -275,12 +275,15 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {String}  taskBeginTime  关联巡检任务开始时间
      * @apiSuccess (响应结果) {String}  taskEndTime  关联巡检任务结束时间
      * @apiSuccess (响应结果) {Int}  orderID  工单ID
+     * @apiSuccess (响应结果) {Int}  instanceID 工单ID
      * @apiSuccess (响应结果) {Int}  typeID 事件类型ID
      * @apiSuccess (响应结果) {String}  typeName  事件类型名称
      * @apiSuccess (响应结果) {String}  address   事件位置
      * @apiSuccess (响应结果) {String}  location 事件经纬度
      * @apiSuccess (响应结果) {String}  describe 事件描述
      * @apiSuccess (响应结果) {Date}  handleTime 处理时间
+     * @apiSuccess (响应结果) {Int}  handleUserID 处理人id
+     * @apiSuccess (响应结果) {String}  handleUserName 处理人名称
      * @apiSuccess (响应结果) {String}  comment  结束批注
      * @apiSuccess (响应结果) {String}  exValue  备注
      * @apiSuccess (响应结果) {Int}  reportUserID  提报人ID

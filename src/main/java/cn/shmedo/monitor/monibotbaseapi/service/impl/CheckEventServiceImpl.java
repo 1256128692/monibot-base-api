@@ -17,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.CheckEventService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @EnableTransactionManagement
 @Service
@@ -109,12 +111,18 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
                 pa.getCurrentPage(), pa.getPageSize()), pa);
         List<QueryEventInfoV1> dataList = page.getRecords();
 
-        TransferUtil.INSTANCE.getUserNameDict(dataList.stream().map(QueryEventInfoV1::getReportUserID).collect(Collectors.toList()))
-                .ifPresent(dict -> {
-                    for (QueryEventInfoV1 d : dataList) {
-                        d.setReportUserName(dict.get(d.getReportUserID()));
-                    }
-                });
+        if (!CollectionUtil.isNullOrEmpty(dataList)) {
+            TransferUtil.INSTANCE.getUserNameDict(dataList.stream()
+                            .map(QueryEventInfoV1::getReportUserID)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList()))
+                    .ifPresent(dict -> {
+                        for (QueryEventInfoV1 d : dataList) {
+                            d.setReportUserName(dict.get(d.getReportUserID()));
+                        }
+                    });
+        }
+
         return new PageUtil.Page<>(page.getPages(), dataList, page.getTotal());
     }
 
@@ -139,12 +147,18 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
             List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(JSONUtil.toList(eventInfoV2.getAnnexes(), String.class), pa.getCompanyID());
             eventInfoV2.setFileInfoList(fileUrlList);
         }
-
-        TransferUtil.INSTANCE.getUserNameDict(List.of(eventInfoV2.getCheckerID(), eventInfoV2.getReportUserID()))
-                .ifPresent(dict -> {
-                    eventInfoV2.setCheckerName(dict.get(eventInfoV2.getCheckerID()));
-                    eventInfoV2.setReportUserName(dict.get(eventInfoV2.getReportUserID()));
-                });
+        if (ObjectUtil.isNotNull(eventInfoV2)) {
+            List<Integer> idList = Stream.of(eventInfoV2.getCheckerID(), eventInfoV2.getReportUserID(), eventInfoV2.getHandleUserID())
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            TransferUtil.INSTANCE.getUserNameDict(idList)
+                    .ifPresent(dict -> {
+                        eventInfoV2.setCheckerName(dict.get(eventInfoV2.getCheckerID()));
+                        eventInfoV2.setReportUserName(dict.get(eventInfoV2.getReportUserID()));
+                        eventInfoV2.setHandleUserName(dict.get(eventInfoV2.getHandleUserID()));
+                    });
+            eventInfoV2.setInstanceID(eventInfoV2.getOrderID());
+        }
         return eventInfoV2;
     }
 

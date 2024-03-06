@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.netty.util.internal.StringUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -79,6 +80,10 @@ public class UpdateEventInfoParam implements ParameterValidator, ResourcePermiss
         vo.setComment(this.comment);
         vo.setExValue(this.exValue);
 
+        if (!StringUtil.isNullOrEmpty(this.comment)) {
+            vo.setHandleUserID(this.subjectID);
+            vo.setHandleTime(DateUtil.date().toLocalDateTime());
+        }
         vo.setUpdateUserID(this.subjectID);
         vo.setUpdateTime(DateUtil.date().toLocalDateTime());
 
