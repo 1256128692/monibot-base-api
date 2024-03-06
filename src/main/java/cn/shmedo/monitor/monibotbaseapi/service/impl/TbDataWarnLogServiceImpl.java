@@ -314,7 +314,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
         tbDataWarnLog.setWarnEndTime(current);
         if (Objects.nonNull(silenceCycle)) {
             publisher.publishEvent(new WarnConfigEventDto(this, RedisKeys.WARN_SILENCE_CYCLE + warnThresholdID,
-                    null, silenceCycle * 3600000L, tbDataWarnLog.getWarnLevel()));
+                    null, silenceCycle * 3600L, tbDataWarnLog.getWarnLevel()));
         }
         publisher.publishEvent(new WarnConfigClearDto(this, RedisKeys.WARN_HIT + warnThresholdID));
         this.updateById(tbDataWarnLog);
