@@ -11,6 +11,7 @@ import cn.hutool.json.JSON;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
@@ -22,6 +23,8 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.RedisCompanyInfoDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.redis.YsTokenDao;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.device.UpdateDeviceGroupSenderDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.*;
@@ -32,6 +35,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.hk.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.video.ys.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.SaveDeviceWarnParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.UpdateDeviceGroupSenderEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.presetPoint.PresetPointWithDeviceInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.*;
@@ -56,6 +60,7 @@ import io.netty.util.internal.StringUtil;
 import jakarta.annotation.Resource;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -102,6 +107,7 @@ public class VideoServiceImpl implements VideoService {
     private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
 
     private final NotifyService notifyService;
+    private final ApplicationEventPublisher publisher;
 
     private final ITbDeviceWarnLogService tbDeviceWarnLogService;
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
@@ -548,7 +554,7 @@ public class VideoServiceImpl implements VideoService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Object deleteVideoDeviceList(DeleteVideoDeviceParam pa) {
+    public Object deleteVideoDeviceList(DeleteVideoDeviceParam pa, String accessToken, CurrentSubject currentSubject) {
 
         // 1. 删除视频设备
         if (CollectionUtil.isNullOrEmpty(pa.getTbVideoDevices())) {
@@ -568,10 +574,17 @@ public class VideoServiceImpl implements VideoService {
         // 删除通道视频设备
         videoDeviceSourceMapper.deleteByDeviceSerialList(pa.getDeviceSerialList());
 
-        // 视频设备报警是中台直接产生的,没有走物联网平台那一套 device_group -> device_group_sender 推送,因此在物联网平台无法获取到这套推送的逻辑
-        // 中台绑定的逻辑是一台视频设备直接通过`tb_video_device`表的`ProjectID`字段绑定到一个工程
-        // 生成报警的接口 @see #batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam)
-        tbDeviceWarnLogService.remove(new LambdaQueryWrapper<TbDeviceWarnLog>().in(TbDeviceWarnLog::getDeviceSerial, pa.getDeviceSerialList()));
+        /*
+         * 视频设备报警是中台直接产生的,没有走物联网平台那一套 device_group -> device_group_sender 推送,因此在物联网平台无法获取到推送到的工程
+         * 中台绑定的逻辑是一台视频设备直接通过`tb_video_device`表的`ProjectID`字段绑定到一个工程
+         * 生成报警的接口 @see #batchUpdateVideoDeviceStatus(BatchUpdateVideoDeviceStatusParam)
+         */
+        List<UpdateDeviceGroupSenderEventParam> eventParamList = pa.getTbVideoDevices().stream().map(u -> {
+            UpdateDeviceGroupSenderEventParam eventParam = new UpdateDeviceGroupSenderEventParam();
+            eventParam.setDeviceToken(u.getDeviceToken());
+            return eventParam;
+        }).toList();
+        publisher.publishEvent(new UpdateDeviceGroupSenderDto(this, eventParamList, ListenerEventAppend.of(currentSubject, accessToken)));
 
         // 4. 删除物联网平台设备
         ResultWrapper<List<DeviceBaseInfo>> listResultWrapper = iotService.queryDeviceBaseInfo(QueryDeviceBaseInfoParam.builder()
@@ -586,7 +599,6 @@ public class VideoServiceImpl implements VideoService {
                     .build();
             iotService.deleteDevice(build);
         }
-
 
         // ,因为目前没有验证码,暂时不验证删除萤石云设备
 //        pa.getTbVideoDevices().forEach(d -> {

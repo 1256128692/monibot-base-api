@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
@@ -82,4 +83,6 @@ public interface NotifyService {
      * 设置消息通知状态
      */
     void setNotifyStatus(SetNotifyStatusParam pa, String accessToken);
+
+    void clearNotify(final List<Integer> notifyIDList, final ListenerEventAppend append);
 }

@@ -85,7 +85,7 @@
             GROUP_CONCAT( ba.FilePath  ORDER BY ba.CreateTime DESC ) attachmentStr
         FROM tb_bulletin_data bd
             LEFT JOIN tb_bulletin_platform_relation bpr ON bpr.`BulletinID` = bd.`ID`
-            LEFT JOIN tb_bulletin_attachment ba ON ba.`BulletinID` = bd.`ID`
+            LEFT JOIN tb_bulletin_attachment ba ON ba.`BulletinID` = bd.`ID` AND ba.`Type`=1
         WHERE bd.`ID`=#{bulletinID}
         GROUP BY bd.`ID`
     </select>

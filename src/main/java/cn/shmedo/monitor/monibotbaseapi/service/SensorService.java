@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DataSourceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.IdRecord;
@@ -59,7 +60,7 @@ public interface SensorService extends IService<TbSensor> {
      *
      * @param request {@link DeleteSensorRequest}
      */
-    void deleteSensor(DeleteSensorRequest request);
+    void deleteSensor(DeleteSensorRequest request, String accessToken, CurrentSubject currentSubject);
 
     /**
      * 更新传感器

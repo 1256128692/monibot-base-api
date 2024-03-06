@@ -14,8 +14,10 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.third.TbService;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
@@ -226,7 +228,7 @@ public class NotifyServiceImpl implements NotifyService {
                     d.forEach(item -> {
                         NotifyListByProjectID notifyListByProjectID = idMap.get(item.getNotifyID());
                         DataDeviceWarnType dataDeviceWarnType = DataDeviceWarnType.fromCode(item.getRelationType());
-                        if(Objects.nonNull(notifyListByProjectID)){
+                        if (Objects.nonNull(notifyListByProjectID)) {
                             switch (dataDeviceWarnType) {
                                 case DATA -> item.setDataInfo(new NotifyPageResponse.DataInfo()
                                         .setMonitorItemID(notifyListByProjectID.getMonitorItemID())
@@ -268,7 +270,19 @@ public class NotifyServiceImpl implements NotifyService {
         userService.setNotifyStatus(pa, accessToken);
     }
 
-//    @Override
+    /**
+     * 清空对应的数据报警消息
+     *
+     * @param notifyIDList 消息IDList
+     * @param append       事件附加信息
+     */
+    @Override
+    public void clearNotify(List<Integer> notifyIDList, ListenerEventAppend append) {
+        tbNotifyRelationMapper.delete(new LambdaQueryWrapper<TbNotifyRelation>().in(TbNotifyRelation::getNotifyID, notifyIDList));
+        userService.deleteNotify(new DeleteNotifyParam(append.companyID(), notifyIDList), append.accessToken());
+    }
+
+    //    @Override
 //    public Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken) {
 //        Map<String, Object> result = new HashMap<>();
 //        TbNotifyRelation relation = tbNotifyRelationMapper.selectNotifyList(param);

@@ -9,6 +9,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -16,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.UpdateDeviceGroupSenderDto;
@@ -261,8 +263,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
     }
 
     @Override
-    public void updateDeviceGroupSenderEvent(List<UpdateDeviceGroupSenderEventParam> param) {
-        this.publisher.publishEvent(new UpdateDeviceGroupSenderDto(this, param));
+    public void updateDeviceGroupSenderEvent(List<UpdateDeviceGroupSenderEventParam> param, String accessToken, CurrentSubject currentSubject) {
+        this.publisher.publishEvent(new UpdateDeviceGroupSenderDto(this, param, ListenerEventAppend.of(currentSubject, accessToken)));
     }
 
     public @Nullable String getLowestAreaCode(final String areaJson) {

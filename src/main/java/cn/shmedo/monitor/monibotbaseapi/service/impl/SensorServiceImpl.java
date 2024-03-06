@@ -23,6 +23,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceWithSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.*;
@@ -273,7 +274,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void deleteSensor(DeleteSensorRequest request) {
+    public void deleteSensor(DeleteSensorRequest request, String accessToken, CurrentSubject currentSubject) {
         //删除传感器数据源
         Set<String> dataSourceIds = request.getSensorList().stream()
                 .map(TbSensor::getDataSourceID).filter(Objects::nonNull)
@@ -291,7 +292,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         //删除传感器
         removeBatchByIds(request.getSensorIDList());
         // 处理传感器相关数据
-        publisher.publishEvent(new DeleteSensorEventDto(this, request.getSensorIDList()));
+        publisher.publishEvent(new DeleteSensorEventDto(this, request.getSensorIDList(),
+                ListenerEventAppend.of(currentSubject, accessToken)));
     }
 
     @Override

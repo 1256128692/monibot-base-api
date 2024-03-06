@@ -5,11 +5,15 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogHistoryMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnThresholdConfigMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataWarnLogHistory;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnThresholdConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.DeleteSensorEventDto;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
+import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Resource;
@@ -18,7 +22,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -33,9 +36,11 @@ public class DeleteEventListener {
     @SuppressWarnings("all")
     @Resource(name = RedisConstant.MONITOR_REDIS_SERVICE)
     private final RedisService monitorRedisService;
+    private final NotifyService notifyService;
     private final TbWarnThresholdConfigMapper tbWarnThresholdConfigMapper;
     private final TbDataWarnLogMapper tbDataWarnLogMapper;
     private final TbDataWarnLogHistoryMapper tbDataWarnLogHistoryMapper;
+    private final TbNotifyRelationMapper tbNotifyRelationMapper;
 
     /**
      * 监听<b>删除监测传感器</b>事件
@@ -43,21 +48,30 @@ public class DeleteEventListener {
     @EventListener
     @Transactional(rollbackFor = Exception.class)
     public void listenDeleteSensorEvent(DeleteSensorEventDto dto) {
-        clearDataWarn(dto.getSensorIDList());
+        clearDataWarn(dto);
     }
 
     /**
-     * 清空传感器对应的报警配置和报警记录
-     *
-     * @param sensorIDList 传感器IDList
+     * 清空传感器对应的报警配置、报警记录和通知消息<br>
+     * 目前这里只有3个动作,如果需要添加更多的动作,建议修改成pipeline的形式
      */
-    private void clearDataWarn(Collection<Integer> sensorIDList) {
+    private void clearDataWarn(final DeleteSensorEventDto dto) {
         List<Integer> thresholdConfigIDList = tbWarnThresholdConfigMapper.selectList(
-                        new LambdaQueryWrapper<TbWarnThresholdConfig>().in(TbWarnThresholdConfig::getSensorID, sensorIDList))
+                        new LambdaQueryWrapper<TbWarnThresholdConfig>().in(TbWarnThresholdConfig::getSensorID, dto.getSensorIDList()))
                 .stream().map(TbWarnThresholdConfig::getId).toList();
         if (CollUtil.isNotEmpty(thresholdConfigIDList)) {
             clearDataWarnConfig(thresholdConfigIDList);
-            clearDataWarnLog(thresholdConfigIDList);
+            List<Integer> dataWarnLogIDList = tbDataWarnLogMapper.selectList(new LambdaQueryWrapper<TbDataWarnLog>()
+                    .in(TbDataWarnLog::getWarnThresholdID, thresholdConfigIDList)).stream().map(TbDataWarnLog::getId).toList();
+            if (CollUtil.isNotEmpty(dataWarnLogIDList)) {
+                clearDataWarnLog(dataWarnLogIDList);
+                List<Integer> notifyIDList = tbNotifyRelationMapper.selectList(new LambdaQueryWrapper<TbNotifyRelation>()
+                        .eq(TbNotifyRelation::getType, DataDeviceWarnType.DATA.getCode())
+                        .in(TbNotifyRelation::getRelationID, dataWarnLogIDList)).stream().map(TbNotifyRelation::getNotifyID).toList();
+                if (CollUtil.isNotEmpty(notifyIDList)) {
+                    notifyService.clearNotify(notifyIDList, dto.getAppend());
+                }
+            }
         }
     }
 
@@ -81,14 +95,10 @@ public class DeleteEventListener {
      *
      * @param thresholdConfigIDList 阈值IDList
      */
-    private void clearDataWarnLog(final List<Integer> thresholdConfigIDList) {
-        List<Integer> dataWarnLogIDList = tbDataWarnLogMapper.selectList(new LambdaQueryWrapper<TbDataWarnLog>()
-                .in(TbDataWarnLog::getWarnThresholdID, thresholdConfigIDList)).stream().map(TbDataWarnLog::getId).toList();
-        if (CollUtil.isNotEmpty(dataWarnLogIDList)) {
-            // 清空数据报警变化历史
-            tbDataWarnLogHistoryMapper.delete(new LambdaQueryWrapper<TbDataWarnLogHistory>().in(TbDataWarnLogHistory::getWarnLogID, dataWarnLogIDList));
-            // 清空数据报警
-            tbDataWarnLogMapper.deleteBatchIds(dataWarnLogIDList);
-        }
+    private void clearDataWarnLog(final List<Integer> dataWarnLogIDList) {
+        // 清空数据报警变化历史
+        tbDataWarnLogHistoryMapper.delete(new LambdaQueryWrapper<TbDataWarnLogHistory>().in(TbDataWarnLogHistory::getWarnLogID, dataWarnLogIDList));
+        // 清空数据报警
+        tbDataWarnLogMapper.deleteBatchIds(dataWarnLogIDList);
     }
 }

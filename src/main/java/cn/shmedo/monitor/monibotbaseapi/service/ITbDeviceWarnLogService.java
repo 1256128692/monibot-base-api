@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDeviceWarnLog;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnDetailParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.QueryDeviceWarnPageParam;
@@ -21,5 +22,5 @@ public interface ITbDeviceWarnLogService extends IService<TbDeviceWarnLog> {
 
     DeviceWarnPageInfo queryDeviceWarnDetail(QueryDeviceWarnDetailParam param);
 
-    void updateDeviceGroupSenderEvent(List<UpdateDeviceGroupSenderEventParam> param);
+    void updateDeviceGroupSenderEvent(List<UpdateDeviceGroupSenderEventParam> param, String accessToken, CurrentSubject currentSubject);
 }

@@ -2,12 +2,15 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.interceptor.CurrentSubjectFilter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
 import cn.shmedo.monitor.monibotbaseapi.service.IDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbVideoDeviceService;
 import cn.shmedo.monitor.monibotbaseapi.service.VideoService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -268,7 +271,7 @@ public class VideoController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [status] 视频设备状态枚举 0.全部 1.仅在线 2.仅离线（默认是0.全部）
      * @apiParam (请求体) {String} [deviceSerial] 序列号/唯一标识
-      @apiParam (请求体) {String} [queryCode] 模糊匹配,可模糊匹配监测点组名称、监测点名称
+     * @apiParam (请求体) {String} [queryCode] 模糊匹配,可模糊匹配监测点组名称、监测点名称
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Object[]} dataList 监测组数据列表
      * @apiSuccess (返回结果) {Int} dataList.monitorGroupID 监测分组ID
@@ -536,7 +539,7 @@ public class VideoController {
      * @api {POST} /QueryVideoDeviceListV1 查询视频设备列表(不分页-新版)
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 查询视频设备列表(不分页-新版)
+     * @apiDescription 查询视频设备列表(不分页 - 新版)
      * @apiName QueryVideoDeviceListV1
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String[]} [deviceSerialList] 设备序列号/监控点唯一标识,null查询该公司下全部
@@ -654,7 +657,7 @@ public class VideoController {
      * @api {POST} /QueryHkVideoDeviceBaseInfo 查询海康视频设备基本信息
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 查询海康视频设备基本信息,调用海康api服务接口
+     * @apiDescription 查询海康视频设备基本信息, 调用海康api服务接口
      * @apiName QueryHkVideoDeviceBaseInfo
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiParam (请求体) {String} deviceSerial 海康的设备序列号
@@ -687,8 +690,8 @@ public class VideoController {
      */
     @Permission(permissionName = "mdmbase:DeleteVideoDevice")
     @RequestMapping(value = "/DeleteVideoDeviceList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object deleteVideoDeviceList(@Validated @RequestBody DeleteVideoDeviceParam pa) {
-        return videoService.deleteVideoDeviceList(pa);
+    public Object deleteVideoDeviceList(@Validated @RequestBody DeleteVideoDeviceParam pa, HttpServletRequest request) {
+        return videoService.deleteVideoDeviceList(pa, request.getHeader(CurrentSubjectFilter.TOKEN_HEADER), CurrentSubjectHolder.getCurrentSubject());
     }
 
 
@@ -993,7 +996,7 @@ public class VideoController {
      * @api {POST} /BatchHandlerIotDeviceStatusChange 批量处理Iot设备在线离线状态变化
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 批量处理Iot设备在线离线状态变化,设备由在线转变为离线后,发送预警通知
+     * @apiDescription 批量处理Iot设备在线离线状态变化, 设备由在线转变为离线后, 发送预警通知
      * @apiName BatchHandlerIotDeviceStatusChange
      * @apiParam (请求体) {Int} companyID  公司ID
      * @apiSuccess (返回结果) {Boolean} data 数据
