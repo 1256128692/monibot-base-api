@@ -26,6 +26,8 @@ public class QueryEventInfoV2 {
     private String reportUserName;
     private Date reportTime;
     private Date handleTime;
+    private Integer handleUserID;
+    private String handleUserName;
     private String comment;
     private String exValue;
 
@@ -36,6 +38,7 @@ public class QueryEventInfoV2 {
     private Date taskEndTime;
 
     private Integer orderID;
+    private Integer instanceID;
 
     private String annexes;
 

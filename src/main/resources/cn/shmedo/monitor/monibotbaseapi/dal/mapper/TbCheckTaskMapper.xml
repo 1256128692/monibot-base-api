@@ -30,7 +30,7 @@
 
 
   <select id="selectListByCondition" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskInfo">
-      select ID,
+      select ID as taskID,
              `Name`       as taskName,
              SerialNumber as taskSerialNumber,
              CheckType,
@@ -41,7 +41,7 @@
       where TaskDate &gt;= #{param.begin}
         AND TaskDate &lt;= #{param.end}
       <if test="param.serviceID != null">
-          AND projectID in (select ProjectID from tb_project_service_relation where serviceID = #{param.serviceID})
+          AND serviceID = #{param.serviceID}
       </if>
       <if test="param.projectID != null">
           AND projectID = #{param.projectID}

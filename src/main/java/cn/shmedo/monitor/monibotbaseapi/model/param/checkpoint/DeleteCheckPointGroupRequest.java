@@ -15,7 +15,7 @@ public class DeleteCheckPointGroupRequest extends AbsDeleteCheckPointGroup {
 
     @Override
     public ResultWrapper<?> validate() {
-        super.validateGroupStatus();
+        super.validate();
         Assert.isTrue(super.validateGroupStatus(),
                 () -> new InvalidParameterException("所选的巡检组中包含有正在执行巡检任务的巡检点，请确认任务执行结束再做删除。"));
         return null;

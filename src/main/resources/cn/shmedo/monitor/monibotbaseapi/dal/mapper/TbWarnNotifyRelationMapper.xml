@@ -2,15 +2,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper">
 
-    <select id="selectRealTimeWarnNotify"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyRelation">
-        SELECT
-            wnr.*
-        FROM tb_warn_notify_relation wnr
-            LEFT JOIN tb_data_warn_log dwl1 ON wnr.Type = 1 AND wnr.WarnLogID = dwl1.ID
-            LEFT JOIN tb_device_warn_log dwl2 ON wnr.Type = 2 AND wnr.WarnLogID = dwl2.ID
-        WHERE (wnr.Type=1 AND dwl1.WarnEndTime IS NOT NULL AND dwl1.CompanyID=#{param.companyID} AND dwl1.Platform=#{param.platform})
-           OR (wnr.Type=2 AND dwl2.WarnEndTime IS NOT NULL AND dwl2.CompanyID=#{param.companyID} AND dwl2.Platform=#{param.platform})
-        ORDER BY wnr.ID DESC LIMIT 1
-    </select>
+<!--    <select id="selectRealTimeWarnNotify"-->
+<!--            resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyRelation">-->
+<!--        SELECT-->
+<!--            wnr.*-->
+<!--        FROM tb_warn_notify_relation wnr-->
+<!--            LEFT JOIN tb_data_warn_log dwl1 ON wnr.Type = 1 AND wnr.WarnLogID = dwl1.ID-->
+<!--            LEFT JOIN tb_device_warn_log dwl2 ON wnr.Type = 2 AND wnr.WarnLogID = dwl2.ID-->
+<!--        WHERE (wnr.Type=1 AND dwl1.WarnEndTime IS NOT NULL AND dwl1.CompanyID=#{param.companyID} AND dwl1.Platform=#{param.platform})-->
+<!--           OR (wnr.Type=2 AND dwl2.WarnEndTime IS NOT NULL AND dwl2.CompanyID=#{param.companyID} AND dwl2.Platform=#{param.platform})-->
+<!--        ORDER BY wnr.ID DESC LIMIT 1-->
+<!--    </select>-->
 </mapper>

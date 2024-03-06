@@ -17,6 +17,7 @@
         <result column="Annexes" property="annexes"/>
         <result column="ReportUserID" property="reportUserID"/>
         <result column="ReportTime" property="reportTime"/>
+        <result column="HandleUserID" property="handleUserID"/>
         <result column="HandleTime" property="handleTime"/>
         <result column="Status" property="status"/>
         <result column="Comment" property="comment"/>
@@ -40,6 +41,7 @@
         Annexes,
         ReportUserID,
         ReportTime,
+        HandleUserID,
         HandleTime,
         `Status`,
         `Comment`,
@@ -208,6 +210,9 @@
             <if test="annexes != null">
                 annexes = #{annexes},
             </if>
+            <if test="handleUserID != null">
+                handleUserID = #{handleUserID},
+            </if>
             <if test="handleTime != null">
                 handleTime = #{handleTime},
             </if>
@@ -320,6 +325,7 @@
              , ce.`describe`
              , ce.reportUserID
              , ce.reportTime
+             , ce.handleUserID
              , ce.handleTime
              , ce.`comment`
              , ce.exValue

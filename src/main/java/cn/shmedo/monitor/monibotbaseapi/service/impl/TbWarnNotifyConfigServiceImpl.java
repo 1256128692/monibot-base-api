@@ -8,7 +8,6 @@ import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyConfigProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
@@ -50,7 +49,6 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     private final FileConfig fileConfig;
     private final TbProjectInfoMapper tbProjectInfoMapper;
     private final TbNotifyConfigProjectRelationMapper tbNotifyConfigProjectRelationMapper;
-    private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
 
     @Override
     public WarnNotifyConfigDetail queryWarnNotifyConfigDetail(QueryWarnNotifyConfigDetailParam param) {

@@ -49,6 +49,7 @@ public class NotifyController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Int} currentPageData.notifyID 系统通知ID
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (返回结果) {Int} currentPageData.serviceID 平台ID
      * @apiSuccess (返回结果) {Int} currentPageData.serviceName 平台名称
      * @apiSuccess (返回结果) {Int} currentPageData.type 类型，1.报警 2.事件 3.工单
@@ -85,6 +86,7 @@ public class NotifyController {
      * @apiParam (请求参数) {Int} [serviceID] 平台ID
      * @apiSuccess (返回结果) {Object[]} dataList 当前页数据
      * @apiSuccess (返回结果) {Int} dataList.notifyID 系统通知ID
+     * @apiSuccess (返回结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (返回结果) {Int} dataList.serviceID 平台ID
      * @apiSuccess (返回结果) {Int} dataList.serviceName 平台名称
      * @apiSuccess (返回结果) {Int} dataList.type 类型，1.报警 2.事件 3.工单
