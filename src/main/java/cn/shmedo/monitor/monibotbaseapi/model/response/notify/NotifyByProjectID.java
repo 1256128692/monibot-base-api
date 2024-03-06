@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @Author wuxl
@@ -16,8 +17,9 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class NotifyByProjectID {
-    private List<Integer> dataList;
-    private List<Integer> deviceList;
-    private List<Integer> eventList;
-    private List<Integer> workOrderList;
+    private Set<Integer> dataList;
+    private Set<Integer> deviceList;
+    private Set<Integer> eventList;
+    private Set<Integer> workOrderList;
+    private List<NotifyListByProjectID> notifyListByProjectIDList;
 }

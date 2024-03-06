@@ -58,6 +58,11 @@ public class NotifyController {
      * @apiSuccess (返回结果) {DateTime} currentPageData.time 接收时间
      * @apiSuccess (返回结果) {Int} [currentPageData.relationID] 关联ID,如果该项为空则不可跳转
      * @apiSuccess (返回结果) {Int} [currentPageData.relationType] 关联类型, 1.数据报警 2.设备报警 3.事件 4.工单
+     * @apiSuccess (返回结果) {Object} [currentPageData.dataInfo] 数据报警附加信息 当且仅当relationType=1时，非空
+     * @apiSuccess (返回结果) {Int} [currentPageData.dataInfo.monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {Int} [currentPageData.dataInfo.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Object} [currentPageData.deviceInfo] 设备报警附加信息 当且仅当relationType=2时，非空
+     * @apiSuccess (返回结果) {Boolean} [currentPageData.deviceInfo.historyFlag] 是否是历史报警，当为true表示历史报警，false表示正在报警
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeNotify
      */
@@ -89,6 +94,11 @@ public class NotifyController {
      * @apiSuccess (返回结果) {DateTime} dataList.time 接收时间
      * @apiSuccess (返回结果) {Int} [dataList.relationID] 关联ID,如果该项为空则不可跳转
      * @apiSuccess (返回结果) {Int} [dataList.relationType] 关联类型, 1.数据报警 2.设备报警 3.事件 4.工单
+     * @apiSuccess (返回结果) {Object} [currentPageData.dataInfo] 数据报警附加信息 当且仅当relationType=1时，非空
+     * @apiSuccess (返回结果) {Int} [currentPageData.dataInfo.monitorItemID] 监测项目ID
+     * @apiSuccess (返回结果) {Int} [currentPageData.dataInfo.monitorPointID] 监测点ID
+     * @apiSuccess (返回结果) {Object} [currentPageData.deviceInfo] 设备报警附加信息 当且仅当relationType=2时，非空
+     * @apiSuccess (返回结果) {Boolean} [currentPageData.deviceInfo.historyFlag] 是否是历史报警，当为true表示历史报警，false表示正在报警
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeNotify
      */

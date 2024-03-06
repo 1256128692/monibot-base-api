@@ -15,13 +15,22 @@
     </select>
     <select id="selectNotifyByProjectID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID">
-        select 1 type,twtc.ProjectID from tb_notify_relation tnr
+        select tnr.NotifyID notifyID,1 type,twtc.ProjectID,MonitorItemID monitorItemID,MonitorPointID monitorPointID,null historyFlag
+        from tb_notify_relation tnr
         inner join tb_data_warn_log tdwl on tdwl.ID = tnr.RelationID
         inner join tb_warn_threshold_config twtc on twtc.ID=tdwl.WarnThresholdID and tnr.Type=1
-        GROUP BY type,ProjectID
+        inner join tb_sensor ts on ts.ID = twtc.SensorID
+        where 1=1
+        <if test="projectID != null">
+            and twtc.projectID = #{projectID}
+        </if>
         union all
-        select 2 type,tdwl.ProjectID from tb_notify_relation tnr
+        select tnr.NotifyID notifyID,2 type,tdwl.ProjectID,null monitorItemID,null monitorPointID,IF(ISNULL(WarnEndTime),0,1) historyFlag
+        from tb_notify_relation tnr
         inner join tb_device_warn_log tdwl on tdwl.ID=tnr.RelationID and tnr.Type=2
-        GROUP BY type,ProjectID
+        where 1=1
+        <if test="projectID != null">
+            where tdwl.projectID = #{projectID}
+        </if>
     </select>
 </mapper>
