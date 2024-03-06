@@ -158,6 +158,9 @@ public class NotifyServiceImpl implements NotifyService {
         Map<Integer, NotifyListByProjectID> idMap = notifyListByProjectIDList
                 .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
 
+        if(CollectionUtil.isEmpty(notifyList)){
+            return Collections.emptyList();
+        }
         // 通知记录关系
         Map<Integer, TbNotifyRelation> notifyRelationMap = Optional.of(notifyList)
                 .map(u -> u.stream().map(NotifyPageInfo::getNotifyID).toList()).filter(CollUtil::isNotEmpty)
