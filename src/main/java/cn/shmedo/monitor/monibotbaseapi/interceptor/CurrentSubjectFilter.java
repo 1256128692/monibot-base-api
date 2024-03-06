@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 @Order(InterceptorOrder.CURRENT_USER_SET)
 public class CurrentSubjectFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(CurrentSubjectFilter.class);
-    private static final String TOKEN_HEADER = "Authorization";
+    public static final String TOKEN_HEADER = "Authorization";
     private static final String APP_KEY_HEADER = "appKey";
     private static final String APP_SECRET_HEADER = "appSecret";
 

@@ -2,11 +2,14 @@ package cn.shmedo.monitor.monibotbaseapi.controller;
 
 import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.interceptor.CurrentSubjectFilter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
@@ -355,8 +358,8 @@ public class SensorController {
     @Permission(permissionName = "mdmbase:DeleteBaseSensor")
     @PostMapping(value = "/DeleteSensor", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
-    public Object deleteSensor(@RequestBody @Validated DeleteSensorRequest request) {
-        sensorService.deleteSensor(request);
+    public Object deleteSensor(@RequestBody @Validated DeleteSensorRequest request, HttpServletRequest httpServletRequest) {
+        sensorService.deleteSensor(request, httpServletRequest.getHeader(CurrentSubjectFilter.TOKEN_HEADER), CurrentSubjectHolder.getCurrentSubject());
         return ResultWrapper.successWithNothing();
     }
 

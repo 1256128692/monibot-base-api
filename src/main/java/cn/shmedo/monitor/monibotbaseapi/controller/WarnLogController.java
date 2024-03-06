@@ -6,10 +6,12 @@ import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultCode;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
+import cn.shmedo.monitor.monibotbaseapi.interceptor.CurrentSubjectFilter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnlog.*;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDataWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
 import cn.shmedo.monitor.monibotbaseapi.service.IWarnLogService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -421,8 +423,8 @@ public class WarnLogController {
      */
     @Permission(permissionName = "mdmbase:WriteBaseWarn", allowUser = false, allowApplication = true)
     @PostMapping(value = "/UpdateDeviceGroupSenderEvent", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object updateDeviceGroupSenderEvent(@Valid @NotNull @RequestBody List<UpdateDeviceGroupSenderEventParam> param) {
-        deviceWarnLogService.updateDeviceGroupSenderEvent(param);
+    public Object updateDeviceGroupSenderEvent(@Valid @NotNull @RequestBody List<UpdateDeviceGroupSenderEventParam> param, HttpServletRequest request) {
+        deviceWarnLogService.updateDeviceGroupSenderEvent(param, request.getHeader(CurrentSubjectFilter.TOKEN_HEADER), CurrentSubjectHolder.getCurrentSubject());
         return ResultWrapper.successWithNothing();
     }
 

@@ -8,6 +8,7 @@ import cn.shmedo.iot.entity.api.auth.OpenAuthQueryHasPermissionParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserBase;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
@@ -124,6 +125,13 @@ public interface UserService {
     @RequestLine("POST /QueryNotifyStatistics")
     @Headers("Authorization: {accessToken}")
     ResultWrapper<NotifyStatisticsInfo> queryNotifyStatistics(QueryNotifyStatisticsParam param, @Param("accessToken") String accessToken);
+
+    /**
+     * 删除系统通知
+     */
+    @RequestLine("POST /DeleteNotify")
+    @Headers("Authorization: {accessToken}")
+    ResultWrapper<Void> deleteNotify(DeleteNotifyParam param, @Param("accessToken") String accessToken);
 
     @RequestLine("POST /QueryNotifyDetail")
     @Headers("Authorization: {accessToken}")

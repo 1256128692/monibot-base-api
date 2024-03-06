@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.sensor;
 
+import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
@@ -12,9 +13,11 @@ import java.util.Collection;
 @Getter
 public class DeleteSensorEventDto extends ApplicationEvent {
     private final Collection<Integer> sensorIDList;
+    private final ListenerEventAppend append;
 
-    public DeleteSensorEventDto(Object source, Collection<Integer> sensorIDList) {
+    public DeleteSensorEventDto(Object source, Collection<Integer> sensorIDList, ListenerEventAppend append) {
         super(source);
         this.sensorIDList = sensorIDList;
+        this.append = append;
     }
 }

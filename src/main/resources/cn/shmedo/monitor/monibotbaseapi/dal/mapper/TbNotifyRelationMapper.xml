@@ -30,7 +30,7 @@
         inner join tb_device_warn_log tdwl on tdwl.ID=tnr.RelationID and tnr.Type=2
         where 1=1
         <if test="projectID != null">
-            where tdwl.projectID = #{projectID}
+            and tdwl.projectID = #{projectID}
         </if>
     </select>
 </mapper>

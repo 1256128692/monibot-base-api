@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.third.user;
 
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -54,6 +55,7 @@ public class QueryNotifyPageListParam {
      */
     @Range(min = 0, max = 2, message = "通知状态 0.未读 1.已读 2.待办 null.全部")
     private Integer status;
+    private NotifyByProjectID notifyByProjectID;
     /**
      * 开始时间
      */

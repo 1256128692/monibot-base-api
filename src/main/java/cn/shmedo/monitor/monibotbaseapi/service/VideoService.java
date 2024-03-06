@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.iot.entity.api.CurrentSubject;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.model.param.presetpoint.AddPresetPointParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.*;
@@ -37,7 +38,7 @@ public interface VideoService {
 
     List<VideoDeviceInfoV1> queryVideoDeviceList(QueryVideoDeviceListParam pa);
 
-    Object deleteVideoDeviceList(DeleteVideoDeviceParam pa);
+    Object deleteVideoDeviceList(DeleteVideoDeviceParam pa, String accessToken, CurrentSubject currentSubject);
 
     VideoDeviceInfoV1 queryHkVideoDeviceBaseInfo(QueryHkVideoDeviceBaseInfoParam pa);
 
