@@ -45,7 +45,7 @@ public class AbsDeleteCheckPointGroup implements ParameterValidator, ResourcePer
         List<TbCheckPointGroup> groupList = SpringUtil.getBean(TbCheckPointGroupMapper.class).selectBatchIds(idList);
 
         Optional.of(groupList).filter(r -> r.size() == idList.size())
-                .orElseThrow(() -> new IllegalArgumentException("巡检点必须有效且不能为空"));
+                .orElseThrow(() -> new IllegalArgumentException("巡检组必须有效且不能为空"));
 
         List<Integer> list = groupList.stream().map(TbCheckPointGroup::getCompanyID).distinct().toList();
         Optional.of(list)

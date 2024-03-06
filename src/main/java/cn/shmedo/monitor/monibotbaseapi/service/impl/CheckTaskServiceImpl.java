@@ -95,8 +95,8 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
             switch (k) {
                 case 0 -> stats.setNotStartCount(v);
                 case 1 -> stats.setOngoingCount(v);
-                case 2 -> stats.setEndedCount(v);
-                case 3 -> stats.setExpiredCount(v);
+                case 2 -> stats.setExpiredCount(v);
+                case 3 -> stats.setEndedCount(v);
             }
         });
         stats.setTotalCount(statsMap.values().stream().mapToLong(e -> e).sum());
