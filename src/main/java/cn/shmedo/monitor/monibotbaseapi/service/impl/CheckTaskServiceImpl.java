@@ -77,9 +77,9 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
     @Transactional(rollbackFor = Exception.class)
     public void delete(DeleteCheckTaskRequest request) {
         taskPointMapper.delete(Wrappers.<TbCheckTaskPoint>lambdaQuery()
-                .eq(TbCheckTaskPoint::getTaskID, request.getIdList()));
+                .in(TbCheckTaskPoint::getTaskID, request.getIdList()));
         eventMapper.delete(Wrappers.<TbCheckEvent>lambdaQuery()
-                .eq(TbCheckEvent::getTaskID, request.getIdList()));
+                .in(TbCheckEvent::getTaskID, request.getIdList()));
         this.removeByIds(request.getIdList());
     }
 
@@ -147,42 +147,33 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
                     TbCheckPoint point = JSONUtil.toBean(e.getPointInfo(), TbCheckPoint.class);
                     List<CheckTaskInfo.Annexe> annexes = Optional
                             .ofNullable(JSONUtil.toList(e.getAnnexes(), String.class)).orElse(List.of())
-                            .stream().map(i -> new CheckTaskInfo.Annexe(i, null)).toList();
+                            .stream().map(i -> new CheckTaskInfo.Annexe(i, null, null)).toList();
                     return new CheckTaskInfo.Note(point.getID(), point.getName(), annexes, e.getRemark());
                 }).toList();
 
         List<CheckTaskInfo.Event> events = eventMapper.listByTaskID(request.getId()).stream().map(e -> {
             List<CheckTaskInfo.Annexe> annexes = Optional
                     .ofNullable(JSONUtil.toList(e.getAnnexes(), String.class)).orElse(List.of())
-                    .stream().map(i -> new CheckTaskInfo.Annexe(i, null)).toList();
+                    .stream().map(i -> new CheckTaskInfo.Annexe(i, null, null)).toList();
             return new CheckTaskInfo.Event(e.getId(), e.getTypeID(), e.getTypeName(), e.getAddress(),
                     e.getLocation(), e.getDescribe(), annexes);
         }).toList();
 
         //附件字典
         Map<String, FileInfoResponse> fileMap = fileService.getFileUrlList(Stream.concat(notes.stream()
-                                        .flatMap(e -> e.annexes().stream()),
-                                events.stream().flatMap(e -> e.annexes().stream()))
+                                        .flatMap(e -> e.getAnnexes().stream()),
+                                events.stream().flatMap(e -> e.getAnnexes().stream()))
                         .map(CheckTaskInfo.Annexe::getName).distinct().toList(), project.getCompanyID())
                 .stream().collect(Collectors.toMap(FileInfoResponse::getFilePath, e -> e));
 
-        notes.forEach(e -> e.annexes().forEach(a -> Optional
-                .ofNullable(fileMap.get(a.getName())).ifPresent(f -> {
-                    a.setName(f.getFileName());
-                    a.setUrl(f.getAbsolutePath());
-                })));
-
-        events.forEach(e -> e.annexes().forEach(a -> Optional
-                .ofNullable(fileMap.get(a.getName())).ifPresent(f -> {
-                    a.setName(f.getFileName());
-                    a.setUrl(f.getAbsolutePath());
-                })));
-
+        notes.forEach(e -> e.setAnnexes(fillFileUrl(e.getAnnexes(), fileMap)));
+        events.forEach(e -> e.setAnnexes(fillFileUrl(e.getAnnexes(), fileMap)));
         data.setEvents(events);
         data.setNotes(notes);
 
         return data;
     }
+
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -233,4 +224,13 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
         Integer number = baseMapper.lastSerialNumber(prefix);
         return prefix + NumberUtil.decimalFormat("00000", number == null ? 1 : number + 1);
     }
+
+    protected List<CheckTaskInfo.Annexe> fillFileUrl(List<CheckTaskInfo.Annexe> list, Map<String, FileInfoResponse> fileMap) {
+       return list.stream().peek(a -> Optional.ofNullable(fileMap.get(a.getName())).ifPresent(f -> {
+            a.setName(f.getFileName());
+            a.setFileType(f.getFileType());
+            a.setUrl(f.getAbsolutePath());
+        })).filter(a -> a.getUrl() != null).toList();
+    }
+
 }

@@ -114,4 +114,21 @@
       </foreach>
     </where>
   </select>
+
+  <resultMap id="listPointGroupStatusMap" type="reactor.util.function.Tuple2">
+    <result column="t1" property="t1" jdbcType="INTEGER" javaType="java.lang.Integer"/>
+    <result column="t2" property="t2" jdbcType="TINYINT" javaType="java.lang.Integer"/>
+  </resultMap>
+
+  <select id="listPointGroupStatus" resultMap="listPointGroupStatusMap">
+    SELECT tcp.GroupID t1,
+           tct.`Status` t2
+    FROM `tb_check_task_point` tctp
+           INNER JOIN tb_check_task tct ON tctp.TaskID = tct.ID
+           INNER JOIN tb_check_point tcp ON tcp.ID = tctp.PointID
+    WHERE tcp.GroupID IS NOT NULL
+    <foreach collection="collection" separator="," open="AND tcp.GroupID IN (" close=")" item="item">
+      #{item}
+    </foreach>
+  </select>
 </mapper>

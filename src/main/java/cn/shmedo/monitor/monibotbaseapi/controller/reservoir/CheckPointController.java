@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.AbsDeleteCheckPoint;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckPointService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -107,12 +108,30 @@ public class CheckPointController {
      * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
      */
     @Permission(permissionName = "mdmbase:DeleteCheckPoint")
-    @LogParam(moduleName = "巡检管理", operationName = "删除巡检任务", operationProperty = OperationProperty.DELETE)
+    @LogParam(moduleName = "巡检管理", operationName = "删除巡检点", operationProperty = OperationProperty.DELETE)
     @PostMapping(value = "DeleteCheckPoint", produces = MediaType.APPLICATION_JSON_VALUE,
             consumes = MediaType.APPLICATION_JSON_VALUE)
     public Object delete(@Valid @RequestBody DeleteCheckPointRequest body) {
         service.delete(body);
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /DeleteCheckPointCheck 删除巡检点校验
+     * @apiVersion 1.0.0
+     * @apiGroup 水库-巡检点模块
+     * @apiName DeleteCheckPointCheck
+     * @apiDescription 删除巡检点
+     * @apiParam (请求参数) {Int[]} idList 巡检点id集合
+     * @apiSuccess (返回结果) {Boolean} data 是否可以删除
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:DeleteCheckPoint
+     */
+    @Permission(permissionName = "mdmbase:DeleteCheckPoint")
+    @PostMapping(value = "DeleteCheckPointCheck", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object delete(@Valid @RequestBody AbsDeleteCheckPoint body) {
+        return service.deleteCheck(body);
     }
 
     /**
@@ -288,6 +307,24 @@ public class CheckPointController {
     public Object deleteGroup(@Valid @RequestBody DeleteCheckPointGroupRequest body) {
         service.deleteGroup(body);
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /DeleteCheckPointGroupCheck 删除巡检组校验
+     * @apiVersion 1.0.0
+     * @apiGroup 水库-巡检点模块
+     * @apiName DeleteCheckPointGroupCheck
+     * @apiDescription 删除巡检组校验
+     * @apiParam (请求参数) {Int[]} idList 巡检组id集合
+     * @apiSuccess (返回结果) {String} none 无
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:DeleteCheckPointGroup
+     */
+    @Permission(permissionName = "mdmbase:DeleteCheckPointGroup")
+    @PostMapping(value = "DeleteCheckPointGroupCheck", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object deleteGroupCheck(@Valid @RequestBody AbsDeleteCheckPointGroup body) {
+        return service.deleteGroupCheck(body);
     }
 
     /**

@@ -21,11 +21,27 @@ public class CheckTaskInfo extends TbCheckTask {
     private List<Note> notes;
     private List<Event> events;
 
-    public record Note(Integer id, String name, List<Annexe> annexes, String remark) {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Note {
+        private Integer id;
+        private String name;
+        private List<Annexe> annexes;
+        private String remark;
     }
 
-    public record Event(Integer id, Integer typeID, String typeName, String address, String location, String describe,
-                        List<Annexe> annexes) {
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Event {
+        private Integer id;
+        private Integer typeID;
+        private String typeName;
+        private String address;
+        private String location;
+        private String describe;
+        private List<Annexe> annexes;
     }
 
     @Data
@@ -34,6 +50,7 @@ public class CheckTaskInfo extends TbCheckTask {
     public static class Annexe {
         private String name;
         private String url;
+        private String fileType;
     }
 
     public static CheckTaskInfo valueOf(TbCheckTask task) {

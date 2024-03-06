@@ -14,6 +14,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.reservoir.CheckTaskStatus;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.AbsDeleteCheckPoint;
 import cn.shmedo.monitor.monibotbaseapi.service.CheckPointService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
@@ -138,6 +139,16 @@ public class CheckPointServiceImpl extends ServiceImpl<TbCheckPointMapper, TbChe
     @Override
     public List<CheckPointGroupSimple> listGroup(QueryCheckPointGroupListRequest request) {
         return groupMapper.list(request);
+    }
+
+    @Override
+    public Boolean deleteCheck(AbsDeleteCheckPoint body) {
+        return body.validatePointStatus();
+    }
+
+    @Override
+    public Boolean deleteGroupCheck(AbsDeleteCheckPointGroup body) {
+        return body.validateGroupStatus();
     }
 
     /**

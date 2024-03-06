@@ -213,6 +213,7 @@ public class CheckTaskController {
      * @apiSuccess (返回结果) {Object[]} notes.annexes 巡检记录附件
      * @apiSuccess (返回结果) {String} notes.annexes.name 附件名称
      * @apiSuccess (返回结果) {String} notes.annexes.url 附件地址
+     * @apiSuccess (返回结果) {String} notes.annexes.fileType 文件类型(后缀名不含 . )
      * @apiSuccess (返回结果) {String} notes.remark 记录备注
      * @apiSuccess (返回结果) {Object[]} events 巡检事件
      * @apiSuccess (返回结果) {Int} events.id 事件id

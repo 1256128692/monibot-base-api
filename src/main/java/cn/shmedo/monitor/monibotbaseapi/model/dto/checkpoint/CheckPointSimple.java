@@ -42,4 +42,6 @@ public class CheckPointSimple {
     private LocalDateTime lastCheckTime;
 
     private String exValue;
+
+    private Boolean existRunningTask;
 }

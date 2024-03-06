@@ -5,6 +5,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointGroupSimp
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.*;
+import cn.shmedo.monitor.monibotbaseapi.model.param.checkpoint.AbsDeleteCheckPoint;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -34,4 +35,7 @@ public interface CheckPointService extends IService<TbCheckPoint> {
 
     List<CheckPointGroupSimple> listGroup(QueryCheckPointGroupListRequest request);
 
+    Boolean deleteCheck(AbsDeleteCheckPoint body);
+
+    Boolean deleteGroupCheck(AbsDeleteCheckPointGroup body);
 }

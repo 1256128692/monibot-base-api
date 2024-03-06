@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTaskPoint;
 import jakarta.annotation.Nonnull;
 import org.apache.ibatis.annotations.Mapper;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuple3;
 
 import java.util.Collection;
@@ -21,4 +22,11 @@ public interface TbCheckTaskPointMapper extends BasicMapper<TbCheckTaskPoint> {
      * @return t1: tb_check_task_point id; t2: 巡检点id; t3: 任务状态
      */
     List<Tuple3<Integer, Integer, Integer>> listPointStatus(@Nonnull Collection<Integer> pointIds);
+
+    /**
+     * 查询巡检组及其关联任务状态
+     * @param pointGroupIds 巡检组id
+     * @return t1: 巡检组id; t3: 任务状态
+     */
+    List<Tuple2<Integer, Integer>> listPointGroupStatus(@Nonnull Collection<Integer> pointGroupIds);
 }
