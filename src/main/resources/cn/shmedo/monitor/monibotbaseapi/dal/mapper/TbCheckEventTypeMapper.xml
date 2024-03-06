@@ -5,6 +5,7 @@
         <!--@Table tb_check_event_type-->
         <id column="ID" property="ID"/>
         <result column="Name" property="name"/>
+        <result column="ServiceID" property="serviceID"/>
         <result column="ExValue" property="exValue"/>
         <result column="CreateUserID" property="createUserID"/>
         <result column="CreateTime" property="createTime"/>
@@ -14,6 +15,7 @@
     <sql id="Base_Column_List">
         ID,
         `Name`,
+        ServiceID,
         ExValue,
         CreateUserID,
         CreateTime,
@@ -27,6 +29,9 @@
         <set>
             <if test="name != null">
                 `Name` = #{name},
+            </if>
+            <if test="serviceID != null">
+                ServiceID = #{serviceID},
             </if>
             <if test="exValue != null">
                 ExValue = #{exValue},

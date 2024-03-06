@@ -32,6 +32,9 @@ public class TbCheckEventType {
     @TableField(value = "`Name`")
     private String name;
 
+    @TableField(value = "ServiceID")
+    private Integer serviceID;
+
     /**
      * 扩展字段
      */

@@ -27,6 +27,9 @@ public class AddEventTypeParam implements ParameterValidator, ResourcePermission
     @NotBlank(message = "事件名称不能为空")
     private String name;
 
+    @NotNull(message = "服务ID不能为空")
+    private Integer serviceID;
+
     private String exValue;
 
     @JsonIgnore
@@ -42,7 +45,8 @@ public class AddEventTypeParam implements ParameterValidator, ResourcePermission
     public ResultWrapper validate() {
         TbCheckEventTypeMapper checkEventTypeMapper = ContextHolder.getBean(TbCheckEventTypeMapper.class);
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        TbCheckEventType checkEventType = checkEventTypeMapper.selectOne(new QueryWrapper<TbCheckEventType>().eq("name", name));
+        TbCheckEventType checkEventType = checkEventTypeMapper.selectOne(new QueryWrapper<TbCheckEventType>
+                ().eq("name", name).eq("serviceID", serviceID));
 
         if (ObjectUtil.isNotNull(checkEventType)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "事件类型名称不允许重复");
@@ -69,6 +73,7 @@ public class AddEventTypeParam implements ParameterValidator, ResourcePermission
     public TbCheckEventType toRawVo() {
         TbCheckEventType vo = new TbCheckEventType();
         vo.setName(this.name);
+        vo.setServiceID(this.serviceID);
         vo.setExValue(this.exValue);
         vo.setCreateTime(this.createTime);
         vo.setCreateUserID(this.createUserID);

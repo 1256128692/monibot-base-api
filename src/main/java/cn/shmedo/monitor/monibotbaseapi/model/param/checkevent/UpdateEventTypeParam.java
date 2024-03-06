@@ -24,6 +24,8 @@ public class UpdateEventTypeParam implements ParameterValidator, ResourcePermiss
     private Integer id;
     private String name;
 
+    @NotNull(message = "服务ID不能为空")
+    private Integer serviceID;
     private String exValue;
 
     @JsonIgnore
@@ -37,6 +39,7 @@ public class UpdateEventTypeParam implements ParameterValidator, ResourcePermiss
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         TbCheckEventType checkEventType = checkEventTypeMapper.selectOne(new QueryWrapper<TbCheckEventType>()
                 .eq("name", name)
+                .eq("serviceID", serviceID)
                 .ne("ID", id));
 
         if (ObjectUtil.isNotNull(checkEventType)) {
@@ -63,6 +66,7 @@ public class UpdateEventTypeParam implements ParameterValidator, ResourcePermiss
         TbCheckEventType vo = new TbCheckEventType();
         vo.setName(this.name);
         vo.setExValue(this.exValue);
+        vo.setServiceID(this.serviceID);
         vo.setUpdateTime(this.updateTime);
         vo.setUpdateUserID(this.updateUserID);
         return vo;

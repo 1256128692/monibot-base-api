@@ -28,6 +28,7 @@ public class CheckEventController {
      * @apiName AddEventType
      * @apiDescription 新建事件类型
      * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int} serviceID 服务ID
      * @apiParam (请求体) {String} name 事件类型名称
      * @apiParam (请求体) {String} [exValue] 备注
      * @apiSuccess (返回结果) {String} none 空
@@ -73,6 +74,7 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} id 事件id
      * @apiParam (请求体) {String} name 事件类型名称
+     * @apiParam (请求体) {Int} serviceID 服务ID
      * @apiParam (请求体) {String} [exValue] 备注
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
@@ -98,6 +100,7 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {Object[]} data   事件类型列表
      * @apiSuccess (响应结果) {Int} data.id  事件类型ID
      * @apiSuccess (响应结果) {String} data.name   名称
+     * @apiSuccess (响应结果) {Int} data.serviceID 服务ID
      * @apiSuccess (响应结果) {String} data.exValue 备注
      * @apiSuccess (响应结果) {Date} data.createTime 创建时间
      * @apiSuccess (响应结果) {Int} data.createUserID  创建人ID
