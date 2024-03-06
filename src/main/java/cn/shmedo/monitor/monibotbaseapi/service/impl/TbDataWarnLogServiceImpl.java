@@ -234,8 +234,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
                         // 短信
                         Map<String, Object> paramMap = Map.of(
                                 "warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
-                                "projectName", Optional.ofNullable(threshold.getProjectShortName())
-                                        .filter(e -> !e.isBlank()).orElse(threshold.getProjectName()),
+                                "projectName", threshold.getProjectName(),
                                 "pointName", threshold.getMonitorPointName(),
                                 "time", DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
                                 "warnName", threshold.getWarnName(),
