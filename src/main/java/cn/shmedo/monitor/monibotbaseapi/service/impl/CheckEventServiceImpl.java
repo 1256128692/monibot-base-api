@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
@@ -65,6 +66,9 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
         QueryWrapper<TbCheckEventType> queryWrapper = new QueryWrapper<>();
         if (!StringUtil.isNullOrEmpty(pa.getName())) {
             queryWrapper.eq("name", pa.getName());
+        }
+        if (ObjectUtil.isNotNull(pa.getServiceID())) {
+            queryWrapper.eq("serviceID", pa.getServiceID());
         }
         return tbCheckEventTypeMapper.selectList(queryWrapper);
     }

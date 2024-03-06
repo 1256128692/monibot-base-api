@@ -97,6 +97,7 @@ public class CheckEventController {
      * @apiDescription 查询事件类型列表
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {String} [name] 事件类型名称,模糊匹配
+     * @apiParam (请求体) {Int} [serviceID] 服务ID
      * @apiSuccess (响应结果) {Object[]} data   事件类型列表
      * @apiSuccess (响应结果) {Int} data.id  事件类型ID
      * @apiSuccess (响应结果) {String} data.name   名称

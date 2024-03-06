@@ -16,6 +16,7 @@ public class QueryEventTypeParam implements ParameterValidator, ResourcePermissi
     @NotNull(message = "公司ID不能为空")
     private Integer companyID;
     private String name;
+    private Integer serviceID;
 
 
     @Override
