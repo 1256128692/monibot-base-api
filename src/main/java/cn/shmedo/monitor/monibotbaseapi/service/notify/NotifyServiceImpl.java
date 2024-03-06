@@ -116,8 +116,6 @@ public class NotifyServiceImpl implements NotifyService {
     public NotifyPageResponse.Page<NotifyPageResponse> queryNotifyPage(QueryNotifyPageParam param, String accessToken) {
         // 工程级别过滤
         NotifyByProjectID notifyByProjectID = this.filterProject(param.getProjectID());
-        Map<Integer, NotifyListByProjectID> idMap = notifyByProjectID.getNotifyListByProjectIDList()
-                .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
         if (Objects.nonNull(param.getProjectID())) {
             param.setNotifyByProjectID(notifyByProjectID);
         }
@@ -133,49 +131,9 @@ public class NotifyServiceImpl implements NotifyService {
                 .filter(ResultWrapper::apiSuccess)
                 .map(ResultWrapper::getData).orElse(new NotifyStatisticsInfo());
 
-        // 条件查询通知关系
-        Map<Integer, TbNotifyRelation> notifyRelationMap = Optional.of(page).map(PageUtil.Page::currentPageData)
-                .map(u -> u.stream().map(NotifyPageInfo::getNotifyID).toList()).filter(CollUtil::isNotEmpty)
-                .map(u -> new LambdaQueryWrapper<TbNotifyRelation>().in(TbNotifyRelation::getNotifyID, u))
-                .map(tbNotifyRelationMapper::selectList).map(u -> u.stream().collect(Collectors
-                        .toMap(TbNotifyRelation::getNotifyID, Function.identity()))).orElse(Map.of());
-
-        // 平台服务
-        RedisService authRedisService = SpringUtil.getBean(RedisConstant.AUTH_REDIS_SERVICE, RedisService.class);
-        Map<String, TbService> tbServiceMap = Optional.of(authRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, TbService.class)).get();
-
-        // 组装返回结果
-        List<NotifyPageResponse> list = Optional.ofNullable(page.currentPageData()).map(u -> u.stream().map(w -> {
-            NotifyPageResponse response = new NotifyPageResponse();
-            BeanUtil.copyProperties(w, response);
-            Optional.ofNullable(response.getNotifyID()).map(notifyRelationMap::get).ifPresent(s -> {
-                response.setRelationID(s.getRelationID());
-                response.setRelationType(s.getType());
-            });
-            if (Objects.nonNull(response.getServiceID())) {
-                response.setServiceName(tbServiceMap.get(String.valueOf(response.getServiceID())).getServiceName());
-            }
-            return response;
-        }).toList()).orElse(List.of());
-        list = Optional.of(list)
-                .filter(CollectionUtil::isNotEmpty)
-                .map(d -> {
-                    d.forEach(item -> {
-                        NotifyListByProjectID notifyListByProjectID = idMap.get(item.getNotifyID());
-                        DataDeviceWarnType dataDeviceWarnType = DataDeviceWarnType.fromCode(item.getRelationType());
-                        if (Objects.nonNull(notifyListByProjectID)) {
-                            switch (dataDeviceWarnType) {
-                                case DATA -> item.setDataInfo(new NotifyPageResponse.DataInfo()
-                                        .setMonitorItemID(notifyListByProjectID.getMonitorItemID())
-                                        .setMonitorPointID(notifyListByProjectID.getMonitorPointID()));
-                                case DEVICE -> item.setDeviceInfo(new NotifyPageResponse.DeviceInfo()
-                                        .setHistoryFlag(notifyListByProjectID.getHistoryFlag()));
-                            }
-                        }
-                    });
-                    return d;
-                }).orElse(Collections.emptyList());
-        return new NotifyPageResponse.Page<>(page.totalPage(), list, page.totalCount(),
+        return new NotifyPageResponse.Page<>(page.totalPage(),
+                notify(page.currentPageData(), notifyByProjectID.getNotifyListByProjectIDList()),
+                page.totalCount(),
                 Objects.isNull(notifyStatisticsInfo.getUnreadCount()) ? 0 : notifyStatisticsInfo.getUnreadCount());
     }
 
@@ -183,18 +141,23 @@ public class NotifyServiceImpl implements NotifyService {
     public List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken) {
         // 工程级别过滤
         NotifyByProjectID notifyByProjectID = this.filterProject(param.getProjectID());
-        Map<Integer, NotifyListByProjectID> idMap = notifyByProjectID.getNotifyListByProjectIDList()
-                .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
         if (Objects.nonNull(param.getProjectID())) {
             param.setNotifyByProjectID(notifyByProjectID);
         }
         // 远程调用查询符合条件的通知
         ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, accessToken);
 
-        // 条件查询通知关系
-        Map<Integer, TbNotifyRelation> notifyRelationMap = Optional.of(resultWrapper)
-                .filter(ResultWrapper::apiSuccess)
-                .map(ResultWrapper::getData)
+        return notify(resultWrapper.getData(), notifyByProjectID.getNotifyListByProjectIDList());
+    }
+
+
+    private List<NotifyPageResponse> notify(Collection<? extends NotifyPageInfo> notifyList,
+                                            Collection<NotifyListByProjectID> notifyListByProjectIDList){
+        Map<Integer, NotifyListByProjectID> idMap = notifyListByProjectIDList
+                .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
+
+        // 通知记录关系
+        Map<Integer, TbNotifyRelation> notifyRelationMap = Optional.of(notifyList)
                 .map(u -> u.stream().map(NotifyPageInfo::getNotifyID).toList()).filter(CollUtil::isNotEmpty)
                 .map(u -> new LambdaQueryWrapper<TbNotifyRelation>().in(TbNotifyRelation::getNotifyID, u))
                 .map(tbNotifyRelationMapper::selectList).map(u -> u.stream().collect(Collectors
@@ -205,14 +168,12 @@ public class NotifyServiceImpl implements NotifyService {
         Map<String, TbService> tbServiceMap = Optional.of(authRedisService.getAll(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE, TbService.class)).get();
 
         // 组装返回结果
-        List<NotifyPageResponse> list = Optional.of(resultWrapper)
-                .map(ResultWrapper::getData)
+        List<NotifyPageResponse> list = Optional.of(notifyList)
                 .map(u -> u.stream().map(w -> {
                     NotifyPageResponse response = new NotifyPageResponse();
                     BeanUtil.copyProperties(w, response);
                     Optional.ofNullable(response.getNotifyID()).map(notifyRelationMap::get).ifPresent(s -> {
                         response.setRelationID(s.getRelationID());
-                        // 真正的type
                         response.setRelationType(s.getType());
                     });
                     if (Objects.nonNull(response.getServiceID())) {
@@ -225,14 +186,17 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(d -> {
                     d.forEach(item -> {
                         NotifyListByProjectID notifyListByProjectID = idMap.get(item.getNotifyID());
-                        DataDeviceWarnType dataDeviceWarnType = DataDeviceWarnType.fromCode(item.getRelationType());
-                        if(Objects.nonNull(notifyListByProjectID)){
-                            switch (dataDeviceWarnType) {
-                                case DATA -> item.setDataInfo(new NotifyPageResponse.DataInfo()
-                                        .setMonitorItemID(notifyListByProjectID.getMonitorItemID())
-                                        .setMonitorPointID(notifyListByProjectID.getMonitorPointID()));
-                                case DEVICE -> item.setDeviceInfo(new NotifyPageResponse.DeviceInfo()
-                                        .setHistoryFlag(notifyListByProjectID.getHistoryFlag()));
+                        if (Objects.nonNull(item.getRelationType())) {
+                            DataDeviceWarnType dataDeviceWarnType = DataDeviceWarnType.fromCode(item.getRelationType());
+                            if (Objects.nonNull(notifyListByProjectID)) {
+                                item.setProjectID(notifyListByProjectID.getProjectID());
+                                switch (dataDeviceWarnType) {
+                                    case DATA -> item.setDataInfo(new NotifyPageResponse.DataInfo()
+                                            .setMonitorItemID(notifyListByProjectID.getMonitorItemID())
+                                            .setMonitorPointID(notifyListByProjectID.getMonitorPointID()));
+                                    case DEVICE -> item.setDeviceInfo(new NotifyPageResponse.DeviceInfo()
+                                            .setHistoryFlag(notifyListByProjectID.getHistoryFlag()));
+                                }
                             }
                         }
                     });

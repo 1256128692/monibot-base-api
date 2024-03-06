@@ -22,6 +22,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigClearDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnConfigEventDto;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnThresholdConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnLevelStyle;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.WarnTag;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
@@ -77,7 +78,7 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
     private final ITbWarnNotifyConfigService notifyConfigService;
     private final NotifyService notifyService;
     private final TbDataWarnLogHistoryMapper historyMapper;
-    private final TbWarnNotifyRelationMapper notifyRelationMapper;
+    private final TbNotifyRelationMapper tbNotifyRelationMapper;
     private final TbSensorMapper sensorMapper;
     private final TbWarnLevelAliasMapper warnLevelAliasMapper;
     private final FileConfig fileConfig;
@@ -220,13 +221,13 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
 
                         //通知关联
                         Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
-                                .ifPresent(e -> notifyRelationMapper.insertBatchSomeColumn(e.stream()
+                                .ifPresent(e -> tbNotifyRelationMapper.insertBatchSomeColumn(e.stream()
                                         .map(item -> {
-                                            TbWarnNotifyRelation relation = new TbWarnNotifyRelation();
-                                            relation.setNotifyID(item);
-                                            relation.setWarnLogID(warnLog.getId());
-                                            relation.setType(1);
-                                            return relation;
+                                            TbNotifyRelation tbNotifyRelation = new TbNotifyRelation();
+                                            tbNotifyRelation.setNotifyID(item);
+                                            tbNotifyRelation.setRelationID(warnLog.getId());
+                                            tbNotifyRelation.setType(DataDeviceWarnType.DATA.getCode());
+                                            return tbNotifyRelation;
                                         }).toList()));
                     }
 

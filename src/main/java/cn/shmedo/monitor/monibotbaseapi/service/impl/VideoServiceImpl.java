@@ -99,8 +99,6 @@ public class VideoServiceImpl implements VideoService {
     private final ITbWarnNotifyConfigService iTbWarnNotifyConfigService;
     private final TbWarnNotifyConfigMapper tbWarnNotifyConfigMapper;
 
-    private final TbWarnNotifyRelationMapper tbWarnNotifyRelationMapper;
-
     private final NotifyService notifyService;
 
     private final ITbDeviceWarnLogService tbDeviceWarnLogService;
