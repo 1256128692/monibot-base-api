@@ -15,6 +15,7 @@ public class MonitorItemWithPoint {
     private Integer monitorItemID;
     private String monitorItemName;
     private String monitorItemAlias;
+    private Integer monitorTypeID;
     private Integer monitorType;
     private String monitorTypeName;
     private String monitorTypeAlias;

@@ -310,6 +310,7 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称
      * @apiSuccess (返回结果) {String} list.monitorItemAlias 监测项目别名
+     * @apiSuccess (返回结果) {Int} list.monitorTypeID 监测类型ID
      * @apiSuccess (返回结果) {Int} list.monitorType 监测类型
      * @apiSuccess (返回结果) {String} list.monitorTypeName 监测类型名称
      * @apiSuccess (返回结果) {String} list.monitorTypeAlias 监测类型别名

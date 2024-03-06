@@ -364,10 +364,11 @@
                it.Name     as monitorItemName,
                it.Alias    as monitorItemAlias,
                t.MonitorType,
+               t.id        as monitorTypeID,
                t.TypeName  as monitorTypeName,
                t.TypeAlias as monitorTypeAlias
         from tb_monitor_item as it
-            left join tb_monitor_type as t on t.MonitorType = it.MonitorType
+                 left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         where it.ProjectID = #{projectID}
         <if test="itemEnable != null">
             and it.Enable = #{itemEnable}
