@@ -127,16 +127,15 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(u -> userService.queryNotifyPageList(u, accessToken))
                 .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).orElse(PageUtil.Page.empty());
 
-        // 查询系统通知统计信息
-        QueryNotifyStatisticsParam notifyStatisticsParam = BeanUtil.toBean(param, QueryNotifyStatisticsParam.class);
-        NotifyStatisticsInfo notifyStatisticsInfo = Optional.ofNullable(userService.queryNotifyStatistics(notifyStatisticsParam, accessToken))
-                .filter(ResultWrapper::apiSuccess)
-                .map(ResultWrapper::getData).orElse(new NotifyStatisticsInfo());
-
+        int unReadCount = Optional.ofNullable(page.currentPageData())
+                .filter(CollectionUtil::isNotEmpty)
+                .map(data -> data.stream().filter(d -> d.getStatus() == 0).collect(Collectors.toList()))
+                .map(List::size)
+                .orElse(0);
         return new NotifyPageResponse.Page<>(page.totalPage(),
                 notify(page.currentPageData(), notifyByProjectID.getNotifyListByProjectIDList()),
                 page.totalCount(),
-                Objects.isNull(notifyStatisticsInfo.getUnreadCount()) ? 0 : notifyStatisticsInfo.getUnreadCount());
+                unReadCount);
     }
 
     @Override
@@ -248,41 +247,6 @@ public class NotifyServiceImpl implements NotifyService {
         tbNotifyRelationMapper.delete(new LambdaQueryWrapper<TbNotifyRelation>().in(TbNotifyRelation::getNotifyID, notifyIDList));
         userService.deleteNotify(new DeleteNotifyParam(append.companyID(), notifyIDList), append.accessToken());
     }
-
-    //    @Override
-//    public Map<String, Object> queryNotifyList(QueryNotifyListParam param, String accessToken) {
-//        Map<String, Object> result = new HashMap<>();
-//        TbNotifyRelation relation = tbNotifyRelationMapper.selectNotifyList(param);
-//        Optional.ofNullable(relation).ifPresent(u -> {
-//            final Integer companyID = param.getCompanyID();
-//            final Integer relationID = u.getRelationID();
-//            final Integer notifyID = u.getNotifyID();
-//            Optional.of(new QueryNotifyDetailParam(companyID, notifyID))
-//                    .map(w -> userService.queryNotifyDetail(w, accessToken))
-//                    .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData)
-//                    .filter(w -> SysNotify.Status.UNREAD.equals(w.getStatus())).ifPresent(w -> {
-//                        switch (DataDeviceWarnType.fromCode(relation.getType())) {
-//                            case DATA -> {
-//                                DataWarnLatestInfo info = tbDataWarnLogMapper.selectDataWarnBaseInfoByID(relationID);
-//                                info.setNotifyID(notifyID);
-//                                result.put("dataWarn", info);
-//                            }
-//                            case DEVICE -> {
-//                                DeviceWarnLatestInfo info = new DeviceWarnLatestInfo();
-//                                TbDeviceWarnLog tbDeviceWarnLog = tbDeviceWarnLogMapper.selectById(relationID);
-//                                info.setWarnLogID(tbDeviceWarnLog.getId());
-//                                info.setWarnName("设备离线");
-//                                info.setWarnTime(tbDeviceWarnLog.getWarnTime());
-//                                info.setDeviceToken(tbDeviceWarnLog.getDeviceSerial());
-//                                info.setNotifyID(notifyID);
-//                                fillDeviceInfo(info, companyID);
-//                                result.put("deviceWarn", info);
-//                            }
-//                        }
-//                    });
-//        });
-//        return result;
-//    }
 
     /**
      * 格式化短信参数内容，防止超过20个字符

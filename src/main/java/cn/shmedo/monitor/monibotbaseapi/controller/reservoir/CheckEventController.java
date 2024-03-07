@@ -197,7 +197,7 @@ public class CheckEventController {
      * @apiPermission 系统权限 mdmbase:UpdateEvent
      */
     @LogParam(moduleName = "事件模块", operationName = "编辑事件", operationProperty = OperationProperty.UPDATE)
-    @Permission(permissionName = "mdmbase:UpdateEvent")
+    @Permission(permissionName = "mdmbase:UpdateEvent", allowApplication = true)
     @PostMapping(value = "/UpdateEventInfo", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object updateEventInfo(@RequestBody @Validated UpdateEventInfoParam pa) {
         checkEventService.updateEventInfo(pa);
