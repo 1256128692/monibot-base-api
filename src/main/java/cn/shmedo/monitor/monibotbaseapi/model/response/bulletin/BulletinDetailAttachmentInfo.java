@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.bulletin;
 
+import cn.shmedo.monitor.monibotbaseapi.util.FileSizeUtil;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,4 +15,10 @@ public class BulletinDetailAttachmentInfo {
     private String fileName;
     private String fileType;
     private String filePath;
+    private Integer fileSize;
+
+    @JsonProperty("fileSizeDesc")
+    private String fileSizeDesc() {
+        return FileSizeUtil.getFileSizeDesc(fileSize);
+    }
 }

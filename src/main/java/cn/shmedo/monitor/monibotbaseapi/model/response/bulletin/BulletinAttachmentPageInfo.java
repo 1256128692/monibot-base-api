@@ -3,15 +3,11 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.bulletin;
 import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbBulletinAttachment;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.mdinfo.FileInfoResponse;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import cn.shmedo.monitor.monibotbaseapi.util.FileSizeUtil;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Date;
-import java.util.Optional;
-import java.util.function.Function;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -26,9 +22,6 @@ public class BulletinAttachmentPageInfo {
     private String createUser;
     private Date createTime;
     private String filePath;
-    @JsonIgnore
-    private static final Function<Double, String> FORMATTER = num -> String.valueOf(BigDecimal.valueOf(num)
-            .setScale(2, RoundingMode.HALF_UP).doubleValue());
 
     public static BulletinAttachmentPageInfo build(final TbBulletinAttachment attachment, final FileInfoResponse response) {
         BulletinAttachmentPageInfo info = new BulletinAttachmentPageInfo();
@@ -40,19 +33,6 @@ public class BulletinAttachmentPageInfo {
 
     @JsonProperty("fileSizeDesc")
     private String fileSizeDesc() {
-        return Optional.ofNullable(fileSize).map(u -> {
-
-            if (u < 1024L) {
-                return u + "B";
-            }
-            if (u < 1024L * 1024) {
-                return FORMATTER.apply((double) u / 1024L) + "KB";
-            }
-            if (u < 1024L * 1024 * 1024) {
-                return FORMATTER.apply((double) u / (1024L * 1024)) + "MB";
-            }
-            return FORMATTER.apply((double) u / (1024L * 1024 * 1024)) + "GB";
-        }).orElse(null);
-
+        return FileSizeUtil.getFileSizeDesc(fileSize);
     }
 }

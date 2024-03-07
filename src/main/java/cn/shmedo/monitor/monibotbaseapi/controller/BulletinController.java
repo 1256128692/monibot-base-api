@@ -115,6 +115,8 @@ public class BulletinController {
      * @apiSuccess (返回结果) {String} attachmentDataList.fileName 文件名称
      * @apiSuccess (返回结果) {String} attachmentDataList.fileType 文件类型
      * @apiSuccess (返回结果) {String} attachmentDataList.filePath 文件绝对路径
+     * @apiSuccess (返回结果) {Int} attachmentDataList.fileSize 附件文件大小
+     * @apiSuccess (返回结果) {String} attachmentDataList.fileSizeDesc 附件文件大小描述,例: 3.81KB 2.81MB
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:DescribeBulletinData
      */

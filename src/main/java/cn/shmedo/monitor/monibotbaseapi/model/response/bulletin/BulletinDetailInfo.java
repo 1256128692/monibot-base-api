@@ -28,6 +28,6 @@ public class BulletinDetailInfo extends BulletinDataBaseInfo {
                 .map(u -> u.distinct().toList()).flatMap(u -> Optional.of(ContextHolder.getBean(FileService.class))
                         .map(w -> w.getFileUrlList(u, getCompanyID())).map(w -> w.stream().map(s ->
                                 BulletinDetailAttachmentInfo.builder().fileName(s.getFileName()).fileType(s.getFileType())
-                                        .filePath(s.getAbsolutePath()).build()).toList())).orElse(List.of());
+                                        .filePath(s.getAbsolutePath()).fileSize(s.getFileSize()).build()).toList())).orElse(List.of());
     }
 }
