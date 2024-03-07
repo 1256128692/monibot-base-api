@@ -23,4 +23,6 @@ public interface TbCheckEventMapper extends BasicMapper<TbCheckEvent> {
     List<CheckEventSimple> listByTaskID(@Nonnull Integer taskID);
 
     QueryEventInfoV2 selectDetailInfoByID(Integer eventID);
+
+    void logicDeleteBatchIds(List<Integer> eventIDList);
 }

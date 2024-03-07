@@ -132,6 +132,8 @@ public class TbCheckEvent {
     @TableField(value = "ExValue")
     private String exValue;
 
+    @TableField(value = "`Delete`")
+    private Boolean delete;
     /**
      * 创建人
      */

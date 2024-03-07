@@ -22,6 +22,7 @@
         <result column="Status" property="status"/>
         <result column="Comment" property="comment"/>
         <result column="ExValue" property="exValue"/>
+        <result column="Delete" property="delete"/>
         <result column="CreateUserID" property="createUserID"/>
         <result column="CreateTime" property="createTime"/>
         <result column="UpdateUserID" property="updateUserID"/>
@@ -46,6 +47,7 @@
         `Status`,
         `Comment`,
         ExValue,
+        `Delete`,
         CreateUserID,
         CreateTime,
         UpdateUserID,
@@ -102,6 +104,9 @@
             </if>
             <if test="exValue != null">
                 `ExValue`,
+            </if>
+            <if test="delete != null">
+                `Delete`,
             </if>
             <if test="createUserID != null">
                 CreateUserID,
@@ -165,6 +170,9 @@
             <if test="exValue != null">
                 #{exValue,jdbcType=VARCHAR},
             </if>
+            <if test="delete != null">
+                #{delete},
+            </if>
             <if test="createUserID != null">
                 #{createUserID,jdbcType=INTEGER},
             </if>
@@ -225,6 +233,9 @@
             <if test="exValue != null">
                 exValue = #{exValue,jdbcType=VARCHAR},
             </if>
+            <if test="delete != null">
+                `Delete` = #{delete},
+            </if>
             <if test="updateUserID != null">
                 updateUserID = #{updateUserID,jdbcType=INTEGER},
             </if>
@@ -262,6 +273,7 @@
                  left join tb_check_task ct on ce.`taskID` = ct.ID
                  left join tb_project_info p on ce.`projectID` = p.ID
         where 1 = 1
+            AND ce.delete = 0
         <if test="pa.begin != null">
             AND ce.reportTime &gt;= #{pa.begin}
         </if>
@@ -282,11 +294,12 @@
         </if>
         <if test="pa.queryContent != null and pa.queryContent != ''">
             and (
-                ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
-                )
+                    ce.SerialNumber like concat('%', #{pa.queryContent}, '%')
+                    )
             <if test="pa.reportUserIDs != null and pa.reportUserIDs.size != 0">
                 or ce.reportUserID in
-                <foreach collection="pa.reportUserIDs" item="reportUserID" separator="," index="index" open="(" close=")">
+                <foreach collection="pa.reportUserIDs" item="reportUserID" separator="," index="index" open="("
+                         close=")">
                     #{reportUserID}
                 </foreach>
             </if>
@@ -339,8 +352,18 @@
                  left join tb_check_task ct on ce.`taskID` = ct.ID
                  left join tb_project_info p on ce.`projectID` = p.ID
         where 1 = 1
+          and ce.delete = 0
         <if test="eventID != null">
             and ce.ID = #{eventID}
         </if>
     </select>
+
+    <update id="logicDeleteBatchIds">
+        UPDATE tb_check_event
+        SET `Delete` = 1
+        WHERE ID IN
+        <foreach collection="eventIDList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </update>
 </mapper>

@@ -95,7 +95,7 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
 
     @Override
     public void deleteEventInfo(DeleteEventInfoParam pa) {
-        this.baseMapper.deleteBatchIds(pa.getEventIDList());
+        this.baseMapper.logicDeleteBatchIds(pa.getEventIDList());
     }
 
     @Override
@@ -143,11 +143,12 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
     public Object queryEventInfoDetail(QueryEventInfoDetailParam pa) {
 
         QueryEventInfoV2 eventInfoV2 = this.baseMapper.selectDetailInfoByID(pa.getEventID());
-        if (!StringUtil.isNullOrEmpty(eventInfoV2.getAnnexes())) {
-            List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(JSONUtil.toList(eventInfoV2.getAnnexes(), String.class), pa.getCompanyID());
-            eventInfoV2.setFileInfoList(fileUrlList);
-        }
         if (ObjectUtil.isNotNull(eventInfoV2)) {
+            if (!StringUtil.isNullOrEmpty(eventInfoV2.getAnnexes())) {
+                List<FileInfoResponse> fileUrlList = fileService.getFileUrlList(JSONUtil.toList(eventInfoV2.getAnnexes(), String.class), pa.getCompanyID());
+                eventInfoV2.setFileInfoList(fileUrlList);
+            }
+
             List<Integer> idList = Stream.of(eventInfoV2.getCheckerID(), eventInfoV2.getReportUserID(), eventInfoV2.getHandleUserID())
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());

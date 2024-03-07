@@ -132,7 +132,7 @@ public class AddEventInfoParam implements ParameterValidator, ResourcePermission
         vo.setStatus(this.status);
         vo.setComment(this.comment);
         vo.setExValue(this.exValue);
-
+        vo.setDelete(false);
         vo.setCreateUserID(this.subjectID);
         vo.setCreateTime(DateUtil.date().toLocalDateTime());
         vo.setUpdateUserID(this.subjectID);
