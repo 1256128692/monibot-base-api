@@ -103,7 +103,7 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
         WarnNotifyConfigInfo info = new WarnNotifyConfigInfo();
         BeanUtil.copyProperties(tbWarnBaseConfig, info);
         // set Projects
-        setWarnNotifyConfigProjectInfo(info, companyID, param.getPlatform());
+        setWarnNotifyConfigProjectInfo(info, companyID, param.getPlatform(), param.getProjectID());
         // set Users
         setWarnNotifyConfigUserInfo(info, companyID);
         return info;
@@ -137,7 +137,8 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
         return null;
     }
 
-    private void setWarnNotifyConfigProjectInfo(WarnNotifyConfigInfo info, final Integer companyID, final Integer platform) {
+    private void setWarnNotifyConfigProjectInfo(WarnNotifyConfigInfo info, final Integer companyID, final Integer platform,
+                                                final Integer projectID) {
         Map<Integer, TbProjectInfo> allProjectIDMap = tbProjectInfoMapper.selectList(new LambdaQueryWrapper<TbProjectInfo>()
                 .eq(TbProjectInfo::getCompanyID, companyID)).stream().collect(Collectors.toMap(TbProjectInfo::getID, Function.identity()));
         List<QueryProjectBaseInfoResponse> allProjectList = allProjectIDMap.values().stream().map(u -> {
@@ -148,10 +149,10 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
             return response;
         }).toList();
         List<DataWarnConfigInfo> deviceWarnConfigInfoList = baseMapper.selectWarnNotifyConfigList(
-                        companyID, platform, NotifyType.DEVICE_NOTIFY.getCode())
+                        companyID, platform, projectID, NotifyType.DEVICE_NOTIFY.getCode())
                 .stream().peek(u -> u.afterProperties(allProjectIDMap, allProjectList)).toList();
         List<DataWarnConfigInfo> dataWarnConfigInfoList = baseMapper.selectWarnNotifyConfigList(
-                        companyID, platform, NotifyType.DATA_NOTIFY.getCode())
+                        companyID, platform, projectID, NotifyType.DATA_NOTIFY.getCode())
                 .stream().peek(u -> u.afterProperties(allProjectIDMap, allProjectList)).toList();
         info.setDeviceWarnList(new ArrayList<>(deviceWarnConfigInfoList));
         info.setDataWarnList(dataWarnConfigInfoList);

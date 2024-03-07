@@ -36,6 +36,9 @@
             `tb_warn_notify_config` wnc
             LEFT JOIN `tb_notify_config_project_relation` ncpr ON wnc.`ID` = ncpr.`NotifyConfigID`
         WHERE wnc.`CompanyID`=#{companyID} AND wnc.`Platform`=#{platform} AND wnc.`NotifyType`=#{notifyType}
+        <if test="projectID != null">
+            AND ncpr.`ProjectID`=#{projectID}
+        </if>
         ORDER BY wnc.CreateTime DESC
     </select>
 

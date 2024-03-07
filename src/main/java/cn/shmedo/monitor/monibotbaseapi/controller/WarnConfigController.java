@@ -101,6 +101,7 @@ public class WarnConfigController {
      * @apiDescription 查询报警通知配置
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} platform 平台key
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
      * @apiSuccess (返回结果) {Int} warnTag 报警标签枚举 1.报警 2.告警 3.预警
      * @apiSuccess (返回结果) {Int} warnLevelType 报警等级类型枚举 1: 4级 2: 3级(配置阈值前可修改)
      * @apiSuccess (返回结果) {Int} warnLevelStyle 等级样式枚举 1: 红橙黄蓝 2: 1,2,3,4级 3: Ⅰ,Ⅱ,Ⅲ,Ⅳ级
