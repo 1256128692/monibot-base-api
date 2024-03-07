@@ -1,11 +1,12 @@
 package cn.shmedo.monitor.monibotbaseapi.service.notify;
 
 import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.AddNotifyRelationRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
-import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import jakarta.annotation.Nonnull;
 
@@ -85,4 +86,6 @@ public interface NotifyService {
     void setNotifyStatus(SetNotifyStatusParam pa, String accessToken);
 
     void clearNotify(final List<Integer> notifyIDList, final ListenerEventAppend append);
+
+    List<Integer> addNotifyRelation(AddNotifyRelationRequest request);
 }

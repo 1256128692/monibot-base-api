@@ -10,27 +10,29 @@ import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDeviceWarnLogMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyRelationMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.db.third.TbService;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DeviceWarnDeviceType;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.AddNotifyRelationRequest;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.SmsNotify;
-import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -246,6 +248,13 @@ public class NotifyServiceImpl implements NotifyService {
     public void clearNotify(List<Integer> notifyIDList, ListenerEventAppend append) {
         tbNotifyRelationMapper.delete(new LambdaQueryWrapper<TbNotifyRelation>().in(TbNotifyRelation::getNotifyID, notifyIDList));
         userService.deleteNotify(new DeleteNotifyParam(append.companyID(), notifyIDList), append.accessToken());
+    }
+
+    @Override
+    public List<Integer> addNotifyRelation(AddNotifyRelationRequest request) {
+        List<TbNotifyRelation> list = request.toNotifyRelationList();
+        tbNotifyRelationMapper.insertBatchSomeColumn(list);
+        return list.stream().map(TbNotifyRelation::getId).toList();
     }
 
     /**

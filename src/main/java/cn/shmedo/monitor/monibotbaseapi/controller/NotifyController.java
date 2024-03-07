@@ -4,14 +4,16 @@ import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.AddNotifyRelationRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -129,5 +131,27 @@ public class NotifyController {
     public Object setNotifyStatus(@RequestBody @Valid @NotNull SetNotifyStatusParam pa, HttpServletRequest request) {
         notifyService.setNotifyStatus(pa, request.getHeader("Authorization"));
         return ResultWrapper.successWithNothing();
+    }
+
+    /**
+     * @api {POST} /AddNotifyRelation 添加消息通知关联 (仅限应用)
+     * @apiVersion 1.0.0
+     * @apiGroup 消息通知模块
+     * @apiName AddNotifyRelation
+     * @apiDescription 添加消息通知关联
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Object[]} dataList 数据集
+     * @apiParam (请求参数) {Int} dataList.notifyID 通知id
+     * @apiParam (请求参数) {Int} dataList.relationID 关联对象id
+     * @apiParam (请求参数) {Int} dataList.type 关联类型 1.数据报警 2.设备报警 3.事件 4.工单
+     * @apiSuccess (返回结果) {Int[]} data 关联记录id
+     * @apiSampleRequest off
+     * @apiPermission 应用权限 mdmbase:AddNotifyRelation
+     */
+    @Permission(permissionName = "mdmbase:AddNotifyRelation", allowUser = false, allowApplication = true)
+    @PostMapping(value = "AddNotifyRelation", produces = MediaType.APPLICATION_JSON_VALUE,
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public Object addNotifyRelation(@Valid @RequestBody AddNotifyRelationRequest body) {
+        return notifyService.addNotifyRelation(body);
     }
 }
