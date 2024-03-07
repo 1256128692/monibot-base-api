@@ -43,6 +43,7 @@ import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnBaseConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
+import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -200,86 +201,87 @@ public class TbDataWarnLogServiceImpl extends ServiceImpl<TbDataWarnLogMapper, T
 
         //通知 (新生成和升级 需要发送通知)
         if (!SAME.equals(param.getWarnCase()) && !DOWNLEVEL.equals(param.getWarnCase())) {
-            WarnNotifyConfig notifyConfig = notifyConfigService.queryByProjectIDAndPlatform(threshold.getProjectID(),
-                    threshold.getPlatform(), 2);
-            if (notifyConfig != null) {
-                if (notifyConfig.getLevels().contains(param.getWarnLevel())) {
-                    if (notifyConfig.getMethods().contains(1)) {
-                        // 平台消息
-                        final String warnName = threshold.getWarnName();
-                        List<Integer> notifyIds = null;
-                        try {
-                            notifyIds = notifyService.sysNotify(threshold.getCompanyID(),
-                                    () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, threshold.getPlatform(), warnName,
-                                            param.getWarnContent(), SysNotify.Status.UNREAD, param.getWarnTime())),
-                                    notifyConfig.getContacts().keySet().toArray(Integer[]::new));
-                        } catch (Exception e) {
-                            log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(),
-                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
-                            throw e;
-                        }
 
-                        //通知关联
-                        Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
-                                .ifPresent(e -> tbNotifyRelationMapper.insertBatchSomeColumn(e.stream()
-                                        .map(item -> {
-                                            TbNotifyRelation tbNotifyRelation = new TbNotifyRelation();
-                                            tbNotifyRelation.setNotifyID(item);
-                                            tbNotifyRelation.setRelationID(warnLog.getId());
-                                            tbNotifyRelation.setType(DataDeviceWarnType.DATA.getCode());
-                                            return tbNotifyRelation;
-                                        }).toList()));
-                    }
+            //等级->通知方式->通知联系人
+            Map<Integer, Map<Integer, WarnNotifyConfig>> configMap = notifyConfigService
+                    .queryByProjectIDAndPlatform(threshold.getProjectID(), threshold.getPlatform(), 2);
 
-                    if (notifyConfig.getMethods().contains(2)) {
-                        // 短信
-                        Map<String, Object> paramMap = Map.of(
-                                "warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
-                                "projectName", threshold.getProjectName(),
-                                "pointName", threshold.getMonitorPointName(),
-                                "time", DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
-                                "warnName", threshold.getWarnName(),
-                                "warnLevel", param.getWarnLevelName(),
-                                "sensorName", threshold.getFieldName(),
-                                "sensorData", param.getWarnValue().toString(),
-                                "unit", Optional.ofNullable(threshold.getFieldUnitEng())
-                                        .filter(e -> !e.isEmpty()).orElse("无"));
-                        try {
-                            boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME,
-                                    fileConfig.getDataWarnTemplateCode(), paramMap,
-                                    notifyConfig.getContacts().values().stream().map(UserContact::getCellphone)
-                                            .filter(Objects::nonNull).distinct().toArray(String[]::new));
-                            Assert.isTrue(result);
-                        } catch (Exception e) {
-                            log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(),
-                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
-                        }
-                    }
+            Optional.ofNullable(configMap.get(param.getWarnLevel())).filter(e -> !e.isEmpty()).ifPresent(methodMap -> {
+                //对应等级存在通知配置
+                methodMap.forEach((method, c) -> {
+                    switch (method) {
+                        case 1 -> //平台消息
+                                TransferUtil.INSTANCE.applyUserContact(c, contacts -> {
+                                    final String warnName = threshold.getWarnName();
+                                    try {
+                                        List<Integer> notifyIds = notifyService.sysNotify(threshold.getCompanyID(),
+                                                () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM,
+                                                        threshold.getPlatform(), warnName, param.getWarnContent(),
+                                                        SysNotify.Status.UNREAD, param.getWarnTime())),
+                                                contacts.keySet().toArray(Integer[]::new));
 
-                    if (notifyConfig.getMethods().contains(3)) {
-                        // 邮件
-                        try {
-                            boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
-                                    false, () -> StrUtil.format(WARN_EMAIL_FORMAT, threshold.getProjectName(),
-                                            threshold.getMonitorPointName(),
-                                            DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
-                                            threshold.getWarnName(), param.getWarnLevelName(), threshold.getFieldName(),
-                                            param.getWarnValue().toString(),
-                                            Optional.ofNullable(threshold.getFieldUnitEng()).filter(e -> !e.isEmpty()).orElse("无")),
-                                    notifyConfig.getContacts().values()
-                                            .stream().map(UserContact::getEmail).filter(Objects::nonNull)
-                                            .toArray(String[]::new));
-                            Assert.isTrue(result);
-                        } catch (Exception e) {
-                            log.error("规则:{} 项目: {}, 平台: {} 数据报警邮件发送失败: {}", threshold.getId(),
-                                    threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
-                        }
+                                        //通知关联
+                                        Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
+                                                .ifPresent(e -> tbNotifyRelationMapper.insertBatchSomeColumn(e.stream()
+                                                        .map(item -> {
+                                                            TbNotifyRelation tbNotifyRelation = new TbNotifyRelation();
+                                                            tbNotifyRelation.setNotifyID(item);
+                                                            tbNotifyRelation.setRelationID(warnLog.getId());
+                                                            tbNotifyRelation.setType(DataDeviceWarnType.DATA.getCode());
+                                                            return tbNotifyRelation;
+                                                        }).toList()));
+                                    } catch (Exception e) {
+                                        log.error("规则:{} 项目: {}, 平台: {} 数据报警平台通知发送失败: {}", threshold.getId(),
+                                                threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
+                                        throw e;
+                                    }
+                                });
+                        case 2 -> //短信
+                                TransferUtil.INSTANCE.applyUserContact(c, contacts -> {
+                                    Map<String, Object> paramMap = Map.of(
+                                            "warnType", UPGRADE.equals(param.getWarnCase()) ? "警报升级" : "警报通知",
+                                            "projectName", threshold.getProjectName(),
+                                            "pointName", threshold.getMonitorPointName(),
+                                            "time", DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
+                                            "warnName", threshold.getWarnName(),
+                                            "warnLevel", param.getWarnLevelName(),
+                                            "sensorName", threshold.getFieldName(),
+                                            "sensorData", param.getWarnValue().toString(),
+                                            "unit", Optional.ofNullable(threshold.getFieldUnitEng())
+                                                    .filter(e -> !e.isEmpty()).orElse("无"));
+                                    try {
+                                        boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME,
+                                                fileConfig.getDataWarnTemplateCode(), paramMap,
+                                                contacts.values().stream().map(UserContact::getCellphone)
+                                                        .filter(Objects::nonNull).distinct().toArray(String[]::new));
+                                        Assert.isTrue(result);
+                                    } catch (Exception e) {
+                                        log.error("规则:{} 项目: {}, 平台: {} 数据报警短信发送失败: {}", threshold.getId(),
+                                                threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
+                                    }
+                                });
+                        case 3 -> //邮件
+                                TransferUtil.INSTANCE.applyUserContact(c, contacts -> {
+                                    try {
+                                        boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
+                                                false, () -> StrUtil.format(WARN_EMAIL_FORMAT, threshold.getProjectName(),
+                                                        threshold.getMonitorPointName(),
+                                                        DateUtil.format(param.getWarnTime(), DatePattern.NORM_DATETIME_FORMAT),
+                                                        threshold.getWarnName(), param.getWarnLevelName(), threshold.getFieldName(),
+                                                        param.getWarnValue().toString(),
+                                                        Optional.ofNullable(threshold.getFieldUnitEng()).filter(e -> !e.isEmpty()).orElse("无")),
+                                                contacts.values()
+                                                        .stream().map(UserContact::getEmail).filter(Objects::nonNull)
+                                                        .toArray(String[]::new));
+                                        Assert.isTrue(result);
+                                    } catch (Exception e) {
+                                        log.error("规则:{} 项目: {}, 平台: {} 数据报警邮件发送失败: {}", threshold.getId(),
+                                                threshold.getProjectID(), threshold.getPlatform(), e.getMessage());
+                                    }
+                                });
                     }
-                }
-            } else {
-                log.info("规则:{} 项目: {}, 平台: {} 数据报警未配置通知人, 无法发送通知", threshold.getId(),
-                        threshold.getProjectID(), threshold.getPlatform());
-            }
+                });
+            });
         }
     }
 

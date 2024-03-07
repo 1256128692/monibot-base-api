@@ -68,8 +68,6 @@
                 </if>
             </trim>
         </where>
-        ORDER BY tncpr.ProjectID DESC
-        LIMIT 1
     </select>
 
 

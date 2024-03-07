@@ -2,18 +2,20 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyConfigProjectRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectInfoMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbWarnNotifyConfigMapper;
-import cn.shmedo.monitor.monibotbaseapi.model.db.*;
-import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyConfigProjectRelation;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnBaseConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbWarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.NotifyType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryDepartmentIncludeUserInfoListParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserInDeptListNoPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.CompanyPlatformParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.warnConfig.QueryWarnNotifyConfigDetailParam;
@@ -118,23 +120,26 @@ public class TbWarnNotifyConfigServiceImpl extends ServiceImpl<TbWarnNotifyConfi
     }
 
     @Override
-    public WarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform,
+    public Map<Integer, Map<Integer, WarnNotifyConfig>> queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform,
                                                         @Nonnull Integer notifyType) {
-        TbWarnNotifyConfig config = baseMapper.queryByProjectIDAndPlatform(projectID, platform, notifyType);
-        if (config != null) {
-            ResultWrapper<Map<Integer, UserContact>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
-                    .depts(JSONUtil.toList(config.getDepts(), Integer.class))
-                    .roles(JSONUtil.toList(config.getRoles(), Integer.class))
-                    .users(JSONUtil.toList(config.getUsers(), Integer.class))
-                    .build(), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        List<TbWarnNotifyConfig> configs = baseMapper.queryByProjectIDAndPlatform(projectID, platform, notifyType);
 
-            WarnNotifyConfig item = new WarnNotifyConfig();
-            item.setLevels(JSONUtil.toList(config.getWarnLevel(), Integer.class));
-            item.setContacts(Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of()));
-            item.setMethods(JSONUtil.toList(config.getNotifyMethod(), Integer.class));
-            return item;
-        }
-        return null;
+        //解析配置
+        return configs.stream()
+                //先展开
+                .flatMap(e -> JSONUtil.toList(e.getWarnLevel(), Integer.class).stream()
+                        .flatMap(i -> JSONUtil.toList(e.getNotifyMethod(), Integer.class).stream()
+                                .map(m -> new WarnNotifyConfig(i, m,
+                                        Convert.toSet(Integer.class, e.getDepts()),
+                                        Convert.toSet(Integer.class, e.getRoles()),
+                                        Convert.toSet(Integer.class, e.getUsers())))))
+                //再分组
+                .collect(Collectors.groupingBy(e -> e.level(), Collectors.toMap(e -> e.method(), e -> e, (e1, e2) -> {
+                    e1.depts().addAll(e2.depts());
+                    e1.roles().addAll(e2.roles());
+                    e1.users().addAll(e2.users());
+                    return e1;
+                })));
     }
 
     private void setWarnNotifyConfigProjectInfo(WarnNotifyConfigInfo info, final Integer companyID, final Integer platform,

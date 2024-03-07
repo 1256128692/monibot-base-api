@@ -22,7 +22,7 @@ public interface TbWarnNotifyConfigMapper extends BasicMapper<TbWarnNotifyConfig
                                                         @Param("projectID") Integer projectID,
                                                         @Param("notifyType") Integer notifyType);
 
-    TbWarnNotifyConfig queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform, @Nonnull Integer notifyType);
+    List<TbWarnNotifyConfig> queryByProjectIDAndPlatform(@Nonnull Integer projectID, @Nonnull Integer platform, @Nonnull Integer notifyType);
 
     TbWarnNotifyConfig queryByCompanyIDAndPlatformID(@Param("companyID") Integer companyID,
                                                      @Param("platform") Integer platform,

@@ -5,7 +5,10 @@ import cn.hutool.core.util.ObjUtil;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserContactParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryUserIDNameParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.DeviceBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.UserIDName;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -105,5 +109,29 @@ public enum TransferUtil {
         wrapper.checkApi();
         return Optional.ofNullable(wrapper.getData())
                 .map(e -> e.stream().collect(Collectors.toMap(UserIDName::getUserID, UserIDName::getUserName)));
+    }
+
+    /**
+     * 通过通知配置 获取用户联系方式
+     * @param config  config 报警通知配置
+     * @param resultConsumer 结果处理器
+     */
+    public void applyUserContact(WarnNotifyConfig config,
+                                 Consumer<Map<Integer, UserContact>> resultConsumer) {
+        applyUserContact(builder -> builder.users(config.users()).depts(config.depts()).roles(config.roles()), resultConsumer);
+    }
+
+    /**
+     * 通过 角色id、部门id、用户id 获取用户联系方式
+     * @param consumer  条件构造器 {@link QueryUserContactParam.QueryUserContactParamBuilder}
+     * @param resultConsumer 结果处理器
+     */
+    public void applyUserContact(Consumer<QueryUserContactParam.QueryUserContactParamBuilder> consumer,
+                                       Consumer<Map<Integer, UserContact>> resultConsumer) {
+        QueryUserContactParam.QueryUserContactParamBuilder builder = QueryUserContactParam.builder();
+        consumer.accept(builder);
+        ResultWrapper<Map<Integer, UserContact>> wrapper = userService
+                .queryUserContact(builder.build(), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+        Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).ifPresent(resultConsumer);
     }
 }
