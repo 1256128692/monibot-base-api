@@ -15,4 +15,6 @@ public interface TbNotifyRelationMapper extends BasicMapper<TbNotifyRelation> {
     TbNotifyRelation selectNotifyList(@Param("param") QueryNotifyListParam param);
 
     List<NotifyListByProjectID> selectNotifyByProjectID(Integer projectID);
+
+    List<Integer> selectNotifyIdListMore(@Param("idList") List<Integer> idList);
 }

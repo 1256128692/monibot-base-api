@@ -5,17 +5,20 @@
     <select id="selectNotifyList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation">
         SELECT
-            wnr.*
+        wnr.*
         FROM tb_warn_notify_relation wnr
-            LEFT JOIN tb_data_warn_log dwl1 ON wnr.Type = 1 AND wnr.WarnLogID = dwl1.ID
-            LEFT JOIN tb_device_warn_log dwl2 ON wnr.Type = 2 AND wnr.WarnLogID = dwl2.ID
-        WHERE (wnr.Type=1 AND dwl1.WarnEndTime IS NOT NULL AND dwl1.CompanyID=#{param.companyID} AND dwl1.Platform=#{param.platform})
-           OR (wnr.Type=2 AND dwl2.WarnEndTime IS NOT NULL AND dwl2.CompanyID=#{param.companyID} AND dwl2.Platform=#{param.platform})
+        LEFT JOIN tb_data_warn_log dwl1 ON wnr.Type = 1 AND wnr.WarnLogID = dwl1.ID
+        LEFT JOIN tb_device_warn_log dwl2 ON wnr.Type = 2 AND wnr.WarnLogID = dwl2.ID
+        WHERE (wnr.Type=1 AND dwl1.WarnEndTime IS NOT NULL AND dwl1.CompanyID=#{param.companyID} AND
+        dwl1.Platform=#{param.platform})
+        OR (wnr.Type=2 AND dwl2.WarnEndTime IS NOT NULL AND dwl2.CompanyID=#{param.companyID} AND
+        dwl2.Platform=#{param.platform})
         ORDER BY wnr.ID DESC LIMIT 1
     </select>
     <select id="selectNotifyByProjectID"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID">
-        select tnr.NotifyID notifyID,twtc.ProjectID projectID,1 type,twtc.ProjectID,MonitorItemID monitorItemID,MonitorPointID monitorPointID,null historyFlag
+        select tnr.NotifyID notifyID,twtc.ProjectID projectID,1 type,twtc.ProjectID,MonitorItemID
+        monitorItemID,MonitorPointID monitorPointID,null historyFlag
         from tb_notify_relation tnr
         inner join tb_data_warn_log tdwl on tdwl.ID = tnr.RelationID
         inner join tb_warn_threshold_config twtc on twtc.ID=tdwl.WarnThresholdID and tnr.Type=1
@@ -25,12 +28,20 @@
             and twtc.projectID = #{projectID}
         </if>
         union all
-        select tnr.NotifyID notifyID,tdwl.ProjectID projectID,2 type,tdwl.ProjectID,null monitorItemID,null monitorPointID,IF(ISNULL(WarnEndTime),0,1) historyFlag
+        select tnr.NotifyID notifyID,tdwl.ProjectID projectID,2 type,tdwl.ProjectID,null monitorItemID,null
+        monitorPointID,IF(ISNULL(WarnEndTime),0,1) historyFlag
         from tb_notify_relation tnr
         inner join tb_device_warn_log tdwl on tdwl.ID=tnr.RelationID and tnr.Type=2
         where 1=1
         <if test="projectID != null">
             and tdwl.projectID = #{projectID}
         </if>
+    </select>
+    <select id="selectNotifyIdListMore" resultType="java.lang.Integer">
+        select NotifyID from tb_notify_relation where RelationID in (
+        select RelationID from tb_notify_relation where NotifyID in
+        <foreach collection="idList" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>)
     </select>
 </mapper>

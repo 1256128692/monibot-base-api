@@ -25,6 +25,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
@@ -33,6 +34,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -66,8 +68,6 @@ public class NotifyServiceImpl implements NotifyService {
     private final UserService userService;
 
     private final TbNotifyRelationMapper tbNotifyRelationMapper;
-    private final TbDataWarnLogMapper tbDataWarnLogMapper;
-    private final TbDeviceWarnLogMapper tbDeviceWarnLogMapper;
     private final TbVideoDeviceMapper tbVideoDeviceMapper;
 
     @Override
@@ -129,10 +129,12 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(u -> userService.queryNotifyPageList(u, accessToken))
                 .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).orElse(PageUtil.Page.empty());
 
-        int unReadCount = Optional.ofNullable(page.currentPageData())
-                .filter(CollectionUtil::isNotEmpty)
-                .map(data -> data.stream().filter(d -> d.getStatus() == 0).collect(Collectors.toList()))
-                .map(List::size)
+        // 查询系统通知统计信息
+        QueryNotifyStatisticsParam notifyStatisticsParam = BeanUtil.toBean(param, QueryNotifyStatisticsParam.class);
+        int unReadCount = Optional.ofNullable(userService.queryNotifyStatistics(notifyStatisticsParam, accessToken))
+                .filter(ResultWrapper::apiSuccess)
+                .map(ResultWrapper::getData)
+                .map(NotifyStatisticsInfo::getUnreadCount)
                 .orElse(0);
         return new NotifyPageResponse.Page<>(page.totalPage(),
                 notify(page.currentPageData(), notifyByProjectID.getNotifyListByProjectIDList()),
@@ -159,7 +161,7 @@ public class NotifyServiceImpl implements NotifyService {
         Map<Integer, NotifyListByProjectID> idMap = notifyListByProjectIDList
                 .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
 
-        if(CollectionUtil.isEmpty(notifyList)){
+        if (CollectionUtil.isEmpty(notifyList)) {
             return Collections.emptyList();
         }
         // 通知记录关系
@@ -235,6 +237,15 @@ public class NotifyServiceImpl implements NotifyService {
 
     @Override
     public void setNotifyStatus(SetNotifyStatusParam pa, String accessToken) {
+        if (CollectionUtil.isEmpty(pa.getNotifyIDList())) {
+            return;
+        }
+        // 同一条报警，报警状态变化会产生多条消息，但是任意一条消息已读后其他的也变为已读，直到产生新的报警状态变化
+        Optional.ofNullable(pa.getNotifyIDList())
+                .filter(CollectionUtil::isNotEmpty)
+                .map(tbNotifyRelationMapper::selectNotifyIdListMore)
+                .ifPresent(pa::setNotifyIDList);
+        // 通知id找到报警id， -> 报警id反查出所有的通知id
         userService.setNotifyStatus(pa, accessToken);
     }
 
