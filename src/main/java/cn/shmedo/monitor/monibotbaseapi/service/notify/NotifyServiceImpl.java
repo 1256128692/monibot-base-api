@@ -193,7 +193,6 @@ public class NotifyServiceImpl implements NotifyService {
                             .ifPresent(s -> {
                                 response.setRelationID(s.getRelationID());
                                 response.setRelationType(s.getType());
-                                response.setType(s.getType());
                             });
                     if (Objects.nonNull(response.getServiceID())) {
                         response.setServiceName(tbServiceMap.get(String.valueOf(response.getServiceID())).getServiceDesc());
