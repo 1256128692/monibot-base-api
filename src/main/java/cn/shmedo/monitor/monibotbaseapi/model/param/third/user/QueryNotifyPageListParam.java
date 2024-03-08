@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -67,4 +68,5 @@ public class QueryNotifyPageListParam {
      * 创建时间排序 0.降序（默认） 1.升序
      */
     private int timeOrder;
+    private List<Integer> notifyIDList;
 }

@@ -139,7 +139,11 @@ public class NotifyServiceImpl implements NotifyService {
                 // status为查询全部时，查询未读统计
                 param.setStatus(0);
                 ResultWrapper<PageUtil.Page<NotifyPageInfo>> unReadPage = userService.queryNotifyPageList(param.build(), accessToken);
-                unReadCount = unReadPage.getData().totalCount();
+                unReadCount = Optional.ofNullable(unReadPage)
+                        .filter(ResultWrapper::apiSuccess)
+                        .map(ResultWrapper::getData)
+                        .filter(Objects::nonNull)
+                        .map(PageUtil.Page::totalCount).orElse(0L);
             }
         }
         return new NotifyPageResponse.Page<>(page.totalPage(),
