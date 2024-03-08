@@ -15,6 +15,7 @@ import java.util.Set;
  * @Version 1.0
  */
 @Data
+@Deprecated
 @Accessors(chain = true)
 public class NotifyByProjectID {
     private Set<Integer> dataList;

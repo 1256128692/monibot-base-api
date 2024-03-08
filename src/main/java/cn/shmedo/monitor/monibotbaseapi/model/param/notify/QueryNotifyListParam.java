@@ -2,13 +2,12 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.notify;
 
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.standard.IPlatformCheck;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -23,7 +22,7 @@ public class QueryNotifyListParam implements ParameterValidator, ResourcePermiss
     private Integer projectID;
     private Integer serviceID;
     private Integer status;
-    private NotifyByProjectID notifyByProjectID;
+    private List<Integer> notifyIDList;
 
     @Override
     public Integer getPlatform() {

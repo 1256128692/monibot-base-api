@@ -6,9 +6,7 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.QueryNotifyPageListParam;
-import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +15,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -41,7 +40,7 @@ public class QueryNotifyPageParam implements ParameterValidator, ResourcePermiss
     private String queryCode;
     @Range(min = 0, max = 1, message = "已读/未读状态 0.未读 1.已读")
     private Integer status;
-    private NotifyByProjectID notifyByProjectID;
+    private List<Integer> notifyIDList;
     @JsonProperty("startTime")
     private Date begin;
     @JsonProperty("endTime")

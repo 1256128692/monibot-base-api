@@ -15,6 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class NotifyPageInfo {
     private Integer notifyID;
+    @Deprecated(since = "auth.tb_notify_data废弃，凡是经auth平台获取的type，都要走接口重置，从monitor_base.tb_notify_relation获取")
     private Integer type;
     private Integer serviceID;
     private String name;

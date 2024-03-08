@@ -119,10 +119,11 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public NotifyPageResponse.Page<NotifyPageResponse> queryNotifyPage(QueryNotifyPageParam param, String accessToken) {
         // 工程级别过滤
-        NotifyByProjectID notifyByProjectID = this.filterProject(param.getProjectID());
-        if (Objects.nonNull(param.getProjectID())) {
-            param.setNotifyByProjectID(notifyByProjectID);
-        }
+        List<NotifyListByProjectID> notifyListByProjectIDList = tbNotifyRelationMapper.selectNotifyByProjectID(param.getProjectID());
+        Optional.ofNullable(notifyListByProjectIDList)
+                .filter(CollectionUtil::isNotEmpty)
+                .map(n -> n.stream().map(NotifyListByProjectID::getNotifyID).collect(Collectors.toList()))
+                .ifPresent(param::setNotifyIDList);
 
         // 分页查询通知信息（条件过滤）
         PageUtil.Page<NotifyPageInfo> page = Optional.ofNullable(param.build())
@@ -131,8 +132,7 @@ public class NotifyServiceImpl implements NotifyService {
 
         // 查询未读通知统计信息
         long unReadCount;
-        SysNotify.Status status = SysNotify.Status.getStatus(param.getStatus());
-        switch (status){
+        switch (SysNotify.Status.getStatus(param.getStatus())) {
             case UNREAD -> unReadCount = page.totalCount();
             case READ -> unReadCount = 0;
             default -> {
@@ -143,7 +143,7 @@ public class NotifyServiceImpl implements NotifyService {
             }
         }
         return new NotifyPageResponse.Page<>(page.totalPage(),
-                notify(page.currentPageData(), notifyByProjectID.getNotifyListByProjectIDList()),
+                notify(page.currentPageData(), notifyListByProjectIDList),
                 page.totalCount(),
                 unReadCount);
     }
@@ -151,25 +151,27 @@ public class NotifyServiceImpl implements NotifyService {
     @Override
     public List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken) {
         // 工程级别过滤
-        NotifyByProjectID notifyByProjectID = this.filterProject(param.getProjectID());
-        if (Objects.nonNull(param.getProjectID())) {
-            param.setNotifyByProjectID(notifyByProjectID);
-        }
+        List<NotifyListByProjectID> notifyListByProjectIDList = tbNotifyRelationMapper.selectNotifyByProjectID(param.getProjectID());
+        Optional.ofNullable(notifyListByProjectIDList)
+                .filter(CollectionUtil::isNotEmpty)
+                .map(n -> n.stream().map(NotifyListByProjectID::getNotifyID).collect(Collectors.toList()))
+                .ifPresent(param::setNotifyIDList);
+
         // 远程调用查询符合条件的通知
         ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, accessToken);
-
-        return notify(resultWrapper.getData(), notifyByProjectID.getNotifyListByProjectIDList());
+        return notify(resultWrapper.getData(), notifyListByProjectIDList);
     }
 
 
     private List<NotifyPageResponse> notify(Collection<? extends NotifyPageInfo> notifyList,
                                             Collection<NotifyListByProjectID> notifyListByProjectIDList) {
+        if (CollectionUtil.isEmpty(notifyList) || CollectionUtil.isEmpty(notifyListByProjectIDList)) {
+            return Collections.emptyList();
+        }
+
         Map<Integer, NotifyListByProjectID> idMap = notifyListByProjectIDList
                 .stream().collect(Collectors.toMap(NotifyListByProjectID::getNotifyID, Function.identity()));
 
-        if (CollectionUtil.isEmpty(notifyList)) {
-            return Collections.emptyList();
-        }
         // 通知记录关系
         Map<Integer, TbNotifyRelation> notifyRelationMap = Optional.of(notifyList)
                 .map(u -> u.stream().map(NotifyPageInfo::getNotifyID).toList()).filter(CollUtil::isNotEmpty)
@@ -186,10 +188,13 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(u -> u.stream().map(w -> {
                     NotifyPageResponse response = new NotifyPageResponse();
                     BeanUtil.copyProperties(w, response);
-                    Optional.ofNullable(response.getNotifyID()).map(notifyRelationMap::get).ifPresent(s -> {
-                        response.setRelationID(s.getRelationID());
-                        response.setRelationType(s.getType());
-                    });
+                    Optional.ofNullable(response.getNotifyID())
+                            .map(notifyRelationMap::get)
+                            .ifPresent(s -> {
+                                response.setRelationID(s.getRelationID());
+                                response.setRelationType(s.getType());
+                                response.setType(s.getType());
+                            });
                     if (Objects.nonNull(response.getServiceID())) {
                         response.setServiceName(tbServiceMap.get(String.valueOf(response.getServiceID())).getServiceDesc());
                     }
@@ -224,6 +229,7 @@ public class NotifyServiceImpl implements NotifyService {
      * @param projectID 工程ID
      * @return 消息ID列表
      */
+    @Deprecated
     private NotifyByProjectID filterProject(Integer projectID) {
         List<NotifyListByProjectID> notifyListByProjectIDList = tbNotifyRelationMapper.selectNotifyByProjectID(projectID);
         return Optional.ofNullable(notifyListByProjectIDList)
