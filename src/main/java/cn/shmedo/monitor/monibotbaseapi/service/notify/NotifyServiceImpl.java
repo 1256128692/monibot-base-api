@@ -129,13 +129,19 @@ public class NotifyServiceImpl implements NotifyService {
                 .map(u -> userService.queryNotifyPageList(u, accessToken))
                 .filter(ResultWrapper::apiSuccess).map(ResultWrapper::getData).orElse(PageUtil.Page.empty());
 
-        // 查询系统通知统计信息
-        QueryNotifyStatisticsParam notifyStatisticsParam = BeanUtil.toBean(param, QueryNotifyStatisticsParam.class);
-        int unReadCount = Optional.ofNullable(userService.queryNotifyStatistics(notifyStatisticsParam, accessToken))
-                .filter(ResultWrapper::apiSuccess)
-                .map(ResultWrapper::getData)
-                .map(NotifyStatisticsInfo::getUnreadCount)
-                .orElse(0);
+        // 查询未读通知统计信息
+        long unReadCount;
+        SysNotify.Status status = SysNotify.Status.getStatus(param.getStatus());
+        switch (status){
+            case UNREAD -> unReadCount = page.totalCount();
+            case READ -> unReadCount = 0;
+            default -> {
+                // status为查询全部时，查询未读统计
+                param.setStatus(0);
+                ResultWrapper<PageUtil.Page<NotifyPageInfo>> unReadPage = userService.queryNotifyPageList(param.build(), accessToken);
+                unReadCount = unReadPage.getData().totalCount();
+            }
+        }
         return new NotifyPageResponse.Page<>(page.totalPage(),
                 notify(page.currentPageData(), notifyByProjectID.getNotifyListByProjectIDList()),
                 page.totalCount(),

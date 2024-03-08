@@ -26,6 +26,8 @@ public class SysNotify {
     @Getter
     @AllArgsConstructor
     public enum Status {
+        @JsonProperty("-1")
+        ERROR(-1, "错误状态"),
 
         @JsonProperty("0")
         UNREAD(0, "未读"),
@@ -41,6 +43,15 @@ public class SysNotify {
         @JsonValue
         private final Integer code;
         private final String desc;
+
+        public static Status getStatus(Integer code){
+            for (Status value : Status.values()) {
+                if (value.getCode().equals(code)){
+                    return value;
+                }
+            }
+            return ERROR;
+        }
     }
 
     @Getter
