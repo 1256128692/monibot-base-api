@@ -92,6 +92,5 @@
             and tncpr.ProjectID IN (#{projectID}, - 1)
         </where>
         ORDER BY tncpr.ProjectID DESC
-        LIMIT 1
     </select>
 </mapper>

@@ -19,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.ListenerEventAppend;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
+import cn.shmedo.monitor.monibotbaseapi.model.dto.datawarn.WarnNotifyConfig;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceStateInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.UpdateDeviceGroupSenderDto;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.DataDeviceWarnType;
@@ -39,11 +40,13 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.warnConfig.DeviceWarnHist
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.ITbDeviceWarnLogService;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbWarnNotifyConfigService;
 import cn.shmedo.monitor.monibotbaseapi.service.notify.NotifyService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -89,6 +92,8 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
     private final IotService iotService;
     private final RedisService redisService;
 
+    private final ITbWarnNotifyConfigService tbWarnNotifyConfigService;
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void saveDeviceWarnLog(SaveDeviceWarnParam param) {
@@ -105,88 +110,90 @@ public class TbDeviceWarnLogServiceImpl extends ServiceImpl<TbDeviceWarnLogMappe
                     null, null);
 
             if (param.getStatus() != null && !param.getStatus()) {
-                TbWarnNotifyConfig warnNotifyConfig = tbWarnNotifyConfigMapper.queryByCompanyIDAndPlatformID(param.getCompanyID(),
+                List<TbWarnNotifyConfig> warnNotifyConfigList = tbWarnNotifyConfigMapper.queryByCompanyIDAndPlatformID(param.getCompanyID(),
                         param.getPlatform(), 1, param.getProjectID());
 
                 tbDeviceWarnLogMapper.insert(tbDeviceWarnLog);
 
-                if (ObjectUtil.isNotNull(warnNotifyConfig)) {
-                    //通知 (需要发送通知)
-                    if (warnNotifyConfig.getNotifyMethod() != null) {
+                if (!CollectionUtil.isNullOrEmpty(warnNotifyConfigList)) {
+                    warnNotifyConfigList.forEach(warnNotifyConfig -> {
+                        //通知 (需要发送通知)
+                        if (warnNotifyConfig.getNotifyMethod() != null) {
 
-                        ResultWrapper<Map<Integer, UserContact>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
-                                .depts(JSONUtil.toList(warnNotifyConfig.getDepts(), Integer.class))
-                                .roles(JSONUtil.toList(warnNotifyConfig.getRoles(), Integer.class))
-                                .users(JSONUtil.toList(warnNotifyConfig.getUsers(), Integer.class))
-                                .build(), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
+                            ResultWrapper<Map<Integer, UserContact>> wrapper = userService.queryUserContact(QueryUserContactParam.builder()
+                                    .depts(JSONUtil.toList(warnNotifyConfig.getDepts(), Integer.class))
+                                    .roles(JSONUtil.toList(warnNotifyConfig.getRoles(), Integer.class))
+                                    .users(JSONUtil.toList(warnNotifyConfig.getUsers(), Integer.class))
+                                    .build(), fileConfig.getAuthAppKey(), fileConfig.getAuthAppSecret());
 
-                        // 邮件
-                        if (warnNotifyConfig.getNotifyMethod().contains("3")) {
-                            Map<Integer, UserContact> emailMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
-                            try {
-                                boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
-                                        true, () -> StrUtil.format(WARN_EMAIL_FORMAT, param.getProjectName(),
-                                                param.getDeviceSource(), DateUtil.format(param.getTime(), DatePattern.NORM_DATETIME_FORMAT),
-                                                param.getDeviceType(), param.getDeviceSerial()), emailMap.values()
-                                                .stream().map(UserContact::getEmail).filter(Objects::nonNull)
-                                                .toArray(String[]::new));
-                                Assert.isTrue(result);
-                            } catch (Exception e) {
-                                log.error(" 项目: {}, 平台: {} 设备报警邮件发送失败: {}",
-                                        param.getProjectID(), param.getPlatform(), e.getMessage());
+                            // 邮件
+                            if (warnNotifyConfig.getNotifyMethod().contains("3")) {
+                                Map<Integer, UserContact> emailMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                                try {
+                                    boolean result = notifyService.mailNotify(DefaultConstant.SMS_SIGN_NAME,
+                                            true, () -> StrUtil.format(WARN_EMAIL_FORMAT, param.getProjectName(),
+                                                    param.getDeviceSource(), DateUtil.format(param.getTime(), DatePattern.NORM_DATETIME_FORMAT),
+                                                    param.getDeviceType(), param.getDeviceSerial()), emailMap.values()
+                                                    .stream().map(UserContact::getEmail).filter(Objects::nonNull)
+                                                    .toArray(String[]::new));
+                                    Assert.isTrue(result);
+                                } catch (Exception e) {
+                                    log.error(" 项目: {}, 平台: {} 设备报警邮件发送失败: {}",
+                                            param.getProjectID(), param.getPlatform(), e.getMessage());
+                                }
                             }
-                        }
 
-                        // 短信推送
-                        if (warnNotifyConfig.getNotifyMethod().contains("2")) {
-                            Map<Integer, UserContact> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                            // 短信推送
+                            if (warnNotifyConfig.getNotifyMethod().contains("2")) {
+                                Map<Integer, UserContact> phoneMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
 
-                            try {
-                                boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDeviceWarnTemplateCode(),
-                                        Map.of("projectName", param.getProjectName(),
-                                                "deviceModel", param.getDeviceSource(),
-                                                "time", param.getTime(),
-                                                "deviceType", param.getDeviceType(),
-                                                "deviceSn", param.getDeviceSerial()), phoneMap.values().stream().map(UserContact::getCellphone)
-                                                .filter(Objects::nonNull).distinct().toArray(String[]::new));
-                                assert result;
-                            } catch (Exception e) {
-                                log.error("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
-                                        param.getPlatform(), e.getMessage());
+                                try {
+                                    boolean result = notifyService.smsNotify(DefaultConstant.SMS_SIGN_NAME, fileConfig.getDeviceWarnTemplateCode(),
+                                            Map.of("projectName", param.getProjectName(),
+                                                    "deviceModel", param.getDeviceSource(),
+                                                    "time", param.getTime(),
+                                                    "deviceType", param.getDeviceType(),
+                                                    "deviceSn", param.getDeviceSerial()), phoneMap.values().stream().map(UserContact::getCellphone)
+                                                    .filter(Objects::nonNull).distinct().toArray(String[]::new));
+                                    assert result;
+                                } catch (Exception e) {
+                                    log.error("设备SN: {}, 平台: {} 报警短信发送失败: {}", param.getDeviceSerial(),
+                                            param.getPlatform(), e.getMessage());
+                                }
                             }
-                        }
 
-                        // 平台推送
-                        if (warnNotifyConfig.getNotifyMethod().contains("1")) {
-                            // 绑定通知ID与设备预警日志
-                            final String warnName = "设备下线";
-                            List<Integer> notifyIds = null;
-                            Map<Integer, UserContact> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
-                            try {
-                                notifyIds = notifyService.sysNotify(param.getCompanyID(),
-                                        () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, param.getPlatform(), warnName,
-                                                content, SysNotify.Status.UNREAD, param.getTime())),
-                                        phoneUserMap.keySet().toArray(Integer[]::new));
-                            } catch (Exception e) {
-                                log.error("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceSerial(),
-                                        param.getPlatform(), e.getMessage());
-                            }
+                            // 平台推送
+                            if (warnNotifyConfig.getNotifyMethod().contains("1")) {
+                                // 绑定通知ID与设备预警日志
+                                final String warnName = "设备下线";
+                                List<Integer> notifyIds = null;
+                                Map<Integer, UserContact> phoneUserMap = Optional.ofNullable(wrapper.getData()).filter(e -> !e.isEmpty()).orElse(Map.of());
+                                try {
+                                    notifyIds = notifyService.sysNotify(param.getCompanyID(),
+                                            () -> List.of(new SysNotify.Notify(SysNotify.Type.ALARM, param.getPlatform(), warnName,
+                                                    content, SysNotify.Status.UNREAD, param.getTime())),
+                                            phoneUserMap.keySet().toArray(Integer[]::new));
+                                } catch (Exception e) {
+                                    log.error("设备SN: {}, 平台: {} 报警平台通知发送失败: {}", param.getDeviceSerial(),
+                                            param.getPlatform(), e.getMessage());
+                                }
 
 //                            通知关联
-                            Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
-                                    .ifPresent(e -> tbNotifyRelationMapper.insertBatchSomeColumn(e.stream()
-                                            .map(item -> {
-                                                TbNotifyRelation tbNotifyRelation = new TbNotifyRelation();
-                                                tbNotifyRelation.setNotifyID(item);
-                                                tbNotifyRelation.setRelationID(tbDeviceWarnLog.getId());
-                                                tbNotifyRelation.setType(DataDeviceWarnType.DEVICE.getCode());
-                                                return tbNotifyRelation;
-                                            }).toList()));
+                                Optional.ofNullable(notifyIds).filter(e -> !e.isEmpty())
+                                        .ifPresent(e -> tbNotifyRelationMapper.insertBatchSomeColumn(e.stream()
+                                                .map(item -> {
+                                                    TbNotifyRelation tbNotifyRelation = new TbNotifyRelation();
+                                                    tbNotifyRelation.setNotifyID(item);
+                                                    tbNotifyRelation.setRelationID(tbDeviceWarnLog.getId());
+                                                    tbNotifyRelation.setType(DataDeviceWarnType.DEVICE.getCode());
+                                                    return tbNotifyRelation;
+                                                }).toList()));
 
+                            }
+                        } else {
+                            log.error("设备SN:{}  平台: {} 未配置通知人, 无法发送通知", param.getDeviceToken(), param.getPlatform());
                         }
-                    } else {
-                        log.error("设备SN:{}  平台: {} 未配置通知人, 无法发送通知", param.getDeviceToken(), param.getPlatform());
-                    }
+                    });
                 }
             }
         } else {
