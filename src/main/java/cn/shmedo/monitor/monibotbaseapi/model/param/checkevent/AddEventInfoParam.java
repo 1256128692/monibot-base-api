@@ -41,7 +41,6 @@ public class AddEventInfoParam implements ParameterValidator, ResourcePermission
     private String address;
     @NotBlank
     private String location;
-    @NotBlank
     private String describe;
     private List<String> ossKeyList;
     private LocalDateTime handleTime;

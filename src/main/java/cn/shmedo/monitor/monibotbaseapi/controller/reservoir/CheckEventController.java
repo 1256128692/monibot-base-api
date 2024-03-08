@@ -131,7 +131,7 @@ public class CheckEventController {
      * @apiParam (请求体) {Int} typeID 事件类型ID
      * @apiParam (请求体) {String} address 事件位置
      * @apiParam (请求体) {String} location 事件经纬度
-     * @apiParam (请求体) {String} describe 事件描述
+     * @apiParam (请求体) {String} [describe] 事件描述
      * @apiParam (请求体) {String[]} [ossKeyList] 附件文件osskey列表
      * @apiParam (请求体) {Date}   [handleTime] 处理时间
      * @apiParam (请求体) {Int} status 事件状态 0-未处理 1-已处理
