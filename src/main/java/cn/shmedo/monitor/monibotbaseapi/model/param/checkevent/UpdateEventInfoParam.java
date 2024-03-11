@@ -8,16 +8,21 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEvent;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import io.netty.util.internal.StringUtil;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
 
 @Data
-public class UpdateEventInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
+public class UpdateEventInfoParam implements ParameterValidator, ResourcePermissionProvider<Resource>, Serializable {
 
     @NotNull
     private Integer companyID;
@@ -32,6 +37,8 @@ public class UpdateEventInfoParam implements ParameterValidator, ResourcePermiss
     private String location;
     private String describe;
     private List<String> ossKeyList;
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     private LocalDateTime handleTime;
     private Integer status;
     private String comment;
