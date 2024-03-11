@@ -231,7 +231,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                                     Tuple<Integer, String> pointInfo = sensorPointInfoMap.get(Convert.toInt(w.get(DbConstant.SENSOR_ID_FIELD_TOKEN)));
                                     Double value = Optional.ofNullable(w.get(fieldToken)).map(Convert::toDouble).orElse(null);
                                     Optional.ofNullable(value).map(s -> s + upper).ifPresent(limitInfo::setItem1);
-                                    Optional.ofNullable(value).map(s -> s - upper).ifPresent(limitInfo::setItem2);
+                                    Optional.ofNullable(value).map(s -> s - lower).ifPresent(limitInfo::setItem2);
                                     builder.datumPointData(DatumPointData.builder().monitorPointID(pointInfo.getItem1())
                                             .monitorPointName(pointInfo.getItem2()).value(value)
                                             .upper(Optional.ofNullable(value).map(s -> s + upper).orElse(null))
