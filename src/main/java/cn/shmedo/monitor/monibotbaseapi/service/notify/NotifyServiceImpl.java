@@ -256,12 +256,12 @@ public class NotifyServiceImpl implements NotifyService {
         if (CollectionUtil.isEmpty(pa.getNotifyIDList())) {
             return;
         }
-        // 同一条报警，报警状态变化会产生多条消息，但是任意一条消息已读后其他的也变为已读，直到产生新的报警状态变化
-        Optional.ofNullable(pa.getNotifyIDList())
-                .filter(CollectionUtil::isNotEmpty)
-                .map(tbNotifyRelationMapper::selectNotifyIdListMore)
-                .ifPresent(pa::setNotifyIDList);
-        // 通知id找到报警id， -> 报警id反查出所有的通知id
+//        // 同一条报警，报警状态变化会产生多条消息，但是任意一条消息已读后其他的也变为已读，直到产生新的报警状态变化
+//        Optional.ofNullable(pa.getNotifyIDList())
+//                .filter(CollectionUtil::isNotEmpty)
+//                // 通知id找到报警id， -> 报警id反查出所有的通知id
+//                .map(tbNotifyRelationMapper::selectNotifyIdListMore)
+//                .ifPresent(pa::setNotifyIDList);
         userService.setNotifyStatus(pa, accessToken);
     }
 
