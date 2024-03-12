@@ -100,6 +100,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
     private final SensorDataDao sensorDataDao;
     private final TbMonitorPointMapper tbMonitorPointMapper;
+    private final TbVideoDeviceMapper tbVideoDeviceMapper;
     private final WtReportService wtReportService;
 
     @Override
@@ -576,9 +577,9 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 new LambdaQueryWrapper<TbProjectInfo>()
                         .select(TbProjectInfo::getID, TbProjectInfo::getCompanyID)
         );
-        Map<Integer, Long> vieocountMap = tbMonitorPointMapper.selectVideoPointListByCondition(projectInfoList.stream().map(TbProjectInfo::getID).toList(),
-                null, null, null, null, null, cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType.VIDEO.getKey(),
-                null, null).stream().collect(Collectors.groupingBy(WtVideoPageInfo::getProjectID, Collectors.counting()));
+        Map<Integer, Long> vieocountMap = tbVideoDeviceMapper.selectList(
+                new LambdaQueryWrapper<TbVideoDevice>().in(TbVideoDevice::getProjectID, projectInfoList.stream().map(TbProjectInfo::getID).toList())
+        ).stream().collect(Collectors.groupingBy(TbVideoDevice::getProjectID, Collectors.counting()));
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(null)
                 .sendType(SendType.MDMBASE.toInt())
