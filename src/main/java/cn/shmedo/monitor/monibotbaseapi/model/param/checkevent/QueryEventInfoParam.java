@@ -5,6 +5,7 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -28,6 +29,9 @@ public class QueryEventInfoParam implements ParameterValidator, ResourcePermissi
 
     @JsonIgnore
     private List<Integer> reportUserIDs;
+
+    @JsonIgnore
+    private Collection<Integer> projectList;
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")
     @NotNull(message = "pageSize不能为空")
     private Integer pageSize;
@@ -39,6 +43,8 @@ public class QueryEventInfoParam implements ParameterValidator, ResourcePermissi
     @Override
     public ResultWrapper<?> validate() {
         TbMonitorItemMapper tbMonitorItemMapper = ContextHolder.getBean(TbMonitorItemMapper.class);
+
+        this.projectList = PermissionUtil.getHavePermissionProjectList(this.companyID, projectID == null ? null : List.of(projectID));
 
         this.queryContent = Optional.ofNullable(this.queryContent).map(String::trim).orElse(null);
 

@@ -864,6 +864,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 handlerImagePathToRealPath(result);
                 // 水库类型
                 if (item.getProjectType() == 1) {
+                    result.setWaterWarn(0);
                     if (CollectionUtil.isNotEmpty(sensorsGroupedByProject)) {
                         List<TbSensor> tbSensors = sensorsGroupedByProject.get(item.getID());
                         if (CollectionUtil.isNotEmpty(tbSensors)) {

@@ -286,8 +286,12 @@
         <if test="pa.eventStatus != null">
             and ce.`status` = #{pa.eventStatus}
         </if>
-        <if test="pa.projectID != null">
-            and ce.projectID = #{pa.projectID}
+        <if test="pa.projectList != null and pa.projectList.size() != 0">
+            AND ce.projectID in
+            <foreach collection="pa.projectList" item="item" separator="," index="index" open="("
+                     close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="pa.serviceID != null">
             and ce.serviceID = #{pa.serviceID}

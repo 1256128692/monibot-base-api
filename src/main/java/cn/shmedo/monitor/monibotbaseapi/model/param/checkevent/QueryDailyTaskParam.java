@@ -5,13 +5,16 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbCheckEventTypeMapper;
+import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
 import com.alibaba.nacos.shaded.org.checkerframework.checker.nullness.qual.Nullable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -37,9 +40,13 @@ public class QueryDailyTaskParam implements ParameterValidator, ResourcePermissi
     @NotNull
     private Date end;
 
+    @JsonIgnore
+    private Collection<Integer> projectList;
+
     @Override
     public ResultWrapper validate() {
         TbCheckEventTypeMapper checkEventTypeMapper = ContextHolder.getBean(TbCheckEventTypeMapper.class);
+        this.projectList = PermissionUtil.getHavePermissionProjectList(this.companyID, projectID == null ? null : List.of(projectID));
 
         if (begin.after(end)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");

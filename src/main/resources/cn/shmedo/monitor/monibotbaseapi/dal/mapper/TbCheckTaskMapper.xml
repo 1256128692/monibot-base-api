@@ -44,8 +44,12 @@
       <if test="param.serviceID != null">
           AND serviceID = #{param.serviceID}
       </if>
-      <if test="param.projectID != null">
-          AND projectID = #{param.projectID}
+      <if test="param.projectList != null and param.projectList.size() != 0">
+          AND projectID in
+          <foreach collection="param.projectList" item="item" separator="," index="index" open="("
+                   close=")">
+              #{item}
+          </foreach>
       </if>
       <if test="userID != null">
           AND CheckerID = #{userID}
