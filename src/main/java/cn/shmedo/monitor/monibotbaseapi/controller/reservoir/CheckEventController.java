@@ -331,6 +331,8 @@ public class CheckEventController {
      * @apiSuccess (响应结果) {Int} data.taskDataResponseList.taskInfoList.status 任务状态
      * @apiSuccess (响应结果) {Date} data.taskDataResponseList.taskInfoList.taskDate 任务日期
      * @apiSuccess (响应结果) {String} data.taskDataResponseList.taskInfoList.projectID  关联项目ID
+     * @apiSuccess (响应结果) {Int} data.taskDataResponseList.taskInfoList.checkerID   任务类型
+     * @apiSuccess (响应结果) {String} data.taskDataResponseList.taskInfoList.checkerName   任务类型
      * @apiSuccess (响应结果) {Object} data.taskStatusInfo  任务状态统计
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.unpreparedCount  未开始任务数量
      * @apiSuccess (响应结果) {Int} data.taskStatusInfo.underwayCount  进行中任务数量

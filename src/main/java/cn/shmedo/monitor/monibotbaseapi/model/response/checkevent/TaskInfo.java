@@ -14,4 +14,8 @@ public class TaskInfo {
     private Integer status;
     private Date taskDate;
     private String projectID;
+
+    private Integer checkerID;
+
+    private String checkerName;
 }

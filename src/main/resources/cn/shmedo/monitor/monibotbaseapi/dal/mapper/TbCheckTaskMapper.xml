@@ -30,13 +30,14 @@
 
 
   <select id="selectListByCondition" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.checkevent.TaskInfo">
-      select ID as taskID,
+      select ID           as taskID,
              `Name`       as taskName,
              SerialNumber as taskSerialNumber,
              CheckType,
              `Status`,
              TaskDate,
-             ProjectID
+             ProjectID,
+             CheckerID
       from tb_check_task
       where TaskDate &gt;= #{param.begin}
         AND TaskDate &lt;= #{param.end}

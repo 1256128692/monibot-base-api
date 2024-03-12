@@ -83,6 +83,17 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
         } else {
             taskInfoList = tbCheckTaskMapper.selectListByCondition(pa, subjectID);
         }
+        if (!CollectionUtil.isNullOrEmpty(taskInfoList)) {
+            TransferUtil.INSTANCE.getUserNameDict(taskInfoList.stream()
+                            .map(TaskInfo::getCheckerID)
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList()))
+                    .ifPresent(dict -> {
+                        for (TaskInfo d : taskInfoList) {
+                            d.setCheckerName(dict.get(d.getCheckerID()));
+                        }
+                    });
+        }
         TaskDateAndStatisticsInfo.TaskStatusInfo taskStatusInfo = calculateTaskStatusInfo(taskInfoList);
         List<TaskDataResponse> taskDataResponses = groupTaskInfoByDate(taskInfoList);
         return new TaskDateAndStatisticsInfo(taskDataResponses, taskStatusInfo);
