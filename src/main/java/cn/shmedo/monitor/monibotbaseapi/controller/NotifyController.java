@@ -124,9 +124,9 @@ public class NotifyController {
      * @apiParam {Int} status 通知状态 0.未读 1.已读 2.待办
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 系统权限 user:ChangeNotify
+     * @apiPermission 系统权限 mdmbase:DescribeNotify
      */
-    @Permission(permissionName = "mdmbase:ChangeNotify")
+    @Permission(permissionName = "mdmbase:DescribeNotify")
     @RequestMapping(value = "/SetNotifyStatus", method = RequestMethod.POST, consumes = CommonVariable.JSON, produces = CommonVariable.JSON)
     public Object setNotifyStatus(@RequestBody @Valid @NotNull SetNotifyStatusParam pa, HttpServletRequest request) {
         notifyService.setNotifyStatus(pa, request.getHeader("Authorization"));
