@@ -240,7 +240,12 @@ public class HkVideoServiceImpl implements HkVideoService {
                     .map(u -> new HashMap<String, String>() {
                         {
                             Optional.ofNullable(u.get(HIK_CODE)).map(String::valueOf).ifPresent(w -> put(HIK_CODE, w));
-                            Optional.ofNullable(u.get(HIK_MSG)).map(String::valueOf).ifPresent(w -> put(HIK_MSG, w));
+                            Optional.ofNullable(u.get(HIK_MSG)).map(String::valueOf).ifPresent(w -> {
+                                // 海康设备是否调用失败
+                                boolean hikFailed = Optional.ofNullable(u.get(HIK_CODE)).map(String::valueOf)
+                                        .map(s -> !HIK_SUCCESS_CODE.equals(s)).orElse(false);
+                                put(HIK_MSG, hikFailed ? "海康设备操作失败,海康错误码:" + u.get(HIK_CODE) : w);
+                            });
                         }
                     }).orElseThrow(() -> new RuntimeException("海康接口调用失败,responseBody: " + responseBody));
         } catch (Exception e) {
