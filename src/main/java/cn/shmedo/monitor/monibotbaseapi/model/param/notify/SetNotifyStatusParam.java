@@ -18,7 +18,6 @@ public class SetNotifyStatusParam implements ParameterValidator, ResourcePermiss
     @NotNull
     private Integer status;
 
-    @JsonIgnore
     private Integer userID;
 
     public Integer getCompanyID() {

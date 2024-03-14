@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.spring.SpringUtil;
+import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
@@ -254,6 +255,7 @@ public class NotifyServiceImpl implements NotifyService {
         if (CollectionUtil.isEmpty(pa.getNotifyIDList())) {
             return;
         }
+        pa.setUserID(CurrentSubjectHolder.getCurrentSubject().getSubjectID());
         userService.setNotifyStatus(pa, config.getAuthAppKey(), config.getAuthAppSecret());
     }
 
