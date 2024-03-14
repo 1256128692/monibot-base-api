@@ -116,8 +116,10 @@ public interface UserService {
      * 设置消息通知状态
      */
     @RequestLine("POST /SetNotifyStatus")
-    @Headers("Authorization: {accessToken}")
-    ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, @Param("accessToken") String accessToken);
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param,
+                                     @Param("appKey") String appKey,
+                                     @Param("appSecret") String appSecret);
 
     /**
      * 查询系统通知统计信息

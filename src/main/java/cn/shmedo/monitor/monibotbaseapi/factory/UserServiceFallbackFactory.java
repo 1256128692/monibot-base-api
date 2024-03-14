@@ -109,8 +109,8 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
             }
 
             @Override
-            public ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, String accessToken) {
-                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            public ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, String appKey, String appSecret) {
+                return null;
             }
 
             @Override

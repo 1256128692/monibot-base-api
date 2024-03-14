@@ -10,8 +10,6 @@ import cn.shmedo.iot.entity.exception.CustomBaseException;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDataWarnLogMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbDeviceWarnLogMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbNotifyRelationMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbNotifyRelation;
@@ -25,7 +23,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyPageParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
-import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceBaseInfoParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.notify.MailNotify;
@@ -34,7 +31,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID;
 import cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyPageResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyPageInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.third.auth.NotifyStatisticsInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.warnlog.DeviceWarnLatestInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
@@ -43,6 +39,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.TransferUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +62,8 @@ public class NotifyServiceImpl implements NotifyService {
 
     private final FileConfig config;
     private final MdNotifyService mdNotifyService;
-    private final UserService userService;
+    @Resource(name = "userService")
+    private UserService userService;
 
     private final TbNotifyRelationMapper tbNotifyRelationMapper;
     private final TbVideoDeviceMapper tbVideoDeviceMapper;
@@ -256,13 +254,7 @@ public class NotifyServiceImpl implements NotifyService {
         if (CollectionUtil.isEmpty(pa.getNotifyIDList())) {
             return;
         }
-//        // 同一条报警，报警状态变化会产生多条消息，但是任意一条消息已读后其他的也变为已读，直到产生新的报警状态变化
-//        Optional.ofNullable(pa.getNotifyIDList())
-//                .filter(CollectionUtil::isNotEmpty)
-//                // 通知id找到报警id， -> 报警id反查出所有的通知id
-//                .map(tbNotifyRelationMapper::selectNotifyIdListMore)
-//                .ifPresent(pa::setNotifyIDList);
-        userService.setNotifyStatus(pa, accessToken);
+        userService.setNotifyStatus(pa, config.getAuthAppKey(), config.getAuthAppSecret());
     }
 
     /**
