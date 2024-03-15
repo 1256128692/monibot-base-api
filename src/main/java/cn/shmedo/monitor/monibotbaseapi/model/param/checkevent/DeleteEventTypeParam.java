@@ -27,7 +27,9 @@ public class DeleteEventTypeParam implements ParameterValidator, ResourcePermiss
     @Override
     public ResultWrapper validate() {
         TbCheckEventMapper checkEventMapper = ContextHolder.getBean(TbCheckEventMapper.class);
-        List<TbCheckEvent> checkEvents = checkEventMapper.selectList(new QueryWrapper<TbCheckEvent>().in("TypeID", idList));
+        List<TbCheckEvent> checkEvents = checkEventMapper.selectList(new QueryWrapper<TbCheckEvent>()
+                .in("TypeID", idList)
+                .eq("`Delete`", false));
 
         if (!CollectionUtil.isNullOrEmpty(checkEvents)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "所选事件类型有绑定的事件,无法删除");
