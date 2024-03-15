@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResourceType;
@@ -338,9 +339,11 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     private List<DeviceStatisticByMonitorProjectListResult> queryDeviceStatistic(Integer companyID, Set<Integer> projectIDSet) {
         ArrayList<DeviceStatisticByMonitorProjectListResult> resultList = new ArrayList<>();
         List<List<Integer>> seperatorList = cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil.seperatorList(new ArrayList<>(projectIDSet), 100);
+        Timestamp begin = new Timestamp(DateUtil.offsetDay(new Date(), -7).getTime());
+        Timestamp end = Timestamp.valueOf(LocalDateTime.now());
         seperatorList.parallelStream().forEach(seperator -> {
             QueryDeviceStatisticByMonitorProjectListParam monitorProjectListParam = new QueryDeviceStatisticByMonitorProjectListParam(
-                    companyID, seperator, TimeUtil.DEFAULT_START_TIME, Timestamp.valueOf(LocalDateTime.now()));
+                    companyID, seperator, begin, end);
             ResultWrapper<List<DeviceStatisticByMonitorProjectListResult>> resultWrapper = iotService.queryDeviceStatisticByMonitorProjectList(
                     monitorProjectListParam);
             if (resultWrapper.apiSuccess() && CollectionUtil.isNotEmpty(resultWrapper.getData())) {
