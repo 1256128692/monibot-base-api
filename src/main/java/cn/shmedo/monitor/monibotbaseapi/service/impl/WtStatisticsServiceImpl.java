@@ -596,9 +596,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                         .select(TbProjectInfo::getID, TbProjectInfo::getCompanyID)
         );
         // <companyID, <PID, Count>>， 没有项目ID的为-1
-        Map<Integer, Map<Integer, Long>> vieocountMap = tbVideoDeviceMapper.selectList(
-                new LambdaQueryWrapper<TbVideoDevice>().in(TbVideoDevice::getProjectID, projectInfoList.stream().map(TbProjectInfo::getID).toList())
-        ).stream().collect(Collectors.groupingBy(TbVideoDevice::getCompanyID, Collectors.groupingBy(e -> e.getProjectID() == null ? -1 : e.getProjectID(), Collectors.counting())));
+        Map<Integer, Map<Integer, Long>> vieocountMap = tbVideoDeviceMapper.selectAllList().stream().collect(Collectors.groupingBy(TbVideoDevice::getCompanyID, Collectors.groupingBy(e -> e.getProjectID() == null ? -1 : e.getProjectID(), Collectors.counting())));
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(null)
                 .sendType(SendType.MDMBASE.toInt())
