@@ -279,7 +279,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
             onlineCount.addAndGet(result.getOnlineCount());
             offlineCount.addAndGet(result.getOfflineCount());
         });
-        double deviceOnlineRate = Double.parseDouble(decimalFormat.format((double) onlineCount.get() / offlineCount.get()));
+        double deviceOnlineRate = Double.parseDouble(decimalFormat.format((double) onlineCount.get() / (offlineCount.get() + onlineCount.get())));
         return new DeviceMaintenanceRes()
                 .setActiveCount(activeCount.get())
                 .setActiveSuccessCount(activeSuccessCount.get())
