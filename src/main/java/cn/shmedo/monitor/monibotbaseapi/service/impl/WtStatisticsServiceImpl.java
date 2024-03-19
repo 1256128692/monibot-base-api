@@ -40,7 +40,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoV4;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
-import cn.shmedo.monitor.monibotbaseapi.model.response.wtdevice.WtVideoPageInfo;
 import cn.shmedo.monitor.monibotbaseapi.service.WtStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
@@ -51,6 +50,8 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
@@ -510,23 +511,41 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
 
     @Override
     public ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList) {
+        ReservoirDeviceStatisticsResult result = ReservoirDeviceStatisticsResult.builder()
+                .iotDeviceCount(0)
+                .videoDeviceCount(0)
+                .build();
         if (ObjectUtil.isEmpty(havePermissionProjectList)) {
-            return ReservoirDeviceStatisticsResult.builder().build();
+            return result;
         }
-        List<Integer> pidList = projectInfoMapper.selectList(
+        List<Integer> pidList = new ArrayList<>(projectInfoMapper.selectList(
                 new LambdaQueryWrapper<TbProjectInfo>()
                         .eq(TbProjectInfo::getCompanyID, companyID)
                         .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
                         .in(TbProjectInfo::getID, havePermissionProjectList)
-        ).stream().map(TbProjectInfo::getID).toList();
+        ).stream().map(TbProjectInfo::getID).toList());
 
-        List<CacheIntelDeviceStatItem> list = monitorRedisService.getAll(INTEL_DEVICE_STATS, Integer.class, CacheIntelDeviceStatItem.class)
-                .entrySet().stream().filter(e -> pidList.contains(e.getKey()))
-                .map(Map.Entry::getValue).toList();
-        return ReservoirDeviceStatisticsResult.builder()
-                .iotDeviceCount(list.stream().mapToInt(CacheIntelDeviceStatItem::getIotDeviceCount).sum())
-                .videoDeviceCount(list.stream().mapToInt(CacheIntelDeviceStatItem::getVideoDeviceCount).sum())
-                .build();
+        String str = monitorRedisService.get(INTEL_DEVICE_STATS, companyID.toString());
+        if (StrUtil.isBlank(str)) {
+            return result;
+        }
+        JSONObject entries = JSONUtil.parseObj(str);
+        entries.getByPath(Integer.toString(11), CacheIntelDeviceStatItem.class);
+        pidList.add(-1);
+        pidList.forEach(
+                pid -> {
+                    CacheIntelDeviceStatItem item = entries.getByPath(pid.toString(), CacheIntelDeviceStatItem.class);
+                    if (item != null) {
+                        if (item.getIotDeviceCount() != null) {
+                            result.setIotDeviceCount(result.getIotDeviceCount() + item.getIotDeviceCount());
+                        }
+                        if (item.getVideoDeviceCount() != null) {
+                            result.setVideoDeviceCount(result.getVideoDeviceCount() + item.getVideoDeviceCount());
+                        }
+                    }
+                }
+        );
+        return result;
     }
 
     @Override
@@ -577,9 +596,10 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 new LambdaQueryWrapper<TbProjectInfo>()
                         .select(TbProjectInfo::getID, TbProjectInfo::getCompanyID)
         );
-        Map<Integer, Long> vieocountMap = tbVideoDeviceMapper.selectList(
+        // <companyID, <PID, Count>>， 没有项目ID的为-1
+        Map<Integer, Map<Integer, Long>> vieocountMap = tbVideoDeviceMapper.selectList(
                 new LambdaQueryWrapper<TbVideoDevice>().in(TbVideoDevice::getProjectID, projectInfoList.stream().map(TbProjectInfo::getID).toList())
-        ).stream().collect(Collectors.groupingBy(TbVideoDevice::getProjectID, Collectors.counting()));
+        ).stream().collect(Collectors.groupingBy(TbVideoDevice::getCompanyID, Collectors.groupingBy(e -> e.getProjectID() == null ? -1 : e.getProjectID(), Collectors.counting())));
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(null)
                 .sendType(SendType.MDMBASE.toInt())
@@ -589,7 +609,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 .online(null)
                 .productID(null)
                 .build();
-        Map<String, Long> iotcountMap = new HashMap<>();
+        Map<String, Map<Integer, Long>> iotcountMap = new HashMap<>();
         projectInfoList.stream().collect(Collectors.groupingBy(
                 TbProjectInfo::getCompanyID
         )).forEach((companyID, list) -> {
@@ -600,21 +620,26 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
             }
             if (ObjectUtil.isNotEmpty(resultWrapper.getData())) {
-                iotcountMap.putAll(
-                        resultWrapper.getData().stream().flatMap(e -> e.getSendAddressList().stream()).collect(Collectors.groupingBy(
-                                String::toString, Collectors.counting())));
+                iotcountMap.put(companyID.toString(), resultWrapper.getData().stream().flatMap(e -> e.getSendAddressList().stream()).collect(Collectors.groupingBy(
+                        Integer::valueOf, Collectors.counting())
+                ));
             }
         });
-
-        Map<String, CacheIntelDeviceStatItem> collect = projectInfoList.stream().map(
-                e -> new Tuple<TbProjectInfo, CacheIntelDeviceStatItem>(e, CacheIntelDeviceStatItem.builder()
-                        .iotDeviceCount(iotcountMap.getOrDefault(e.getID().toString(), 0L).intValue())
-                        .videoDeviceCount(vieocountMap.getOrDefault(e.getID(), 0L).intValue())
-                        .build())
-        ).collect(Collectors.toMap(
-                e -> e.getItem1().getID().toString(),
-                Tuple::getItem2
-        ));
+        Map<String, Map<String, CacheIntelDeviceStatItem>> collect = new HashMap<>();
+        projectInfoList.stream().map(TbProjectInfo::getCompanyID).distinct().forEach(companyID -> {
+            if (vieocountMap.containsKey(companyID))
+                vieocountMap.get(companyID).forEach((pid, count) -> {
+                    CacheIntelDeviceStatItem item = collect.computeIfAbsent(companyID.toString(), k -> new HashMap<>()).getOrDefault(pid.toString(), CacheIntelDeviceStatItem.builder().build());
+                    item.setVideoDeviceCount(count.intValue());
+                    collect.get(companyID.toString()).put(pid.toString(), item);
+                });
+            if (iotcountMap.containsKey(companyID.toString()))
+                iotcountMap.get(companyID.toString()).forEach((pid, count) -> {
+                    CacheIntelDeviceStatItem item = collect.computeIfAbsent(companyID.toString(), k -> new HashMap<>()).getOrDefault(pid.toString(), CacheIntelDeviceStatItem.builder().build());
+                    item.setIotDeviceCount(count.intValue());
+                    collect.get(companyID.toString()).put(pid.toString(), item);
+                });
+        });
         monitorRedisService.putAll(INTEL_DEVICE_STATS, collect);
     }
 
