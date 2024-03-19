@@ -521,7 +521,6 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         List<Integer> pidList = new ArrayList<>(projectInfoMapper.selectList(
                 new LambdaQueryWrapper<TbProjectInfo>()
                         .eq(TbProjectInfo::getCompanyID, companyID)
-                        .eq(TbProjectInfo::getProjectType, ProjectType.RESERVOIR.getCode())
                         .in(TbProjectInfo::getID, havePermissionProjectList)
         ).stream().map(TbProjectInfo::getID).toList());
 
