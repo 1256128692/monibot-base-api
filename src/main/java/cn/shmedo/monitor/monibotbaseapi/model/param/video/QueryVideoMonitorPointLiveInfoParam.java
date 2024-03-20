@@ -9,7 +9,9 @@ import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbVideoDeviceMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbVideoDevice;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorQueryType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.response.video.VideoMonitorPointLiveInfo;
@@ -20,6 +22,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Data
 public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator, ResourcePermissionProvider<Resource> {
@@ -45,6 +49,7 @@ public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator,
 //        if (CollectionUtil.isNullOrEmpty(projectMonitorClassList)) {
 //            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "当前监测工程未配置监测类型归属");
 //        }
+        TbVideoDeviceMapper tbVideoDeviceMapper = ContextHolder.getBean(TbVideoDeviceMapper.class);
 
         liveInfos = tbMonitorPointMapper.selectListByIDList(monitorPointIDList);
         if (!CollectionUtil.isNullOrEmpty(liveInfos)){
@@ -73,6 +78,26 @@ public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator,
                     pojo.setYsChannelNo(dict.get(DefaultConstant.VIDEO_CHANNEL).toString());
                 }
             });
+
+            List<TbVideoDevice> tbVideoDevices = tbVideoDeviceMapper.selectList(new LambdaQueryWrapper<TbVideoDevice>()
+                    .in(TbVideoDevice::getDeviceSerial, liveInfos.stream().map(VideoMonitorPointLiveInfo::getSeqNo).collect(Collectors.toList())));
+            if (!CollectionUtil.isNullOrEmpty(tbVideoDevices)) {
+                liveInfos.forEach(pojo -> {
+                    Optional<TbVideoDevice> matchingDevice = tbVideoDevices.stream()
+                            .filter(device -> device.getDeviceSerial().equals(pojo.getSeqNo()))
+                            .findFirst();
+
+                    matchingDevice.ifPresent(device -> {
+                        if (device.getAccessPlatform() == 0) {
+                            pojo.setProtocol((DefaultConstant.VIDEO_YS));
+                        } else if (device.getAccessPlatform() == 1) {
+                            pojo.setProtocol((DefaultConstant.VIDEO_HK));
+                        }
+                    });
+                });
+            } else {
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表含未绑定设备的监测点");
+            }
         }
 
         return null;

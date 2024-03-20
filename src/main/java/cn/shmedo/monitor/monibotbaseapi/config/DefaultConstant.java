@@ -88,6 +88,10 @@ public class DefaultConstant {
     public static final String VIDEO_DEVICE_SN = "seqNo";
     public static final String VIDEO_CHANNEL = "channelNo";
 
+    public static final String VIDEO_YS = "ys";
+
+    public static final String VIDEO_HK = "hk";
+
     public static final String VIDEO_IMAGECAPTURE = "imageCapture";
 
     public static final String VIDEO_CAPTUREINTERVAL = "captureInterval";

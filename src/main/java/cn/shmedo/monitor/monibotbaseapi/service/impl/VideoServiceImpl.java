@@ -162,10 +162,17 @@ public class VideoServiceImpl implements VideoService {
         String ysToken = getYsToken();
         if (!CollectionUtil.isNullOrEmpty(liveInfos)) {
             liveInfos.forEach(item -> {
-                String baseUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), false, item.getYsChannelNo());
-                String hdUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), true, item.getYsChannelNo());
-                item.setBaseUrl(baseUrl);
-                item.setHdUrl(hdUrl);
+                if (item.getProtocol() != null && item.getProtocol().equals(DefaultConstant.VIDEO_YS)) {
+                    String baseUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), false, item.getYsChannelNo());
+                    String hdUrl = YsUtil.getEzOpenAddress(item.getSeqNo(), true, item.getYsChannelNo());
+                    item.setBaseUrl(baseUrl);
+                    item.setHdUrl(hdUrl);
+                } else {
+                    String url = hkVideoService.getStreamUrl(item.getSeqNo(), 0, DefaultConstant.HikVideoParamKeys.HIK_PROTOCOL_WS, null, null, null);
+                    item.setBaseUrl(url);
+                    item.setHdUrl(url);
+                }
+
                 item.setYsToken(ysToken);
             });
 

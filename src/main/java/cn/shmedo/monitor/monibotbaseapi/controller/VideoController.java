@@ -29,7 +29,7 @@ public class VideoController {
      * @api {POST} /QueryVideoMonitorPointLiveInfo 查询视频类型监测点直播地址信息
      * @apiVersion 1.0.0
      * @apiGroup 视频模块
-     * @apiDescription 查询视频类型监测点直播地址信息
+     * @apiDescription 查询视频类型监测点直播地址信息,可查看萤石云或者海康的直播地址
      * @apiName QueryVideoMonitorPointLiveInfo
      * @apiParam (请求体) {Int} projectID  工程ID
      * @apiParam (请求体) {Int[]} monitorPointIDList  监测点ID列表
