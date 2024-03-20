@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @program: monibot-base-api
  * @author: gaoxu
@@ -15,6 +17,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CacheIntelDeviceStatItem {
-    private Integer videoDeviceCount;
-    private Integer iotDeviceCount;
+    private List<String> videoDeviceTokens;
+    private List<String> iotDeviceTokens;
 }

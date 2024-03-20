@@ -531,19 +531,21 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         JSONObject entries = JSONUtil.parseObj(str);
         entries.getByPath(Integer.toString(11), CacheIntelDeviceStatItem.class);
         pidList.add(-1);
+        Set<String> iotTokenSet = new HashSet<>();
         pidList.forEach(
                 pid -> {
                     CacheIntelDeviceStatItem item = entries.getByPath(pid.toString(), CacheIntelDeviceStatItem.class);
                     if (item != null) {
-                        if (item.getIotDeviceCount() != null) {
-                            result.setIotDeviceCount(result.getIotDeviceCount() + item.getIotDeviceCount());
+                        if (item.getIotDeviceTokens() != null) {
+                            iotTokenSet.addAll(item.getIotDeviceTokens());
                         }
-                        if (item.getVideoDeviceCount() != null) {
-                            result.setVideoDeviceCount(result.getVideoDeviceCount() + item.getVideoDeviceCount());
+                        if (item.getVideoDeviceTokens() != null) {
+                            result.setVideoDeviceCount(result.getVideoDeviceCount() + item.getVideoDeviceTokens().size());
                         }
                     }
                 }
         );
+        result.setIotDeviceCount(iotTokenSet.size());
         return result;
     }
 
@@ -595,8 +597,10 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 new LambdaQueryWrapper<TbProjectInfo>()
                         .select(TbProjectInfo::getID, TbProjectInfo::getCompanyID)
         );
-        // <companyID, <PID, Count>>， 没有项目ID的为-1
-        Map<Integer, Map<Integer, Long>> vieocountMap = tbVideoDeviceMapper.selectAllList().stream().collect(Collectors.groupingBy(TbVideoDevice::getCompanyID, Collectors.groupingBy(e -> e.getProjectID() == null ? -1 : e.getProjectID(), Collectors.counting())));
+        // <companyID, <PID, List>>， 没有项目ID的为-1
+        Map<Integer, Map<Integer, List<String>>> vieocountMap = tbVideoDeviceMapper.selectAllList().stream()
+                .collect(Collectors.groupingBy(TbVideoDevice::getCompanyID,
+                        Collectors.groupingBy(e -> e.getProjectID() == null ? -1 : e.getProjectID(), Collectors.mapping(TbVideoDevice::getDeviceToken, Collectors.toList()))));
         QueryDeviceSimpleBySenderAddressParam request = QueryDeviceSimpleBySenderAddressParam.builder()
                 .companyID(null)
                 .sendType(SendType.MDMBASE.toInt())
@@ -606,7 +610,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 .online(null)
                 .productID(null)
                 .build();
-        Map<String, Map<Integer, Long>> iotcountMap = new HashMap<>();
+        Map<String, Map<Integer, List<String>>> iotcountMap = new HashMap<>();
         projectInfoList.stream().collect(Collectors.groupingBy(
                 TbProjectInfo::getCompanyID
         )).forEach((companyID, list) -> {
@@ -617,23 +621,38 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
                 throw new CustomBaseException(resultWrapper.getCode(), resultWrapper.getMsg());
             }
             if (ObjectUtil.isNotEmpty(resultWrapper.getData())) {
-                iotcountMap.put(companyID.toString(), resultWrapper.getData().stream().flatMap(e -> e.getSendAddressList().stream()).collect(Collectors.groupingBy(
-                        Integer::valueOf, Collectors.counting())
-                ));
+                Map<Integer, List<String>> integerListHashMap = new HashMap<>();
+                resultWrapper.getData().forEach(
+                        e -> {
+                            e.getSendAddressList().forEach(
+                                    ee -> {
+                                        if (integerListHashMap.containsKey(Integer.valueOf(ee))) {
+                                            integerListHashMap.get(Integer.valueOf(ee)).add(e.getDeviceToken());
+                                        } else {
+                                            List<String> list1 = new ArrayList<>();
+                                            list1.add(e.getDeviceToken());
+                                            integerListHashMap.put(Integer.valueOf(ee), list1);
+
+                                        }
+                                    }
+                            );
+                        }
+                );
+                iotcountMap.put(companyID.toString(), integerListHashMap);
             }
         });
         Map<String, Map<String, CacheIntelDeviceStatItem>> collect = new HashMap<>();
         projectInfoList.stream().map(TbProjectInfo::getCompanyID).distinct().forEach(companyID -> {
             if (vieocountMap.containsKey(companyID))
-                vieocountMap.get(companyID).forEach((pid, count) -> {
+                vieocountMap.get(companyID).forEach((pid, tokens) -> {
                     CacheIntelDeviceStatItem item = collect.computeIfAbsent(companyID.toString(), k -> new HashMap<>()).getOrDefault(pid.toString(), CacheIntelDeviceStatItem.builder().build());
-                    item.setVideoDeviceCount(count.intValue());
+                    item.setVideoDeviceTokens(tokens);
                     collect.get(companyID.toString()).put(pid.toString(), item);
                 });
             if (iotcountMap.containsKey(companyID.toString()))
-                iotcountMap.get(companyID.toString()).forEach((pid, count) -> {
+                iotcountMap.get(companyID.toString()).forEach((pid, tokens) -> {
                     CacheIntelDeviceStatItem item = collect.computeIfAbsent(companyID.toString(), k -> new HashMap<>()).getOrDefault(pid.toString(), CacheIntelDeviceStatItem.builder().build());
-                    item.setIotDeviceCount(count.intValue());
+                    item.setIotDeviceTokens(tokens);
                     collect.get(companyID.toString()).put(pid.toString(), item);
                 });
         });
@@ -794,5 +813,12 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         dict.put("offline", "离线" + tag);
         IntStream.range(0, levelNum).forEach(i -> dict.put("level" + (i + 1), split[i] + tag));
         return dict;
+    }
+
+    @Bean
+    private ApplicationRunner XX() {
+        return args -> {
+            cachedIntelDeviceStatistics();
+        };
     }
 }
