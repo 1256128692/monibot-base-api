@@ -88,6 +88,7 @@ public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator,
                             .findFirst();
 
                     matchingDevice.ifPresent(device -> {
+                        pojo.setVideoDeviceID(device.getID());
                         if (device.getAccessPlatform() == 0) {
                             pojo.setProtocol((DefaultConstant.VIDEO_YS));
                         } else if (device.getAccessPlatform() == 1) {
@@ -96,7 +97,7 @@ public class QueryVideoMonitorPointLiveInfoParam  implements ParameterValidator,
                     });
                 });
             } else {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表含未绑定设备的监测点");
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点列表含未绑定视频设备的监测点");
             }
         }
 

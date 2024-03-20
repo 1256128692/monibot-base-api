@@ -42,11 +42,10 @@ public class VideoMonitorPointLiveInfo {
     private String ysToken;
 
 
-    @JsonIgnore
     private String seqNo;
-    @JsonIgnore
     private String ysChannelNo;
-    @JsonIgnore
     private String protocol;
+
+    private Integer videoDeviceID;
 
 }
