@@ -210,7 +210,7 @@ public class WtStatisticsController {
     @Permission(permissionName = "mdmbase:DescribeBaseDashboard")
     @PostMapping("ReservoirDeviceStatistics")
     public Object reservoirDeviceStatistics(@Valid @RequestBody ReservoirDeviceStatisticsParam pa) {
-        return wtStatisticsService.reservoirDeviceStatistics(pa.getCompanyID(), pa.getHavePermissionProjectList());
+        return wtStatisticsService.reservoirDeviceStatistics(pa.getCompanyID(), pa.getHavePermissionProjectList(), pa.getProjectID());
     }
 
     /**

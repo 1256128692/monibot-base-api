@@ -32,7 +32,7 @@ public interface WtStatisticsService {
 
     List<PointWithProjectInfo> reservoirVideoMonitorPoint(Integer companyID, Collection<Integer> havePermissionProjectList);
 
-    ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList);
+    ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList, Integer projectID);
 
     void cacheTypePointStatistics();
 

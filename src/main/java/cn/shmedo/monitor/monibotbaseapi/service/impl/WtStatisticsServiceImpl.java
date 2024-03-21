@@ -510,7 +510,7 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
     }
 
     @Override
-    public ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList) {
+    public ReservoirDeviceStatisticsResult reservoirDeviceStatistics(Integer companyID, Collection<Integer> havePermissionProjectList, Integer projectID) {
         ReservoirDeviceStatisticsResult result = ReservoirDeviceStatisticsResult.builder()
                 .iotDeviceCount(0)
                 .videoDeviceCount(0)
@@ -530,7 +530,10 @@ public class WtStatisticsServiceImpl implements WtStatisticsService {
         }
         JSONObject entries = JSONUtil.parseObj(str);
         entries.getByPath(Integer.toString(11), CacheIntelDeviceStatItem.class);
-        pidList.add(-1);
+        if (projectID == null) {
+            // 如果没有传项目ID，就是统计公司下所有的，需要统计未分配到项目的设备
+            pidList.add(-1);
+        }
         Set<String> iotTokenSet = new HashSet<>();
         pidList.forEach(
                 pid -> {
