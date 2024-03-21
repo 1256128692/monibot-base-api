@@ -121,10 +121,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         });
 
         // 获取监测类型缓存
-        log.info(String.format("产品缓存size:%s，productMap：%s", productMap.size(), productMap.keySet()));
-        // 获取监测类型缓存
-        Map<String, MonitorTypeCacheData> monitorTypeMap = iotRedisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
-        log.info(String.format("监测类型缓存size:%s，monitorTypeMap：%s", monitorTypeMap.size(), monitorTypeMap.keySet()));
+        Map<String, MonitorTypeCacheData> monitorTypeMap = monitorRedisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
         // 处理返回数据
         List<ProductServicesRes> resList = new ArrayList<>();
         productMap.forEach((k, v) -> {
