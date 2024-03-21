@@ -274,8 +274,8 @@ public class WtMonitorDataController {
      * @apiDescription 根据公司ID和监测类型去查询工程区域信息
      * @apiName QueryProjectLocation
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} monitorClassType 监测类别
-     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} [monitorClassType] 监测类别
+     * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiSuccess (响应结果) {Object[]} dataList 统计信息
      * @apiSuccess (响应结果) {String} dataList.location   区域代码
      * @apiSuccess (响应结果) {String} dataList.key   区域code

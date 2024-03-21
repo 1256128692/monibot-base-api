@@ -477,9 +477,13 @@
       select distinct pi.location
       from tb_monitor_point mi
                right join tb_project_info pi on mi.ProjectID = pi.ID
-      where mi.MonitorType = #{monitorType}
-        and pi.CompanyID = #{companyID}
-        and mi.ProjectID in (select ProjectID from tb_project_monitor_class where MonitorClass = #{monitorClassType})
+      where pi.CompanyID = #{companyID}
+      <if test="monitorType != null">
+          and mi.MonitorType = #{monitorType}
+      </if>
+      <if test="monitorClassType != null">
+          and mi.ProjectID in (select ProjectID from tb_project_monitor_class where MonitorClass = #{monitorClassType})
+      </if>
   </select>
 
   <select id="queryListByProjectIDAndMonitorItemID"

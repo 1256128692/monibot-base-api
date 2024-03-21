@@ -13,9 +13,7 @@ public class QueryProjectLocationParam  implements ParameterValidator, ResourceP
     @NotNull
     private Integer companyID;
 
-    @NotNull
     private Integer monitorType;
-    @NotNull
     private Integer monitorClassType;
 
     @Override

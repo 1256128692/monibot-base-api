@@ -108,45 +108,36 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     public List<ProductServicesRes> queryProductServices(QueryProductServicesParam param) {
         Map<String, List<ProductServicesRes.Product>> productMap = new HashMap<>();
         // 按照条件统一过滤
-        List<ProductServicesRes> resList = null;
-        try {
-            List<ProjectInfoCache> projectInfoCacheList = filterProject(param.getProjectMainType(), null);
-            log.debug(String.format("项目信息缓存size:%s，projectInfoCacheList：%s", projectInfoCacheList.size(), projectInfoCacheList));
-            projectInfoCacheList.stream().map(ProjectInfoCache::getID).collect(Collectors.toSet()).forEach(projectID -> {
-                // key-工程项目分组
-                String key = RedisKeys.MONITOR_TYPE_DEVICE_COUNT + ":" + projectID;
-                if (monitorRedisService.hasKey(key)) {
-                    // key-MonitorType；value-统计数据
-                    Map<String, String> map = monitorRedisService.getAll(key);
-                    // 合并不同项目下具有相同的监测类型
-                    map.forEach((k, v) -> productMap.computeIfAbsent(k, (m) -> new ArrayList<>()).addAll(JSONUtil.toList(v, ProductServicesRes.Product.class)));
-                }
-            });
+        List<ProjectInfoCache> projectInfoCacheList = filterProject(param.getProjectMainType(), null);
+        projectInfoCacheList.stream().map(ProjectInfoCache::getID).collect(Collectors.toSet()).forEach(projectID -> {
+            // key-工程项目分组
+            String key = RedisKeys.MONITOR_TYPE_DEVICE_COUNT + ":" + projectID;
+            if (monitorRedisService.hasKey(key)) {
+                // key-MonitorType；value-统计数据
+                Map<String, String> map = monitorRedisService.getAll(key);
+                // 合并不同项目下具有相同的监测类型
+                map.forEach((k, v) -> productMap.computeIfAbsent(k, (m) -> new ArrayList<>()).addAll(JSONUtil.toList(v, ProductServicesRes.Product.class)));
+            }
+        });
 
-            log.debug(String.format("产品缓存size:%s，productMap：%s", productMap.size(), productMap));
-            // 获取监测类型缓存
-            Map<String, MonitorTypeCacheData> monitorTypeMap = iotRedisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
-            log.debug(String.format("监测类型缓存size:%s，monitorTypeMap：%s", monitorTypeMap.size(), monitorTypeMap));
-            // 处理返回数据
-            resList = new ArrayList<>();
-            List<ProductServicesRes> finalResList = resList;
-            productMap.forEach((k, v) -> {
-                // 处理不同项目下具有相同的监测类型
-                int deviceCount = v.stream().mapToInt(ProductServicesRes.Product::getDeviceCount).sum();
-                Map<Integer, ProductServicesRes.Product> countMap = v.stream().collect(Collectors.groupingBy(ProductServicesRes.Product::getProductID,
-                        Collectors.collectingAndThen(Collectors.toList(), li -> {
-                            li.get(0).setDeviceCount(li.stream().mapToInt(ProductServicesRes.Product::getDeviceCount).sum());
-                            return li.get(0);
-                        })));
-                ProductServicesRes res = new ProductServicesRes().setMonitorType(Integer.parseInt(k))
-                        .setMonitorTypeName(monitorTypeMap.get(k).getTypeName())
-                        .setDeviceCount(deviceCount)
-                        .setProductList(new ArrayList<>(countMap.values()));
-                finalResList.add(res);
-            });
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        // 获取监测类型缓存
+        Map<String, MonitorTypeCacheData> monitorTypeMap = iotRedisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
+        // 处理返回数据
+        List<ProductServicesRes> resList = new ArrayList<>();
+        productMap.forEach((k, v) -> {
+            // 处理不同项目下具有相同的监测类型
+            int deviceCount = v.stream().mapToInt(ProductServicesRes.Product::getDeviceCount).sum();
+            Map<Integer, ProductServicesRes.Product> countMap = v.stream().collect(Collectors.groupingBy(ProductServicesRes.Product::getProductID,
+                    Collectors.collectingAndThen(Collectors.toList(), li -> {
+                        li.get(0).setDeviceCount(li.stream().mapToInt(ProductServicesRes.Product::getDeviceCount).sum());
+                        return li.get(0);
+                    })));
+            ProductServicesRes res = new ProductServicesRes().setMonitorType(Integer.parseInt(k))
+                    .setMonitorTypeName(monitorTypeMap.get(k).getTypeName())
+                    .setDeviceCount(deviceCount)
+                    .setProductList(new ArrayList<>(countMap.values()));
+            resList.add(res);
+        });
         // 条形图按照数量的倒序排列
         return resList.stream().sorted(Comparator.comparing(ProductServicesRes::getDeviceCount).reversed()).collect(Collectors.toList());
     }
