@@ -84,7 +84,7 @@
                 </if>
             </trim>
         </where>
-        ORDER BY tcp.UpdateTime DESC
+        ORDER BY tcp.ID DESC
     </sql>
 
     <select id="page" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checkpoint.CheckPointSimple">
