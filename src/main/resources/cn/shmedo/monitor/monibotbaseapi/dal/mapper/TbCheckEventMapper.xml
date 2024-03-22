@@ -308,6 +308,7 @@
                 </foreach>
             </if>
         </if>
+        order by ce.reportTime desc
     </select>
 
 

@@ -1240,7 +1240,6 @@ public class VideoServiceImpl implements VideoService {
     public Object saveVideoSensorList(SaveVideoDeviceSensorParam pa) {
 
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-
         // 1. 筛选出来不同企业的视频设备,然后同步到iot进行转移
         List<VideoDeviceInfoV4> transferVideoDeviceList = pa.getVideoDeviceList().stream().filter(i -> !i.getCompanyID().equals(pa.getCompanyID())).collect(Collectors.toList());
         if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList)) {
@@ -1428,19 +1427,22 @@ public class VideoServiceImpl implements VideoService {
                     videoDeviceInfo.setIotDeviceID(deviceID);
                 }
             });
-        }
+            if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))) {
+                TransferDeviceParam param = TransferDeviceParam.builder()
+                        .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
+                        .companyID(companyID)
+                        .originalCompanyID(transferVideoDeviceList.get(0).getCompanyID())
+                        .build();
 
-        TransferDeviceParam param = TransferDeviceParam.builder()
-                .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
-                .companyID(companyID)
-                .originalCompanyID(transferVideoDeviceList.get(0).getCompanyID())
-                .build();
-
-        ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
-        if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
-            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
-        } else {
+                ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
+                if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
+                }
+            }
             return null;
+        } else {
+            return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "查询物联网设备列表为空");
         }
+
     }
 }
