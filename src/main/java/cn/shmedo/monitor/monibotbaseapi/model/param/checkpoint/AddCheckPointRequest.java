@@ -48,11 +48,14 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
     @Size(max = 255)
     private String location;
 
+    private Boolean enable;
+
     @Override
     public ResultWrapper<?> validate() {
         this.name = name.trim();
         this.address = address.trim();
         this.location = location.trim();
+        this.enable = Optional.ofNullable(this.enable).orElse(Boolean.TRUE);
 
         TbCheckPointMapper mapper = SpringUtil.getBean(TbCheckPointMapper.class);
         boolean exists = mapper.exists(Wrappers.<TbCheckPoint>lambdaQuery()
@@ -94,6 +97,7 @@ public class AddCheckPointRequest implements ParameterValidator, ResourcePermiss
         entity.setName(name);
         entity.setAddress(address);
         entity.setLocation(location);
+        entity.setEnable(enable);
         entity.setCreateUserID(subject.getSubjectID());
         entity.setUpdateUserID(subject.getSubjectID());
         return entity;

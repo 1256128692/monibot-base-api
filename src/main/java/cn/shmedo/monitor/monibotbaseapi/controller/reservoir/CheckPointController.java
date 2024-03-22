@@ -37,6 +37,7 @@ public class CheckPointController {
      * @apiParam (请求参数) {String} name 巡检点名称(10)
      * @apiParam (请求参数) {String} address 巡检点地址
      * @apiParam (请求参数) {String} location 巡检点地址经纬度
+     * @apiParam (请求参数) {Boolean} [enable] 是否启用(默认为 true)
      * @apiSuccess (返回结果) {Int} data 巡检点id
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:UpdateCheckPoint
