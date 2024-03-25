@@ -132,7 +132,7 @@
                tct.CheckerID,
                tct.ExValue
         <include refid="list_sql_part"/>
-        ORDER BY tct.TaskDate, tct.UpdateTime DESC
+        ORDER BY tct.`ID` DESC
     </select>
 
     <select id="list" resultType="cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak.CheckTaskSimple">
@@ -149,7 +149,7 @@
                tct.CheckerID,
                tct.ExValue
         <include refid="list_sql_part"/>
-        ORDER BY tct.TaskDate, tct.UpdateTime DESC
+        ORDER BY tct.`ID` DESC
     </select>
 
     <resultMap id="statisMap" type="cn.shmedo.iot.entity.base.Tuple">
