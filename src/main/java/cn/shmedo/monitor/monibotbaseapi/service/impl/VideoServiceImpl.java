@@ -1237,6 +1237,7 @@ public class VideoServiceImpl implements VideoService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Object saveVideoSensorList(SaveVideoDeviceSensorParam pa) {
 
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
@@ -1428,6 +1429,7 @@ public class VideoServiceImpl implements VideoService {
                 }
             });
             if (!CollectionUtil.isNullOrEmpty(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))) {
+                log.info("转移的设备ID列表:{}", transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()));
                 TransferDeviceParam param = TransferDeviceParam.builder()
                         .deviceIDList(transferVideoDeviceList.stream().map(VideoDeviceInfoV4::getIotDeviceID).collect(Collectors.toList()))
                         .companyID(companyID)
@@ -1435,8 +1437,12 @@ public class VideoServiceImpl implements VideoService {
                         .build();
 
                 ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
-                if (!booleanResultWrapper.apiSuccess() || !booleanResultWrapper.getData()) {
-                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
+                if (booleanResultWrapper.apiSuccess() ) {
+                    if (!booleanResultWrapper.getData()) {
+                        return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
+                    }
+                } else {
+                    return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "调用转移物联网设备接口失败,失败原因:" + booleanResultWrapper.getMsg());
                 }
             }
             return null;
