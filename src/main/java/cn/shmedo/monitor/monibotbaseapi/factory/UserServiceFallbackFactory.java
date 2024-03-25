@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryUserInCompanyListParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
@@ -80,6 +81,11 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
 
             @Override
             public ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa, String appKey, String appSecret) {
+                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
+            }
+
+            @Override
+            public ResultWrapper<List<CompanyIDAndNameV2>> queryUserInCompanyList(QueryUserInCompanyListParameter param, String accessToken) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 

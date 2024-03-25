@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.dto.UserContact;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.SetNotifyStatusParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.DeleteNotifyParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryNotifyStatisticsParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryUserInCompanyListParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.SysNotify;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.notify.QueryNotifyListParam;
@@ -79,6 +80,10 @@ public interface UserService {
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
     ResultWrapper<List<CompanyIDAndNameV2>> listCompanyIDName(CompanyIDListParam pa,
                                                               @Param("appKey") String appKey, @Param("appSecret") String appSecret);
+
+    @RequestLine("POST /QueryUserInCompanyList")
+    @Headers({"Authorization: {accessToken}"})
+    ResultWrapper<List<CompanyIDAndNameV2>> queryUserInCompanyList(QueryUserInCompanyListParameter param, @Param("accessToken") String accessToken);
 
     @RequestLine("POST /QueryDeptSimpleList")
     @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})

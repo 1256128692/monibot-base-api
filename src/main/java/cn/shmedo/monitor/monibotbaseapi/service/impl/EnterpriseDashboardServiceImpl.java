@@ -17,12 +17,15 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryIndustryDistributionParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProductServicesParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dashboard.QueryProvinceProjectDetailParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.auth.QueryUserInCompanyListParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceStatisticByMonitorProjectListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.third.user.CompanyIDAndNameV2;
 import cn.shmedo.monitor.monibotbaseapi.model.response.dashboard.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.ProjectInfoCache;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.iot.DeviceStatisticByMonitorProjectListResult;
 import cn.shmedo.monitor.monibotbaseapi.service.EnterpriseDashboardService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import cn.shmedo.monitor.monibotbaseapi.service.third.auth.UserService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
 import cn.shmedo.monitor.monibotbaseapi.util.CustomizeBeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.PermissionUtil;
@@ -62,6 +65,7 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
     @Resource(name = RedisConstant.IOT_REDIS_SERVICE)
     private RedisService iotRedisService;
 
+    private final UserService userService;
     private final IotService iotService;
     private Map<Long, RegionArea> provincialCapitalMap;
     private static final DecimalFormat decimalFormat = new DecimalFormat("#.00");
@@ -147,11 +151,12 @@ public class EnterpriseDashboardServiceImpl implements EnterpriseDashboardServic
         // 按照条件统一过滤
         List<ProjectInfoCache> projectInfoCacheList = filterProject(param.getProjectMainType(), null);
         // 服务客户、覆盖区域、管理工程
-        long companyCount = projectInfoCacheList.stream().map(ProjectInfoCache::getCompanyID).distinct().count();
+        ResultWrapper<List<CompanyIDAndNameV2>> resultWrapper = userService.queryUserInCompanyList(
+                new QueryUserInCompanyListParameter(), CurrentSubjectHolder.getCurrentSubjectExtractData().toString());
         long areaCount = projectInfoCacheList.stream().map(p -> p.getLocationInfo().getCity()).distinct().count();
         long projectCount = projectInfoCacheList.stream().map(ProjectInfoCache::getID).distinct().count();
         return new ResourceOverviewRes()
-                .setCompanyCount(companyCount)
+                .setCompanyCount(resultWrapper.apiSuccess() ? resultWrapper.getData().size() : 0)
                 .setAreaCount(areaCount)
                 .setProjectCount(projectCount);
     }
