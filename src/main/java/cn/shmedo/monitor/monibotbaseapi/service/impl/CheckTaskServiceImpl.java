@@ -156,7 +156,7 @@ public class CheckTaskServiceImpl extends ServiceImpl<TbCheckTaskMapper, TbCheck
                     .ofNullable(JSONUtil.toList(e.getAnnexes(), String.class)).orElse(List.of())
                     .stream().map(i -> new CheckTaskInfo.Annexe(i, null, null)).toList();
             return new CheckTaskInfo.Event(e.getId(), e.getTypeID(), e.getTypeName(), e.getAddress(),
-                    e.getLocation(), e.getDescribe(), annexes);
+                    e.getLocation(), e.getDescribe(), annexes, e.getReportTime());
         }).toList();
 
         //附件字典

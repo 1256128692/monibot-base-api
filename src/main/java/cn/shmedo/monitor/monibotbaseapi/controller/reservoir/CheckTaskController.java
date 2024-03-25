@@ -225,6 +225,7 @@ public class CheckTaskController {
      * @apiSuccess (返回结果) {Object[]} events.annexes 巡检记录附件
      * @apiSuccess (返回结果) {String} events.annexes.name 附件名称
      * @apiSuccess (返回结果) {String} events.annexes.url 附件地址
+     * @apiSuccess (返回结果) {DateTime} events.reportTime 事件上报时间
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:DescribeCheckTask
      */

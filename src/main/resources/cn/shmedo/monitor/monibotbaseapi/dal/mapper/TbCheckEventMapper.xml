@@ -319,7 +319,8 @@
                tce.Address,
                tce.Location,
                tce.`Describe`,
-               tce.Annexes
+               tce.Annexes,
+               tce.ReportTime
         FROM `tb_check_event` tce
                  LEFT JOIN `tb_check_event_type` tcet ON tce.TypeID = tcet.ID
         WHERE tce.TaskID = #{taskID}

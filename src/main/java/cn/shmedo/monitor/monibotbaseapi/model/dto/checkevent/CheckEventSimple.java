@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Chengfs on 2024/3/1
  */
@@ -19,4 +21,5 @@ public class CheckEventSimple {
     private String location;
     private String describe;
     private String annexes;
+    private LocalDateTime reportTime;
 }

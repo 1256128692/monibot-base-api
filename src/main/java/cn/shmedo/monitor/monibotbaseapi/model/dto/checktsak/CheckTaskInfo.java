@@ -1,8 +1,15 @@
 package cn.shmedo.monitor.monibotbaseapi.model.dto.checktsak;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckTask;
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -42,6 +49,9 @@ public class CheckTaskInfo extends TbCheckTask {
         private String location;
         private String describe;
         private List<Annexe> annexes;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        @JsonSerialize(using = LocalDateTimeSerializer.class)
+        private LocalDateTime reportTime;
     }
 
     @Data
