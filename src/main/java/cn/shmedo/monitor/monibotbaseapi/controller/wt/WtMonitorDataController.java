@@ -197,7 +197,11 @@ public class WtMonitorDataController {
      * @apiSuccess (响应结果) {String} locationInfo     第四级区域名称
      * @apiSuccess (响应结果) {String} density          监测点查询密度
      * @apiSuccess (响应结果) {Bool} multiSensor        是否为关联多传感器
-     * @apiSuccess (响应结果) {String} sensorStatus     传感器状态 -1:无数据 0:正常 1-4:警报等级
+     * @apiSuccess (响应结果) {Object[]} sensorList      传感器信息
+     * @apiSuccess (响应结果) {Int} sensorList.id        传感器id
+     * @apiSuccess (响应结果) {Int} sensorList.projectID 项目id
+     * @apiSuccess (响应结果) {Int} sensorList.monitorPointID  监测点ID
+     * @apiSuccess (响应结果) {Byte} sensorList.status         传感器状态 -1 无数据 0 正常 1,2,3,4对应预警级别
      * @apiSuccess (响应结果) {Object} sensorData        传感器最新数据，流量流速数据示例:{"sid":1,"time":"2023-03-01 00:00:00","flow":100.2,"speed":40.5}
      * @apiSuccess (响应结果) {Int} sensorData.sid       传感器ID
      * @apiSuccess (响应结果) {DateTime} sensorData.time     数据采集时间
