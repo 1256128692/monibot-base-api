@@ -73,6 +73,7 @@ public class AddEventTypeParam implements ParameterValidator, ResourcePermission
     public TbCheckEventType toRawVo() {
         TbCheckEventType vo = new TbCheckEventType();
         vo.setName(this.name);
+        vo.setCompanyID(this.companyID);
         vo.setServiceID(this.serviceID);
         vo.setExValue(this.exValue);
         vo.setCreateTime(this.createTime);

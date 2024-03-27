@@ -72,6 +72,7 @@ public class CheckEventServiceImpl extends ServiceImpl<TbCheckEventMapper, TbChe
         if (ObjectUtil.isNotNull(pa.getServiceID())) {
             queryWrapper.eq("serviceID", pa.getServiceID());
         }
+        queryWrapper.eq("companyID", pa.getCompanyID());
         return tbCheckEventTypeMapper.selectList(queryWrapper);
     }
 

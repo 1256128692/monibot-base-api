@@ -4,6 +4,7 @@
     <resultMap id="BaseResultMap" type="cn.shmedo.monitor.monibotbaseapi.model.db.TbCheckEventType">
         <!--@Table tb_check_event_type-->
         <id column="ID" property="ID"/>
+        <result column="CompanyID" property="companyID"/>
         <result column="Name" property="name"/>
         <result column="ServiceID" property="serviceID"/>
         <result column="ExValue" property="exValue"/>
@@ -14,6 +15,7 @@
     </resultMap>
     <sql id="Base_Column_List">
         ID,
+        CompanyID,
         `Name`,
         ServiceID,
         ExValue,

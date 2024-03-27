@@ -26,6 +26,9 @@ public class TbCheckEventType {
     @TableId(value = "ID", type = IdType.AUTO)
     private Integer ID;
 
+    @TableField(value = "CompanyID")
+    private Integer companyID;
+
     /**
      * 名称
      */

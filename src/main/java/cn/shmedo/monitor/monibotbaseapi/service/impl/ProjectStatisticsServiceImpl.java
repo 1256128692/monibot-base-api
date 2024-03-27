@@ -16,6 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.device.DeviceInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.SendType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceInfoByUniqueTokensParam;
@@ -32,6 +33,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.third.SimpleDeviceV5;
 import cn.shmedo.monitor.monibotbaseapi.service.ProjectStatisticsService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.service.third.iot.IotService;
+import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -349,6 +351,24 @@ public class ProjectStatisticsServiceImpl implements ProjectStatisticsService {
             List<FieldSelectInfo> fieldList = getFieldSelectInfoListFromModleTypeFieldList(monitorTypeFields);
             List<Integer> sensorIDList = sensors.stream().map(SensorBaseInfoV4::getSensorID).collect(Collectors.toList());
             List<Map<String, Object>> maps = sensorDataDao.querySensorNewData(sensorIDList, fieldList, false, monitorType);
+
+            if (monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
+                if (!CollectionUtil.isNullOrEmpty(maps)) {
+                    for (Map<String, Object> sensorData : maps) {
+                        if (sensorData.containsKey("capacity")) {
+                            Object distanceValue = sensorData.get("capacity");
+                            if (ObjectUtil.isNotNull(distanceValue)) {
+                                if (distanceValue instanceof Number) {
+                                    double distance = ((Number) distanceValue).doubleValue();
+                                    if (distance < 0) {
+                                        sensorData.put("capacity", 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             sensors.forEach(s -> {
                 s.setMonitorTypeFields(monitorTypeFields);
