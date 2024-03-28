@@ -676,4 +676,14 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     public List<MonitorTypeFieldListV2Info> queryMonitorTypeFieldListV2(QueryMonitorTypeFieldListV2Param param) {
         return baseMapper.selectMonitorTypeFieldListV2(param);
     }
+
+    @Override
+    public Map<Integer, TbMonitorType> queryMonitorTypeMap() {
+        List<TbMonitorType> tbMonitorTypes = baseMapper.selectAll();
+        if (CollectionUtils.isEmpty(tbMonitorTypes)) {
+            return Collections.emptyMap();
+        }
+
+        return tbMonitorTypes.stream().collect(Collectors.toMap(TbMonitorType::getMonitorType, Function.identity()));
+    }
 }

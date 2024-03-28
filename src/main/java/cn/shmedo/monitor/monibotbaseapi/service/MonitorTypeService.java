@@ -12,6 +12,7 @@ import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: monibot-base-api
@@ -56,4 +57,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     void refreshMonitorTypeCache(RefreshMonitorTypeCacheParam pa);
 
     List<MonitorTypeFieldListV2Info> queryMonitorTypeFieldListV2(QueryMonitorTypeFieldListV2Param param);
+
+    Map<Integer, TbMonitorType> queryMonitorTypeMap();
 }

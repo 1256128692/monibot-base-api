@@ -1,12 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.MonitorItemDefaultCheckedConfig;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemFieldMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorItemMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeFieldMapper;
-import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbProjectMonitorClassMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
@@ -21,6 +17,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeAndChildMonito
 import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
@@ -52,6 +49,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
+
+    private final MonitorTypeService monitorTypeService;
 
     @Override
     public WtMonitorItemInfo queryWtMonitorItemList(QueryWtMonitorItemListParam request) {
@@ -307,7 +306,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
      * @param monitorItemBaseInfos
      */
     private void handleMonitorTypeList(MonitorClassInfo vo, List<MonitorItemBaseInfo> monitorItemBaseInfos) {
-        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
 
         if (!CollectionUtil.isNullOrEmpty(monitorItemBaseInfos)) {
             Map<Integer, List<MonitorItemBaseInfo>> monitorTypeGroup = monitorItemBaseInfos.stream()

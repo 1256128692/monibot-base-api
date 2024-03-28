@@ -11,7 +11,6 @@ import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
 import cn.shmedo.iot.entity.api.iot.base.FieldType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.monitor.monibotbaseapi.cache.DataUnitCache;
-import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.cache.ProjectTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
@@ -25,6 +24,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorItemFieldResponse;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorHistoryAvgDataResponse;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.service.WtMonitorService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import cn.shmedo.monitor.monibotbaseapi.util.MonitorTypeUtil;
@@ -74,6 +74,8 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     private final TbMonitorTypeMapper tbMonitorTypeMapper;
 
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
+
+    private final MonitorTypeService monitorTypeService;
 
     @Override
     public List<SensorNewDataInfo> queryMonitorPointList(QueryCompanyMonitorPointNewDataListParam pa) {
@@ -129,7 +131,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<SensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
-        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
         Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
@@ -527,7 +529,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     @Override
     public MonitorPointTypeStatisticsInfo queryMonitorPointTypeStatistics(StatisticsMonitorPointTypeParam pa) {
 
-        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
         List<TbSensor> sensorList = tbSensorMapper.selectListByCompanyIDAndQueryTypeAndProjectIDList(
@@ -738,7 +740,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
 
         List<TbMonitorType> tbMonitorTypes = new LinkedList<TbMonitorType>();
-        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
         List<Integer> tbMonitorTypeIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorType).collect(Collectors.toList());
         monitorTypeMap.entrySet().forEach(item -> {
             if (!CollectionUtil.isNullOrEmpty(tbMonitorTypeIDs)) {
@@ -1496,7 +1498,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<TriaxialDisplacementSensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
-        Map<Integer, TbMonitorType> monitorTypeMap = MonitorTypeCache.monitorTypeMap;
+        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());

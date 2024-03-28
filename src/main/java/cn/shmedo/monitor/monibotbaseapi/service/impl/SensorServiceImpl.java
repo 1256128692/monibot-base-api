@@ -17,7 +17,6 @@ import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.iot.entity.exception.InvalidParameterException;
-import cn.shmedo.monitor.monibotbaseapi.cache.MonitorTypeCache;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.FormulaCacheData;
@@ -33,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
@@ -94,6 +94,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
 
     @Resource
     private ApplicationEventPublisher publisher;
+
+    @Resource
+    private MonitorTypeService monitorTypeService;
 
 
     @Override
@@ -268,7 +271,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         response.setDataSourceList(sensorDataSourceMapper
                 .selectList(new LambdaQueryWrapper<TbSensorDataSource>()
                         .eq(TbSensorDataSource::getDataSourceID, response.getDataSourceID())));
-        response.setMonitorTypeName(MonitorTypeCache.monitorTypeMap.get(response.getMonitorType()).getTypeName());
+        response.setMonitorTypeName(monitorTypeService.queryMonitorTypeMap().get(response.getMonitorType()).getTypeName());
         return response;
     }
 
