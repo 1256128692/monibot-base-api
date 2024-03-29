@@ -4,6 +4,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.AllArgsConstructor;
@@ -138,7 +139,7 @@ public class TriaxialDisplacementSensorNewDataInfo {
 
     public static TriaxialDisplacementSensorNewDataInfo reBuildProAndMonitor(MonitorPointAndItemInfo tbMonitorPoint, TbProjectInfo tbProjectInfo,
                                                          Map<Byte, TbProjectType> projectTypeMap, List<TbSensor> sensorList,
-                                                         Map<Integer, TbMonitorType> monitorTypeMap) {
+                                                                             MonitorTypeCacheData tbMonitorType) {
         TriaxialDisplacementSensorNewDataInfo vo = new TriaxialDisplacementSensorNewDataInfo();
         vo.setProjectID(tbProjectInfo.getID());
         vo.setProjectTypeID(tbProjectInfo.getProjectType());
@@ -150,8 +151,8 @@ public class TriaxialDisplacementSensorNewDataInfo {
         vo.setProjectTypeName(projectTypeMap.get(tbProjectInfo.getProjectType()).getTypeName());
         vo.setMonitorPointName(tbMonitorPoint.getName());
         // 缓存
-        vo.setMonitorTypeName(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeName());
-        vo.setMonitorTypeAlias(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeAlias());
+        vo.setMonitorTypeName(tbMonitorType.getTypeName());
+        vo.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
         vo.setLocation(tbProjectInfo.getLocation());
         if (StringUtils.isNotBlank(tbProjectInfo.getLocation())){
             if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {

@@ -93,6 +93,19 @@ public class MonitorTypeCacheData extends AbstractCacheData {
         return monitorTypeCacheData;
     }
 
+    public static TbMonitorType toNewVo(MonitorTypeCacheData monitorTypeCacheData) {
+        TbMonitorType vo = new TbMonitorType();
+        vo.setMonitorType(monitorTypeCacheData.getMonitorType());
+        vo.setTypeName(monitorTypeCacheData.getTypeName());
+        vo.setTypeAlias(monitorTypeCacheData.getTypeAlias());
+        vo.setMultiSensor(monitorTypeCacheData.getMultiSensor());
+        vo.setCompanyID(monitorTypeCacheData.getCompanyID());
+        vo.setCreateType(monitorTypeCacheData.getCreateType().byteValue());
+        vo.setDisplayOrder(monitorTypeCacheData.getDisplayOrder());
+        vo.setExValues(monitorTypeCacheData.getExValues());
+        return vo;
+    }
+
     @Data
     @EqualsAndHashCode(callSuper = true)
     public static class Field extends AbstractCacheData {

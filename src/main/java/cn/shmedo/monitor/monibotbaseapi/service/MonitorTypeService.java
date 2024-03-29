@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
@@ -58,5 +59,7 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
 
     List<MonitorTypeFieldListV2Info> queryMonitorTypeFieldListV2(QueryMonitorTypeFieldListV2Param param);
 
-    Map<Integer, TbMonitorType> queryMonitorTypeMap();
+    MonitorTypeCacheData queryMonitorType(Integer monitorType);
+
+    Map<String, MonitorTypeCacheData> queryMonitorTypeMap();
 }

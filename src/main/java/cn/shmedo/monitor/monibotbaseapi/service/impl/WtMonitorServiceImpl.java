@@ -16,6 +16,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.RainDensityType;
@@ -131,7 +132,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<SensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
-        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
+        MonitorTypeCacheData monitorTypeMap = monitorTypeService.queryMonitorType(monitorType);
         Map<Integer, TbDataUnit> dataUnitsMap = DataUnitCache.dataUnitsMap;
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
@@ -529,7 +530,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     @Override
     public MonitorPointTypeStatisticsInfo queryMonitorPointTypeStatistics(StatisticsMonitorPointTypeParam pa) {
 
-        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
+        Map<String, MonitorTypeCacheData> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
 
         List<TbSensor> sensorList = tbSensorMapper.selectListByCompanyIDAndQueryTypeAndProjectIDList(
@@ -566,7 +567,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             List<TbProjectType> projectTypeInfos = new LinkedList<>();
             if (!monitorTypeMap.isEmpty()) {
                 // 监测类型相关信息
-                TbMonitorType tbMonitorType = monitorTypeMap.get(item.getMonitorType());
+                MonitorTypeCacheData tbMonitorType = monitorTypeMap.get(String.valueOf(item.getMonitorType()));
                 if (tbMonitorType != null) {
                     item.setMonitorTypeName(tbMonitorType.getTypeName());
                     item.setMonitorTypeAlias(tbMonitorType.getTypeAlias());
@@ -740,12 +741,12 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         }
 
         List<TbMonitorType> tbMonitorTypes = new LinkedList<TbMonitorType>();
-        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
+        Map<String, MonitorTypeCacheData> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
         List<Integer> tbMonitorTypeIDs = tbMonitorPoints.stream().map(TbMonitorPoint::getMonitorType).collect(Collectors.toList());
         monitorTypeMap.entrySet().forEach(item -> {
             if (!CollectionUtil.isNullOrEmpty(tbMonitorTypeIDs)) {
-                if (tbMonitorTypeIDs.contains(item.getKey())) {
-                    tbMonitorTypes.add(item.getValue());
+                if (tbMonitorTypeIDs.contains(Integer.valueOf(item.getKey()))) {
+                    tbMonitorTypes.add(MonitorTypeCacheData.toNewVo(item.getValue()));
                 }
             }
         });
@@ -1498,7 +1499,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
         List<TriaxialDisplacementSensorNewDataInfo> sensorNewDataInfoList = new LinkedList<>();
         // 获取项目类型(方式缓存)
         Map<Byte, TbProjectType> projectTypeMap = ProjectTypeCache.projectTypeMap;
-        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
+        MonitorTypeCacheData tbMonitorType = monitorTypeService.queryMonitorType(monitorType);
 
         List<Integer> monitorPointIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getID).collect(Collectors.toList());
         List<Integer> monitorItemIDs = tbMonitorPoints.stream().map(MonitorPointAndItemInfo::getMonitorItemID).collect(Collectors.toList());
@@ -1541,7 +1542,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
             TbProjectInfo tbProjectInfo = tbProjectInfos.stream().filter(tpi -> tpi.getID().equals(item.getProjectID())).findFirst().orElse(null);
             List<TbSensor> sensorList = tbSensors.stream().filter(ts -> ts.getMonitorPointID().equals(item.getID())).collect(Collectors.toList());
             sensorNewDataInfoList.add(TriaxialDisplacementSensorNewDataInfo.reBuildProAndMonitor(item, tbProjectInfo,
-                    projectTypeMap, sensorList, monitorTypeMap));
+                    projectTypeMap, sensorList, tbMonitorType));
         });
 
         List<Map<String, Object>> maps;

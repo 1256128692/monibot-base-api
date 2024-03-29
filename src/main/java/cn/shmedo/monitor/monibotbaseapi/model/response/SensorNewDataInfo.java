@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.iot.base.FieldSelectInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import lombok.AllArgsConstructor;
@@ -159,7 +160,7 @@ public class SensorNewDataInfo {
 
     public static SensorNewDataInfo reBuildProAndMonitor(MonitorPointAndItemInfo tbMonitorPoint, TbProjectInfo tbProjectInfo,
                                                          Map<Byte, TbProjectType> projectTypeMap, List<TbSensor> sensorList,
-                                                         Map<Integer, TbMonitorType> monitorTypeMap) {
+                                                         MonitorTypeCacheData monitorTypeMap) {
         SensorNewDataInfo vo = new SensorNewDataInfo();
         vo.setProjectID(tbProjectInfo.getID());
         vo.setProjectTypeID(tbProjectInfo.getProjectType());
@@ -171,8 +172,8 @@ public class SensorNewDataInfo {
         vo.setProjectTypeName(projectTypeMap.get(tbProjectInfo.getProjectType()).getTypeName());
         vo.setMonitorPointName(tbMonitorPoint.getName());
         // 缓存
-        vo.setMonitorTypeName(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeName());
-        vo.setMonitorTypeAlias(monitorTypeMap.get(tbMonitorPoint.getMonitorType()).getTypeAlias());
+        vo.setMonitorTypeName(monitorTypeMap.getTypeName());
+        vo.setMonitorTypeAlias(monitorTypeMap.getTypeAlias());
         vo.setLocation(tbProjectInfo.getLocation());
         if (StringUtils.isNotBlank(tbProjectInfo.getLocation())){
             if (JSONUtil.isTypeJSON(tbProjectInfo.getLocation())) {

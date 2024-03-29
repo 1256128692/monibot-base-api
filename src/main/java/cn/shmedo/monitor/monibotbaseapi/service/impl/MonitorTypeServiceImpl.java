@@ -617,8 +617,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 }
             });
             Optional.of(paramMap).ifPresent(map -> map.forEach((k, v) ->
-                operations.opsForHash().putAll(RedisKeys.PARAMETER_PREFIX_KEY + k,
-                        RedisService.serializeMap(v.stream().collect(Collectors.groupingBy(TbParameter::getSubjectID))))
+                    operations.opsForHash().putAll(RedisKeys.PARAMETER_PREFIX_KEY + k,
+                            RedisService.serializeMap(v.stream().collect(Collectors.groupingBy(TbParameter::getSubjectID))))
             ));
         });
         paramMap.clear();
@@ -664,10 +664,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 .filter(Objects::nonNull)
                 .collect(Collectors.toMap(MonitorTypeTemplateCacheData::getID, e -> e));
         redisService.transaction(operations -> {
-           Optional.ofNullable(pa.getIsClear()).filter(b -> b)
-                   .ifPresent(b -> operations.delete(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY));
-              Optional.of(templateCacheDataMap).filter(m -> !m.isEmpty())
-                        .ifPresent(m -> operations.opsForHash().putAll(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, RedisService.serializeMap(m)));
+            Optional.ofNullable(pa.getIsClear()).filter(b -> b)
+                    .ifPresent(b -> operations.delete(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY));
+            Optional.of(templateCacheDataMap).filter(m -> !m.isEmpty())
+                    .ifPresent(m -> operations.opsForHash().putAll(RedisKeys.MONITOR_TYPE_TEMPLATE_KEY, RedisService.serializeMap(m)));
         });
         templateCacheDataMap.clear();
     }
@@ -678,12 +678,19 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     }
 
     @Override
-    public Map<Integer, TbMonitorType> queryMonitorTypeMap() {
-        List<TbMonitorType> tbMonitorTypes = baseMapper.selectAll();
-        if (CollectionUtils.isEmpty(tbMonitorTypes)) {
-            return Collections.emptyMap();
-        }
+    public MonitorTypeCacheData queryMonitorType(Integer monitorType) {
 
-        return tbMonitorTypes.stream().collect(Collectors.toMap(TbMonitorType::getMonitorType, Function.identity()));
+        Map<String, MonitorTypeCacheData> monitorTypeMap = redisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
+
+        if (CollectionUtils.isEmpty(monitorTypeMap)) {
+            return null;
+        }
+        return monitorTypeMap.get(String.valueOf(monitorType));
+    }
+
+
+    @Override
+    public Map<String, MonitorTypeCacheData> queryMonitorTypeMap() {
+        return redisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
     }
 }

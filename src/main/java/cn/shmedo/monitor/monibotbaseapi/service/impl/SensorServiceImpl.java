@@ -271,7 +271,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         response.setDataSourceList(sensorDataSourceMapper
                 .selectList(new LambdaQueryWrapper<TbSensorDataSource>()
                         .eq(TbSensorDataSource::getDataSourceID, response.getDataSourceID())));
-        response.setMonitorTypeName(monitorTypeService.queryMonitorTypeMap().get(response.getMonitorType()).getTypeName());
+        response.setMonitorTypeName(monitorTypeService.queryMonitorType(response.getMonitorType()).getTypeName());
         return response;
     }
 

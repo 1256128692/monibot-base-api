@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.MonitorItemDefaultCheckedConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
+import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
@@ -306,7 +307,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
      * @param monitorItemBaseInfos
      */
     private void handleMonitorTypeList(MonitorClassInfo vo, List<MonitorItemBaseInfo> monitorItemBaseInfos) {
-        Map<Integer, TbMonitorType> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
+        Map<String, MonitorTypeCacheData> monitorTypeMap = monitorTypeService.queryMonitorTypeMap();
 
         if (!CollectionUtil.isNullOrEmpty(monitorItemBaseInfos)) {
             Map<Integer, List<MonitorItemBaseInfo>> monitorTypeGroup = monitorItemBaseInfos.stream()
@@ -316,7 +317,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             // 遍历monitorTypeGroup分组,封装回返回对象中
             for (Map.Entry<Integer, List<MonitorItemBaseInfo>> entry : monitorTypeGroup.entrySet()) {
                 List<MonitorItemBaseInfo> list = entry.getValue();
-                TbMonitorType tbMonitorType = monitorTypeMap.get(entry.getKey());
+                MonitorTypeCacheData tbMonitorType = monitorTypeMap.get(String.valueOf(entry.getKey()));
                 MonitorTypeAndChildMonitorItemInfo monitorTypeVo = new MonitorTypeAndChildMonitorItemInfo();
                 monitorTypeVo.setMonitorType(tbMonitorType.getMonitorType());
                 monitorTypeVo.setMonitorTypeName(tbMonitorType.getTypeName());
