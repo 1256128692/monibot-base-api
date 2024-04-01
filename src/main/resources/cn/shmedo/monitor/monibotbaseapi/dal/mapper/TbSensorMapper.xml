@@ -1121,6 +1121,7 @@
         ts.configFieldValue,
         ts.monitorType,
         ts.monitorPointID,
+        ts.ProjectID,
         tmp.Name        as monitorPointName,
         tmp.gpsLocation,
         tmp.imageLocation,
