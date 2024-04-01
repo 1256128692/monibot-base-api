@@ -1,0 +1,247 @@
+[33mcommit 9523656e5196ac0e7dcce3595c2f4a89d45c67b6[m[33m ([m[1;36mHEAD -> [m[1;32mwys[m[33m, [m[1;31morigin/wys[m[33m)[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Sep 20 15:01:30 2023 +0800
+
+    fix:修复/QueryWarnLogDetail查询风险源类型异常问题;perf:暂时关闭武夷山新增权限
+
+[33mcommit 0d1c1b6e665d3e3fd51d2705630bbfe7148d1bc4[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Sep 20 14:33:50 2023 +0800
+
+    Revert "fix:修复/QueryWarnLogDetail查询风险源类型异常问题"
+    
+    This reverts commit bc00b3507a1a5b6c346e07b34aeb481f6e0924ce.
+
+[33mcommit e623294d0ae257ff043dff6c101da18232f47aeb[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Sep 20 14:05:53 2023 +0800
+
+    Revert "fix: 修改/TerminalOpsStatistics 处理逻辑"
+    
+    This reverts commit 4c34eb0341bebda21310d7931e804b6cb06f5221.
+
+[33mcommit bc00b3507a1a5b6c346e07b34aeb481f6e0924ce[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Sep 20 13:32:00 2023 +0800
+
+    fix:修复/QueryWarnLogDetail查询风险源类型异常问题
+
+[33mcommit d68e0f7bb57b987b4e58efdcd677ede0ea49092f[m
+Merge: 220958c1 4c34eb03
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Sep 20 10:33:23 2023 +0800
+
+    Merge branch 'wys' of https://gitlab.shmedo.cn/middle-platform/monitor/backend/monibot-base-api into wys
+
+[33mcommit 4c34eb0341bebda21310d7931e804b6cb06f5221[m
+Author: Chengfs <fengsheng.cheng@shmedo.cn>
+Date:   Tue Sep 19 18:17:22 2023 +0800
+
+    fix: 修改/TerminalOpsStatistics 处理逻辑
+
+[33mcommit f7c3fb32f6dd4b196f9aeb4c42819745490b57e0[m
+Author: Chengfs <fengsheng.cheng@shmedo.cn>
+Date:   Tue Sep 19 17:52:03 2023 +0800
+
+    fix: 修改/TerminalOpsStatistics 处理逻辑
+
+[33mcommit 72c61b12f59f627d639978d4f2ffef632a5bb194[m
+Author: liuwei <wei.liu@shmedo.cn>
+Date:   Tue Sep 19 16:46:16 2023 +0800
+
+    fix:萤石API配置超时时间
+
+[33mcommit dc10a6e54378ad1e996474e704032da5a138e508[m
+Author: Chengfs <fengsheng.cheng@shmedo.cn>
+Date:   Tue Sep 19 14:34:46 2023 +0800
+
+    fix: 云台控制响应码60006视为成功
+
+[33mcommit 244198e0b4121f661b15fc494de30510311b5dbe[m
+Author: Chengfs <fengsheng.cheng@shmedo.cn>
+Date:   Tue Sep 19 14:31:12 2023 +0800
+
+    fix: 智能终端设备运维统计在/离线数量错误
+
+[33mcommit 220958c1854a1bd5b7914ec31b48525d6db4603c[m
+Merge: 43026fdd 49c51287
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Sep 19 13:12:25 2023 +0800
+
+    Mergt branch 'wys' of https://gitlab.shmedo.cn/middle-platform/monitor/backend/monibot-base-api into wys
+
+[33mcommit 49c51287fd5a6139a7840549d27a3e0fcd3a64fa[m
+Author: medo_rjx <medo123456>
+Date:   Mon Sep 18 15:18:26 2023 +0800
+
+    fix:修复查询监测点数量,监测项目数量bug
+
+[33mcommit b431047fe296ca230d9e0ba0e9139494b7747da2[m
+Author: medo_rjx <medo123456>
+Date:   Mon Sep 18 14:56:11 2023 +0800
+
+    fix:修复设备数量为nullbug
+
+[33mcommit 43026fdde4000b516e84f75acb475cf75cb678c3[m
+Merge: 2ed87c41 78d3f884
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Sep 12 15:42:56 2023 +0800
+
+    Merge branch 'wys' of https://gitlab.shmedo.cn/middle-platform/monitor/backend/monibot-base-api into wys
+
+[33mcommit 78d3f8842daa5a9965b383d4bf756ec6cd50b530[m
+Author: liuwei <wei.liu@shmedo.cn>
+Date:   Tue Sep 12 15:37:45 2023 +0800
+
+    feat:根据工程ID查询工程项目统计信息添加工程名称模糊匹配
+
+[33mcommit b28220974b070772cd7663e73161ab9c6752c282[m
+Author: liuwei <wei.liu@shmedo.cn>
+Date:   Tue Sep 12 10:49:41 2023 +0800
+
+    chore:更新了配置文件
+
+[33mcommit 2ed87c41f7e1315d57b15c8641c93343b1711376[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Fri Aug 25 15:24:22 2023 +0800
+
+    perf:增加各接口权限
+
+[33mcommit 993c3da7138ccfee9353b5192a7b5041d2768669[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Fri Aug 25 11:43:42 2023 +0800
+
+    perf:删除工单时将事件状态置为事件触发
+
+[33mcommit 156dde1e59a6acc9e519ab035b878110a1a23580[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 24 17:25:25 2023 +0800
+
+    feat:新增DeviceWarnStatistics接口
+
+[33mcommit 762c50f5f9116d3ae0a7aef46fa6e1b769d95ea4[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 24 16:30:09 2023 +0800
+
+    feat:将增加摄像头报警功能加入到定时任务里
+
+[33mcommit 050302874897e0a4f2d110e89548a3ca941e9bf8[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 24 14:17:04 2023 +0800
+
+    fix:修复终端、摄像头报警生成的bug
+
+[33mcommit 3382c7bd73e55763f94348e85875625e4278ebfe[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 24 10:18:09 2023 +0800
+
+    feat:生成摄像头报警记录;fix:QueryEventStatisticsData统计重复问题;fix:AddCameraWarnLog填充工程ID问题
+
+[33mcommit 5dfeb3b8890bb2ef6c8cca62ac5751b2b7ecea52[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Aug 23 14:54:56 2023 +0800
+
+    fix:终端报警动作处理
+
+[33mcommit 6a4bc9930a1b5342fecc986f3928643cb5a5efc6[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Aug 23 10:28:27 2023 +0800
+
+    feat:终端报警触发
+
+[33mcommit 6c118ab1b157ff616384f75565fd4abe89635591[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Aug 22 18:06:31 2023 +0800
+
+    fix:修复事件升级优化产生的问题
+
+[33mcommit c064c421f0f151c4fbd2068ab3f42156851d619b[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Aug 22 17:43:30 2023 +0800
+
+    fix:修复事件升级优化产生的bug
+
+[33mcommit 4199b547660c4af3a28fd69b00488b3f27810143[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Aug 22 14:10:09 2023 +0800
+
+    fix:修复升级事件仅存在默认工单查询失败的情况
+
+[33mcommit de4426517bb62c56ce51ca7999838c53ffbc5181[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Mon Aug 21 13:31:38 2023 +0800
+
+    fix:事件升级时对应默认工单关闭修复
+
+[33mcommit 119d2a8136a6ebb02210ec037f0869857d08adf7[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Fri Aug 18 17:31:50 2023 +0800
+
+    fix:替换@Builder注解
+
+[33mcommit 647d4cc2497d55c3e5c3babb80cb3adfb598b692[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Fri Aug 18 15:12:25 2023 +0800
+
+    fix:删除模拟事件接口的事件升级优化处理
+
+[33mcommit a16bb458ec9eae6ff579b7ce4987c386c9a394a6[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Fri Aug 18 14:38:58 2023 +0800
+
+    fix:事件升级优化
+
+[33mcommit 7383c66969c1ec8ab956a7b9e37ca184fe5fa296[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 17 17:29:39 2023 +0800
+
+    fix:设备离线统计问题修复
+
+[33mcommit 95b7d66cae14cb1ebd752fa56aa85bc2a583f485[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 17 14:53:24 2023 +0800
+
+    feat:设备离线统计
+
+[33mcommit ab372d373f508ceb09458773bbaa651c13b1a2e4[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Wed Aug 16 14:38:07 2023 +0800
+
+    docs:设备离线统计接口
+
+[33mcommit 06da4c110862840c943145c86c0a4b9195808266[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Aug 15 13:48:31 2023 +0800
+
+    fix:修复AddWtDeviceWarnRule接口重复null key问题
+
+[33mcommit 3d36905728517d506f21b6c8c57171e2947b36ab[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Tue Aug 15 13:35:31 2023 +0800
+
+    fix:修复AddWtDeviceWarnRule重复null问题,修复QueryEngineInfoBySensorIDs动作返参映射失败问题
+
+[33mcommit 796ae2f044ada4054d711276ba990647d73b65c3[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Mon Aug 14 09:57:45 2023 +0800
+
+    fix:/QueryWtEnginePage修复非报警规则类型关联查询传感器时异常
+
+[33mcommit 679c9cc7a43c61d1419b8c915832fca0c318c9b0[m
+Merge: a3f42796 b92919a2
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 10 17:46:41 2023 +0800
+
+    Merge branch 'wys' of https://gitlab.shmedo.cn/middle-platform/monitor/backend/monibot-base-api into wys
+
+[33mcommit a3f42796aac7ef4cd4de9e8ac19083c40270a222[m
+Author: medo_kyx <youxian.kong@shmedo.cn>
+Date:   Thu Aug 10 17:46:37 2023 +0800
+
+    fix:报警过滤问题
+
+[33mcommit b92919a2b838ae64c4d59b1d4cb3afe7b02c9d3f[m
+Author: gaoxu <gaoxao004@gmail.com>
+Date:   Thu Aug 10 17:33:26 2023 +0800
+
+ 

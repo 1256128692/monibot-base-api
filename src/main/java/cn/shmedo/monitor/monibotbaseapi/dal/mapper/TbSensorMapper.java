@@ -139,4 +139,6 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
     Integer autoUpdateStatusById(Integer id);
 
     List<SensorBaseInfoV4> selectListByProjectIDList(List<Integer> projectIDList);
+
+    List<SensorBaseInfoV4> selectListByCondition1(Integer companyID, Integer monitorType, List<Integer> monitorItemIDList, String monitorPointName);
 }
