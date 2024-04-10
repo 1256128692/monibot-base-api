@@ -816,6 +816,9 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
         if (!StringUtil.isNullOrEmpty(pa.getProjectName())) {
             wrapper.like(TbProjectInfo::getProjectName, pa.getProjectName());
         }
+        if (!StringUtil.isNullOrEmpty(pa.getLocation())) {
+            wrapper.eq(TbProjectInfo::getLocation, pa.getLocation());
+        }
         if (pa.getProjectType() != null) {
             wrapper.eq(TbProjectInfo::getProjectType, pa.getProjectType());
         }

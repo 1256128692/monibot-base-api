@@ -33,6 +33,8 @@ public class QueryProjectListParam implements ParameterValidator, ResourcePermis
 
     private Collection<Integer> projectIDList;
 
+    private String location;
+
     @Override
     public ResultWrapper<?> validate() {
         Optional.ofNullable(platformType).ifPresent(val -> Assert.isTrue(PlatformType.validate(val), "platformType is invalid"));
