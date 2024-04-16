@@ -194,9 +194,18 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
         allMonitorItemIDList.addAll(parentGroupList.stream().map(Group4Web::getID).toList());
         allMonitorItemIDList.addAll(sonGroupList.stream().map(Group4Web::getID).toList());
         List<GroupMonitorItem> monitorItems = tbMonitorItemMapper.queryMonitorItemByGroupIDs(allMonitorItemIDList);
-        Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
+//        Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream().collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
+
+        // 过滤掉 monitorItemID 为 null 的数据
+        Map<Integer, List<GroupMonitorItem>> monitorItemMap = monitorItems.stream()
+                .filter(item -> item.getMonitorItemID() != null)
+                .collect(Collectors.groupingBy(GroupMonitorItem::getGroupID));
         List<GroupPoint> groupPoints = tbMonitorPointMapper.queryGroupPointByGroupIDs(allMonitorItemIDList);
-        Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
+//        Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream().collect(Collectors.groupingBy(GroupPoint::getGroupID));
+
+        Map<Integer, List<GroupPoint>> groupPointMap = groupPoints.stream()
+                .filter(item -> item.getMonitorItemID() != null)
+                .collect(Collectors.groupingBy(GroupPoint::getGroupID));
 
         sonGroupList.forEach(
                 group -> {
