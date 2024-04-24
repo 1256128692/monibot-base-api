@@ -387,6 +387,8 @@ public class MonitorPointController {
      * @apiDescription 查询监测项目下监测点列表
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {Boolean} [enable] 是否启用 true启用|false不启用
+     * @apiParam (请求体) {Boolean} [bindPoint] 是否有绑定对应监测点 true有绑定对应监测点|false没有绑定对应监测点
      * @apiSuccess (返回结果) {Object[]} list
      * @apiSuccess (返回结果) {Int} list.monitorItemID 监测项目ID
      * @apiSuccess (返回结果) {String} list.monitorItemName 监测项目名称

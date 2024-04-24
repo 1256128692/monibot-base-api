@@ -99,6 +99,59 @@ public class MonitorDataController {
         return monitorDataService.queryMonitorPointDataList(pa);
     }
 
+    /**
+     * @api {POST} /QueryMonitorPointDataListPage 查询监测点数据列表(分页)
+     * @apiVersion 1.0.0
+     * @apiGroup 监测通用数据模块
+     * @apiName QueryMonitorPointDataListPage
+     * @apiDescription 查询监测点数据列表
+     * @apiParam (请求体) {Int} projectID 工程ID
+     * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} monitorItemID 监测项目ID
+     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {DateTime} begin 开始时间
+     * @apiParam (请求体) {DateTime} end 结束时间
+     * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
+     * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
+     * @apiParam (请求体) {Int} fieldToken 监测属性token
+     * @apiParam (请求体) {Int} pageSize 分页大小 (1-100)
+     * @apiParam (请求体) {Int} currentPage 当前页码 (大于0)
+     * @apiParam (请求体) {Boolean} [filterEmptyData] 是否过滤空数据,默认为false(不过滤),true(过滤空数据)
+     * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
+     * @apiParam (请求体) {Int[]} [eigenValueIDList] 特征值ID列表
+     * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
+     * @apiParamExample 请求体示例
+     * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0,
+     * "pageSize":5,"currentPage":1}
+     * @apiSuccess (响应结果) {Int} totalCount 数据总量
+     * @apiSuccess (响应结果) {Int} totalPage 总页数
+     * @apiSuccess (响应结果) {Object[]} currentPageData 当前页数据
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID 监测点ID
+     * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
+     * @apiSuccess (响应结果) {Int} currentPageData.monitorType 监测类型
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeName 监测类型名称
+     * @apiSuccess (响应结果) {String} currentPageData.monitorTypeAlias 监测类型别名
+     * @apiSuccess (响应结果) {Int} currentPageData.sensorID 传感器ID
+     * @apiSuccess (响应结果) {Int} currentPageData.projectID 项目ID
+     * @apiSuccess (响应结果) {String} currentPageData.sensorName 传感器名称
+     * @apiSuccess (响应结果) {DateTime} currentPageData.time 数据采集时间
+     * @apiSuccess (响应结果) {T} currentPageData.data 传感器数据
+     * @apiSuccess (响应结果) {Bool} [currentPageData.multiSensor] 是否为关联多传感器
+     * @apiSuccess (响应结果) {String} currentPageData.fieldToken 字段标志
+     * @apiSuccess (响应结果) {String} currentPageData.fieldName 字段名称
+     * @apiSuccess (响应结果) {String} currentPageData.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} currentPageData.chnUnit 中文单位
+     * @apiSuccess (响应结果) {String} currentPageData.unitClass 单位类型
+     * @apiSuccess (响应结果) {String} currentPageData.unitDesc 单位类型描述
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
+     */
+    // @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @RequestMapping(value = "/QueryMonitorPointDataListPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryMonitorPointDataListPage(@Validated @RequestBody Object pa) {
+        return ResultWrapper.successWithNothing();
+    }
 
     /**
      * @api {POST} /QueryMonitorPointFilterDataList 查询监测点过滤值列表

@@ -580,7 +580,7 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
      * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
-     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} [rainfallMonitorPointID] 降雨量监测点ID
      * @apiParam (请求体) {Int} displayDensity 显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年
      * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
      * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
@@ -590,7 +590,7 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Int} totalPage 总页数
      * @apiSuccess (返回结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (返回结果) {Double} currentPageData.slopeRratio 坡度比
-     * @apiSuccess (返回结果) {Double} currentPageData.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} [currentPageData.rainfall] 降雨量(mm)
      * @apiSuccess (返回结果) {Object} currentPageData.dryBeach 干滩数据
      * @apiSuccess (返回结果) {Double} currentPageData.dryBeach.value 滩长(m)
      * @apiSuccess (返回结果) {Double} [currentPageData.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'且当前值为异常值时才有该项<br>为负值时表示该点值超出最小干滩长度
@@ -617,14 +617,14 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
      * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
-     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} [rainfallMonitorPointID] 降雨量监测点ID
      * @apiParam (请求体) {Int} displayDensity 显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年
      * @apiParam (请求体) {DateTime} startTime 查询时段开始时间
      * @apiParam (请求体) {DateTime} endTime 查询时段结束时间
      * @apiSuccess (返回结果) {Objcet[]} dataList 数据列表
      * @apiSuccess (返回结果) {DateTime} time 时间
      * @apiSuccess (返回结果) {Double} dataList.slopeRratio 坡度比
-     * @apiSuccess (返回结果) {Double} dataList.rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} [dataList.rainfall] 降雨量(mm)
      * @apiSuccess (返回结果) {Object} dataList.dryBeach 干滩数据
      * @apiSuccess (返回结果) {Double} dataList.dryBeach.value 滩长(m)
      * @apiSuccess (返回结果) {Double} [dataList.dryBeach.abnormalValue] 异常值 配置了特征值'最小干滩长度'且当前值为异常值时才有该项<br>为负值时表示该点值超出最小干滩长度
@@ -649,9 +649,9 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} dryBeachMonitorPointID 干滩监测点ID
      * @apiParam (请求体) {Int} distanceMonitorPointID 库水位监测点ID
-     * @apiParam (请求体) {Int} rainfallMonitorPointID 降雨量监测点ID
+     * @apiParam (请求体) {Int} [rainfallMonitorPointID] 降雨量监测点ID
      * @apiSuccess (返回结果) {Double} slopeRratio 坡度比
-     * @apiSuccess (返回结果) {Double} rainfall 降雨量(mm)
+     * @apiSuccess (返回结果) {Double} [rainfall] 降雨量(mm)
      * @apiSuccess (返回结果) {Double} dryBeach 滩长(m)
      * @apiSuccess (返回结果) {Double} distance 库水位(m)
      * @apiSampleRequest off
