@@ -5,6 +5,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSON;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubject;
@@ -836,59 +837,57 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         }
         List<TbProjectInfo> tbProjectInfos = tbProjectInfoMapper.selectList(wrapper);
-        if (CollectionUtil.isNotEmpty(tbProjectInfos)) {
+        if (CollectionUtil.isEmpty(tbProjectInfos))
+            return Collections.emptyList();
+        Map<Integer, List<TbSensor>> sensorsGroupedByProject;
+        List<Integer> projectIDList = tbProjectInfos.stream().filter(pro -> pro.getProjectType() == 1).map(TbProjectInfo::getID).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(projectIDList)) {
+            List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(
+                    TbSensor::getProjectID, projectIDList));
 
-            Map<Integer, List<TbSensor>> sensorsGroupedByProject;
-            List<Integer> projectIDList = tbProjectInfos.stream().filter(pro -> pro.getProjectType()== 1).map(TbProjectInfo::getID).collect(Collectors.toList());
-            if (CollectionUtil.isNotEmpty(projectIDList)) {
-                List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>().in(
-                        TbSensor::getProjectID, projectIDList));
+            List<TbSensor> filteredSensors = tbSensors.stream()
+                    .filter(sensor -> sensor.getStatus() != null)
+                    .collect(Collectors.toList());
 
-                List<TbSensor> filteredSensors = tbSensors.stream()
-                        .filter(sensor -> sensor.getStatus() != null)
-                        .collect(Collectors.toList());
-
-                if (CollectionUtil.isNotEmpty(filteredSensors)) {
-                    sensorsGroupedByProject = filteredSensors.stream()
-                            .collect(Collectors.groupingBy(TbSensor::getProjectID));
-                } else {
-                    sensorsGroupedByProject = null;
-                }
-
+            if (CollectionUtil.isNotEmpty(filteredSensors)) {
+                sensorsGroupedByProject = filteredSensors.stream()
+                        .collect(Collectors.groupingBy(TbSensor::getProjectID));
             } else {
                 sensorsGroupedByProject = null;
             }
 
+        } else {
+            sensorsGroupedByProject = null;
+        }
 
-            List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
-            tbProjectInfos.forEach(item -> {
-                ProjectBaseInfo result = new ProjectBaseInfo();
-                BeanUtil.copyProperties(item, result);
-                handlerImagePathToRealPath(result);
-                // 水库类型
-                if (item.getProjectType() == 1) {
-                    result.setWaterWarn(0);
-                    if (CollectionUtil.isNotEmpty(sensorsGroupedByProject)) {
-                        List<TbSensor> tbSensors = sensorsGroupedByProject.get(item.getID());
-                        if (CollectionUtil.isNotEmpty(tbSensors)) {
-                            if (tbSensors.get(0).getStatus() == 0) {
-                                result.setWaterWarn(0);
-                            }
-                            if (tbSensors.get(0).getStatus() == 1 || tbSensors.get(0).getStatus() == 2
-                                    || tbSensors.get(0).getStatus() == 3 || tbSensors.get(0).getStatus() == 4) {
-                                result.setWaterWarn(1);
-                            }
+        List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
+                .in(TbMonitorItem::getProjectID, projectIDList));
+        Map<Integer, List<TbMonitorItem>> monitorItemMap = tbMonitorItemList.stream().collect(Collectors.groupingBy(TbMonitorItem::getProjectID));
+        List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
+        tbProjectInfos.forEach(item -> {
+            ProjectBaseInfo result = new ProjectBaseInfo();
+            BeanUtil.copyProperties(item, result);
+            handlerImagePathToRealPath(result);
+            // 水库类型
+            if (item.getProjectType() == 1) {
+                result.setWaterWarn(0);
+                if (CollectionUtil.isNotEmpty(sensorsGroupedByProject)) {
+                    List<TbSensor> tbSensors = sensorsGroupedByProject.get(item.getID());
+                    if (CollectionUtil.isNotEmpty(tbSensors)) {
+                        if (tbSensors.get(0).getStatus() == 0) {
+                            result.setWaterWarn(0);
+                        }
+                        if (tbSensors.get(0).getStatus() == 1 || tbSensors.get(0).getStatus() == 2
+                                || tbSensors.get(0).getStatus() == 3 || tbSensors.get(0).getStatus() == 4) {
+                            result.setWaterWarn(1);
                         }
                     }
                 }
-
-                projectBaseInfoList.add(result);
-            });
-
-            return projectBaseInfoList;
-        } else {
-            return null;
-        }
+            }
+            result.setTbMonitorItemList(monitorItemMap.get(result.getID()));
+            projectBaseInfoList.add(result);
+        });
+        return projectBaseInfoList;
     }
 
     @Override
@@ -1026,6 +1025,21 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             }
         });
         return projectInfoResponseList;
+    }
+
+    @Override
+    public List<TbMonitorItem> queryFavoriteMonitorItemList(QueryFavoriteMonitorItemListParam pa) {
+        List<TbProjectInfo> tbProjectInfoList = this.list(new LambdaQueryWrapper<TbProjectInfo>()
+                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
+                .isNotNull(TbProjectInfo::getExtend)
+                .select(TbProjectInfo::getExtend));
+        Set<Integer> monitorItemIDList = new HashSet<>();
+        tbProjectInfoList.stream().map(TbProjectInfo::getExtend)
+                .map(JSONUtil::parseObj)
+                .forEach(object -> monitorItemIDList.addAll((List<Integer>) (object.get(Param2DBEntityUtil.favoriteMonitorItemList))));
+        if (CollectionUtil.isEmpty(monitorItemIDList))
+            return null;
+        return tbMonitorItemMapper.selectBatchIds(monitorItemIDList);
     }
 
     @Override

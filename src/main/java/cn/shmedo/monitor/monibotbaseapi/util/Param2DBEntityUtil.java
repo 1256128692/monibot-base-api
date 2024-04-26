@@ -1,6 +1,9 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectLevel;
@@ -16,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +31,15 @@ import java.util.stream.Collectors;
  * @create: 2023-02-23 14:20
  **/
 public class Param2DBEntityUtil {
+    public static final String favoriteMonitorItemList = "favoriteMonitorItemList";
 
     public static TbProjectInfo fromAddProjectParam2TbProjectInfo(AddProjectParam pa, Integer userID, String imgPath) {
+        String extend = null;
+        if (CollectionUtil.isNotEmpty(pa.getFavoriteMonitorItemIDList())) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.set("favoriteMonitorItemList", pa.getFavoriteMonitorItemIDList());
+            extend = JSONUtil.toJsonStr(jsonObject);
+        }
         Date now = new Date();
         TbProjectInfo obj = new TbProjectInfo();
         obj.setCompanyID(pa.getCompanyID());
@@ -45,6 +56,7 @@ public class Param2DBEntityUtil {
         obj.setImagePath(imgPath);
         obj.setProjectDesc(pa.getDesc());
         obj.setModelID(pa.getModelID());
+        obj.setExtend(extend.toString());
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);
         obj.setCreateTime(now);

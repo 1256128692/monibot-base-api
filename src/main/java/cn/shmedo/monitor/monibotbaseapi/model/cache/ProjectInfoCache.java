@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.cache;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectInfo;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
@@ -15,6 +16,7 @@ import lombok.experimental.Accessors;
  */
 @Data
 @ToString
+@EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
 public class ProjectInfoCache extends TbProjectInfo {
     /**

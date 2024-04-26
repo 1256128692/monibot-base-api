@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.service;
 
 import cn.shmedo.iot.entity.api.CurrentSubject;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.project.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.ProjectBaseInfo;
@@ -66,6 +67,8 @@ public interface ProjectService {
     QueryWtProjectResponse queryWtProjectSimpleList(QueryWtProjectParam pa);
 
     List<QueryProjectBaseInfoResponse> queryProjectBaseInfoList(QueryProjectBaseInfoListParam pa);
+
+    List<TbMonitorItem> queryFavoriteMonitorItemList(QueryFavoriteMonitorItemListParam pa);
 
     Boolean checkProjectName(CheckProjectNameParam pa);
 

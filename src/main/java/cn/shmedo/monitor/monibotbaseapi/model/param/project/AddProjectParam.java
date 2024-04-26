@@ -19,6 +19,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.db.TbProperty;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbPropertyModel;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PlatformType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.ProjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.PropertyModelType;
 import cn.shmedo.monitor.monibotbaseapi.model.response.AuthService;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
@@ -82,6 +83,7 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<@NotNull TagKeyAndValue> tagList;
     @Valid
     private List<@NotNull Integer> monitorItemIDList;
+    private List<Integer> favoriteMonitorItemIDList;
     @NotNull
     private Integer modelID;
     @Valid

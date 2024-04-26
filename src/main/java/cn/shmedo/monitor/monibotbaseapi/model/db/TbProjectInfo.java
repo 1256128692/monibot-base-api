@@ -118,6 +118,12 @@ public class TbProjectInfo {
     private Integer modelID;
 
     /**
+     * 扩展字段
+     */
+    @TableField(value = "Extend")
+    private String extend;
+
+    /**
      * 创建时间
      */
     @TableField(value = "CreateTime")
