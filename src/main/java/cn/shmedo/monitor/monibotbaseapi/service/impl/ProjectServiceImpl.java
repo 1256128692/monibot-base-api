@@ -860,10 +860,14 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
             sensorsGroupedByProject = null;
         }
 
-        List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
-                .in(TbMonitorItem::getProjectID, projectIDList));
-        Map<Integer, List<TbMonitorItem>> monitorItemMap = tbMonitorItemList.stream().collect(Collectors.groupingBy(TbMonitorItem::getProjectID));
+        Map<Integer, List<TbMonitorItem>> monitorItemMap = new HashMap<>();
+        if(CollectionUtil.isNotEmpty(tbProjectInfos)){
+            List<Integer> idSet = tbProjectInfos.stream().map(TbProjectInfo::getID).toList();
+            List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>().in(TbMonitorItem::getProjectID, idSet));
+            monitorItemMap = tbMonitorItemList.stream().collect(Collectors.groupingBy(TbMonitorItem::getProjectID));
+        }
         List<ProjectBaseInfo> projectBaseInfoList = new LinkedList<>();
+        Map<Integer, List<TbMonitorItem>> finalMonitorItemMap = monitorItemMap;
         tbProjectInfos.forEach(item -> {
             ProjectBaseInfo result = new ProjectBaseInfo();
             BeanUtil.copyProperties(item, result);
@@ -884,7 +888,7 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                     }
                 }
             }
-            result.setTbMonitorItemList(monitorItemMap.get(result.getID()));
+            result.setTbMonitorItemList(finalMonitorItemMap.get(result.getID()));
             projectBaseInfoList.add(result);
         });
         return projectBaseInfoList;
