@@ -42,7 +42,7 @@ public class SetProjectConfigParam implements IConfigParam, IConfigID, Parameter
     private String key;
     @NotEmpty(message = "要配置的group不能为空")
     private String group;
-    @NotEmpty(message = "要配置的value不能为空")
+    @NotNull(message = "要配置的value不能为空")
     private String value;
     private Integer monitorGroupID;
     private Integer monitorPointID;

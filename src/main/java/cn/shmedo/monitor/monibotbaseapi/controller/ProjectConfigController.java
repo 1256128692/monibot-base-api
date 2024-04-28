@@ -37,7 +37,7 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {Int} [monitorPointID] 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateProjectConfig
      */
     @PostMapping(value = "/SetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     @Permission(permissionName = "mdmbase:UpdateProjectConfig")
@@ -63,7 +63,7 @@ public class ProjectConfigController {
      * @apiParam (请求参数) {Int} [dataList.monitorPointID] 监测点ID
      * @apiSuccess (返回结果) {String} none 空
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:UpdateProjectConfig
      */
     @PostMapping(value = "/BatchSetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     @Permission(permissionName = "mdmbase:UpdateProjectConfig")
@@ -89,7 +89,7 @@ public class ProjectConfigController {
      * @apiSuccess (返回结果) {String} dataList.key key
      * @apiSuccess (返回结果) {String} dataList.value value
      * @apiSampleRequest off
-     * @apiPermission 项目权限
+     * @apiPermission 项目权限 mdmbase:ListProjectConfig
      */
     @PostMapping(value = "/ListProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     @Permission(permissionName = "mdmbase:ListProjectConfig")
