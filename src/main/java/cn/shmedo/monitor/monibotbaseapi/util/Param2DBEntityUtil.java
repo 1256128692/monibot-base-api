@@ -19,7 +19,6 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.property.AddModelParam;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -56,7 +55,7 @@ public class Param2DBEntityUtil {
         obj.setImagePath(imgPath);
         obj.setProjectDesc(pa.getDesc());
         obj.setModelID(pa.getModelID());
-        obj.setExtend(extend.toString());
+        obj.setExtend(extend);
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);
         obj.setCreateTime(now);
