@@ -4,7 +4,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.DisplayDensity;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
@@ -15,6 +14,7 @@ import org.hibernate.validator.constraints.Range;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -34,10 +34,10 @@ public class QueryDryBeachDataListParam extends QueryDryBeachDataParam {
     private String rainfallToken;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         Date currentDate = new Date();
         endTime = endTime.after(currentDate) ? currentDate : endTime;
-        ResultWrapper validate = super.validate();
+        ResultWrapper<?> validate = super.validate();
         if (Objects.nonNull(validate)) {
             return validate;
         }
@@ -49,8 +49,8 @@ public class QueryDryBeachDataListParam extends QueryDryBeachDataParam {
         // 中台只会用到{@code periodRainfall}属性,{@code dailyRainfall}统计的是08:00:00~08:00:00的数据
         // rainfallToken = getRainfallMonitorType().equals(MonitorType.RAINFALL.getKey()) ?
         //         DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.getRainfallToken(DisplayDensity.fromValue(displayDensity));
-        rainfallToken = getRainfallMonitorType().equals(MonitorType.RAINFALL.getKey()) ?
-                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL;
+        rainfallToken = Optional.ofNullable(getRainfallMonitorType()).map(type -> type.equals(MonitorType.RAINFALL.getKey()) ?
+                DefaultConstant.ThematicFieldToken.RAINFALL : DefaultConstant.ThematicFieldToken.PERIOD_RAINFALL).orElse(null);
         return null;
     }
 }

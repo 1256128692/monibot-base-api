@@ -66,7 +66,7 @@ public class QueryWetLineConfigParam implements ParameterValidator, ResourcePerm
         }
         if (Objects.nonNull(wtPointID)) {
             List<TbMonitorPoint> tbWtMonitorPointList = tbMonitorPointMapper.selectList(new LambdaQueryWrapper<TbMonitorPoint>()
-                    .eq(TbMonitorPoint::getID, wtPointID).eq(TbMonitorPoint::getMonitorType, MonitorType.WATER_LEVEL.getKey()));
+                    .eq(TbMonitorPoint::getID, wtPointID).in(TbMonitorPoint::getMonitorType, MonitorType.WATER_LEVEL.getKey(), MonitorType.LEVEL.getKey()));
             if (CollUtil.isEmpty(tbWtMonitorPointList)) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选中的库水位监测点不存在或者不是库水位监测点");
             } else {

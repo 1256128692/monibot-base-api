@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
@@ -17,6 +18,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +37,6 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
     @NotNull(message = "库水位监测点ID不能为空")
     private Integer distanceMonitorPointID;
     @Positive(message = "降雨量监测点ID不能小于0")
-    @NotNull(message = "降雨量监测点ID不能为空")
     private Integer rainfallMonitorPointID;
     @JsonIgnore
     private List<Map<String, Object>> pointIDExValuesList;
@@ -48,9 +49,10 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
 
     @Override
     public ResultWrapper validate() {
-        pointIDExValuesList = ContextHolder.getBean(TbMonitorPointMapper.class)
-                .selectMonitorTypeExValuesByPointIDList(List.of(dryBeachMonitorPointID, distanceMonitorPointID, rainfallMonitorPointID));
-        if (pointIDExValuesList.size() != 3) {
+        List<Integer> pointList = CollUtil.toList(dryBeachMonitorPointID, distanceMonitorPointID);
+        Optional.ofNullable(rainfallMonitorPointID).ifPresent(pointList::add);
+        pointIDExValuesList = ContextHolder.getBean(TbMonitorPointMapper.class).selectMonitorTypeExValuesByPointIDList(pointList);
+        if (pointIDExValuesList.size() != pointList.size()) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测点不存在!");
         }
         for (Map<String, Object> map : pointIDExValuesList) {
@@ -60,7 +62,7 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的干滩监测点的监测类型错误!");
             } else if (distanceMonitorPointID.equals(pointID) && !monitorType.equals(MonitorType.WATER_LEVEL.getKey())) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的库水位监测点的监测类型错误!");
-            } else if (rainfallMonitorPointID.equals(pointID)) {
+            } else if (Optional.ofNullable(rainfallMonitorPointID).map(data -> data.equals(pointID)).orElse(false)) {
                 rainfallMonitorType = monitorType;
                 if (!(monitorType.equals(MonitorType.WT_RAINFALL.getKey()) || monitorType.equals(MonitorType.RAINFALL.getKey()))) {
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "传入的降雨量监测点的监测类型错误!");
@@ -68,7 +70,7 @@ public class QueryDryBeachDataParam implements ParameterValidator, ResourcePermi
             }
         }
         tbSensorList = ContextHolder.getBean(TbSensorMapper.class).selectList(new LambdaQueryWrapper<TbSensor>()
-                .in(TbSensor::getMonitorPointID, List.of(dryBeachMonitorPointID, rainfallMonitorPointID, distanceMonitorPointID)));
+                .in(TbSensor::getMonitorPointID, pointList));
         List<Integer> monitorTypeList = tbSensorList.stream().map(TbSensor::getMonitorType).distinct().toList();
         monitorTypeFieldMap = ContextHolder.getBean(TbMonitorTypeFieldMapper.class).selectList(
                         new LambdaQueryWrapper<TbMonitorTypeField>().in(TbMonitorTypeField::getMonitorType, monitorTypeList))

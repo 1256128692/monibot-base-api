@@ -184,11 +184,12 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
 
         // 最新库水位数据
         Optional.ofNullable(param.getWtSensor()).flatMap(u -> {
+            Integer monitorType = u.getMonitorType();
             List<FieldSelectInfo> wtFieldSelectInfoList = tbMonitorTypeFieldMapper.selectList(new LambdaQueryWrapper<TbMonitorTypeField>()
-                            .eq(TbMonitorTypeField::getMonitorType, MonitorType.WATER_LEVEL.getKey())).stream().map(TbMonitorTypeField::getFieldToken)
-                    .map(InfluxDBDataUtil::buildFieldSelectInfo).toList();
+                            .eq(TbMonitorTypeField::getMonitorType, monitorType)).stream()
+                    .map(TbMonitorTypeField::getFieldToken).map(InfluxDBDataUtil::buildFieldSelectInfo).toList();
             List<Map<String, Object>> wtDataList = sensorDataDao.querySensorNewData(
-                    List.of(u.getID()), wtFieldSelectInfoList, false, MonitorType.WATER_LEVEL.getKey());
+                    List.of(u.getID()), wtFieldSelectInfoList, false, monitorType);
             return Optional.of(wtDataList).flatMap(w -> w.stream().filter(s -> Objects.nonNull(s.get(DISTANCE))).findAny());
         }).map(u -> u.get(DISTANCE)).map(Convert::toDouble).ifPresent(res::setWtPointValue);
 
@@ -353,7 +354,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
             return List.of();
         }
         DisplayDensity displayDensity = DisplayDensity.fromValue(param.getDisplayDensity());
-        final String rainfallToken = param.getRainfallToken();
+        @Nullable final String rainfallToken = param.getRainfallToken();
         final DateTimeFormatter formatter = TimeUtil.DestinyFormatter.getFormatter(displayDensity);
         List<ThematicEigenValueInfo> eigenValueList = tbEigenValueMapper.selectFieldInfoByPointIDList(
                 List.of(param.getDryBeachMonitorPointID(), param.getDistanceMonitorPointID()));
@@ -376,7 +377,7 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                     ThematicDryBeachInfo.ThematicDryBeachInfoBuilder builder = ThematicDryBeachInfo.builder().time(DateUtil.parse(u.getKey(), formatter));
                     u.getValue().stream().peek(w -> {
                         Optional.ofNullable(w.get(SLOPE_RATIO)).map(Convert::toDouble).ifPresent(builder::slopeRratio);
-                        Optional.ofNullable(w.get(rainfallToken)).map(Convert::toDouble).ifPresent(builder::rainfall);
+                        Optional.ofNullable(rainfallToken).filter(StrUtil::isNotEmpty).map(w::get).map(Convert::toDouble).ifPresent(builder::rainfall);
                         Optional.ofNullable(w.get(DRY_BEACH)).map(Convert::toDouble).ifPresent(n -> builder.dryBeach(Optional.ofNullable(minDryBeach)
                                 .filter(s -> s > n).map(s -> Map.of("value", n, "abnormalValue", n - s)).orElse(Map.of("value", n))));
                         Optional.ofNullable(w.get(DISTANCE)).map(Convert::toDouble).ifPresent(n -> builder.distance(Optional.ofNullable(design)
@@ -412,8 +413,9 @@ public class ThematicDataAnalysisServiceImpl implements IThematicDataAnalysisSer
                             });
                 } else if (distanceMonitorPointID.equals(monitorPointID)) {
                     queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, DISTANCE, builder::distance);
-                } else if (rainfallMonitorPointID.equals(monitorPointID)) {
-                    queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, monitorType.equals(MonitorType.RAINFALL.getKey()) ? RAINFALL : PERIOD_RAINFALL, builder::rainfall);
+                } else if (Optional.ofNullable(rainfallMonitorPointID).map(data -> data.equals(monitorPointID)).orElse(false)) {
+                    queryNewDryBeachData(sensorID, monitorType, fieldSelectInfoList, monitorType.equals(MonitorType.RAINFALL.getKey()) ?
+                            RAINFALL : PERIOD_RAINFALL, builder::rainfall);
                 }
             }
         }

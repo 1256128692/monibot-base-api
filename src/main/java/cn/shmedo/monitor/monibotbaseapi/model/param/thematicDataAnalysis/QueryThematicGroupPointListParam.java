@@ -27,9 +27,9 @@ public class QueryThematicGroupPointListParam implements ParameterValidator, Res
     private List<Integer> monitorTypeList;
 
     @Override
-    public ResultWrapper validate() {
-        // 目前只有一个'浸润线'，因此直接在这里设置(浸润线需要筛选出组内'浸润线'和'水位'的监测点);否则需要通过{@code thematicType}来确认
-        monitorTypeList = List.of(MonitorType.WET_LINE.getKey(), MonitorType.WATER_LEVEL.getKey());
+    public ResultWrapper<?> validate() {
+        // 目前只有一个'浸润线'，因此直接在这里设置(浸润线需要筛选出组内'浸润线'、'水位'和'物位'的监测点);否则需要通过{@code thematicType}来确认
+        monitorTypeList = List.of(MonitorType.WET_LINE.getKey(), MonitorType.WATER_LEVEL.getKey(), MonitorType.LEVEL.getKey());
         return null;
     }
 
