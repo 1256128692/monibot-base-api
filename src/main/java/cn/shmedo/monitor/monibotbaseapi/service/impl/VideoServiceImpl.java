@@ -1226,7 +1226,9 @@ public class VideoServiceImpl implements VideoService {
                 }
             }
         });
-        return list;
+        return list.stream().peek(item -> item.setSensorList(Optional.ofNullable(item.getSensorList()).orElse(Collections.emptyList())
+                .stream().sorted(Comparator.comparing((VideoCaptureBaseInfo sensor) -> Objects.isNull(sensor.getSensorID()))
+                        .thenComparing(VideoCaptureBaseInfo::getChannelNo)).toList())).toList();
     }
 
     @Override
@@ -1437,7 +1439,7 @@ public class VideoServiceImpl implements VideoService {
                         .build();
 
                 ResultWrapper<Boolean> booleanResultWrapper = iotService.transferDevice(param);
-                if (booleanResultWrapper.apiSuccess() ) {
+                if (booleanResultWrapper.apiSuccess()) {
                     if (!booleanResultWrapper.getData()) {
                         return ResultWrapper.withCode(ResultCode.SERVER_EXCEPTION, "转移物联网设备失败");
                     }
