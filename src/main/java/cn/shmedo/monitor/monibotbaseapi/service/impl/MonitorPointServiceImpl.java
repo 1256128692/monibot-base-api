@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
@@ -45,6 +46,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     private TbMonitorGroupMapper tbMonitorGroupMapper;
     private TbMonitorGroupItemMapper tbMonitorGroupItemMapper;
     private TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
+
     @Override
     public void addMonitorPoint(AddMonitorPointParam pa, Integer userID) {
         TbMonitorPoint temp = Param2DBEntityUtil.fromAddMonitorPointParam2TbMonitorPoint(pa, userID);
@@ -78,16 +80,16 @@ public class MonitorPointServiceImpl implements MonitorPointService {
         Page<MonitorPoint4Web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
 
         IPage<MonitorPoint4Web> pageData = tbMonitorPointMapper.queryPage(page, pa.getProjectID(), pa.getMonitorType(), pa.getMonitorItemID(), pa.getQueryCode());
-        if (CollectionUtils.isEmpty(pageData.getRecords())){
+        if (CollectionUtils.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
         List<Integer> pIDList = pageData.getRecords().stream().map(MonitorPoint4Web::getID).collect(Collectors.toList());
         List<TbSensor> tbSensorList = tbSensorMapper.selectList(
                 new QueryWrapper<TbSensor>().in("MonitorPointID", pIDList)
         );
-        if (CollectionUtils.isNotEmpty(tbSensorList)){
+        if (CollectionUtils.isNotEmpty(tbSensorList)) {
             Map<Integer, List<TbSensor>> map = tbSensorList.stream().collect(Collectors.groupingBy(TbSensor::getMonitorPointID));
-            pageData.getRecords().forEach(item ->{
+            pageData.getRecords().forEach(item -> {
                 item.setSensorList(map.get(item.getID()));
             });
         }
@@ -102,7 +104,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
     @Override
     public List<MonitorItemWithPoint> queryMonitorItemPointList(QueryMonitorItemPointListParam pa) {
         List<MonitorItemWithPoint> list = tbMonitorItemMapper.queryMonitorItemWithPointBy(pa.getProjectID(), pa.getMonitorItemIDList(), pa.getItemEnable());
-        if (CollectionUtils.isNotEmpty(list)){
+        if (CollectionUtils.isNotEmpty(list)) {
             List<TbMonitorPoint> temp = tbMonitorPointMapper.selectList(
                     new QueryWrapper<TbMonitorPoint>()
                             .in("monitorItemID", list.stream().map(MonitorItemWithPoint::getMonitorItemID).collect(Collectors.toList()))
@@ -111,7 +113,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
             Map<Integer, List<TbMonitorPoint>> map = temp.stream().collect(Collectors.groupingBy(TbMonitorPoint::getMonitorItemID));
 
             List<MonitorTypeFieldBaseInfo> allMonitorTypeFieldList = tbMonitorTypeFieldMapper.selectListByMonitorItemIDList(list.stream().map(MonitorItemWithPoint::getMonitorItemID).collect(Collectors.toList()));
-            list.forEach(item ->{
+            list.forEach(item -> {
                 item.setMonitorPointList(map.get(item.getMonitorItemID()));
                 if (!CollectionUtil.isNullOrEmpty(allMonitorTypeFieldList)) {
                     item.setMonitorTypeFieldList(allMonitorTypeFieldList.stream().filter(a -> a.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
@@ -135,7 +137,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
 
     @Override
     public List<MonitorPointAllInfoV1> queryMonitorGroupPointList(QueryMonitorGroupPointParam pa) {
-        List<MonitorPointAllInfoV1> list = tbMonitorItemMapper.queryListByProjectIDAndMonitorItemID(pa.getProjectID(), pa.getMonitorItemID());
+        List<MonitorPointAllInfoV1> list = tbMonitorItemMapper.queryListByProjectIDAndMonitorItemID(pa.getProjectID(), pa.getMonitorItemID(), pa.getEnable());
 
         if (!CollectionUtil.isNullOrEmpty(list)) {
             List<Integer> monitorItemIDList = list.stream().map(MonitorPointAllInfoV1::getMonitorItemID).collect(Collectors.toList());
@@ -144,7 +146,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
             List<MonitorPointBaseInfoV1> monitorPointList = tbMonitorPointMapper.selectPointListByMonitorItemIDList(monitorItemIDList);
             Map<Integer, List<MonitorGroupBaseInfoV1>> groupMap = new HashMap<>();
             // 将组别按照parentID分组
-            allGroups.add(new MonitorGroupBaseInfoV1(-1,null,"未分配组",true,null));
+            allGroups.add(new MonitorGroupBaseInfoV1(-1, null, "未分配组", true, null));
             for (MonitorGroupBaseInfoV1 group : allGroups) {
                 groupMap.computeIfAbsent(group.getParentID(), k -> new ArrayList<>()).add(group);
             }
@@ -158,6 +160,9 @@ public class MonitorPointServiceImpl implements MonitorPointService {
                 item.setMonitorGroupList(buildGroupTree(groupMap, null));
                 item.setMonitorPointList(monitorPointList.stream().filter(m -> m.getMonitorItemID().equals(item.getMonitorItemID())).collect(Collectors.toList()));
             }
+        }
+        if (Optional.ofNullable(pa.getBindPoint()).orElse(false)) {
+            list = list.stream().filter(data -> CollUtil.isNotEmpty(data.getMonitorPointList())).toList();
         }
 
         return list;

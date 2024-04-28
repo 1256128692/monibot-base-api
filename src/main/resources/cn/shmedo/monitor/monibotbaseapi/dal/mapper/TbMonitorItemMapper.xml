@@ -500,6 +500,9 @@
       <if test="monitorItemID != null">
           and mi.ID = #{monitorItemID}
       </if>
+      <if test="enable != null">
+          AND mi.`Enable`=#{enable}
+      </if>
   </select>
 
   <select id="selectListByEventIDList"

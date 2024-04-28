@@ -11,15 +11,14 @@ import lombok.Data;
 
 @Data
 public class QueryMonitorGroupPointParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
-
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
-
-
     private Integer monitorItemID;
+    private Boolean enable;
+    private Boolean bindPoint;
 
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         return null;
     }
 

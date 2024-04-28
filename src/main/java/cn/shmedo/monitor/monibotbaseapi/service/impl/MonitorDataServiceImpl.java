@@ -1,6 +1,8 @@
 package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.NumberUtil;
@@ -28,10 +30,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfo
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeBaseInfoV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.MonitorTypeConfigV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EigenBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.EventBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.MonitorPointDataInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
@@ -252,8 +251,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                 }
             } else {
                 // 没有配置的,默认全部
-                i.setDisplayDensity(List.of(1,2,3,4,5,6));
-                i.setStatisticalMethods(List.of(1,2,3,4));
+                i.setDisplayDensity(List.of(1, 2, 3, 4, 5, 6));
+                i.setStatisticalMethods(List.of(1, 2, 3, 4));
             }
         });
 
@@ -359,6 +358,34 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         }
 
         return monitorPointDataInfoList;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public PageUtil.Page<MonitorPointListPageDataInfo> queryMonitorPointDataListPage(QueryMonitorPointDataListPageParam pa) {
+        String fieldToken = pa.getFieldToken();
+        List<MonitorPointDataInfo> list = queryMonitorPointDataList(pa);
+        List<MonitorPointListPageDataInfo> dataList = list.stream().map(item -> Optional.ofNullable(item.getFieldList())
+                        .orElse(Collections.emptyList()).stream().filter(field -> fieldToken.equals(field.getFieldToken()))
+                        .findAny().map(fieldBaseInfo2 -> Optional.ofNullable(item.getSensorList()).orElse(Collections.emptyList())
+                                .stream().map(sensor -> Optional.ofNullable(sensor.getMultiSensorData()).orElse(Collections.emptyList())
+                                        .stream().filter(sensorData -> Objects.nonNull(sensorData.getOrDefault(fieldToken, null)))
+                                        .map(sensorData -> {
+                                            Date time = Optional.ofNullable(sensorData.get(DbConstant.TIME_FIELD))
+                                                    .map(Convert::toDate).orElseThrow(() -> new RuntimeException("获取传感器数据时间失败"));
+                                            MonitorPointListPageDataInfo info = new MonitorPointListPageDataInfo();
+                                            BeanUtil.copyProperties(item, info);
+                                            BeanUtil.copyProperties(sensor, info);
+                                            BeanUtil.copyProperties(fieldBaseInfo2, info);
+                                            info.setData(sensorData.get(fieldToken));
+                                            info.setTime(time);
+                                            return info;
+                                        }).collect(Collectors.toList())).filter(CollUtil::isNotEmpty).flatMap(Collection::stream)
+                                .collect(Collectors.toList())).orElse((List<MonitorPointListPageDataInfo>) Collections.EMPTY_LIST))
+                .flatMap(Collection::stream).sorted((item1, item2) -> Optional.ofNullable(pa.getDataSort()).orElse(false) ?
+                        item1.getTime().compareTo(item2.getTime()) : item2.getTime().compareTo(item1.getTime()))
+                .collect(Collectors.toList());
+        return PageUtil.page(dataList, pa.getPageSize(), pa.getCurrentPage());
     }
 
     @Override

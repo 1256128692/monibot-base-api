@@ -60,7 +60,7 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
 
     List<ProjectLocationInfo> getProjectLocation(@Param("companyID") Integer companyID, @Param("monitorType") Integer monitorType, @Param("monitorClassType") Integer monitorClassType);
 
-    List<MonitorPointAllInfoV1> queryListByProjectIDAndMonitorItemID(Integer projectID, Integer monitorItemID);
+    List<MonitorPointAllInfoV1> queryListByProjectIDAndMonitorItemID(Integer projectID, Integer monitorItemID, Boolean enable);
 
     List<MonitorItemBaseInfo> selectListByEventIDList(List<Integer> eventIDList);
 }

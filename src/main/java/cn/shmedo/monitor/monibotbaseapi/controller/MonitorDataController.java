@@ -113,7 +113,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {DateTime} end 结束时间
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
-     * @apiParam (请求体) {Int} fieldToken 监测属性token
+     * @apiParam (请求体) {String} fieldToken 监测属性token
      * @apiParam (请求体) {Int} pageSize 分页大小 (1-100)
      * @apiParam (请求体) {Int} currentPage 当前页码 (大于0)
      * @apiParam (请求体) {Boolean} [filterEmptyData] 是否过滤空数据,默认为false(不过滤),true(过滤空数据)
@@ -147,10 +147,10 @@ public class MonitorDataController {
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
-    // @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
+    @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
     @RequestMapping(value = "/QueryMonitorPointDataListPage", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryMonitorPointDataListPage(@Validated @RequestBody Object pa) {
-        return ResultWrapper.successWithNothing();
+    public Object queryMonitorPointDataListPage(@Validated @RequestBody QueryMonitorPointDataListPageParam pa) {
+        return monitorDataService.queryMonitorPointDataListPage(pa);
     }
 
     /**
@@ -229,8 +229,8 @@ public class MonitorDataController {
      * @apiParamExample 请求体示例
      * {"projectID":1,"dataList":[
      * {
-     *   "scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
-     *      * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"
+     * "scope":"1","monitorItemID":1,"monitorPointIDList":[1,2],
+     * * "monitorTypeFieldID":"1","name":"123","value":"123.123","unitID":"1"
      * }
      * ]}
      * @apiSuccess (返回结果) {String} none 空
@@ -522,7 +522,7 @@ public class MonitorDataController {
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryDisMonitorTypeHasDataCountByMonitorPoints
-     * @apiDescription 查询通用监测点有无数据日期时间列表,可以跨监测类型, 最低支持到日
+     * @apiDescription 查询通用监测点有无数据日期时间列表, 可以跨监测类型, 最低支持到日
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int[]} monitorPointIDList 监测点列表,[1-100]
      * @apiParam (请求体) {DateTime} begin 开始时间
