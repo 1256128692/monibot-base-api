@@ -40,7 +40,7 @@ public class ProjectConfigController {
      * @apiPermission 项目权限
      */
     @PostMapping(value = "/SetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:UpdateProjectConfig")
     public Object setProjectConfig(@Valid @RequestBody SetProjectConfigParam param) {
         tbProjectConfigService.setProjectConfig(param);
         return ResultWrapper.successWithNothing();
@@ -51,7 +51,7 @@ public class ProjectConfigController {
      * @apiVersion 1.0.0
      * @apiGroup 自定义配置模块
      * @apiName BatchSetProjectConfig
-     * @apiDescription 批量额外配置,仅能同时对单一项目进行配置;同一个被配置对象在一次接口调用中仅能被配置一次
+     * @apiDescription 批量额外配置, 仅能同时对单一项目进行配置;同一个被配置对象在一次接口调用中仅能被配置一次
      * @apiParam (请求参数) {Int} projectID 项目ID
      * @apiParam (请求参数) {Object[]} dataList 配置对象
      * @apiParam (请求参数) {Int} dataList.projectID 项目ID
@@ -66,7 +66,7 @@ public class ProjectConfigController {
      * @apiPermission 项目权限
      */
     @PostMapping(value = "/BatchSetProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:UpdateProjectConfig")
     public Object batchSetProjectConfig(@Valid @RequestBody BatchSetProjectConfigParam param) {
         tbProjectConfigService.batchSetProjectConfig(param);
         return ResultWrapper.successWithNothing();
@@ -92,7 +92,7 @@ public class ProjectConfigController {
      * @apiPermission 项目权限
      */
     @PostMapping(value = "/ListProjectConfig", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-//    @Permission(permissionName = "")
+    @Permission(permissionName = "mdmbase:ListProjectConfig")
     public Object listProjectConfig(@Valid @RequestBody ListProjectConfigParam param) {
         return tbProjectConfigService.listProjectConfig(param);
     }
