@@ -33,12 +33,6 @@ public class Param2DBEntityUtil {
     public static final String favoriteMonitorItemList = "favoriteMonitorItemList";
 
     public static TbProjectInfo fromAddProjectParam2TbProjectInfo(AddProjectParam pa, Integer userID, String imgPath) {
-        String extend = null;
-        if (CollectionUtil.isNotEmpty(pa.getFavoriteMonitorItemIDList())) {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.set("favoriteMonitorItemList", pa.getFavoriteMonitorItemIDList());
-            extend = JSONUtil.toJsonStr(jsonObject);
-        }
         Date now = new Date();
         TbProjectInfo obj = new TbProjectInfo();
         obj.setCompanyID(pa.getCompanyID());
@@ -55,7 +49,6 @@ public class Param2DBEntityUtil {
         obj.setImagePath(imgPath);
         obj.setProjectDesc(pa.getDesc());
         obj.setModelID(pa.getModelID());
-        obj.setExtend(extend);
         obj.setCreateUserID(userID);
         obj.setUpdateUserID(userID);
         obj.setCreateTime(now);

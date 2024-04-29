@@ -68,8 +68,6 @@ public interface ProjectService {
 
     List<QueryProjectBaseInfoResponse> queryProjectBaseInfoList(QueryProjectBaseInfoListParam pa);
 
-    List<TbMonitorItem> queryFavoriteMonitorItemList(QueryFavoriteMonitorItemListParam pa);
-
     Boolean checkProjectName(CheckProjectNameParam pa);
 
     void setProjectRelation(SetProjectRelationParam pa, Integer subjectID);

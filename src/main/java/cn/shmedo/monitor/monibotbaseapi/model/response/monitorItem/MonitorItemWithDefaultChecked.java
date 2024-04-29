@@ -13,4 +13,5 @@ import lombok.EqualsAndHashCode;
 @Data
 public class MonitorItemWithDefaultChecked extends TbMonitorItem {
     private Boolean defaultChecked;
+    private Boolean izFavorite;
 }

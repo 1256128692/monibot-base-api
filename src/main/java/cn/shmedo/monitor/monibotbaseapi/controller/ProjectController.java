@@ -59,7 +59,6 @@ public class ProjectController {
      * @apiParam (请求体) {String} tagList.key 标签键
      * @apiParam (请求体) {String} [tagList.value] 标签值
      * @apiParam (请求体) {Int[]} [monitorItemIDList] 监测项目列表（用于工程项目配置了哪些监测项目）
-     * @apiParam (请求体) {Int[]} [favoriteMonitorItemIDList] 收藏的监测项目列表（用于工程项目收藏了哪些监测项目）
      * @apiParam (请求体) {Int} modelID 模型ID
      * @apiParam (请求体) {Object[]} [modelValueList] 模型值列表(预定义与自定义部分的合集)
      * @apiParam (请求体) {String} modelValueList.id 属性ID
@@ -506,29 +505,6 @@ public class ProjectController {
     @RequestMapping(value = "QueryProjectList", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object queryProjectListByProjectName(@Validated @RequestBody QueryProjectListParam pa) {
         return projectService.queryProjectListByProjectName(pa);
-    }
-
-    /**
-     * @api {post} /QueryFavoriteMonitorItemList 查询企业下收藏的监测项目列表
-     * @apiDescription 查询企业下（工程项目）收藏的监测项目列表
-     * @apiVersion 1.0.0
-     * @apiGroup 工程项目管理模块
-     * @apiName QueryFavoriteMonitorItemList
-     * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiSuccess (返回结果) {Object[]} data 监测项目列表
-     * @apiSuccess (返回结果) {Int} data.id 监测项目ID
-     * @apiSuccess (返回结果) {String} data.name 监测项目名称
-     * @apiSuccess (返回结果) {String} data.alias 监测项目别名
-     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
-     * @apiSuccess (返回结果) {Int} data.projectType 项目类型
-     * @apiSuccess (返回结果) {Int} data.createType 创建类型
-     * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:ListBaseProject
-     */
-    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
-    @RequestMapping(value = "QueryFavoriteMonitorItemList", method = RequestMethod.POST, produces = CommonVariable.JSON)
-    public Object queryFavoriteMonitorItemList(@Validated @RequestBody QueryFavoriteMonitorItemListParam pa) {
-        return projectService.queryFavoriteMonitorItemList(pa);
     }
 
     /**

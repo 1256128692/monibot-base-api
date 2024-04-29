@@ -4,18 +4,18 @@ import cn.shmedo.iot.entity.annotations.LogParam;
 import cn.shmedo.iot.entity.annotations.Permission;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.base.CommonVariable;
 import cn.shmedo.iot.entity.base.OperationProperty;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.QueryMonitorItemSimpleListParam;
+import cn.shmedo.monitor.monibotbaseapi.model.param.project.QueryFavoriteMonitorItemListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @program: monibot-base-api
@@ -254,7 +254,8 @@ public class MonitorItemController {
      * @apiParam (请求参数) {String} [keyword] 模糊检索关键字，支持: 监测项目名称、监测项目别名
      * @apiSuccess (返回结果) {Object[]} list 监测项目列表
      * @apiSuccess (返回结果) {Int} list.id 监测项目ID
-     * @apiSuccess (返回结果) {Int} list.defaultChecked 是否默认选中
+     * @apiSuccess (返回结果) {Bool} list.defaultChecked 是否默认选中
+     * @apiSuccess (返回结果) {Bool} list.IzFavorite 是否收藏
      * @apiSuccess (返回结果) {String} list.name 监测项目名称
      * @apiSuccess (返回结果) {String} list.alias 监测项目别名
      * @apiSuccess (返回结果) {Boolean} list.enable 是否开启
@@ -320,4 +321,28 @@ public class MonitorItemController {
     public Object listMonitorItemSimple(@Validated @RequestBody QueryMonitorItemSimpleListParam param) {
         return monitorItemService.listMonitorItemSimple(param);
     }
+
+    /**
+     * @api {post} /QueryFavoriteMonitorItemList 查询企业下收藏的监测项目列表（废弃）
+     * @apiDescription 查询企业下（工程项目）收藏的监测项目列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测项目模块
+     * @apiName QueryFavoriteMonitorItemList
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiSuccess (返回结果) {Object[]} data 监测项目列表
+     * @apiSuccess (返回结果) {Int} data.id 监测项目ID
+     * @apiSuccess (返回结果) {String} data.name 监测项目名称
+     * @apiSuccess (返回结果) {String} data.alias 监测项目别名
+     * @apiSuccess (返回结果) {Int} data.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} data.projectType 项目类型
+     * @apiSuccess (返回结果) {Int} data.createType 创建类型
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseProject
+     */
+    @Permission(permissionName = "mdmbase:ListBaseProject", allowApplication = true)
+    @RequestMapping(value = "QueryFavoriteMonitorItemList", method = RequestMethod.POST, produces = CommonVariable.JSON)
+    public Object queryFavoriteMonitorItemList(@Validated @RequestBody QueryFavoriteMonitorItemListParam pa) {
+        return null;
+    }
+
 }

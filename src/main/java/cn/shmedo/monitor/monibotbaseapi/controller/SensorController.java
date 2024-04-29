@@ -629,17 +629,24 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName QuerySensorConfigList
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int[]} [idList] 传感器id集合
-     * @apiParam (请求体) {Int[]} [projectIDList] 工程项目id集合
-     * @apiParam (请求体) {Int[]} [monitorTypeList] 监测类型集合
+     * @apiParam (请求体) {Int} serviceID 服务ID
+     * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
-     * @apiSuccess (返回结果) {Int} dataList.id 传感器id
-     * @apiSuccess (返回结果) {Int} dataList.projectID 所属工程ID
-     * @apiSuccess (返回结果) {String} dataList.name 传感器名称
-     * @apiSuccess (返回结果) {String} dataList.alias 传感器别名
-     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
-     * @apiSuccess (返回结果) {Int} dataList.kind 传感器类型 1-自动化传感器 2-融合传感器 3-人工传感器
-     * @apiSuccess (返回结果) {Int} dataList.monitorPointID 关联监测点id
+     * @apiSuccess (返回结果) {Int} dataList.ID 设备ID
+     * @apiSuccess (返回结果) {String} dataList.deviceToken 设备token
+     * @apiSuccess (返回结果) {String} dataList.deviceName 设备名称
+     * @apiSuccess (返回结果) {Object[]} dataList.deviceSensorList 设备传感器列表
+     * @apiSuccess (返回结果) {Int} dataList.deviceSensorList.ID 传感器ID
+     * @apiSuccess (返回结果) {Int} dataList.deviceSensorList.projectID 所属工程ID
+     * @apiSuccess (返回结果) {String} dataList.deviceSensorList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.deviceSensorList.alias 传感器别名
+     * @apiSuccess (返回结果) {String} dataList.deviceSensorList.uniqueToken 传感器token
+     * @apiSuccess (返回结果) {Object[]} [dataList.deviceSensorList.monitorSensorList] 监测传感器列表
+     * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.ID] 监测传感器-名称
+     * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.name] 监测传感器-名称
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorTypeID] 监测传感器-监测类型
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorPointID] 监测传感器-监测点
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupID] 监测传感器-监测组
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensor
      */

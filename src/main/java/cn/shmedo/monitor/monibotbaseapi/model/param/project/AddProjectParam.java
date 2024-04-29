@@ -83,7 +83,6 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
     private List<@NotNull TagKeyAndValue> tagList;
     @Valid
     private List<@NotNull Integer> monitorItemIDList;
-    private List<Integer> favoriteMonitorItemIDList;
     @NotNull
     private Integer modelID;
     @Valid

@@ -4,11 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.shmedo.monitor.monibotbaseapi.config.MonitorItemDefaultCheckedConfig;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbFavorite;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItemField;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbProjectMonitorClass;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.FavoriteSubjectType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorClassType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitorItem.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
@@ -17,6 +18,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeAndChildMonitorItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.WtMonitorItemInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.*;
+import cn.shmedo.monitor.monibotbaseapi.service.ITbFavoriteService;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
@@ -42,16 +44,12 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class MonitorItemServiceImpl implements MonitorItemService {
-
-
     private final TbProjectMonitorClassMapper tbProjectMonitorClassMapper;
-
     private final TbMonitorItemMapper tbMonitorItemMapper;
-
     private final TbMonitorItemFieldMapper tbMonitorItemFieldMapper;
     private final TbMonitorTypeFieldMapper tbMonitorTypeFieldMapper;
-
     private final MonitorTypeService monitorTypeService;
+    private final ITbFavoriteService tbFavoriteService;
 
     @Override
     public WtMonitorItemInfo queryWtMonitorItemList(QueryWtMonitorItemListParam request) {
@@ -229,6 +227,11 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         List<TbMonitorItem> tbMonitorItems = tbMonitorItemMapper.selectList(
                 queryWrapper
         );
+        // 查询企业下收藏
+        List<Integer> favoriteSubjectIDList = tbFavoriteService.list(new LambdaQueryWrapper<TbFavorite>()
+                        .eq(TbFavorite::getCompanyID, pa.getCompanyID())
+                        .eq(TbFavorite::getSubjectType, FavoriteSubjectType.MONITOR_PROJECT.getType()))
+                .stream().map(TbFavorite::getSubjectID).toList();
         List<MonitorItemWithDefaultChecked> list = tbMonitorItems.stream().map(
                 e -> {
                     MonitorItemWithDefaultChecked obj = BeanUtil.copyProperties(e, MonitorItemWithDefaultChecked.class);
@@ -237,6 +240,8 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                     } else {
                         obj.setDefaultChecked(false);
                     }
+                    if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(pa.getCreateType()))
+                        obj.setIzFavorite(favoriteSubjectIDList.contains(obj.getID()));
                     return obj;
                 }
         ).toList();

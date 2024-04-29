@@ -1032,21 +1032,6 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
     }
 
     @Override
-    public List<TbMonitorItem> queryFavoriteMonitorItemList(QueryFavoriteMonitorItemListParam pa) {
-        List<TbProjectInfo> tbProjectInfoList = this.list(new LambdaQueryWrapper<TbProjectInfo>()
-                .eq(TbProjectInfo::getCompanyID, pa.getCompanyID())
-                .isNotNull(TbProjectInfo::getExtend)
-                .select(TbProjectInfo::getExtend));
-        Set<Integer> monitorItemIDList = new HashSet<>();
-        tbProjectInfoList.stream().map(TbProjectInfo::getExtend)
-                .map(JSONUtil::parseObj)
-                .forEach(object -> monitorItemIDList.addAll((List<Integer>) (object.get(Param2DBEntityUtil.favoriteMonitorItemList))));
-        if (CollectionUtil.isEmpty(monitorItemIDList))
-            return null;
-        return tbMonitorItemMapper.selectBatchIds(monitorItemIDList);
-    }
-
-    @Override
     public Boolean checkProjectName(CheckProjectNameParam pa) {
         return tbProjectInfoMapper.selectCount(
                 new LambdaQueryWrapper<TbProjectInfo>()

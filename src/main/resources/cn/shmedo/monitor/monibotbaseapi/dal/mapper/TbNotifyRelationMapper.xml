@@ -15,8 +15,7 @@
         dwl2.Platform=#{param.platform})
         ORDER BY wnr.ID DESC LIMIT 1
     </select>
-    <select id="selectNotifyByProjectID"
-            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID">
+    <select id="selectNotifyByProjectID" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.notify.NotifyListByProjectID">
         select tnr.NotifyID notifyID,twtc.ProjectID projectID,1 type,twtc.ProjectID,MonitorItemID
         monitorItemID,MonitorPointID monitorPointID,null historyFlag
         from tb_notify_relation tnr
