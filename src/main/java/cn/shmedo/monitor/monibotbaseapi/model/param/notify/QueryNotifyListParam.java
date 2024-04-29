@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -22,7 +23,8 @@ public class QueryNotifyListParam implements ParameterValidator, ResourcePermiss
     private Integer projectID;
     private Integer serviceID;
     private Integer status;
-    private List<Integer> notifyIDList;
+    private Integer userID;
+    private Set<Integer> notifyIDList;
 
     @Override
     public Integer getPlatform() {

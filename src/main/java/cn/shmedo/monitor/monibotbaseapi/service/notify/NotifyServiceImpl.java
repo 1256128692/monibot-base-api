@@ -8,6 +8,7 @@ import cn.hutool.extra.spring.SpringUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.exception.CustomBaseException;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.config.DefaultConstant;
 import cn.shmedo.monitor.monibotbaseapi.config.FileConfig;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
@@ -46,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -156,16 +158,17 @@ public class NotifyServiceImpl implements NotifyService {
     public List<NotifyPageResponse> queryNotifyList(QueryNotifyListParam param, String accessToken) {
         // 工程级别过滤
         List<NotifyListByProjectID> notifyListByProjectIDList = tbNotifyRelationMapper.selectNotifyByProjectID(param.getProjectID());
-        Optional.ofNullable(notifyListByProjectIDList)
-                .filter(CollectionUtil::isNotEmpty)
-                .map(n -> n.stream().map(NotifyListByProjectID::getNotifyID).collect(Collectors.toList()))
-                .ifPresent(param::setNotifyIDList);
+        if (Objects.nonNull(param.getProjectID()))
+            Optional.ofNullable(notifyListByProjectIDList)
+                    .filter(CollectionUtil::isNotEmpty)
+                    .map(n -> n.stream().map(NotifyListByProjectID::getNotifyID).collect(Collectors.toSet()))
+                    .ifPresent(param::setNotifyIDList);
 
         // 远程调用查询符合条件的通知
-        ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, accessToken);
+        param.setUserID(CurrentSubjectHolder.getCurrentSubject().getSubjectID());
+        ResultWrapper<List<NotifyPageResponse>> resultWrapper = userService.queryNotifyList(param, config.getAuthAppKey(), config.getAuthAppSecret());
         return notify(resultWrapper.getData(), notifyListByProjectIDList);
     }
-
 
     private List<NotifyPageResponse> notify(Collection<? extends NotifyPageInfo> notifyList,
                                             Collection<NotifyListByProjectID> notifyListByProjectIDList) {

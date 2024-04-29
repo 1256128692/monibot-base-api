@@ -110,18 +110,13 @@ public class UserServiceFallbackFactory implements FallbackFactory<UserService> 
             }
 
             @Override
-            public ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, String accessToken) {
+            public ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, String appKey, String appSecret) {
                 return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override
             public ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param, String appKey, String appSecret) {
                 return null;
-            }
-
-            @Override
-            public ResultWrapper<NotifyStatisticsInfo> queryNotifyStatistics(QueryNotifyStatisticsParam param, String accessToken) {
-                return ResultWrapper.withCode(ResultCode.THIRD_PARTY_SERVICE_INVOKE_ERROR);
             }
 
             @Override

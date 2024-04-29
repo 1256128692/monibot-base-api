@@ -621,4 +621,32 @@ public class SensorController {
     public Object calculate(@RequestBody @Validated CalculateFieldRequest request) {
         return sensorService.calculateField(request);
     }
+
+    /**
+     * @api {POST} /QuerySensorConfigList 查询传感器配置列表
+     * @apiDescription 查询传感器配置列表
+     * @apiVersion 1.0.0
+     * @apiGroup 传感器模块
+     * @apiName QuerySensorConfigList
+     * @apiParam (请求体) {Int} companyID 公司ID
+     * @apiParam (请求体) {Int[]} [idList] 传感器id集合
+     * @apiParam (请求体) {Int[]} [projectIDList] 工程项目id集合
+     * @apiParam (请求体) {Int[]} [monitorTypeList] 监测类型集合
+     * @apiSuccess (返回结果) {Object[]} dataList 数据列表
+     * @apiSuccess (返回结果) {Int} dataList.id 传感器id
+     * @apiSuccess (返回结果) {Int} dataList.projectID 所属工程ID
+     * @apiSuccess (返回结果) {String} dataList.name 传感器名称
+     * @apiSuccess (返回结果) {String} dataList.alias 传感器别名
+     * @apiSuccess (返回结果) {Int} dataList.monitorType 监测类型
+     * @apiSuccess (返回结果) {Int} dataList.kind 传感器类型 1-自动化传感器 2-融合传感器 3-人工传感器
+     * @apiSuccess (返回结果) {Int} dataList.monitorPointID 关联监测点id
+     * @apiSampleRequest off
+     * @apiPermission 项目权限 mdmbase:ListBaseSensor
+     */
+    @Permission(permissionName = "mdmbase:ListBaseSensor")
+    @PostMapping(value = "/QuerySensorConfigList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object querySensorConfigList(@Valid @RequestBody QuerySensorSimpleListRequest param) {
+//        return sensorSrvice.querySensorConfigList(param);
+        return null;
+    }
 }

@@ -114,8 +114,8 @@ public interface UserService {
      * 不分页查询系统通知列表
      */
     @RequestLine("POST /QueryNotifyList")
-    @Headers("Authorization: {accessToken}")
-    ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, @Param("accessToken") String accessToken);
+    @Headers({"appKey: {appKey}", "appSecret: {appSecret}"})
+    ResultWrapper<List<NotifyPageResponse>> queryNotifyList(QueryNotifyListParam param, @Param("appKey") String appKey, @Param("appSecret") String appSecret);
 
     /**
      * 设置消息通知状态
@@ -125,13 +125,6 @@ public interface UserService {
     ResultWrapper<?> setNotifyStatus(SetNotifyStatusParam param,
                                      @Param("appKey") String appKey,
                                      @Param("appSecret") String appSecret);
-
-    /**
-     * 查询系统通知统计信息
-     */
-    @RequestLine("POST /QueryNotifyStatistics")
-    @Headers("Authorization: {accessToken}")
-    ResultWrapper<NotifyStatisticsInfo> queryNotifyStatistics(QueryNotifyStatisticsParam param, @Param("accessToken") String accessToken);
 
     /**
      * 删除系统通知
