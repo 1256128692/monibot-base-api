@@ -75,7 +75,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
 
-        Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
+//        Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
         List<Integer> typeList;
         if (StringUtils.isBlank(pa.getQueryCode())) {
             typeList = null;
@@ -85,9 +85,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(),
+        List<TbMonitorType4web> records = baseMapper.queryPage(pa.getCompanyID(), pa.getCreateType(),
                 pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID(), pa.getTypeName());
-        List<TbMonitorType4web> records = pageData.getRecords();
         if (ObjectUtil.isEmpty(records))
             return PageUtil.Page.empty();
 
@@ -99,14 +98,13 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                     .eq(Objects.nonNull(pa.getProjectID()), TbMonitorItem::getProjectID, pa.getProjectID())
                     .eq(Objects.nonNull(pa.getCreateType()), TbMonitorItem::getCreateType, pa.getCreateType()));
             Stream<TbMonitorType4web> stream = records.stream();
-            switch (Objects.requireNonNull(item)) {
+            switch (Objects.requireNonNull(item, "引用类型不合法")) {
                 case ALL -> records = stream.filter(monitorType ->
                         tbMonitorItemList.stream().allMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
-                case PART -> records = stream.filter(monitorType ->
+                case ANY -> records = stream.filter(monitorType ->
                         tbMonitorItemList.stream().anyMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
                 case NONE -> records = stream.filter(monitorType ->
                         tbMonitorItemList.stream().noneMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
-                default -> throw new RuntimeException("引用类型不合法");
             }
         }
         if (ObjectUtil.isEmpty(records))
@@ -127,11 +125,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 item.setUsePredefinedMonitorType(true);
         });
         // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
-        return new PageUtil.Page<>(
-                pageData.getPages(),
-                records.stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
-                        .thenComparing(TbMonitorType4web::isUsePredefinedMonitorType).reversed()).toList(),
-                pageData.getTotal());
+        records = records.stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
+                .thenComparing(TbMonitorType4web::isUsePredefinedMonitorType).reversed()).toList();
+        return PageUtil.page(records, pa.getPageSize(), pa.getCurrentPage());
     }
 
     @Override

@@ -13,7 +13,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum MonitorTypeWithMonitorItem {
     ALL(0, "全部"),
-    PART(1, "被引用"),
+    ANY(1, "被引用"),
     NONE(2, "未被引用")
     ;
 

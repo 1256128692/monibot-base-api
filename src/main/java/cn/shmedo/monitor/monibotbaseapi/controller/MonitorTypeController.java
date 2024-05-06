@@ -415,7 +415,6 @@ public class MonitorTypeController {
      */
     @Permission(permissionName = "mdmbase:UpdateBaseMonitorType")
     @LogParam(moduleName = "监测类型模块", operationName = "添加模板", operationProperty = OperationProperty.ADD)
-
     @PostMapping(value = "/AddTemplate", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     public Object addTemplate(@RequestBody @Validated AddTemplateParam pa) {
         monitorTypeService.addTemplate(pa, CurrentSubjectHolder.getCurrentSubject().getSubjectID());
