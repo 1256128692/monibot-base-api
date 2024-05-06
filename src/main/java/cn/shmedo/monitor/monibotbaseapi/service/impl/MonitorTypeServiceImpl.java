@@ -21,6 +21,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.cache.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeWithMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -47,7 +48,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @program: monibot-base-api
@@ -82,28 +85,51 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 return PageUtil.Page.empty();
             }
         }
-        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID());
-        if (ObjectUtil.isEmpty(pageData.getRecords())) {
+        IPage<TbMonitorType4web> pageData = baseMapper.queryPage(page, pa.getCompanyID(), pa.getCreateType(),
+                pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID(), pa.getTypeName());
+        List<TbMonitorType4web> records = pageData.getRecords();
+        if (ObjectUtil.isEmpty(records))
             return PageUtil.Page.empty();
+
+        // 条件搜索-“是否被监测项目引用”筛选，有“全部”、“被引用”、“未被引用”三个选项 @MonitorTypeWithMonitorItem
+        if (Objects.nonNull(pa.getUsedMonitorItem())) {
+            MonitorTypeWithMonitorItem item = MonitorTypeWithMonitorItem.getMonitorTypeWithMonitorItem(pa.getUsedMonitorItem());
+            List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
+                    .eq(Objects.nonNull(pa.getCompanyID()), TbMonitorItem::getCompanyID, pa.getCompanyID())
+                    .eq(Objects.nonNull(pa.getProjectID()), TbMonitorItem::getProjectID, pa.getProjectID())
+                    .eq(Objects.nonNull(pa.getCreateType()), TbMonitorItem::getCreateType, pa.getCreateType()));
+            Stream<TbMonitorType4web> stream = records.stream();
+            switch (Objects.requireNonNull(item)) {
+                case ALL -> records = stream.filter(monitorType ->
+                        tbMonitorItemList.stream().allMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
+                case PART -> records = stream.filter(monitorType ->
+                        tbMonitorItemList.stream().anyMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
+                case NONE -> records = stream.filter(monitorType ->
+                        tbMonitorItemList.stream().noneMatch(monitorItem -> monitorItem.getMonitorType().equals(monitorType.getMonitorType()))).toList();
+                default -> throw new RuntimeException("引用类型不合法");
+            }
         }
-        // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
-        // 查询监测项目中用了预定义监测类型的监测项目id
+        if (ObjectUtil.isEmpty(records))
+            return PageUtil.Page.empty();
+
+        // 查询监测项目中用了预定义监测类型的监测项目
         List<Integer> monitorItemIDList = tbMonitorItemMapper.selectByMonitorType(pa.getCompanyID(), CreateType.PREDEFINED.getType());
         // 处理字段和数据源统计
-        List<Integer> monitorTypeList = pageData.getRecords().stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
+        List<Integer> monitorTypeList = records.stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
         Map<Integer, List<TbMonitorTypeField>> typeMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeField::getMonitorType));
         List<TypeAndCount> countList = tbMonitorTypeTemplateMapper.countGroupByMonitorType(monitorTypeList, List.of(pa.getCompanyID(), -1));
         Map<Integer, Integer> countMap = countList.stream().collect(Collectors.toMap(TypeAndCount::getType, TypeAndCount::getCount));
-        pageData.getRecords().forEach(item -> {
+        records.forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
             item.setFieldList(typeMap.get(item.getMonitorType()));
             if (monitorItemIDList.contains(item.getID()))
                 item.setUsePredefinedMonitorType(true);
         });
+        // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
         return new PageUtil.Page<>(
                 pageData.getPages(),
-                pageData.getRecords().stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
+                records.stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
                         .thenComparing(TbMonitorType4web::isUsePredefinedMonitorType).reversed()).toList(),
                 pageData.getTotal());
     }

@@ -244,11 +244,14 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                     if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(pa.getCreateType())) {
                         obj.setIzFavorite(favoriteMap.containsKey(obj.getID()));
                         obj.setFavoriteTime(favoriteMap.containsKey(obj.getID()) ? favoriteMap.get(obj.getID()).getCreateTime() : null);
+                    } else {
+                        obj.setIzFavorite(false);
                     }
                     return obj;
                 }
         ).toList();
-        return list.stream().sorted(Comparator.comparing(MonitorItemWithDefaultChecked::getIzFavorite).reversed()).toList();
+        return list.stream().sorted(Comparator.comparing(MonitorItemWithDefaultChecked::getIzFavorite)
+                .thenComparing(MonitorItemWithDefaultChecked::getFavoriteTime, Comparator.nullsLast(Date::compareTo)).reversed()).toList();
     }
 
     @Override

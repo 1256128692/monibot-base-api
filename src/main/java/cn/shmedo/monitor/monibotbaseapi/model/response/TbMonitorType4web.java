@@ -18,6 +18,6 @@ import java.util.List;
 public class TbMonitorType4web extends TbMonitorType {
     private Integer datasourceCount;
     private List<TbMonitorTypeField> fieldList;
-//    @JsonIgnore
+    @JsonIgnore
     private boolean usePredefinedMonitorType;
 }

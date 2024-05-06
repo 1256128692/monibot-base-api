@@ -34,12 +34,13 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
     List<MonitorTypeBaseInfo> selectMonitorBaseInfo(List<Integer> monitorItemIDList);
 
     IPage<TbMonitorType4web> queryPage(Page<TbMonitorType4web> page,
-                                       @Param("companyID")Integer companyID,
-                                       @Param("createType")Byte createType,
-                                       @Param("queryCode")String queryCode,
-                                       @Param("typeList")List<Integer> typeList,
+                                       @Param("companyID") Integer companyID,
+                                       @Param("createType") Byte createType,
+                                       @Param("queryCode") String queryCode,
+                                       @Param("typeList") List<Integer> typeList,
                                        @Param("monitorType") Integer monitorType,
-                                       @Param("projectID")Integer projectID);
+                                       @Param("projectID") Integer projectID,
+                                       @Param("typeName") String typeName);
 
     List<TbMonitorType> queryByTemplateIDList(List<Integer> templateIDList);
 
@@ -47,10 +48,12 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
 
     /**
      * 查询监测类型及其字段
+     *
      * @param wrapper 条件构造器 {@link Wrapper<Void>}
-     * @return  {@link MonitorTypeWithField}
+     * @return {@link MonitorTypeWithField}
      */
     List<MonitorTypeWithField> queryMonitorTypeWithField(@Param(Constants.WRAPPER) Wrapper<Void> wrapper);
+
     TbMonitorType queryByType(Integer type);
 
     List<MonitorTypeBaseInfoV1> selectByMonitorTypeList(List<Integer> monitorTypeList);
