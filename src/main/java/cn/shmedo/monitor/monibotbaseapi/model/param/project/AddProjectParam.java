@@ -166,13 +166,12 @@ public class AddProjectParam implements ParameterValidator, ResourcePermissionPr
             if (monitorItems.size() != monitorItemIDList.size()) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目不存在");
             }
-            if (monitorItems.stream().anyMatch(item -> !((item.getCreateType().equals(CreateType.PREDEFINED.getType())) && (item.getCompanyID() == -1 || item.getProjectID() == -1)))) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目应为预定义或公司定义模板");
-            }
+//            if (monitorItems.stream().anyMatch(item -> !((item.getCreateType().equals(CreateType.PREDEFINED.getType())) && (item.getCompanyID() == -1 || item.getProjectID() == -1)))) {
+//                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测项目应为预定义或公司定义模板");
+//            }
             if (monitorItems.stream().filter(item -> item.getCompanyID() != -1).anyMatch(item -> !item.getCompanyID().equals(companyID))) {
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不属于该公司模板");
             }
-
         }
         RedisService authRedisService = SpringUtil.getBean(RedisConstant.AUTH_REDIS_SERVICE, RedisService.class);
         List<Integer> allServiceIDLIst = authRedisService.hashKeys(DefaultConstant.REDIS_KEY_MD_AUTH_SERVICE).stream().map(Integer::valueOf).toList();

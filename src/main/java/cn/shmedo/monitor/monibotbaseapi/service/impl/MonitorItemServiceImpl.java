@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 
@@ -228,10 +229,10 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                 queryWrapper
         );
         // 查询企业下收藏
-        List<Integer> favoriteSubjectIDList = tbFavoriteService.list(new LambdaQueryWrapper<TbFavorite>()
-                        .eq(TbFavorite::getCompanyID, pa.getCompanyID())
-                        .eq(TbFavorite::getSubjectType, FavoriteSubjectType.MONITOR_PROJECT.getType()))
-                .stream().map(TbFavorite::getSubjectID).toList();
+        List<TbFavorite> favoriteList = tbFavoriteService.list(new LambdaQueryWrapper<TbFavorite>()
+                .eq(TbFavorite::getCompanyID, pa.getCompanyID())
+                .eq(TbFavorite::getSubjectType, FavoriteSubjectType.MONITOR_PROJECT.getType()));
+        Map<Integer, TbFavorite> favoriteMap = favoriteList.stream().collect(Collectors.toMap(TbFavorite::getSubjectID, Function.identity()));
         List<MonitorItemWithDefaultChecked> list = tbMonitorItems.stream().map(
                 e -> {
                     MonitorItemWithDefaultChecked obj = BeanUtil.copyProperties(e, MonitorItemWithDefaultChecked.class);
@@ -240,12 +241,14 @@ public class MonitorItemServiceImpl implements MonitorItemService {
                     } else {
                         obj.setDefaultChecked(false);
                     }
-                    if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(pa.getCreateType()))
-                        obj.setIzFavorite(favoriteSubjectIDList.contains(obj.getID()));
+                    if (Integer.valueOf(CreateType.PREDEFINED.getType()).equals(pa.getCreateType())) {
+                        obj.setIzFavorite(favoriteMap.containsKey(obj.getID()));
+                        obj.setFavoriteTime(favoriteMap.containsKey(obj.getID()) ? favoriteMap.get(obj.getID()).getCreateTime() : null);
+                    }
                     return obj;
                 }
         ).toList();
-        return list;
+        return list.stream().sorted(Comparator.comparing(MonitorItemWithDefaultChecked::getIzFavorite).reversed()).toList();
     }
 
     @Override

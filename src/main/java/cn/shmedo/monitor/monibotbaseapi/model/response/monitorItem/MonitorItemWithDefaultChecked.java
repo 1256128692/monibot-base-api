@@ -1,8 +1,11 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * @program: monibot-base-api
@@ -14,4 +17,6 @@ import lombok.EqualsAndHashCode;
 public class MonitorItemWithDefaultChecked extends TbMonitorItem {
     private Boolean defaultChecked;
     private Boolean izFavorite;
+    @JsonIgnore
+    private Date favoriteTime;
 }
