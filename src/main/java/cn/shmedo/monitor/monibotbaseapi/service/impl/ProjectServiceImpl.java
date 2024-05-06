@@ -217,7 +217,8 @@ public class ProjectServiceImpl extends ServiceImpl<TbProjectInfoMapper, TbProje
                 tbMonitorItem.setCreateUserID(userID);
                 tbMonitorItem.setUpdateTime(now);
                 tbMonitorItem.setUpdateUserID(userID);
-                tbMonitorItem.setCreateType(CreateType.CUSTOMIZED.getType());
+                // 和原有的保持一致
+//                tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
             }
             tbMonitorItemMapper.insertBatch(map.keySet());
             map.forEach((key, value) -> {

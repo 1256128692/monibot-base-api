@@ -31,6 +31,7 @@ public class AddCompanyMonitorItemParam implements ParameterValidator, ResourceP
     @NotEmpty
     @Valid
     private List< @NotNull  Integer > monitorItemIDList;
+    private Integer projectID;
     @Override
     public ResultWrapper validate() {
 

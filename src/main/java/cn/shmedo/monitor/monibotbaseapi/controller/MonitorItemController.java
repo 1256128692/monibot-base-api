@@ -90,6 +90,7 @@ public class MonitorItemController {
      * @apiName AddCompanyMonitorItem
      * @apiDescription 保存为公司监测项目模板
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
      * @apiParam (请求参数) {Int[]}  monitorItemIDList 监测项目列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off

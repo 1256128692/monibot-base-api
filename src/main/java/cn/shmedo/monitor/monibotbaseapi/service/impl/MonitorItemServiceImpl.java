@@ -144,12 +144,13 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         Date now = new Date();
         for (TbMonitorItem tbMonitorItem : tbMonitorItems) {
             map.put(tbMonitorItem, temp.get(tbMonitorItem.getID()));
-            tbMonitorItem.setProjectID(-1);
+            tbMonitorItem.setProjectID(Objects.nonNull(pa.getProjectID()) ? pa.getProjectID() : -1);
             tbMonitorItem.setCreateTime(now);
             tbMonitorItem.setCreateUserID(userID);
             tbMonitorItem.setUpdateTime(now);
             tbMonitorItem.setUpdateUserID(userID);
-            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
+            // 和原有的保持一致
+//            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
         tbMonitorItemMapper.insertBatch(map.keySet());
         map.forEach((key, value) -> {
