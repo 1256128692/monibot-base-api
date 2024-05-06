@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeField;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -17,4 +18,6 @@ import java.util.List;
 public class TbMonitorType4web extends TbMonitorType {
     private Integer datasourceCount;
     private List<TbMonitorTypeField> fieldList;
+//    @JsonIgnore
+    private boolean usePredefinedMonitorType;
 }

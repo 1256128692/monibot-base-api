@@ -33,7 +33,13 @@ public interface TbMonitorTypeMapper extends BaseMapper<TbMonitorType> {
 
     List<MonitorTypeBaseInfo> selectMonitorBaseInfo(List<Integer> monitorItemIDList);
 
-    IPage<TbMonitorType4web> queryPage(Page<TbMonitorType4web> page, Integer companyID, Byte createType, String queryCode, List<Integer> typeList, Integer monitorType, Integer projectID);
+    IPage<TbMonitorType4web> queryPage(Page<TbMonitorType4web> page,
+                                       @Param("companyID")Integer companyID,
+                                       @Param("createType")Byte createType,
+                                       @Param("queryCode")String queryCode,
+                                       @Param("typeList")List<Integer> typeList,
+                                       @Param("monitorType") Integer monitorType,
+                                       @Param("projectID")Integer projectID);
 
     List<TbMonitorType> queryByTemplateIDList(List<Integer> templateIDList);
 

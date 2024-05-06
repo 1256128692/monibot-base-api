@@ -202,7 +202,7 @@ public class MonitorTypeController {
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
      * @apiName QueryMonitorTypePage
-     * @apiDescription 查询监测类型分页
+     * @apiDescription 查询监测类型分页 1、排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
      * @apiParam (请求参数) {Int} companyID 公司ID
      * @apiParam (请求参数) {Int} [monitorType] 监测类型
      * @apiParam (请求参数) {Int} [projectID]  项目ID, 该项存在时候,返回工程项目对应的监测项目的监测类型

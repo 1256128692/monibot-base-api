@@ -23,12 +23,12 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    ID, CompanyID, ProjectID, MonitorType, MonitorClass, `Name`, `Alias`, `Enable`, CreateType, 
+    ID, CompanyID, ProjectID, MonitorType, MonitorClass, `Name`, `Alias`, `Enable`, CreateType,
     ProjectType, ExValue, DisplayOrder, CreateTime, CreateUserID, UpdateTime, UpdateUserID
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     <!--@mbg.generated-->
-    select 
+    select
     <include refid="Base_Column_List" />
     from tb_monitor_item
     where ID = #{ID,jdbcType=INTEGER}
@@ -40,16 +40,16 @@
   </delete>
   <insert id="insert" keyColumn="ID" keyProperty="ID" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tb_monitor_item (CompanyID, ProjectID, MonitorType, 
-      MonitorClass, `Name`, `Alias`, 
-      `Enable`, CreateType, ProjectType, 
-      ExValue, DisplayOrder, CreateTime, 
+    insert into tb_monitor_item (CompanyID, ProjectID, MonitorType,
+      MonitorClass, `Name`, `Alias`,
+      `Enable`, CreateType, ProjectType,
+      ExValue, DisplayOrder, CreateTime,
       CreateUserID, UpdateTime, UpdateUserID
       )
-    values (#{companyID,jdbcType=INTEGER}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER}, 
-      #{monitorClass,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{alias,jdbcType=VARCHAR}, 
-      #{enable,jdbcType=BIT}, #{createType,jdbcType=TINYINT}, #{projectType,jdbcType=INTEGER}, 
-      #{exValue,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, 
+    values (#{companyID,jdbcType=INTEGER}, #{projectID,jdbcType=INTEGER}, #{monitorType,jdbcType=INTEGER},
+      #{monitorClass,jdbcType=TINYINT}, #{name,jdbcType=VARCHAR}, #{alias,jdbcType=VARCHAR},
+      #{enable,jdbcType=BIT}, #{createType,jdbcType=TINYINT}, #{projectType,jdbcType=INTEGER},
+      #{exValue,jdbcType=VARCHAR}, #{displayOrder,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP},
       #{createUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}
       )
   </insert>
@@ -522,4 +522,11 @@
       </foreach>
       )
   </select>
+    <select id="selectByMonitorType" resultType="java.lang.Integer">
+        select id
+        from tb_monitor_item
+        where CompanyID=#{companyID}
+        and MonitorType in(
+            select MonitorType from tb_monitor_type where CreateType=#{createType} and CompanyID=-1)
+    </select>
 </mapper>

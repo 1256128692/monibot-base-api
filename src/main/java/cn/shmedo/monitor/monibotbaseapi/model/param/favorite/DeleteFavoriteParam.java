@@ -5,18 +5,19 @@ import cn.shmedo.iot.entity.api.Resource;
 import cn.shmedo.iot.entity.api.ResourceType;
 import cn.shmedo.iot.entity.api.ResultWrapper;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class DeleteFavoriteParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull(message = "公司id不能为空")
     private Integer companyID;
     @NotEmpty(message = "收藏id不能为空")
+    @JsonProperty("IDList")
     private List<Integer> IDList;
 
     @Override

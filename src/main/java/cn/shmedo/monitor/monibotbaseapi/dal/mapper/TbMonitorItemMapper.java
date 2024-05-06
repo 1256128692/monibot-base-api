@@ -1,6 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
@@ -63,4 +64,6 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
     List<MonitorPointAllInfoV1> queryListByProjectIDAndMonitorItemID(Integer projectID, Integer monitorItemID, Boolean enable);
 
     List<MonitorItemBaseInfo> selectListByEventIDList(List<Integer> eventIDList);
+
+    List<Integer> selectByMonitorType(@Param("companyID") Integer companyID, @Param("createType") Byte createType);
 }

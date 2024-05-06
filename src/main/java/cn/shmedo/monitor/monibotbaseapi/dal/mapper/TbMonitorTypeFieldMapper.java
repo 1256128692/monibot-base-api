@@ -9,6 +9,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeF
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.FieldBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.thematicDataAnalysis.MonitorTypeFieldV2;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(String fuzzyFieldName, String fuzzyFieldToken, String queryCode, Boolean allFiled);
 
-    List<TbMonitorTypeField> queryByMonitorTypes(List<Integer> monitorTypes, Boolean allFiled);
+    List<TbMonitorTypeField> queryByMonitorTypes(@Param("monitorTypes") List<Integer> monitorTypes, @Param("allFiled") Boolean allFiled);
 
     List<MonitorTypeFieldV2> queryByMonitorTypesV2(List<Integer> monitorTypes, Boolean allFiled);
 

@@ -30,11 +30,11 @@ public class FavoriteController {
      * @api {post} /AddFavorite 新增企业下收藏
      * @apiDescription 新增企业下收藏
      * @apiVersion 1.0.0
-     * @apiGroup 监测项目模块
+     * @apiGroup 企业收藏模块
      * @apiName AddFavorite
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} subjectType 0-监测项目
-     * @apiParam (请求体) {Int[]} subjectID 收藏对象ID
+     * @apiParam (请求体) {Int[]} subjectIDSet 收藏对象ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
      * @apiPermission 系统权限 mdmbase:AddMonitorItem
@@ -50,7 +50,7 @@ public class FavoriteController {
      * @api {post} /DeleteFavorite 删除企业下收藏
      * @apiDescription 删除企业下收藏
      * @apiVersion 1.0.0
-     * @apiGroup 监测项目模块
+     * @apiGroup 企业收藏模块
      * @apiName DeleteFavorite
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int[]} IDList 收藏ID列表

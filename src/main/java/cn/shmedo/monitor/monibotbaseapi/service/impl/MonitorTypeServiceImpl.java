@@ -20,6 +20,7 @@ import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.Model;
+import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
@@ -85,6 +86,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (ObjectUtil.isEmpty(pageData.getRecords())) {
             return PageUtil.Page.empty();
         }
+        // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
+        // 查询监测项目中用了预定义监测类型的监测项目id
+        List<Integer> monitorItemIDList = tbMonitorItemMapper.selectByMonitorType(pa.getCompanyID(), CreateType.PREDEFINED.getType());
         // 处理字段和数据源统计
         List<Integer> monitorTypeList = pageData.getRecords().stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
@@ -94,8 +98,14 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         pageData.getRecords().forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
             item.setFieldList(typeMap.get(item.getMonitorType()));
+            if (monitorItemIDList.contains(item.getID()))
+                item.setUsePredefinedMonitorType(true);
         });
-        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+        return new PageUtil.Page<>(
+                pageData.getPages(),
+                pageData.getRecords().stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
+                        .thenComparing(TbMonitorType4web::isUsePredefinedMonitorType).reversed()).toList(),
+                pageData.getTotal());
     }
 
     @Override
