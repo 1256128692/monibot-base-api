@@ -81,12 +81,11 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             typeList = null;
         } else {
             typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode(), pa.getAllFiled());
-            if (CollectionUtils.isEmpty(typeList)) {
-                return PageUtil.Page.empty();
-            }
+//            if (CollectionUtils.isEmpty(typeList)) {
+//                return PageUtil.Page.empty();
+//            }
         }
-        List<TbMonitorType4web> records = baseMapper.queryPage(pa.getCompanyID(), pa.getCreateType(),
-                pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID(), pa.getTypeName());
+        List<TbMonitorType4web> records = baseMapper.queryPage(pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID());
         if (ObjectUtil.isEmpty(records))
             return PageUtil.Page.empty();
 
@@ -415,15 +414,10 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Transactional(rollbackFor = Exception.class)
     public void updateCustomizedMonitorType(UpdateCustomizedMonitorTypeParam pa) {
         TbMonitorType tbMonitorTypeNew = pa.update();
-        baseMapper.updateByPrimaryKey(
-                tbMonitorTypeNew
-        );
+        baseMapper.updateByPrimaryKey(tbMonitorTypeNew);
 
         // 更新缓存
-        setMonitorTypeCache(tbMonitorTypeNew,
-                tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(tbMonitorTypeNew.getMonitorType()), true
-                )
-        );
+        setMonitorTypeCache(tbMonitorTypeNew, tbMonitorTypeFieldMapper.queryByMonitorTypes(List.of(tbMonitorTypeNew.getMonitorType()), true));
     }
 
     @Override

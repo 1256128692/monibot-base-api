@@ -26,7 +26,10 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     int updateByPrimaryKey(TbMonitorTypeField record);
 
-    List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(String fuzzyFieldName, String fuzzyFieldToken, String queryCode, Boolean allFiled);
+    List<Integer> queryMonitorTypeByFuzzyNameAndFuzzyToken(@Param("fuzzyFieldName") String fuzzyFieldName,
+                                                           @Param("fuzzyFieldToken")String fuzzyFieldToken,
+                                                           @Param("queryCode")String queryCode,
+                                                           @Param("allFiled")Boolean allFiled);
 
     List<TbMonitorTypeField> queryByMonitorTypes(@Param("monitorTypes") List<Integer> monitorTypes, @Param("allFiled") Boolean allFiled);
 
@@ -40,7 +43,7 @@ public interface TbMonitorTypeFieldMapper extends BaseMapper<TbMonitorTypeField>
 
     void deleteByMonitorTypeList(List<Integer> monitorTypeList);
 
-    List<TbMonitorTypeFieldWithItemID> queryByMonitorItemIDs(List<Integer> monitorItemIDList);
+    List<TbMonitorTypeFieldWithItemID> queryByMonitorItemIDs(@Param("monitorItemIDList") List<Integer> monitorItemIDList);
 
     List<MonitorTypeFieldV1> queryMonitorTypeFieldV1ByMonitorItems(List<Integer> monitorItemIDList);
 

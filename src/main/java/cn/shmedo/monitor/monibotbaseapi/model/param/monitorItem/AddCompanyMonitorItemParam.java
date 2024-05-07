@@ -49,14 +49,13 @@ public class AddCompanyMonitorItemParam implements ParameterValidator, ResourceP
         }
         if (CollectionUtils.isEmpty(tbMonitorItemList) || tbMonitorItemList.size()!= monitorItemIDList.size()){
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不存在");
-
         }
-        if (tbMonitorItemList.stream().anyMatch(item -> !item.getCompanyID().equals(companyID))){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不属于该公司");
-        }
-        if (tbMonitorItemList.stream().anyMatch(item -> item.getCompanyID().equals(-1))){
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "预定义的监测项目不可进行设置");
-        }
+//        if (tbMonitorItemList.stream().anyMatch(item -> !item.getCompanyID().equals(companyID))){
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不属于该公司");
+//        }
+//        if (tbMonitorItemList.stream().anyMatch(item -> item.getCompanyID().equals(-1))){
+//            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "预定义的监测项目不可进行设置");
+//        }
         return null;
     }
 

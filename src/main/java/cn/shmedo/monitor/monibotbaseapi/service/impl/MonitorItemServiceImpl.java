@@ -149,6 +149,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             tbMonitorItem.setCreateUserID(userID);
             tbMonitorItem.setUpdateTime(now);
             tbMonitorItem.setUpdateUserID(userID);
+            tbMonitorItem.setCompanyID(pa.getCompanyID());
             // 和原有的保持一致
 //            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
@@ -168,9 +169,9 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         List<Integer> idList = null;
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(null, null, pa.getQueryCode());
-            if (CollectionUtils.isEmpty(idList)) {
-                return PageUtil.Page.empty();
-            }
+//            if (CollectionUtils.isEmpty(idList)) {
+//                return PageUtil.Page.empty();
+//            }
         }
         IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem(), pa.getMonitorItemID(), pa.getEnable());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {

@@ -220,17 +220,15 @@
         select MonitorType  from tb_monitor_item where ProjectID = #{projectID}
         )
       </if>
-      <if test="typeName != null and typeName != ''">
-        TypeName like concat('%', #{typeName}, '%')
-      </if>
       <if test="queryCode != null and queryCode != ''">
         and (
+        TypeName like concat('%', #{queryCode}, '%')
         <if test="typeList != null and typeList.size &gt; 0">
-          MonitorType in <foreach close=")" collection="typeList" item="type" open="(" separator=",">
-          #{type}
-        </foreach>
+          or MonitorType in
+          <foreach close=")" collection="typeList" item="type" open="(" separator=",">
+            #{type}
+          </foreach>
         </if>
-
         )
       </if>
       <choose>
