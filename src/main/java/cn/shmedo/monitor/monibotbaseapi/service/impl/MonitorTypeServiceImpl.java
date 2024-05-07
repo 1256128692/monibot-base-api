@@ -124,7 +124,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
                 item.setUsePredefinedMonitorType(true);
         });
         // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型
-        records = records.stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType).reversed()
+        records = records.stream().sorted(Comparator.comparing(TbMonitorType4web::getCreateType)
                 .thenComparing(TbMonitorType4web::isUsePredefinedMonitorType).reversed()).toList();
         return PageUtil.page(records, pa.getPageSize(), pa.getCurrentPage());
     }
