@@ -52,6 +52,7 @@ public class UpdateMonitorItemParam implements ParameterValidator, ResourcePermi
 
     public TbMonitorItem update(Integer userID, Date now){
         tbMonitorItem.setAlias(alias);
+        tbMonitorItem.setName(alias);
         tbMonitorItem.setEnable(enable);
         if (enable == false) {
             tbMonitorItem.setMonitorClass(null);

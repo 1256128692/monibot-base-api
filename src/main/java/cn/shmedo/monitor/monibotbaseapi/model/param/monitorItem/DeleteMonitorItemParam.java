@@ -46,7 +46,7 @@ public class DeleteMonitorItemParam implements ParameterValidator, ResourcePermi
         if (tbMonitorItemMapper.selectCount(
                 new QueryWrapper<TbMonitorItem>().eq("projectID", projectID).in("ID", monitorItemIDList)
         ) != monitorItemIDList.size()) {
-            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不能存在或者不属于该项目");
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "有监测项目不存在或者不属于该项目");
         }
         TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
         if (tbMonitorPointMapper.selectCount(
