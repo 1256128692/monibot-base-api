@@ -26,6 +26,8 @@ public class QueryMonitorTypePageParam implements ParameterValidator, ResourcePe
     private String queryCode;
     private Boolean allFiled;
     private Integer projectID;
+    @NotNull
+    private Integer requiredProjectID;
     private Integer usedMonitorItem;
     @Range(min = 1, max = 100, message = "分页大小必须在1-100之间")
     @NotNull(message = "pageSize不能为空")

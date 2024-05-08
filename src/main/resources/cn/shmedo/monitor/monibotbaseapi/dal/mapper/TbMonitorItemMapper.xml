@@ -349,6 +349,9 @@
         from tb_monitor_item as it
         left join tb_monitor_type as t on t.MonitorType = it.MonitorType
         where ProjectID = #{projectID}
+        <if test="monitorTypeCreateType != null">
+            and t.CreateType = #{monitorTypeCreateType}
+        </if>
         <if test="enable != null">
             and it.Enable = #{enable}
         </if>

@@ -25,6 +25,8 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeWithMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
@@ -74,17 +76,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
 
     @Override
     public PageUtil.Page<TbMonitorType4web> queryMonitorTypePage(QueryMonitorTypePageParam pa) {
-
-//        Page<TbMonitorType4web> page = new Page<>(pa.getCurrentPage(), pa.getPageSize());
-        List<Integer> typeList;
-        if (StringUtils.isBlank(pa.getQueryCode())) {
-            typeList = null;
-        } else {
+        List<Integer> typeList = null;
+        if (StringUtils.isNotBlank(pa.getQueryCode()))
             typeList = tbMonitorTypeFieldMapper.queryMonitorTypeByFuzzyNameAndFuzzyToken(null, null, pa.getQueryCode(), pa.getAllFiled());
-//            if (CollectionUtils.isEmpty(typeList)) {
-//                return PageUtil.Page.empty();
-//            }
-        }
         List<TbMonitorType4web> records = baseMapper.queryPage(pa.getCompanyID(), pa.getCreateType(), pa.getQueryCode(), typeList, pa.getMonitorType(), pa.getProjectID());
         if (ObjectUtil.isEmpty(records))
             return PageUtil.Page.empty();
@@ -110,7 +104,9 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             return PageUtil.Page.empty();
 
         // 查询监测项目中用了预定义监测类型的监测项目
-        List<Integer> monitorItemIDList = tbMonitorItemMapper.selectByMonitorType(pa.getCompanyID(), CreateType.PREDEFINED.getType());
+        List<MonitorItemV1> monitorItemV1List = tbMonitorItemMapper.queryMonitorItemV1By(pa.getRequiredProjectID(),
+                null, null, null, CreateType.PREDEFINED.getType());
+        Set<Integer> monitorTypeSet = monitorItemV1List.stream().map(MonitorItemV1::getMonitorType).collect(Collectors.toSet());
         // 处理字段和数据源统计
         List<Integer> monitorTypeList = records.stream().map(TbMonitorType4web::getMonitorType).collect(Collectors.toList());
         List<TbMonitorTypeField> temp = tbMonitorTypeFieldMapper.queryByMonitorTypes(monitorTypeList, pa.getAllFiled());
@@ -120,7 +116,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         records.forEach(item -> {
             item.setDatasourceCount(countMap.get(item.getMonitorType()));
             item.setFieldList(typeMap.get(item.getMonitorType()));
-            if (monitorItemIDList.contains(item.getID()))
+            if (monitorTypeSet.contains(item.getMonitorType()))
                 item.setUsePredefinedMonitorType(true);
         });
         // 排序规则：自定义监测类型、监测项目中用到的预定义监测类型、其他监测类型

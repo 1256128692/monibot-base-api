@@ -32,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
+import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
 import cn.shmedo.monitor.monibotbaseapi.service.SensorService;
 import cn.shmedo.monitor.monibotbaseapi.service.file.FileService;
@@ -48,6 +49,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import jakarta.annotation.Resource;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,6 +100,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Resource
     private MonitorTypeService monitorTypeService;
 
+    @Resource
+    private TbMonitorItemMapper tbMonitorItemMapper;
 
     @Override
     public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
@@ -153,9 +157,16 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Set<Integer> monitorTypes = monitorTypeTemplateMapper.selectList(wrapper)
                 .stream().map(TbMonitorTypeTemplate::getMonitorType).collect(Collectors.toSet());
 
+        // 工程下监测项目
+        List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
+                .eq(TbMonitorItem::getCompanyID, request.getCompanyID())
+                .eq(TbMonitorItem::getProjectID, request.getProjectID()));
+        Set<Integer> monitorTypeSet = tbMonitorItemList.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toSet());
+        Collection<Integer> monitorTypeIntersection = CollectionUtils.intersection(monitorTypes, monitorTypeSet);
+
         if (!monitorTypes.isEmpty()) {
             return monitorTypeMapper.selectList(Wrappers.lambdaQuery(TbMonitorType.class)
-                            .in(TbMonitorType::getMonitorType, monitorTypes)
+                            .in(TbMonitorType::getMonitorType, monitorTypeIntersection)
                             .in(TbMonitorType::getCompanyID, List.of(-1, request.getCompanyID())))
                     .stream().map(MonitorTypeCatalogResponse::valueOf).toList();
         }
@@ -561,6 +572,11 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 throw new InvalidParameterException("不支持的数据源组合类型");
             }
         }
+        return null;
+    }
+
+    @Override
+    public Object querySensorConfigList(QuerySensorConfigListParam param) {
         return null;
     }
 

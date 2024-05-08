@@ -111,7 +111,6 @@ public class MonitorItemServiceImpl implements MonitorItemService {
     public void addMonitorItem(AddMonitorItemParam pa, Integer userID) {
         TbMonitorItem tbMonitorItem = Param2DBEntityUtil.fromAddMonitorItemParam2TbMonitorItem(pa, userID);
         tbMonitorItemMapper.insert(tbMonitorItem);
-
         tbMonitorItemFieldMapper.insertBatch(tbMonitorItem.getID(), pa.getFieldItemList());
     }
 
@@ -150,15 +149,9 @@ public class MonitorItemServiceImpl implements MonitorItemService {
             tbMonitorItem.setUpdateTime(now);
             tbMonitorItem.setUpdateUserID(userID);
             tbMonitorItem.setCompanyID(pa.getCompanyID());
-            // 和原有的保持一致
-//            tbMonitorItem.setCreateType(CreateType.PREDEFINED.getType());
         }
         tbMonitorItemMapper.insertBatch(map.keySet());
-        map.forEach((key, value) -> {
-            value.forEach(item -> {
-                item.setMonitorItemID(key.getID());
-            });
-        });
+        map.forEach((key, value) -> value.forEach(item -> item.setMonitorItemID(key.getID())));
         tbMonitorItemFieldMapper.insertEntityBatch(map.values().stream().flatMap(Collection::stream).collect(Collectors.toList()));
     }
 
@@ -169,9 +162,6 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         List<Integer> idList = null;
         if (StringUtils.isNotBlank(pa.getQueryCode())) {
             idList = tbMonitorItemFieldMapper.queryItemListByFieldTokenAndName(null, null, pa.getQueryCode());
-//            if (CollectionUtils.isEmpty(idList)) {
-//                return PageUtil.Page.empty();
-//            }
         }
         IPage<MonitorItem4Web> pageData = tbMonitorItemMapper.queryPage(page, pa.getCompanyID(), pa.getProjectID(), pa.getCreateType(), pa.getQueryCode(), pa.getMonitorType(), idList, pa.getCompanyItem(), pa.getMonitorItemID(), pa.getEnable());
         if (CollectionUtils.isEmpty(pageData.getRecords())) {
@@ -188,7 +178,7 @@ public class MonitorItemServiceImpl implements MonitorItemService {
 
     @Override
     public List<MonitorItemV1> queryMonitorItemList(QueryMonitorItemListParam pa) {
-        List<MonitorItemV1> list = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType(), pa.getEnable());
+        List<MonitorItemV1> list = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectID(), pa.getMonitorItemName(), pa.getMonitorType(), pa.getEnable(), null);
         if (CollectionUtils.isNotEmpty(list)) {
             List<Integer> monitorItemIDList = list.stream().map(MonitorItemV1::getItemID).collect(Collectors.toList());
             List<MonitorTypeFieldV1> temp = tbMonitorTypeFieldMapper.queryMonitorTypeFieldV1ByMonitorItems(monitorItemIDList);

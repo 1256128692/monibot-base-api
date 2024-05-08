@@ -629,8 +629,8 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName QuerySensorConfigList
      * @apiParam (请求体) {Int} companyID 公司ID
-     * @apiParam (请求体) {Int} serviceID 服务ID
      * @apiParam (请求体) {Int} projectID 工程项目ID
+     * @apiParam (请求体) {Int} serviceID 服务ID
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.ID 设备ID
      * @apiSuccess (返回结果) {String} dataList.deviceToken 设备token
@@ -655,8 +655,7 @@ public class SensorController {
      */
     @Permission(permissionName = "mdmbase:ListBaseSensor")
     @PostMapping(value = "/QuerySensorConfigList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
-    public Object querySensorConfigList(@Valid @RequestBody QuerySensorSimpleListRequest param) {
-//        return sensorSrvice.querySensorConfigList(param);
-        return null;
+    public Object querySensorConfigList(@Valid @RequestBody QuerySensorConfigListParam param) {
+        return sensorService.querySensorConfigList(param);
     }
 }

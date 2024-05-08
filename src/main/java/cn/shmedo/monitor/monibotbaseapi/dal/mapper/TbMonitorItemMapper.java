@@ -1,7 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorItem;
-import cn.shmedo.monitor.monibotbaseapi.model.enums.CreateType;
 import cn.shmedo.monitor.monibotbaseapi.model.param.workorder.QueryWorkOrderStatisticsParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorItemBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorPointAllInfoV1;
@@ -54,7 +53,21 @@ public interface TbMonitorItemMapper extends BaseMapper<TbMonitorItem> {
                                      @Param("monitorItemID") Integer monitorItemID,
                                      @Param("enable") Boolean enable);
 
-    List<MonitorItemV1> queryMonitorItemV1By(Integer projectID, String monitorItemName, Integer monitorType, Boolean enable);
+    List<MonitorItem4Web> queryPage(@Param("companyID") Integer companyID,
+                                    @Param("projectID") Integer projectID,
+                                    @Param("createType") Byte createType,
+                                    @Param("queryCode") String queryCode,
+                                    @Param("monitorType") Integer monitorType,
+                                    @Param("idList") List<Integer> idList,
+                                    @Param("companyItem") Boolean companyItem,
+                                    @Param("monitorItemID") Integer monitorItemID,
+                                    @Param("enable") Boolean enable);
+
+    List<MonitorItemV1> queryMonitorItemV1By(@Param("projectID") Integer projectID,
+                                             @Param("monitorItemName") String monitorItemName,
+                                             @Param("monitorType") Integer monitorType,
+                                             @Param("enable") Boolean enable,
+                                             @Param("monitorTypeCreateType") Byte monitorTypeCreateType);
 
     List<MonitorItemWithPoint> queryMonitorItemWithPointBy(Integer projectID, List<Integer> monitorItemIDList, Boolean itemEnable);
 

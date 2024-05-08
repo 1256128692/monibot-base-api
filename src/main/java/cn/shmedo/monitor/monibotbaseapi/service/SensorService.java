@@ -127,4 +127,6 @@ public interface SensorService extends IService<TbSensor> {
     List<SensorSimple> querySimpleList(QuerySensorSimpleListRequest param);
 
     TryingResponse calculateField(CalculateFieldRequest request);
+
+    Object querySensorConfigList(QuerySensorConfigListParam param);
 }
