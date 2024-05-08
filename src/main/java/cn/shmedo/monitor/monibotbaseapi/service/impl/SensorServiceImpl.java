@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.lang.Dict;
@@ -31,6 +32,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.SensorKindEnum;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryDeviceAndSensorRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.param.video.VideoDeviceInfoV5;
+import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.*;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorItemService;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
@@ -55,6 +57,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -103,6 +106,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Resource
     private TbMonitorItemMapper tbMonitorItemMapper;
 
+    @Resource
+    private TbMonitorPointMapper tbMonitorPointMapper;
+
     @Override
     public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
         Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
@@ -134,7 +140,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     if (DataSourceType.IOT_SENSOR.getCode() == e.getDataSourceType()) {
                         List<DeviceWithSensor> childList = iotMap.getOrDefault(token, List.of())
                                 .stream().peek(device -> device.setSensorList(device.getSensorList().stream()
-                                        .filter(sensor -> sensor.iotSensorType().equals(token)).toList()))
+                                        .filter(sensor -> sensor.getIotSensorType().equals(token)).toList()))
                                 .filter(device -> !device.getSensorList().isEmpty())
                                 .toList();
                         e.setChildList(childList);
@@ -576,8 +582,40 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     }
 
     @Override
-    public Object querySensorConfigList(QuerySensorConfigListParam param) {
-        return null;
+    public List<SensorConfigListResponse> querySensorConfigList(QuerySensorConfigListParam param) {
+        QueryDeviceAndSensorRequest request = QueryDeviceAndSensorRequest.builder()
+                .companyID(param.getCompanyID())
+                .sendType(param.getSendType())
+                .sendAddressList(List.of(param.getProjectID().toString()))
+                .build();
+        ResultWrapper<List<DeviceWithSensor>> resultWrapper = iotService.queryDeviceAndSensorList(request);
+        if (!resultWrapper.apiSuccess() || resultWrapper.getData().isEmpty())
+            return null;
+        List<SensorConfigListResponse> responseList = BeanUtil.copyToList(resultWrapper.getData(), SensorConfigListResponse.class);
+        Map<String, SensorConfigListResponse.DeviceSensor> map = new HashMap<>();
+        responseList.forEach(item -> item.getSensorList().forEach(sensor -> map.put(item.getUniqueToken() + "@" + sensor.getSensorName(), sensor)));
+        // 查询监测传感器信息
+        List<SensorConfigListResponse.MonitorSensor> monitorSensorList = baseMapper.listSensor(param.getProjectID(), map.keySet());
+        Map<String, List<SensorConfigListResponse.MonitorSensor>> monitorSensorMap = monitorSensorList.stream().collect(
+                Collectors.groupingBy(SensorConfigListResponse.MonitorSensor::getDataSourceToken));
+        // 监测类型
+        Map<Integer, String> monitorTypeMap = monitorTypeMapper.selectList(null)
+                .stream().collect(Collectors.toMap(TbMonitorType::getMonitorType, TbMonitorType::getTypeName));
+        // 监测点
+        Map<Integer, List<MonitorPointInfo>> pointInfoMap = tbMonitorPointMapper.selectMonitorPoints(param.getProjectID(), null)
+                .stream().collect(Collectors.groupingBy(MonitorPointInfo::getID));
+        // 给监测传感器赋值信息检测类型、监测点、监测点组等
+        monitorSensorMap.forEach((dataSourceToken, sensorList) -> sensorList.forEach(sensor -> {
+            List<MonitorPointInfo> monitorPointInfoList = pointInfoMap.get(sensor.getID());
+            sensor.setMonitorTypeName(monitorTypeMap.get(sensor.getMonitorType()));
+            sensor.setMonitorPointName(CollectionUtil.isEmpty(monitorPointInfoList) ? "" : monitorPointInfoList.get(0).getMonitorPointName());
+            sensor.setMonitorGroupList(CollectionUtil.isEmpty(monitorPointInfoList) ? null : BeanUtil.copyToList(monitorPointInfoList, SensorConfigListResponse.MonitorGroup.class));
+        }));
+        responseList.forEach(item -> item.getSensorList().forEach(sensor ->
+                sensor.setMonitorSensorList(
+                        monitorSensorMap.get(item.getUniqueToken() + "@" + sensor.getSensorName())
+                )));
+        return responseList;
     }
 
     /**
@@ -609,7 +647,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             if (wrapper.apiSuccess()) {
                 List<DeviceWithSensor> data = wrapper.getData();
                 data.forEach(item -> {
-                    item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::iotSensorType))
+                    item.getSensorList().stream().collect(Collectors.groupingBy(DeviceWithSensor.Sensor::getIotSensorType))
                             .forEach((iotSensorType, list) -> {
                                 DeviceWithSensor temp = BeanUtil.copyProperties(item, DeviceWithSensor.class);
                                 temp.setSensorList(list);

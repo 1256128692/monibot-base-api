@@ -999,4 +999,22 @@
         </if>
         GROUP BY tmp.MonitorItemID, tmi.NAME, tmi.monitorType
     </select>
+
+    <select id="selectMonitorPoints"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointInfo">
+        select tmp.ID ID,tmp.ProjectID,tmp.MonitorType,tmp.MonitorItemID,tmp.Name monitorPointName,
+            tmg.ID monitorGroupID,tmg.Name monitorGroupName
+        from tb_monitor_point tmp
+        left join tb_monitor_group_point tmgp on tmgp.MonitorPointID=tmp.ID
+        left join tb_monitor_group tmg on tmg.ID= tmgp.MonitorGroupID
+        WHERE 1=1
+        <if test="projectID != null">
+            and tmp.ProjectID = #{projectID}
+        </if>
+        <if test="monitorPointIDList != null and monitorPointIDList.size() != 0">
+            <foreach collection="monitorPointIDList" separator="," item="item" open=" AND tmp.ID IN (" close=") ">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

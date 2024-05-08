@@ -1,5 +1,6 @@
 package cn.shmedo.monitor.monibotbaseapi.model.response.sensor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
@@ -19,26 +20,37 @@ public class SensorConfigListResponse {
     private Integer ID;
     private String deviceToken;
     private String deviceName;
-    private List<DeviceSensor> deviceSensorList;
+    private String uniqueToken;
+    @JsonProperty("deviceSensorList")
+    private List<DeviceSensor> sensorList;
 
-    private static class DeviceSensor {
+    @Data
+    public static class DeviceSensor {
         @JsonProperty("ID")
-        private Integer ID;
-        private Integer projectID;
-        private String name;
+        private Integer id;
+        @JsonProperty("name")
+        private String sensorName;
         private String alias;
-        private String uniqueToken;
         private List<MonitorSensor> monitorSensorList;
     }
+
+    @Data
     public static class MonitorSensor{
         @JsonProperty("ID")
         private Integer ID;
         private String name;
-        private String monitorTypeID;
+        private Integer monitorType;
         private String monitorTypeName;
-        private String monitorPointID;
+        private Integer monitorPointID;
         private String monitorPointName;
-        private String monitorGroupID;
+        @JsonIgnore
+        private String dataSourceToken;
+        private List<MonitorGroup> monitorGroupList;
+    }
+
+    @Data
+    public static class MonitorGroup{
+        private Integer monitorGroupID;
         private String monitorGroupName;
     }
 }

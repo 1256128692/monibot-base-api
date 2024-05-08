@@ -133,6 +133,8 @@ public interface TbSensorMapper extends BasicMapper<TbSensor> {
 
     List<SensorWithIot> listSensorWithIot();
 
+    List<SensorConfigListResponse.MonitorSensor> listSensor(Integer projectID, Collection<String> dataSourceTokens);
+
     /**
      * 自动根据数据预警更新传感器状态
      */

@@ -1065,6 +1065,24 @@
           AND tsds.DataSourceComposeType = 1
     </select>
 
+    <select id="listSensor" resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorConfigListResponse$MonitorSensor">
+        SELECT ts.ID ID,ts.Name name,ts.MonitorType monitorType,ts.MonitorPointID monitorPointID,tsds.DataSourceToken dataSourceToken
+        FROM `tb_sensor` ts
+        LEFT JOIN tb_sensor_data_source tsds ON ts.DataSourceID = tsds.DataSourceID
+        WHERE 1=1
+        AND tsds.DataSourceType = 1
+        AND tsds.DataSourceComposeType = 1
+        <if test="projectID != null">
+            AND ts.ProjectID=#{projectID}
+        </if>
+        <if test="dataSourceTokens != null and dataSourceTokens.size() != 0">
+            AND tsds.DataSourceToken IN
+            <foreach collection="dataSourceTokens" separator="," item="item" open=" (" close=") ">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
     <select id="autoUpdateStatusById" resultType="java.lang.Integer">
         UPDATE `tb_sensor`
         SET `Status` = IFNULL((SELECT WarnLevel

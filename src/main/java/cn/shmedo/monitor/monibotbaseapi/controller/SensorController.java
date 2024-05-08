@@ -630,26 +630,25 @@ public class SensorController {
      * @apiName QuerySensorConfigList
      * @apiParam (请求体) {Int} companyID 公司ID
      * @apiParam (请求体) {Int} projectID 工程项目ID
-     * @apiParam (请求体) {Int} serviceID 服务ID
+     * @apiParam (请求体) {Int} sendType 推送类型 HTTP(0)、AMQP(1)、MDNET(2)、MDCS(3)、HTTP_QUERY(4)、MDMBASE(5)
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
      * @apiSuccess (返回结果) {Int} dataList.ID 设备ID
      * @apiSuccess (返回结果) {String} dataList.deviceToken 设备token
      * @apiSuccess (返回结果) {String} dataList.deviceName 设备名称
      * @apiSuccess (返回结果) {Object[]} dataList.deviceSensorList 设备传感器列表
      * @apiSuccess (返回结果) {Int} dataList.deviceSensorList.ID 传感器ID
-     * @apiSuccess (返回结果) {Int} dataList.deviceSensorList.projectID 所属工程ID
      * @apiSuccess (返回结果) {String} dataList.deviceSensorList.name 传感器名称
      * @apiSuccess (返回结果) {String} dataList.deviceSensorList.alias 传感器别名
-     * @apiSuccess (返回结果) {String} dataList.deviceSensorList.uniqueToken 传感器token
      * @apiSuccess (返回结果) {Object[]} [dataList.deviceSensorList.monitorSensorList] 监测传感器列表
      * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.ID] 监测传感器-名称
      * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.name] 监测传感器-名称
-     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorTypeID] 监测传感器-监测类型
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorType] 监测传感器-监测类型
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorTypeName] 监测传感器-监测类型名称
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorPointID] 监测传感器-监测点
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorPointName] 监测传感器-监测点名称
-     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupID] 监测传感器-监测组
-     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupName] 监测传感器-监测组名称
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList] 监测传感器-监测点-监测组列表
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupID] 监测传感器-监测点-监测组
+     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupName] 监测传感器-监测点-监测组名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensor
      */

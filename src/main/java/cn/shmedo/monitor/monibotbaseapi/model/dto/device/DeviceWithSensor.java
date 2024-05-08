@@ -25,7 +25,12 @@ public class DeviceWithSensor {
     private String uniqueToken;
     private List<Sensor> sensorList;
 
-    public record Sensor(Integer id, String sensorName, String iotSensorType, String alias) {
+    @Data
+    public static class Sensor{
+        private Integer id;
+        private String sensorName;
+        private String iotSensorType;
+        private String alias;
     }
 }
 
