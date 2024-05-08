@@ -104,7 +104,7 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             return PageUtil.Page.empty();
 
         // 查询监测项目中用了预定义监测类型的监测项目
-        List<MonitorItemV1> monitorItemV1List = tbMonitorItemMapper.queryMonitorItemV1By(pa.getRequiredProjectID(),
+        List<MonitorItemV1> monitorItemV1List = tbMonitorItemMapper.queryMonitorItemV1By(pa.getProjectIDSorted(),
                 null, null, null, CreateType.PREDEFINED.getType());
         Set<Integer> monitorTypeSet = monitorItemV1List.stream().map(MonitorItemV1::getMonitorType).collect(Collectors.toSet());
         // 处理字段和数据源统计
