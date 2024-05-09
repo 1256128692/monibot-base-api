@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -25,9 +26,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.enums.MonitorTypeWithMonitorItem;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.third.iot.QueryModelFieldBatchParam;
 import cn.shmedo.monitor.monibotbaseapi.model.response.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItem4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorItem.MonitorItemV1;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeTemplateAndTemplateDataSource;
 import cn.shmedo.monitor.monibotbaseapi.model.response.third.ModelField;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorTypeService;
@@ -37,11 +38,9 @@ import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -714,5 +712,19 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
     @Override
     public Map<String, MonitorTypeCacheData> queryMonitorTypeMap() {
         return redisService.getAll(RedisKeys.MONITOR_TYPE_KEY, MonitorTypeCacheData.class);
+    }
+
+    @Override
+    public List<TbMonitorType> queryMonitorTypeList(MonitorTypeListParam param) {
+        List<MonitorTypeTemplateAndTemplateDataSource> list = tbMonitorTypeTemplateMapper.selectMonitorTypeTemplateList(null);
+        if (StringUtils.isNotBlank(param.getDataSourceToken()))
+            list = list.stream().filter(item ->
+                    Arrays.asList(item.getTemplateDataSourceToken().split(",")).contains(param.getDataSourceToken())).collect(Collectors.toList());
+        if(CollectionUtil.isEmpty(list))
+            return Collections.emptyList();
+        Set<Integer> monitorTypeSet = list.stream().map(MonitorTypeTemplateAndTemplateDataSource::getMonitorType).collect(Collectors.toSet());
+        return baseMapper.selectList(new LambdaQueryWrapper<TbMonitorType>()
+                .in(TbMonitorType::getCompanyID, List.of(param.getCompanyID(), -1))
+                .in(TbMonitorType::getMonitorType, monitorTypeSet));
     }
 }

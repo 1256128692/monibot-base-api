@@ -3,6 +3,7 @@ package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorTypeTemplate;
 import cn.shmedo.monitor.monibotbaseapi.model.param.sensor.DataSourceCatalogRequest;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.DataSourceCatalogResponse;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeTemplateAndTemplateDataSource;
 import cn.shmedo.monitor.monibotbaseapi.model.tempitem.TypeAndCount;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -22,7 +23,9 @@ public interface TbMonitorTypeTemplateMapper extends BaseMapper<TbMonitorTypeTem
 
     int updateByPrimaryKey(TbMonitorTypeTemplate record);
 
-    List<TypeAndCount> countGroupByMonitorType(@Param("monitorTypeList") List<Integer> monitorTypeList, @Param("companyIDList") List<Integer> companyIDList);
+    List<TypeAndCount> countGroupByMonitorType(List<Integer> monitorTypeList, List<Integer> companyIDList);
 
     List<DataSourceCatalogResponse> dataSourceCatalog(DataSourceCatalogRequest request);
+
+    List<MonitorTypeTemplateAndTemplateDataSource> selectMonitorTypeTemplateList(Integer monitorType);
 }

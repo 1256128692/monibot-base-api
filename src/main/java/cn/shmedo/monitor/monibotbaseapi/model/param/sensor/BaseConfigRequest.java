@@ -1,12 +1,19 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeTemplateMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeTemplateAndTemplateDataSource;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author Chengfs on 2023/4/10
@@ -23,8 +30,12 @@ public class BaseConfigRequest implements ParameterValidator, ResourcePermission
     /**
      * 监测类型模板ID
      */
-    @NotNull(message = "监测类型模板ID不能为空")
     private Integer templateID;
+
+    /**
+     * 模板数据源标识
+     */
+    private String templateDataSourceToken;
 
     /**
      * 监测类型
@@ -34,6 +45,19 @@ public class BaseConfigRequest implements ParameterValidator, ResourcePermission
 
     @Override
     public ResultWrapper<?> validate() {
+        if (Objects.isNull(templateID) && StringUtils.isBlank(templateDataSourceToken))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型模板ID，模板数据源标识不能同时为空");
+        if (Objects.isNull(templateID)) {
+            TbMonitorTypeTemplateMapper templateMapper = ContextHolder.getBean(TbMonitorTypeTemplateMapper.class);
+            List<MonitorTypeTemplateAndTemplateDataSource> list = templateMapper.selectMonitorTypeTemplateList(monitorType);
+            list = list.stream().filter(item ->
+                    Arrays.asList(item.getTemplateDataSourceToken().split(",")).contains(templateDataSourceToken)).collect(Collectors.toList());
+            if (CollectionUtil.isEmpty(list))
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型模板不存在");
+            if (list.size() > 1)
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测类型模板存在多个");
+            templateID = list.get(0).getMonitorTypeTemplateID();
+        }
         return null;
     }
 

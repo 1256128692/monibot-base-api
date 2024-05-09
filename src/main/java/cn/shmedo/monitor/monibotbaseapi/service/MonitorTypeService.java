@@ -4,11 +4,9 @@ import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorType;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.param.monitortype.*;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeDetail;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldListV2Info;
-import cn.shmedo.monitor.monibotbaseapi.model.response.MonitorTypeFieldWithFormula;
-import cn.shmedo.monitor.monibotbaseapi.model.response.TbMonitorType4web;
+import cn.shmedo.monitor.monibotbaseapi.model.response.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorType.QueryFormulaParamsResult;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeTemplateAndTemplateDataSource;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -62,4 +60,6 @@ public interface MonitorTypeService extends IService<TbMonitorType> {
     MonitorTypeCacheData queryMonitorType(Integer monitorType);
 
     Map<String, MonitorTypeCacheData> queryMonitorTypeMap();
+
+    List<TbMonitorType> queryMonitorTypeList(MonitorTypeListParam param);
 }

@@ -221,4 +221,15 @@
     </where>
 
     </select>
+    <select id="selectMonitorTypeTemplateList"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.MonitorTypeTemplateAndTemplateDataSource">
+      select t.ID monitorTypeTemplateID,t.Name name,t.TemplateDataSourceID templateDataSourceID,t.MonitorType monitorType,
+        s.TemplateDataSourceToken templateDataSourceToken
+      from tb_monitor_type_template t
+      inner join tb_template_data_source s on t.TemplateDataSourceID=s.TemplateDataSourceID
+      where 1=1
+      <if test="monitorType != null">
+        and t.MonitorType=#{monitorType}
+      </if>
+    </select>
 </mapper>

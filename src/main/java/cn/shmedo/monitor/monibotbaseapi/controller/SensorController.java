@@ -189,7 +189,8 @@ public class SensorController {
      * @apiGroup 传感器模块
      * @apiName BaseConfig
      * @apiParam (请求参数) {Int} projectID 项目ID
-     * @apiParam (请求参数) {String} templateID 监测类型模板ID
+     * @apiParam (请求参数) {Integer} [templateID] 监测类型模板ID（和templateDataSourceToken二选一；若同时传，templateID生效）
+     * @apiParam (请求参数) {String} [templateDataSourceToken] 模板数据源标识（和templateID二选一；若同时传，templateID生效）
      * @apiParam (请求参数) {Int} monitorType 监测类型
      * @apiParamExample 请求体示例
      * {"monitorType":4646,"templateID":5116,"projectID":2730}

@@ -285,6 +285,31 @@ public class MonitorTypeController {
     }
 
     /**
+     * @api {POST} /QueryMonitorTypeList 查询监测类型模板列表
+     * @apiVersion 1.0.0
+     * @apiGroup 监测类型模块
+     * @apiName QueryMonitorTypeList（根据数据源传感器过滤）
+     * @apiDescription 查询监测类型模板列表
+     * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {String} [dataSourceToken] 数据源传感器
+     * @apiSuccess (返回结果) {Object[]} list  参数列表
+     * @apiSuccess (返回结果) {Int} list.id
+     * @apiSuccess (返回结果) {Int} list.monitorType  监测类型
+     * @apiSuccess (返回结果) {Int} list.companyID  公司ID
+     * @apiSuccess (返回结果) {String} [list.monitorTypeClass] 监测类型分类
+     * @apiSuccess (返回结果) {String} list.typeName  类型名称
+     * @apiSuccess (返回结果) {String} list.typeAlias  类型别名
+     * @apiSuccess (返回结果) {Int} list.createType  创建类型
+     * @apiSampleRequest off
+     * @apiPermission 系统权限 mdmbase:ListBaseMonitorType
+     */
+    @Permission(permissionName = "mdmbase:ListBaseMonitorType")
+    @PostMapping(value = "/QueryMonitorTypeList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
+    public Object QueryMonitorTypeList(@RequestBody @Validated MonitorTypeListParam param) {
+        return monitorTypeService.queryMonitorTypeList(param);
+    }
+
+    /**
      * @api {POST} /DeleteMonitorTypeBatch 批量删除监测类型
      * @apiVersion 1.0.0
      * @apiGroup 监测类型模块
