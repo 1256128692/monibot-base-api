@@ -197,7 +197,7 @@ public class MonitorPointServiceImpl implements MonitorPointService {
             Map<Integer, List<TbSensor>> map = tbSensorList.stream().collect(Collectors.groupingBy(TbSensor::getMonitorPointID));
             list.forEach(item -> item.setSensorList(map.get(item.getID())));
         }
-        if (pa.isExcludeBindingSensorOnSingle())
+        if (pa.isExcludedBindingSensorOnSingle())
             // 监测类型为单传感器时，排除绑定了传感器的监测点
             list = list.stream().filter(item ->
                     !(!item.getMonitorTypeMultiSensor() && !CollectionUtil.isNullOrEmpty(item.getSensorList()))).collect(Collectors.toList());

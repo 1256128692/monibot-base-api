@@ -25,7 +25,7 @@ public class QueryMonitorPointListParam implements ParameterValidator, ResourceP
     private String queryCode;
     private Integer monitorType;
     private Integer monitorItemID;
-    private boolean excludeBindingSensorOnSingle;
+    private boolean excludedBindingSensorOnSingle;
 
     @Override
     public ResultWrapper validate() {
