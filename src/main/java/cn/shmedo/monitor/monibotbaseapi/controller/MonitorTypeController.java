@@ -291,6 +291,8 @@ public class MonitorTypeController {
      * @apiName QueryMonitorTypeList（根据数据源传感器过滤）
      * @apiDescription 查询监测类型模板列表
      * @apiParam (请求参数) {Int} companyID 公司ID
+     * @apiParam (请求参数) {Int} [projectID] 工程ID
+     * @apiParam (请求参数) {String} [typeName] 监测类型名称
      * @apiParam (请求参数) {String} [dataSourceToken] 数据源传感器
      * @apiSuccess (返回结果) {Object[]} list  参数列表
      * @apiSuccess (返回结果) {Int} list.id

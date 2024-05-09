@@ -109,6 +109,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Resource
     private TbMonitorPointMapper tbMonitorPointMapper;
 
+    @Resource
+    private TbMonitorGroupPointMapper tbMonitorGroupPointMapper;
+
     @Override
     public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
         Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
@@ -163,16 +166,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         Set<Integer> monitorTypes = monitorTypeTemplateMapper.selectList(wrapper)
                 .stream().map(TbMonitorTypeTemplate::getMonitorType).collect(Collectors.toSet());
 
-        // 工程下监测项目
-        List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
-                .eq(TbMonitorItem::getCompanyID, request.getCompanyID())
-                .eq(TbMonitorItem::getProjectID, request.getProjectID()));
-        Set<Integer> monitorTypeSet = tbMonitorItemList.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toSet());
-        Collection<Integer> monitorTypeIntersection = CollectionUtils.intersection(monitorTypes, monitorTypeSet);
-
         if (!monitorTypes.isEmpty()) {
             return monitorTypeMapper.selectList(Wrappers.lambdaQuery(TbMonitorType.class)
-                            .in(TbMonitorType::getMonitorType, monitorTypeIntersection)
                             .in(TbMonitorType::getCompanyID, List.of(-1, request.getCompanyID())))
                     .stream().map(MonitorTypeCatalogResponse::valueOf).toList();
         }
@@ -191,6 +186,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         TbSensor sensor = new TbSensor();
         sensor.setProjectID(request.getProjectID());
         sensor.setTemplateID(request.getTemplateID());
+        sensor.setMonitorPointID(request.getMonitorPointID());
         sensor.setDataSourceID(UUID.randomUUID().toString());
         sensor.setDataSourceComposeType(request.getDataSourceComposeType().getCode());
         sensor.setMonitorType(request.getMonitorType());
@@ -206,6 +202,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             sensor.setImagePath(fileService.base64Upload(request.getImagePath()));
         }
         baseMapper.insert(sensor);
+
+        // 监测点和监测组关系
+        if (Objects.nonNull(request.getMonitorGroupID()))
+            tbMonitorGroupPointMapper.insert(TbMonitorGroupPoint.builder()
+                    .monitorGroupID(request.getMonitorGroupID()).monitorPointID(request.getMonitorPointID())
+                    .imageLocation(request.getTbMonitorPoint().getImageLocation()).build());
 
         //传感器数据源
         if (CollUtil.isNotEmpty(request.getDataSourceList())) {

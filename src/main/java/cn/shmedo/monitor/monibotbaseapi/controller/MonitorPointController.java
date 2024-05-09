@@ -239,6 +239,7 @@ public class MonitorPointController {
      * @apiParam (请求体) {Int} projectID 工程项目ID
      * @apiParam (请求体) {Int} [monitorType] 监测类型
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {Bool} [excludeBindingSensorOnSingle] 监测类型为单传感器时，是否排除绑定了传感器。默认为false
      * @apiParam (请求体) {String} [queryCode] 检索关键字，可匹配 监测点名称， 传感器名称（别名）
      * @apiSuccess (返回结果) {Object[]} dataList 监测点列表
      * @apiSuccess (返回结果) {Int} dataList.id 监测点ID
@@ -270,11 +271,9 @@ public class MonitorPointController {
      */
     @PostMapping(value = "/QueryMonitorPointList", produces = DefaultConstant.JSON, consumes = DefaultConstant.JSON)
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")
-
     public Object queryMonitorPointList(@Validated @RequestBody QueryMonitorPointListParam pa) {
         return monitorPointService.queryMonitorPointList(pa);
     }
-
 
     /**
      * @api {POST} /QueryMonitorPointSimpleList 查询监测点简要信息列表

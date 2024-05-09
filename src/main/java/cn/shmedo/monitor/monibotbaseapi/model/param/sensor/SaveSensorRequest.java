@@ -14,10 +14,13 @@ import cn.shmedo.iot.entity.api.monitor.enums.DataSourceType;
 import cn.shmedo.iot.entity.api.monitor.enums.FieldClass;
 import cn.shmedo.iot.entity.api.monitor.enums.ParameterSubjectType;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
@@ -65,6 +68,10 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     @NotNull(message = "监测类型不能为空")
     private Integer monitorType;
 
+    private Integer monitorPointID;
+
+    private Integer monitorGroupID;
+
     /**
      * 数据来源类型, 默认为1 <br/>
      * 1单一物模型单一传感器 <br/>
@@ -107,6 +114,8 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     @JsonIgnore
     private Boolean manual;
 
+    @JsonIgnore
+    private TbMonitorPoint tbMonitorPoint;
 
     @Data
     public static class DataSource {
@@ -146,6 +155,15 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     @Override
     public ResultWrapper<?> validate() {
         manual = DataSourceComposeType.MANUAL_MONITOR_DATA.equals(dataSourceComposeType);
+
+        if (Objects.isNull(monitorPointID) && Objects.nonNull(monitorGroupID))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选择了监测组时，监测点不能为空");
+        if (Objects.nonNull(monitorPointID)) {
+            TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+            tbMonitorPoint = tbMonitorPointMapper.selectById(monitorPointID);
+            if(Objects.isNull(tbMonitorPoint))
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+        }
 
         //校验名称
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);

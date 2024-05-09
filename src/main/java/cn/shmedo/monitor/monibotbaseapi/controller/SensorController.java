@@ -239,6 +239,8 @@ public class SensorController {
      * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} alias 传感器别名
      * @apiParam (请求体) {Int} monitorType 监测类型
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点
+     * @apiParam (请求体) {Int} [monitorGroupID] 监测组
      * @apiParam (请求体) {Int} [templateID] 监测类型模板ID, 仅当dataSourceComposeType为100时不需要
      * @apiParam (请求体) {String} [dataSourceComposeType] 数据来源类型, 默认为1 <br/>      1单一物模型单一传感器 <br/>      2多个物联网传感器（同一物模型多个或者不同物模型多个）<br/>      3物联网传感器+监测传感器<br/>      4单个监测传感器<br/>      5多个监测传感器<br/>      100API推送<br/>      500人工传感器
      * @apiParam (请求体) {Object[]} [dataSourceList] 数据源列表, 仅当dataSourceComposeType为100时不需要

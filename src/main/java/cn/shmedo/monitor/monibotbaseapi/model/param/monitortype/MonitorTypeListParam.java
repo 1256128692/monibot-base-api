@@ -19,6 +19,8 @@ import lombok.NoArgsConstructor;
 public class MonitorTypeListParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
     @NotNull
     private Integer companyID;
+    private Integer projectID;
+    private String typeName;
     private String dataSourceToken;
     @Override
     public ResultWrapper validate() {

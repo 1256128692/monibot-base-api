@@ -720,10 +720,18 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
         if (StringUtils.isNotBlank(param.getDataSourceToken()))
             list = list.stream().filter(item ->
                     Arrays.asList(item.getTemplateDataSourceToken().split(",")).contains(param.getDataSourceToken())).collect(Collectors.toList());
-        if(CollectionUtil.isEmpty(list))
+        if (CollectionUtil.isEmpty(list))
             return Collections.emptyList();
         Set<Integer> monitorTypeSet = list.stream().map(MonitorTypeTemplateAndTemplateDataSource::getMonitorType).collect(Collectors.toSet());
+        if (Objects.nonNull(param.getProjectID())) {
+            List<TbMonitorItem> tbMonitorItemList = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
+                    .eq(TbMonitorItem::getCompanyID, param.getCompanyID())
+                    .eq(TbMonitorItem::getProjectID, param.getProjectID()));
+            Set<Integer> monitorTypeSet2 = tbMonitorItemList.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toSet());
+            monitorTypeSet = new HashSet<>(org.apache.commons.collections4.CollectionUtils.intersection(monitorTypeSet, monitorTypeSet2));
+        }
         return baseMapper.selectList(new LambdaQueryWrapper<TbMonitorType>()
+                .eq(StringUtils.isNotBlank(param.getTypeName()), TbMonitorType::getTypeName, param.getTypeName())
                 .in(TbMonitorType::getCompanyID, List.of(param.getCompanyID(), -1))
                 .in(TbMonitorType::getMonitorType, monitorTypeSet));
     }
