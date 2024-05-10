@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -70,7 +71,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
 
     private Integer monitorPointID;
 
-    private Integer monitorGroupID;
+    private List<Integer> monitorGroupIDList;
 
     /**
      * 数据来源类型, 默认为1 <br/>
@@ -156,7 +157,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     public ResultWrapper<?> validate() {
         manual = DataSourceComposeType.MANUAL_MONITOR_DATA.equals(dataSourceComposeType);
 
-        if (Objects.isNull(monitorPointID) && Objects.nonNull(monitorGroupID))
+        if (Objects.isNull(monitorPointID) && CollectionUtil.isNotEmpty(monitorGroupIDList))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选择了监测组时，监测点不能为空");
         if (Objects.nonNull(monitorPointID)) {
             TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);

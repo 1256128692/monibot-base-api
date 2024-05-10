@@ -730,6 +730,8 @@ public class MonitorTypeServiceImpl extends ServiceImpl<TbMonitorTypeMapper, TbM
             Set<Integer> monitorTypeSet2 = tbMonitorItemList.stream().map(TbMonitorItem::getMonitorType).collect(Collectors.toSet());
             monitorTypeSet = new HashSet<>(org.apache.commons.collections4.CollectionUtils.intersection(monitorTypeSet, monitorTypeSet2));
         }
+        if (CollectionUtil.isEmpty(monitorTypeSet))
+            return Collections.emptyList();
         return baseMapper.selectList(new LambdaQueryWrapper<TbMonitorType>()
                 .eq(StringUtils.isNotBlank(param.getTypeName()), TbMonitorType::getTypeName, param.getTypeName())
                 .in(TbMonitorType::getCompanyID, List.of(param.getCompanyID(), -1))

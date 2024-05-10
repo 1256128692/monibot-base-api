@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Data
 public class SensorConfigListResponse {
-    @JsonProperty("ID")
+    @JsonProperty("deviceID")
     private Integer ID;
     private String deviceToken;
     private String deviceName;
@@ -26,21 +26,25 @@ public class SensorConfigListResponse {
 
     @Data
     public static class DeviceSensor {
-        @JsonProperty("ID")
+        @JsonProperty("deviceSensorID")
         private Integer id;
         @JsonProperty("name")
         private String sensorName;
         private String alias;
+        private Integer monitorTypeTemplateID;
+        private String templateDataSourceID;
         private List<MonitorSensor> monitorSensorList;
     }
 
     @Data
     public static class MonitorSensor{
-        @JsonProperty("ID")
+        @JsonProperty("monitorSensorID")
         private Integer ID;
         private String name;
         private Integer monitorType;
         private String monitorTypeName;
+        private Integer monitorItemID;
+        private String monitorItemName;
         private Integer monitorPointID;
         private String monitorPointName;
         @JsonIgnore

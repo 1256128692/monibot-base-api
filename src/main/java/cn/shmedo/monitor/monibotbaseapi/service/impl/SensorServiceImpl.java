@@ -204,10 +204,13 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         baseMapper.insert(sensor);
 
         // 监测点和监测组关系
-        if (Objects.nonNull(request.getMonitorGroupID()))
-            tbMonitorGroupPointMapper.insert(TbMonitorGroupPoint.builder()
-                    .monitorGroupID(request.getMonitorGroupID()).monitorPointID(request.getMonitorPointID())
-                    .imageLocation(request.getTbMonitorPoint().getImageLocation()).build());
+        if (CollectionUtil.isNotEmpty(request.getMonitorGroupIDList())) {
+            List<TbMonitorGroupPoint> tbMonitorGroupPointList = new ArrayList<>();
+            request.getMonitorGroupIDList().forEach(groupID -> tbMonitorGroupPointList.add(TbMonitorGroupPoint.builder()
+                    .monitorGroupID(groupID).monitorPointID(request.getMonitorPointID())
+                    .imageLocation(request.getTbMonitorPoint().getImageLocation()).build()));
+            tbMonitorGroupPointMapper.insertBatchSomeColumn(tbMonitorGroupPointList);
+        }
 
         //传感器数据源
         if (CollUtil.isNotEmpty(request.getDataSourceList())) {
@@ -583,6 +586,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         return null;
     }
 
+    @Resource
+    private TbMonitorTypeTemplateMapper tbMonitorTypeTemplateMapper;
+
     @Override
     public List<SensorConfigListResponse> querySensorConfigList(QuerySensorConfigListParam param) {
         QueryDeviceAndSensorRequest request = QueryDeviceAndSensorRequest.builder()
@@ -591,32 +597,60 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .sendAddressList(List.of(param.getProjectID().toString()))
                 .build();
         ResultWrapper<List<DeviceWithSensor>> resultWrapper = iotService.queryDeviceAndSensorList(request);
-        if (!resultWrapper.apiSuccess() || resultWrapper.getData().isEmpty())
+        if (!resultWrapper.apiSuccess() || CollectionUtil.isEmpty(resultWrapper.getData()))
             return null;
+
         List<SensorConfigListResponse> responseList = BeanUtil.copyToList(resultWrapper.getData(), SensorConfigListResponse.class);
-        Map<String, SensorConfigListResponse.DeviceSensor> map = new HashMap<>();
-        responseList.forEach(item -> item.getSensorList().forEach(sensor -> map.put(item.getUniqueToken() + "@" + sensor.getSensorName(), sensor)));
+        Set<String> dataSourceTokens = new HashSet<>();
+        responseList.forEach(item -> item.getSensorList().forEach(sensor -> dataSourceTokens.add(item.getUniqueToken() + StrUtil.AT + sensor.getSensorName())));
         // 查询监测传感器信息
-        List<SensorConfigListResponse.MonitorSensor> monitorSensorList = baseMapper.listSensor(param.getProjectID(), map.keySet());
+        List<SensorConfigListResponse.MonitorSensor> monitorSensorList = baseMapper.listSensor(param.getProjectID(), dataSourceTokens);
         Map<String, List<SensorConfigListResponse.MonitorSensor>> monitorSensorMap = monitorSensorList.stream().collect(
                 Collectors.groupingBy(SensorConfigListResponse.MonitorSensor::getDataSourceToken));
+
+        // 查询数据源模板信息
+        Map<String, MonitorTypeTemplateAndTemplateDataSource> monitorTypeTemplateMap = new HashMap<>();
+        List<MonitorTypeTemplateAndTemplateDataSource> typeTemplateList = tbMonitorTypeTemplateMapper.selectMonitorTypeTemplateList(null);
+        typeTemplateList.forEach(typeTemplate -> Arrays.asList(typeTemplate.getTemplateDataSourceToken().split(","))
+                .forEach(token -> monitorTypeTemplateMap
+                        .putIfAbsent(token.contains(StrUtil.UNDERLINE) ? token.substring(0, token.indexOf(StrUtil.UNDERLINE)) : token, typeTemplate)));
+
         // 监测类型
         Map<Integer, String> monitorTypeMap = monitorTypeMapper.selectList(null)
                 .stream().collect(Collectors.toMap(TbMonitorType::getMonitorType, TbMonitorType::getTypeName));
         // 监测点
-        Map<Integer, List<MonitorPointInfo>> pointInfoMap = tbMonitorPointMapper.selectMonitorPoints(param.getProjectID(), null)
-                .stream().collect(Collectors.groupingBy(MonitorPointInfo::getID));
+        List<MonitorPointInfo> pointInfoList = tbMonitorPointMapper.selectMonitorPoints(param.getProjectID(), null);
+        Map<Integer, List<MonitorPointInfo>> pointInfoMap = pointInfoList.stream().collect(Collectors.groupingBy(MonitorPointInfo::getID));
+        // 监测项目
+        Map<Integer, String> monitorItemMap = tbMonitorItemMapper.selectList(new LambdaQueryWrapper<TbMonitorItem>()
+                .eq(TbMonitorItem::getCompanyID, param.getCompanyID())
+                .eq(TbMonitorItem::getProjectID, param.getProjectID())).stream().collect(Collectors.toMap(TbMonitorItem::getID, TbMonitorItem::getName));
         // 给监测传感器赋值信息检测类型、监测点、监测点组等
         monitorSensorMap.forEach((dataSourceToken, sensorList) -> sensorList.forEach(sensor -> {
-            List<MonitorPointInfo> monitorPointInfoList = pointInfoMap.get(sensor.getID());
+            List<MonitorPointInfo> monitorPointInfoList = pointInfoMap.get(sensor.getMonitorPointID());
+            if (CollectionUtil.isNotEmpty(monitorPointInfoList)) {
+                sensor.setMonitorItemID(monitorPointInfoList.get(0).getMonitorItemID());
+                sensor.setMonitorItemName(monitorItemMap.get(monitorPointInfoList.get(0).getMonitorItemID()));
+                sensor.setMonitorPointName(monitorPointInfoList.get(0).getMonitorPointName());
+            }
             sensor.setMonitorTypeName(monitorTypeMap.get(sensor.getMonitorType()));
-            sensor.setMonitorPointName(CollectionUtil.isEmpty(monitorPointInfoList) ? "" : monitorPointInfoList.get(0).getMonitorPointName());
             sensor.setMonitorGroupList(CollectionUtil.isEmpty(monitorPointInfoList) ? null : BeanUtil.copyToList(monitorPointInfoList, SensorConfigListResponse.MonitorGroup.class));
         }));
-        responseList.forEach(item -> item.getSensorList().forEach(sensor ->
-                sensor.setMonitorSensorList(
-                        monitorSensorMap.get(item.getUniqueToken() + "@" + sensor.getSensorName())
-                )));
+        responseList.forEach(item -> item.getSensorList().forEach(sensor -> {
+                    String key = sensor.getSensorName().contains(StrUtil.UNDERLINE) ?
+                            sensor.getSensorName().substring(0, sensor.getSensorName().indexOf(StrUtil.UNDERLINE)) : sensor.getSensorName();
+                    MonitorTypeTemplateAndTemplateDataSource template = monitorTypeTemplateMap.get(key);
+                    // 设备传感器数据源模板赋值
+                    if (Objects.nonNull(template)) {
+                        sensor.setMonitorTypeTemplateID(template.getMonitorTypeTemplateID());
+                        sensor.setTemplateDataSourceID(template.getTemplateDataSourceID());
+                    }
+                    // 监测传感器赋值
+                    sensor.setMonitorSensorList(
+                            monitorSensorMap.get(item.getUniqueToken() + StrUtil.AT + sensor.getSensorName())
+                    );
+                }
+        ));
         return responseList;
     }
 
@@ -697,5 +731,4 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     }
 }
 
-    
-    
+
