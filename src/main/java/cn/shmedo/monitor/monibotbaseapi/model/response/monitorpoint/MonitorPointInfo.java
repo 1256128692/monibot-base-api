@@ -18,5 +18,6 @@ public class MonitorPointInfo {
     private Integer MonitorItemID;
     private String monitorPointName;
     private Integer monitorGroupID;
+    private Integer monitorGroupParentID;
     private String monitorGroupName;
 }
