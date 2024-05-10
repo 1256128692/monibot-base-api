@@ -30,6 +30,11 @@ public class DataSourceCatalogRequest implements ParameterValidator, ResourcePer
     private Integer dataSourceComposeType;
 
     /**
+     * 模板数据源token
+     */
+    private String templateDataSourceToken;
+
+    /**
      * 监测类型
      */
     private Integer monitorType;

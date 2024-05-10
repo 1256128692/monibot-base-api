@@ -31,8 +31,6 @@ public class SensorConfigListResponse {
         @JsonProperty("name")
         private String sensorName;
         private String alias;
-        private Integer monitorTypeTemplateID;
-        private String templateDataSourceID;
         private List<MonitorSensor> monitorSensorList;
     }
 

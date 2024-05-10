@@ -157,6 +157,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
     public ResultWrapper<?> validate() {
         manual = DataSourceComposeType.MANUAL_MONITOR_DATA.equals(dataSourceComposeType);
 
+        // 校验监测点、监测组
         if (Objects.isNull(monitorPointID) && CollectionUtil.isNotEmpty(monitorGroupIDList))
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选择了监测组时，监测点不能为空");
         if (Objects.nonNull(monitorPointID)) {
@@ -164,6 +165,14 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             tbMonitorPoint = tbMonitorPointMapper.selectById(monitorPointID);
             if(Objects.isNull(tbMonitorPoint))
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+            // 如果绑定的监测点是已关联传感器的并且是单传感器类型的监测点，要提示监测点已绑定过传感器
+            TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+            List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getProjectID, projectID)
+                    .eq(TbSensor::getMonitorPointID, monitorPointID)
+                    .eq(TbSensor::getDataSourceComposeType, 1));
+            if(CollectionUtil.isNotEmpty(tbSensors))
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
         }
 
         //校验名称
