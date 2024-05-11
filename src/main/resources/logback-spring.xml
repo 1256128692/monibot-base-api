@@ -45,7 +45,7 @@
     </appender>
 
     <springProfile name="dev">
-        <logger name="cn.shmedo" additivity="true" level="debug"/>
+        <logger name="cn.shmedo" additivity="true" level="info"/>
     </springProfile>
 
     <springProfile name="loc">
