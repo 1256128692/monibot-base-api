@@ -244,6 +244,12 @@
                  left join tb_monitor_type_field mtf on mtf.ID = ev.MonitorTypeFieldID
                  left join tb_monitor_item mi on mi.ID = ev.MonitorItemID
         where ev.ProjectID = #{projectID}
+        <if test="fieldTokenList != null and fieldTokenList.size > 0">
+            AND mtf.FieldToken IN
+            <foreach collection="fieldTokenList" item="item" index="index" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
         <if test="monitorItemID != null">
             and ev.monitorItemID = #{monitorItemID}
         </if>

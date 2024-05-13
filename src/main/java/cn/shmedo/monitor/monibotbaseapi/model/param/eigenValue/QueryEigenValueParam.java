@@ -14,6 +14,7 @@ public class QueryEigenValueParam implements ParameterValidator, ResourcePermiss
 
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
+    private List<String> fieldTokenList;
     private List<Integer> monitorPointIDList;
     private Integer monitorItemID;
     private Integer scope;

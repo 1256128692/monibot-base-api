@@ -60,7 +60,7 @@ public interface TbEigenValueMapper {
 
     Integer selectCountByProjectIDAndItemIDAndFiledIDAndName(Integer projectID, Integer monitorItemID, Integer monitorTypeFieldID, String name, List<Integer> monitorPointIDList);
 
-    List<EigenValueInfoV1> selectListByCondition(Integer monitorItemID, Integer projectID, List<Integer> monitorPointIDList, Integer scope);
+    List<EigenValueInfoV1> selectListByCondition(Integer monitorItemID, Integer projectID, List<Integer> monitorPointIDList, List<String> fieldTokenList, Integer scope);
 
     Integer selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID(Integer projectID, Integer monitorItemID,
                                                                   Integer monitorTypeFieldID, String name,

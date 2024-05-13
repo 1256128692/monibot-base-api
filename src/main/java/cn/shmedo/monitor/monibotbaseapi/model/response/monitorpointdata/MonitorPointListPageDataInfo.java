@@ -3,6 +3,8 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author youxian.kong@shmedo.cn
@@ -20,11 +22,8 @@ public class MonitorPointListPageDataInfo {
     private Integer sensorID;
     private String sensorName;
     private Date time;
-    private Object data;
-    private String fieldToken;
-    private String fieldName;
-    private String engUnit;
-    private String chnUnit;
-    private String unitClass;
-    private String unitDesc;
+    private Map<String, Object> data;
+    private Map<String, Integer> maxMark;
+    private Map<String, Integer> minMark;
+    private List<EventBaseWithHitDateInfo> eventList;
 }

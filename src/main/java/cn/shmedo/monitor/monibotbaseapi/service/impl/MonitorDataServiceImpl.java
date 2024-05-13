@@ -5,12 +5,12 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.convert.Convert;
 import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import cn.shmedo.iot.entity.api.CurrentSubjectHolder;
+import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
@@ -33,22 +33,23 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPoint
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpointdata.*;
 import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorBaseInfoResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorDataService;
+import cn.shmedo.monitor.monibotbaseapi.util.DataEventTimeRangeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -89,10 +90,9 @@ public class MonitorDataServiceImpl implements MonitorDataService {
 
     @Override
     @Transactional
-    public Object queryEigenValueList(QueryEigenValueParam pa) {
-
+    public List<EigenValueInfoV1> queryEigenValueList(QueryEigenValueParam pa) {
         List<EigenValueInfoV1> eigenValueInfoV1List = tbEigenValueMapper.selectListByCondition(pa.getMonitorItemID(),
-                pa.getProjectID(), pa.getMonitorPointIDList(), pa.getScope());
+                pa.getProjectID(), pa.getMonitorPointIDList(), pa.getFieldTokenList(), pa.getScope());
 
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
@@ -360,32 +360,13 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         return monitorPointDataInfoList;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public PageUtil.Page<MonitorPointListPageDataInfo> queryMonitorPointDataListPage(QueryMonitorPointDataListPageParam pa) {
-        String fieldToken = pa.getFieldToken();
+    public PageUtil.PageWithMap<MonitorPointListPageDataInfo> queryMonitorPointDataListPage(QueryMonitorPointDataListPageParam pa) {
         List<MonitorPointDataInfo> list = queryMonitorPointDataList(pa);
-        List<MonitorPointListPageDataInfo> dataList = list.stream().map(item -> Optional.ofNullable(item.getFieldList())
-                        .orElse(Collections.emptyList()).stream().filter(field -> fieldToken.equals(field.getFieldToken()))
-                        .findAny().map(fieldBaseInfo2 -> Optional.ofNullable(item.getSensorList()).orElse(Collections.emptyList())
-                                .stream().map(sensor -> Optional.ofNullable(sensor.getMultiSensorData()).orElse(Collections.emptyList())
-                                        .stream().filter(sensorData -> Objects.nonNull(sensorData.getOrDefault(fieldToken, null)))
-                                        .map(sensorData -> {
-                                            Date time = Optional.ofNullable(sensorData.get(DbConstant.TIME_FIELD))
-                                                    .map(Convert::toDate).orElseThrow(() -> new RuntimeException("获取传感器数据时间失败"));
-                                            MonitorPointListPageDataInfo info = new MonitorPointListPageDataInfo();
-                                            BeanUtil.copyProperties(item, info);
-                                            BeanUtil.copyProperties(sensor, info);
-                                            BeanUtil.copyProperties(fieldBaseInfo2, info);
-                                            info.setData(sensorData.get(fieldToken));
-                                            info.setTime(time);
-                                            return info;
-                                        }).collect(Collectors.toList())).filter(CollUtil::isNotEmpty).flatMap(Collection::stream)
-                                .collect(Collectors.toList())).orElse((List<MonitorPointListPageDataInfo>) Collections.EMPTY_LIST))
-                .flatMap(Collection::stream).sorted((item1, item2) -> Optional.ofNullable(pa.getDataSort()).orElse(false) ?
-                        item1.getTime().compareTo(item2.getTime()) : item2.getTime().compareTo(item1.getTime()))
-                .collect(Collectors.toList());
-        return PageUtil.page(dataList, pa.getPageSize(), pa.getCurrentPage());
+        List<FieldBaseInfo> fieldList = buildFieldListByPointDataList(list, pa.getMonitorItemID());
+        List<MonitorPointListPageDataInfo> dataList = buildMonitorPointDataListPageByList(list, fieldList);
+        PageUtil.Page<MonitorPointListPageDataInfo> page = PageUtil.page(dataList, pa.getPageSize(), pa.getCurrentPage());
+        return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), Map.of("fieldList", fieldList));
     }
 
     @Override
@@ -722,4 +703,124 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         return minDataMap;
     }
 
+    /**
+     * 构建监测属性基础数据
+     *
+     * @param list          优化处理,如果之前已经查出来基础属性数据,那么直接从查出来的数据中处理
+     * @param monitorItemID 监测项目id,保证一定能够查出来基础属性数据
+     */
+    private List<FieldBaseInfo> buildFieldListByPointDataList(List<MonitorPointDataInfo> list, Integer monitorItemID) {
+        return Optional.ofNullable(list).flatMap(l -> l.stream().findAny().map(MonitorPointDataInfo::getFieldList)).orElse(
+                tbMonitorTypeFieldMapper.selectListByMonitorItemIDList(List.of(monitorItemID)).stream().map(field -> {
+                    FieldBaseInfo info = new FieldBaseInfo();
+                    BeanUtil.copyProperties(field, info);
+                    return info;
+                }).collect(Collectors.toList()));
+    }
+
+    /**
+     * @param list
+     * @param fieldList 用于计算最值
+     * @return
+     */
+    private List<MonitorPointListPageDataInfo> buildMonitorPointDataListPageByList(List<MonitorPointDataInfo> list,
+                                                                                   List<FieldBaseInfo> fieldList) {
+        // key-fieldToken, value-min,max
+        Map<String, Tuple<Double, Double>> fieldTokenOptimalValMap = fieldList.stream().map(FieldBaseInfo::getFieldToken)
+                .collect(Collectors.toMap(Function.identity(), t -> new Tuple<>()));
+        List<MonitorPointListPageDataInfo> dataList = list.stream().map(item ->
+                        getMonitorPointListPageDataInfoLists(item, getTimeRangeEventsMapByList(item.getEventList())))
+                .flatMap(Collection::stream).flatMap(Collection::stream).sorted(Comparator
+                        .comparing(MonitorPointListPageDataInfo::getTime).reversed()).peek(item ->
+                        Optional.ofNullable(item.getData()).filter(CollUtil::isNotEmpty).ifPresent(data ->
+                                data.forEach((field, valObj) -> {
+                                    if (!(DbConstant.TIME_FIELD.equals(field) || DbConstant.SENSOR_ID_FIELD_TOKEN.equals(field))) {
+                                        Optional.ofNullable(valObj).map(Convert::toDouble).ifPresent(value ->
+                                                Optional.ofNullable(fieldTokenOptimalValMap.get(field)).ifPresent(tuple -> {
+                                                    tuple.setItem1(Optional.ofNullable(tuple.getItem1()).filter(min ->
+                                                            min <= value).orElse(value));
+                                                    tuple.setItem2(Optional.ofNullable(tuple.getItem2()).filter(max ->
+                                                            max >= value).orElse(value));
+                                                }));
+                                    }
+                                }))).toList();
+        fillOptimalVal(dataList, fieldTokenOptimalValMap);
+        return dataList;
+    }
+
+    /**
+     * 最值填充
+     *
+     * @param dataList                数据列表
+     * @param fieldTokenOptimalValMap 最值map, key-fieldToken,value-tuple(min,max)
+     */
+    private void fillOptimalVal(List<MonitorPointListPageDataInfo> dataList, Map<String, Tuple<Double, Double>> fieldTokenOptimalValMap) {
+        for (MonitorPointListPageDataInfo info : dataList) {
+            if (CollUtil.isEmpty(fieldTokenOptimalValMap)) {
+                break;
+            } else {
+                Optional.ofNullable(info.getData()).filter(CollUtil::isNotEmpty).ifPresent(data -> data.forEach((fieldToken, valueObj) ->
+                        Optional.ofNullable(fieldTokenOptimalValMap.getOrDefault(fieldToken, null)).ifPresent(tuple -> {
+                            Double value = Convert.toDouble(valueObj);
+                            fillOptimalVal(tuple.getItem1(), value, fieldToken, info.getMinMark(), tuple::setItem1, info::setMinMark);
+                            fillOptimalVal(tuple.getItem2(), value, fieldToken, info.getMaxMark(), tuple::setItem2, info::setMaxMark);
+
+                            // 两个最值都被标记过,从{@code fieldTokenOptimalValMap}删除这个{@code fieldToken},减少循环次数
+                            if (Objects.isNull(tuple.getItem1()) && Objects.isNull(tuple.getItem2())) {
+                                fieldTokenOptimalValMap.remove(fieldToken);
+                            }
+                        })));
+            }
+        }
+    }
+
+    private void fillOptimalVal(Double optimalVal, Double value, String fieldToken, @Nullable Map<String, Integer> markMap,
+                                Consumer<Double> tupleConsumer, Consumer<Map<String, Integer>> infoConsumer) {
+        Optional.ofNullable(optimalVal).filter(item -> item.equals(value)).ifPresent(item -> {
+            // 标记过该最值,则将tuple中最值置空
+            tupleConsumer.accept(null);
+            Map<String, Integer> map = Optional.ofNullable(markMap).orElse(new HashMap<>());
+            map.put(fieldToken, 1);
+            infoConsumer.accept(map);
+        });
+    }
+
+    private List<List<MonitorPointListPageDataInfo>> getMonitorPointListPageDataInfoLists(MonitorPointDataInfo item,
+                                                                                          Map<List<Tuple<Date, Date>>, List<EventBaseInfo>> eventMap) {
+        return Optional.ofNullable(item.getSensorList()).map(sensorList -> sensorList.stream().map(sensor ->
+                        Optional.ofNullable(sensor.getMultiSensorData()).map(sensorDataList -> sensorDataList.stream().map(data -> {
+                            MonitorPointListPageDataInfo info = new MonitorPointListPageDataInfo();
+                            BeanUtil.copyProperties(item, info);
+                            BeanUtil.copyProperties(sensor, info);
+                            Optional.ofNullable(data.get(DbConstant.TIME_FIELD)).map(Convert::toDate).ifPresent(time -> {
+                                info.setData(data);
+                                info.setTime(time);
+                                eventMap.forEach((key, value) -> {
+                                    // {@code tuple}中两项全为null的数据已经在{@link #getTimeRangeEventsMapByList(List)}中过滤掉了
+                                    List<Tuple<Date, Date>> hintTimeRange = DataEventTimeRangeUtil.findHintTimeInRange(time, key);
+                                    Optional.of(hintTimeRange).filter(CollUtil::isNotEmpty).map(DataEventTimeRangeUtil::parse)
+                                            .ifPresent(hintStr -> info.setEventList(value.stream().map(event ->
+                                                    EventBaseWithHitDateInfo.build(event, hintStr)).toList()));
+                                });
+                            });
+                            return info;
+                        }).filter(data -> Objects.nonNull(data.getTime())).collect(Collectors.toList())).orElse(List.of()))
+                .collect(Collectors.toList())).orElse(List.of());
+    }
+
+    /**
+     * 将{@code eventList}按{@code timeRange}的解析结果分组,过滤掉时段为空和key为空列表的数据
+     *
+     * @param eventList 大事记列表
+     * @return key-某个时段; value-时段所对应的大事记列表
+     * @see DataEventTimeRangeUtil#parse(String)
+     */
+    private Map<List<Tuple<Date, Date>>, List<EventBaseInfo>> getTimeRangeEventsMapByList(List<EventBaseInfo> eventList) {
+        return Optional.ofNullable(eventList).map(list -> list.stream().collect(Collectors.groupingBy(event ->
+                        Optional.ofNullable(event.getTimeRange()).map(DataEventTimeRangeUtil::parse).map(tuples ->
+                                tuples.stream().filter(tuple -> Objects.nonNull(tuple.getItem1()) || Objects.nonNull(tuple.getItem2()))
+                                        .collect(Collectors.toList())).orElse(List.of()))).entrySet().stream().filter(entry ->
+                        CollUtil.isNotEmpty(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
+                .orElse(new HashMap<>());
+    }
 }

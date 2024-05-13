@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.monitorpointdata;
 
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
@@ -20,6 +19,4 @@ public class QueryMonitorPointDataListPageParam extends QueryMonitorPointDataPar
     @NotNull(message = "当前页不能为空")
     @Positive(message = "当前页不能小于1")
     private Integer currentPage;
-    @NotEmpty(message = "监测属性token不能为空")
-    private String fieldToken;
 }

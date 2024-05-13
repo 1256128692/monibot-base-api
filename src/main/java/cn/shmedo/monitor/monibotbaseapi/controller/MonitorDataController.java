@@ -113,7 +113,6 @@ public class MonitorDataController {
      * @apiParam (请求体) {DateTime} end 结束时间
      * @apiParam (请求体) {Int} densityType 密度,(全部:1 小时:2 日:3 周:4 月:5 年:6),查询最新数据默认传1
      * @apiParam (请求体) {Int} statisticsType 统计方式,(最新一条:1 平均:2 阶段累积:3 阶段变化:4),查询最新数据默认传1
-     * @apiParam (请求体) {String} fieldToken 监测属性token
      * @apiParam (请求体) {Int} pageSize 分页大小 (1-100)
      * @apiParam (请求体) {Int} currentPage 当前页码 (大于0)
      * @apiParam (请求体) {Boolean} [filterEmptyData] 是否过滤空数据,默认为false(不过滤),true(过滤空数据)
@@ -126,6 +125,12 @@ public class MonitorDataController {
      * "pageSize":5,"currentPage":1}
      * @apiSuccess (响应结果) {Int} totalCount 数据总量
      * @apiSuccess (响应结果) {Int} totalPage 总页数
+     * @apiSuccess (响应结果) {Object} map 监测属性描述(表头数据)
+     * @apiSuccess (响应结果) {Object[]} map.fieldList 监测类型属性字段列表
+     * @apiSuccess (响应结果) {String} map.fieldList.fieldToken 字段标志
+     * @apiSuccess (响应结果) {String} map.fieldList.fieldName 字段名称
+     * @apiSuccess (响应结果) {String} map.fieldList.engUnit 英文单位
+     * @apiSuccess (响应结果) {String} map.fieldList.chnUnit 中文单位
      * @apiSuccess (响应结果) {Object[]} currentPageData 当前页数据
      * @apiSuccess (响应结果) {Int} currentPageData.monitorPointID 监测点ID
      * @apiSuccess (响应结果) {String} currentPageData.monitorPointName 监测点名称
@@ -133,17 +138,20 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} currentPageData.monitorTypeName 监测类型名称
      * @apiSuccess (响应结果) {String} currentPageData.monitorTypeAlias 监测类型别名
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID 传感器ID
-     * @apiSuccess (响应结果) {Int} currentPageData.projectID 项目ID
+     * @apiSuccess (响应结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName 传感器名称
      * @apiSuccess (响应结果) {DateTime} currentPageData.time 数据采集时间
-     * @apiSuccess (响应结果) {T} currentPageData.data 传感器数据
+     * @apiSuccess (响应结果) {Map} currentPageData.data 传感器数据map,内部key为动态值，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Bool} [currentPageData.multiSensor] 是否为关联多传感器
-     * @apiSuccess (响应结果) {String} currentPageData.fieldToken 字段标志
-     * @apiSuccess (响应结果) {String} currentPageData.fieldName 字段名称
-     * @apiSuccess (响应结果) {String} currentPageData.engUnit 英文单位
-     * @apiSuccess (响应结果) {String} currentPageData.chnUnit 中文单位
-     * @apiSuccess (响应结果) {String} currentPageData.unitClass 单位类型
-     * @apiSuccess (响应结果) {String} currentPageData.unitDesc 单位类型描述
+     * @apiSuccess (响应结果) {Object} [currentPageData.maxMark] 最大值标记,key-fieldToken,value-标记值;仅data中该属性值为最大值时存在该标记,恒为1(同时有多个最大值时,取最新一条)
+     * @apiSuccess (响应结果) {Object} [currentPageData.minMark] 最小值标记,key-fieldToken,value-标记值;仅data中该属性值为最小值时存在该标记,恒为1(同时有多个最小值时,取最新一条)
+     * @apiSuccess (响应结果) {Object[]} [currentPageData.eventList] 大事记列表
+     * @apiSuccess (响应结果) {Int} currentPageData.eventList.id 大事记id
+     * @apiSuccess (响应结果) {Int} currentPageData.eventList.frequency 频率
+     * @apiSuccess (响应结果) {String} currentPageData.eventList.eventName 大事记名称
+     * @apiSuccess (响应结果) {String} currentPageData.eventList.frequencyStr 频率描述
+     * @apiSuccess (响应结果) {String} currentPageData.eventList.timeRange 时间范围
+     * @apiSuccess (响应结果) {String} currentPageData.eventList.hintTimeRange 大事记命中的时间范围
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
@@ -335,6 +343,7 @@ public class MonitorDataController {
      * @apiDescription 查询数据特征值列表
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 监测项目ID
+     * @apiParam (请求体) {String[]} [fieldTokenList] 监测子属性token列表
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
      * @apiParam (请求体) {Int} [scope] 数据范围
      * @apiParamExample 请求体示例
