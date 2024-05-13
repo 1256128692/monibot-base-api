@@ -813,11 +813,12 @@ public class MonitorDataServiceImpl implements MonitorDataService {
      *
      * @param eventList 大事记列表
      * @return key-某个时段; value-时段所对应的大事记列表
-     * @see DataEventTimeRangeUtil#parse(String)
+     * @see DataEventTimeRangeUtil#parse(String, Integer)
      */
     private Map<List<Tuple<Date, Date>>, List<EventBaseInfo>> getTimeRangeEventsMapByList(List<EventBaseInfo> eventList) {
         return Optional.ofNullable(eventList).map(list -> list.stream().collect(Collectors.groupingBy(event ->
-                        Optional.ofNullable(event.getTimeRange()).map(DataEventTimeRangeUtil::parse).map(tuples ->
+                        Optional.ofNullable(event.getTimeRange()).map(timeRange ->
+                                DataEventTimeRangeUtil.parse(timeRange, event.getFrequency())).map(tuples ->
                                 tuples.stream().filter(tuple -> Objects.nonNull(tuple.getItem1()) || Objects.nonNull(tuple.getItem2()))
                                         .collect(Collectors.toList())).orElse(List.of()))).entrySet().stream().filter(entry ->
                         CollUtil.isNotEmpty(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))

@@ -1,5 +1,7 @@
 package cn.shmedo.monitor.monibotbaseapi.util;
 
+import cn.hutool.core.date.DateField;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.extra.spring.SpringUtil;
 import cn.hutool.json.JSONException;
 import cn.hutool.json.JSONUtil;
@@ -30,10 +32,11 @@ public class DataEventTimeRangeUtil {
     /**
      * @return item1-startTime,item2-endTime
      */
-    public static List<Tuple<Date, Date>> parse(String timeRange) {
+    public static List<Tuple<Date, Date>> parse(String timeRange, Integer frequency) {
         try {
             return JSONUtil.parseArray(timeRange).toList(TimeRange.class).stream().map(item ->
-                    new Tuple<>(item.startTime, item.endTime)).collect(Collectors.toList());
+                    new Tuple<>(adjustTimeByFrequency(item.startTime, frequency),
+                            adjustTimeByFrequency(item.endTime, frequency))).collect(Collectors.toList());
         } catch (JSONException e) {
             log.error("parse timeRange failed,timeRange: {}", timeRange);
             return null;
@@ -62,6 +65,15 @@ public class DataEventTimeRangeUtil {
                 Optional.ofNullable(tuple.getItem1()).map(startTime -> startTime.before(time)).orElse(true) &&
                         Optional.ofNullable(tuple.getItem2()).map(endTime -> endTime.after(time)).orElse(true) ?
                         tuple : null).filter(Objects::nonNull).toList();
+    }
+
+    private static Date adjustTimeByFrequency(Date time, Integer frequency) {
+        return Optional.ofNullable(time).map(t -> Optional.ofNullable(frequency).map(f -> f == 1).orElse(false) ?
+                adjustTimeToCurrentYear(t) : t).orElse(null);
+    }
+
+    private static Date adjustTimeToCurrentYear(Date time) {
+        return DateUtil.date(time).setField(DateField.YEAR, DateUtil.date().getField(DateField.YEAR));
     }
 
     @Data
