@@ -20,12 +20,10 @@ import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorTypeMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
-import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.db.*;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -168,13 +166,20 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
             if (Objects.isNull(tbMonitorPoint))
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
             // 如果绑定的监测点是已关联传感器的并且是单传感器类型的监测点，要提示监测点已绑定过传感器
-            TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
-            List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
-                    .eq(TbSensor::getProjectID, projectID)
-                    .eq(TbSensor::getMonitorPointID, monitorPointID)
-                    .eq(TbSensor::getDataSourceComposeType, 1));
-            if (CollectionUtil.isNotEmpty(tbSensors))
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
+            // 若监测类型为单传感器时，选择已绑定传感器的监测点要校验
+            TbMonitorTypeMapper tbMonitorTypeMapper = ContextHolder.getBean(TbMonitorTypeMapper.class);
+            TbMonitorType tbMonitorType = tbMonitorTypeMapper.selectOne(new LambdaQueryWrapper<TbMonitorType>()
+                    .eq(TbMonitorType::getMonitorType, monitorType)
+                    .eq(TbMonitorType::getMultiSensor, false));
+            if(Objects.nonNull(tbMonitorType)){
+                TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+                List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
+                        .eq(TbSensor::getProjectID, projectID)
+                        .eq(TbSensor::getMonitorPointID, monitorPointID)
+                        .eq(TbSensor::getDataSourceComposeType, 1));
+                if (CollectionUtil.isNotEmpty(tbSensors))
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
+            }
             // 监测点、监测组关系不能重复添加
             if (CollectionUtil.isNotEmpty(monitorGroupIDList)) {
                 TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
