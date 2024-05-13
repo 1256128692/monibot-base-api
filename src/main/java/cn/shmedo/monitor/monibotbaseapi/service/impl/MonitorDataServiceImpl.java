@@ -728,8 +728,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         // key-fieldToken, value-min,max
         Map<String, Tuple<Double, Double>> fieldTokenOptimalValMap = fieldList.stream().map(FieldBaseInfo::getFieldToken)
                 .collect(Collectors.toMap(Function.identity(), t -> new Tuple<>()));
-        List<MonitorPointListPageDataInfo> dataList = list.stream().map(item ->
-                        getMonitorPointListPageDataInfoLists(item, getTimeRangeEventsMapByList(item.getEventList())))
+        List<MonitorPointListPageDataInfo> dataList = list.stream().map(this::getMonitorPointListPageDataInfoLists)
                 .flatMap(Collection::stream).flatMap(Collection::stream).sorted(Comparator
                         .comparing(MonitorPointListPageDataInfo::getTime).reversed()).peek(item ->
                         Optional.ofNullable(item.getData()).filter(CollUtil::isNotEmpty).ifPresent(data ->
@@ -785,8 +784,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         });
     }
 
-    private List<List<MonitorPointListPageDataInfo>> getMonitorPointListPageDataInfoLists(MonitorPointDataInfo item,
-                                                                                          Map<List<Tuple<Date, Date>>, List<EventBaseInfo>> eventMap) {
+    private List<List<MonitorPointListPageDataInfo>> getMonitorPointListPageDataInfoLists(MonitorPointDataInfo item) {
+        List<EventBaseInfo> eventList = Optional.ofNullable(item.getEventList()).orElse(new ArrayList<>());
         return Optional.ofNullable(item.getSensorList()).map(sensorList -> sensorList.stream().map(sensor ->
                         Optional.ofNullable(sensor.getMultiSensorData()).map(sensorDataList -> sensorDataList.stream().map(data -> {
                             MonitorPointListPageDataInfo info = new MonitorPointListPageDataInfo();
@@ -795,33 +794,15 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                             Optional.ofNullable(data.get(DbConstant.TIME_FIELD)).map(Convert::toDate).ifPresent(time -> {
                                 info.setData(data);
                                 info.setTime(time);
-                                eventMap.forEach((key, value) -> {
-                                    // {@code tuple}中两项全为null的数据已经在{@link #getTimeRangeEventsMapByList(List)}中过滤掉了
-                                    List<Tuple<Date, Date>> hintTimeRange = DataEventTimeRangeUtil.findHintTimeInRange(time, key);
-                                    Optional.of(hintTimeRange).filter(CollUtil::isNotEmpty).map(DataEventTimeRangeUtil::parse)
-                                            .ifPresent(hintStr -> info.setEventList(value.stream().map(event ->
-                                                    EventBaseWithHitDateInfo.build(event, hintStr)).toList()));
-                                });
+                                eventList.forEach(event -> Optional.ofNullable(DataEventTimeRangeUtil
+                                                .parse(event.getTimeRange(), time, event.getFrequency()))
+                                        .map(events -> DataEventTimeRangeUtil.findHintTimeInRange(time, events))
+                                        .filter(CollUtil::isNotEmpty).map(DataEventTimeRangeUtil::parse)
+                                        .ifPresent(hintStr -> info.setEventList(eventList.stream().map(events ->
+                                                EventBaseWithHitDateInfo.build(events, hintStr)).toList())));
                             });
                             return info;
                         }).filter(data -> Objects.nonNull(data.getTime())).collect(Collectors.toList())).orElse(List.of()))
                 .collect(Collectors.toList())).orElse(List.of());
-    }
-
-    /**
-     * 将{@code eventList}按{@code timeRange}的解析结果分组,过滤掉时段为空和key为空列表的数据
-     *
-     * @param eventList 大事记列表
-     * @return key-某个时段; value-时段所对应的大事记列表
-     * @see DataEventTimeRangeUtil#parse(String, Integer)
-     */
-    private Map<List<Tuple<Date, Date>>, List<EventBaseInfo>> getTimeRangeEventsMapByList(List<EventBaseInfo> eventList) {
-        return Optional.ofNullable(eventList).map(list -> list.stream().collect(Collectors.groupingBy(event ->
-                        Optional.ofNullable(event.getTimeRange()).map(timeRange ->
-                                DataEventTimeRangeUtil.parse(timeRange, event.getFrequency())).map(tuples ->
-                                tuples.stream().filter(tuple -> Objects.nonNull(tuple.getItem1()) || Objects.nonNull(tuple.getItem2()))
-                                        .collect(Collectors.toList())).orElse(List.of()))).entrySet().stream().filter(entry ->
-                        CollUtil.isNotEmpty(entry.getKey())).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)))
-                .orElse(new HashMap<>());
     }
 }

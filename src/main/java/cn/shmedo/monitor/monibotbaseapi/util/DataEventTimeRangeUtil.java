@@ -30,13 +30,22 @@ public class DataEventTimeRangeUtil {
     }
 
     /**
+     * 根据数据时间解析时间范围
+     * <pre>
+     * 如果频率{@code frequency}等于1时表示每年这个时间段都是大事记的时间段,此时的时间范围就需要忽略掉年份;
+     * 对于单个数据而言,展示给前端页面的也应该是这个数据那年的大事记的时间段,这里在解析时就已经转化了
+     * </pre>
+     *
+     * @param dataTime  数据时间,不允许为{@code null}
+     * @param frequency 频率
      * @return item1-startTime,item2-endTime
      */
-    public static List<Tuple<Date, Date>> parse(String timeRange, Integer frequency) {
+    public static List<Tuple<Date, Date>> parse(String timeRange, Date dataTime, Integer frequency) {
         try {
+            int year = DateUtil.date(dataTime).getField(DateField.YEAR);
             return JSONUtil.parseArray(timeRange).toList(TimeRange.class).stream().map(item ->
-                    new Tuple<>(adjustTimeByFrequency(item.startTime, frequency),
-                            adjustTimeByFrequency(item.endTime, frequency))).collect(Collectors.toList());
+                    new Tuple<>(adjustTimeByDataTimeFrequency(item.startTime, year, frequency),
+                            adjustTimeByDataTimeFrequency(item.endTime, year, frequency))).collect(Collectors.toList());
         } catch (JSONException e) {
             log.error("parse timeRange failed,timeRange: {}", timeRange);
             return null;
@@ -57,23 +66,24 @@ public class DataEventTimeRangeUtil {
     /**
      * 筛选出{@code tupleList}中命中目标时间范围的子集,目标时间{@code time}为{@code null}时返回空集
      *
-     * @param time      目标时间
-     * @param tupleList item1-startTime,item2-endTime,要求至少其一不为{@code null}
+     * @param time     目标时间
+     * @param dateList 根据目标时间处理后的时间范围。
+     * @see #parse(String, Date, Integer)
      */
-    public static List<Tuple<Date, Date>> findHintTimeInRange(Date time, List<Tuple<Date, Date>> tupleList) {
-        return Objects.isNull(time) ? List.of() : tupleList.stream().map(tuple ->
-                Optional.ofNullable(tuple.getItem1()).map(startTime -> startTime.before(time)).orElse(true) &&
-                        Optional.ofNullable(tuple.getItem2()).map(endTime -> endTime.after(time)).orElse(true) ?
-                        tuple : null).filter(Objects::nonNull).toList();
+    public static List<Tuple<Date, Date>> findHintTimeInRange(Date time, List<Tuple<Date, Date>> dateList) {
+        return Optional.ofNullable(time).flatMap(t -> Optional.ofNullable(dateList).map(list ->
+                list.stream().map(tuple -> Optional.ofNullable(tuple.getItem1()).map(startTime ->
+                        startTime.before(time)).orElse(true) && Optional.ofNullable(tuple.getItem2()).map(endTime ->
+                        endTime.after(time)).orElse(true) ? tuple : null).filter(Objects::nonNull).toList())).orElse(List.of());
     }
 
-    private static Date adjustTimeByFrequency(Date time, Integer frequency) {
+    private static Date adjustTimeByDataTimeFrequency(Date time, int year, Integer frequency) {
         return Optional.ofNullable(time).map(t -> Optional.ofNullable(frequency).map(f -> f == 1).orElse(false) ?
-                adjustTimeToCurrentYear(t) : t).orElse(null);
+                adjustTimeToDataTimeYear(t, year) : t).orElse(null);
     }
 
-    private static Date adjustTimeToCurrentYear(Date time) {
-        return DateUtil.date(time).setField(DateField.YEAR, DateUtil.date().getField(DateField.YEAR));
+    private static Date adjustTimeToDataTimeYear(Date time, int year) {
+        return DateUtil.date(time).setField(DateField.YEAR, year);
     }
 
     @Data
