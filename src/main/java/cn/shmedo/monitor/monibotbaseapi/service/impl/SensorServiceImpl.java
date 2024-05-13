@@ -391,8 +391,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
 
         // 监测传感器之前绑定过监测点
-        if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID())
-                || (Objects.nonNull(newTbMonitorPoint) && tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID())))
+        if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID()))
             return;
         // 新监测点和新监测组关系（当然所有的解除绑定之前，都要判断，如果当前监测点绑定的监测传感器是多传感器，且该监测点除绑定当前传感器外，还有绑定其它，则不需要解绑监测点、监测组关系
         // 情况一、如果监测点非空（属于监测点变化），监测组为空，需要解除数据库存在的监测点和监测组关系；
