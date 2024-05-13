@@ -379,4 +379,19 @@
             LEFT JOIN tb_monitor_item mi ON mp.MonitorItemID = mi.ID
         WHERE mp.MonitorType =#{monitorType} AND mp.ProjectID=#{projectID}
     </select>
+    <select id="selectByMonitorPoints"
+            resultType="cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorConfigListResponse$MonitorGroup">
+        select tmgp.MonitorPointID monitorPointID,tmg.ID monitorGroupID,tmg.Name monitorGroupName,
+            tmg.ParentID monitorGroupParentID,tmg2.Name monitorGroupParentName
+        from tb_monitor_group tmg
+        inner join tb_monitor_group_point tmgp on tmgp.MonitorGroupID=tmg.ID
+        left join tb_monitor_group tmg2 on tmg2.ID=tmg.ParentID
+        where 1=1
+        <if test="monitorIDList != null and monitorIDList.size > 0">
+            and tmgp.MonitorPointID in
+            <foreach collection="monitorIDList" item="item" open="(" close=")" separator=",">
+                #{item}
+            </foreach>
+        </if>
+    </select>
 </mapper>

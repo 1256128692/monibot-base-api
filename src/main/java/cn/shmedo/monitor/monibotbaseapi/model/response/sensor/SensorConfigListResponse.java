@@ -53,6 +53,7 @@ public class SensorConfigListResponse {
 
     @Data
     public static class MonitorGroup{
+        private Integer monitorPointID;
         private Integer monitorGroupID;
         private String monitorGroupName;
         private Integer monitorGroupParentID;

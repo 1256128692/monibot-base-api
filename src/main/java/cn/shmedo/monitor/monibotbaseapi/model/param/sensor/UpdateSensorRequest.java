@@ -124,7 +124,8 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                 List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
                         .eq(TbSensor::getProjectID, projectID)
                         .eq(TbSensor::getMonitorPointID, monitorPointID)
-                        .eq(TbSensor::getDataSourceComposeType, 1));
+                        .eq(TbSensor::getDataSourceComposeType, 1)
+                        .ne(TbSensor::getID, sensorID));
                 if (CollectionUtil.isNotEmpty(tbSensors))
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
             }

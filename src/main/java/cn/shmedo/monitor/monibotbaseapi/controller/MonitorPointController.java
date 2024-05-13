@@ -260,6 +260,11 @@ public class MonitorPointController {
      * @apiSuccess (返回结果) {Bool} dataList.enable 是否启用
      * @apiSuccess (返回结果) {String} [dataList.exValues] 拓展字段
      * @apiSuccess (返回结果) {Int} dataList.displayOrder 排序字段
+     * @apiSuccess (返回结果) {Object[]} dataList.monitorGroupList 监测组列表
+     * @apiSuccess (返回结果) {Int} [dataList.monitorGroupList.monitorGroupID] 监测组
+     * @apiSuccess (返回结果) {String} [dataList.monitorGroupList.monitorGroupName] 监测组名称
+     * @apiSuccess (返回结果) {Int} [dataList.monitorGroupList.monitorGroupParentID] 监测组别ID
+     * @apiSuccess (返回结果) {String} [dataList.monitorGroupList.monitorGroupName] 监测组名称
      * @apiSuccess (返回结果) {Object[]} dataList.sensorList 监测传感器列表
      * @apiSuccess (返回结果) {Int} dataList.sensorList.id 传感器ID
      * @apiSuccess (返回结果) {String} dataList.sensorList.name 传感器名称

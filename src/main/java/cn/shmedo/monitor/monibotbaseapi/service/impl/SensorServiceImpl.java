@@ -332,6 +332,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Override
     @Transactional(rollbackFor = Exception.class)
     public IdRecord updateSensor(UpdateSensorRequest request) {
+        // 更新监测点、监测组关系
+        updateGroupPointRelation(request.getSensor(), request.getTbMonitorPoint(), request.getMonitorGroupIDList());
+
         CurrentSubject subject = CurrentSubjectHolder.getCurrentSubject();
         Optional.ofNullable(request.getEnable()).ifPresent(enable -> request.getSensor().setEnable(enable));
         Optional.ofNullable(request.getDisplayOrder())
@@ -346,7 +349,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             //校验别名是否重复
             Long count = baseMapper.selectCount(new LambdaQueryWrapper<TbSensor>()
                     .eq(TbSensor::getAlias, request.getAlias())
-                    .ne(TbSensor::getProjectID, request.getProjectID()));
+                    .eq(TbSensor::getProjectID, request.getProjectID())
+                    .ne(TbSensor::getID, request.getSensorID()));
             Assert.isTrue(count == null || count == 0, "名称已存在");
             request.getSensor().setAlias(request.getAlias());
         }
@@ -355,9 +359,6 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         request.getSensor().setUpdateTime(null);
         //更新传感器、参数
         updateById(request.getSensor());
-
-        // 更新监测点、监测组关系
-        updateGroupPointRelation(request.getSensor(), request.getTbMonitorPoint(), request.getMonitorGroupIDList());
 
         if (CollUtil.isNotEmpty(request.getParamList())) {
             parameterMapper.replaceBatch(request.getParamList());
@@ -390,7 +391,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
 
         // 监测传感器之前绑定过监测点
-        if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID()) || tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID()))
+        if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID())
+                || (Objects.nonNull(newTbMonitorPoint) && tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID())))
             return;
         // 新监测点和新监测组关系（当然所有的解除绑定之前，都要判断，如果当前监测点绑定的监测传感器是多传感器，且该监测点除绑定当前传感器外，还有绑定其它，则不需要解绑监测点、监测组关系
         // 情况一、如果监测点非空（属于监测点变化），监测组为空，需要解除数据库存在的监测点和监测组关系；
@@ -410,7 +412,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     .eq(TbSensor::getMonitorPointID, tbSensor.getMonitorPointID())
                     .ne(TbSensor::getID, tbSensor.getID()));
             if (CollectionUtil.isEmpty(tbSensorList))
-                tbMonitorPointMapper.deleteBatchIds(oldGroupPointIDList);
+                tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
         }
     }
 

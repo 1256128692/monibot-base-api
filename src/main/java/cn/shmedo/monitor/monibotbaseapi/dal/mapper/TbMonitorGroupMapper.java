@@ -10,6 +10,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.Group4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorGroupPointBaseInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.ProjectGroupPlainInfo;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.SimpleMonitorInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorConfigListResponse;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.ibatis.annotations.Param;
@@ -52,4 +53,6 @@ public interface TbMonitorGroupMapper extends BasicMapper<TbMonitorGroup>{
     List<MonitorGroupBaseInfoV1> selectGroupInfoByItemIDs(List<Integer> monitorItemIDList);
 
     List<MonitorGroupPointBaseInfo> queryMonitorTypeGroupPoint(QueryManualSensorListByMonitorParam pa);
+
+    List<SensorConfigListResponse.MonitorGroup> selectByMonitorPoints(Collection<Integer> monitorIDList);
 }

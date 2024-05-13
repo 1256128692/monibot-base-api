@@ -2,6 +2,7 @@ package cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint;
 
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorConfigListResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -26,4 +27,5 @@ public class MonitorPoint4Web extends TbMonitorPoint {
     private Boolean monitorTypeMultiSensor;
 
     private List<TbSensor> sensorList;
+    private List<SensorConfigListResponse.MonitorGroup> monitorGroupList;
 }

@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorItemW
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPoint4Web;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointSimple;
 import cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorTypeFieldBaseInfo;
+import cn.shmedo.monitor.monibotbaseapi.model.response.sensor.SensorConfigListResponse;
 import cn.shmedo.monitor.monibotbaseapi.service.MonitorPointService;
 import cn.shmedo.monitor.monibotbaseapi.util.Param2DBEntityUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
@@ -201,6 +202,12 @@ public class MonitorPointServiceImpl implements MonitorPointService {
             // 监测类型为单传感器时，排除绑定了传感器的监测点
             list = list.stream().filter(item ->
                     !(!item.getMonitorTypeMultiSensor() && !CollectionUtil.isNullOrEmpty(item.getSensorList()))).collect(Collectors.toList());
+        // 获取监测点下监测组，及监测组别
+        List<Integer> monitorIDList = list.stream().map(MonitorPoint4Web::getID).toList();
+        List<SensorConfigListResponse.MonitorGroup> monitorGroupList = tbMonitorGroupMapper.selectByMonitorPoints(monitorIDList);
+        Map<Integer, List<SensorConfigListResponse.MonitorGroup>> groupMap = monitorGroupList.stream().collect(Collectors
+                .groupingBy(SensorConfigListResponse.MonitorGroup::getMonitorPointID));
+        list.forEach(point -> point.setMonitorGroupList(groupMap.get(point.getID())));
         return list;
     }
 

@@ -657,8 +657,9 @@ public class SensorController {
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorPointName] 监测传感器-监测点名称
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList] 监测传感器-监测点-监测组列表
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupID] 监测传感器-监测点-监测组
+     * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupName] 监测传感器-监测点-监测组名称
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupParentID] 监测传感器-监测点-监测组别ID
-     * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupName] 监测传感器-监测点-监测组名称
+     * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.monitorGroupList.monitorGroupName] 监测传感器-监测点-监测组名称
      * @apiSampleRequest off
      * @apiPermission 项目权限 mdmbase:ListBaseSensor
      */
