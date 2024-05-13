@@ -22,7 +22,7 @@ public class AddDataEventParam implements ParameterValidator, ResourcePermission
 
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
-    @NotBlank(message = "大事件名称Name不能为空")
+    @NotBlank(message = "大事记名称Name不能为空")
     private String name;
     @NotNull(message = "频率frequency不能为空")
     private Integer frequency;

@@ -345,7 +345,7 @@ public class ThematicDataAnalysisController {
      * @apiParam (请求体) {Int} [volumeFlowOutputMonitorPointID] 出库流量监测点ID
      * @apiParam (请求体) {Int} displayDensity 显示密度 1.全部 2.小时 3.日 4.周 5.月 6.年
      * @apiParam (请求体) {Int[]} [eigenvalueIDList] 特征值IDList
-     * @apiParam (请求体) {Int[]} [dataEventIDList] 大事件IDList
+     * @apiParam (请求体) {Int[]} [dataEventIDList] 大事记IDList
      * @apiParam (请求体) {DateTime} startTime 开始时间
      * @apiParam (请求体) {DateTime} endTime 结束时间
      * @apiSuccess (返回结果) {Object[]} dataList 数据列表
@@ -365,13 +365,13 @@ public class ThematicDataAnalysisController {
      * @apiSuccess (返回结果) {Double} eigenvalueDataList.eigenValue 值
      * @apiSuccess (返回结果) {String} eigenvalueDataList.engUnit 单位英文名称
      * @apiSuccess (返回结果) {String} eigenvalueDataList.chnUnit 单位中文名称
-     * @apiSuccess (返回结果) {Object[]} [dataEventDataList] 大事件数据列表
-     * @apiSuccess (返回结果) {Int} dataEventDataList.eventID 大事件ID
-     * @apiSuccess (返回结果) {String} dataEventDataList.eventName 大事件名称
+     * @apiSuccess (返回结果) {Object[]} [dataEventDataList] 大事记数据列表
+     * @apiSuccess (返回结果) {Int} dataEventDataList.eventID 大事记ID
+     * @apiSuccess (返回结果) {String} dataEventDataList.eventName 大事记名称
      * @apiSuccess (返回结果) {String} dataEventDataList.timeRange 时间范围
      * @apiSampleRequest off
      * @apiSuccessExample {json} 响应结果示例
-     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":0.0,"distance":0.0,"volumeFlowInput":0.0,"volumeFlowOutput":0.0}],"maxDataList":[{"value":4.71,"key":1,"time":"2023-11-21 05:00:00"},{"value":10.0,"key":2,"time":"2023-11-17 16:00:00"},{"value":9.98,"key":3,"time":"2023-11-21 06:00:00"},{"value":9.96,"key":4,"time":"2023-11-21 06:00:00"}],"eigenvalueDataList":[{"monitorType":2,"eigenValueID":11,"eigenValueName":"214库水位特征值","eigenValue":5.0,"chnUnit":"毫米","engUnit":"mm"}],"dataEventDataList":[{"eventID":12,"eventName":"库水位大事件","timeRange":"[{\"startTime\": \"2023-10-18 00:00:00\", \"endTime\": \"2023-10-30 23:59:59\"}, {\"startTime\": \"2023-11-20 00:00:00\", \"endTime\": \"2023-11-21 23:59:59\"}]"}]}
+     * {"dataList":[{"time":"2023-11-01 00:00:00","rainfall":0.0,"distance":0.0,"volumeFlowInput":0.0,"volumeFlowOutput":0.0}],"maxDataList":[{"value":4.71,"key":1,"time":"2023-11-21 05:00:00"},{"value":10.0,"key":2,"time":"2023-11-17 16:00:00"},{"value":9.98,"key":3,"time":"2023-11-21 06:00:00"},{"value":9.96,"key":4,"time":"2023-11-21 06:00:00"}],"eigenvalueDataList":[{"monitorType":2,"eigenValueID":11,"eigenValueName":"214库水位特征值","eigenValue":5.0,"chnUnit":"毫米","engUnit":"mm"}],"dataEventDataList":[{"eventID":12,"eventName":"库水位大事记","timeRange":"[{\"startTime\": \"2023-10-18 00:00:00\", \"endTime\": \"2023-10-30 23:59:59\"}, {\"startTime\": \"2023-11-20 00:00:00\", \"endTime\": \"2023-11-21 23:59:59\"}]"}]}
      * @apiPermission 项目权限 mdmbase:ListBaseMonitorPoint
      */
     @Permission(permissionName = "mdmbase:ListBaseMonitorPoint")

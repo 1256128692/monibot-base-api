@@ -21,9 +21,9 @@ public class UpdateDataEventParam  implements ParameterValidator, ResourcePermis
 
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
-    @NotNull(message = "大事件id不能为空")
+    @NotNull(message = "大事记id不能为空")
     private Integer id;
-    @NotBlank(message = "大事件名称name不能为空")
+    @NotBlank(message = "大事记名称name不能为空")
     private String name;
     @NotNull(message = "频率frequency不能为空")
     private Integer frequency;

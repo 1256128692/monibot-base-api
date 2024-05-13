@@ -21,7 +21,7 @@ public class TbDataEvent implements Serializable {
     private Integer projectID;
 
     /**
-    * 大事件名称
+    * 大事记名称
     */
     private String name;
 

@@ -382,13 +382,13 @@ public class MonitorDataController {
 
 
     /**
-     * @api {POST} /AddDataEvent 新增大事件
+     * @api {POST} /AddDataEvent 新增大事记
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName AddDataEvent
-     * @apiDescription 新增大事件
+     * @apiDescription 新增大事记
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {String} name 大事件名称
+     * @apiParam (请求体) {String} name 大事记名称
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性
@@ -416,13 +416,13 @@ public class MonitorDataController {
 
 
     /**
-     * @api {POST} /DeleteBatchDataEvent 删除大事件
+     * @api {POST} /DeleteBatchDataEvent 删除大事记
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName DeleteBatchDataEvent
-     * @apiDescription 删除大事件
+     * @apiDescription 删除大事记
      * @apiParam (请求体) {Int} projectID 工程ID
-     * @apiParam (请求体) {Int[]} eventIDList 大事件名称
+     * @apiParam (请求体) {Int[]} eventIDList 大事记名称
      * @apiParamExample 请求体示例
      * {"projectID":1,"eventIDList":[1]}
      * @apiSuccess (返回结果) {String} none 空
@@ -438,11 +438,11 @@ public class MonitorDataController {
 
 
     /**
-     * @api {POST} /QueryDataEventList 查询大事件列表
+     * @api {POST} /QueryDataEventList 查询大事记列表
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName QueryDataEventList
-     * @apiDescription 查询大事件列表
+     * @apiDescription 查询大事记列表
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} [monitorItemID] 项目ID
      * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表
@@ -450,10 +450,10 @@ public class MonitorDataController {
      * @apiParam (请求体) {DateTime} [end]   结束时间
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorItemID":1}
-     * @apiSuccess (返回结果) {Object[]} dataList 大事件ID
-     * @apiSuccess (返回结果) {Int} dataList.id 大事件ID
+     * @apiSuccess (返回结果) {Object[]} dataList 大事记ID
+     * @apiSuccess (返回结果) {Int} dataList.id 大事记ID
      * @apiSuccess (返回结果) {Int} dataList.projectID 工程ID
-     * @apiSuccess (返回结果) {String} dataList.name 大事件名称
+     * @apiSuccess (返回结果) {String} dataList.name 大事记名称
      * @apiSuccess (返回结果) {Int} dataList.frequency 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.frequencyStr 频率,0:单次  1:每年
      * @apiSuccess (返回结果) {String} dataList.timeRange 开始-结束时间,json格式
@@ -473,14 +473,14 @@ public class MonitorDataController {
 
 
     /**
-     * @api {POST} /UpdateDataEvent 更新大事件
+     * @api {POST} /UpdateDataEvent 更新大事记
      * @apiVersion 1.0.0
      * @apiGroup 监测通用数据模块
      * @apiName UpdateDataEvent
-     * @apiDescription 更新大事件
+     * @apiDescription 更新大事记
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} id 大事记ID
-     * @apiParam (请求体) {String} name 大事件名称
+     * @apiParam (请求体) {String} name 大事记名称
      * @apiParam (请求体) {Int} frequency 频率,0:单次  1:每年
      * @apiParam (请求体) {String} timeRange 开始-结束时间,json格式
      * @apiParam (请求体) {String} [exValue] 拓展属性

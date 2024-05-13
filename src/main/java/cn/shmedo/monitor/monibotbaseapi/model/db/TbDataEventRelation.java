@@ -12,7 +12,7 @@ public class TbDataEventRelation implements Serializable {
     private Integer id;
 
     /**
-    * 大事件ID
+    * 大事记ID
     */
     private Integer eventID;
 
