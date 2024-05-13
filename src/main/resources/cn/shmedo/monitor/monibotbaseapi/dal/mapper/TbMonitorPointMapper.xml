@@ -1003,10 +1003,11 @@
     <select id="selectMonitorPoints"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorpoint.MonitorPointInfo">
         select tmp.ID ID,tmp.ProjectID,tmp.MonitorType,tmp.MonitorItemID,tmp.Name monitorPointName,
-            tmg.ID monitorGroupID,tmg.ParentID monitorGroupParentID,tmg.Name monitorGroupName
+            tmg.ID monitorGroupID,tmg.ParentID monitorGroupParentID,tmg2.Name monitorGroupParentName,tmg.Name monitorGroupName
         from tb_monitor_point tmp
         left join tb_monitor_group_point tmgp on tmgp.MonitorPointID=tmp.ID
         left join tb_monitor_group tmg on tmg.ID= tmgp.MonitorGroupID
+        left join tb_monitor_group tmg2 on tmg.parentID= tmg2.ID
         WHERE 1=1
         <if test="projectID != null">
             and tmp.ProjectID = #{projectID}

@@ -217,26 +217,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
         baseMapper.insert(sensor);
 
-        if (CollectionUtil.isNotEmpty(request.getMonitorGroupIDList())) {
-            // 绑定监测点和监测组关系
-            List<TbMonitorGroupPoint> tbMonitorGroupPointList = new ArrayList<>();
-            request.getMonitorGroupIDList().forEach(groupID -> tbMonitorGroupPointList.add(TbMonitorGroupPoint.builder()
-                    .monitorGroupID(groupID).monitorPointID(request.getMonitorPointID())
-                    .imageLocation(request.getTbMonitorPoint().getImageLocation()).build()));
-            tbMonitorGroupPointMapper.insertBatchSomeColumn(tbMonitorGroupPointList);
-
-            // 监测点和监测组关系（如果监测点非空，监测组为空，需要解除数据库存在的监测点和监测组关系；如果两个均为空，不需要解除；
-            // 如果两个均不为空；若之前有绑定监测组，且本次没有，需要解绑之前监测组）
-            if (Objects.nonNull(request.getMonitorPointID())) {
-                List<TbMonitorGroupPoint> groupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
-                        .eq(TbMonitorGroupPoint::getMonitorPointID, request.getMonitorPointID()));
-                List<Integer> groupPointIDList = groupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
-                if (CollectionUtil.isNotEmpty(request.getMonitorGroupIDList()) && CollectionUtil.isNotEmpty(groupPointIDList))
-                    groupPointIDList = groupPointIDList.stream().filter(id -> !request.getMonitorGroupIDList().contains(id)).collect(Collectors.toList());
-                if (CollectionUtil.isNotEmpty(groupPointIDList))
-                    tbMonitorPointMapper.deleteBatchIds(groupPointIDList);
-            }
-        }
+        // 更新监测点、监测组关系
+        updateGroupPointRelation(null, request.getTbMonitorPoint(), request.getMonitorGroupIDList());
 
         //传感器数据源
         if (CollUtil.isNotEmpty(request.getDataSourceList())) {
@@ -369,9 +351,14 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             request.getSensor().setAlias(request.getAlias());
         }
         request.getSensor().setUpdateUserID(subject.getSubjectID());
+        request.getSensor().setMonitorPointID(request.getMonitorPointID());
         request.getSensor().setUpdateTime(null);
         //更新传感器、参数
         updateById(request.getSensor());
+
+        // 更新监测点、监测组关系
+        updateGroupPointRelation(request.getSensor(), request.getTbMonitorPoint(), request.getMonitorGroupIDList());
+
         if (CollUtil.isNotEmpty(request.getParamList())) {
             parameterMapper.replaceBatch(request.getParamList());
             monitorRedisService.putAll(RedisKeys.PARAMETER_PREFIX_KEY + ParameterSubjectType.SENSOR.getCode(),
@@ -381,6 +368,50 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                             .stream().collect(Collectors.groupingBy(TbParameter::getSubjectID)));
         }
         return new IdRecord(request.getSensor().getID());
+    }
+
+    /**
+     * 新增或保存监测传感器时，更新监测点和监测组关系
+     *
+     * @param tbSensor              监测传感器，更新操作时必选
+     * @param newTbMonitorPoint     更新后监测点
+     * @param newMonitorGroupIDList 更新后监测组列表
+     */
+    private void updateGroupPointRelation(TbSensor tbSensor, TbMonitorPoint newTbMonitorPoint, List<Integer> newMonitorGroupIDList) {
+        if (CollectionUtil.isNotEmpty(newMonitorGroupIDList)) {
+            // 绑定监测点和监测组关系
+            List<TbMonitorGroupPoint> tbMonitorGroupPointList = new ArrayList<>();
+            newMonitorGroupIDList.forEach(groupID -> tbMonitorGroupPointList.add(
+                    TbMonitorGroupPoint.builder()
+                            .monitorGroupID(groupID)
+                            .monitorPointID(newTbMonitorPoint.getID())
+                            .imageLocation(newTbMonitorPoint.getImageLocation()).build()));
+            tbMonitorGroupPointMapper.insertBatchSomeColumn(tbMonitorGroupPointList);
+        }
+
+        // 监测传感器之前绑定过监测点
+        if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID()) || tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID()))
+            return;
+        // 新监测点和新监测组关系（当然所有的解除绑定之前，都要判断，如果当前监测点绑定的监测传感器是多传感器，且该监测点除绑定当前传感器外，还有绑定其它，则不需要解绑监测点、监测组关系
+        // 情况一、如果监测点非空（属于监测点变化），监测组为空，需要解除数据库存在的监测点和监测组关系；
+        // 情况二、如果两个均为空（属于监测点变化），需要解除数据库存在的监测点和监测组关系；
+        // 情况三、如果两个均不为空，若之前有绑定监测组，且本次没有，需要解绑之前监测组）
+        List<TbMonitorGroupPoint> oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID()));
+        List<Integer> oldGroupPointIDList = oldGroupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(oldGroupPointIDList) && CollectionUtil.isNotEmpty(newMonitorGroupIDList))
+            // 情况三
+            oldGroupPointIDList = oldGroupPointIDList.stream().filter(id -> !newMonitorGroupIDList.contains(id)).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(oldGroupPointIDList)) {
+            // 情况一、情况二（属于监测点变化）
+            // 过滤掉监测点存在被其它监测传感器（多传感器）引用情况
+            List<TbSensor> tbSensorList = this.list(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getProjectID, tbSensor.getProjectID())
+                    .eq(TbSensor::getMonitorPointID, tbSensor.getMonitorPointID())
+                    .ne(TbSensor::getID, tbSensor.getID()));
+            if (CollectionUtil.isEmpty(tbSensorList))
+                tbMonitorPointMapper.deleteBatchIds(oldGroupPointIDList);
+        }
     }
 
     @Override
@@ -621,7 +652,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 .build();
         ResultWrapper<List<DeviceWithSensor>> resultWrapper = iotService.queryDeviceAndSensorList(request);
         if (!resultWrapper.apiSuccess() || CollectionUtil.isEmpty(resultWrapper.getData()))
-            return null;
+            return Collections.emptyList();
 
         List<SensorConfigListResponse> responseList = BeanUtil.copyToList(resultWrapper.getData(), SensorConfigListResponse.class);
         Set<String> dataSourceTokens = new HashSet<>();
@@ -653,8 +684,8 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                 sensor.setMonitorPointName(defaultMonitorPoint.getMonitorPointName());
                 List<MonitorPointInfo> groupList = monitorPointInfoList.stream()
                         .filter(item -> Objects.nonNull(item.getMonitorGroupID())).collect(Collectors.toList());
-                sensor.setMonitorGroupList(CollectionUtil.isEmpty(groupList)
-                        ? null : BeanUtil.copyToList(groupList, SensorConfigListResponse.MonitorGroup.class));
+                List<SensorConfigListResponse.MonitorGroup> monitorGroupList = BeanUtil.copyToList(groupList, SensorConfigListResponse.MonitorGroup.class);
+                sensor.setMonitorGroupList(CollectionUtil.isEmpty(groupList) ? null : monitorGroupList);
             }
         }));
         responseList.forEach(item -> item.getSensorList().forEach(sensor -> sensor.setMonitorSensorList(

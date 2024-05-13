@@ -1,18 +1,22 @@
 package cn.shmedo.monitor.monibotbaseapi.model.param.sensor;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.extra.spring.SpringUtil;
-import cn.shmedo.iot.entity.api.ParameterValidator;
-import cn.shmedo.iot.entity.api.Resource;
-import cn.shmedo.iot.entity.api.ResourceType;
-import cn.shmedo.iot.entity.api.ResultWrapper;
+import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
+import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
 import cn.shmedo.monitor.monibotbaseapi.model.dto.sensor.SensorConfigField;
 import cn.shmedo.monitor.monibotbaseapi.service.redis.RedisService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +24,9 @@ import lombok.Data;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 更新传感器 请求体
@@ -35,6 +41,10 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
      */
     @NotNull(message = "项目ID不能为空")
     private Integer projectID;
+
+    private Integer monitorPointID;
+
+    private List<Integer> monitorGroupIDList;
 
     /**
      * 传感器ID
@@ -88,11 +98,42 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
     @JsonIgnore
     private TbSensor sensor;
 
+    @JsonIgnore
+    private TbMonitorPoint tbMonitorPoint;
+
     @Override
     public ResultWrapper<?> validate() {
         TbSensorMapper sensorMapper = SpringUtil.getBean(TbSensorMapper.class);
         this.sensor = sensorMapper.selectById(sensorID);
         Assert.notNull(sensor, "传感器不存在");
+
+        // 校验监测点、监测组
+        if (Objects.isNull(monitorPointID) && CollectionUtil.isNotEmpty(monitorGroupIDList))
+            return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "选择了监测组时，监测点不能为空");
+        if (Objects.nonNull(monitorPointID)) {
+            TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
+            tbMonitorPoint = tbMonitorPointMapper.selectById(monitorPointID);
+            if (Objects.isNull(tbMonitorPoint))
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
+            // 如果绑定的监测点是已关联传感器的并且是单传感器类型的监测点，要提示监测点已绑定过传感器
+            TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
+            List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getProjectID, projectID)
+                    .eq(TbSensor::getMonitorPointID, monitorPointID)
+                    .eq(TbSensor::getDataSourceComposeType, 1));
+            if (CollectionUtil.isNotEmpty(tbSensors))
+                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
+            // 监测点、监测组关系不能重复添加
+            if (CollectionUtil.isNotEmpty(monitorGroupIDList)) {
+                TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
+                List<TbMonitorGroupPoint> existsGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                        .eq(TbMonitorGroupPoint::getMonitorPointID, monitorPointID)
+                        .in(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupIDList));
+                monitorGroupIDList = monitorGroupIDList.stream().filter(newGroupID -> !existsGroupPointList.stream()
+                        .map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet()).contains(newGroupID)).collect(Collectors.toList());
+            }
+        }
+
         RedisService redisService = SpringUtil.getBean(RedisConstant.MONITOR_REDIS_SERVICE, RedisService.class);
         //校验扩展配置
         Optional.ofNullable(exFields).ifPresent(fields ->

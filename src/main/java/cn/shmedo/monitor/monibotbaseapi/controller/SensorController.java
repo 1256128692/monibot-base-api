@@ -374,6 +374,8 @@ public class SensorController {
      * @apiName UpdateSensor
      * @apiParam (请求体) {Int} sensorID 传感器ID
      * @apiParam (请求体) {Int} projectID 项目ID
+     * @apiParam (请求体) {Int} [monitorPointID] 监测点
+     * @apiParam (请求体) {Int[]} [monitorGroupIDList] 监测组
      * @apiParam (请求体) {String} [imagePath] 传感器图片base64 带前缀形如 data:image/png;base64,iVBORw0AAA
      * @apiParam (请求体) {String} [alias] 传感器别名
      * @apiParam (请求体) {Boolean} [enable] 是否启用, 不启用将不会接收数据
@@ -646,6 +648,7 @@ public class SensorController {
      * @apiSuccess (返回结果) {Object[]} [dataList.deviceSensorList.monitorSensorList] 监测传感器列表
      * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.monitorSensorID] 监测传感器-名称
      * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.name] 监测传感器-名称
+     * @apiSuccess (返回结果) {String} [dataList.deviceSensorList.monitorSensorList.alias] 监测传感器-别名
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorType] 监测传感器-监测类型
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorTypeName] 监测传感器-监测类型名称
      * @apiSuccess (返回结果) {Int} [dataList.deviceSensorList.monitorSensorList.monitorItemID] 监测传感器-监测项目

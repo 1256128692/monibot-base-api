@@ -170,10 +170,9 @@ public class MonitorItemServiceImpl implements MonitorItemService {
         List<Integer> monitorItemIDList = pageData.getRecords().stream().map(MonitorItem4Web::getID).collect(Collectors.toList());
         List<TbMonitorTypeFieldWithItemID> temp = tbMonitorTypeFieldMapper.queryByMonitorItemIDs(monitorItemIDList);
         Map<Integer, List<TbMonitorTypeFieldWithItemID>> fieldMap = temp.stream().collect(Collectors.groupingBy(TbMonitorTypeFieldWithItemID::getItemID));
-        pageData.getRecords().forEach(item -> {
-            item.setFieldList(fieldMap.get(item.getID()));
-        });
-        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords(), pageData.getTotal());
+        pageData.getRecords().forEach(item -> item.setFieldList(fieldMap.get(item.getID())));
+        return new PageUtil.Page<>(pageData.getPages(), pageData.getRecords().stream()
+                .sorted(Comparator.comparing(MonitorItem4Web::getCreateType).reversed()).collect(Collectors.toList()), pageData.getTotal());
     }
 
     @Override

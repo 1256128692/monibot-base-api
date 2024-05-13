@@ -18,9 +18,11 @@ import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.monitor.monibotbaseapi.config.ContextHolder;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisConstant;
 import cn.shmedo.monitor.monibotbaseapi.constants.RedisKeys;
+import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorGroupPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbMonitorPointMapper;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.TbSensorMapper;
 import cn.shmedo.monitor.monibotbaseapi.model.cache.MonitorTypeCacheData;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorGroupPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbParameter;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbSensor;
@@ -163,7 +165,7 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
         if (Objects.nonNull(monitorPointID)) {
             TbMonitorPointMapper tbMonitorPointMapper = ContextHolder.getBean(TbMonitorPointMapper.class);
             tbMonitorPoint = tbMonitorPointMapper.selectById(monitorPointID);
-            if(Objects.isNull(tbMonitorPoint))
+            if (Objects.isNull(tbMonitorPoint))
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点不存在");
             // 如果绑定的监测点是已关联传感器的并且是单传感器类型的监测点，要提示监测点已绑定过传感器
             TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
@@ -171,8 +173,17 @@ public class SaveSensorRequest implements ParameterValidator, ResourcePermission
                     .eq(TbSensor::getProjectID, projectID)
                     .eq(TbSensor::getMonitorPointID, monitorPointID)
                     .eq(TbSensor::getDataSourceComposeType, 1));
-            if(CollectionUtil.isNotEmpty(tbSensors))
+            if (CollectionUtil.isNotEmpty(tbSensors))
                 return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
+            // 监测点、监测组关系不能重复添加
+            if (CollectionUtil.isNotEmpty(monitorGroupIDList)) {
+                TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
+                List<TbMonitorGroupPoint> existsGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                        .eq(TbMonitorGroupPoint::getMonitorPointID, monitorPointID)
+                        .in(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupIDList));
+                monitorGroupIDList = monitorGroupIDList.stream().filter(newGroupID -> !existsGroupPointList.stream()
+                        .map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet()).contains(newGroupID)).collect(Collectors.toList());
+            }
         }
 
         //校验名称

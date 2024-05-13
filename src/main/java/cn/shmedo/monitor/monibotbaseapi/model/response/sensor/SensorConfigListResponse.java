@@ -39,6 +39,7 @@ public class SensorConfigListResponse {
         @JsonProperty("monitorSensorID")
         private Integer ID;
         private String name;
+        private String alias;
         private Integer monitorType;
         private String monitorTypeName;
         private Integer monitorItemID;
@@ -53,7 +54,8 @@ public class SensorConfigListResponse {
     @Data
     public static class MonitorGroup{
         private Integer monitorGroupID;
-        private Integer monitorGroupParentID;
         private String monitorGroupName;
+        private Integer monitorGroupParentID;
+        private String monitorGroupParentName;
     }
 }
