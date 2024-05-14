@@ -12,6 +12,7 @@
         <result column="Name" jdbcType="VARCHAR" property="name"/>
         <result column="Value" jdbcType="DOUBLE" property="value"/>
         <result column="UnitID" jdbcType="INTEGER" property="unitID"/>
+        <result column="AllMonitorPoint" jdbcType="TINYINT" property="allMonitorPoint"/>
         <result column="ExValue" jdbcType="VARCHAR" property="exValue"/>
         <result column="CreateUserID" jdbcType="INTEGER" property="createUserID"/>
         <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime"/>
@@ -28,196 +29,13 @@
         `Name`,
         `Value`,
         UnitID,
+        AllMonitorPoint,
         ExValue,
         CreateUserID,
         CreateTime,
         UpdateUserID,
         UpdateTime
     </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from tb_eigen_value
-        where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        <!--@mbg.generated-->
-        delete
-        from tb_eigen_value
-        where ID = #{ID,jdbcType=INTEGER}
-    </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_eigen_value (ProjectID, `Scope`, MonitorItemID,
-                                    MonitorTypeFieldID, `Name`, `Value`,
-                                    UnitID, ExValue, CreateUserID,
-                                    CreateTime, UpdateUserID, UpdateTime)
-        values (#{projectID,jdbcType=INTEGER}, #{scope,jdbcType=INTEGER}, #{monitorItemID,jdbcType=INTEGER},
-                #{monitorTypeFieldID,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{value,jdbcType=DOUBLE},
-                #{unitID,jdbcType=INTEGER}, #{exValue,jdbcType=VARCHAR}, #{createUserID,jdbcType=INTEGER},
-                #{createTime,jdbcType=TIMESTAMP}, #{updateUserID,jdbcType=INTEGER}, #{updateTime,jdbcType=TIMESTAMP})
-    </insert>
-    <insert id="insertSelective" keyProperty="id" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue"
-            useGeneratedKeys="true">
-        insert into tb_eigen_value
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="projectID != null">
-                ProjectID,
-            </if>
-            <if test="scope != null">
-                `Scope`,
-            </if>
-            <if test="monitorItemID != null">
-                MonitorItemID,
-            </if>
-            <if test="monitorTypeFieldID != null">
-                MonitorTypeFieldID,
-            </if>
-            <if test="name != null">
-                `Name`,
-            </if>
-            <if test="value != null">
-                `Value`,
-            </if>
-            <if test="unitID != null">
-                UnitID,
-            </if>
-            <if test="exValue != null">
-                ExValue,
-            </if>
-            <if test="createUserID != null">
-                CreateUserID,
-            </if>
-            <if test="createTime != null">
-                CreateTime,
-            </if>
-            <if test="updateUserID != null">
-                UpdateUserID,
-            </if>
-            <if test="updateTime != null">
-                UpdateTime,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="projectID != null">
-                #{projectID,jdbcType=INTEGER},
-            </if>
-            <if test="scope != null">
-                #{scope,jdbcType=INTEGER},
-            </if>
-            <if test="monitorItemID != null">
-                #{monitorItemID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorTypeFieldID != null">
-                #{monitorTypeFieldID,jdbcType=INTEGER},
-            </if>
-            <if test="name != null">
-                #{name,jdbcType=VARCHAR},
-            </if>
-            <if test="value != null">
-                #{value,jdbcType=DOUBLE},
-            </if>
-            <if test="unitID != null">
-                #{unitID,jdbcType=INTEGER},
-            </if>
-            <if test="exValue != null">
-                #{exValue,jdbcType=VARCHAR},
-            </if>
-            <if test="createUserID != null">
-                #{createUserID,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUserID != null">
-                #{updateUserID,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
-        <!--@mbg.generated-->
-        update tb_eigen_value
-        <set>
-            <if test="projectID != null">
-                ProjectID = #{projectID,jdbcType=INTEGER},
-            </if>
-            <if test="scope != null">
-                `Scope` = #{scope,jdbcType=INTEGER},
-            </if>
-            <if test="monitorItemID != null">
-                MonitorItemID = #{monitorItemID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorTypeFieldID != null">
-                MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
-            </if>
-            <if test="name != null">
-                `Name` = #{name,jdbcType=VARCHAR},
-            </if>
-            <if test="value != null">
-                `Value` = #{value,jdbcType=DOUBLE},
-            </if>
-            <if test="unitID != null">
-                UnitID = #{unitID,jdbcType=INTEGER},
-            </if>
-            <if test="exValue != null">
-                ExValue = #{exValue,jdbcType=VARCHAR},
-            </if>
-            <if test="createUserID != null">
-                CreateUserID = #{createUserID,jdbcType=INTEGER},
-            </if>
-            <if test="createTime != null">
-                CreateTime = #{createTime,jdbcType=TIMESTAMP},
-            </if>
-            <if test="updateUserID != null">
-                UpdateUserID = #{updateUserID,jdbcType=INTEGER},
-            </if>
-            <if test="updateTime != null">
-                UpdateTime = #{updateTime,jdbcType=TIMESTAMP},
-            </if>
-        </set>
-        where ID = #{id,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue">
-        <!--@mbg.generated-->
-        update tb_eigen_value
-        set ProjectID          = #{projectID,jdbcType=INTEGER},
-            `Scope`            = #{scope,jdbcType=INTEGER},
-            MonitorItemID      = #{monitorItemID,jdbcType=INTEGER},
-            MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER},
-            `Name`             = #{name,jdbcType=VARCHAR},
-            `Value`            = #{value,jdbcType=DOUBLE},
-            UnitID             = #{unitID,jdbcType=INTEGER},
-            ExValue            = #{exValue,jdbcType=VARCHAR},
-            CreateUserID       = #{createUserID,jdbcType=INTEGER},
-            CreateTime         = #{createTime,jdbcType=TIMESTAMP},
-            UpdateUserID       = #{updateUserID,jdbcType=INTEGER},
-            UpdateTime         = #{updateTime,jdbcType=TIMESTAMP}
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
-
-    <select id="selectCountByProjectIDAndItemIDAndFiledIDAndName" resultType="java.lang.Integer">
-        select count(1)
-        from tb_eigen_value
-        where ProjectID = #{projectID,jdbcType=INTEGER}
-          and MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
-          and MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
-          and `Name` = #{name,jdbcType=VARCHAR}
-        <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
-            and ID in (
-            select eigenValueID
-            from tb_eigen_value_relation where
-                MonitorPointID in
-            <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
-                #{itemID}
-            </foreach>
-            )
-        </if>
-    </select>
 
     <select id="selectListByCondition"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.eigenValue.EigenValueInfoV1">
@@ -234,6 +52,7 @@
                ev.CreateTime,
                ev.UpdateUserID,
                ev.UpdateTime,
+               ev.AllMonitorPoint,
                du.ChnUnit,
                du.EngUnit,
                mtf.FieldName as monitorTypeFieldName,
@@ -263,7 +82,7 @@
             <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
                 #{itemID}
             </foreach>
-            )
+            ) or ev.AllMonitorPoint = 1
         </if>
     </select>
 
@@ -308,20 +127,11 @@
         LEFT JOIN tb_eigen_value ev ON ev.ID = evr.EigenValueID
         LEFT JOIN tb_data_unit du ON du.ID = ev.UnitID
         LEFT JOIN tb_monitor_type_field mtf ON mtf.ID = ev.MonitorTypeFieldID
-    WHERE evr.MonitorPointID IN
+    WHERE (evr.MonitorPointID IN
     <foreach collection="monitorPointIDList" item="item" index="index" open="(" close=")" separator=",">
         #{item}
-    </foreach>
+    </foreach>) OR ev.AllMonitorPoint = 1
   </select>
-    <select id="selectCountByProjectIDAndItemIDAndFiledIDAndNameAndID" resultType="java.lang.Integer">
-        select count(1)
-        from tb_eigen_value
-        where ProjectID = #{projectID,jdbcType=INTEGER}
-          and MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
-          and MonitorTypeFieldID = #{monitorTypeFieldID,jdbcType=INTEGER}
-          and `Name` = #{name,jdbcType=VARCHAR}
-          and ID != #{eigenValueID}
-    </select>
 
     <delete id="deleteByEigenValueIDList">
         delete
@@ -354,21 +164,22 @@
         </foreach>
     </select>
 
-    <insert id="insertBatchSelective">
+    <insert id="insertBatchSelective" keyProperty="id" useGeneratedKeys="true">
         insert into tb_eigen_value
-        (ID,ProjectID, `Scope`, MonitorItemID, MonitorTypeFieldID, `Name`, `Value`, UnitID, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime)
+        (ProjectID, `Scope`, MonitorItemID, MonitorTypeFieldID, `Name`, `Value`,
+         UnitID, AllMonitorPoint, ExValue, CreateUserID, CreateTime, UpdateUserID, UpdateTime)
         values
-        <foreach collection="tbEigenValues" item="item" separator=",">
-            (#{item.eigenValueID,jdbcType=INTEGER},
-            #{item.projectID,jdbcType=INTEGER},
-            #{item.scope,jdbcType=INTEGER},
-            #{item.monitorItemID,jdbcType=INTEGER},
-            #{item.monitorTypeFieldID,jdbcType=INTEGER},
-            #{item.name,jdbcType=VARCHAR},
-            #{item.value,jdbcType=DOUBLE},
-            #{item.unitID,jdbcType=INTEGER},
+        <foreach collection="list" item="item" separator=",">
+            (#{item.projectID,jdbcType=INTEGER},
+             #{item.scope,jdbcType=INTEGER},
+             #{item.monitorItemID,jdbcType=INTEGER},
+             #{item.monitorTypeFieldID,jdbcType=INTEGER},
+             #{item.name,jdbcType=VARCHAR},
+             #{item.value,jdbcType=DOUBLE},
+             #{item.unitID,jdbcType=INTEGER},
+             #{item.allMonitorPoint,jdbcType=INTEGER},
             <choose>
-                <when test="item.exValue != null">
+                <when test="item.exValue != null and item.exValue != ''">
                     #{item.exValue,jdbcType=VARCHAR},
                 </when>
                 <otherwise>
@@ -382,23 +193,40 @@
         </foreach>
     </insert>
 
-    <select id="selectMaxID" resultType="java.lang.Integer">
-        select max(ID) from tb_eigen_value
-    </select>
-
-    <select id="selectNameByMonitorIDList" resultType="java.lang.String">
-        select tev.name from tb_eigen_value tev
-        where tev.ProjectID = #{projectID,jdbcType=INTEGER}
-        and tev.MonitorItemID = #{monitorItemID,jdbcType=INTEGER}
-        <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
-            and tev.ID in (
-            select EigenValueID
-            from tb_eigen_value_relation where MonitorPointID in
-            <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
-                #{itemID}
-            </foreach>
-            )
-        </if>
-        and tev.ID != #{eigenValueID}
+    <select id="selectExist" resultType="boolean">
+        SELECT EXISTS
+        <trim prefix="(" suffix=")">
+            SELECT 1
+            FROM tb_eigen_value tev
+                     LEFT JOIN tb_eigen_value_relation tevr ON tev.ID = tevr.EigenValueID
+            <if test="list != null and list.size != 0">
+                WHERE tev.ProjectID = #{projectID,jdbcType=INTEGER}
+                <if test="excludeEigenValueID != null">
+                    AND tev.ID != #{excludeEigenValueID,jdbcType=INTEGER}
+                </if>
+                <foreach collection="list" item="item" separator="OR" open="AND (" close=")">
+                    <trim prefix="(" suffix=")" prefixOverrides="AND">
+                        <if test="item.scope != null">
+                            AND tev.Scope = #{item.scope.code,jdbcType=INTEGER}
+                        </if>
+                        <if test="item.monitorTypeFieldID != null">
+                            AND tev.MonitorTypeFieldID = #{item.monitorTypeFieldID,jdbcType=INTEGER}
+                        </if>
+                        <if test="item.monitorItemID != null">
+                            AND tev.MonitorItemID = #{item.monitorItemID,jdbcType=INTEGER}
+                        </if>
+                        <if test="item.name != null and item.name != ''">
+                            AND tev.`Name` = #{item.name,jdbcType=VARCHAR}
+                        </if>
+                        <if test="item.monitorPointIDList != null and item.monitorPointIDList.size != 0">
+                            <foreach collection="item.monitorPointIDList" separator=","
+                                     open="AND tevr.MonitorPointID in (" close=")" item="pid">
+                                #{pid}
+                            </foreach>
+                        </if>
+                    </trim>
+                </foreach>
+            </if>
+        </trim>
     </select>
 </mapper>
