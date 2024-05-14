@@ -4,7 +4,10 @@ import cn.shmedo.iot.entity.api.*;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionProvider;
 import cn.shmedo.iot.entity.api.permission.ResourcePermissionType;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.ScopeType;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.util.List;
@@ -12,20 +15,23 @@ import java.util.List;
 @Data
 public class QueryEigenValueParam implements ParameterValidator, ResourcePermissionProvider<Resource> {
 
+    @Positive
     @NotNull(message = "工程ID不能为空")
     private Integer projectID;
-    private List<String> fieldTokenList;
-    private List<Integer> monitorPointIDList;
+
+    @Valid
+    private List<@NotBlank String> fieldTokenList;
+
+    @Valid
+    private List<@Positive @NotNull Integer> monitorPointIDList;
+
+    @Positive
     private Integer monitorItemID;
-    private Integer scope;
+
+    private ScopeType scope;
 
     @Override
-    public ResultWrapper validate() {
-        if (scope != null) {
-            if (!ScopeType.isValidScopeType(scope)) {
-                return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "参数:scope字段值的为作用范围非法类型");
-            }
-        }
+    public ResultWrapper<?> validate() {
         return null;
     }
 

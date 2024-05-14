@@ -1,10 +1,18 @@
 package cn.shmedo.monitor.monibotbaseapi.model.enums;
 
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
+
 public enum ScopeType {
 
+    @JsonProperty("0")
     SPECIAL_ANALYSIS(0, "专题分析"),
+    @JsonProperty("1")
     HISTORICAL_DATA(1, "历史数据");
 
+    @JsonValue
+    @EnumValue
     private final int code;
     private final String description;
 

@@ -231,7 +231,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Object[]} dataList 参数列表
      * @apiParam (请求体) {Int} dataList.scope 作用范围,0:专题分析 1:历史数据
      * @apiParam (请求体) {Int} dataList.monitorItemID 监测项目ID
-     * @apiParam (请求体) {Int[]} dataList.monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {Int[]} [dataList.monitorPointIDList] 监测点ID列表 (!为空时表示关联所有监测点)
      * @apiParam (请求体) {Int} dataList.monitorTypeFieldID 属性(监测子类型ID)
      * @apiParam (请求体) {String} dataList.name 特征值名称
      * @apiParam (请求体) {Double} dataList.value 数值
@@ -296,7 +296,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Int} projectID 工程ID
      * @apiParam (请求体) {Int} scope 作用范围,0:专题分析 1:历史数据
      * @apiParam (请求体) {Int} monitorItemID 监测项目ID
-     * @apiParam (请求体) {Int[]} monitorPointIDList 监测点ID列表
+     * @apiParam (请求体) {Int[]} [monitorPointIDList] 监测点ID列表 (!为空时表示关联所有监测点)
      * @apiParam (请求体) {Int} monitorTypeFieldID 属性(监测子类型ID)
      * @apiParam (请求体) {String} name 特征值名称
      * @apiParam (请求体) {Double} value 数值
@@ -364,6 +364,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {String} eigenvalueList.name 特征值
      * @apiSuccess (响应结果) {Double} eigenvalueList.value 数值
      * @apiSuccess (响应结果) {Int} eigenvalueList.unitID 单位ID
+     * @apiSuccess (响应结果) {Boolean} eigenvalueList.allMonitorPoint 是否关联全部监测点
      * @apiSuccess (响应结果) {String} eigenvalueList.engUnit 单位英文描述
      * @apiSuccess (响应结果) {String} eigenvalueList.chnUnit 单位中文描述
      * @apiSuccess (响应结果) {String} [eigenvalueList.exValue] 拓展属性
@@ -371,7 +372,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.updateUserID 修改人ID
      * @apiSuccess (响应结果) {Date} eigenvalueList.createTime 创建时间
      * @apiSuccess (响应结果) {Date} eigenvalueList.updateTime 修改时间
-     * @apiSuccess (响应结果) {Object[]} eigenvalueList.monitorPointList 监测点ID列表
+     * @apiSuccess (响应结果) {Object[]} [eigenvalueList.monitorPointList] 监测点ID列表，当关联全部监测点时此项为空
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorPointList.monitorPointID 监测点ID
      * @apiSuccess (响应结果) {String} eigenvalueList.monitorPointList.monitorPointName 监测点名称
      * @apiSampleRequest off

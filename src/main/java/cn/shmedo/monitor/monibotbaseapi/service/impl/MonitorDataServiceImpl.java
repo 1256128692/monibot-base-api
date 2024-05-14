@@ -14,7 +14,8 @@ import cn.shmedo.iot.entity.base.Tuple;
 import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
-import cn.shmedo.monitor.monibotbaseapi.model.db.*;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.DeleteBatchDataEventParam;
@@ -37,12 +38,14 @@ import cn.shmedo.monitor.monibotbaseapi.util.DataEventTimeRangeUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.InfluxDBDataUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.CollectionUtil;
 import cn.shmedo.monitor.monibotbaseapi.util.base.PageUtil;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -81,10 +84,16 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addEigenValue(AddEigenValueParam pa) {
-        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        TbEigenValue tbEigenValue = AddEigenValueParam.toNewVo(pa, subjectID);
-        tbEigenValueMapper.insertSelective(tbEigenValue);
-        tbEigenValueRelationMapper.insertBatch(pa.getMonitorPointIDList(), tbEigenValue.getId());
+        tbEigenValueMapper.insertBatchSelective(List.of(pa));
+        if (!pa.getAllMonitorPoint()) {
+            tbEigenValueRelationMapper.insertBatchSomeColumn(pa.getMonitorPointIDList().stream()
+                    .map(e -> {
+                        TbEigenValueRelation relation = new TbEigenValueRelation();
+                        relation.setEigenValueID(pa.getId());
+                        relation.setMonitorPointID(e);
+                        return relation;
+                    }).toList());
+        }
     }
 
     @Override
@@ -100,7 +109,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByEigenValueIDList(eigenValueIDList);
 
         eigenValueInfoV1List.forEach(item -> {
-            item.setScopeStr(ScopeType.getDescriptionByCode(item.getScope()));
+            item.setScopeStr(item.getScope().getDescription());
             if (!CollectionUtil.isNullOrEmpty(allMonitorPointList)) {
                 item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getEigenValueID().equals(item.getId())).collect(Collectors.toList()));
             }
@@ -113,12 +122,20 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     @Transactional(rollbackFor = Exception.class)
     public void updateEigenValue(UpdateEigenValueParam pa) {
         Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-        TbEigenValue tbEigenValue = UpdateEigenValueParam.toNewVo(pa, subjectID);
-        tbEigenValueMapper.updateByPrimaryKeySelective(tbEigenValue);
+        tbEigenValueMapper.updateById(UpdateEigenValueParam.toNewVo(pa, subjectID));
 
         // 删除之前关系,重新绑定
-        tbEigenValueRelationMapper.deleteByEigenValueIDList(List.of(pa.getEigenValueID()));
-        tbEigenValueRelationMapper.insertBatch(pa.getMonitorPointIDList(), pa.getEigenValueID());
+        tbEigenValueRelationMapper.delete(Wrappers.<TbEigenValueRelation>lambdaQuery()
+                .eq(TbEigenValueRelation::getEigenValueID, pa.getEigenValueID()));
+        if (!CollectionUtils.isEmpty(pa.getMonitorPointIDList())) {
+            tbEigenValueRelationMapper.insertBatchSomeColumn(pa.getMonitorPointIDList()
+                    .stream().map(e -> {
+                        TbEigenValueRelation relation = new TbEigenValueRelation();
+                        relation.setEigenValueID(pa.getEigenValueID());
+                        relation.setMonitorPointID(e);
+                        return relation;
+                    }).toList());
+        }
     }
 
     @Override
@@ -497,24 +514,19 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addEigenValueList(AddEigenValueListParam pa) {
 
-        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
-
-        Integer maxEigenValueID = tbEigenValueMapper.selectMaxID();
-        List<AddEigenValueParam> tbEigenValues = new LinkedList<AddEigenValueParam>();
-        for (int i = 0; i < pa.getDataList().size(); i++) {
-            if (maxEigenValueID != null) {
-                pa.getDataList().get(i).setEigenValueID(maxEigenValueID + i + 1);
-            } else {
-                pa.getDataList().get(i).setEigenValueID(i + 1);
-            }
-            tbEigenValues.add(AddEigenValueParam.toNewVo1(pa.getDataList().get(i), subjectID));
-        }
-
-        tbEigenValueMapper.insertBatchSelective(tbEigenValues);
-
-        tbEigenValueRelationMapper.insertBatchRelation(tbEigenValues);
+        tbEigenValueMapper.insertBatchSelective(pa.getDataList());
+        tbEigenValueRelationMapper.insertBatchSomeColumn(pa.getDataList().stream()
+                .filter(e -> Boolean.FALSE.equals(e.getAllMonitorPoint()))
+                .flatMap(e -> e.getMonitorPointIDList().stream()
+                        .map(m -> {
+                            TbEigenValueRelation relation = new TbEigenValueRelation();
+                            relation.setEigenValueID(e.getId());
+                            relation.setMonitorPointID(m);
+                            return relation;
+                        })).toList());
 
     }
 

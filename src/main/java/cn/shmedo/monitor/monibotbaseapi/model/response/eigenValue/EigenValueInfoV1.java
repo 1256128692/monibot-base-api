@@ -23,6 +23,8 @@ public class EigenValueInfoV1 extends TbEigenValue {
 
     private String chnUnit;
 
+    private Boolean allMonitorPoint;
+
     private List<MonitorPointBaseInfoV2> monitorPointList;
 
 }

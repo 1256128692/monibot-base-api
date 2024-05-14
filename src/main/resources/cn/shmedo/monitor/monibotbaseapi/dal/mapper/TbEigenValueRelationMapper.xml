@@ -14,75 +14,6 @@
         EigenValueID,
         MonitorPointID
     </sql>
-    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-        <!--@mbg.generated-->
-        select
-        <include refid="Base_Column_List"/>
-        from tb_eigen_value_relation
-        where ID = #{ID,jdbcType=INTEGER}
-    </select>
-    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-        <!--@mbg.generated-->
-        delete
-        from tb_eigen_value_relation
-        where ID = #{ID,jdbcType=INTEGER}
-    </delete>
-    <insert id="insert" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_eigen_value_relation (EigenValueID, MonitorPointID)
-        values (#{eigenValueID,jdbcType=INTEGER}, #{monitorPointID,jdbcType=INTEGER})
-    </insert>
-    <insert id="insertSelective" keyColumn="ID" keyProperty="ID"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation" useGeneratedKeys="true">
-        <!--@mbg.generated-->
-        insert into tb_eigen_value_relation
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="eigenValueID != null">
-                EigenValueID,
-            </if>
-            <if test="monitorPointID != null">
-                MonitorPointID,
-            </if>
-        </trim>
-        <trim prefix="values (" suffix=")" suffixOverrides=",">
-            <if test="eigenValueID != null">
-                #{eigenValueID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorPointID != null">
-                #{monitorPointID,jdbcType=INTEGER},
-            </if>
-        </trim>
-    </insert>
-    <update id="updateByPrimaryKeySelective"
-            parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation">
-        <!--@mbg.generated-->
-        update tb_eigen_value_relation
-        <set>
-            <if test="eigenValueID != null">
-                EigenValueID = #{eigenValueID,jdbcType=INTEGER},
-            </if>
-            <if test="monitorPointID != null">
-                MonitorPointID = #{monitorPointID,jdbcType=INTEGER},
-            </if>
-        </set>
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
-    <update id="updateByPrimaryKey" parameterType="cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation">
-        <!--@mbg.generated-->
-        update tb_eigen_value_relation
-        set EigenValueID   = #{eigenValueID,jdbcType=INTEGER},
-            MonitorPointID = #{monitorPointID,jdbcType=INTEGER}
-        where ID = #{ID,jdbcType=INTEGER}
-    </update>
-
-    <insert id="insertBatch">
-        INSERT INTO tb_eigen_value_relation (MonitorPointID, EigenValueID)
-        VALUES
-        <foreach collection="monitorPointIDList" item="monitorPointID" index="index" separator=",">
-            (#{monitorPointID}, #{eigenValueID})
-        </foreach>
-    </insert>
 
     <delete id="deleteByEigenValueIDList">
         delete
@@ -103,13 +34,4 @@
         </foreach>
     </select>
 
-    <insert id="insertBatchRelation" parameterType="java.util.List">
-        insert into tb_eigen_value_relation (EigenValueID, MonitorPointID)
-        values
-        <foreach collection="tbEigenValues" item="item" separator=",">
-            <foreach collection="item.monitorPointIDList" item="monitorPointID" separator=",">
-                (#{item.eigenValueID,jdbcType=INTEGER}, #{monitorPointID,jdbcType=INTEGER})
-            </foreach>
-        </foreach>
-    </insert>
 </mapper>
