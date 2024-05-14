@@ -54,7 +54,7 @@ public class QueryMonitorPointDataParam implements ParameterValidator, ResourceP
      */
     private List<Integer> eventIDList;
     @Override
-    public ResultWrapper validate() {
+    public ResultWrapper<?> validate() {
         // 时间校验
         if (begin.after(end)) {
             return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "开始时间不能小于结束时间");

@@ -118,7 +118,7 @@ public class MonitorDataController {
      * @apiParam (请求体) {Boolean} [filterEmptyData] 是否过滤空数据,默认为false(不过滤),true(过滤空数据)
      * @apiParam (请求体) {Boolean} [dataSort]  数据排序,为空默认倒序,true为正序,false为倒序
      * @apiParam (请求体) {Int[]} [eigenValueIDList] 特征值ID列表
-     * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表
+     * @apiParam (请求体) {Int[]} [eventIDList] 大事记ID列表,该参数不传时为全部(列表没有大事记下拉框,不传该参数,展示全部)
      * @apiParamExample 请求体示例
      * {"projectID":1,"monitorType":"1","monitorItemID":1,"monitorPointIDList":[1,2],
      * "begin":"2023-10-06 16:29:31","end":"2023-10-07 16:29:31","densityType":0,"statisticsType":0,
