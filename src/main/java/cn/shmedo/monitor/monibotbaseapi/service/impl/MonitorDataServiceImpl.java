@@ -279,8 +279,9 @@ public class MonitorDataServiceImpl implements MonitorDataService {
             List<Integer> sensorIDList = allSensorInfoList.stream().map(SensorBaseInfoResponse::getSensorID).collect(Collectors.toList());
             List<Map<String, Object>> sensorDataList = sensorDataDao.queryCommonSensorDataList(sensorIDList, pa.getBegin(), pa.getEnd(),
                     pa.getDensityType(), pa.getStatisticsType(), fieldList, pa.getMonitorType());
-            Integer total = 0;
-            total = sensorDataList.size();
+//            Integer total = 0;
+//            total = sensorDataList.size();
+
             List<Map<String, Object>> finalSensorDataList = sensorDataList;
             if (pa.getDataSort()) {
                 CollUtil.sortByProperty(finalSensorDataList, "time");
@@ -320,11 +321,15 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                 }
             });
 
-            Integer finalTotal = total;
+//            Integer finalTotal = total;
             monitorPointDataInfoList.forEach(m -> {
-                m.setSensorList(allSensorInfoList.stream().filter(s -> s.getMonitorPointID().equals(m.getMonitorPointID())).collect(Collectors.toList()));
+                List<SensorBaseInfoResponse> infoResponses = allSensorInfoList.stream().filter(s -> s.getMonitorPointID()
+                        .equals(m.getMonitorPointID())).collect(Collectors.toList());
+                long sensorDataCount = infoResponses.stream().map(SensorBaseInfoResponse::getMultiSensorData)
+                        .filter(CollUtil::isNotEmpty).mapToLong(Collection::size).sum();
+                m.setSensorList(infoResponses);
                 m.setFieldList(fieldList);
-                m.setSensorDataCount(finalTotal);
+                m.setSensorDataCount((int) sensorDataCount);
             });
         }
 
