@@ -140,6 +140,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} currentPageData.sensorID 传感器ID
      * @apiSuccess (响应结果) {Int} currentPageData.projectID 工程ID
      * @apiSuccess (响应结果) {String} currentPageData.sensorName 传感器名称
+     * @apiSuccess (响应结果) {String} currentPageData.sensorAlias 传感器别称
      * @apiSuccess (响应结果) {DateTime} currentPageData.time 数据采集时间
      * @apiSuccess (响应结果) {Map} currentPageData.data 传感器数据map,内部key为动态值，参考监测项目属性字段列表,如:土壤含水量(%)等
      * @apiSuccess (响应结果) {Bool} [currentPageData.multiSensor] 是否为关联多传感器

@@ -21,6 +21,7 @@ public class MonitorPointListPageDataInfo {
     private Integer projectID;
     private Integer sensorID;
     private String sensorName;
+    private String sensorAlias;
     private Date time;
     private Map<String, Object> data;
     private Map<String, Integer> maxMark;

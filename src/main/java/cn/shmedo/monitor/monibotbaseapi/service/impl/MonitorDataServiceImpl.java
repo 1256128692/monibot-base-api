@@ -49,7 +49,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Service
@@ -794,12 +793,12 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                             Optional.ofNullable(data.get(DbConstant.TIME_FIELD)).map(Convert::toDate).ifPresent(time -> {
                                 info.setData(data);
                                 info.setTime(time);
-                                eventList.forEach(event -> Optional.ofNullable(DataEventTimeRangeUtil
-                                                .parse(event.getTimeRange(), time, event.getFrequency()))
-                                        .map(events -> DataEventTimeRangeUtil.findHintTimeInRange(time, events))
-                                        .filter(CollUtil::isNotEmpty).map(DataEventTimeRangeUtil::parse)
-                                        .ifPresent(hintStr -> info.setEventList(eventList.stream().map(events ->
-                                                EventBaseWithHitDateInfo.build(events, hintStr)).toList())));
+                                info.setEventList(eventList.stream().map(event -> Optional.ofNullable(DataEventTimeRangeUtil
+                                                        .parse(event.getTimeRange(), time, event.getFrequency())).map(range ->
+                                                        DataEventTimeRangeUtil.findHintTimeInRange(time, range))
+                                                .filter(CollUtil::isNotEmpty).map(DataEventTimeRangeUtil::parse).map(hintStr ->
+                                                        EventBaseWithHitDateInfo.build(event, hintStr)).orElse(null))
+                                        .filter(Objects::nonNull).toList());
                             });
                             return info;
                         }).filter(data -> Objects.nonNull(data.getTime())).collect(Collectors.toList())).orElse(List.of()))
