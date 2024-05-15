@@ -80,6 +80,7 @@ public class TbSensor implements Serializable {
     /**
      * 关联监测点ID
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private Integer monitorPointID;
 
     /**
