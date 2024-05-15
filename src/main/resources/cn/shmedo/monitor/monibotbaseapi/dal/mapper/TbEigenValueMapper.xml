@@ -76,13 +76,13 @@
             and ev.scope = #{scope}
         </if>
         <if test="monitorPointIDList != null and monitorPointIDList.size != 0">
-            and ev.ID in (
+            and (ev.ID in (
             select EigenValueID
             from tb_eigen_value_relation where MonitorPointID in
             <foreach close=")" collection="monitorPointIDList" item="itemID" open="(" separator=",">
                 #{itemID}
             </foreach>
-            ) or ev.AllMonitorPoint = 1
+            ) or ev.AllMonitorPoint = 1)
         </if>
     </select>
 
