@@ -345,7 +345,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                                     .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
                                     .findFirst().orElse(null);
                             if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
-                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                                r.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深").toString()));
                             }
                         });
                     }
@@ -501,7 +501,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                                     .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
                                     .findFirst().orElse(null);
                             if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
-                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                                r.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深").toString()));
                             }
                         });
                     }
@@ -593,7 +593,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                                     .filter(s -> s.getSensorID().equals((Integer) r.get(DbConstant.SENSOR_ID_FIELD_TOKEN)))
                                     .findFirst().orElse(null);
                             if (sInfo != null && StringUtils.isNotBlank(sInfo.getConfigFieldValue())) {
-                                r.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深"));
+                                r.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(sInfo.getConfigFieldValue()).getByPath("$.埋深").toString()));
                             }
                         });
                     }

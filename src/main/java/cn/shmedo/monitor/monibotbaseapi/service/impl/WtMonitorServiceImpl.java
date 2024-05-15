@@ -335,7 +335,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                                 TbSensor tbSensor = tbSensors.stream().filter(ts -> ts.getID().equals(da.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
                                 // 将JSON字符串转换为JSON对象
                                 if (tbSensor != null) {
-                                    da.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深"));
+                                    da.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深").toString()));
                                 }
                                 result.add(da);
                             }
@@ -352,7 +352,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
                         Map<String, Object> currentSensorData = maps.stream().filter(m -> m.get(DbConstant.SENSOR_ID_FIELD_TOKEN).equals(tbSensor.getID())).findFirst().orElse(null);
                         if (MapUtil.isNotEmpty(currentSensorData)) {
                             if (tbSensor.getMonitorType().equals(MonitorType.SOIL_MOISTURE.getKey())) {
-                                currentSensorData.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深"));
+                                currentSensorData.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(tbSensor.getConfigFieldValue()).getByPath("$.埋深").toString()));
                             }
                             snd.setSensorData(handleSpecialType(tbSensor.getMonitorType(), currentSensorData, snd.getProjectTypeID()));
                             snd.setTime(DateUtil.parse((String) currentSensorData.get(DbConstant.TIME_FIELD)));
@@ -1639,7 +1639,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
     private Map<String, Object> handleTriaxialDisplacementType(Map<String, Object> map, List<TbSensor> tbSensors) {
         TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
         if (sensor != null) {
-            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深"));
+            map.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深").toString()));
         }
         return map;
     }
@@ -1768,7 +1768,7 @@ public class WtMonitorServiceImpl implements WtMonitorService {
 
         TbSensor sensor = tbSensors.stream().filter(tbSensor -> tbSensor.getID().equals(map.get(DbConstant.SENSOR_ID_FIELD_TOKEN))).findFirst().orElse(null);
         if (sensor != null) {
-            map.put(DbConstant.SHANGQING_DEEP, JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深"));
+            map.put(DbConstant.SHANGQING_DEEP, Double.valueOf(JSONUtil.parseObj(sensor.getConfigFieldValue()).getByPath("$.埋深").toString()));
         }
         return map;
     }
