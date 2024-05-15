@@ -886,7 +886,7 @@
                evr.eigenValueID
         from tb_monitor_point as mp
                  left join tb_eigen_value_relation evr on evr.monitorPointID = mp.ID
-        <trim prefix="where (" suffix=")" prefixOverrides="or">
+        <trim prefix="where mp.`Enable` = 1 and  (" suffix=")" prefixOverrides="or">
             <if test="eigenValueIDList != null and eigenValueIDList.size != 0">
                 <foreach collection="eigenValueIDList" item="eigenValueID" index="index" open="evr.EigenValueID IN ("
                          close=")" separator=",">

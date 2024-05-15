@@ -132,7 +132,7 @@ public class MonitorDataServiceImpl implements MonitorDataService {
                         .toList());
             } else {
                 item.setMonitorPointList(allMonitorPointList.stream()
-                        .filter(a -> a.getEigenValueID().equals(item.getId())).collect(Collectors.toList()));
+                        .filter(a -> item.getId().equals(a.getEigenValueID())).collect(Collectors.toList()));
             }
         });
 
