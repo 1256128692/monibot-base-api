@@ -119,7 +119,7 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
             TbMonitorType tbMonitorType = tbMonitorTypeMapper.selectOne(new LambdaQueryWrapper<TbMonitorType>()
                     .eq(TbMonitorType::getMonitorType, sensor.getMonitorType())
                     .eq(TbMonitorType::getMultiSensor, false));
-            if(Objects.nonNull(tbMonitorType)){
+            if (Objects.nonNull(tbMonitorType)) {
                 TbSensorMapper tbSensorMapper = ContextHolder.getBean(TbSensorMapper.class);
                 List<TbSensor> tbSensors = tbSensorMapper.selectList(new LambdaQueryWrapper<TbSensor>()
                         .eq(TbSensor::getProjectID, projectID)

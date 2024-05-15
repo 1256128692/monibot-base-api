@@ -124,7 +124,10 @@ public class NotifyServiceImpl implements NotifyService {
         Optional.ofNullable(notifyListByProjectIDList)
                 .filter(CollectionUtil::isNotEmpty)
                 .map(n -> n.stream().map(NotifyListByProjectID::getNotifyID).collect(Collectors.toList()))
-                .ifPresent(param::setNotifyIDList);
+                .ifPresent(n -> {
+                    if (Objects.nonNull(param.getProjectID()))
+                        param.setNotifyIDList(n);
+                });
 
         // 分页查询通知信息（条件过滤）
         PageUtil.Page<NotifyPageInfo> page = Optional.ofNullable(param.build())
