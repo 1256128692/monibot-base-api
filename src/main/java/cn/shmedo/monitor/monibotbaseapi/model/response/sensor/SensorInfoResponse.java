@@ -28,6 +28,11 @@ public class SensorInfoResponse extends TbSensor {
     private String monitorTypeName;
 
     /**
+     * 监测点组列表
+     */
+    private List<SensorConfigListResponse.MonitorGroup> monitorGroups;
+
+    /**
      * 扩展字段
      */
     private List<ExField> exFields;

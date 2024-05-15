@@ -313,6 +313,11 @@ public class SensorController {
      * @apiSuccess (响应结果) {Int} [data.channelCode] 通道号
      * @apiSuccess (响应结果) {String} [data.videoDeviceSource] 视频设备来源
      * @apiSuccess (响应结果) {Boolean} [enable] 是否启用, 不启用将不会接收数据
+     * @apiSuccess (响应结果) {Object[]} data.monitorGroups 监测组列表
+     * @apiSuccess (返回结果) {Int} data.monitorGroups.monitorGroupID 监测组ID
+     * @apiSuccess (返回结果) {String} data.monitorGroups.monitorGroupName 监测组名称
+     * @apiSuccess (返回结果) {Int} data.monitorGroups.monitorGroupParentID 组别ID
+     * @apiSuccess (返回结果) {Int} data.monitorGroups.monitorGroupParentName 组别名称
      * @apiSuccess (响应结果) {Object[]} data.exFields 拓展字段
      * @apiSuccess (响应结果) {Int} data.exFields.id 拓展字段ID
      * @apiSuccess (响应结果) {Int} data.exFields.monitorType 监测类型

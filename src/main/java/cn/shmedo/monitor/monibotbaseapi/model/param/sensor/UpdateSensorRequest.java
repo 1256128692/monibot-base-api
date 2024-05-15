@@ -130,14 +130,14 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                     return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
             }
             // 监测点、监测组关系不能重复添加
-            if (CollectionUtil.isNotEmpty(monitorGroupIDList)) {
-                TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
-                List<TbMonitorGroupPoint> existsGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
-                        .eq(TbMonitorGroupPoint::getMonitorPointID, monitorPointID)
-                        .in(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupIDList));
-                monitorGroupIDList = monitorGroupIDList.stream().filter(newGroupID -> !existsGroupPointList.stream()
-                        .map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet()).contains(newGroupID)).collect(Collectors.toList());
-            }
+//            if (CollectionUtil.isNotEmpty(monitorGroupIDList)) {
+//                TbMonitorGroupPointMapper tbMonitorGroupPointMapper = ContextHolder.getBean(TbMonitorGroupPointMapper.class);
+//                List<TbMonitorGroupPoint> existsGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+//                        .eq(TbMonitorGroupPoint::getMonitorPointID, monitorPointID)
+//                        .in(TbMonitorGroupPoint::getMonitorGroupID, monitorGroupIDList));
+//                monitorGroupIDList = monitorGroupIDList.stream().filter(newGroupID -> !existsGroupPointList.stream()
+//                        .map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet()).contains(newGroupID)).collect(Collectors.toList());
+//            }
         }
 
         RedisService redisService = SpringUtil.getBean(RedisConstant.MONITOR_REDIS_SERVICE, RedisService.class);

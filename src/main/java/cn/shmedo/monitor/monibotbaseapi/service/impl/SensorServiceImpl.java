@@ -113,6 +113,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
     @Resource
     private TbMonitorGroupPointMapper tbMonitorGroupPointMapper;
 
+    @Resource
+    private TbMonitorGroupMapper tbMonitorGroupMapper;
+
     @Override
     public PageUtil.Page<SensorListResponse> sensorPage(SensorPageRequest request) {
         Page<SensorListResponse> page = new Page<>(request.getCurrentPage(), request.getPageSize());
@@ -301,6 +304,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         response.setDataSourceList(sensorDataSourceMapper
                 .selectList(new LambdaQueryWrapper<TbSensorDataSource>()
                         .eq(TbSensorDataSource::getDataSourceID, response.getDataSourceID())));
+        // 监测点组
+        if (Objects.nonNull(response.getMonitorPointID()))
+            response.setMonitorGroups(tbMonitorGroupMapper.selectByMonitorPoints(Collections.singletonList(response.getMonitorPointID())));
         response.setMonitorTypeName(monitorTypeService.queryMonitorType(response.getMonitorType()).getTypeName());
         return response;
     }
@@ -380,26 +386,44 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
      */
     private void updateGroupPointRelation(TbSensor tbSensor, TbMonitorPoint newTbMonitorPoint, List<Integer> newMonitorGroupIDList) {
         if (CollectionUtil.isNotEmpty(newMonitorGroupIDList)) {
-            // 绑定监测点和监测组关系
-            List<TbMonitorGroupPoint> tbMonitorGroupPointList = new ArrayList<>();
-            newMonitorGroupIDList.forEach(groupID -> tbMonitorGroupPointList.add(
-                    TbMonitorGroupPoint.builder()
-                            .monitorGroupID(groupID)
-                            .monitorPointID(newTbMonitorPoint.getID())
-                            .imageLocation(newTbMonitorPoint.getImageLocation()).build()));
-            tbMonitorGroupPointMapper.insertBatchSomeColumn(tbMonitorGroupPointList);
+            // 防止重复添加监测点和监测组关系
+            List<TbMonitorGroupPoint> dbExistsGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                    .eq(TbMonitorGroupPoint::getMonitorPointID, newTbMonitorPoint.getID())
+                    .in(TbMonitorGroupPoint::getMonitorGroupID, newMonitorGroupIDList));
+            List<Integer> addMonitorGroupIDList = newMonitorGroupIDList.stream().filter(newGroupID -> !dbExistsGroupPointList.stream()
+                    .map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet()).contains(newGroupID)).collect(Collectors.toList());
+            // 新增监测点和监测组关系
+            if (CollectionUtil.isNotEmpty(addMonitorGroupIDList)) {
+                List<TbMonitorGroupPoint> tbMonitorGroupPointList = new ArrayList<>();
+                addMonitorGroupIDList.forEach(groupID -> tbMonitorGroupPointList.add(
+                        TbMonitorGroupPoint.builder()
+                                .monitorGroupID(groupID)
+                                .monitorPointID(newTbMonitorPoint.getID())
+                                .imageLocation(newTbMonitorPoint.getImageLocation()).build()));
+                tbMonitorGroupPointMapper.insertBatchSomeColumn(tbMonitorGroupPointList);
+            }
         }
 
-        // 监测传感器之前绑定过监测点
+        // 监测传感器之前绑定过监测点 # tbSensor.getMonitorPointID()旧的点
         if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID()))
             return;
         // 新监测点和新监测组关系（当然所有的解除绑定之前，都要判断，如果当前监测点绑定的监测传感器是多传感器，且该监测点除绑定当前传感器外，还有绑定其它，则不需要解绑监测点、监测组关系
         // 情况一、如果监测点非空（属于监测点变化），监测组为空，需要解除数据库存在的监测点和监测组关系；
         // 情况二、如果两个均为空（属于监测点变化），需要解除数据库存在的监测点和监测组关系；
         // 情况三、如果两个均不为空，若之前有绑定监测组，且本次没有，需要解绑之前监测组）
-        List<TbMonitorGroupPoint> oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
-                .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID()));
+        List<TbMonitorGroupPoint> oldGroupPointList;
+        if (Objects.isNull(newTbMonitorPoint) || !tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID())) {
+            // 获取旧点绑定的点、组关系
+            oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                    .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID()));
+        } else {
+            // 获取新点绑定点、组关系
+            oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                    .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID())
+                    .notIn(CollectionUtil.isNotEmpty(newMonitorGroupIDList), TbMonitorGroupPoint::getMonitorGroupID, newMonitorGroupIDList));
+        }
         List<Integer> oldGroupPointIDList = oldGroupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
+
         if (CollectionUtil.isNotEmpty(oldGroupPointIDList) && CollectionUtil.isNotEmpty(newMonitorGroupIDList))
             // 情况三
             oldGroupPointIDList = oldGroupPointIDList.stream().filter(id -> !newMonitorGroupIDList.contains(id)).collect(Collectors.toList());
