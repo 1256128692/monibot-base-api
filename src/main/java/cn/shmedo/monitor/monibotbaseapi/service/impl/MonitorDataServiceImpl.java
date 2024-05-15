@@ -385,7 +385,8 @@ public class MonitorDataServiceImpl implements MonitorDataService {
     public PageUtil.PageWithMap<MonitorPointListPageDataInfo> queryMonitorPointDataListPage(QueryMonitorPointDataListPageParam pa) {
         List<MonitorPointDataInfo> list = queryMonitorPointDataList(pa);
         List<FieldBaseInfo> fieldList = buildFieldListByPointDataList(list, pa.getMonitorItemID());
-        List<MonitorPointListPageDataInfo> dataList = buildMonitorPointDataListPageByList(list, fieldList);
+        List<MonitorPointListPageDataInfo> dataList = buildMonitorPointDataListPageByList(list, fieldList,
+                Optional.ofNullable(pa.getDataSort()).orElse(false));
         PageUtil.Page<MonitorPointListPageDataInfo> page = PageUtil.page(dataList, pa.getPageSize(), pa.getCurrentPage());
         return new PageUtil.PageWithMap<>(page.totalPage(), page.currentPageData(), page.totalCount(), Map.of("fieldList", fieldList));
     }
@@ -740,13 +741,17 @@ public class MonitorDataServiceImpl implements MonitorDataService {
      * @return
      */
     private List<MonitorPointListPageDataInfo> buildMonitorPointDataListPageByList(List<MonitorPointDataInfo> list,
-                                                                                   List<FieldBaseInfo> fieldList) {
+                                                                                   List<FieldBaseInfo> fieldList, Boolean dataSort) {
+        Comparator<MonitorPointListPageDataInfo> comparing = Comparator.comparing(MonitorPointListPageDataInfo::getTime);
+        if (!dataSort) {
+            comparing = comparing.reversed();
+        }
+
         // key-fieldToken, value-min,max
         Map<String, Tuple<Double, Double>> fieldTokenOptimalValMap = fieldList.stream().map(FieldBaseInfo::getFieldToken)
                 .collect(Collectors.toMap(Function.identity(), t -> new Tuple<>()));
         List<MonitorPointListPageDataInfo> dataList = list.stream().map(this::getMonitorPointListPageDataInfoLists)
-                .flatMap(Collection::stream).flatMap(Collection::stream).sorted(Comparator
-                        .comparing(MonitorPointListPageDataInfo::getTime).reversed()).peek(item ->
+                .flatMap(Collection::stream).flatMap(Collection::stream).sorted(comparing).peek(item ->
                         Optional.ofNullable(item.getData()).filter(CollUtil::isNotEmpty).ifPresent(data ->
                                 data.forEach((field, valObj) -> {
                                     if (!(DbConstant.TIME_FIELD.equals(field) || DbConstant.SENSOR_ID_FIELD_TOKEN.equals(field))) {
