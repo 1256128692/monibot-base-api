@@ -876,7 +876,7 @@
         </foreach>
     </select>
 
-    <select id="selectListByEigenValueIDList"
+    <select id="selectListByEigenValueIDListAndMonitorItemIDList"
             resultType="cn.shmedo.monitor.monibotbaseapi.model.response.monitorgroup.MonitorPointBaseInfoV2">
         select mp.ID     as monitorPointID,
                mp.name   as monitorPointName,
@@ -886,16 +886,20 @@
                evr.eigenValueID
         from tb_monitor_point as mp
                  left join tb_eigen_value_relation evr on evr.monitorPointID = mp.ID
-        where 1 = 1
-        <if test="eigenValueIDList != null and eigenValueIDList.size != 0">
-            and mp.ID in
-            (select monitorPointID
-             from tb_eigen_value_relation where eigenValueID in
-            <foreach collection="eigenValueIDList" item="eigenValueID" index="index" open="(" close=")" separator=",">
-                #{eigenValueID}
-            </foreach>
-            )
-        </if>
+        <trim prefix="where (" suffix=")" prefixOverrides="or">
+            <if test="eigenValueIDList != null and eigenValueIDList.size != 0">
+                <foreach collection="eigenValueIDList" item="eigenValueID" index="index" open="evr.EigenValueID IN ("
+                         close=")" separator=",">
+                    #{eigenValueID}
+                </foreach>
+            </if>
+            <if test="monitorItemIDList != null and monitorItemIDList.size != 0">
+                <foreach collection="monitorItemIDList" item="item" index="index" open="or mp.MonitorItemID IN ("
+                         close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </trim>
     </select>
 
     <select id="listByProjectType"

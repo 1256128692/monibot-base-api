@@ -1,6 +1,5 @@
 package cn.shmedo.monitor.monibotbaseapi.dal.mapper;
 
-import cn.hutool.core.lang.Opt;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbMonitorPoint;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryThematicGroupPointListParam;
 import cn.shmedo.monitor.monibotbaseapi.model.param.thematicDataAnalysis.QueryWetLineConfigParam;
@@ -81,7 +80,8 @@ public interface TbMonitorPointMapper extends BasicMapper<TbMonitorPoint> {
 
     WetLineConfigInfo selectWetLineConfig(@Param("param") QueryWetLineConfigParam param);
 
-    List<MonitorPointBaseInfoV2> selectListByEigenValueIDList(@Param("eigenValueIDList") List<Integer> eigenValueIDList);
+    List<MonitorPointBaseInfoV2> selectListByEigenValueIDListAndMonitorItemIDList(@Param("eigenValueIDList") List<Integer> eigenValueIDList,
+                                                              @Param("monitorItemIDList") List<Integer> monitorItemIDList);
 
     List<MonitorPointSimple> listByProjectType(@Param("projectIDList") Collection<Integer> projectIDList,
                                                @Param("monitorTypeList") Collection<Integer> monitorTypeList);

@@ -15,6 +15,7 @@ import cn.shmedo.monitor.monibotbaseapi.config.DbConstant;
 import cn.shmedo.monitor.monibotbaseapi.dal.dao.SensorDataDao;
 import cn.shmedo.monitor.monibotbaseapi.dal.mapper.*;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbDataEvent;
+import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValue;
 import cn.shmedo.monitor.monibotbaseapi.model.db.TbEigenValueRelation;
 import cn.shmedo.monitor.monibotbaseapi.model.enums.*;
 import cn.shmedo.monitor.monibotbaseapi.model.param.dataEvent.AddDataEventParam;
@@ -105,13 +106,33 @@ public class MonitorDataServiceImpl implements MonitorDataService {
         if (CollectionUtil.isNullOrEmpty(eigenValueInfoV1List)) {
             return Collections.emptyList();
         }
+
+        //如果存在绑定了全部监测点特征值，则通过监测项目查询所有监测点
+        List<Integer> monitorItemIdSet = eigenValueInfoV1List.stream().filter(EigenValueInfoV1::getAllMonitorPoint)
+                .map(TbEigenValue::getMonitorItemID).distinct().toList();
         List<Integer> eigenValueIDList = eigenValueInfoV1List.stream().map(EigenValueInfoV1::getId).collect(Collectors.toList());
-        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper.selectListByEigenValueIDList(eigenValueIDList);
+        List<MonitorPointBaseInfoV2> allMonitorPointList = tbMonitorPointMapper
+                .selectListByEigenValueIDListAndMonitorItemIDList(eigenValueIDList, monitorItemIdSet);
 
         eigenValueInfoV1List.forEach(item -> {
             item.setScopeStr(item.getScope().getDescription());
-            if (!CollectionUtil.isNullOrEmpty(allMonitorPointList)) {
-                item.setMonitorPointList(allMonitorPointList.stream().filter(a -> a.getEigenValueID().equals(item.getId())).collect(Collectors.toList()));
+            if (item.getAllMonitorPoint()) {
+                item.setMonitorPointList(allMonitorPointList.stream()
+                        .filter(e -> e.getMonitorItemID().equals(item.getMonitorItemID()))
+                        .map(e -> {
+                            MonitorPointBaseInfoV2 p = new MonitorPointBaseInfoV2();
+                            p.setMonitorPointID(e.getMonitorPointID());
+                            p.setMonitorPointName(e.getMonitorPointName());
+                            p.setMonitorPointEnable(e.getMonitorPointEnable());
+                            p.setMonitorType(e.getMonitorType());
+                            p.setMonitorItemID(e.getMonitorItemID());
+                            p.setEigenValueID(item.getId());
+                            return p;
+                        })
+                        .toList());
+            } else {
+                item.setMonitorPointList(allMonitorPointList.stream()
+                        .filter(a -> a.getEigenValueID().equals(item.getId())).collect(Collectors.toList()));
             }
         });
 

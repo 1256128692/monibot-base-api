@@ -372,7 +372,7 @@ public class MonitorDataController {
      * @apiSuccess (响应结果) {Int} eigenvalueList.updateUserID 修改人ID
      * @apiSuccess (响应结果) {Date} eigenvalueList.createTime 创建时间
      * @apiSuccess (响应结果) {Date} eigenvalueList.updateTime 修改时间
-     * @apiSuccess (响应结果) {Object[]} [eigenvalueList.monitorPointList] 监测点ID列表，当关联全部监测点时此项为空
+     * @apiSuccess (响应结果) {Object[]} eigenvalueList.monitorPointList 监测点ID列表
      * @apiSuccess (响应结果) {Int} eigenvalueList.monitorPointList.monitorPointID 监测点ID
      * @apiSuccess (响应结果) {String} eigenvalueList.monitorPointList.monitorPointName 监测点名称
      * @apiSampleRequest off
