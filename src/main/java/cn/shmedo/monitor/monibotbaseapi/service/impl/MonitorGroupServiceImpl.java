@@ -134,6 +134,10 @@ public class MonitorGroupServiceImpl implements MonitorGroupService {
                         tbMonitorGroupPointList
                 );
             }
+        } else {
+            // 监测点为空，解绑监测组和之前监测点的绑定关系
+            tbMonitorGroupPointMapper.delete(new LambdaQueryWrapper<TbMonitorGroupPoint>()
+                    .eq(TbMonitorGroupPoint::getMonitorGroupID, pa.getGroupID()));
         }
     }
 

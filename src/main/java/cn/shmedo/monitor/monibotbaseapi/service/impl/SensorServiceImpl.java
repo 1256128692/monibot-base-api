@@ -424,19 +424,12 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         }
         List<Integer> oldGroupPointIDList = oldGroupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
 
+        // 情况三
         if (CollectionUtil.isNotEmpty(oldGroupPointIDList) && CollectionUtil.isNotEmpty(newMonitorGroupIDList))
-            // 情况三
             oldGroupPointIDList = oldGroupPointIDList.stream().filter(id -> !newMonitorGroupIDList.contains(id)).collect(Collectors.toList());
-        if (CollectionUtil.isNotEmpty(oldGroupPointIDList)) {
-            // 情况一、情况二（属于监测点变化）
-            // 过滤掉监测点存在被其它监测传感器（多传感器）引用情况
-            List<TbSensor> tbSensorList = this.list(new LambdaQueryWrapper<TbSensor>()
-                    .eq(TbSensor::getProjectID, tbSensor.getProjectID())
-                    .eq(TbSensor::getMonitorPointID, tbSensor.getMonitorPointID())
-                    .ne(TbSensor::getID, tbSensor.getID()));
-            if (CollectionUtil.isEmpty(tbSensorList))
-                tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
-        }
+        // 情况一、情况二（属于监测点变化）
+        if (CollectionUtil.isNotEmpty(oldGroupPointIDList))
+            tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
     }
 
     @Override
