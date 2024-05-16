@@ -422,14 +422,36 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID())
                     .notIn(CollectionUtil.isNotEmpty(newMonitorGroupIDList), TbMonitorGroupPoint::getMonitorGroupID, newMonitorGroupIDList));
         }
-        List<Integer> oldGroupPointIDList = oldGroupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
 
         // 情况三
-        if (CollectionUtil.isNotEmpty(oldGroupPointIDList) && CollectionUtil.isNotEmpty(newMonitorGroupIDList))
+        List<Integer> oldGroupPointIDList = oldGroupPointList.stream().map(TbMonitorGroupPoint::getID).collect(Collectors.toList());
+        ;
+        Set<Integer> oldMonitorPointIDSet = null;
+        if (CollectionUtil.isNotEmpty(oldGroupPointList) && CollectionUtil.isNotEmpty(newMonitorGroupIDList)) {
+            oldMonitorPointIDSet = oldGroupPointList.stream().map(TbMonitorGroupPoint::getMonitorGroupID).collect(Collectors.toSet());
             oldGroupPointIDList = oldGroupPointIDList.stream().filter(id -> !newMonitorGroupIDList.contains(id)).collect(Collectors.toList());
+        }
         // 情况一、情况二（属于监测点变化）
-        if (CollectionUtil.isNotEmpty(oldGroupPointIDList))
-            tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
+        if (CollectionUtil.isNotEmpty(oldGroupPointIDList)) {
+            // 过滤掉监测点存在被其它监测传感器（多传感器）引用情况
+            List<TbSensor> tbSensorList = this.list(new LambdaQueryWrapper<TbSensor>()
+                    .eq(TbSensor::getProjectID, tbSensor.getProjectID())
+                    .eq(TbSensor::getMonitorPointID, tbSensor.getMonitorPointID())
+                    .ne(TbSensor::getID, tbSensor.getID()));
+            // 单传感器+无监测点，或多传感器+有监测组变化，解绑监测点和监测组关系
+            Set<Integer> newMonitorGroupIDSet = Collections.emptySet();
+            if (CollectionUtil.isNotEmpty(newMonitorGroupIDList))
+                newMonitorGroupIDSet = new HashSet<>(newMonitorGroupIDList);
+            if (
+//                    Objects.isNull(newTbMonitorPoint) || !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) ||
+                    (CollectionUtil.isEmpty(tbSensorList) &&
+                            (Objects.isNull(newTbMonitorPoint) || !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) || CollectionUtil.isEmpty(newMonitorGroupIDSet) || !newMonitorGroupIDSet.equals(oldMonitorPointIDSet))) ||
+                    (CollectionUtil.isNotEmpty(tbSensorList) && !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) &&
+                            (CollectionUtil.isNotEmpty(newMonitorGroupIDSet) && !newMonitorGroupIDSet.equals(oldMonitorPointIDSet))))
+//            if ((CollectionUtil.isEmpty(tbSensorList) && Objects.isNull(newTbMonitorPoint)) ||
+//                    (CollectionUtil.isEmpty(newMonitorGroupIDSet) || !newMonitorGroupIDSet.equals(oldMonitorPointIDSet)))
+                tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
+        }
     }
 
     @Override
