@@ -42,13 +42,16 @@ public class AddFavoriteParam implements ParameterValidator, ResourcePermissionP
     }
 
     public List<TbFavorite> getFavoriteList() {
+        Integer subjectID = CurrentSubjectHolder.getCurrentSubject().getSubjectID();
         List<TbFavorite> tbFavoriteList = new ArrayList<>(subjectIDSet.size());
+        Date date = new Date();
         for (Integer id : subjectIDSet) {
             TbFavorite tbFavorite = new TbFavorite()
                     .setCompanyID(companyID)
                     .setSubjectID(id)
                     .setSubjectType(FavoriteSubjectType.MONITOR_PROJECT.getType())
-                    .setCreateTime(new Date());
+                    .setCreateUserID(subjectID)
+                    .setCreateTime(date);
             tbFavoriteList.add(tbFavorite);
         }
         return tbFavoriteList;

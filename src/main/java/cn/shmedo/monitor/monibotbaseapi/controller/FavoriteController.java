@@ -37,9 +37,9 @@ public class FavoriteController {
      * @apiParam (请求体) {Int[]} subjectIDSet 收藏对象ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:AddMonitorItem
+     * @apiPermission 系统权限 mdmbase:AddBaseFavorite
      */
-    @Permission(permissionName = "mdmbase:AddFavorite")
+    @Permission(permissionName = "mdmbase:AddBaseFavorite")
     @RequestMapping(value = "AddFavorite", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object addFavorite(@Valid @RequestBody AddFavoriteParam pa) {
         tbFavoriteService.addFavorite(pa);
@@ -56,9 +56,9 @@ public class FavoriteController {
      * @apiParam (请求体) {Int[]} IDList 收藏ID列表
      * @apiSuccess (返回结果) {String} none 无
      * @apiSampleRequest off
-     * @apiPermission 系统权限 mdmbase:DeleteBaseMonitorItem
+     * @apiPermission 系统权限 mdmbase:DeleteBaseFavorite
      */
-    @Permission(permissionName = "mdmbase:DeleteFavorite")
+    @Permission(permissionName = "mdmbase:DeleteBaseFavorite")
     @RequestMapping(value = "DeleteFavorite", method = RequestMethod.POST, produces = CommonVariable.JSON)
     public Object deleteFavorite(@Valid @RequestBody DeleteFavoriteParam pa) {
         tbFavoriteService.deleteFavorite(pa);

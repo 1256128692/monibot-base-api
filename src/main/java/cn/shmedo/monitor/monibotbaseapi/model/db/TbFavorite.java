@@ -43,9 +43,24 @@ public class TbFavorite implements Serializable {
     private Integer subjectID;
 
     /**
+     * 创建用户
+     */
+    private Integer createUserID;
+
+    /**
      * 创建时间
      */
     private Date createTime;
+
+    /**
+     * 修改用户
+     */
+    private Integer updateUserID;
+
+    /**
+     * 修改时间
+     */
+    private Date updateTime;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
