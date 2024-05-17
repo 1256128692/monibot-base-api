@@ -442,14 +442,13 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             Set<Integer> newMonitorGroupIDSet = Collections.emptySet();
             if (CollectionUtil.isNotEmpty(newMonitorGroupIDList))
                 newMonitorGroupIDSet = new HashSet<>(newMonitorGroupIDList);
-            if (
-//                    Objects.isNull(newTbMonitorPoint) || !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) ||
-                    (CollectionUtil.isEmpty(tbSensorList) &&
-                            (Objects.isNull(newTbMonitorPoint) || !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) || CollectionUtil.isEmpty(newMonitorGroupIDSet) || !newMonitorGroupIDSet.equals(oldMonitorPointIDSet))) ||
-                    (CollectionUtil.isNotEmpty(tbSensorList) && !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID()) &&
-                            (CollectionUtil.isNotEmpty(newMonitorGroupIDSet) && !newMonitorGroupIDSet.equals(oldMonitorPointIDSet))))
-//            if ((CollectionUtil.isEmpty(tbSensorList) && Objects.isNull(newTbMonitorPoint)) ||
-//                    (CollectionUtil.isEmpty(newMonitorGroupIDSet) || !newMonitorGroupIDSet.equals(oldMonitorPointIDSet)))
+            boolean singleSensor = (CollectionUtil.isEmpty(tbSensorList) &&
+                    (Objects.isNull(newTbMonitorPoint) || !newTbMonitorPoint.getID().equals(tbSensor.getMonitorPointID())
+                            || CollectionUtil.isEmpty(newMonitorGroupIDSet) || !newMonitorGroupIDSet.equals(oldMonitorPointIDSet)));
+            boolean multiSensor = CollectionUtil.isNotEmpty(tbSensorList) &&
+                    ((Objects.nonNull(newTbMonitorPoint) && Objects.isNull(tbSensor.getMonitorPointID())) || (Objects.isNull(newTbMonitorPoint) && Objects.nonNull(tbSensor.getMonitorPointID())) ||
+                            (Objects.nonNull(newTbMonitorPoint) && (CollectionUtil.isEmpty(newMonitorGroupIDSet) || (CollectionUtil.isNotEmpty(newMonitorGroupIDSet) && !newMonitorGroupIDSet.equals(oldMonitorPointIDSet)))));
+            if (singleSensor || multiSensor)
                 tbMonitorGroupPointMapper.deleteBatchIds(oldGroupPointIDList);
         }
     }

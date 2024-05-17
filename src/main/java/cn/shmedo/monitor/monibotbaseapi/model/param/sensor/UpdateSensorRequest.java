@@ -126,8 +126,8 @@ public class UpdateSensorRequest implements ParameterValidator, ResourcePermissi
                         .eq(TbSensor::getMonitorPointID, monitorPointID)
                         .eq(TbSensor::getDataSourceComposeType, 1)
                         .ne(TbSensor::getID, sensorID));
-//                if (CollectionUtil.isNotEmpty(tbSensors))
-//                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
+                if (CollectionUtil.isNotEmpty(tbSensors))
+                    return ResultWrapper.withCode(ResultCode.INVALID_PARAMETER, "监测点已绑定过传感器");
             }
         }
 
