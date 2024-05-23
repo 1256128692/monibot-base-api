@@ -404,6 +404,9 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             }
         }
 
+        if(Objects.isNull(tbSensor) && Objects.nonNull(newTbMonitorPoint) && CollectionUtil.isEmpty(newMonitorGroupIDList))
+            tbMonitorGroupPointMapper.delete(new LambdaQueryWrapper<TbMonitorGroupPoint>().eq(TbMonitorGroupPoint::getMonitorPointID, newTbMonitorPoint.getID()));
+
         // 监测传感器之前绑定过监测点 # tbSensor.getMonitorPointID()旧的点
         if (Objects.isNull(tbSensor) || Objects.isNull(tbSensor.getMonitorPointID()))
             return;
