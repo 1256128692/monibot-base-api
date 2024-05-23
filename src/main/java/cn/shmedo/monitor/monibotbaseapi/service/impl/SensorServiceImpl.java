@@ -404,7 +404,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
             }
         }
 
-        if(Objects.isNull(tbSensor) && Objects.nonNull(newTbMonitorPoint) && CollectionUtil.isEmpty(newMonitorGroupIDList))
+        if (Objects.isNull(tbSensor) && Objects.nonNull(newTbMonitorPoint) && CollectionUtil.isEmpty(newMonitorGroupIDList))
             tbMonitorGroupPointMapper.delete(new LambdaQueryWrapper<TbMonitorGroupPoint>().eq(TbMonitorGroupPoint::getMonitorPointID, newTbMonitorPoint.getID()));
 
         // 监测传感器之前绑定过监测点 # tbSensor.getMonitorPointID()旧的点
@@ -418,7 +418,10 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
         if (Objects.isNull(newTbMonitorPoint) || !tbSensor.getMonitorPointID().equals(newTbMonitorPoint.getID())) {
             // 获取旧点绑定的点、组关系
             oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
-                    .eq(TbMonitorGroupPoint::getMonitorPointID, tbSensor.getMonitorPointID()));
+                    .in(TbMonitorGroupPoint::getMonitorPointID, Arrays.asList(tbSensor.getMonitorPointID(), newTbMonitorPoint.getID())));
+            if (CollectionUtil.isNotEmpty(newMonitorGroupIDList))
+                oldGroupPointList = oldGroupPointList.stream().filter(old ->
+                        newTbMonitorPoint.getID().equals(old.getMonitorPointID()) && !newMonitorGroupIDList.contains(old.getMonitorPointID())).collect(Collectors.toList());
         } else {
             // 获取新点绑定点、组关系
             oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
