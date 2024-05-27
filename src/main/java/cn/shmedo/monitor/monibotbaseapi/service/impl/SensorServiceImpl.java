@@ -421,7 +421,7 @@ public class SensorServiceImpl extends ServiceImpl<TbSensorMapper, TbSensor> imp
                     .in(TbMonitorGroupPoint::getMonitorPointID, Arrays.asList(tbSensor.getMonitorPointID(), newTbMonitorPoint.getID())));
             if (CollectionUtil.isNotEmpty(newMonitorGroupIDList))
                 oldGroupPointList = oldGroupPointList.stream().filter(old ->
-                        newTbMonitorPoint.getID().equals(old.getMonitorPointID()) && !newMonitorGroupIDList.contains(old.getMonitorGroupID())).collect(Collectors.toList());
+                        !(newTbMonitorPoint.getID().equals(old.getMonitorPointID()) && newMonitorGroupIDList.contains(old.getMonitorGroupID()))).collect(Collectors.toList());
         } else {
             // 获取新点绑定点、组关系
             oldGroupPointList = tbMonitorGroupPointMapper.selectList(new LambdaQueryWrapper<TbMonitorGroupPoint>()
